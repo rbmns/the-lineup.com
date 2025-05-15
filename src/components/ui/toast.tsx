@@ -129,6 +129,31 @@ export interface ToasterToast {
   duration?: number;
 }
 
+// Implement the actual useToast hook here
+type ToasterToastOptions = Partial<
+  Omit<ToasterToast, "id">
+>;
+
+// Create a dummy state that would normally manage toasts
+const useToast = () => {
+  return {
+    toast: (opts: ToasterToastOptions) => {
+      console.log('Toast called:', opts);
+      // In a real implementation, this would add the toast to some state
+      return { id: '1', ...opts };
+    },
+    dismiss: (toastId?: string) => {
+      console.log('Dismiss toast:', toastId);
+    },
+  };
+};
+
+// Create the toast function
+const toast = (opts: ToasterToastOptions) => {
+  const { toast: addToast } = useToast();
+  return addToast(opts);
+};
+
 export {
   type ToastProps,
   type ToastActionElement,
@@ -139,7 +164,6 @@ export {
   ToastDescription,
   ToastClose,
   ToastAction,
+  useToast,
+  toast,
 }
-
-// Export the useToast hook
-export { toast, useToast } from "@/hooks/use-toast";
