@@ -1,56 +1,43 @@
 
-/* RSVP Button Animations */
+/* RSVP Button Animation Effects */
 @keyframes rsvp-success-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
-    transform: scale(1.05);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-    transform: scale(1);
-  }
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(102, 204, 102, 0); }
+  30% { transform: scale(1.02); box-shadow: 0 0 0 5px rgba(102, 204, 102, 0.3); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(102, 204, 102, 0); }
 }
 
 .rsvp-success-pulse {
-  animation: rsvp-success-pulse 1s ease-out;
+  animation: rsvp-success-pulse 0.3s ease-out;
 }
 
-/* Status Animation */
-@keyframes status-pop {
-  0% {
-    opacity: 0;
-    transform: scale(0.8) translateY(5px);
-  }
-  70% {
-    transform: scale(1.1) translateY(-2px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+/* Nature Theme RSVP Button Animations */
+@keyframes rsvp-going-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(64, 145, 108, 0); }
+  30% { box-shadow: 0 0 0 5px rgba(64, 145, 108, 0.3); }
+  100% { box-shadow: 0 0 0 0 rgba(64, 145, 108, 0); }
 }
 
-.status-pop-in {
-  animation: status-pop 0.3s ease-out forwards;
+@keyframes rsvp-interested-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(0, 153, 204, 0); }
+  30% { box-shadow: 0 0 0 5px rgba(0, 153, 204, 0.3); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 153, 204, 0); }
 }
 
-/* Loading Animation */
-@keyframes loading-pulse {
-  0% {
-    opacity: 0.6;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.6;
-  }
+.rsvp-going-animation {
+  animation: rsvp-going-pulse 0.3s ease-out;
 }
 
-.loading-pulse {
-  animation: loading-pulse 1.5s infinite ease-in-out;
+.rsvp-interested-animation {
+  animation: rsvp-interested-pulse 0.3s ease-out;
+}
+
+/* Button click feedback animation */
+@keyframes button-click {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+.button-click-animation {
+  animation: button-click 0.1s ease-out;
 }

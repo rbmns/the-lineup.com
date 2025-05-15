@@ -49,8 +49,8 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
           className={cn(
             "py-1 px-3 text-xs font-medium transition-all duration-200",
             currentStatus === 'Going' 
-              ? "bg-green-50 text-green-700 border-green-200" 
-              : "bg-blue-50 text-blue-700 border-blue-200"
+              ? "bg-green-50 text-[#40916C] border-[#74C69D]" 
+              : "bg-blue-50 text-[#0099CC] border-[#94D2BD]"
           )}
         >
           {currentStatus}
@@ -63,7 +63,9 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   const getButtonStyle = (active: boolean, status: 'Going' | 'Interested') => {
     if (variant === 'minimal') {
       return active ? 
-        'bg-primary text-white hover:bg-primary-600' : 
+        (status === 'Going' ? 
+          'bg-[#40916C] text-white hover:bg-[#2D6A4F]' : 
+          'bg-[#0099CC] text-white hover:bg-[#005F73]') : 
         'bg-transparent border-gray-300 hover:bg-gray-50 text-gray-700';
     }
     
@@ -71,8 +73,8 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     
     if (active) {
       return isGoingBtn ? 
-        'bg-green-500 text-white border-green-600 hover:bg-green-600' : 
-        'bg-blue-500 text-white border-blue-600 hover:bg-blue-600';
+        'bg-[#40916C] text-white border-[#2D6A4F] hover:bg-[#2D6A4F]' : 
+        'bg-[#0099CC] text-white border-[#005F73] hover:bg-[#005F73]';
     }
     
     return 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700';

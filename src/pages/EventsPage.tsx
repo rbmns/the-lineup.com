@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
 import { filterUpcomingEvents } from '@/utils/dateUtils';
@@ -8,7 +8,6 @@ import { LazyEventsList } from '@/components/events/LazyEventsList';
 import { useCanonical } from '@/hooks/useCanonical';
 import { EventsPageHeader } from '@/components/events/EventsPageHeader';
 import { useOptimisticRsvp } from '@/hooks/event-rsvp/useOptimisticRsvp';
-import { useRef } from 'react';
 
 const EventsPage = () => {
   // Add canonical URL for SEO - providing the path as required parameter
@@ -16,7 +15,7 @@ const EventsPage = () => {
   
   const { user } = useAuth();
   const { data: events = [], isLoading } = useEvents(user?.id);
-  const { handleRsvp } = useOptimisticRsvp(user?.id);
+  const { handleRsvp, rsvpInProgress } = useOptimisticRsvp(user?.id);
   const rsvpInProgressRef = useRef(false);
   
   // Set page metadata
@@ -38,41 +37,15 @@ const EventsPage = () => {
 
   // Use the optimistic RSVP handler with proper event handling
   const handleEventRsvp = async (eventId: string, status: 'Going' | 'Interested') => {
-    if (!user) {
-      console.log("User not logged in");
-      return false;
-    }
-    
-    // Prevent multiple simultaneous RSVP actions
-    if (rsvpInProgressRef.current) {
-      console.log("RSVP action already in progress, ignoring");
+    if (!user || rsvpInProgressRef.current) {
       return false;
     }
     
     try {
       rsvpInProgressRef.current = true;
-      
-      // Save current scroll position
-      const scrollPosition = window.scrollY;
-      console.log(`EventsPage - Saved scroll position: ${scrollPosition}px`);
-      
-      // Use the optimistic RSVP handler - no invalidation, just cache updates
-      const result = await handleRsvp(eventId, status);
-      
-      // Restore scroll position after a short delay to ensure UI has updated
-      setTimeout(() => {
-        window.scrollTo({
-          top: scrollPosition,
-          behavior: 'auto'
-        });
-      }, 50);
-      
-      return result;
-    } catch (error) {
-      console.error("Error in EventsPage RSVP handler:", error);
-      return false;
+      return await handleRsvp(eventId, status);
     } finally {
-      // Reset the in-progress flag after a small delay
+      // Reset the in-progress flag after a delay
       setTimeout(() => {
         rsvpInProgressRef.current = false;
       }, 300);
@@ -85,16 +58,17 @@ const EventsPage = () => {
         <EventsPageHeader title="What's Happening?" />
         
         <div className="space-y-6 mt-6">
-          {/* Events List Section - using compact list view for more efficient display */}
+          {/* Events List Section - use grid view by default */}
           <LazyEventsList 
             mainEvents={displayEvents}
             relatedEvents={[]}
             isLoading={isLoading}
-            isRsvpLoading={false}
+            isRsvpLoading={rsvpInProgress}
             onRsvp={user ? handleEventRsvp : undefined}
             showRsvpButtons={!!user}
             hasActiveFilters={false}
-            compact={true}
+            compact={false}
+            defaultView="grid" // Set default view to grid instead of list
           />
         </div>
       </div>

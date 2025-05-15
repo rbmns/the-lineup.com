@@ -1,0 +1,140 @@
+
+/* Nature-Inspired Color Palette */
+
+:root {
+  /* Ocean Theme */
+  --ocean-deep: #005F73;
+  --ocean-medium: #0099CC;
+  --ocean-light: #94D2BD;
+  --ocean-foam: #E9F5F5;
+  --teal: #00CCCC;
+
+  /* Earth Theme */
+  --sand: #FFCC99;
+  --sunset: #FF9933;
+  --coral: #FF6666;
+  --amber: #EE9B00;
+  --sandstone: #CA6702;
+
+  /* Forest Theme */
+  --leaf: #66CC66;
+  --lime: #99CC33;
+  --jungle: #2D6A4F;
+  --palm: #40916C;
+  --moss: #74C69D;
+
+  /* Sky Theme */
+  --dawn: #FFADAD;
+  --dusk: #9966FF;
+  --daylight: #AED9E0;
+  --twilight: #5E60CE;
+  --night: #3A0CA3;
+}
+
+/* Use classes to quickly apply colors */
+.bg-ocean-deep { background-color: var(--ocean-deep); }
+.bg-ocean-medium { background-color: var(--ocean-medium); }
+.bg-ocean-light { background-color: var(--ocean-light); }
+.bg-ocean-foam { background-color: var(--ocean-foam); }
+.bg-teal { background-color: var(--teal); }
+
+.bg-sand { background-color: var(--sand); }
+.bg-sunset { background-color: var(--sunset); }
+.bg-coral { background-color: var(--coral); }
+.bg-amber { background-color: var(--amber); }
+.bg-sandstone { background-color: var(--sandstone); }
+
+.bg-leaf { background-color: var(--leaf); }
+.bg-lime { background-color: var(--lime); }
+.bg-jungle { background-color: var(--jungle); }
+.bg-palm { background-color: var(--palm); }
+.bg-moss { background-color: var(--moss); }
+
+.bg-dawn { background-color: var(--dawn); }
+.bg-dusk { background-color: var(--dusk); }
+.bg-daylight { background-color: var(--daylight); }
+.bg-twilight { background-color: var(--twilight); }
+.bg-night { background-color: var(--night); }
+
+/* Text colors */
+.text-ocean-deep { color: var(--ocean-deep); }
+.text-ocean-medium { color: var(--ocean-medium); }
+.text-ocean-light { color: var(--ocean-light); }
+.text-ocean-foam { color: var(--ocean-foam); }
+.text-teal { color: var(--teal); }
+
+.text-sand { color: var(--sand); }
+.text-sunset { color: var(--sunset); }
+.text-coral { color: var(--coral); }
+.text-amber { color: var(--amber); }
+.text-sandstone { color: var(--sandstone); }
+
+.text-leaf { color: var(--leaf); }
+.text-lime { color: var(--lime); }
+.text-jungle { color: var(--jungle); }
+.text-palm { color: var(--palm); }
+.text-moss { color: var(--moss); }
+
+.text-dawn { color: var(--dawn); }
+.text-dusk { color: var(--dusk); }
+.text-daylight { color: var(--daylight); }
+.text-twilight { color: var(--twilight); }
+.text-night { color: var(--night); }
+
+/* Border colors */
+.border-ocean-deep { border-color: var(--ocean-deep); }
+.border-ocean-medium { border-color: var(--ocean-medium); }
+.border-ocean-light { border-color: var(--ocean-light); }
+.border-ocean-foam { border-color: var(--ocean-foam); }
+.border-teal { border-color: var(--teal); }
+
+.border-sand { border-color: var(--sand); }
+.border-sunset { border-color: var(--sunset); }
+.border-coral { border-color: var(--coral); }
+.border-amber { border-color: var(--amber); }
+.border-sandstone { border-color: var(--sandstone); }
+
+.border-leaf { border-color: var(--leaf); }
+.border-lime { border-color: var(--lime); }
+.border-jungle { border-color: var(--jungle); }
+.border-palm { border-color: var(--palm); }
+.border-moss { border-color: var(--moss); }
+
+.border-dawn { border-color: var(--dawn); }
+.border-dusk { border-color: var(--dusk); }
+.border-daylight { border-color: var(--daylight); }
+.border-twilight { border-color: var(--twilight); }
+.border-night { border-color: var(--night); }
+
+/* Button styles based on our nature theme */
+.btn-ocean {
+  background-color: var(--ocean-medium);
+  color: white;
+}
+.btn-ocean:hover {
+  background-color: var(--ocean-deep);
+}
+
+.btn-forest {
+  background-color: var(--palm);
+  color: white;
+}
+.btn-forest:hover {
+  background-color: var(--jungle);
+}
+
+.btn-earth {
+  background-color: var(--sunset);
+  color: white;
+}
+.btn-earth:hover {
+  background-color: var(--sandstone);
+}
+
+.btn-sky {
+  background-color: var(--twilight);
+  color: white;
+}
+.btn-sky:hover {
+  background-color: var(--night);
+}

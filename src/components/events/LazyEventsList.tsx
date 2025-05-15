@@ -1,155 +1,118 @@
-
 import React, { useState } from 'react';
 import { Event } from '@/types';
-import EventCard from '../EventCard';
-import EventCardList from './EventCardList';
-import { SkeletonCard } from '@/components/skeletons/SkeletonCard';
-import { SkeletonCardList } from '@/components/skeletons/SkeletonCardList';
+import { EventsList } from '@/components/events/EventsList';
+import { EventGrid } from '@/components/events/EventGrid';
+import { RelatedEventsSection } from '@/components/events/RelatedEventsSection';
+import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
+import { SkeletonEventCard } from '@/components/events/SkeletonEventCard';
 import { cn } from '@/lib/utils';
-import { EventsEmptyState } from './list-components/EventsEmptyState';
+import { List as ListIcon, LayoutGrid } from 'lucide-react';
 
 interface LazyEventsListProps {
   mainEvents: Event[];
   relatedEvents?: Event[];
   isLoading: boolean;
   isRsvpLoading?: boolean;
-  showRsvpButtons?: boolean;
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
+  showRsvpButtons?: boolean;
   hasActiveFilters?: boolean;
   compact?: boolean;
+  defaultView?: 'list' | 'grid';
 }
 
 export const LazyEventsList: React.FC<LazyEventsListProps> = ({
-  mainEvents = [],
+  mainEvents,
   relatedEvents = [],
-  isLoading = false,
+  isLoading,
   isRsvpLoading = false,
-  showRsvpButtons = false,
   onRsvp,
+  showRsvpButtons = true,
   hasActiveFilters = false,
-  compact = false
+  compact = false,
+  defaultView = 'list'
 }) => {
-  const [displayMode, setDisplayMode] = useState<'grid' | 'list'>('list'); // Default to list view for compact display
+  // State for view mode - default based on prop
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>(defaultView);
   
-  // Determine content to render based on loading state and data
-  const renderContent = () => {
-    // Loading state
-    if (isLoading) {
-      return displayMode === 'grid' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <SkeletonCard key={index} />
-          ))}
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <SkeletonCardList key={index} />
-          ))}
-        </div>
-      );
-    }
-    
-    // No events
-    if (mainEvents.length === 0) {
-      return (
-        <EventsEmptyState 
-          message={hasActiveFilters ? "No events match your filters" : "No events found"}
-          subMessage={hasActiveFilters 
-            ? "Try adjusting your filters or search criteria to find more events."
-            : "Check back later for new events or try a different search."}
-          resetFilters={hasActiveFilters ? () => {} : undefined}
-        />
-      );
-    }
-    
-    // Display events in grid or list mode
-    return displayMode === 'grid' ? (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {mainEvents.map((event) => (
-          <EventCard 
-            key={event.id} 
-            event={event} 
-            compact={compact} 
-            showRsvpButtons={showRsvpButtons}
-            onRsvp={onRsvp}
-          />
-        ))}
-      </div>
-    ) : (
-      <div className="space-y-3">
-        {mainEvents.map((event) => (
-          <EventCardList 
-            key={event.id} 
-            event={event} 
-            showRsvpButtons={showRsvpButtons}
-            onRsvp={onRsvp}
-            compact={true}
-          />
-        ))}
-      </div>
-    );
-  };
-  
+  // Loading skeleton cards
+  const skeletonCards = Array.from({ length: 3 }, (_, i) => <SkeletonEventCard key={`skeleton-${i}`} />);
+
+  // Determine if we should show the "no results" message
+  const showNoResults = !isLoading && mainEvents.length === 0 && !hasActiveFilters;
+
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Events</h2>
-        
-        <div className="flex items-center space-x-2">
-          {/* Grid/List view toggle */}
-          <div className="flex border rounded-lg overflow-hidden">
-            <button 
-              className={cn(
-                "p-2", 
-                displayMode === 'grid' ? "bg-gray-200" : "bg-white"
-              )}
-              onClick={() => setDisplayMode('grid')}
-              aria-label="Grid view"
-            >
-              <div className="grid grid-cols-2 gap-0.5">
-                <div className="h-1.5 w-1.5 bg-gray-600 rounded-sm"></div>
-                <div className="h-1.5 w-1.5 bg-gray-600 rounded-sm"></div>
-                <div className="h-1.5 w-1.5 bg-gray-600 rounded-sm"></div>
-                <div className="h-1.5 w-1.5 bg-gray-600 rounded-sm"></div>
-              </div>
-            </button>
-            <button 
-              className={cn(
-                "p-2", 
-                displayMode === 'list' ? "bg-gray-200" : "bg-white"
-              )}
-              onClick={() => setDisplayMode('list')}
+    <div className={cn('space-y-6', compact ? 'compact-view' : '')}>
+      {/* Loading Skeleton */}
+      {isLoading && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {skeletonCards}
+        </div>
+      )}
+
+      {/* No Results Message */}
+      {showNoResults && (
+        <NoResultsFound />
+      )}
+      
+      {/* Display options header */}
+      {!isLoading && mainEvents.length > 0 && (
+        <div className="flex justify-between items-center border-b pb-2">
+          <span className="text-sm text-gray-500">
+            {mainEvents.length} {mainEvents.length === 1 ? 'event' : 'events'} found
+          </span>
+          <div className="flex space-x-2">
+            <button
+              className={`p-1.5 rounded text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors ${viewMode === 'list' ? 'bg-gray-100 text-gray-700' : ''}`}
+              onClick={() => setViewMode('list')}
               aria-label="List view"
+              title="List view"
             >
-              <div className="flex flex-col gap-0.5">
-                <div className="h-1 w-4 bg-gray-600 rounded-sm"></div>
-                <div className="h-1 w-4 bg-gray-600 rounded-sm"></div>
-                <div className="h-1 w-4 bg-gray-600 rounded-sm"></div>
-              </div>
+              <ListIcon className="w-4 h-4" />
+            </button>
+            <button
+              className={`p-1.5 rounded text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors ${viewMode === 'grid' ? 'bg-gray-100 text-gray-700' : ''}`}
+              onClick={() => setViewMode('grid')}
+              aria-label="Grid view"
+              title="Grid view"
+            >
+              <LayoutGrid className="w-4 h-4" />
             </button>
           </div>
         </div>
-      </div>
-      
-      {renderContent()}
-      
-      {/* Related events section - if there are any */}
-      {relatedEvents && relatedEvents.length > 0 && !isLoading && (
-        <div className="mt-8 pt-6 border-t">
-          <h2 className="text-lg font-semibold mb-4">You might also like</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {relatedEvents.slice(0, 3).map((event) => (
-              <EventCard 
-                key={`related-${event.id}`} 
-                event={event} 
-                compact 
-                showRsvpButtons={showRsvpButtons}
-                onRsvp={onRsvp}
-              />
-            ))}
-          </div>
-        </div>
+      )}
+
+      {/* Main Events */}
+      {!isLoading && mainEvents.length > 0 && (
+        viewMode === 'list' ? (
+          <EventsList
+            events={mainEvents}
+            onRsvp={onRsvp}
+            isRsvpLoading={isRsvpLoading}
+            showRsvpButtons={showRsvpButtons}
+            compact={compact}
+            className="animate-fade-in"
+            style={{ animationDuration: '100ms' }}
+          />
+        ) : (
+          <EventGrid
+            events={mainEvents}
+            onRsvp={onRsvp}
+            isRsvpLoading={isRsvpLoading}
+            showRsvpButtons={showRsvpButtons}
+            className="animate-fade-in"
+            style={{ animationDuration: '100ms' }}
+          />
+        )
+      )}
+
+      {/* Related Events Section */}
+      {relatedEvents && relatedEvents.length > 0 && (
+        <RelatedEventsSection events={relatedEvents} />
+      )}
+
+      {/* No results message when filters are active */}
+      {!isLoading && mainEvents.length === 0 && hasActiveFilters && (
+        <NoResultsFound message="No events found with the current filters." />
       )}
     </div>
   );
