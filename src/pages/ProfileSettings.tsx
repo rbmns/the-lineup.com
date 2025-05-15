@@ -3,7 +3,7 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
-const Friends: React.FC = () => {
+const ProfileSettings: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -20,14 +20,14 @@ const Friends: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">Friends</h1>
+      <h1 className="text-2xl font-bold mb-6">Profile Settings</h1>
       <div className="bg-white rounded-lg shadow p-6">
         <p className="text-gray-600">
-          This is the Friends page where you can see and manage your connections.
+          This is where you can update your profile settings and preferences.
         </p>
       </div>
     </div>
   );
 };
 
-export default Friends;
+export default ProfileSettings;

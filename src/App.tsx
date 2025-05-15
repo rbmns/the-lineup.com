@@ -1,3 +1,4 @@
+
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import EventsPageRefactored from "./pages/EventsPageRefactored";
@@ -10,6 +11,7 @@ import Login from "./pages/Login";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ToastProvider } from "./contexts/ToastContext";
 import DesignSystem from "./pages/DesignSystem";
+import ProfileSettings from "./pages/ProfileSettings";
 
 const App: React.FC = () => {
   return (
@@ -22,6 +24,8 @@ const App: React.FC = () => {
             <Route path="/events/:id" element={<EventDetail />} />
             <Route path="/friends" element={<Friends />} />
             <Route path="/users/:userId" element={<UserProfilePage />} />
+            <Route path="/profile" element={<UserProfilePage />} />
+            <Route path="/profile/settings" element={<ProfileSettings />} />
             <Route path="/login" element={<Login />} />
             <Route path="/design-system" element={<DesignSystem />} />
             <Route path="*" element={<EventsPageRefactored />} />
