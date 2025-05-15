@@ -1,6 +1,7 @@
 
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 
 /**
  * Hook to provide consistent event navigation across the app,
@@ -19,25 +20,39 @@ export const useEventNavigation = () => {
   }) => {
     if (!event?.id) {
       console.error("Cannot navigate: missing event ID");
+      toast({
+        title: "Navigation Error",
+        description: "Could not navigate to event page - missing ID",
+        variant: "destructive",
+      });
       return;
     }
     
-    // Always use ID-based URLs for internal navigation
-    const url = `/events/${event.id}`;
-    console.log(`Navigation to event URL: ${url}`, event);
-    
-    // Force navigation to the ID-based URL
-    navigate(url, { 
-      replace: false,
-      state: { 
-        fromDirectNavigation: true,
-        forceRefresh: true,
-        fromEventNavigation: true,
-        useTransition: true,
-        originalEventId: event.id,
-        timestamp: Date.now()
-      }
-    });
+    try {
+      // Always use ID-based URLs for internal navigation
+      const url = `/events/${event.id}`;
+      console.log(`Navigation to event URL: ${url}`, event);
+      
+      // Force navigation to the ID-based URL
+      navigate(url, { 
+        replace: false,
+        state: { 
+          fromDirectNavigation: true,
+          forceRefresh: true,
+          fromEventNavigation: true,
+          useTransition: true,
+          originalEventId: event.id,
+          timestamp: Date.now()
+        }
+      });
+    } catch (error) {
+      console.error("Navigation error:", error);
+      toast({
+        title: "Navigation Error",
+        description: "Failed to navigate to event page",
+        variant: "destructive",
+      });
+    }
   }, [navigate]);
   
   // Navigate to destination events

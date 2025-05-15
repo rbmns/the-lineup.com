@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { formatRelativeDate, formatEventTime, getEventDateTime } from '@/utils/dateUtils';
@@ -6,8 +7,8 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
+import { toast } from '@/hooks/use-toast';
 
 interface EventCardProps {
   event: Event;
@@ -29,7 +30,6 @@ const EventCard: React.FC<EventCardProps> = ({
   onShare
 }) => {
   const { getEventImageUrl } = useEventImages();
-  const navigate = useNavigate();
   const { navigateToEvent } = useEventNavigation();
   
   const imageUrl = getEventImageUrl(event);
@@ -48,7 +48,16 @@ const EventCard: React.FC<EventCardProps> = ({
     } else if (event && event.id) {
       // Use the navigation hook for consistent navigation behavior
       console.log(`Navigating to event detail with ID: ${event.id}`);
-      navigateToEvent(event);
+      try {
+        navigateToEvent(event);
+      } catch (error) {
+        console.error("Error navigating to event:", error);
+        toast({
+          title: "Navigation Error",
+          description: "Could not navigate to event page",
+          variant: "destructive",
+        });
+      }
     } else {
       console.error("Cannot navigate: Missing event ID", event);
     }

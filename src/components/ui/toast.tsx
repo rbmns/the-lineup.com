@@ -15,7 +15,7 @@ const ToastViewport = React.forwardRef<
   <ToastPrimitives.Viewport
     ref={ref}
     className={cn(
-      "fixed left-4 top-1/2 z-[100] flex max-h-screen w-full -translate-y-1/2 flex-col gap-2 p-4 md:max-w-[340px]",
+      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
       className
     )}
     {...props}
@@ -24,15 +24,16 @@ const ToastViewport = React.forwardRef<
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName
 
 const toastVariants = cva(
-  "group pointer-events-auto relative flex w-full items-center justify-between space-x-2 overflow-hidden rounded-md border p-4 pr-6 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=open]:slide-in-from-left-full data-[state=closed]:slide-out-to-left-full",
+  "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full",
   {
     variants: {
       variant: {
         default: "border bg-background text-foreground",
-        destructive: "destructive group border-destructive bg-destructive text-destructive-foreground",
-        success: "border-green-500 bg-green-50 text-green-700",
-        warning: "border-amber-500 bg-amber-50 text-amber-700",
-        info: "border-blue-500 bg-blue-50 text-blue-700",
+        destructive:
+          "destructive group border-destructive bg-destructive text-destructive-foreground",
+        success: "bg-green-100 border-green-200 text-green-900",
+        warning: "bg-amber-100 border-amber-200 text-amber-900",
+        info: "bg-blue-100 border-blue-200 text-blue-900"
       },
     },
     defaultVariants: {
@@ -63,7 +64,7 @@ const ToastAction = React.forwardRef<
   <ToastPrimitives.Action
     ref={ref}
     className={cn(
-      "inline-flex h-7 items-center justify-center rounded-md border bg-transparent px-2 text-xs font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive",
+      "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive",
       className
     )}
     {...props}
@@ -107,7 +108,7 @@ const ToastDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Description
     ref={ref}
-    className={cn("text-xs opacity-90", className)}
+    className={cn("text-sm opacity-90", className)}
     {...props}
   />
 ))
@@ -117,53 +118,47 @@ type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
 
 type ToastActionElement = React.ReactElement<typeof ToastAction>
 
-// Make id optional in ToasterToast
-export interface ToasterToast {
-  id?: string;  // Made optional
-  title?: React.ReactNode;
-  description?: React.ReactNode;
-  action?: ToastActionElement;
-  icon?: React.ReactNode;
-  variant?: "default" | "destructive" | "success" | "warning" | "info";
-  className?: string;
-  duration?: number;
+export type ToasterToast = ToastProps & {
+  id: string
+  title?: React.ReactNode
+  description?: React.ReactNode
+  action?: ToastActionElement
 }
 
-// Define the options type for the toast function
-type ToasterToastOptions = Partial<
-  Omit<ToasterToast, "id">
->;
+type ToasterProps = React.ComponentPropsWithoutRef<typeof ToastProvider> & {
+  toasts: ToasterToast[]
+}
 
-// Create a simple toast hook that logs toast calls
-// This minimalistic implementation just logs toast calls but doesn't show UI toasts
-const useToast = () => {
-  return {
-    toast: (opts: ToasterToastOptions) => {
-      console.log('Toast called:', opts);
-      return { id: '1', ...opts };
-    },
-    dismiss: (toastId?: string) => {
-      console.log('Dismiss toast:', toastId);
-    },
-  };
-};
+export const Toaster = ({ toasts = [], ...props }: ToasterProps) => {
+  return (
+    <ToastProvider {...props}>
+      {toasts.map(function ({ id, title, description, action, ...props }) {
+        return (
+          <Toast key={id} {...props}>
+            <div className="grid gap-1">
+              {title && <ToastTitle>{title}</ToastTitle>}
+              {description && (
+                <ToastDescription>{description}</ToastDescription>
+              )}
+            </div>
+            {action}
+            <ToastClose />
+          </Toast>
+        )
+      })}
+      <ToastViewport />
+    </ToastProvider>
+  )
+}
 
-// Simple toast function for components that need it
-const toast = (opts: ToasterToastOptions) => {
-  const { toast: addToast } = useToast();
-  return addToast(opts);
-};
+export type { ToastProps, ToastActionElement }
 
 export {
-  type ToastProps,
-  type ToastActionElement,
-  ToastProvider,
-  ToastViewport,
   Toast,
-  ToastTitle,
-  ToastDescription,
-  ToastClose,
   ToastAction,
-  useToast,
-  toast,
+  ToastClose,
+  ToastDescription,
+  ToastProvider,
+  ToastTitle,
+  ToastViewport,
 }

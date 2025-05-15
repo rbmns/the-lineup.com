@@ -8,6 +8,7 @@ import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { useEventImages } from '@/hooks/useEventImages';
 import { CategoryPill } from '@/components/ui/category-pill';
+import { toast } from '@/hooks/use-toast';
 
 // Amsterdam timezone for date formatting
 const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
@@ -33,8 +34,26 @@ const EventCardList: React.FC<EventCardListProps> = ({
   const { getEventImageUrl } = useEventImages();
   const imageUrl = getEventImageUrl(event);
 
-  const handleClick = () => {
-    navigateToEvent(event);
+  const handleClick = (e: React.MouseEvent) => {
+    // Don't navigate if clicking on RSVP buttons
+    if ((e.target as HTMLElement).closest('[data-rsvp-button]') || 
+        (e.target as HTMLElement).closest('[data-rsvp-container]')) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    
+    try {
+      // Use hook for consistent navigation
+      navigateToEvent(event);
+    } catch (error) {
+      console.error("Error navigating to event:", error);
+      toast({
+        title: "Navigation Error",
+        description: "Could not navigate to event page",
+        variant: "destructive",
+      });
+    }
   };
 
   // Format date for display
@@ -69,6 +88,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
         className
       )}
       onClick={handleClick}
+      data-event-id={event.id}
     >
       {/* Image */}
       <div className="relative h-[120px] sm:h-auto sm:w-[180px] overflow-hidden bg-gray-100">
@@ -119,7 +139,11 @@ const EventCardList: React.FC<EventCardListProps> = ({
         
         {/* RSVP Buttons - only if needed */}
         {(showRsvpButtons || showRsvpStatus) && onRsvp && (
-          <div className="mt-auto">
+          <div 
+            className="mt-auto" 
+            data-rsvp-container="true" 
+            onClick={(e) => e.stopPropagation()}
+          >
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}

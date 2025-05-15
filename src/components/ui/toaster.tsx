@@ -1,15 +1,34 @@
 
 import {
+  Toast,
+  ToastClose,
+  ToastDescription,
   ToastProvider,
+  ToastTitle,
   ToastViewport,
 } from "@/components/ui/toast"
+import { useToast } from "@/hooks/use-toast"
 
-// Simplified Toaster that doesn't actually render any toasts
-// This ensures we don't break imports but don't show actual toasts
 export function Toaster() {
+  const { toasts } = useToast()
+
   return (
     <ToastProvider>
-      <ToastViewport className="fixed top-4 right-4 flex flex-col gap-2 p-4 w-full max-w-[380px] m-0 list-none z-[100] outline-none" />
+      {toasts.map(function ({ id, title, description, action, ...props }) {
+        return (
+          <Toast key={id} {...props}>
+            <div className="grid gap-1">
+              {title && <ToastTitle>{title}</ToastTitle>}
+              {description && (
+                <ToastDescription>{description}</ToastDescription>
+              )}
+            </div>
+            {action}
+            <ToastClose />
+          </Toast>
+        );
+      })}
+      <ToastViewport />
     </ToastProvider>
   )
 }
