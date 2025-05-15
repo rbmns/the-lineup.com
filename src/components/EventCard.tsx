@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Event } from '@/types';
-import { MapPin, Calendar, Clock } from 'lucide-react';
+import { MapPin, Calendar, Clock, Check, Star } from 'lucide-react';
 import { formatInTimeZone } from 'date-fns-tz';
 import { cn } from '@/lib/utils';
 import { CategoryPill } from '@/components/ui/category-pill';
@@ -19,6 +19,7 @@ export interface EventCardProps {
   onClick?: (event: Event) => void;
   view?: 'list' | 'grid';
   isLoading?: boolean;
+  featured?: boolean;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -29,7 +30,8 @@ const EventCard: React.FC<EventCardProps> = ({
   className,
   onClick,
   view = 'grid',
-  isLoading = false
+  isLoading = false,
+  featured = false
 }) => {
   const { getEventImageUrl } = useEventImages();
   const { navigateToEvent } = useEventNavigation();
@@ -39,7 +41,7 @@ const EventCard: React.FC<EventCardProps> = ({
   const formatDateDisplay = (dateStr: string): string => {
     try {
       const date = new Date(dateStr);
-      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "d MMM yyyy");
+      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, MMM d");
     } catch (error) {
       console.error('Error formatting date:', error);
       return dateStr;
@@ -94,18 +96,25 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
 
+  // Determine card style based on props
+  const cardStyle = featured ? "featured" : compact ? "compact" : "default";
+
   return (
     <div
       className={cn(
-        "group relative rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer bg-white flex flex-col h-full",
-        compact ? "max-h-[320px]" : "",
+        "group relative rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer bg-white flex flex-col",
+        cardStyle === "compact" ? "max-h-[280px]" : "",
         className
       )}
       onClick={handleClick}
       data-event-id={event.id}
+      data-card-style={cardStyle}
     >
       {/* Image container with event type label positioned on top */}
-      <div className="relative aspect-[16/9] overflow-hidden">
+      <div className={cn(
+        "relative overflow-hidden",
+        cardStyle === "featured" ? "aspect-[4/3]" : "aspect-[16/9]"
+      )}>
         <img
           src={imageUrl}
           alt={event.title}
@@ -117,37 +126,68 @@ const EventCard: React.FC<EventCardProps> = ({
           <div className="absolute top-2 left-2 z-10">
             <CategoryPill 
               category={event.event_type} 
-              size="xs" 
-              showIcon={false}
+              size="sm" 
+              showIcon={true}
             />
           </div>
         )}
       </div>
 
       {/* Content Section */}
-      <div className="p-3 flex flex-col flex-grow">
+      <div className={cn(
+        "flex flex-col flex-grow",
+        cardStyle === "compact" ? "p-3" : "p-4"
+      )}>
         {/* Title */}
-        <h3 className="font-semibold text-gray-900 text-base line-clamp-1 mb-1">
+        <h3 className={cn(
+          "font-semibold text-gray-900",
+          cardStyle === "compact" ? "text-sm line-clamp-1 mb-1" : 
+          cardStyle === "featured" ? "text-lg line-clamp-2 mb-2" : 
+          "text-base line-clamp-2 mb-2"
+        )}>
           {event.title}
         </h3>
         
         {/* Date & Time */}
-        <div className="flex items-center text-xs text-gray-600 mb-0.5">
-          <Calendar className="h-3 w-3 mr-1 flex-shrink-0" />
-          {event.start_time && formatDateDisplay(event.start_time)}
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center text-xs text-gray-700">
+            <Calendar className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
+            <span className="font-medium">{event.start_time && formatDateDisplay(event.start_time)}</span>
+          </div>
+          
+          {/* Time */}
+          <div className="flex items-center text-xs text-gray-700">
+            <Clock className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
+            <span>{event.start_time && getEventTimeDisplay(event)}</span>
+          </div>
+          
+          {/* Venue/Location */}
+          <div className="flex items-center text-xs text-gray-700 mb-2">
+            <MapPin className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
+            <span className="truncate">{event.venues?.name || event.location || 'No location'}</span>
+          </div>
         </div>
         
-        {/* Time */}
-        <div className="flex items-center text-xs text-gray-600 mb-0.5">
-          <Clock className="h-3 w-3 mr-1 flex-shrink-0" />
-          {event.start_time && getEventTimeDisplay(event)}
-        </div>
+        {/* RSVP count display */}
+        {event.going_count > 0 || event.interested_count > 0 ? (
+          <div className="flex items-center text-xs text-gray-500 mb-2">
+            {event.going_count > 0 && (
+              <span className="mr-3 flex items-center">
+                <Check className="h-3 w-3 mr-1 text-green-500" />
+                {event.going_count} going
+              </span>
+            )}
+            {event.interested_count > 0 && (
+              <span className="flex items-center">
+                <Star className="h-3 w-3 mr-1 text-blue-500" />
+                {event.interested_count} interested
+              </span>
+            )}
+          </div>
+        ) : null}
         
-        {/* Venue/Location */}
-        <div className="flex items-center text-xs text-gray-600 mb-2">
-          <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
-          <span className="truncate">{event.venues?.name || event.location || 'No location'}</span>
-        </div>
+        {/* Spacer */}
+        <div className="flex-grow min-h-[8px]"></div>
         
         {/* RSVP Buttons */}
         {showRsvpButtons && (
@@ -159,8 +199,9 @@ const EventCard: React.FC<EventCardProps> = ({
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
-              size="sm"
+              size={cardStyle === "compact" ? "sm" : "default"}
               isLoading={isLoading}
+              variant={cardStyle === "featured" ? "default" : "compact"}
             />
           </div>
         )}
