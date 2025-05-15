@@ -1,100 +1,125 @@
 
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ShareButtons } from './ShareButtons';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { toast } from '@/hooks/use-toast';
-import { Copy } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Event } from '@/types';
+import { Button } from '@/components/ui/button';
+import { Copy, Check } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+import { ShareButtons } from './ShareButtons';
+import { useEventImages } from '@/hooks/useEventImages';
+import { 
+  shareToNative, 
+  copyToClipboard,
+  type SocialShare
+} from '@/utils/sharing';
 
 interface ShareDialogProps {
-  event: Event;
   isOpen: boolean;
   onClose: () => void;
+  event: Event;
 }
 
-export interface SocialShare {
-  title: string;
-  url: string;
-  text?: string; 
-  description?: string; // Added description property
-}
-
-export const ShareDialog: React.FC<ShareDialogProps> = ({ event, isOpen, onClose }) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(isOpen);
+export function ShareDialog({ isOpen, onClose, event }: ShareDialogProps) {
+  const [copied, setCopied] = useState(false);
+  const { getShareImageUrl } = useEventImages();
   
-  // Create the share URL and text for the event
-  const shareUrl = typeof window !== 'undefined' 
-    ? `${window.location.origin}/events/${event.id}`
-    : `https://example.com/events/${event.id}`;
-    
-  const shareTitle = `Check out ${event.title} on EventHub!`;
-  const shareText = event.description 
-    ? `${event.title} - ${event.description.slice(0, 100)}${event.description.length > 100 ? '...' : ''}`
-    : `Join me at ${event.title}!`;
+  // Create the canonical URL for sharing
+  const shareUrl = `${window.location.origin}/events/${event.slug || event.id}`;
   
-  const socialShare: SocialShare = {
-    title: shareTitle,
+  // Create the share data object
+  const shareData: SocialShare = {
+    title: event.title,
+    text: event.description || `Join me at ${event.title}`,
     url: shareUrl,
-    text: shareText,
-    description: `${event.title} - Join me at this event!`
+    image: getShareImageUrl(event) || '',
   };
 
-  // Handle dialog close
-  const handleClose = () => {
-    setIsDialogOpen(false);
-    if (onClose) onClose();
-  };
-  
-  // Copy event URL to clipboard
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(shareUrl)
-      .then(() => {
-        toast({
-          title: "Link Copied",
-          description: "Event link copied to clipboard!",
-          variant: "default",
-        });
-      })
-      .catch((error) => {
-        console.error('Failed to copy:', error);
-        toast({
-          title: "Copy Failed",
-          description: "Could not copy to clipboard.",
-          variant: "destructive",
-        });
+  // Reset the copied state when the dialog opens/closes
+  useEffect(() => {
+    setCopied(false);
+  }, [isOpen]);
+
+  const handleCopy = async () => {
+    try {
+      await copyToClipboard(shareUrl);
+      setCopied(true);
+      toast({
+        title: "Link copied!",
+        description: "The event link has been copied to your clipboard.",
       });
+      
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch (error) {
+      toast({
+        title: "Failed to copy",
+        description: "There was an error copying the link. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
-  
+
+  const handleNativeShare = async () => {
+    try {
+      await shareToNative({
+        title: event.title,
+        text: event.description || `Join me at ${event.title}`,
+        url: shareUrl,
+      });
+      
+      toast({
+        title: "Sharing...",
+        description: "Opening share dialog.",
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to share",
+        description: "There was an error opening the share dialog. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Share this event</DialogTitle>
           <DialogDescription>
-            Share this event with friends and social media
+            Invite your friends to join you at {event.title}
           </DialogDescription>
         </DialogHeader>
         
-        <div className="flex items-center space-x-2 mt-4">
-          <Input
-            readOnly
-            value={shareUrl}
-            className="flex-1"
-          />
-          <Button 
-            size="icon"
-            variant="outline"
-            onClick={copyToClipboard}
-            aria-label="Copy link"
-          >
-            <Copy className="h-4 w-4" />
-          </Button>
+        <div className="grid gap-6">
+          <div className="flex items-center space-x-2">
+            <div className="grid flex-1 gap-2">
+              <p className="text-sm text-muted-foreground truncate">
+                {shareUrl}
+              </p>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="px-3"
+              onClick={handleCopy}
+            >
+              {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              <span className="sr-only">Copy</span>
+            </Button>
+          </div>
+          
+          <ShareButtons shareData={shareData} />
+          
+          {navigator.share && (
+            <div className="flex justify-center">
+              <Button className="w-full" onClick={handleNativeShare}>
+                Share via...
+              </Button>
+            </div>
+          )}
         </div>
-        
-        <ShareButtons shareData={socialShare} />
       </DialogContent>
     </Dialog>
   );
-};
+}

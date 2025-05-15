@@ -1,200 +1,135 @@
 
-import React, { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useEventDetails } from '@/hooks/useEventDetails';
+import { useEventImages } from '@/hooks/useEventImages';
 import { useEventMetaTags } from '@/hooks/useEventMetaTags';
-import { useScrollPosition } from '@/hooks/useScrollPosition';
-import { EventDetailLoadingState } from '@/components/events/EventDetailLoadingState';
+import { setCanonicalLink } from '@/utils/canonicalUtils';
+import { useRsvpActions } from '@/hooks/useRsvpActions';
+import { Event } from '@/types';
+
 import { EventDetailErrorState } from '@/components/events/EventDetailErrorState';
+import { EventDetailLoadingState } from '@/components/events/EventDetailLoadingState';
+import { EventDetailHeader } from '@/components/events/EventDetailHeader';
 import { EventDetailContent } from '@/components/events/EventDetailContent';
-import { ChevronLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useEventDetailParams } from '@/hooks/useEventDetailParams';
-import { useEventDetailHandlers } from '@/hooks/useEventDetailHandlers';
-import { useViewportOptimization } from '@/hooks/useViewportOptimization';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
+import { MobileRsvpFooter } from '@/components/events/MobileRsvpFooter';
+import { ShareDialog } from '@/components/events/share/ShareDialog';
 
 const EventDetail = () => {
-  const { user, isAuthenticated } = useAuth();
-  const isMobile = useIsMobile();
+  const { eventId, eventSlug } = useParams<{ eventId?: string, eventSlug?: string }>();
+  const navigate = useNavigate();
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   
-  // Extract route parameters and URL handling
-  const { 
-    id, eventId, eventSlug, destination, 
-    location, initialFetchDone, forceKey,
-    isSlugRoute, isDestinationRoute,
-    hasTransitionState
-  } = useEventDetailParams();
-  
-  // Extract event handlers
-  const { 
-    handleBackToEvents, 
-    handleEventTypeClick,
-    wrapRsvpWithScrollPreservation 
-  } = useEventDetailHandlers();
-  
-  // Check if this navigation is from another event (for transitions)
-  const isFromEventNavigation = location?.state?.fromEventNavigation === true;
-  const useTransition = location?.state?.useTransition === true;
-  
-  // Hook for managing the event data
-  const { 
-    event, 
-    attendees,
-    isLoading, 
-    error, 
-    rsvpLoading,
-    handleRsvpAction: originalHandleRsvpAction,
-    refreshData
-  } = useEventDetails(id, user?.id, eventSlug, destination);
-  
-  // Apply meta tags for SEO
+  // Get event data
+  const {
+    event,
+    isLoading,
+    error
+  } = useEventDetails(eventId, eventSlug);
+
+  // Set meta tags
   useEventMetaTags(event);
   
-  // Mobile viewport optimization
-  useViewportOptimization();
+  const { handleRsvp } = useRsvpActions();
   
-  // Add navigation from event handlers
-  const navigate = useNavigate();
-  
-  // Wrap the RSVP action with scroll preservation
-  const handleRsvpAction = wrapRsvpWithScrollPreservation(originalHandleRsvpAction);
-
-  // Force refresh the event data on component mount or URL change - with safeguards
   useEffect(() => {
-    // Check if we have valid parameters
-    if (!eventId && !eventSlug) {
-      console.log("No event ID or slug found, skipping data fetch");
-      return;
+    // Set canonical link
+    if (event?.slug) {
+      setCanonicalLink(`${window.location.origin}/events/${event.slug}`);
+    } else if (eventId) {
+      setCanonicalLink(`${window.location.origin}/events/${eventId}`);
     }
-    
-    // Check if we already fetched this data
-    if (initialFetchDone.current) {
-      console.log("Initial fetch already done, skipping");
-      return; 
-    }
-    
-    console.log(`Initial data fetch for ${eventId || eventSlug}`);
-    initialFetchDone.current = true;
-    refreshData();
-    
-    // Scroll to top when loading a new event
-    window.scrollTo(0, 0);
-  }, [eventId, eventSlug, destination, refreshData, initialFetchDone]);
+  }, [event, eventId]);
 
-  // Redirect to canonical URL if needed
-  useEffect(() => {
-    // This effect ensures we only apply the redirection when all data is available
-    if (event && location && location.pathname && !error) {
-      // Inside the effect, we have guaranteed that all values are defined
-      const applyRedirection = () => {
-        try {
-          // Now we can safely call our hook within an effect where we've verified all values
-          const canonicalUrl = `${window.location.origin}/events/${event.slug || event.id}`;
-          const link = document.querySelector('link[rel="canonical"]');
-          if (link) {
-            document.head.removeChild(link);
-          }
-          const canonicalLink = document.createElement('link');
-          canonicalLink.rel = 'canonical';
-          canonicalLink.href = canonicalUrl;
-          document.head.appendChild(canonicalLink);
-          
-          // Handle redirections directly instead of using the hook
-          if (!isSlugRoute && !isDestinationRoute && event.destination && event.slug) {
-            const newUrl = `/events/${encodeURIComponent(event.destination)}/${event.slug}`;
-            if (location.pathname !== newUrl) {
-              console.log(`Redirecting to destination+slug URL: ${newUrl}`);
-              navigate(newUrl, { replace: true });
-            }
-          } else if (!isSlugRoute && !isDestinationRoute && event.slug && !event.destination) {
-            const newUrl = `/events/${event.slug}`;
-            if (location.pathname !== newUrl) {
-              console.log(`Redirecting to slug URL: ${newUrl}`);
-              navigate(newUrl, { replace: true });
-            }
-          }
-        } catch (e) {
-          console.error("Error in redirection logic:", e);
-        }
-      };
-      
-      applyRedirection();
+  // Handle RSVP button click
+  const handleRsvpClick = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    if (!event) return false;
+    try {
+      await handleRsvp(event.id, status);
+      return true;
+    } catch (error) {
+      console.error('Error updating RSVP:', error);
+      return false;
     }
-    
-    return () => {
-      // Clean up canonical link on unmount
-      try {
-        const canonicalLink = document.querySelector('link[rel="canonical"]');
-        if (canonicalLink) {
-          document.head.removeChild(canonicalLink);
-        }
-      } catch (e) {
-        console.error("Error cleaning up canonical link:", e);
-      }
-    };
-  }, [event, location, isSlugRoute, isDestinationRoute, error, navigate]);
-
-  // Determine which animation class to use based on navigation source
-  const getAnimationClass = () => {
-    // Use scale-in effect for transitions between events
-    if (isFromEventNavigation && useTransition) {
-      return "event-page-transition animate-scale-in";
-    }
-    // Use fade-in for regular page loads
-    return "event-page-transition animate-fade-in";
   };
 
-  if (error) {
-    return (
-      <EventDetailErrorState
-        error={error}
-        onBackToEvents={handleBackToEvents}
-      />
-    );
-  }
+  // Handle share button click
+  const handleShare = () => {
+    setIsShareDialogOpen(true);
+  };
 
+  // Handle event type icon click
+  const handleEventTypeClick = (eventType: string) => {
+    navigate(`/events?type=${encodeURIComponent(eventType)}`);
+  };
+  
   if (isLoading) {
     return <EventDetailLoadingState />;
   }
 
+  if (error) {
+    let errorMessage: string;
+    if (typeof error === 'string') {
+      errorMessage = error;
+    } else if (error instanceof Error) {
+      errorMessage = error.message;
+    } else {
+      errorMessage = 'An unknown error occurred';
+    }
+    
+    return <EventDetailErrorState error={errorMessage} />;
+  }
+  
   if (!event) {
-    return (
-      <EventDetailErrorState
-        error={null}
-        onBackToEvents={handleBackToEvents}
-        notFound={true}
-      />
-    );
+    return <EventDetailErrorState error="Event not found" />;
   }
 
   return (
-    <div className={`container py-8 relative ${getAnimationClass()}`} key={forceKey}>
-      {/* Back to Events button - only shown on desktop */}
-      {!isMobile && (
-        <div className="mb-6 animate-fade-in" style={{ animationDelay: "50ms" }}>
-          <Button 
-            variant="secondary" 
-            onClick={handleBackToEvents}
-            className="flex items-center gap-2 shadow-sm hover:shadow-md transition-all"
-            type="button"
-            size="default"
-          >
-            <ChevronLeft className="h-5 w-5" />
-            <span className="font-medium">Back to Events</span>
-          </Button>
-        </div>
-      )}
+    <div className="bg-white">
+      <EventDetailHeader 
+        event={event} 
+        onShare={handleShare}
+        onEventTypeClick={handleEventTypeClick}
+      />
       
-      <EventDetailContent
+      <div className="container mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="md:col-span-2">
+            <EventDetailContent 
+              event={event} 
+              onEventTypeClick={handleEventTypeClick}
+            />
+          </div>
+          
+          <div className="md:col-span-1">
+            <div className="sticky top-20">
+              <div className="bg-white p-6 rounded-lg shadow mb-6">
+                <h3 className="font-bold text-xl mb-4">RSVP to this event</h3>
+                
+                <EventRsvpButtons 
+                  currentStatus={event.user_rsvp_status} 
+                  onRsvp={handleRsvpClick} 
+                  fullWidth
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Mobile RSVP footer that appears on smaller screens */}
+      <MobileRsvpFooter 
+        event={event} 
+        onRsvp={handleRsvpClick} 
+        onShare={handleShare}
+      />
+      
+      {/* Share dialog */}
+      <ShareDialog 
+        isOpen={isShareDialogOpen}
+        onClose={() => setIsShareDialogOpen(false)}
         event={event}
-        attendees={attendees}
-        isAuthenticated={isAuthenticated}
-        rsvpLoading={rsvpLoading}
-        handleRsvpAction={handleRsvpAction}
-        handleBackToEvents={handleBackToEvents}
-        handleEventTypeClick={() => handleEventTypeClick(event.event_type)}
       />
     </div>
   );

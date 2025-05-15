@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,7 +24,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { EventCard } from '@/components/EventCard';
+import EventCard from '@/components/EventCard';
 import { filterUpcomingEvents, sortEventsByDate } from '@/utils/dateUtils';
 import { useCanonical } from '@/hooks/useCanonical';
 import { pageSeoTags } from '@/utils/seoUtils';
@@ -360,6 +361,16 @@ const Friends = () => {
     setFriendshipStatus('none');
   };
 
+  // Get the user events for the currently selected friend
+  const {
+    userEvents,
+    isLoading: isUserEventsLoading,
+    upcomingEvents,
+    pastEvents,
+    handleRsvp,
+    refetch
+  } = useUserEvents(selectedFriendId, user?.id, friendshipStatus);
+
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-2xl font-bold mb-4">Friends</h1>
@@ -382,7 +393,7 @@ const Friends = () => {
               <CardContent className="space-y-4">
                 {friends.length > 0 ? (
                   <ul className="space-y-2">
-                    {friends.map(friend => (
+                    {friends.map((friend) => (
                       <li key={friend.id} className="flex items-center justify-between">
                         <div className="flex items-center space-x-3" onClick={() => selectFriend(friend)}>
                           <Avatar>

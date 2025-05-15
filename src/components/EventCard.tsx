@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { formatRelativeDate, formatEventTime, getEventDateTime } from '@/utils/dateUtils';
@@ -27,7 +28,7 @@ const EventCard: React.FC<EventCardProps> = ({
   onClick,
   onShare
 }) => {
-  const { getEventImageUrl } = useEventImages();
+  const { images, getEventImageUrl } = useEventImages();
   const { navigateToEvent } = useEventNavigation();
   const navigate = useNavigate();
   
@@ -136,4 +137,6 @@ const EventCard: React.FC<EventCardProps> = ({
   );
 };
 
+export { EventCard };
 export default EventCard;
+
