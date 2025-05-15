@@ -1,138 +1,271 @@
 
-import React from 'react';
+import { useMemo } from 'react';
 import { Event } from '@/types';
+import {
+  Calendar,
+  MapPin,
+  Clock,
+  Users,
+  ExternalLink,
+  Share2
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
+import { EventMap } from '@/components/events/EventMap';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { Badge } from '@/components/ui/badge';
+import { formatInTimeZone } from 'date-fns-tz';
+import { formatDistanceToNow } from 'date-fns';
 
-export interface EventDetailContentProps {
+const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
+
+interface EventDetailContentProps {
   event: Event;
-  handleEventTypeClick: (eventType: string) => void;
+  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
+  isRsvpLoading?: boolean;
+  isOwner?: boolean;
 }
 
-export const EventDetailContent: React.FC<EventDetailContentProps> = ({ 
+export const EventDetailContent: React.FC<EventDetailContentProps> = ({
   event,
-  handleEventTypeClick
+  onRsvp,
+  isRsvpLoading = false,
+  isOwner = false,
 }) => {
-  // Since the component depends on many components that we can't modify,
-  // we'll create placeholder versions that match the expected props
+  // Format date for detail view
+  const formattedDate = useMemo(() => {
+    if (!event.start_time) return '';
+    
+    try {
+      const date = new Date(event.start_time);
+      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEEE, MMMM d, yyyy 'at' h:mm a");
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return String(event.start_time);
+    }
+  }, [event.start_time]);
   
-  const DateTimeInfo = () => (
-    <div className="flex items-center space-x-2 text-gray-600 mb-4">
-      <span className="font-medium">Date & Time:</span>
-      <span>{new Date(event.start_time).toLocaleString()}</span>
-      {event.end_time && (
-        <span> - {new Date(event.end_time).toLocaleString()}</span>
-      )}
-    </div>
-  );
+  // Format time until event
+  const timeUntilEvent = useMemo(() => {
+    if (!event.start_time) return '';
+    
+    try {
+      const date = new Date(event.start_time);
+      if (date <= new Date()) return 'Event has started';
+      return `Starts ${formatDistanceToNow(date, { addSuffix: true })}`;
+    } catch (error) {
+      console.error('Error calculating time until event:', error);
+      return '';
+    }
+  }, [event.start_time]);
   
-  const LocationInfo = () => (
-    <div className="flex items-center space-x-2 text-gray-600 mb-4">
-      <span className="font-medium">Location:</span>
-      <span>{event.location || "No location specified"}</span>
-    </div>
-  );
+  // Format event duration
+  const eventDuration = useMemo(() => {
+    if (!event.start_time || !event.end_time) return '';
+    
+    try {
+      const start = new Date(event.start_time);
+      const end = new Date(event.end_time);
+      const durationHours = Math.abs(end.getTime() - start.getTime()) / 36e5;
+      return `${durationHours.toFixed(1)} hours`;
+    } catch (error) {
+      console.error('Error calculating event duration:', error);
+      return '';
+    }
+  }, [event.start_time, event.end_time]);
   
-  const VenueInfo = () => event.venues ? (
-    <div className="border-t border-gray-200 pt-4 mb-4">
-      <h3 className="font-bold text-lg mb-2">Venue</h3>
-      <p>{event.venues.name}</p>
-      <p>{event.venues.street}</p>
-      <p>{event.venues.city}, {event.venues.postal_code}</p>
-      {event.venues.website && (
-        <a 
-          href={event.venues.website} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:underline mt-2 inline-block"
-        >
-          Visit website
-        </a>
-      )}
-    </div>
-  ) : null;
+  // Process tags for display
+  const eventTags = useMemo(() => {
+    if (!event.tags) return [];
+    
+    // If tags is already an array, return it
+    if (Array.isArray(event.tags)) {
+      return event.tags.filter(tag => !!tag);
+    }
+    
+    // If tags is a string, split by comma
+    if (typeof event.tags === 'string') {
+      return event.tags.split(',').map(tag => tag.trim());
+    }
+    
+    // For any other type, try to convert to string
+    try {
+      // Convert to string and check if it's valid
+      const tagsStr = String(event.tags);
+      // Only proceed if we have a non-empty string
+      if (tagsStr && tagsStr !== "[object Object]" && tagsStr !== "undefined" && tagsStr !== "null") {
+        return tagsStr.split(',').map(tag => tag.trim());
+      }
+    } catch (e) {
+      console.error('Error processing tags:', e);
+    }
+    
+    // Fallback
+    return [];
+  }, [event.tags]);
   
-  const Description = () => (
-    <div className="border-t border-gray-200 pt-4 mb-4">
-      <h3 className="font-bold text-lg mb-2">About this event</h3>
-      <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: event.description }}></div>
-    </div>
-  );
+  // Handle RSVP
+  const handleRsvp = async (status: 'Going' | 'Interested') => {
+    if (!onRsvp) return false;
+    return onRsvp(event.id, status);
+  };
   
-  const CategoryPills = () => (
-    <div className="border-t border-gray-200 pt-4 mb-4">
-      <h3 className="font-bold text-lg mb-2">Categories</h3>
-      <div className="flex flex-wrap gap-2">
-        <span 
-          onClick={() => handleEventTypeClick(event.event_type)} 
-          className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm cursor-pointer hover:bg-blue-200 transition"
-        >
-          {event.event_type}
-        </span>
-        {event.tags && event.tags.map(tag => (
-          <span 
-            key={tag}
-            className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-  
-  const AttendeesList = () => (
-    <div className="border-t border-gray-200 pt-4 mb-4">
-      <h3 className="font-bold text-lg mb-2">Who's going</h3>
-      {event.attendees ? (
-        <div>
-          <p>{event.attendees.going} going · {event.attendees.interested} interested</p>
-        </div>
-      ) : (
-        <p>No attendees yet</p>
-      )}
-    </div>
-  );
-  
-  const AdditionalInfo = () => event.extra_info ? (
-    <div className="border-t border-gray-200 pt-4 mb-4">
-      <h3 className="font-bold text-lg mb-2">Additional Information</h3>
-      <p>{event.extra_info}</p>
-    </div>
-  ) : null;
-  
-  const OrganizerInfo = () => (
-    <div className="border-t border-gray-200 pt-4 mb-4">
-      <h3 className="font-bold text-lg mb-2">Organizer</h3>
-      {event.organiser_name ? (
-        <p>{event.organiser_name}</p>
-      ) : event.creator ? (
-        <p>{event.creator.username || "Anonymous"}</p>
-      ) : (
-        <p>Unknown organizer</p>
-      )}
-      
-      {event.organizer_link && (
-        <a 
-          href={event.organizer_link} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:underline mt-2 inline-block"
-        >
-          Visit organizer's website
-        </a>
-      )}
-    </div>
-  );
-
   return (
-    <div className="space-y-6">
-      <DateTimeInfo />
-      <LocationInfo />
-      <VenueInfo />
-      <Description />
-      <OrganizerInfo />
-      <CategoryPills />
-      <AdditionalInfo />
-      <AttendeesList />
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-12">
+      {/* Event details - takes up 2/3 of the space on desktop */}
+      <div className="lg:col-span-2 space-y-8">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold mb-4">{event.title}</h1>
+          
+          {/* Date and time info */}
+          <div className="flex items-start space-x-2">
+            <Calendar className="h-5 w-5 text-gray-500 mt-0.5" />
+            <div>
+              <p className="font-medium">{formattedDate}</p>
+              <p className="text-sm text-gray-600">{timeUntilEvent}</p>
+              {eventDuration && (
+                <p className="text-sm text-gray-600">Duration: {eventDuration}</p>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        <Separator />
+        
+        {/* Location section */}
+        {(event.venue_id || event.location || (event.coordinates && event.coordinates.latitude)) && (
+          <div>
+            <div className="flex items-start space-x-2 mb-4">
+              <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
+              <div>
+                <p className="font-medium">{event.venues?.name || 'Event Location'}</p>
+                <p className="text-sm text-gray-600">
+                  {[
+                    event.venues?.street,
+                    event.venues?.city,
+                    event.venues?.postal_code
+                  ].filter(Boolean).join(', ') || event.location || 'Location details not provided'}
+                </p>
+              </div>
+            </div>
+            
+            {event.coordinates && event.coordinates.latitude && event.coordinates.longitude && (
+              <div className="mt-4 rounded-xl overflow-hidden border h-[300px]">
+                <AspectRatio ratio={16/9} className="h-full">
+                  <EventMap 
+                    latitude={event.coordinates.latitude} 
+                    longitude={event.coordinates.longitude}
+                    name={event.venues?.name || event.title || 'Event Location'}
+                  />
+                </AspectRatio>
+              </div>
+            )}
+          </div>
+        )}
+        
+        {/* Description */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">About this event</h2>
+          <div className="prose prose-sm max-w-none">
+            <p className="whitespace-pre-line">{event.description}</p>
+          </div>
+        </div>
+        
+        {/* Tags */}
+        {eventTags.length > 0 && (
+          <div className="pt-2">
+            <h3 className="text-sm font-medium text-gray-500 mb-2">Tags</h3>
+            <div className="flex flex-wrap gap-2">
+              {eventTags.map((tag, index) => (
+                <Badge key={index} variant="secondary" className="text-xs">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+      
+      {/* Sidebar - takes up 1/3 of the space on desktop */}
+      <div className="space-y-8">
+        {/* RSVP actions */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <div className="space-y-4">
+            {onRsvp && !isOwner && (
+              <>
+                <h3 className="font-medium">Are you going?</h3>
+                <EventRsvpButtons 
+                  currentStatus={event.rsvp_status || null}
+                  onRsvp={handleRsvp}
+                  size="lg"
+                  className="w-full"
+                />
+              </>
+            )}
+            
+            {isOwner && (
+              <div className="bg-blue-50 p-4 rounded-md">
+                <p className="text-sm text-blue-700">You created this event</p>
+              </div>
+            )}
+            
+            <div className="pt-2">
+              <Button 
+                variant="outline"
+                className="w-full flex items-center justify-center gap-2" 
+                onClick={() => {
+                  navigator.share?.({
+                    title: event.title,
+                    text: `Check out this event: ${event.title}`,
+                    url: window.location.href
+                  }).catch(error => {
+                    console.error('Error sharing:', error);
+                    // Fallback: copy to clipboard
+                    navigator.clipboard.writeText(window.location.href);
+                    alert('Link copied to clipboard!');
+                  });
+                }}
+              >
+                <Share2 className="h-4 w-4" />
+                Share this event
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Attendees summary */}
+        <div>
+          <h3 className="font-medium flex items-center gap-2 mb-3">
+            <Users className="h-5 w-5" /> 
+            <span>Who's coming</span>
+          </h3>
+          <div className="flex items-center space-x-4">
+            <div className="text-center">
+              <div className="text-xl font-bold">{event.attendees?.going || 0}</div>
+              <div className="text-sm text-gray-600">Going</div>
+            </div>
+            <div className="text-center">
+              <div className="text-xl font-bold">{event.attendees?.interested || 0}</div>
+              <div className="text-sm text-gray-600">Interested</div>
+            </div>
+          </div>
+        </div>
+        
+        {/* External link if available */}
+        {event.external_url && (
+          <div>
+            <a 
+              href={event.external_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-purple-600 font-medium flex items-center gap-1.5 hover:underline"
+            >
+              <ExternalLink className="h-4 w-4" /> Visit event website
+            </a>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

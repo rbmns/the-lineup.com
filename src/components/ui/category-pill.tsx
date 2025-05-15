@@ -1,78 +1,145 @@
 
 import React from 'react';
-import { EventCategoryIcon, IconSize } from './event-category-icon';
-import { eventTypeColors } from '@/utils/eventImages';
+import { Calendar, Music, Globe, Users, Film, Book, Dumbbell, Utensils, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { NATURE_COLORS } from '@/constants';
+
+type CategoryIconMapping = {
+  [key: string]: React.ElementType;
+};
+
+const categoryIconMapping: CategoryIconMapping = {
+  'music': Music,
+  'concert': Music,
+  'festival': Music,
+  'conference': Users,
+  'networking': Users,
+  'meetup': Users,
+  'community': Users,
+  'fitness': Dumbbell,
+  'sports': Dumbbell,
+  'food': Utensils,
+  'dining': Utensils,
+  'film': Film, 
+  'movie': Film,
+  'literature': Book,
+  'reading': Book,
+  'culture': Globe,
+  'travel': Globe
+};
+
+const getCategoryIcon = (category: string): React.ElementType => {
+  const lowerCategory = category.toLowerCase();
+  
+  // Check if there's a direct match
+  for (const [key, Icon] of Object.entries(categoryIconMapping)) {
+    if (lowerCategory === key || lowerCategory.includes(key)) {
+      return Icon;
+    }
+  }
+  
+  // Default icon if no match
+  return Tag;
+};
+
+const getCategoryColor = (category: string): string => {
+  const lowerCategory = category.toLowerCase();
+  
+  // Music related categories
+  if (lowerCategory.includes('music') || 
+      lowerCategory.includes('concert') || 
+      lowerCategory.includes('festival')) {
+    return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
+  }
+  
+  // Community related categories
+  if (lowerCategory.includes('conference') || 
+      lowerCategory.includes('networking') ||
+      lowerCategory.includes('meetup') || 
+      lowerCategory.includes('community')) {
+    return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
+  }
+  
+  // Active categories
+  if (lowerCategory.includes('fitness') || 
+      lowerCategory.includes('sports')) {
+    return 'bg-green-100 text-green-800 hover:bg-green-200';
+  }
+  
+  // Food related
+  if (lowerCategory.includes('food') || 
+      lowerCategory.includes('dining')) {
+    return 'bg-orange-100 text-orange-800 hover:bg-orange-200';
+  }
+  
+  // Entertainment
+  if (lowerCategory.includes('film') || 
+      lowerCategory.includes('movie')) {
+    return 'bg-red-100 text-red-800 hover:bg-red-200';
+  }
+  
+  // Literature
+  if (lowerCategory.includes('literature') || 
+      lowerCategory.includes('reading')) {
+    return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200';
+  }
+  
+  // Culture/Travel
+  if (lowerCategory.includes('culture') || 
+      lowerCategory.includes('travel')) {
+    return 'bg-teal-100 text-teal-800 hover:bg-teal-200';
+  }
+  
+  // Default
+  return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+};
 
 interface CategoryPillProps {
   category: string;
-  active?: boolean;
   onClick?: () => void;
+  active?: boolean;
   showIcon?: boolean;
   className?: string;
-  size?: 'sm' | 'default' | 'lg';
+  size?: 'xs' | 'sm' | 'default';
 }
 
 export const CategoryPill: React.FC<CategoryPillProps> = ({
   category,
-  active = false,
   onClick,
+  active = false,
   showIcon = false,
-  className = '',
+  className,
   size = 'default'
 }) => {
-  // Convert category to lowercase for consistency
-  const normalizedCategory = category.toLowerCase();
-  
-  // Get colors from the shared utility
-  const colorConfig = eventTypeColors[normalizedCategory as keyof typeof eventTypeColors] || eventTypeColors.other;
-  
-  // Define sizes
+  const Icon = getCategoryIcon(category);
+  const colorClasses = active 
+    ? 'bg-purple-500 text-white' 
+    : getCategoryColor(category);
+    
   const sizeClasses = {
-    sm: "px-2 py-0.5 text-xs",
-    default: "px-3 py-1 text-sm",
-    lg: "px-4 py-1.5 text-base"
+    'xs': 'text-xs py-0.5 px-1.5',
+    'sm': 'text-xs py-1 px-2',
+    'default': 'text-sm py-1.5 px-3'
   };
   
-  // Map component size to icon size
-  const getIconSize = (): IconSize => {
-    switch (size) {
-      case 'sm': return 'sm';
-      case 'lg': return 'lg';
-      case 'default':
-      default: return 'md';
-    }
+  const iconSize = {
+    'xs': 'h-3 w-3 mr-0.5',
+    'sm': 'h-3.5 w-3.5 mr-1',
+    'default': 'h-4 w-4 mr-1.5'
   };
-  
-  // Base styling with hover and active states
-  const pillClass = cn(
-    colorConfig.default.bg,
-    colorConfig.default.text,
-    "font-medium rounded-full transition-all duration-200",
-    active ? 'ring-2 ring-offset-1 ring-black' : '',
-    onClick ? 'cursor-pointer hover:opacity-90' : '',
-    sizeClasses[size],
-    "inline-flex items-center justify-center",
-    className
-  );
   
   return (
-    <div 
-      className={pillClass}
+    <div
+      className={cn(
+        'rounded-full font-medium transition-colors cursor-pointer flex items-center',
+        colorClasses,
+        sizeClasses[size],
+        onClick ? 'cursor-pointer' : 'cursor-default',
+        className
+      )}
       onClick={onClick}
     >
-      {showIcon ? (
-        <div className="flex items-center gap-1">
-          <EventCategoryIcon 
-            category={normalizedCategory} 
-            size={getIconSize()} 
-          />
-          <span>{category}</span>
-        </div>
-      ) : (
-        <span>{category}</span>
-      )}
+      {showIcon && <Icon className={iconSize[size]} />}
+      <span>{category}</span>
     </div>
   );
 };

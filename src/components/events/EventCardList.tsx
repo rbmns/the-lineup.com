@@ -7,20 +7,21 @@ import { cn } from '@/lib/utils';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { useEventImages } from '@/hooks/useEventImages';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
+import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 
 // Amsterdam/Netherlands timezone
 const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
 
 interface EventCardListProps {
   event: Event;
-  showRsvpStatus?: boolean;
+  showRsvpButtons?: boolean;
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   className?: string;
 }
 
 const EventCardList: React.FC<EventCardListProps> = ({
   event,
-  showRsvpStatus = false,
+  showRsvpButtons = false,
   onRsvp,
   className
 }) => {
@@ -56,17 +57,6 @@ const EventCardList: React.FC<EventCardListProps> = ({
     }
   };
 
-  const handleRsvpClick = async (e: React.MouseEvent, status: 'Going' | 'Interested') => {
-    e.stopPropagation();
-    e.preventDefault();
-    if (onRsvp) {
-      await onRsvp(event.id, status);
-    }
-  };
-
-  const isGoing = event.rsvp_status === 'Going';
-  const isInterested = event.rsvp_status === 'Interested';
-
   return (
     <div 
       className={cn(
@@ -76,7 +66,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
       )}
       onClick={handleClick}
     >
-      {/* Left: Event image - Full height */}
+      {/* Left: Event image - Full height with event type pill */}
       <div className="relative h-auto w-20 sm:w-24">
         <img 
           src={imageUrl} 
@@ -84,28 +74,27 @@ const EventCardList: React.FC<EventCardListProps> = ({
           className="absolute inset-0 h-full w-full object-cover"
           style={{ height: '100%' }}
         />
+        
+        {/* Event type pill positioned at top of image */}
+        {event.event_type && (
+          <div className="absolute top-1 left-1 z-10">
+            <CategoryPill 
+              category={event.event_type} 
+              size="xs" 
+              showIcon={true} 
+              className="bg-white/90 backdrop-blur-sm shadow-sm text-xs py-0.5 px-1.5"
+            />
+          </div>
+        )}
       </div>
 
       {/* Center: Event details */}
       <div className="flex-1 min-w-0 p-3 flex flex-col justify-between">
         <div className="space-y-1.5">
-          {/* Date and Event type pill on the same row */}
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-600 font-medium">
-              {event.start_time && formatDate(event.start_time)}
-            </div>
+          {/* Date */}
+          <div className="text-sm text-gray-600 font-medium">
+            {event.start_time && formatDate(event.start_time)}
           </div>
-          
-          {/* Event type pill */}
-          {event.event_type && (
-            <div className="mb-1">
-              <CategoryPill 
-                category={event.event_type} 
-                size="sm"
-                showIcon={true}
-              />
-            </div>
-          )}
           
           {/* Event title */}
           <h3 className="font-medium text-base line-clamp-1">{event.title}</h3>
@@ -117,8 +106,8 @@ const EventCardList: React.FC<EventCardListProps> = ({
               <span className="truncate">{event.venues?.name || event.location || 'No location'}</span>
             </div>
             
-            {/* Display RSVP status inline */}
-            {showRsvpStatus && event.rsvp_status && (
+            {/* Display RSVP status if not showing buttons */}
+            {!showRsvpButtons && event.rsvp_status && (
               <div 
                 className={cn(
                   "ml-2 px-2 py-0.5 text-xs font-medium rounded",
@@ -131,29 +120,14 @@ const EventCardList: React.FC<EventCardListProps> = ({
           </div>
         </div>
         
-        {/* RSVP action buttons - only shown when onRsvp handler is provided */}
-        {onRsvp && (
+        {/* RSVP buttons - only shown when onRsvp handler is provided */}
+        {showRsvpButtons && onRsvp && (
           <div className="flex items-center justify-end mt-2 gap-1">
-            <div className="flex gap-1">
-              <button
-                className={cn(
-                  "flex items-center justify-center rounded-md w-10 h-10 border",
-                  isGoing ? "bg-green-500 text-white border-green-500" : "bg-white text-gray-700 border-gray-300"
-                )}
-                onClick={(e) => handleRsvpClick(e, 'Going')}
-              >
-                <Check className="h-5 w-5" />
-              </button>
-              <button
-                className={cn(
-                  "flex items-center justify-center rounded-md w-10 h-10 border",
-                  isInterested ? "bg-blue-500 text-white border-blue-500" : "bg-white text-gray-700 border-gray-300"
-                )}
-                onClick={(e) => handleRsvpClick(e, 'Interested')}
-              >
-                <Star className="h-5 w-5" />
-              </button>
-            </div>
+            <EventRsvpButtons
+              currentStatus={event.rsvp_status || null}
+              onRsvp={(status) => onRsvp(event.id, status)}
+              size="sm"
+            />
           </div>
         )}
       </div>

@@ -1,72 +1,108 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Check, Star } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
 
-export interface EventRsvpButtonsProps {
-  currentStatus?: string | null | undefined;
+interface EventRsvpButtonsProps {
+  currentStatus: 'Going' | 'Interested' | null;
   onRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
-  fullWidth?: boolean;
-  size?: 'sm' | 'default' | 'lg';
   className?: string;
-  loading?: boolean;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({ 
-  currentStatus, 
+export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
+  currentStatus,
   onRsvp,
-  fullWidth = false,
-  size = 'default',
   className,
-  loading = false
+  size = 'md'
 }) => {
-  const isGoing = currentStatus === 'Going';
-  const isInterested = currentStatus === 'Interested';
+  const { user } = useAuth();
+  const [isUpdating, setIsUpdating] = React.useState(false);
+  const [localStatus, setLocalStatus] = React.useState(currentStatus);
+  
+  // Update local state when prop changes
+  React.useEffect(() => {
+    setLocalStatus(currentStatus);
+  }, [currentStatus]);
 
-  // Determine button size and padding
-  const buttonSize = {
-    sm: 'h-8 text-xs px-2',
-    default: 'h-10 text-sm px-4',
-    lg: 'h-12 text-base px-6'
-  }[size];
+  const handleRsvp = async (status: 'Going' | 'Interested') => {
+    if (!user) return;
+    if (isUpdating) return;
+    
+    try {
+      setIsUpdating(true);
+      
+      // Optimistic update
+      const isSameStatus = localStatus === status;
+      setLocalStatus(isSameStatus ? null : status);
+      
+      // Make API call
+      const success = await onRsvp(status);
+      
+      // If API call failed, revert optimistic update
+      if (!success) {
+        setLocalStatus(currentStatus);
+      }
+    } catch (error) {
+      console.error('RSVP error:', error);
+      setLocalStatus(currentStatus);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
-  // Determine icon size
-  const iconSize = {
-    sm: 14,
-    default: 16,
-    lg: 18
-  }[size];
+  // Size-specific properties
+  const getSizeClasses = () => {
+    switch (size) {
+      case 'sm':
+        return "text-sm py-1 px-3 h-8 gap-1";
+      case 'lg':
+        return "text-base py-3 px-5 h-12 gap-2";
+      default:
+        return "text-sm py-2 px-4 h-10 gap-1.5";
+    }
+  };
+
+  const isGoing = localStatus === 'Going';
+  const isInterested = localStatus === 'Interested';
 
   return (
-    <div className={cn(
-      `flex ${fullWidth ? 'w-full' : ''} space-x-2`,
-      className
-    )}>
+    <div className={cn("flex gap-2", className)}>
       <Button
-        variant={isGoing ? 'default' : 'outline'}
-        onClick={() => onRsvp('Going')}
+        type="button"
+        variant={isGoing ? "default" : "outline"}
         className={cn(
-          "flex-1",
-          isGoing ? 'bg-primary text-primary-foreground' : '',
-          buttonSize
+          getSizeClasses(),
+          isGoing ? "bg-green-500 hover:bg-green-600 text-white border-green-500" : 
+                   "border-gray-300 text-gray-700 hover:bg-gray-50"
         )}
-        disabled={loading}
+        disabled={isUpdating}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleRsvp('Going');
+        }}
       >
-        <Check size={iconSize} className="mr-2" />
+        <Check className={cn("h-4 w-4", size === 'lg' ? "h-5 w-5" : "")} />
         Going
       </Button>
+      
       <Button
-        variant={isInterested ? 'default' : 'outline'}
-        onClick={() => onRsvp('Interested')}
+        type="button"
+        variant={isInterested ? "default" : "outline"}
         className={cn(
-          "flex-1",
-          isInterested ? 'bg-primary text-primary-foreground' : '',
-          buttonSize
+          getSizeClasses(),
+          isInterested ? "bg-blue-500 hover:bg-blue-600 text-white border-blue-500" : 
+                       "border-gray-300 text-gray-700 hover:bg-gray-50"
         )}
-        disabled={loading}
+        disabled={isUpdating}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleRsvp('Interested');
+        }}
       >
-        <Star size={iconSize} className="mr-2" />
+        <Star className={cn("h-4 w-4", size === 'lg' ? "h-5 w-5" : "")} />
         Interested
       </Button>
     </div>

@@ -1,121 +1,150 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { Event } from '@/types';
-import EventCard from '@/components/EventCard';
-import { Loader2 } from 'lucide-react';
-
-// Number of events to load initially and on each "load more"
-const EVENTS_PER_PAGE = 12;
+import EventCard from './EventCard';
+import EventCardList from './EventCardList';
+import { SkeletonCard } from '@/components/skeletons/SkeletonCard';
+import { SkeletonCardList } from '@/components/skeletons/SkeletonCardList';
+import { cn } from '@/lib/utils';
+import { EventsEmptyState } from './list-components/EventsEmptyState';
 
 interface LazyEventsListProps {
   mainEvents: Event[];
   relatedEvents?: Event[];
   isLoading: boolean;
   isRsvpLoading?: boolean;
-  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   showRsvpButtons?: boolean;
+  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   hasActiveFilters?: boolean;
   compact?: boolean;
 }
 
 export const LazyEventsList: React.FC<LazyEventsListProps> = ({
-  mainEvents,
+  mainEvents = [],
   relatedEvents = [],
-  isLoading,
+  isLoading = false,
   isRsvpLoading = false,
+  showRsvpButtons = false,
   onRsvp,
-  showRsvpButtons = true,
   hasActiveFilters = false,
   compact = false
 }) => {
-  const [visibleCount, setVisibleCount] = useState(EVENTS_PER_PAGE);
-  const [hasMore, setHasMore] = useState(true);
-  const observerTarget = useRef<HTMLDivElement>(null);
+  const [displayMode, setDisplayMode] = useState<'grid' | 'list'>('grid');
   
-  // Update hasMore state when event count changes
-  useEffect(() => {
-    setHasMore(visibleCount < mainEvents.length);
-  }, [visibleCount, mainEvents.length]);
-  
-  // Reset visible count when events change
-  useEffect(() => {
-    setVisibleCount(EVENTS_PER_PAGE);
-  }, [mainEvents]);
-  
-  // Set up intersection observer for infinite scroll
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          setVisibleCount(prev => prev + EVENTS_PER_PAGE);
-        }
-      },
-      { threshold: 0.5 }
-    );
-    
-    const currentTarget = observerTarget.current;
-    if (currentTarget) {
-      observer.observe(currentTarget);
+  // Determine content to render based on loading state and data
+  const renderContent = () => {
+    // Loading state
+    if (isLoading) {
+      return displayMode === 'grid' ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <SkeletonCard key={index} />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <SkeletonCardList key={index} />
+          ))}
+        </div>
+      );
     }
     
-    return () => {
-      if (currentTarget) {
-        observer.unobserve(currentTarget);
-      }
-    };
-  }, [hasMore, isLoading]);
-  
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center py-16">
-        <Loader2 className="h-8 w-8 animate-spin text-[#9b87f5]" />
-        <span className="ml-2 text-gray-500">Loading events...</span>
-      </div>
-    );
-  }
-  
-  if (mainEvents.length === 0) {
-    return (
-      <div className="text-center py-16">
-        <p className="text-xl text-gray-600">No events found</p>
-        <p className="text-gray-500 mt-2">Check back later for new events</p>
-      </div>
-    );
-  }
-
-  // Visible events for lazy loading
-  const visibleEvents = mainEvents.slice(0, visibleCount);
-  
-  return (
-    <div className="space-y-8">
-      {/* Main Events Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {visibleEvents.map(event => (
-          <EventCard
-            key={event.id}
-            event={event}
-            onRsvp={onRsvp}
+    // No events
+    if (mainEvents.length === 0) {
+      return (
+        <EventsEmptyState 
+          hasActiveFilters={hasActiveFilters} 
+        />
+      );
+    }
+    
+    // Display events in grid or list mode
+    return displayMode === 'grid' ? (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {mainEvents.map((event) => (
+          <EventCard 
+            key={event.id} 
+            event={event} 
+            compact={compact} 
             showRsvpButtons={showRsvpButtons}
-            compact={compact}
+            onRsvp={onRsvp}
           />
         ))}
       </div>
-      
-      {/* Loading indicator */}
-      {hasMore && (
-        <div 
-          ref={observerTarget}
-          className="flex justify-center py-8"
-        >
-          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+    ) : (
+      <div className="space-y-4">
+        {mainEvents.map((event) => (
+          <EventCardList 
+            key={event.id} 
+            event={event} 
+            showRsvpButtons={showRsvpButtons}
+            onRsvp={onRsvp}
+          />
+        ))}
+      </div>
+    );
+  };
+  
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Events</h2>
+        
+        <div className="flex items-center space-x-2">
+          {/* Grid/List view toggle */}
+          <div className="flex border rounded-lg overflow-hidden">
+            <button 
+              className={cn(
+                "p-2", 
+                displayMode === 'grid' ? "bg-gray-200" : "bg-white"
+              )}
+              onClick={() => setDisplayMode('grid')}
+              aria-label="Grid view"
+            >
+              <div className="grid grid-cols-2 gap-0.5">
+                <div className="h-1.5 w-1.5 bg-gray-600 rounded-sm"></div>
+                <div className="h-1.5 w-1.5 bg-gray-600 rounded-sm"></div>
+                <div className="h-1.5 w-1.5 bg-gray-600 rounded-sm"></div>
+                <div className="h-1.5 w-1.5 bg-gray-600 rounded-sm"></div>
+              </div>
+            </button>
+            <button 
+              className={cn(
+                "p-2", 
+                displayMode === 'list' ? "bg-gray-200" : "bg-white"
+              )}
+              onClick={() => setDisplayMode('list')}
+              aria-label="List view"
+            >
+              <div className="flex flex-col gap-0.5">
+                <div className="h-1 w-4 bg-gray-600 rounded-sm"></div>
+                <div className="h-1 w-4 bg-gray-600 rounded-sm"></div>
+                <div className="h-1 w-4 bg-gray-600 rounded-sm"></div>
+              </div>
+            </button>
+          </div>
         </div>
-      )}
+      </div>
       
-      {/* No more events message */}
-      {!hasMore && mainEvents.length > 0 && (
-        <p className="text-center text-gray-500 py-4">
-          {mainEvents.length} events shown
-        </p>
+      {renderContent()}
+      
+      {/* Related events section - if there are any */}
+      {relatedEvents && relatedEvents.length > 0 && !isLoading && (
+        <div className="mt-12 pt-8 border-t">
+          <h2 className="text-xl font-semibold mb-6">You might also like</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {relatedEvents.slice(0, 3).map((event) => (
+              <EventCard 
+                key={`related-${event.id}`} 
+                event={event} 
+                compact 
+                showRsvpButtons={showRsvpButtons}
+                onRsvp={onRsvp}
+              />
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );
