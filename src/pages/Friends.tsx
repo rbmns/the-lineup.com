@@ -169,13 +169,13 @@ const Friends = () => {
     }
   }, [user?.id]);
 
-  const handleAcceptFriendRequest = async (friendshipId: string) => {
-    if (!user?.id) return;
+  const handleAcceptFriendRequest = async (friendshipId: string): Promise<boolean> => {
+    if (!user?.id) return false;
 
     try {
-      const success = await acceptFriendRequest(friendshipId);
+      const result = await acceptFriendRequest(friendshipId);
 
-      if (success) {
+      if (result?.success) {
         toast({
           title: "Success",
           description: "Friend request accepted!",
@@ -235,12 +235,14 @@ const Friends = () => {
           setFriends(friendsList);
         };
         fetchFriendsAgain();
+        return true;
       } else {
         toast({
           title: "Error",
           description: "Failed to accept friend request.",
           variant: "destructive",
         });
+        return false;
       }
     } catch (error) {
       console.error("Error accepting friend request:", error);
@@ -249,28 +251,31 @@ const Friends = () => {
         description: "Failed to accept friend request.",
         variant: "destructive",
       });
+      return false;
     }
   };
 
-  const handleRejectFriendRequest = async (friendshipId: string) => {
-    if (!user?.id) return;
+  const handleRejectFriendRequest = async (friendshipId: string): Promise<boolean> => {
+    if (!user?.id) return false;
 
     try {
-      const success = await declineFriendRequest(friendshipId);
+      const result = await declineFriendRequest(friendshipId);
 
-      if (success) {
+      if (result?.success) {
         toast({
           title: "Success",
           description: "Friend request rejected.",
         });
         // Optimistically update the UI
         setFriendRequests(prevRequests => prevRequests?.filter(request => request.id !== friendshipId) || []);
+        return true;
       } else {
         toast({
           title: "Error",
           description: "Failed to reject friend request.",
           variant: "destructive",
         });
+        return false;
       }
     } catch (error) {
       console.error("Error rejecting friend request:", error);
@@ -279,11 +284,12 @@ const Friends = () => {
         description: "Failed to reject friend request.",
         variant: "destructive",
       });
+      return false;
     }
   };
 
-  const handleRemoveFriend = async (friendId: string) => {
-    if (!user?.id) return;
+  const handleRemoveFriend = async (friendId: string): Promise<boolean> => {
+    if (!user?.id) return false;
 
     try {
       const success = await removeFriend(friendId);
@@ -295,12 +301,14 @@ const Friends = () => {
         });
         // Optimistically update the UI
         setFriends(prevFriends => prevFriends?.filter(friend => friend.profile.id !== friendId) || []);
+        return true;
       } else {
         toast({
           title: "Error",
           description: "Failed to remove friend.",
           variant: "destructive",
         });
+        return false;
       }
     } catch (error) {
       console.error("Error removing friend:", error);
@@ -309,6 +317,7 @@ const Friends = () => {
         description: "Failed to remove friend.",
         variant: "destructive",
       });
+      return false;
     }
   };
 
