@@ -8,6 +8,13 @@ export interface RelatedEventsSectionProps {
 }
 
 export const RelatedEventsSection: React.FC<RelatedEventsSectionProps> = ({ event }) => {
-  // Pass the eventId and venueId props since RelatedEvents expects these
-  return <RelatedEvents eventId={event.id} venueId={event.venue_id || ''} />;
+  return (
+    <RelatedEvents 
+      eventId={event.id} 
+      venueId={event.venue_id || ''} 
+      eventType={event.event_type || ''}
+      tags={event.tags}
+      vibe={event.vibe}
+    />
+  );
 };

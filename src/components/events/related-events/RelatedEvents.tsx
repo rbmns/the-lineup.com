@@ -11,15 +11,17 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface RelatedEventsProps {
-  eventType: string;
-  currentEventId: string;
+  eventId: string;  // Changed from currentEventId to eventId
+  venueId?: string;
+  eventType?: string;
   tags?: string[];
   vibe?: string;
 }
 
 export const RelatedEvents: React.FC<RelatedEventsProps> = ({ 
-  eventType, 
-  currentEventId,
+  eventId, // Changed from currentEventId to match what RelatedEventsSection passes
+  venueId,
+  eventType = '', // Set default value for eventType
   tags,
   vibe
 }) => {
@@ -27,7 +29,7 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
   const hasFetchedRef = useRef(false);
   const { relatedEvents, loading } = useFetchRelatedEvents({
     eventType,
-    currentEventId,
+    currentEventId: eventId, // Map eventId to currentEventId
     userId: user?.id, // Pass the userId to fetch RSVP status
     tags,
     vibe,
