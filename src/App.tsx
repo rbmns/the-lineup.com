@@ -10,12 +10,14 @@ import UserProfilePage from './pages/UserProfilePage';
 import { Toaster } from './components/ui/toaster';
 import Layout from './components/Layout';
 import Index from './pages/Index';
+import Login from './pages/Login';  // Added import for Login page
 
 function App() {
   return (
     <AuthProvider>
       <ToastProvider>
         <Routes>
+          <Route path="/login" element={<Login />} />  {/* Standalone route for login */}
           <Route path="/" element={<Layout />}>
             <Route index element={<Index />} />
             <Route path="/events" element={<EventsPageRefactored />} />

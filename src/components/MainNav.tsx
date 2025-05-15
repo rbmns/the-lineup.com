@@ -25,10 +25,12 @@ const MainNav = () => {
   }, []);
 
   const handleRegisterClick = () => {
+    console.log('Register button clicked, navigating to /login with register mode');
     navigate('/login', { state: { initialMode: 'register' } });
   };
 
   const handleSignInClick = () => {
+    console.log('Sign in button clicked, navigating to /login');
     navigate('/login');
   };
 
