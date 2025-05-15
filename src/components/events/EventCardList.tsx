@@ -96,7 +96,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
       data-event-id={event.id}
     >
       {/* Image */}
-      <div className="relative h-[120px] sm:h-auto sm:w-[180px] overflow-hidden bg-gray-100 flex-shrink-0">
+      <div className="relative h-[100px] sm:h-auto sm:w-[140px] overflow-hidden bg-gray-100 flex-shrink-0">
         <img 
           src={imageUrl} 
           alt={event.title}
@@ -104,69 +104,64 @@ const EventCardList: React.FC<EventCardListProps> = ({
         />
       </div>
       
-      {/* Content - Updated layout */}
-      <div className="flex flex-col flex-1 p-4 pt-0 sm:pt-4 justify-between">
-        {/* Title - Now first */}
-        <div className="space-y-2">
-          <div className="flex flex-col space-y-2">
-            <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">
-              {event.title}
-            </h3>
+      {/* Content - More compact layout */}
+      <div className="flex flex-col flex-1 p-3 justify-between">
+        {/* Top row with title and event type */}
+        <div className="flex flex-wrap items-start justify-between gap-2 mb-1">
+          <h3 className="font-semibold text-gray-900 text-base line-clamp-1 mr-2">
+            {event.title}
+          </h3>
             
-            {/* Event type pill after the title */}
-            {event.event_type && (
-              <div className="flex">
-                <CategoryPill 
-                  category={event.event_type} 
-                  size="sm" 
-                  showIcon={true} 
-                />
-              </div>
-            )}
-          </div>
-          
-          {/* Date and Time */}
-          <div className="flex items-center gap-4 text-sm text-gray-500 mb-2 mt-2">
-            <div className="flex items-center gap-1">
-              <Calendar className="h-3.5 w-3.5" />
-              <span>
-                {event.start_time ? (
-                  <>
-                    {formatDate(event.start_time)} • {formatEventTime(event.start_time, event.end_time)}
-                  </>
-                ) : 'Date not set'}
-              </span>
+          {/* Event type pill - Now on the same line as title if it fits */}
+          {event.event_type && (
+            <div className="flex-shrink-0">
+              <CategoryPill 
+                category={event.event_type} 
+                size="sm" 
+                showIcon={true} 
+              />
             </div>
-          </div>
+          )}
+        </div>
           
+        {/* Date and Time */}
+        <div className="flex items-center gap-1 text-xs text-gray-500 mt-1 mb-1">
+          <Calendar className="h-3 w-3" />
+          <span>
+            {event.start_time ? (
+              <>
+                {formatDate(event.start_time)} • {formatEventTime(event.start_time, event.end_time)}
+              </>
+            ) : 'Date not set'}
+          </span>
+        </div>
+        
+        {/* Bottom row with location and RSVP buttons */}
+        <div className="flex items-center justify-between mt-1">
           {/* Location */}
-          <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
-            <MapPin className="h-3.5 w-3.5" />
-            <span className="truncate max-w-full">
+          <div className="flex items-center gap-1 text-xs text-gray-500">
+            <MapPin className="h-3 w-3" />
+            <span className="truncate max-w-[200px]">
               {event.venues?.name || event.location || 'No location'}
             </span>
           </div>
           
-          <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-            {event.description || 'No description available'}
-          </p>
+          {/* RSVP Buttons - now on the bottom right */}
+          {(showRsvpButtons || showRsvpStatus) && onRsvp && (
+            <div 
+              className="flex-shrink-0" 
+              data-rsvp-container="true" 
+              onClick={(e) => e.stopPropagation()}
+            >
+              <EventRsvpButtons
+                currentStatus={event.rsvp_status || null}
+                onRsvp={handleRsvp}
+                size="sm"
+                showStatusOnly={!showRsvpButtons && showRsvpStatus}
+              />
+            </div>
+          )}
         </div>
-        
-        {/* RSVP Buttons - only if needed */}
-        {(showRsvpButtons || showRsvpStatus) && onRsvp && (
-          <div 
-            className="mt-auto" 
-            data-rsvp-container="true" 
-            onClick={(e) => e.stopPropagation()}
-          >
-            <EventRsvpButtons
-              currentStatus={event.rsvp_status || null}
-              onRsvp={handleRsvp}
-              size="sm"
-              showStatusOnly={!showRsvpButtons && showRsvpStatus}
-            />
-          </div>
-        )}
       </div>
     </div>
   );

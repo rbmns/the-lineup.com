@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Event } from '@/types';
-import EventCard from './EventCard';
+import EventCard from '../EventCard';
 import EventCardList from './EventCardList';
 import { SkeletonCard } from '@/components/skeletons/SkeletonCard';
 import { SkeletonCardList } from '@/components/skeletons/SkeletonCardList';
@@ -29,20 +29,20 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   hasActiveFilters = false,
   compact = false
 }) => {
-  const [displayMode, setDisplayMode] = useState<'grid' | 'list'>('grid');
+  const [displayMode, setDisplayMode] = useState<'grid' | 'list'>('list'); // Default to list view for compact display
   
   // Determine content to render based on loading state and data
   const renderContent = () => {
     // Loading state
     if (isLoading) {
       return displayMode === 'grid' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, index) => (
             <SkeletonCard key={index} />
           ))}
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {Array.from({ length: 6 }).map((_, index) => (
             <SkeletonCardList key={index} />
           ))}
@@ -65,7 +65,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
     
     // Display events in grid or list mode
     return displayMode === 'grid' ? (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {mainEvents.map((event) => (
           <EventCard 
             key={event.id} 
@@ -77,13 +77,14 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
         ))}
       </div>
     ) : (
-      <div className="space-y-4">
+      <div className="space-y-3">
         {mainEvents.map((event) => (
           <EventCardList 
             key={event.id} 
             event={event} 
             showRsvpButtons={showRsvpButtons}
             onRsvp={onRsvp}
+            compact={true}
           />
         ))}
       </div>
@@ -91,9 +92,9 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   };
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Events</h2>
+        <h2 className="text-lg font-semibold">Events</h2>
         
         <div className="flex items-center space-x-2">
           {/* Grid/List view toggle */}
@@ -135,9 +136,9 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
       
       {/* Related events section - if there are any */}
       {relatedEvents && relatedEvents.length > 0 && !isLoading && (
-        <div className="mt-12 pt-8 border-t">
-          <h2 className="text-xl font-semibold mb-6">You might also like</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="mt-8 pt-6 border-t">
+          <h2 className="text-lg font-semibold mb-4">You might also like</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {relatedEvents.slice(0, 3).map((event) => (
               <EventCard 
                 key={`related-${event.id}`} 

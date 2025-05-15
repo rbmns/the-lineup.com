@@ -81,12 +81,12 @@ const EventsPage = () => {
   };
 
   return (
-    <div className="w-full px-4 md:px-6 py-8">
+    <div className="w-full px-4 md:px-6 py-6">
       <div className="max-w-7xl mx-auto">
         <EventsPageHeader title="What's Happening?" />
         
-        <div className="space-y-12 mt-8">
-          {/* Events List Section - using the optimistic RSVP handler */}
+        <div className="space-y-6 mt-6">
+          {/* Events List Section - using compact list view for more efficient display */}
           <LazyEventsList 
             mainEvents={displayEvents}
             relatedEvents={[]}
@@ -95,7 +95,7 @@ const EventsPage = () => {
             onRsvp={user ? handleEventRsvp : undefined}
             showRsvpButtons={!!user}
             hasActiveFilters={false}
-            compact={true} // Use compact cards for events page
+            compact={true}
           />
         </div>
       </div>

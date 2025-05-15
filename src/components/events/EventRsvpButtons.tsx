@@ -53,9 +53,9 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     );
   }
 
-  // Size configurations
+  // Size configurations - make the sm size even more compact
   const buttonSizeClasses = {
-    sm: 'h-8 px-3 text-xs',
+    sm: 'h-7 px-2 text-xs',
     md: 'h-9 px-4',
     lg: 'h-10 px-5',
   };
@@ -94,7 +94,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
 
   return (
     <div 
-      className={cn("flex gap-2", className)}
+      className={cn("flex gap-1", className)}
       data-no-navigation="true"
       onClick={(e) => e.stopPropagation()}
     >
@@ -102,7 +102,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         variant={optimisticStatus === 'Going' ? "default" : "outline"}
         className={cn(
           buttonClasses,
-          "flex items-center gap-1.5 flex-1 sm:flex-none",
+          "flex items-center gap-1 flex-shrink-0",
           optimisticStatus === 'Going' 
             ? "bg-green-600 hover:bg-green-700 text-white rsvp-going-animation"
             : "hover:border-green-600 hover:text-green-600"
@@ -111,15 +111,15 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         onClick={() => handleRsvp('Going')}
         data-no-navigation="true"
       >
-        <CheckCircle2 className="h-4 w-4" />
-        <span className="whitespace-nowrap">{optimisticStatus === 'Going' ? 'Going' : 'Going'}</span>
+        <CheckCircle2 className={size === 'sm' ? "h-3 w-3" : "h-4 w-4"} />
+        <span className="whitespace-nowrap">{size === 'sm' ? '' : 'Going'}</span>
       </Button>
       
       <Button 
         variant={optimisticStatus === 'Interested' ? "default" : "outline"}
         className={cn(
           buttonClasses,
-          "flex items-center gap-1.5 flex-1 sm:flex-none",
+          "flex items-center gap-1 flex-shrink-0",
           optimisticStatus === 'Interested' 
             ? "bg-blue-600 hover:bg-blue-700 text-white rsvp-interested-animation" 
             : "hover:border-blue-600 hover:text-blue-600"
@@ -128,8 +128,8 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         onClick={() => handleRsvp('Interested')}
         data-no-navigation="true"
       >
-        <Star className="h-4 w-4" />
-        <span className="whitespace-nowrap">Interested</span>
+        <Star className={size === 'sm' ? "h-3 w-3" : "h-4 w-4"} />
+        <span className="whitespace-nowrap">{size === 'sm' ? '' : 'Interested'}</span>
       </Button>
     </div>
   );
