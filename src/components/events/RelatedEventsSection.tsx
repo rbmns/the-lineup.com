@@ -10,11 +10,10 @@ export interface RelatedEventsSectionProps {
 export const RelatedEventsSection: React.FC<RelatedEventsSectionProps> = ({ event }) => {
   return (
     <RelatedEvents 
-      eventId={event.id} 
-      venueId={event.venue_id || ''} 
+      eventId={event.id}
       eventType={event.event_type || ''}
-      tags={event.tags}
-      vibe={event.vibe}
+      // Passing event date for date proximity matching (new)
+      date={event.start_date || event.date || ''}
     />
   );
 };

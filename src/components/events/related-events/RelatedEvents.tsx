@@ -9,31 +9,33 @@ import { supabase } from '@/lib/supabase';
 
 interface RelatedEventsProps {
   eventId: string;
-  venueId?: string;
   eventType?: string;
+  date?: string;
   tags?: string[];
   vibe?: string;
 }
 
 export const RelatedEvents: React.FC<RelatedEventsProps> = ({ 
   eventId,
-  venueId,
   eventType = '',
+  date,
   tags,
   vibe
 }) => {
   const { user } = useAuth();
   const hasFetchedRef = useRef(false);
   const [fallbackEvents, setFallbackEvents] = useState<Event[]>([]);
-  
-  // Get related events based on primary criteria
+
+  // -- Added: eventType + date filtering.
   const { relatedEvents, loading } = useFetchRelatedEvents({
     eventType,
     currentEventId: eventId,
     userId: user?.id,
     tags,
     vibe,
-    minResults: 3 // Increase minimum results to ensure we show something
+    minResults: 3,
+    // NEW: add date param to filtering so only events in a close range are shown.
+    date
   });
 
   // If we don't have at least 2 related events, fetch some fallbacks
@@ -117,5 +119,3 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
     </div>
   );
 };
-
-export default RelatedEvents;

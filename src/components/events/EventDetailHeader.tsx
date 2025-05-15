@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
@@ -7,6 +6,7 @@ import EventShareButton from './EventShareButton';
 import { cn } from '@/lib/utils';
 import { useEventImages } from '@/hooks/useEventImages';
 import { CategoryPill } from '@/components/ui/category-pill';
+import { Calendar } from '@heroicons/react/24/outline';
 
 interface EventDetailHeaderProps {
   event: Event;
@@ -19,6 +19,7 @@ interface EventDetailHeaderProps {
   onEventTypeClick?: () => void;
   startTime?: string;
   showTitleOverlay?: boolean;
+  dateTimeInfo?: string;
 }
 
 export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({ 
@@ -31,7 +32,8 @@ export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({
   title,
   onEventTypeClick,
   startTime,
-  showTitleOverlay
+  showTitleOverlay,
+  dateTimeInfo
 }) => {
   const { getEventImageUrl } = useEventImages();
   
@@ -71,11 +73,16 @@ export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({
           </div>
         )}
         
-        {/* Title overlay - Only shown on desktop/tablet */}
+        {/* Title + date overlay (desktop/tablet only, NOT mobile) */}
         {showTitleOverlay && (
           <div className="absolute bottom-0 left-0 p-6 text-white">
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2">{title || event.title}</h1>
-            
+            {dateTimeInfo && (
+              <div className="flex items-center gap-2 text-white/90 text-base font-medium">
+                <Calendar className="h-5 w-5" />
+                <span>{dateTimeInfo}</span>
+              </div>
+            )}
             {(event.organiser_name || eventType) && (
               <p className="text-base md:text-lg opacity-90">
                 {event.organiser_name ? `By ${event.organiser_name}` : ''}

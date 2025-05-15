@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
@@ -75,7 +74,7 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
 
   return (
     <Card className="overflow-hidden border border-gray-200 shadow-md hover:shadow-xl transition-all duration-500 animate-fade-in">
-      {/* Image header - ALWAYS at the top for all screen sizes */}
+      {/* Image header - ALWAYS at the top for all screen sizes; pass title/date for overlay */}
       <EventDetailHeader
         event={event}
         coverImage={imageUrl}
@@ -86,27 +85,14 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
         onEventTypeClick={handleEventTypeClick}
         startTime={event?.start_time}
         showTitleOverlay={!isMobile}
+        // Pass date/time info for overlay (desktop)
+        dateTimeInfo={!isMobile ? formatDateTime(event.start_date, event.start_time, event.end_time) : undefined}
       />
 
       <CardContent className="p-0">
         <div className="p-6 space-y-6">
 
-          {/* Desktop: show title and datetime over the image; fallback here for accessibility */}
-          {!isMobile && (
-            <div className="mb-2">
-              <h1 className="text-2xl font-semibold leading-tight mb-2 text-gray-900">
-                {event?.title || 'Event'}
-              </h1>
-              {dateTimeInfo && (
-                <div className="flex items-center gap-2 text-gray-700 text-sm mb-2">
-                  <Calendar className="h-4 w-4" />
-                  <span>{dateTimeInfo}</span>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Mobile: show date/time under image under title */}
+          {/* Mobile: show title/date under image under title */}
           {isMobile && (
             <div className="mb-2">
               <h1 className="text-xl font-semibold leading-tight mb-1 text-gray-900">
@@ -121,7 +107,7 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
             </div>
           )}
 
-          {/* RSVP buttons for desktop - directly under the image */}
+          {/* RSVP buttons for desktop - under the image */}
           {isAuthenticated && !isMobile && (
             <div className="animate-fade-in" style={{ animationDelay: '150ms' }}>
               <EventRsvpButtons 
@@ -136,13 +122,13 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
 
           {/* Event description section */}
           <EventDescription description={event.description} isMobile={isMobile} />
-          
-          {/* Location Info - now part of main content */}
+
+          {/* Location Info */}
           <div className="pt-4 pb-2">
             <EventLocationInfo venue={event.venues} />
           </div>
-          
-          {/* Booking Info - now part of main content */}
+
+          {/* Booking Info */}
           <div className="pb-4">
             <BookingInformation event={event} />
           </div>
@@ -153,4 +139,3 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
 };
 
 export default MainEventContent;
-
