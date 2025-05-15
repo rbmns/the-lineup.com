@@ -74,8 +74,13 @@ const EventDetail = () => {
 
   const handleRsvpEvent = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (handleRsvp) {
-      await handleRsvp(event.id, status);
-      return true;
+      try {
+        await handleRsvp(event.id, status);
+        return true;
+      } catch (error) {
+        console.error("Error during RSVP:", error);
+        return false;
+      }
     }
     return false;
   };
@@ -91,7 +96,7 @@ const EventDetail = () => {
         <div className="lg:col-span-2">
           <EventDetailContent 
             event={event}
-            onRsvp={(status) => handleRsvp(event.id, status)}
+            onRsvp={(status: 'Going' | 'Interested') => handleRsvp(event.id, status)}
             isRsvpLoading={false}
             isOwner={event.created_by === event.creator?.id}
           />

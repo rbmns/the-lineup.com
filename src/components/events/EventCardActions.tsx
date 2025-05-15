@@ -65,7 +65,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
   };
 
   // Determine the appropriate button size based on compact mode and useSmallButtons prop
-  const buttonSize = useSmallButtons ? 'sm' : (compact ? 'sm' : 'default');
+  const buttonSize = useSmallButtons ? 'sm' : (compact ? 'sm' : 'md');
 
   return (
     <div 

@@ -99,7 +99,7 @@ interface CategoryPillProps {
   active?: boolean;
   showIcon?: boolean;
   className?: string;
-  size?: 'xs' | 'sm' | 'default';
+  size?: 'xs' | 'sm' | 'default' | 'lg';
 }
 
 export const CategoryPill: React.FC<CategoryPillProps> = ({
@@ -118,13 +118,15 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
   const sizeClasses = {
     'xs': 'text-xs py-0.5 px-1.5',
     'sm': 'text-xs py-1 px-2',
-    'default': 'text-sm py-1.5 px-3'
+    'default': 'text-sm py-1.5 px-3',
+    'lg': 'text-sm py-2 px-4 font-medium'
   };
   
   const iconSize = {
     'xs': 'h-3 w-3 mr-0.5',
     'sm': 'h-3.5 w-3.5 mr-1',
-    'default': 'h-4 w-4 mr-1.5'
+    'default': 'h-4 w-4 mr-1.5',
+    'lg': 'h-4.5 w-4.5 mr-2'
   };
   
   return (

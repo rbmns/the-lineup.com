@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Event } from '@/types';
-import { MapPin, Check, Star } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { formatInTimeZone } from 'date-fns-tz';
 import { cn } from '@/lib/utils';
 import { CategoryPill } from '@/components/ui/category-pill';
@@ -15,6 +15,7 @@ const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
 interface EventCardListProps {
   event: Event;
   showRsvpButtons?: boolean;
+  showRsvpStatus?: boolean;
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   className?: string;
 }
@@ -22,6 +23,7 @@ interface EventCardListProps {
 const EventCardList: React.FC<EventCardListProps> = ({
   event,
   showRsvpButtons = false,
+  showRsvpStatus = false,
   onRsvp,
   className
 }) => {
@@ -54,6 +56,19 @@ const EventCardList: React.FC<EventCardListProps> = ({
       });
     } else {
       console.error("Cannot navigate: Missing event ID", event);
+    }
+  };
+
+  // Safely handle RSVP
+  const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    if (!onRsvp) return false;
+    
+    try {
+      const result = await onRsvp(event.id, status);
+      return result === undefined ? true : !!result;
+    } catch (error) {
+      console.error('Error in EventCardList RSVP handler:', error);
+      return false;
     }
   };
 
@@ -107,7 +122,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
             </div>
             
             {/* Display RSVP status if not showing buttons */}
-            {!showRsvpButtons && event.rsvp_status && (
+            {!showRsvpButtons && showRsvpStatus && event.rsvp_status && (
               <div 
                 className={cn(
                   "ml-2 px-2 py-0.5 text-xs font-medium rounded",
@@ -125,7 +140,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
           <div className="flex items-center justify-end mt-2 gap-1">
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
-              onRsvp={(status) => onRsvp(event.id, status)}
+              onRsvp={handleRsvp}
               size="sm"
             />
           </div>

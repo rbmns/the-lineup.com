@@ -4,7 +4,6 @@ import { Event } from '@/types';
 import {
   Calendar,
   MapPin,
-  Clock,
   Users,
   ExternalLink,
   Share2
@@ -75,7 +74,7 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
     }
   }, [event.start_time, event.end_time]);
   
-  // Process tags for display
+  // Process tags for display - carefully handling all possible types
   const eventTags = useMemo(() => {
     if (!event.tags) return [];
     
@@ -91,7 +90,6 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
     
     // For any other type, try to convert to string
     try {
-      // Convert to string and check if it's valid
       const tagsStr = String(event.tags);
       // Only proceed if we have a non-empty string
       if (tagsStr && tagsStr !== "[object Object]" && tagsStr !== "undefined" && tagsStr !== "null") {
@@ -105,34 +103,44 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
     return [];
   }, [event.tags]);
   
-  // Helper function to safely extract coordinates
-  const getCoordinates = useMemo(() => {
+  // Safely extract coordinates from different possible formats
+  const getEventCoordinates = useMemo(() => {
     if (!event.coordinates) return null;
     
-    // Handle coordinates as an object with latitude/longitude properties
-    if (typeof event.coordinates === 'object' && 'latitude' in event.coordinates && 'longitude' in event.coordinates) {
-      return {
-        latitude: Number(event.coordinates.latitude),
-        longitude: Number(event.coordinates.longitude)
-      };
-    }
-    
-    // Handle coordinates as array [longitude, latitude]
-    if (Array.isArray(event.coordinates) && event.coordinates.length >= 2) {
-      return {
-        latitude: Number(event.coordinates[1]),
-        longitude: Number(event.coordinates[0])
-      };
+    try {
+      // Handle coordinates as an array [longitude, latitude]
+      if (Array.isArray(event.coordinates) && event.coordinates.length >= 2) {
+        return {
+          latitude: Number(event.coordinates[1]),
+          longitude: Number(event.coordinates[0])
+        };
+      }
+      
+      // Handle coordinates as an object with latitude/longitude properties
+      if (typeof event.coordinates === 'object') {
+        const coords = event.coordinates as any;
+        if ('latitude' in coords && 'longitude' in coords) {
+          return {
+            latitude: Number(coords.latitude),
+            longitude: Number(coords.longitude)
+          };
+        }
+      }
+    } catch (err) {
+      console.error('Error processing coordinates:', err);
     }
     
     return null;
   }, [event.coordinates]);
   
   // Handle RSVP
-  const handleRsvp = async (status: 'Going' | 'Interested') => {
+  const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp) return false;
     return onRsvp(event.id, status);
   };
+  
+  // Check if we have a booking link
+  const bookingLink = event.booking_link || event.external_url || null;
   
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-12">
@@ -157,7 +165,7 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
         <Separator />
         
         {/* Location section */}
-        {(event.venue_id || event.location || getCoordinates) && (
+        {(event.venue_id || event.location || getEventCoordinates) && (
           <div>
             <div className="flex items-start space-x-2 mb-4">
               <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
@@ -173,12 +181,12 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
               </div>
             </div>
             
-            {getCoordinates && (
+            {getEventCoordinates && (
               <div className="mt-4 rounded-xl overflow-hidden border h-[300px]">
                 <AspectRatio ratio={16/9} className="h-full">
                   <EventMap 
-                    latitude={getCoordinates.latitude} 
-                    longitude={getCoordinates.longitude}
+                    latitude={getEventCoordinates.latitude} 
+                    longitude={getEventCoordinates.longitude}
                     name={event.venues?.name || event.title || 'Event Location'}
                   />
                 </AspectRatio>
@@ -276,10 +284,10 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
         </div>
         
         {/* External link if available */}
-        {event.booking_link && (
+        {bookingLink && (
           <div>
             <a 
-              href={event.booking_link}
+              href={bookingLink}
               target="_blank"
               rel="noopener noreferrer"
               className="text-purple-600 font-medium flex items-center gap-1.5 hover:underline"

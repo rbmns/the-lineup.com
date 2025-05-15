@@ -10,7 +10,7 @@ interface EventRsvpButtonsProps {
   onRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
-  loading?: boolean;  // Added loading prop
+  loading?: boolean;
 }
 
 export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
@@ -30,8 +30,8 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   }, [currentStatus]);
 
   const handleRsvp = async (status: 'Going' | 'Interested') => {
-    if (!user) return;
-    if (isUpdating || loading) return;
+    if (!user) return false;
+    if (isUpdating || loading) return false;
     
     try {
       setIsUpdating(true);
@@ -47,9 +47,12 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       if (!success) {
         setLocalStatus(currentStatus);
       }
+      
+      return success;
     } catch (error) {
       console.error('RSVP error:', error);
       setLocalStatus(currentStatus);
+      return false;
     } finally {
       setIsUpdating(false);
     }

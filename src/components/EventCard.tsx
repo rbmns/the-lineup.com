@@ -54,11 +54,15 @@ const EventCard: React.FC<EventCardProps> = ({
   };
   
   const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
-    if (onRsvp) {
+    if (!onRsvp) return false;
+    
+    try {
       const result = await onRsvp(event.id, status);
       return result === undefined ? true : !!result;
+    } catch (error) {
+      console.error('Error in EventCard RSVP handler:', error);
+      return false;
     }
-    return false;
   };
   
   const handleShare = (e: React.MouseEvent) => {
@@ -103,20 +107,22 @@ const EventCard: React.FC<EventCardProps> = ({
             No image
           </div>
         )}
+        
+        {/* Event type pill positioned at top of image */}
+        {event.event_type && (
+          <div className="absolute top-3 left-3 z-10">
+            <CategoryPill
+              category={event.event_type}
+              size="sm"
+              showIcon={true}
+              className="bg-white/90 backdrop-blur-sm shadow-sm"
+            />
+          </div>
+        )}
       </AspectRatio>
       
       <div className={cn("flex flex-col justify-between", contentPadding, compact ? 'h-[200px]' : 'h-[200px]')}>
         <div className="space-y-2">
-          {event.event_type && (
-            <div className="mb-1">
-              <CategoryPill
-                category={event.event_type}
-                size={compact ? "sm" : "default"}
-                showIcon={true}
-              />
-            </div>
-          )}
-          
           <h3 className={cn("font-bold line-clamp-2", compact ? 'text-base' : 'text-lg')}>
             {event.title}
           </h3>
@@ -139,7 +145,7 @@ const EventCard: React.FC<EventCardProps> = ({
             <EventRsvpButtons 
               currentStatus={event.rsvp_status} 
               onRsvp={handleRsvp}
-              size={compact ? 'sm' : 'default'}
+              size={compact ? 'sm' : 'md'}
             />
           </div>
         )}
