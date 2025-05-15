@@ -1,0 +1,69 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ... keep existing code */
+
+/* RSVP Animations */
+@keyframes buttonClickPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.button-click-animation {
+  animation: buttonClickPulse 0.2s ease-out;
+}
+
+@keyframes rsvpGoingPulse {
+  0% { box-shadow: 0 0 0 0px rgba(34, 197, 94, 0.2); }
+  100% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+}
+
+.rsvp-going-animation {
+  animation: rsvpGoingPulse 0.4s ease-out;
+}
+
+@keyframes rsvpInterestedPulse {
+  0% { box-shadow: 0 0 0 0px rgba(59, 130, 246, 0.2); }
+  100% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0); }
+}
+
+.rsvp-interested-animation {
+  animation: rsvpInterestedPulse 0.4s ease-out;
+}
+
+/* Loading indicator during RSVP operations */
+.rsvp-loading-indicator {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 1000;
+  overflow: hidden;
+  opacity: 0.5;
+}
+
+.rsvp-loading-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: linear-gradient(to right, #10b981, #3b82f6);
+  width: 100%;
+  animation: rsvpLoading 1.5s infinite linear;
+}
+
+@keyframes rsvpLoading {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ... keep existing code */

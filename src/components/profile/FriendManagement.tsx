@@ -1,0 +1,297 @@
+
+import React from 'react';
+import { Button } from '@/components/ui/button';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog";
+import { useFriendship } from '@/hooks/useFriendship';
+import { supabase } from '@/lib/supabase';
+import { toast } from '@/hooks/use-toast';
+import { UserProfile } from '@/types';
+import { Check, X, UserMinus } from 'lucide-react';
+
+interface FriendManagementProps {
+  profile: UserProfile | null;
+  currentUserId: string | undefined;
+  friendshipStatus: 'none' | 'pending' | 'accepted';
+  setFriendshipStatus: (status: 'none' | 'pending' | 'accepted') => void;
+  onFriendRemoved?: () => void;
+}
+
+export const FriendManagement: React.FC<FriendManagementProps> = ({
+  profile,
+  currentUserId,
+  friendshipStatus,
+  setFriendshipStatus,
+  onFriendRemoved
+}) => {
+  const [showUnfriendDialog, setShowUnfriendDialog] = React.useState(false);
+  const [isProcessing, setIsProcessing] = React.useState(false);
+  const { initiateFriendRequest } = useFriendship();
+
+  const handleAddFriend = async () => {
+    if (!currentUserId || !profile?.id) {
+      toast({
+        title: "Error",
+        description: "Unable to send friend request",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      const result = await initiateFriendRequest(profile.id);
+      if (result) {
+        setFriendshipStatus('pending');
+        // Toast kept for sent request
+      }
+    } catch (err) {
+      console.error('Error sending friend request:', err);
+      toast({
+        title: "Error",
+        description: "Failed to send friend request",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleRemoveFriend = () => {
+    setShowUnfriendDialog(true);
+  };
+  
+  const confirmUnfriend = async () => {
+    if (!currentUserId || !profile?.id) {
+      toast({
+        title: "Error",
+        description: "Unable to remove friend",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setIsProcessing(true);
+    try {
+      const result = await removeFriendship(currentUserId, profile.id);
+      if (result) {
+        // No toast for friend removal to reduce notifications
+        
+        setFriendshipStatus('none');
+        
+        if (onFriendRemoved) {
+          onFriendRemoved();
+        }
+      }
+    } catch (error) {
+      console.error('Error removing friend:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove friend",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+      setShowUnfriendDialog(false);
+    }
+  };
+
+  const removeFriendship = async (userId: string, friendId: string) => {
+    try {
+      console.log(`Attempting to remove friendship between ${userId} and ${friendId}`);
+      
+      // Find the friendship record
+      const { data, error: findError } = await supabase
+        .from('friendships')
+        .select('id')
+        .or(`and(user_id.eq.${userId},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${userId})`)
+        .eq('status', 'Accepted')
+        .maybeSingle();
+        
+      if (findError) {
+        console.error("Error finding friendship:", findError);
+        throw findError;
+      }
+      
+      if (!data) {
+        console.error("Friendship not found");
+        throw new Error('Friendship not found');
+      }
+      
+      console.log(`Found friendship with ID: ${data.id}, updating to Removed`);
+      
+      // Update the friendship record to Removed status instead of deleting
+      const { error: updateError } = await supabase
+        .from('friendships')
+        .update({ 
+          status: 'Removed',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', data.id);
+        
+      if (updateError) {
+        console.error("Error updating friendship:", updateError);
+        throw updateError;
+      }
+      
+      console.log("Friendship successfully marked as Removed");
+      return true;
+    } catch (error) {
+      console.error('Error removing friend:', error);
+      throw error;
+    }
+  };
+
+  const handleAcceptRequest = async () => {
+    if (!currentUserId || !profile?.id) return;
+    
+    try {
+      setIsProcessing(true);
+      
+      // Find the friendship request
+      const { data, error: findError } = await supabase
+        .from('friendships')
+        .select('id')
+        .eq('user_id', profile.id)
+        .eq('friend_id', currentUserId)
+        .eq('status', 'Pending')
+        .maybeSingle();
+      
+      if (findError) throw findError;
+      if (!data) throw new Error('Friend request not found');
+      
+      // Update the status to Accepted
+      const { error: updateError } = await supabase
+        .from('friendships')
+        .update({ 
+          status: 'Accepted',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', data.id);
+        
+      if (updateError) throw updateError;
+      
+      setFriendshipStatus('accepted');
+      
+      // No toast message when accepting request - we're the logged-in user accepting
+      
+    } catch (err) {
+      console.error('Error accepting friend request:', err);
+      toast({
+        title: "Error",
+        description: "Failed to accept friend request",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+  
+  const handleDeclineRequest = async () => {
+    if (!currentUserId || !profile?.id) return;
+    
+    try {
+      setIsProcessing(true);
+      
+      // Find the friendship request
+      const { data, error: findError } = await supabase
+        .from('friendships')
+        .select('id')
+        .eq('user_id', profile.id)
+        .eq('friend_id', currentUserId)
+        .eq('status', 'Pending')
+        .maybeSingle();
+      
+      if (findError) throw findError;
+      if (!data) throw new Error('Friend request not found');
+      
+      // Update the request to Removed status
+      const { error: updateError } = await supabase
+        .from('friendships')
+        .update({ 
+          status: 'Removed',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', data.id);
+        
+      if (updateError) throw updateError;
+      
+      setFriendshipStatus('none');
+      // No toast for declined request
+    } catch (err) {
+      console.error('Error declining friend request:', err);
+      toast({
+        title: "Error",
+        description: "Failed to decline friend request",
+        variant: "destructive"
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <>
+      {friendshipStatus === 'none' && (
+        <Button 
+          onClick={handleAddFriend} 
+          className="mt-4 bg-purple-600 hover:bg-purple-700 text-white"
+          disabled={isProcessing}
+        >
+          {isProcessing ? 'Processing...' : 'Add Friend'}
+        </Button>
+      )}
+      
+      {friendshipStatus === 'pending' && (
+        <Button 
+          disabled 
+          className="mt-4 bg-gray-400 text-white cursor-not-allowed"
+        >
+          Request Pending
+        </Button>
+      )}
+      
+      {friendshipStatus === 'accepted' && (
+        <Button 
+          onClick={handleRemoveFriend} 
+          variant="outline" 
+          className="mt-4 border-red-500 text-black hover:bg-red-50 bg-white"
+          disabled={isProcessing}
+        >
+          <UserMinus className="h-4 w-4 mr-2" />
+          {isProcessing ? 'Processing...' : 'Remove Friend'}
+        </Button>
+      )}
+      
+      <AlertDialog open={showUnfriendDialog} onOpenChange={setShowUnfriendDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Friend</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove {profile?.username || 'this user'} from your friends? 
+              This will end your friendship connection.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isProcessing}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmUnfriend} 
+              className="bg-white border border-red-500 text-black hover:bg-red-50"
+              disabled={isProcessing}
+            >
+              {isProcessing ? 'Processing...' : 'Remove'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+};

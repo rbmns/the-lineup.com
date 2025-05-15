@@ -1,0 +1,35 @@
+
+import React from 'react';
+import { Event } from '@/types';
+import RelatedEventCard from './RelatedEventCard';
+
+interface RelatedEventsGridProps {
+  events: Event[];
+}
+
+export const RelatedEventsGrid: React.FC<RelatedEventsGridProps> = ({ events }) => {
+  // We always want to show at least 2 events, but we handle that in the parent component
+  // This component should just render what it's given
+  if (!events || events.length === 0) {
+    return null;
+  }
+
+  // Ensure we're working with a stable array
+  const eventsArray = Array.isArray(events) ? events : [];
+  
+  // Show up to 3 events if available
+  const eventsToShow = eventsArray.slice(0, 3);
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 gap-y-6">
+      {eventsToShow.map((event) => (
+        <RelatedEventCard 
+          key={event.id} 
+          event={event} 
+        />
+      ))}
+    </div>
+  );
+};
+
+export default RelatedEventsGrid;
