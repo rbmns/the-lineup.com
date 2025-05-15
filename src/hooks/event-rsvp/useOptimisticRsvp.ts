@@ -12,6 +12,7 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
   const isProcessingRef = useRef(false);
+  const toastShownRef = useRef(false);
 
   const handleRsvp = useCallback(async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     // Prevent concurrent RSVP operations
@@ -21,7 +22,13 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
     }
 
     if (!userId) {
-      toast("Please log in to RSVP to events");
+      // Only show toast once per session to avoid spamming
+      if (!toastShownRef.current) {
+        toast("Please log in to RSVP to events");
+        toastShownRef.current = true;
+        // Reset after 5 seconds
+        setTimeout(() => { toastShownRef.current = false }, 5000);
+      }
       return false;
     }
 
@@ -145,10 +152,18 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
             }
           }
           
-          // Show a toast notification for feedback
-          const action = newRsvpStatus === null ? "Removed" : 
-                         newRsvpStatus === "Going" ? "Going to" : "Interested in";
-          toast(`${action} event`);
+          // Limited toast notification to prevent disruptive UX
+          if (!toastShownRef.current) {
+            const action = newRsvpStatus === null ? "Removed" : 
+                          newRsvpStatus === "Going" ? "Going to" : "Interested in";
+            toast(`${action} event`, {
+              duration: 1500,
+            });
+            
+            // Limit toast frequency
+            toastShownRef.current = true;
+            setTimeout(() => { toastShownRef.current = false }, 3000);
+          }
           
           console.log("Database update completed successfully");
           return true;
@@ -164,6 +179,14 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
       if (!result) {
         throw new Error("Database operation failed");
       }
+      
+      // Restore scroll position
+      setTimeout(() => {
+        window.scrollTo({
+          top: scrollPosition,
+          behavior: 'auto'
+        });
+      }, 10);
       
       console.log(`OptimisticRsvp: Completed successfully for event ${eventId}`);
       return true;
@@ -183,7 +206,12 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
         queryClient.setQueryData(['event', eventId], previousEventData);
       }
       
-      toast("Failed to update RSVP status");
+      // Limit toast frequency
+      if (!toastShownRef.current) {
+        toast("Failed to update RSVP status");
+        toastShownRef.current = true;
+        setTimeout(() => { toastShownRef.current = false }, 3000);
+      }
       return false;
     } finally {
       setLoading(false);

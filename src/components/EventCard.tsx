@@ -35,9 +35,11 @@ const EventCard: React.FC<EventCardProps> = ({
   const imageUrl = getEventImageUrl(event);
   
   const handleCardClick = (e: React.MouseEvent) => {
-    // Don't navigate if clicking on RSVP buttons or anything with data-rsvp-button attribute
+    // Don't navigate if clicking on RSVP buttons or anything with data-rsvp-button or data-rsvp-container attribute
     if ((e.target as HTMLElement).closest('[data-rsvp-button]') || 
         (e.target as HTMLElement).closest('[data-rsvp-container]')) {
+      e.preventDefault();
+      e.stopPropagation();
       return;
     }
     

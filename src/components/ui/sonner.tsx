@@ -1,7 +1,6 @@
 
 import { useTheme } from "next-themes"
 import { Toaster as Sonner } from "sonner"
-import { toast } from "@/hooks/use-toast"
 
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
@@ -12,10 +11,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group fixed z-[100]"
-      position="top-right"
+      position="bottom-right"
       expand={false}
       closeButton={true}
       richColors={true}
+      duration={1500}
       toastOptions={{
         classNames: {
           toast:
@@ -30,7 +30,6 @@ const Toaster = ({ ...props }: ToasterProps) => {
           warning: "bg-amber-50 border-amber-500 text-amber-700", 
           info: "bg-blue-50 border-blue-500 text-blue-700",
         },
-        duration: 4000,
       }}
       {...props}
     />

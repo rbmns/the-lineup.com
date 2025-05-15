@@ -63,14 +63,13 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     e.stopPropagation();
     
     if (loading) {
-      toast("Please wait, processing your previous request");
-      return;
+      return false;
     }
     
     // Apply optimistic UI update
     setActiveStatus(activeStatus === status ? undefined : status);
     
-    // Add button press animation - faster and smoother
+    // Add button press animation
     const button = e.currentTarget as HTMLElement;
     if (button) {
       button.classList.add('button-click-animation');
@@ -100,7 +99,10 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     <div 
       className={`flex gap-2 ${className}`} 
       data-rsvp-button="container"
-      onClick={e => e.stopPropagation()}
+      onClick={e => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
     >
       <Button
         type="button"
