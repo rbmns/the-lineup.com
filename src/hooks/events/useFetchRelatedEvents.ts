@@ -11,7 +11,7 @@ interface UseFetchRelatedEventsProps {
   tags?: string[];
   vibe?: string;
   minResults?: number;
-  startDate?: string; // <-- added startDate to the type definition
+  startDate?: string;
 }
 
 export const useFetchRelatedEvents = ({ 
@@ -20,7 +20,7 @@ export const useFetchRelatedEvents = ({
   userId,
   tags,
   vibe,
-  minResults = 2 // Default to at least 2 results
+  minResults = 2
 }: UseFetchRelatedEventsProps) => {
   const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -40,6 +40,9 @@ export const useFetchRelatedEvents = ({
         loadingRef.current = true;
         setLoading(true);
         
+        // Get current date to filter out past events
+        const today = new Date().toISOString().split('T')[0];
+        
         // First strategy: Fetch events with the same event type
         let query = supabase.from('events').select(`
           *,
@@ -48,6 +51,7 @@ export const useFetchRelatedEvents = ({
         `)
         .eq('event_type', eventType)
         .neq('id', currentEventId)
+        .gte('start_date', today) // Only future events
         .order('start_time', { ascending: true })
         .limit(8);
         
@@ -60,13 +64,8 @@ export const useFetchRelatedEvents = ({
         let filteredEvents: Event[] = [];
         
         if (data && data.length > 0) {
-          const now = new Date();
-          
           // Filter to just future events
-          filteredEvents = data.filter(event => {
-            if (!event.start_time) return false;
-            return new Date(event.start_time) > now;
-          });
+          filteredEvents = data;
           
           // If we have a userId, fetch RSVP status for each event
           if (userId) {
@@ -116,19 +115,14 @@ export const useFetchRelatedEvents = ({
             venues:venue_id(*)
           `)
           .neq('id', currentEventId)
+          .gte('start_date', today) // Only future events
           .order('start_time', { ascending: true })
           .limit(10);
           
           const { data: fallbackData, error: fallbackError } = await fallbackQuery;
           
           if (!fallbackError && fallbackData && fallbackData.length > 0) {
-            const now = new Date();
-            
-            // Filter to just future events
-            let additionalEvents = fallbackData.filter(event => {
-              if (!event.start_time) return false;
-              return new Date(event.start_time) > now;
-            });
+            let additionalEvents = fallbackData;
             
             // If we have tags, prefer events with matching tags
             if (tags && tags.length > 0) {
@@ -189,8 +183,13 @@ export const useFetchRelatedEvents = ({
             console.log('Trying similar events as last resort...');
             const similarEvents = await fetchSimilarEvents([eventType]);
           
-            // Filter out the current event
-            const additionalEvents = similarEvents.filter(event => event.id !== currentEventId);
+            // Filter out the current event and past events
+            const now = new Date();
+            const additionalEvents = similarEvents.filter(event => {
+              if (event.id === currentEventId) return false;
+              if (!event.start_time) return false;
+              return new Date(event.start_time) > now;
+            });
             
             // Add RSVP status if available
             if (userId && additionalEvents.length > 0) {
@@ -250,7 +249,7 @@ export const useFetchRelatedEvents = ({
     } else {
       setLoading(false);
     }
-  }, [eventType, currentEventId, userId, minResults, tags, vibe]); 
+  }, [eventType, currentEventId, userId, minResults, tags, vibe, fetchSimilarEvents]); 
   
   return { relatedEvents, loading };
 };
