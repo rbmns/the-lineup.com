@@ -1,8 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Event } from '@/types';
-import { filterEventsByType } from '@/utils/eventUtils';
-import { filterEventsByVenue } from '@/utils/eventUtils';
+import { filterEventsByType, filterEventsByVenue } from '@/utils/eventUtils';
 import { filterEventsByDate } from '@/utils/dateUtils';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
