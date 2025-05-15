@@ -15,6 +15,7 @@ interface EventRsvpButtonsProps {
   className?: string;
   size?: 'sm' | 'default' | 'lg' | 'xl';
   variant?: 'default' | 'compact' | 'minimal';
+  showStatusOnly?: boolean;
 }
 
 export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
@@ -24,7 +25,8 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   disabled = false,
   className = '',
   size = 'default',
-  variant = 'default'
+  variant = 'default',
+  showStatusOnly = false
 }) => {
   const [localLoading, setLocalLoading] = useState<RsvpStatus | 'all' | null>(null);
   const isGoing = currentStatus === 'Going';
@@ -37,6 +39,25 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     lg: 'h-11 text-base',
     xl: 'h-12 text-base'
   };
+
+  // If showStatusOnly is true and there's a current status, only show a badge
+  if (showStatusOnly && currentStatus) {
+    return (
+      <div className={cn("flex items-center", className)}>
+        <Badge
+          variant="outline"
+          className={cn(
+            "py-1 px-3 text-xs font-medium transition-all duration-200",
+            currentStatus === 'Going' 
+              ? "bg-green-50 text-green-700 border-green-200" 
+              : "bg-blue-50 text-blue-700 border-blue-200"
+          )}
+        >
+          {currentStatus}
+        </Badge>
+      </div>
+    );
+  }
 
   // Set sizes based on variant
   const getButtonStyle = (active: boolean, status: 'Going' | 'Interested') => {
