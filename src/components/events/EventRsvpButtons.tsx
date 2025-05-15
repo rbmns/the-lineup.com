@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { CheckCircle2, Star } from 'lucide-react';
@@ -21,6 +21,10 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   className,
   showStatusOnly = false,
 }) => {
+  // Add local loading state to prevent double-clicks
+  const [localLoading, setLocalLoading] = useState(false);
+  const isLoading = loading || localLoading;
+
   // If we're only showing status, render a simple indicator
   if (showStatusOnly && currentStatus) {
     return (
@@ -57,6 +61,18 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   // Base classes for buttons
   const buttonClasses = buttonSizeClasses[size] || buttonSizeClasses.md;
 
+  const handleRsvp = async (status: 'Going' | 'Interested') => {
+    if (isLoading) return; // Prevent multiple clicks
+    
+    try {
+      setLocalLoading(true);
+      await onRsvp(status);
+    } finally {
+      // Add a small delay to prevent rapid re-clicking
+      setTimeout(() => setLocalLoading(false), 500);
+    }
+  };
+
   return (
     <div className={cn("flex gap-2", className)}>
       <Button 
@@ -68,10 +84,8 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
             ? "bg-green-600 hover:bg-green-700 text-white rsvp-going-animation"
             : "hover:border-green-600 hover:text-green-600"
         )}
-        disabled={loading}
-        onClick={async () => {
-          await onRsvp('Going');
-        }}
+        disabled={isLoading}
+        onClick={() => handleRsvp('Going')}
       >
         <CheckCircle2 className="h-4 w-4" />
         <span>{currentStatus === 'Going' ? 'Going' : 'Going'}</span>
@@ -86,10 +100,8 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
             ? "bg-blue-600 hover:bg-blue-700 text-white rsvp-interested-animation" 
             : "hover:border-blue-600 hover:text-blue-600"
         )}
-        disabled={loading}
-        onClick={async () => {
-          await onRsvp('Interested');
-        }}
+        disabled={isLoading}
+        onClick={() => handleRsvp('Interested')}
       >
         <Star className="h-4 w-4" />
         <span>Interested</span>

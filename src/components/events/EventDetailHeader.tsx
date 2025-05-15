@@ -38,8 +38,11 @@ export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({
   const imageUrl = providedCoverImage || image || getEventImageUrl(event);
   
   return (
-    <div className="relative">
-      <AspectRatio ratio={21/9} className="overflow-hidden rounded-lg bg-gray-100 mb-6">
+    <div className="relative w-full">
+      <AspectRatio 
+        ratio={21/9} 
+        className="overflow-hidden rounded-t-lg bg-gray-100"
+      >
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -53,19 +56,24 @@ export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({
           </div>
         )}
         
+        {/* Overlay gradient for text visibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         
-        <div className="absolute bottom-0 left-0 p-6 text-white">
-          <h1 className="text-4xl font-bold mb-2">{title || event.title}</h1>
-          
-          {(event.organiser_name || eventType) && (
-            <p className="text-lg opacity-90">
-              {eventType ? `${eventType}` : ''}
-              {event.organiser_name ? `By ${event.organiser_name}` : ''}
-            </p>
-          )}
-        </div>
+        {/* Title overlay - Only shown on desktop/tablet */}
+        {showTitleOverlay && (
+          <div className="absolute bottom-0 left-0 p-6 text-white">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2">{title || event.title}</h1>
+            
+            {(event.organiser_name || eventType) && (
+              <p className="text-base md:text-lg opacity-90">
+                {eventType ? `${eventType}` : ''}
+                {event.organiser_name ? `By ${event.organiser_name}` : ''}
+              </p>
+            )}
+          </div>
+        )}
         
+        {/* Share button - Always visible */}
         <div className="absolute top-4 right-4">
           <EventShareButton 
             event={event} 

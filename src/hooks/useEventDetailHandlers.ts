@@ -40,19 +40,26 @@ export const useEventDetailHandlers = () => {
   const wrapRsvpWithScrollPreservation = (
     originalHandleRsvpAction: (status: 'Going' | 'Interested') => Promise<boolean>
   ) => {
-    return async (status: 'Going' | 'Interested') => {
+    return async (status: 'Going' | 'Interested'): Promise<boolean> => {
       console.log(`EventDetail: Handling RSVP with status ${status}`);
       
-      // Use the withScrollPreservation utility from our hook
-      return withScrollPreservation(async () => {
-        try {
-          console.log(`Calling originalHandleRsvpAction with status: ${status}`);
-          return await originalHandleRsvpAction(status);
-        } catch (error) {
-          console.error("Error handling RSVP:", error);
-          return false;
-        }
-      });
+      // Cache current scroll position
+      const scrollPosition = window.scrollY;
+      
+      try {
+        // Execute the RSVP action
+        const result = await originalHandleRsvpAction(status);
+        
+        // Restore scroll position after a slight delay to ensure DOM updates have happened
+        setTimeout(() => {
+          window.scrollTo({ top: scrollPosition, behavior: 'auto' });
+        }, 50);
+        
+        return result;
+      } catch (error) {
+        console.error("Error handling RSVP:", error);
+        return false;
+      }
     };
   };
 

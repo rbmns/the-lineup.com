@@ -112,13 +112,13 @@ const EventDetail = () => {
 
   return (
     <div className="container mx-auto px-4 pt-6 pb-24">
-      {/* Back button for all screen sizes */}
+      {/* Back button for all screen sizes - Improved styling */}
       <div className="mb-4">
         <Button 
-          variant="ghost" 
+          variant="outline" 
           onClick={handleBackToEvents}
-          size={isMobile ? "sm" : "default"}
-          className="flex items-center gap-1.5 text-gray-600"
+          size={isMobile ? "default" : "lg"}
+          className="flex items-center gap-1.5 text-gray-700 border-gray-300 shadow-sm hover:bg-gray-50"
         >
           <ChevronLeft className="h-4 w-4" />
           Back to Events
@@ -162,7 +162,7 @@ const EventDetail = () => {
         </div>
         
         {/* Sidebar content - takes up 1/3 of the screen on desktop */}
-        <div className="order-first lg:order-last">
+        <div className="lg:order-last order-first">
           <SidebarContent 
             event={event}
             attendees={attendees}
