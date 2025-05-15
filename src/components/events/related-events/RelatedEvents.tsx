@@ -100,8 +100,10 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
     });
   }
 
-  // Debug log to check if we have any events
-  console.log('Combined events for display:', combinedEvents.length);
+  // If there are no events to display, return null to hide the component completely
+  if (combinedEvents.length === 0) {
+    return null;
+  }
   
   return (
     <div className="animate-fade-in space-y-4" style={{ animationDelay: '400ms' }}>

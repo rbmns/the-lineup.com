@@ -7,6 +7,8 @@ import { EventMetaInfo } from '@/components/events/EventMetaInfo';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar } from 'lucide-react';
 import { EventDescription } from '@/components/events/EventDescription';
+import { EventLocationInfo } from '@/components/events/EventLocationInfo';
+import { BookingInformation } from '@/components/events/BookingInformation';
 
 interface MainEventContentProps {
   event: Event;
@@ -98,6 +100,16 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
 
           {/* Event description section */}
           <EventDescription description={event.description} isMobile={isMobile} />
+          
+          {/* Location Info - now part of main content */}
+          <div className="pt-4 pb-2">
+            <EventLocationInfo venue={event.venues} />
+          </div>
+          
+          {/* Booking Info - now part of main content */}
+          <div className="pb-4">
+            <BookingInformation event={event} />
+          </div>
         </div>
       </CardContent>
     </Card>

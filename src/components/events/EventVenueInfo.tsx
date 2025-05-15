@@ -2,7 +2,6 @@
 import React from 'react';
 import { MapPin } from 'lucide-react';
 import { Venue } from '@/types';
-import { Link } from 'react-router-dom';
 
 interface EventVenueInfoProps {
   venue: Venue | null;
@@ -28,16 +27,7 @@ export const EventVenueInfo: React.FC<EventVenueInfoProps> = ({
     <div className={`flex items-start gap-2 ${className}`}>
       <MapPin className={`flex-shrink-0 mt-1 text-gray-500 ${iconClassName}`} />
       <div className="flex flex-col">
-        {venue.slug ? (
-          <Link 
-            to={`/venues/${venue.slug}`}
-            className="font-medium text-gray-900 font-inter hover:text-blue-600 hover:underline"
-          >
-            {venue.name}
-          </Link>
-        ) : (
-          <span className="font-medium text-gray-900 font-inter">{venue.name}</span>
-        )}
+        <span className="font-medium text-gray-900 font-inter">{venue.name}</span>
         
         {venue.city && (
           <span className="text-gray-600 font-inter">

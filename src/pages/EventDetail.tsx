@@ -153,12 +153,12 @@ const EventDetail = () => {
       </div>
           
       {/* Bottom back to events button - desktop and mobile */}
-      <div className="mt-8 mb-4">
+      <div className="mt-8 mb-4 flex justify-center">
         <Button 
           variant="outline" 
           onClick={handleBackToEvents}
-          className="flex items-center gap-2 shadow-sm hover:shadow-md transition-all w-full"
-          size="lg"
+          className="flex items-center gap-2 shadow-sm hover:shadow-md transition-all"
+          size={isMobile ? "default" : "lg"}
         >
           <ChevronLeft className="h-4 w-4" />
           <span>Back to Events</span>

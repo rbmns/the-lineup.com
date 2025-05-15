@@ -8,14 +8,9 @@ interface RelatedEventsGridProps {
 }
 
 export const RelatedEventsGrid: React.FC<RelatedEventsGridProps> = ({ events }) => {
-  // If no events, show a message
+  // If no events, return null (component will be hidden by parent)
   if (!events || events.length === 0) {
-    return (
-      <div className="p-6 bg-gray-50 rounded-lg text-center">
-        <p className="text-gray-500">No similar events found at the moment</p>
-        <p className="text-sm text-gray-400 mt-1">Check back later for more events</p>
-      </div>
-    );
+    return null;
   }
 
   // Ensure we're working with a stable array
