@@ -24,14 +24,18 @@ export const EventsList: React.FC<EventsListProps> = ({
   style
 }) => {
   return (
-    <div className={cn("space-y-4", className)} style={style}>
+    <div 
+      className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4", className)} 
+      style={style}
+    >
       {events.map((event) => (
         <div key={event.id} className="event-list-item" data-event-id={event.id}>
           <EventCard 
             event={event}
             onRsvp={onRsvp}
             showRsvpButtons={showRsvpButtons}
-            view="list" // Now this is a valid prop since we added it to EventCardProps
+            view="grid"
+            compact={true}
           />
         </div>
       ))}

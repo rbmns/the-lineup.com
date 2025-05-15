@@ -23,7 +23,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
 }) => {
   return (
     <div 
-      className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6", className)} 
+      className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4", className)} 
       style={style}
     >
       {events.map((event) => (
@@ -32,7 +32,8 @@ export const EventGrid: React.FC<EventGridProps> = ({
             event={event}
             onRsvp={onRsvp}
             showRsvpButtons={showRsvpButtons}
-            view="grid" // Now this is a valid prop since we added it to EventCardProps
+            view="grid"
+            compact={true}
           />
         </div>
       ))}

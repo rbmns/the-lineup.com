@@ -1,6 +1,6 @@
 import React from 'react';
 import { Event } from '@/types';
-import { MapPin } from 'lucide-react';
+import { MapPin, Calendar, Clock } from 'lucide-react';
 import { formatInTimeZone } from 'date-fns-tz';
 import { cn } from '@/lib/utils';
 import { CategoryPill } from '@/components/ui/category-pill';
@@ -32,11 +32,11 @@ const EventCard: React.FC<EventCardProps> = ({
   const { navigateToEvent } = useEventNavigation();
   const imageUrl = getEventImageUrl(event);
 
-  // Format date for display - now using European format (DD-MM-YYYY)
+  // Format date for display
   const formatDateDisplay = (dateStr: string): string => {
     try {
       const date = new Date(dateStr);
-      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, d MMM yyyy");
+      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "d MMM yyyy");
     } catch (error) {
       console.error('Error formatting date:', error);
       return dateStr;
@@ -61,7 +61,6 @@ const EventCard: React.FC<EventCardProps> = ({
       onClick(event);
     } else {
       // Otherwise use the default navigation
-      // Make sure we have all required properties for proper navigation
       if (event && event.id) {
         navigateToEvent({
           ...event,
@@ -91,71 +90,65 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
 
-  // Determine max height for compact vs standard view
-  const cardHeightClass = compact ? "max-h-[280px]" : "";
-
   return (
     <div
       className={cn(
         "group relative rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer bg-white flex flex-col h-full",
-        cardHeightClass,
+        compact ? "max-h-[320px]" : "",
         className
       )}
       onClick={handleClick}
       data-event-id={event.id}
     >
       {/* Image container with event type label positioned on top */}
-      <div className="aspect-[16/9] relative overflow-hidden">
+      <div className="relative aspect-[4/3] overflow-hidden">
         <img
           src={imageUrl}
           alt={event.title}
           className="h-full w-full object-cover transition-transform group-hover:scale-105 duration-300"
         />
         
-        {/* Event type pill positioned at top of image */}
+        {/* Event type pill */}
         {event.event_type && (
-          <div className="absolute top-3 left-3 z-10">
+          <div className="absolute top-2 left-2 z-10">
             <CategoryPill 
               category={event.event_type} 
-              size="default" 
-              showIcon={true}
+              size="xs" 
+              showIcon={false}
             />
           </div>
         )}
       </div>
 
       {/* Content Section */}
-      <div className="p-4 flex flex-col flex-grow space-y-2">
-        {/* Title - First */}
-        <h3 className={cn(
-          "font-semibold text-gray-900",
-          compact ? "text-base line-clamp-2" : "text-xl line-clamp-2"
-        )}>
+      <div className="p-3 flex flex-col flex-grow">
+        {/* Title */}
+        <h3 className="font-semibold text-gray-900 text-base line-clamp-1 mb-1">
           {event.title}
         </h3>
         
         {/* Date & Time */}
-        <div className="text-sm text-gray-600 font-medium">
-          {event.start_time && (
-            <>
-              {formatDateDisplay(event.start_time)} • {getEventTimeDisplay(event)}
-            </>
-          )}
+        <div className="flex items-center text-xs text-gray-600 mb-1">
+          <Calendar className="h-3 w-3 mr-1 flex-shrink-0" />
+          {event.start_time && formatDateDisplay(event.start_time)}
+        </div>
+        
+        {/* Time */}
+        <div className="flex items-center text-xs text-gray-600 mb-1">
+          <Clock className="h-3 w-3 mr-1 flex-shrink-0" />
+          {event.start_time && getEventTimeDisplay(event)}
         </div>
         
         {/* Venue/Location */}
-        <div className="flex items-center text-sm text-gray-500">
-          <MapPin className="h-3.5 w-3.5 mr-1 flex-shrink-0" />
+        <div className="flex items-center text-xs text-gray-600 mb-2">
+          <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
           <span className="truncate">{event.venues?.name || event.location || 'No location'}</span>
         </div>
         
-        {/* Spacer to push RSVP buttons to bottom */}
-        <div className="flex-grow min-h-[8px]"></div>
-        
-        {/* RSVP Buttons - only if needed */}
+        {/* RSVP Buttons */}
         {showRsvpButtons && (
           <div 
-            className="mt-2" 
+            className="mt-auto" 
             data-rsvp-container="true"
             onClick={(e) => e.stopPropagation()}
           >
