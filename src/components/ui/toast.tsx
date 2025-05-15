@@ -117,9 +117,9 @@ type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
 
 type ToastActionElement = React.ReactElement<typeof ToastAction>
 
-// Fix the ToasterToast interface to better match the usage patterns
+// Make id optional in ToasterToast to allow calling code to omit it
 export interface ToasterToast {
-  id: string;
+  id?: string;  // Made optional
   title?: React.ReactNode;
   description?: React.ReactNode;
   action?: ToastActionElement;
