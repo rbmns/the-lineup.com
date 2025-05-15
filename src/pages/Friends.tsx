@@ -142,19 +142,12 @@ const Friends: React.FC = () => {
     return success;
   };
 
-  // Effect to trigger search when Enter key is pressed
+  // Effect to trigger search when typing in discover tab
   useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === 'Enter' && activeTab === 'discover') {
-        handleSearch();
-      }
-    };
-    
-    window.addEventListener('keypress', handleKeyPress);
-    return () => {
-      window.removeEventListener('keypress', handleKeyPress);
-    };
-  }, [activeTab, handleSearch]);
+    if (searchQuery.trim().length >= 2) {
+      handleSearch();
+    }
+  }, [searchQuery, handleSearch]);
 
   if (!user) {
     return null; // Will redirect in the effect

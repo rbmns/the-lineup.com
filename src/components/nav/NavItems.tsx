@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useFriends } from '@/hooks/useFriends';
 import { useAuth } from '@/contexts/AuthContext';
-import { CalendarDays, Heart, User } from 'lucide-react';
+import { CalendarDays, Heart } from 'lucide-react';
 import { useFriendRequests } from '@/hooks/useFriendRequests';
 
 export const NavItems = ({ className }: { className?: string }) => {
@@ -45,25 +45,13 @@ export const NavItems = ({ className }: { className?: string }) => {
       name: 'Friends',
       path: '/friends',
       icon: <Heart size={20} />,
-      isActive: (pathname: string) => pathname === '/friends',
-    },
-    {
-      name: 'Profile',
-      path: '/profile',
-      icon: <User size={20} />,
-      isActive: (pathname: string) => pathname === '/profile' || pathname.startsWith('/users') || pathname.startsWith('/profile/'),
-      showOnlyWhenAuthenticated: true,
+      isActive: (pathname: string) => pathname === '/friends' || pathname.startsWith('/users'),
     },
   ];
 
   return (
     <nav className={cn("flex items-center space-x-6", className)}>
       {navItems.map((item) => {
-        // Skip profile nav item if not authenticated and it's for authenticated users only
-        if (item.showOnlyWhenAuthenticated && !user) {
-          return null;
-        }
-        
         const isActive = item.isActive(location.pathname);
         // Only show badge if there are incoming requests (greater than 0) and this is the Friends nav item
         const showBadge = item.name === 'Friends' && friendRequests > 0;
