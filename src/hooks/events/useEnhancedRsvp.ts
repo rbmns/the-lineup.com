@@ -1,18 +1,17 @@
 
 import { useState, useCallback } from 'react';
-import { useOptimisticRsvp } from '@/hooks/event-rsvp/useOptimisticRsvp';
+import { useStableRsvpActions } from '@/hooks/event-rsvp/useStableRsvpActions';
 import { toast } from '@/components/ui/use-toast';
 
 /**
- * Enhanced RSVP handler that combines optimistic updates with better UI feedback
+ * Enhanced RSVP handler that provides immediate UI feedback
  */
 export const useEnhancedRsvp = (userId: string | undefined) => {
   const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
-  const { handleRsvp: optimisticRsvp, loading } = useOptimisticRsvp(userId);
+  const { handleRsvp: rsvpAction, loading } = useStableRsvpActions(userId);
 
   const handleRsvp = useCallback(async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!userId) {
-      // Keep this important toast for authentication feedback
       toast({
         description: "Please sign in to RSVP to events"
       });
@@ -24,23 +23,27 @@ export const useEnhancedRsvp = (userId: string | undefined) => {
       setLoadingEventId(eventId);
       console.log(`EnhancedRsvp: Processing RSVP for event ${eventId} with status ${status}`);
 
-      // Handle the RSVP with optimistic UI updates
-      const result = await optimisticRsvp(eventId, status);
+      // Add visual feedback animation to the event card
+      const eventCard = document.querySelector(`[data-event-id="${eventId}"]`);
+      if (eventCard) {
+        const animationClass = status === 'Going' ? 'rsvp-going-animation' : 'rsvp-interested-animation';
+        eventCard.classList.add(animationClass);
+        setTimeout(() => eventCard.classList.remove(animationClass), 800);
+      }
       
-      // Success but no toast needed - the UI updates optimistically
+      // Handle the RSVP with optimistic UI updates
+      const result = await rsvpAction(eventId, status);
       return result;
     } catch (error) {
       console.error('Error in enhanced RSVP handler:', error);
-      toast({
-        description: "Failed to update your RSVP. Please try again.",
-        variant: "destructive"
-      });
       return false;
     } finally {
-      // Clear loading state after completion
-      setLoadingEventId(null);
+      // Clear loading state after a short delay
+      setTimeout(() => {
+        setLoadingEventId(null);
+      }, 300);
     }
-  }, [userId, optimisticRsvp]);
+  }, [userId, rsvpAction]);
 
   return {
     handleRsvp,

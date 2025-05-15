@@ -18,6 +18,7 @@ interface LazyEventsListProps {
   hasActiveFilters?: boolean;
   compact?: boolean;
   defaultView?: 'list' | 'grid';
+  loadingEventId?: string | null;
 }
 
 export const LazyEventsList: React.FC<LazyEventsListProps> = ({
@@ -28,7 +29,8 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   onRsvp,
   showRsvpButtons = true,
   hasActiveFilters = false,
-  compact = false
+  compact = false,
+  loadingEventId = null
 }) => {
   // Loading skeleton cards
   const skeletonCards = Array.from({ length: 6 }, (_, i) => <SkeletonEventCard key={`skeleton-${i}`} />);
@@ -74,6 +76,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
           showRsvpButtons={showRsvpButtons}
           className="animate-fade-in"
           style={{ animationDuration: '100ms' }}
+          loadingEventId={loadingEventId}
         />
       )}
 

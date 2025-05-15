@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { MapPin, Calendar, Clock } from 'lucide-react';
@@ -16,7 +17,8 @@ export interface EventCardProps {
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   className?: string;
   onClick?: (event: Event) => void;
-  view?: 'list' | 'grid'; // Add the view prop
+  view?: 'list' | 'grid';
+  isLoading?: boolean;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -26,7 +28,8 @@ const EventCard: React.FC<EventCardProps> = ({
   onRsvp,
   className,
   onClick,
-  view = 'grid' // Default to grid view
+  view = 'grid',
+  isLoading = false
 }) => {
   const { getEventImageUrl } = useEventImages();
   const { navigateToEvent } = useEventNavigation();
@@ -52,7 +55,8 @@ const EventCard: React.FC<EventCardProps> = ({
 
   const handleClick = (e: React.MouseEvent) => {
     // Check if click originated from RSVP buttons
-    if ((e.target as HTMLElement).closest('[data-rsvp-container="true"]')) {
+    if ((e.target as HTMLElement).closest('[data-rsvp-container="true"]') ||
+        (e.target as HTMLElement).closest('[data-rsvp-button="true"]')) {
       return; // Don't navigate if clicked on RSVP buttons
     }
     
@@ -156,6 +160,7 @@ const EventCard: React.FC<EventCardProps> = ({
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
               size="sm"
+              isLoading={isLoading}
             />
           </div>
         )}

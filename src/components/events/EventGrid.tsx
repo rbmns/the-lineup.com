@@ -11,6 +11,7 @@ interface EventGridProps {
   showRsvpButtons?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  loadingEventId?: string | null;
 }
 
 export const EventGrid: React.FC<EventGridProps> = ({
@@ -19,7 +20,8 @@ export const EventGrid: React.FC<EventGridProps> = ({
   isRsvpLoading,
   showRsvpButtons = true,
   className,
-  style
+  style,
+  loadingEventId
 }) => {
   return (
     <div 
@@ -34,6 +36,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
             showRsvpButtons={showRsvpButtons}
             view="grid"
             compact={true}
+            isLoading={loadingEventId === event.id}
           />
         </div>
       ))}

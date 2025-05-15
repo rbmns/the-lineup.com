@@ -7,7 +7,8 @@ import { pageSeoTags } from '@/utils/seoUtils';
 import { LazyEventsList } from '@/components/events/LazyEventsList';
 import { useCanonical } from '@/hooks/useCanonical';
 import { EventsPageHeader } from '@/components/events/EventsPageHeader';
-import { useOptimisticRsvp } from '@/hooks/event-rsvp/useOptimisticRsvp';
+import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp';
+import { useRsvpHandler } from '@/hooks/events/useRsvpHandler';
 
 const EventsPage = () => {
   // Add canonical URL for SEO - providing the path as required parameter
@@ -15,8 +16,11 @@ const EventsPage = () => {
   
   const { user } = useAuth();
   const { data: events = [], isLoading } = useEvents(user?.id);
-  const { handleRsvp, rsvpInProgress } = useOptimisticRsvp(user?.id);
+  const { handleRsvp, loadingEventId } = useEnhancedRsvp(user?.id);
   const rsvpInProgressRef = useRef(false);
+  
+  // Use the optimized RSVP handler with proper event handling
+  const { handleEventRsvp } = useRsvpHandler(user, handleRsvp, rsvpInProgressRef);
   
   // Set page metadata
   useEffect(() => {
@@ -35,23 +39,6 @@ const EventsPage = () => {
   // Process events - just filter for upcoming events, no category filters
   const displayEvents = filterUpcomingEvents(events || []);
 
-  // Use the optimistic RSVP handler with proper event handling
-  const handleEventRsvp = async (eventId: string, status: 'Going' | 'Interested') => {
-    if (!user || rsvpInProgressRef.current) {
-      return false;
-    }
-    
-    try {
-      rsvpInProgressRef.current = true;
-      return await handleRsvp(eventId, status);
-    } finally {
-      // Reset the in-progress flag after a delay
-      setTimeout(() => {
-        rsvpInProgressRef.current = false;
-      }, 300);
-    }
-  };
-
   return (
     <div className="w-full px-4 md:px-6 py-6">
       <div className="max-w-7xl mx-auto">
@@ -63,11 +50,12 @@ const EventsPage = () => {
             mainEvents={displayEvents}
             relatedEvents={[]}
             isLoading={isLoading}
-            isRsvpLoading={rsvpInProgress}
+            isRsvpLoading={false} // Don't use global loading state
             onRsvp={user ? handleEventRsvp : undefined}
             showRsvpButtons={!!user}
             hasActiveFilters={false}
             compact={true}
+            loadingEventId={loadingEventId}
           />
         </div>
       </div>

@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { useQueryClient } from '@tanstack/react-query';
 
 /**
- * Hook that provides stable RSVP actions with Supabase updates
+ * Hook that provides stable RSVP actions with optimistic UI updates
  */
 export const useStableRsvpActions = (userId: string | undefined) => {
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ export const useStableRsvpActions = (userId: string | undefined) => {
     setLoading(true);
     
     try {
-      // Check existing RSVP - explicitly use await to ensure we get the data before proceeding
+      // Get current RSVP status to determine toggle behavior
       const checkResult = await supabase
         .from('event_rsvps')
         .select('*')
@@ -34,13 +34,11 @@ export const useStableRsvpActions = (userId: string | undefined) => {
       }
         
       const existingRsvp = checkResult.data;
-      console.log("Existing RSVP:", existingRsvp);
-
       let newRsvpStatus: 'Going' | 'Interested' | null = null;
       
       // If clicking the same status button that's already active, toggle it off
       if (existingRsvp && existingRsvp.status === status) {
-        // Toggle off - delete the RSVP if clicking the same status
+        // Toggle off - delete the RSVP
         console.log("Deleting RSVP (toggle off)");
         const deleteResult = await supabase
           .from('event_rsvps')
@@ -86,10 +84,9 @@ export const useStableRsvpActions = (userId: string | undefined) => {
         newRsvpStatus = status;
       }
 
-      // Invalidate queries to refresh data - this ensures all UI components receive updated data
+      // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['events'] });
       queryClient.invalidateQueries({ queryKey: ['event', eventId] });
-      queryClient.invalidateQueries({ queryKey: ['event-attendees', eventId] });
       queryClient.invalidateQueries({ queryKey: ['user-events'] });
       
       console.log(`StableRsvp: Successfully ${newRsvpStatus ? 'updated' : 'removed'} RSVP`);

@@ -1,0 +1,39 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ... keep existing code */
+
+/* Enhanced RSVP Button Animations */
+@keyframes buttonClickPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.button-click-animation {
+  animation: buttonClickPulse 0.2s ease-out;
+}
+
+@keyframes rsvpGoingPulse {
+  0% { box-shadow: 0 0 0 0px rgba(64, 145, 108, 0.3); }
+  70% { box-shadow: 0 0 0 8px rgba(64, 145, 108, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(64, 145, 108, 0); }
+}
+
+.rsvp-going-animation {
+  animation: rsvpGoingPulse 0.8s ease-out;
+}
+
+@keyframes rsvpInterestedPulse {
+  0% { box-shadow: 0 0 0 0px rgba(0, 153, 204, 0.3); }
+  70% { box-shadow: 0 0 0 8px rgba(0, 153, 204, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 153, 204, 0); }
+}
+
+.rsvp-interested-animation {
+  animation: rsvpInterestedPulse 0.8s ease-out;
+}
+
+/* ... keep existing code */

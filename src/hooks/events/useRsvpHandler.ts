@@ -13,25 +13,24 @@ export const useRsvpHandler = (
     }
     
     try {
-      console.log(`EventsPage - RSVP handler called for event: ${eventId}, status: ${status}`);
-      
       // Mark that we're in an RSVP action to prevent scroll changes
       if (rsvpInProgressRef) {
         rsvpInProgressRef.current = true;
       }
       
-      // Store current scroll position
+      // Store scroll position for restoration
       const scrollPosition = window.scrollY;
       
       // Add visual feedback to the specific event card
       const eventCard = document.querySelector(`[data-event-id="${eventId}"]`);
       if (eventCard) {
-        eventCard.classList.add('animate-pulse');
+        const animationClass = status === 'Going' ? 'rsvp-going-animation' : 'rsvp-interested-animation';
+        eventCard.classList.add(animationClass);
+        setTimeout(() => eventCard.classList.remove(animationClass), 800);
       }
       
-      // Use our preserved RSVP handler
+      // Use our RSVP handler
       const result = await handleRsvp(eventId, status);
-      console.log(`EventsPage - RSVP result:`, result);
       
       // Restore scroll position after the RSVP operation
       setTimeout(() => {
@@ -39,11 +38,6 @@ export const useRsvpHandler = (
           top: scrollPosition,
           behavior: 'auto'
         });
-        
-        // Remove animation
-        if (eventCard) {
-          eventCard.classList.remove('animate-pulse');
-        }
       }, 100);
       
       return result;
