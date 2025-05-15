@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -309,11 +308,11 @@ export default function Friends() {
         const processedPendingSent = pendingSentData?.map(item => item.friend) || [];
         const processedPendingReceived = pendingReceivedData?.map(item => item.user) || [];
         
-        // Filter discovery users to exclude friends and pending connections
+        // Fix: Extract the ids properly from each array element
         const friendIds = new Set([
-          ...processedAccepted.map(f => f.id),
-          ...processedPendingSent.map(f => f.id),
-          ...processedPendingReceived.map(f => f.id)
+          ...processedAccepted.map((f: any) => f.id),
+          ...processedPendingSent.map((f: any) => f.id),
+          ...processedPendingReceived.map((f: any) => f.id)
         ]);
         
         const discoveryUsersList = allProfiles?.filter(profile => 
