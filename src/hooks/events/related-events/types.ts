@@ -19,3 +19,13 @@ export interface RelatedEventsState {
 export interface EventRsvpMap {
   [eventId: string]: 'Going' | 'Interested';
 }
+
+// Extend the Event type with formatting properties
+declare global {
+  namespace '@/types' {
+    interface Event {
+      formattedDate?: string;
+      formattedTime?: string;
+    }
+  }
+}

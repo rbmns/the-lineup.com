@@ -36,23 +36,16 @@ const EventCard: React.FC<EventCardProps> = ({
   const { navigateToEvent } = useEventNavigation();
   const imageUrl = getEventImageUrl(event);
 
-  // Format date for display
-  const formatDateDisplay = (dateStr: string): string => {
-    try {
-      const date = new Date(dateStr);
-      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, MMM d");
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return dateStr;
-    }
-  };
+  // Use the provided formatted date or generate one
+  const displayDate = event.formattedDate || (event.start_date ? formatInTimeZone(
+    new Date(event.start_date), 
+    AMSTERDAM_TIMEZONE, 
+    "EEE, d MMM"
+  ) : '');
   
-  // Format time using the 24-hour time format without seconds
-  const getEventTimeDisplay = (event: Event): string => {
-    if (!event.start_time) return '';
-    
-    return formatEventTime(event.start_time, event.end_time);
-  };
+  // Use the provided formatted time or generate one
+  const displayTime = event.formattedTime || (event.start_time ? 
+    formatEventTime(event.start_time, event.end_time) : '');
 
   const handleClick = (e: React.MouseEvent) => {
     // Check if click originated from RSVP buttons
@@ -149,16 +142,21 @@ const EventCard: React.FC<EventCardProps> = ({
         
         {/* Date & Time */}
         <div className="flex flex-col gap-1">
-          <div className="flex items-center text-xs text-gray-700">
-            <Calendar className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
-            <span className="font-medium">{event.start_time && formatDateDisplay(event.start_time)}</span>
-          </div>
+          {/* Date */}
+          {displayDate && (
+            <div className="flex items-center text-xs text-gray-700">
+              <Calendar className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
+              <span className="font-medium">{displayDate}</span>
+            </div>
+          )}
           
           {/* Time */}
-          <div className="flex items-center text-xs text-gray-700">
-            <Clock className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
-            <span>{event.start_time && getEventTimeDisplay(event)}</span>
-          </div>
+          {displayTime && (
+            <div className="flex items-center text-xs text-gray-700">
+              <Clock className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
+              <span>{displayTime}</span>
+            </div>
+          )}
           
           {/* Venue/Location */}
           <div className="flex items-center text-xs text-gray-700 mb-2">

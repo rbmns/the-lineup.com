@@ -5,6 +5,8 @@ import EventCard from '@/components/EventCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOptimisticRsvp } from '@/hooks/event-rsvp/useOptimisticRsvp';
 import { useEventInteractions } from '@/hooks/events/useEventInteractions';
+import { formatInTimeZone } from 'date-fns-tz';
+import { AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
 
 interface RelatedEventCardProps {
   event: Event;
@@ -16,38 +18,44 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({ event }) => 
   const { handleEventClick } = useEventInteractions();
   const [localRsvpStatus, setLocalRsvpStatus] = useState<'Going' | 'Interested' | undefined>(event.rsvp_status);
   
-  // Format event time to ensure it's displayed as HH:mm without seconds
-  const formatEventTime = (event: Event) => {
-    if (!event.start_time) return '';
+  // Format event date and time according to requirements
+  const formatEventDateTime = (event: Event) => {
+    if (!event.start_date) return '';
     
-    let startTime = event.start_time;
-    // If start_time has seconds (HH:MM:SS format), remove them
-    if (startTime.includes(':') && startTime.split(':').length > 2) {
-      const [hours, minutes] = startTime.split(':');
-      startTime = `${hours}:${minutes}`;
-    }
-    
-    let timeStr = startTime;
-    
-    // If we also have end_time, format it as a range
-    if (event.end_time) {
-      let endTime = event.end_time;
-      // If end_time has seconds, remove them
-      if (endTime.includes(':') && endTime.split(':').length > 2) {
-        const [hours, minutes] = endTime.split(':');
-        endTime = `${hours}:${minutes}`;
+    try {
+      // Convert start_date to a Date object
+      const startDate = new Date(event.start_date);
+      
+      // Format the date part as "day, date, month" - e.g., "Mon, 15 May"
+      const formattedDate = formatInTimeZone(startDate, AMSTERDAM_TIMEZONE, "EEE, d MMM");
+      
+      // Format the time part (without seconds)
+      let timeStr = '';
+      if (event.start_time) {
+        // Remove seconds if present
+        const startTime = event.start_time.split(':').slice(0, 2).join(':');
+        
+        if (event.end_time) {
+          // If we have end time, format as a range (also without seconds)
+          const endTime = event.end_time.split(':').slice(0, 2).join(':');
+          timeStr = `${startTime} - ${endTime}`;
+        } else {
+          timeStr = startTime;
+        }
       }
-      timeStr = `${startTime} - ${endTime}`;
+      
+      return {
+        date: formattedDate,
+        time: timeStr
+      };
+    } catch (error) {
+      console.error('Error formatting event date/time:', error);
+      return { date: '', time: '' };
     }
-    
-    return timeStr;
   };
   
-  // Create a modified event with the formatted time
-  const eventWithFormattedTime = {
-    ...event,
-    formattedTime: formatEventTime(event)
-  };
+  // Get formatted date and time
+  const eventDateTime = formatEventDateTime(event);
   
   // RSVP handler with optimistic UI updates
   const handleRsvpAction = async (eventId: string, status: 'Going' | 'Interested') => {
@@ -93,6 +101,14 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({ event }) => 
     }
   };
 
+  // Create a modified event with the formatted date/time
+  const eventWithFormattedDateTime = {
+    ...event,
+    formattedDate: eventDateTime.date,
+    formattedTime: eventDateTime.time,
+    rsvp_status: localRsvpStatus // Use the local state for RSVP status
+  };
+
   return (
     <div 
       className="h-full transition-all duration-300 hover:scale-[1.01]" 
@@ -100,10 +116,7 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({ event }) => 
       data-event-id={event.id}
     >
       <EventCard
-        event={{
-          ...event,
-          rsvp_status: localRsvpStatus // Use the local state for RSVP status
-        }} 
+        event={eventWithFormattedDateTime}
         showRsvpButtons={isAuthenticated}
         compact={true}
         className="h-full border hover:shadow-md transition-all duration-300"
