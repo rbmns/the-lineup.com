@@ -18,6 +18,8 @@ interface UserRsvpedEventsProps {
   userId?: string;
   currentUserId?: string;
   matchingRsvps?: Event[];
+  title?: string;
+  emptyMessage?: string;
 }
 
 export const UserRsvpedEvents: React.FC<UserRsvpedEventsProps> = ({ 
@@ -30,7 +32,9 @@ export const UserRsvpedEvents: React.FC<UserRsvpedEventsProps> = ({
   isLoading = false,
   userId,
   currentUserId,
-  matchingRsvps = []
+  matchingRsvps = [],
+  title,
+  emptyMessage = "No RSVPs yet"
 }) => {
   const navigate = useNavigate();
   
@@ -49,7 +53,7 @@ export const UserRsvpedEvents: React.FC<UserRsvpedEventsProps> = ({
       <div className="mt-4 sm:mt-6">
         <h2 className="text-lg font-semibold mb-2 sm:mb-3 flex items-center">
           <Calendar className="mr-2 h-4 w-4 text-purple" />
-          {isCurrentUser ? "Your RSVPs" : `${username}'s RSVPs`}
+          {title || (isCurrentUser ? "Your RSVPs" : `${username}'s RSVPs`)}
         </h2>
         <div className="space-y-2 sm:space-y-3">
           <div className="h-16 sm:h-20 bg-gray-100 rounded-lg animate-pulse"></div>
@@ -63,7 +67,7 @@ export const UserRsvpedEvents: React.FC<UserRsvpedEventsProps> = ({
     <div className="mt-4 sm:mt-6">
       <h2 className="text-lg font-semibold mb-2 sm:mb-3 flex items-center">
         <Calendar className="mr-2 h-4 w-4 text-purple" />
-        {isCurrentUser ? "Your RSVPs" : `${username}'s RSVPs`}
+        {title || (isCurrentUser ? "Your RSVPs" : `${username}'s RSVPs`)}
       </h2>
       
       {/* Display matching RSVPs first if available */}
@@ -100,7 +104,7 @@ export const UserRsvpedEvents: React.FC<UserRsvpedEventsProps> = ({
         !matchingRsvps.length && (
           <Card className="border border-gray-100 shadow-sm">
             <CardContent className="p-3 sm:p-4 text-center text-gray-500">
-              <p className="text-sm">No RSVPs yet</p>
+              <p className="text-sm">{emptyMessage}</p>
             </CardContent>
           </Card>
         )

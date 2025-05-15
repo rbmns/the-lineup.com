@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Event, UserProfile } from '@/types';
@@ -7,6 +8,7 @@ import { User } from '@supabase/supabase-js';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
 import { sortEventsByDate } from '@/utils/dateUtils';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface UserProfileContentProps {
   profile: UserProfile | null;
@@ -81,9 +83,6 @@ export const UserProfileContent: React.FC<UserProfileContentProps> = ({
       </div>
     );
   }
-
-  // Combine events with proper ordering
-  const allEvents = sortEventsByDate([...(upcomingEvents || []), ...(pastEvents || [])]);
   
   return (
     <div className="space-y-8">
@@ -105,16 +104,40 @@ export const UserProfileContent: React.FC<UserProfileContentProps> = ({
       )}
       
       {canViewEvents && !eventsLoading && (
-        <UserRsvpedEvents
-          events={allEvents}
-          isCurrentUser={isOwnProfile}
-          showFriendRsvp={!isOwnProfile}
-          friendUsername={profile?.username}
-          isLoading={false}
-          userId={userId}
-          currentUserId={user?.id}
-          matchingRsvps={!isOwnProfile ? matchingRsvps : []}
-        />
+        <Tabs defaultValue="upcoming" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="upcoming">Upcoming Events</TabsTrigger>
+            <TabsTrigger value="past">Past Events</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="upcoming" className="pt-4">
+            <UserRsvpedEvents
+              events={upcomingEvents}
+              isCurrentUser={isOwnProfile}
+              showFriendRsvp={!isOwnProfile}
+              friendUsername={profile?.username}
+              isLoading={false}
+              userId={userId}
+              currentUserId={user?.id}
+              matchingRsvps={!isOwnProfile ? matchingRsvps : []}
+              title="Upcoming Events"
+              emptyMessage="No upcoming events"
+            />
+          </TabsContent>
+          
+          <TabsContent value="past" className="pt-4">
+            <UserRsvpedEvents
+              events={pastEvents}
+              isCurrentUser={isOwnProfile}
+              showFriendRsvp={false}
+              isLoading={false}
+              userId={userId}
+              currentUserId={user?.id}
+              title="Past Events"
+              emptyMessage="No past events"
+            />
+          </TabsContent>
+        </Tabs>
       )}
       
       {!canViewEvents && (
