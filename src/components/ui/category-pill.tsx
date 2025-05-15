@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calendar, Music, Globe, Users, Film, Book, Dumbbell, Utensils, Tag, Waves, Tent, Leaf, Sun, Sailboat, Party, BadgeCheck } from 'lucide-react';
+import { Calendar, Music, Globe, Users, Film, Book, Dumbbell, Utensils, Tag, Waves, Tent, Leaf, Sun, Sailboat, PartyPopper, BadgeCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type CategoryIconMapping = {
@@ -31,7 +31,7 @@ const categoryIconMapping: CategoryIconMapping = {
   'yoga': Leaf,
   'beach': Sun,
   'kite': Sailboat,
-  'party': Party,
+  'party': PartyPopper,
   'market': BadgeCheck
 };
 
