@@ -12,8 +12,7 @@ export const RelatedEventsSection: React.FC<RelatedEventsSectionProps> = ({ even
     <RelatedEvents 
       eventId={event.id}
       eventType={event.event_type || ''}
-      // Passing event date for date proximity matching (new)
-      date={event.start_date || event.date || ''}
+      startDate={event.start_date || ''}
     />
   );
 };

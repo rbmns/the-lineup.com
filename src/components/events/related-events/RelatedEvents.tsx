@@ -10,7 +10,7 @@ import { supabase } from '@/lib/supabase';
 interface RelatedEventsProps {
   eventId: string;
   eventType?: string;
-  date?: string;
+  startDate?: string; // <-- updated from 'date'
   tags?: string[];
   vibe?: string;
 }
@@ -18,7 +18,7 @@ interface RelatedEventsProps {
 export const RelatedEvents: React.FC<RelatedEventsProps> = ({ 
   eventId,
   eventType = '',
-  date,
+  startDate,
   tags,
   vibe
 }) => {
@@ -26,7 +26,7 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
   const hasFetchedRef = useRef(false);
   const [fallbackEvents, setFallbackEvents] = useState<Event[]>([]);
 
-  // -- Added: eventType + date filtering.
+  // Fetch related events using type and date proximity (±2 days)
   const { relatedEvents, loading } = useFetchRelatedEvents({
     eventType,
     currentEventId: eventId,
@@ -34,8 +34,7 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
     tags,
     vibe,
     minResults: 3,
-    // NEW: add date param to filtering so only events in a close range are shown.
-    date
+    startDate, // <-- pass startDate for date-based matching
   });
 
   // If we don't have at least 2 related events, fetch some fallbacks
@@ -43,20 +42,28 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
     const fetchFallbackEvents = async () => {
       if (!loading && relatedEvents.length < 2 && !hasFetchedRef.current) {
         hasFetchedRef.current = true;
-        
         try {
           console.log('Fetching fallback events for event type:', eventType);
-          
-          // First try: Get upcoming events of the same type
           let { data: typeEvents, error: typeError } = await supabase
             .from('events')
             .select('*, venues:venue_id(*), creator:profiles(*)')
             .neq('id', eventId)
             .eq('event_type', eventType)
-            .gte('start_time', new Date().toISOString())
-            .order('start_time', { ascending: true })
+            .gte('start_date', startDate || new Date().toISOString().split('T')[0])
+            .order('start_date', { ascending: true })
             .limit(5);
-            
+
+          // Filter for events near the same date (±2 days)
+          if (typeEvents && typeEvents.length > 0 && startDate) {
+            const eventDate = new Date(startDate);
+            typeEvents = typeEvents.filter(ev => {
+              const evDate = ev.start_date ? new Date(ev.start_date) : null;
+              if (!evDate) return false;
+              const daysDiff = Math.abs((evDate.getTime() - eventDate.getTime()) / (1000 * 60 * 60 * 24));
+              return daysDiff <= 2;
+            });
+          }
+
           // Second try: If not enough, get any upcoming events
           if (!typeEvents || typeEvents.length < 2) {
             console.log('Not enough type-matched events, fetching any upcoming events');
@@ -64,16 +71,14 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
               .from('events')
               .select('*, venues:venue_id(*), creator:profiles(*)')
               .neq('id', eventId)
-              .gte('start_time', new Date().toISOString())
-              .order('start_time', { ascending: true })
+              .gte('start_date', new Date().toISOString().split('T')[0])
+              .order('start_date', { ascending: true })
               .limit(5);
-              
+
             if (anyEvents && anyEvents.length > 0) {
-              console.log('Found fallback events:', anyEvents.length);
               setFallbackEvents(anyEvents);
             }
           } else {
-            console.log('Found type-matched events:', typeEvents.length);
             setFallbackEvents(typeEvents);
           }
         } catch (err) {
@@ -81,38 +86,33 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
         }
       }
     };
-    
     fetchFallbackEvents();
-  }, [eventId, eventType, loading, relatedEvents]);
-  
+  }, [eventId, eventType, loading, relatedEvents, startDate]);
+
   if (loading) {
     return <RelatedEventsLoader />;
   }
-  
+
   // Combine related events with fallback events but remove duplicates
   const combinedEvents = [...relatedEvents];
-  
-  // Only add fallback events if we need more
+
   if (combinedEvents.length < 2) {
     fallbackEvents.forEach(fallbackEvent => {
-      // Make sure the event isn't already in the list and isn't the current event
       if (!combinedEvents.find(e => e.id === fallbackEvent.id) && fallbackEvent.id !== eventId) {
         combinedEvents.push(fallbackEvent);
       }
     });
   }
 
-  // If there are no events to display, return null to hide the component completely
   if (combinedEvents.length === 0) {
     return null;
   }
-  
+
   return (
     <div className="animate-fade-in space-y-4" style={{ animationDelay: '400ms' }}>
       <h2 className="text-xl font-semibold font-inter tracking-tight">
         Similar Events
       </h2>
-      
       <div className="pb-2">
         <RelatedEventsGrid events={combinedEvents.slice(0, 3)} />
       </div>

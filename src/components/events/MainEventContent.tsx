@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
@@ -59,7 +60,6 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
   handleEventTypeClick,
   handleBackToEvents
 }) => {
-  // Wrapper for handleRsvp to meet type requirements
   const handleRsvpWrapped = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     try {
       await handleRsvp(status);
@@ -84,15 +84,13 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
         title={event?.title || 'Event'}
         onEventTypeClick={handleEventTypeClick}
         startTime={event?.start_time}
-        showTitleOverlay={!isMobile}
-        // Pass date/time info for overlay (desktop)
-        dateTimeInfo={!isMobile ? formatDateTime(event.start_date, event.start_time, event.end_time) : undefined}
+        showTitleOverlay={!isMobile} // Only show overlay on desktop
+        dateTimeInfo={!isMobile ? dateTimeInfo : undefined} // Only on desktop
       />
 
       <CardContent className="p-0">
         <div className="p-6 space-y-6">
-
-          {/* Mobile: show title/date under image under title */}
+          {/* Mobile: show title/date under image only on mobile */}
           {isMobile && (
             <div className="mb-2">
               <h1 className="text-xl font-semibold leading-tight mb-1 text-gray-900">

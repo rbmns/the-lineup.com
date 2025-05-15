@@ -6,7 +6,7 @@ import EventShareButton from './EventShareButton';
 import { cn } from '@/lib/utils';
 import { useEventImages } from '@/hooks/useEventImages';
 import { CategoryPill } from '@/components/ui/category-pill';
-import { Calendar } from '@heroicons/react/24/outline';
+import { Calendar } from 'lucide-react';
 
 interface EventDetailHeaderProps {
   event: Event;
