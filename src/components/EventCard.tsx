@@ -102,7 +102,7 @@ const EventCard: React.FC<EventCardProps> = ({
   return (
     <div
       className={cn(
-        "group relative rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer bg-white flex flex-col",
+        "group relative rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer bg-white flex flex-col h-full",
         cardStyle === "compact" ? "max-h-[280px]" : "",
         className
       )}
@@ -133,7 +133,7 @@ const EventCard: React.FC<EventCardProps> = ({
         )}
       </div>
 
-      {/* Content Section */}
+      {/* Content Section - Using flex-grow to ensure this section takes up remaining space */}
       <div className={cn(
         "flex flex-col flex-grow",
         cardStyle === "compact" ? "p-3" : "p-4"
@@ -186,7 +186,7 @@ const EventCard: React.FC<EventCardProps> = ({
           </div>
         ) : null}
         
-        {/* Spacer */}
+        {/* Spacer - This will push the RSVP buttons to the bottom */}
         <div className="flex-grow min-h-[8px]"></div>
         
         {/* RSVP Buttons */}

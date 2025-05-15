@@ -36,7 +36,7 @@ export const EventsList: React.FC<EventsListProps> = ({
       style={style}
     >
       {events.map((event, index) => (
-        <div key={event.id} className="event-list-item" data-event-id={event.id}>
+        <div key={event.id} className="event-list-item h-full" data-event-id={event.id}>
           <EventCard 
             event={event}
             onRsvp={onRsvp}
@@ -45,6 +45,7 @@ export const EventsList: React.FC<EventsListProps> = ({
             compact={compact || (!isEventFeatured(index) && index % 3 !== 0)}
             featured={isEventFeatured(index)}
             isLoading={loadingEventId === event.id}
+            className="h-full"
           />
         </div>
       ))}

@@ -73,12 +73,15 @@ export const EventGrid: React.FC<EventGridProps> = ({
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {visibleEvents.map((event) => (
-          <EventCard 
-            key={event.id} 
-            event={event}
-            onRsvp={handleRsvp}
-            showRsvpButtons={showRsvpButtons}
-          />
+          <div key={event.id} className="h-full">
+            <EventCard 
+              key={event.id} 
+              event={event}
+              onRsvp={handleRsvp}
+              showRsvpButtons={showRsvpButtons}
+              className="h-full"
+            />
+          </div>
         ))}
       </div>
       

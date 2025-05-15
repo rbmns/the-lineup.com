@@ -36,7 +36,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
       style={style}
     >
       {events.map((event, index) => (
-        <div key={event.id} data-event-id={event.id}>
+        <div key={event.id} data-event-id={event.id} className="h-full">
           <EventCard 
             event={event}
             onRsvp={onRsvp}
@@ -45,6 +45,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
             compact={index !== 0 && index % 4 !== 0} // Make some cards compact
             featured={getCardStyle(index)}
             isLoading={loadingEventId === event.id}
+            className="h-full"
           />
         </div>
       ))}
