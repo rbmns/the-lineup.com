@@ -1,9 +1,8 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRsvpActions } from './useRsvpActions';
 import { useEventFetcher } from './useEventFetcher';
 import { useEventRSVP } from './event-rsvp/useEventRSVP';
-import { toast } from './use-toast';
+import { toast } from 'sonner';
 import { useEventLookup } from './useEventLookup';
 
 export const useEventDetails = (
@@ -111,10 +110,8 @@ export const useEventDetails = (
       return false;
     } catch (err) {
       console.error('Error updating RSVP:', err);
-      toast({
-        title: "Error",
-        description: "Failed to update your RSVP status",
-        variant: "destructive"
+      toast("Error", {
+        description: "Failed to update your RSVP status"
       });
       return false;
     }
