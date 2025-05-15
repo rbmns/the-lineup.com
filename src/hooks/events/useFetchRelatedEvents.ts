@@ -66,7 +66,8 @@ export const useFetchRelatedEvents = ({
         
         if (data && data.length > 0) {
           // Filter to just future events
-          filteredEvents = data;
+          // Use type assertion to handle the attendees property that will be added later
+          filteredEvents = data as unknown as Event[];
           
           // If we have a userId, fetch RSVP status for each event
           if (userId) {
@@ -95,13 +96,20 @@ export const useFetchRelatedEvents = ({
                 // Update the events with their RSVP status
                 filteredEvents = filteredEvents.map(event => ({
                   ...event,
-                  rsvp_status: rsvpMap.get(event.id) as 'Going' | 'Interested' | undefined
+                  rsvp_status: rsvpMap.get(event.id) as 'Going' | 'Interested' | undefined,
+                  attendees: [] // Add empty attendees array to satisfy the Event type
                 }));
                 
                 console.log('RSVP status applied to related events:', 
                   filteredEvents.map(e => ({ id: e.id, rsvp: e.rsvp_status })));
               }
             }
+          } else {
+            // Add empty attendees array to satisfy the Event type
+            filteredEvents = filteredEvents.map(event => ({
+              ...event,
+              attendees: [] // Add empty attendees array
+            }));
           }
         }
         
@@ -123,7 +131,14 @@ export const useFetchRelatedEvents = ({
           const { data: fallbackData, error: fallbackError } = await fallbackQuery;
           
           if (!fallbackError && fallbackData && fallbackData.length > 0) {
-            let additionalEvents = fallbackData;
+            // Cast to Event[] with attendees property
+            let additionalEvents = fallbackData as unknown as Event[];
+            
+            // Add empty attendees array to satisfy the Event type
+            additionalEvents = additionalEvents.map(event => ({
+              ...event,
+              attendees: []
+            }));
             
             // If we have tags, prefer events with matching tags
             if (tags && tags.length > 0) {
@@ -184,13 +199,18 @@ export const useFetchRelatedEvents = ({
             console.log('Trying similar events as last resort...');
             const similarEvents = await fetchSimilarEvents([eventType]);
           
-            // Filter out the current event and past events
+            // Filter out the current event and past events and add attendees
             const now = new Date();
-            const additionalEvents = similarEvents.filter(event => {
-              if (event.id === currentEventId) return false;
-              if (!event.start_time) return false;
-              return new Date(event.start_time) > now;
-            });
+            const additionalEvents = similarEvents
+              .filter(event => {
+                if (event.id === currentEventId) return false;
+                if (!event.start_time) return false;
+                return new Date(event.start_time) > now;
+              })
+              .map(event => ({
+                ...event,
+                attendees: []
+              }));
             
             // Add RSVP status if available
             if (userId && additionalEvents.length > 0) {
