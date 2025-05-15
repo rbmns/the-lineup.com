@@ -2,29 +2,31 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
-import { usePreservedRsvp } from '@/hooks/usePreservedRsvp';
+// import { usePreservedRsvp } from '@/hooks/usePreservedRsvp'; // Replaced
 import { useEventListState } from '@/hooks/events/useEventListState';
 import { useEventPageMeta } from '@/components/events/EventsPageMeta';
-import { useRsvpHandler } from '@/hooks/events/useRsvpHandler';
+// import { useRsvpHandler } from '@/hooks/events/useRsvpHandler'; // Replaced
+import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp'; // Added
 import { EventsPageHeader } from '@/components/events/EventsPageHeader';
 import { LazyEventsList } from '@/components/events/LazyEventsList';
-import { Event } from '@/types';
+// Event type is not directly used here, can be removed if not needed elsewhere
+// import { Event } from '@/types'; 
 
 const EventsPageRefactored = () => {
-  // Apply meta tags and canonical URL
   useEventPageMeta();
   
   const { user } = useAuth();
-  const { data: events = [], isLoading } = useEvents(user?.id);
-  const { handleRsvp, loading: rsvpLoading } = usePreservedRsvp(user?.id);
+  const { data: events = [], isLoading: eventsLoading } = useEvents(user?.id);
   
-  // Get state management hooks
   const { 
-    rsvpInProgressRef 
-  } = useEventListState();
+    handleRsvp: enhancedHandleRsvp, 
+    loading: rsvpOverallLoading, // General loading from stable actions
+    loadingEventId, // Specific event being loaded
+    // rsvpInProgressRef // Not directly used by EventsPageRefactored but available
+  } = useEnhancedRsvp(user?.id);
   
-  // Handle RSVP actions
-  const { handleEventRsvp } = useRsvpHandler(user, handleRsvp, rsvpInProgressRef);
+  // useEventListState might not be needed if scroll is handled by useEnhancedRsvp
+  // const { rsvpInProgressRef } = useEventListState(); // Potentially remove or adapt
 
   return (
     <div className="w-full px-4 md:px-6 py-8">
@@ -32,15 +34,15 @@ const EventsPageRefactored = () => {
         <EventsPageHeader title="What's Happening?" />
         
         <div className="space-y-8 mt-8">
-          {/* Events List Section - simplified without filters */}
           <LazyEventsList 
             mainEvents={events}
-            relatedEvents={[]}
-            isLoading={isLoading}
-            isRsvpLoading={rsvpLoading}
-            onRsvp={user ? handleEventRsvp : undefined}
+            relatedEvents={[]} // Keep as is for now
+            isLoading={eventsLoading}
+            // isRsvpLoading is replaced by loadingEventId for more granularity
+            onRsvp={user ? enhancedHandleRsvp : undefined}
             showRsvpButtons={!!user}
-            hasActiveFilters={false}
+            hasActiveFilters={false} // Keep as is for now
+            loadingEventId={loadingEventId} // Pass this down
           />
         </div>
       </div>
