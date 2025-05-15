@@ -34,6 +34,10 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
   const [registrationComplete, setRegistrationComplete] = useState<boolean>(false);
   const [registeredEmail, setRegisteredEmail] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [blurredFields, setBlurredFields] = useState<Record<string, boolean>>({
+    password: false,
+    confirmPassword: false
+  });
   const navigate = useNavigate();
   
   const form = useForm<z.infer<typeof formSchema>>({
@@ -43,7 +47,12 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
       password: "",
       confirmPassword: "",
     },
+    mode: 'onBlur', // Only validate on blur, not on change
   });
+
+  const handleFieldBlur = (fieldName: string) => {
+    setBlurredFields(prev => ({ ...prev, [fieldName]: true }));
+  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
@@ -199,10 +208,14 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
                         type="password" 
                         autoComplete="new-password"
                         disabled={loading} 
+                        onBlur={(e) => {
+                          field.onBlur();
+                          handleFieldBlur('password');
+                        }}
                         {...field} 
                       />
                     </FormControl>
-                    <FormMessage />
+                    {blurredFields.password && <FormMessage />}
                   </FormItem>
                 )}
               />
@@ -219,10 +232,14 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
                         type="password" 
                         autoComplete="new-password" 
                         disabled={loading} 
+                        onBlur={(e) => {
+                          field.onBlur();
+                          handleFieldBlur('confirmPassword');
+                        }}
                         {...field} 
                       />
                     </FormControl>
-                    <FormMessage />
+                    {blurredFields.confirmPassword && <FormMessage />}
                   </FormItem>
                 )}
               />

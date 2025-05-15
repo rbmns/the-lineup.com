@@ -20,7 +20,7 @@ export const RelatedEventsGrid: React.FC<RelatedEventsGridProps> = ({ events }) 
   const eventsToShow = eventsArray.slice(0, 3);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {eventsToShow.map((event) => (
         <div key={event.id} className="w-full">
           <RelatedEventCard event={event} />

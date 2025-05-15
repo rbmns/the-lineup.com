@@ -40,8 +40,12 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({ event }) => {
       }
       
       // If start_time is just a time string (HH:MM:SS)
-      const timeparts = event.start_time.split(':');
-      return `${timeparts[0]}:${timeparts[1]}`; // Only keep hours and minutes
+      if (event.start_time.includes(':')) {
+        const timeparts = event.start_time.split(':');
+        return `${timeparts[0]}:${timeparts[1]}`; // Only keep hours and minutes
+      }
+      
+      return event.start_time;
     } catch (error) {
       console.error('Error formatting time:', error);
       return 'Time not specified';

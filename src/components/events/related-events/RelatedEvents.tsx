@@ -1,121 +1,170 @@
 
-import React, { useEffect, useRef, useState } from 'react';
-import { useFetchRelatedEvents } from '@/hooks/events/useFetchRelatedEvents';
-import RelatedEventsLoader from './RelatedEventsLoader';
-import RelatedEventsGrid from './RelatedEventsGrid';
-import { Event } from '@/types';
-import { useAuth } from '@/contexts/AuthContext';
+import React, { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { RelatedEventsGrid } from './RelatedEventsGrid';
+import { RelatedEventsLoader } from './RelatedEventsLoader';
+import { Event } from '@/types';
 
 interface RelatedEventsProps {
   eventId: string;
-  eventType?: string;
-  startDate?: string; // <-- updated from 'date'
-  tags?: string[];
-  vibe?: string;
+  eventType: string;
+  startDate: string;
+  tags?: string[] | string | null;
+  vibe?: string | null;
 }
 
 export const RelatedEvents: React.FC<RelatedEventsProps> = ({ 
-  eventId,
-  eventType = '',
+  eventId, 
+  eventType, 
   startDate,
   tags,
   vibe
 }) => {
-  const { user } = useAuth();
-  const hasFetchedRef = useRef(false);
-  const [fallbackEvents, setFallbackEvents] = useState<Event[]>([]);
+  const [isVisible, setIsVisible] = useState(false);
 
-  // Fetch related events using type and date proximity (±2 days)
-  const { relatedEvents, loading } = useFetchRelatedEvents({
-    eventType,
-    currentEventId: eventId,
-    userId: user?.id,
-    tags,
-    vibe,
-    minResults: 3,
-    startDate, // <-- pass startDate for date-based matching
-  });
-
-  // If we don't have at least 2 related events, fetch some fallbacks
   useEffect(() => {
-    const fetchFallbackEvents = async () => {
-      if (!loading && relatedEvents.length < 2 && !hasFetchedRef.current) {
-        hasFetchedRef.current = true;
-        try {
-          console.log('Fetching fallback events for event type:', eventType);
-          let { data: typeEvents, error: typeError } = await supabase
-            .from('events')
-            .select('*, venues:venue_id(*), creator:profiles(*)')
-            .neq('id', eventId)
-            .eq('event_type', eventType)
-            .gte('start_date', startDate || new Date().toISOString().split('T')[0])
-            .order('start_date', { ascending: true })
-            .limit(5);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
 
-          // Filter for events near the same date (±2 days)
-          if (typeEvents && typeEvents.length > 0 && startDate) {
-            const eventDate = new Date(startDate);
-            typeEvents = typeEvents.filter(ev => {
-              const evDate = ev.start_date ? new Date(ev.start_date) : null;
-              if (!evDate) return false;
-              const daysDiff = Math.abs((evDate.getTime() - eventDate.getTime()) / (1000 * 60 * 60 * 24));
-              return daysDiff <= 2;
-            });
-          }
+    // Get the element to observe
+    const elementToObserve = document.getElementById('related-events-section');
+    if (elementToObserve) {
+      observer.observe(elementToObserve);
+    }
 
-          // Second try: If not enough, get any upcoming events
-          if (!typeEvents || typeEvents.length < 2) {
-            console.log('Not enough type-matched events, fetching any upcoming events');
-            const { data: anyEvents, error: anyError } = await supabase
-              .from('events')
-              .select('*, venues:venue_id(*), creator:profiles(*)')
-              .neq('id', eventId)
-              .gte('start_date', new Date().toISOString().split('T')[0])
-              .order('start_date', { ascending: true })
-              .limit(5);
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
-            if (anyEvents && anyEvents.length > 0) {
-              setFallbackEvents(anyEvents);
-            }
-          } else {
-            setFallbackEvents(typeEvents);
-          }
-        } catch (err) {
-          console.error('Error fetching fallback events:', err);
+  // Function to parse tags into array format
+  const parseTags = (tagInput: string[] | string | null): string[] => {
+    if (!tagInput) return [];
+    if (Array.isArray(tagInput)) return tagInput.filter(Boolean);
+    if (typeof tagInput === 'string') {
+      return tagInput.split(',').map(tag => tag.trim()).filter(Boolean);
+    }
+    return [];
+  };
+
+  // Get the event tags as an array
+  const eventTags = parseTags(tags);
+
+  // Query for related events
+  const { data: relatedEvents, isLoading, error } = useQuery({
+    queryKey: ['related-events', eventId, eventType, startDate, tags, vibe],
+    queryFn: async () => {
+      // Extract the date part only from startDate for date-based matching
+      const eventDate = startDate ? new Date(startDate) : null;
+      const startOfDay = eventDate ? new Date(eventDate.setHours(0, 0, 0, 0)).toISOString() : null;
+      const endOfDay = eventDate ? new Date(eventDate.setHours(23, 59, 59, 999)).toISOString() : null;
+      
+      // First try: same event type, same day
+      if (eventType && startOfDay && endOfDay) {
+        const { data: sameTypeAndDay } = await supabase
+          .from('events')
+          .select('*')
+          .neq('id', eventId)
+          .eq('event_type', eventType)
+          .gte('start_date', startOfDay)
+          .lte('start_date', endOfDay)
+          .limit(3);
+          
+        if (sameTypeAndDay && sameTypeAndDay.length >= 3) {
+          console.log('Found related events with same type and day:', sameTypeAndDay.length);
+          return sameTypeAndDay;
         }
       }
-    };
-    fetchFallbackEvents();
-  }, [eventId, eventType, loading, relatedEvents, startDate]);
-
-  if (loading) {
-    return <RelatedEventsLoader />;
-  }
-
-  // Combine related events with fallback events but remove duplicates
-  const combinedEvents = [...relatedEvents];
-
-  if (combinedEvents.length < 2) {
-    fallbackEvents.forEach(fallbackEvent => {
-      if (!combinedEvents.find(e => e.id === fallbackEvent.id) && fallbackEvent.id !== eventId) {
-        combinedEvents.push(fallbackEvent);
+      
+      // Second try: same event type, any day
+      if (eventType) {
+        const { data: sameType } = await supabase
+          .from('events')
+          .select('*')
+          .neq('id', eventId)
+          .eq('event_type', eventType)
+          .order('start_date')
+          .limit(5);
+          
+        if (sameType && sameType.length >= 3) {
+          console.log('Found related events with same type:', sameType.length);
+          return sameType;
+        }
       }
-    });
+      
+      // Third try: matching tags (if available)
+      if (eventTags.length > 0) {
+        // For each tag, try to find matching events
+        let tagMatches: Event[] = [];
+        
+        // Try to find events matching at least one tag
+        for (const tag of eventTags) {
+          const { data: matchingTag } = await supabase
+            .from('events')
+            .select('*')
+            .neq('id', eventId)
+            .ilike('tags', `%${tag}%`)
+            .limit(5);
+            
+          if (matchingTag && matchingTag.length > 0) {
+            tagMatches = [...tagMatches, ...matchingTag];
+          }
+        }
+        
+        // Remove duplicates and limit to 5
+        const uniqueTagMatches = Array.from(new Map(tagMatches.map(event => [event.id, event])).values());
+        
+        if (uniqueTagMatches.length >= 3) {
+          console.log('Found related events with matching tags:', uniqueTagMatches.length);
+          return uniqueTagMatches.slice(0, 5);
+        }
+      }
+      
+      // Final fallback: any events, regardless of type or tags
+      const { data: anyEvents } = await supabase
+        .from('events')
+        .select('*')
+        .neq('id', eventId)
+        .order('start_date')
+        .limit(5);
+        
+      console.log('Found fallback related events:', anyEvents?.length || 0);
+      return anyEvents || [];
+    },
+    enabled: isVisible && !!eventId, // Only run when section is visible and eventId exists
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
+
+  // Render nothing if there was an error
+  if (error) {
+    console.error('Error loading related events:', error);
+    return null;
   }
 
-  if (combinedEvents.length === 0) {
+  // Render nothing if there are no related events yet
+  if (!isLoading && (!relatedEvents || relatedEvents.length === 0)) {
     return null;
   }
 
   return (
-    <div className="animate-fade-in space-y-4" style={{ animationDelay: '400ms' }}>
-      <h2 className="text-xl font-semibold font-inter tracking-tight">
-        Similar Events
-      </h2>
-      <div className="pb-2">
-        <RelatedEventsGrid events={combinedEvents.slice(0, 3)} />
-      </div>
+    <div id="related-events-section" className="w-full">
+      <h2 className="text-2xl font-bold mb-6">Similar Events</h2>
+      
+      {isLoading ? (
+        <RelatedEventsLoader />
+      ) : (
+        <RelatedEventsGrid events={relatedEvents || []} />
+      )}
     </div>
   );
 };
+
+export default RelatedEvents;
