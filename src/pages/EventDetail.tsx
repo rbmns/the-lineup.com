@@ -149,7 +149,7 @@ const EventDetail = () => {
       
       {/* Related Events Section - always show at the bottom of the page */}
       <div className="mt-12">
-        <RelatedEventsSection event={event} />
+        <RelatedEventsSection events={[event]} /> {/* Fix: Pass as an array */}
       </div>
           
       {/* Bottom back to events button - desktop and mobile */}

@@ -31,7 +31,7 @@ export const EventsList: React.FC<EventsListProps> = ({
             event={event}
             onRsvp={onRsvp}
             showRsvpButtons={showRsvpButtons}
-            view="list"
+            view="list" // Now this is a valid prop since we added it to EventCardProps
           />
         </div>
       ))}

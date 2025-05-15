@@ -32,7 +32,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
             event={event}
             onRsvp={onRsvp}
             showRsvpButtons={showRsvpButtons}
-            view="grid"
+            view="grid" // Now this is a valid prop since we added it to EventCardProps
           />
         </div>
       ))}

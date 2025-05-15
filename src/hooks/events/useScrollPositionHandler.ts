@@ -1,5 +1,5 @@
 
-import { useEffect, RefObject } from 'react';
+import { useEffect, useState, RefObject } from 'react';
 import { Event } from '@/types';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
 
@@ -10,17 +10,21 @@ export const useScrollPositionHandler = (
   events: Event[]
 ) => {
   const { savePosition, restorePosition, savePositionAndState, restorePositionAndState } = useScrollPosition();
+  const [initialRender, setInitialRender] = useState(false);
+  const [scrollRestored, setScrollRestored] = useState(false);
 
   // Restore scroll position after RSVP operations
   useEffect(() => {
     // Only run this effect once on initial render
-    if (!initialRenderRef.current) {
-      initialRenderRef.current = true;
+    if (!initialRender && !initialRenderRef.current) {
+      setInitialRender(true);
+      // We can't modify the ref directly, but we can work around it
+      // by using our local state
       
       // Get position from sessionStorage
       const storedPosition = sessionStorage.getItem('eventsScrollPosition');
       
-      if (storedPosition && !scrollRestoredRef.current) {
+      if (storedPosition && !scrollRestored && !scrollRestoredRef.current) {
         // Restore position after data is loaded and components are rendered
         setTimeout(() => {
           try {
@@ -28,7 +32,8 @@ export const useScrollPositionHandler = (
             restorePosition(position);
             
             // Mark scroll as restored to prevent duplicate restoration
-            scrollRestoredRef.current = true;
+            setScrollRestored(true);
+            // We can't modify the ref directly
             
             // Clear the stored position
             sessionStorage.removeItem('eventsScrollPosition');
@@ -51,7 +56,9 @@ export const useScrollPositionHandler = (
       }
     };
   }, [
+    initialRender,
     initialRenderRef, 
+    scrollRestored,
     scrollRestoredRef, 
     rsvpInProgressRef, 
     events, 

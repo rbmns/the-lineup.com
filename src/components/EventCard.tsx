@@ -16,6 +16,7 @@ export interface EventCardProps {
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   className?: string;
   onClick?: (event: Event) => void;
+  view?: 'list' | 'grid'; // Add the view prop
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -24,7 +25,8 @@ const EventCard: React.FC<EventCardProps> = ({
   showRsvpButtons = false,
   onRsvp,
   className,
-  onClick
+  onClick,
+  view = 'grid' // Default to grid view
 }) => {
   const { getEventImageUrl } = useEventImages();
   const { navigateToEvent } = useEventNavigation();
@@ -160,7 +162,7 @@ const EventCard: React.FC<EventCardProps> = ({
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
-              size="default"
+              size="sm"
             />
           </div>
         )}
