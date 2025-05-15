@@ -1,4 +1,3 @@
-
 import { useMemo } from 'react';
 import { Event } from '@/types';
 import {
@@ -75,25 +74,30 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
     }
   }, [event.start_time, event.end_time]);
   
-  // Process tags for display - properly handle all possible types
+  // Process tags for display - with proper type handling
   const eventTags = useMemo(() => {
-    // If tags is undefined or null, return empty array
-    if (!event.tags) return [];
-    
-    // If tags is already an array, return it
-    if (Array.isArray(event.tags)) {
-      return event.tags.filter(tag => !!tag);
+    try {
+      // If tags is undefined or null, return empty array
+      if (!event.tags) return [];
+      
+      // If tags is already an array, return filtered version
+      if (Array.isArray(event.tags)) {
+        return event.tags.filter(tag => !!tag);
+      }
+      
+      // If tags is a string, split by comma
+      if (typeof event.tags === 'string') {
+        const tagsString: string = event.tags;
+        return tagsString.split(',').map(tag => tag.trim()).filter(Boolean);
+      }
+      
+      // For any other types, log warning and return empty array
+      console.warn('Unexpected tags format:', typeof event.tags, event.tags);
+      return [];
+    } catch (error) {
+      console.error('Error processing tags:', error);
+      return [];
     }
-    
-    // If tags is a string, split by comma
-    if (typeof event.tags === 'string') {
-      return event.tags.split(',').map(tag => tag.trim()).filter(Boolean);
-    }
-    
-    // For any other type, return empty array
-    console.error('Unexpected tags format:', event.tags);
-    return [];
-    
   }, [event.tags]);
   
   // Safely extract coordinates from different possible formats
