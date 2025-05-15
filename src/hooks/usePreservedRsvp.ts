@@ -4,7 +4,7 @@ import { useRsvpActions } from '@/hooks/useRsvpActions';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
 
 export const usePreservedRsvp = (userId: string | undefined) => {
-  const { handleRsvp: originalHandleRsvp, loading } = useRsvpActions(userId);
+  const { handleRsvp: originalHandleRsvp } = useRsvpActions();
   const { savePosition, restorePosition } = useScrollPosition();
   const [rsvpInProgress, setRsvpInProgress] = useState(false);
 
@@ -60,7 +60,7 @@ export const usePreservedRsvp = (userId: string | undefined) => {
 
   return {
     handleRsvp,
-    loading,
+    loading: false,
     rsvpInProgress
   };
 };

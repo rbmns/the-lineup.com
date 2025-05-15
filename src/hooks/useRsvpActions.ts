@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
-export const useRsvpActions = () => {
+export const useRsvpActions = (userId?: string) => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
 
-  const handleRsvp = async (eventId: string, status: 'Going' | 'Interested') => {
+  const handleRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!isAuthenticated || !user) {
       toast({
         title: "Authentication required",
@@ -16,7 +16,7 @@ export const useRsvpActions = () => {
         variant: "destructive",
       });
       navigate('/login');
-      return;
+      return false;
     }
 
     try {
@@ -43,7 +43,7 @@ export const useRsvpActions = () => {
               description: "Failed to update your RSVP status",
               variant: "destructive",
             });
-            return;
+            return false;
           }
 
           toast({
@@ -51,6 +51,7 @@ export const useRsvpActions = () => {
             description: `You're now marked as ${status}`,
             variant: "default",
           });
+          return true;
         } else {
           // If clicking the same status, remove the RSVP
           const { error } = await supabase
@@ -65,7 +66,7 @@ export const useRsvpActions = () => {
               description: "Failed to remove your RSVP",
               variant: "destructive",
             });
-            return;
+            return false;
           }
 
           toast({
@@ -73,6 +74,7 @@ export const useRsvpActions = () => {
             description: "Your RSVP has been removed",
             variant: "default",
           });
+          return true;
         }
       } else {
         // Create a new RSVP
@@ -87,7 +89,7 @@ export const useRsvpActions = () => {
             description: `Failed to mark you as ${status}`,
             variant: "destructive",
           });
-          return;
+          return false;
         }
 
         toast({
@@ -95,6 +97,7 @@ export const useRsvpActions = () => {
           description: `You're now marked as ${status}`,
           variant: "default",
         });
+        return true;
       }
     } catch (error) {
       console.error('Error in RSVP process:', error);
@@ -103,8 +106,12 @@ export const useRsvpActions = () => {
         description: "Failed to update RSVP status",
         variant: "destructive",
       });
+      return false;
     }
   };
 
-  return { handleRsvp };
+  return { 
+    handleRsvp,
+    loading: false // Add a loading state property
+  };
 };

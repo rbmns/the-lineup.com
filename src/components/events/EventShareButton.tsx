@@ -60,7 +60,11 @@ export const EventShareButton: React.FC<EventShareButtonProps> = ({
           <DialogHeader>
             <DialogTitle>Share this event</DialogTitle>
           </DialogHeader>
-          <ShareButtons url={url} title={title} description={description} />
+          <ShareButtons 
+            url={url} 
+            title={title} 
+            description={description} 
+          />
         </DialogContent>
       </Dialog>
     </>

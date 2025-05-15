@@ -1,136 +1,103 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useRsvpActions } from './useRsvpActions';
-import { useEventFetcher } from './useEventFetcher';
-import { useEventRSVP } from './event-rsvp/useEventRSVP';
-import { toast } from 'sonner';
-import { useEventLookup } from './useEventLookup';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { Event } from '@/types';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
+import { useRsvpActions } from '@/hooks/useRsvpActions';
 
-export const useEventDetails = (
-  eventId?: string, 
-  userId?: string, 
-  eventSlug?: string,
-  destination?: string
-) => {
-  const { handleRsvp, loading: rsvpLoading } = useRsvpActions(userId);
-  const { getAttendeesForEvent } = useEventRSVP();
-  const [fetchTriggered, setFetchTriggered] = useState(false);
-  const [lastFetchParams, setLastFetchParams] = useState<string | null>(null);
-  const { lookupEventBySlug } = useEventLookup();
-  
-  const {
-    event,
-    setEvent,
-    attendees,
-    setAttendees,
-    isLoading,
-    setIsLoading,
-    error,
-    setError,
-    fetchEventAndAttendees
-  } = useEventFetcher(userId);
+interface UseEventDetailsResult {
+  event: Event | null;
+  isLoading: boolean;
+  error: string | null;
+  handleRsvp: (status: 'Going' | 'Interested') => Promise<void>;
+}
 
-  // Generate a unique param string to detect changes without unnecessary re-fetches
-  const fetchParamsString = useCallback(() => {
-    return `${eventId || ''}|${eventSlug || ''}|${destination || ''}`;
-  }, [eventId, eventSlug, destination]);
+export const useEventDetails = (eventId: string): UseEventDetailsResult => {
+  const [event, setEvent] = useState<Event | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { handleRsvp } = useRsvpActions();
 
-  // Prevent unnecessary fetches when no parameters have changed
-  const shouldFetchData = useCallback(() => {
-    const currentParams = fetchParamsString();
-    
-    // If we have no parameters, don't fetch
-    if (!eventId && !eventSlug) {
-      console.log("No fetch params available");
-      return false;
-    }
-    
-    // If params haven't changed and we've already fetched, don't fetch again
-    if (currentParams === lastFetchParams && fetchTriggered) {
-      console.log("Skipping fetch - params unchanged", currentParams);
-      return false;
-    }
-    
-    console.log("New fetch params detected", currentParams);
-    return true;
-  }, [fetchParamsString, lastFetchParams, eventId, eventSlug, fetchTriggered]);
-
-  const fetchWithParams = useCallback(async () => {
-    if (!shouldFetchData()) return;
-    
-    try {
+  useEffect(() => {
+    const fetchEventDetails = async () => {
       setIsLoading(true);
       setError(null);
-      console.log(`Fetching event data with params: ID=${eventId}, slug=${eventSlug}, destination=${destination}`);
-      
-      const result = await fetchEventAndAttendees(eventId, eventSlug, destination);
-      
-      // Update last fetch params to prevent duplicate fetches
-      setLastFetchParams(fetchParamsString());
-      setFetchTriggered(true);
-      
-      return result;
-    } catch (err) {
-      console.error("Error in fetchWithParams:", err);
-      setError(err instanceof Error ? err : new Error("Error fetching event"));
-    } finally {
-      setIsLoading(false);
-    }
-  }, [eventId, eventSlug, destination, fetchEventAndAttendees, setIsLoading, setError, fetchParamsString, shouldFetchData]);
 
-  // Initial data fetch
-  useEffect(() => {
-    fetchWithParams();
-  }, [fetchWithParams]);
+      try {
+        const { data, error } = await supabase
+          .from('events')
+          .select('*')
+          .eq('id', eventId)
+          .single();
 
-  // Modified to take only the status parameter
-  const handleRsvpAction = useCallback(async (status: 'Going' | 'Interested') => {
-    if (!event?.id || !userId) return false;
-    
-    try {
-      const result = await handleRsvp(event.id, status);
-      
-      if (result) {
-        setEvent(prevEvent => {
-          if (!prevEvent) return prevEvent;
-          return { 
-            ...prevEvent, 
-            rsvp_status: prevEvent.rsvp_status === status ? undefined : status 
-          };
-        });
-        
-        try {
-          // Refetch attendees after RSVP action
-          const updatedAttendees = await getAttendeesForEvent(event.id);
-          setAttendees(updatedAttendees);
-        } catch (error) {
-          console.error('Error updating attendees list:', error);
+        if (error) {
+          console.error('Error fetching event details:', error);
+          setError('Failed to load event details.');
         }
-        return true;
-      }
-      return false;
-    } catch (err) {
-      console.error('Error updating RSVP:', err);
-      toast("Error", {
-        description: "Failed to update your RSVP status"
-      });
-      return false;
-    }
-  }, [event?.id, userId, handleRsvp, getAttendeesForEvent, setAttendees, setEvent]);
 
-  const refreshData = useCallback(() => {
-    console.log("Manual refresh requested");
-    setFetchTriggered(false); // Reset fetch state to force a new fetch
-    fetchWithParams();
-  }, [fetchWithParams]);
+        if (data) {
+          setEvent(data);
+        }
+      } catch (err) {
+        console.error('Unexpected error fetching event details:', err);
+        setError('An unexpected error occurred.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEventDetails();
+  }, [eventId]);
+
+  const rsvpToEvent = async (status: 'Going' | 'Interested') => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to RSVP to events",
+        variant: "destructive",
+      });
+      navigate('/login');
+      return;
+    }
+
+    try {
+      if (!eventId) {
+        toast({
+          title: "Error",
+          description: "Event ID is missing.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const result = await handleRsvp(eventId, status);
+      if (result) {
+        // success handling
+        // Optimistically update the event state
+        setEvent((prevEvent) => {
+          if (prevEvent) {
+            return { ...prevEvent, rsvp_status: status };
+          }
+          return prevEvent;
+        });
+      }
+    } catch (err) {
+      console.error('Error during RSVP:', err);
+      toast({
+        title: "RSVP Error",
+        description: "Failed to update RSVP status",
+        variant: "destructive",
+      });
+    }
+  };
 
   return {
     event,
-    attendees,
     isLoading,
     error,
-    rsvpLoading,
-    handleRsvpAction,
-    refreshData,
-    lookupEventBySlug
+    handleRsvp: rsvpToEvent,
   };
 };

@@ -37,10 +37,9 @@ export const ShareDialog: React.FC<ShareDialogProps> = ({
         </DialogHeader>
         <div className="flex flex-col gap-4 py-4">
           <ShareButtons 
-            shareData={shareData}
-            canNativeShare={canNativeShare}
-            attemptNativeShare={attemptNativeShare}
-            onShareComplete={() => onOpenChange(false)}
+            url={shareData.url}
+            title={shareData.title}
+            description={shareData.description}
           />
         </div>
       </DialogContent>

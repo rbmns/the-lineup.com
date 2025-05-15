@@ -1,110 +1,115 @@
-
 import React, { useState } from 'react';
+import { useDropzone } from 'react-dropzone';
 import { Button } from '@/components/ui/button';
-import { Upload } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
 
-const FaviconUploader = () => {
-  const [isUploading, setIsUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
+interface FaviconUploaderProps {
+  currentFaviconUrl: string | null;
+  onUploadComplete: (newFaviconUrl: string) => void;
+}
+
+const FaviconUploader: React.FC<FaviconUploaderProps> = ({ currentFaviconUrl, onUploadComplete }) => {
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<ProgressEvent | null>(null);
   
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    // Check if file is an image and has appropriate size
-    if (!file.type.match('image.*')) {
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: {
+      'image/png': ['.png'],
+      'image/jpeg': ['.jpeg', '.jpg'],
+      'image/x-icon': ['.ico'],
+    },
+    maxFiles: 1,
+    onDrop: acceptedFiles => {
+      setFile(acceptedFiles[0]);
+    }
+  });
+
+  const handleUpload = async () => {
+    if (!file) {
       toast({
-        title: "Invalid file",
-        description: "Please select an image file",
+        title: "No file selected",
+        description: "Please select a favicon file to upload.",
         variant: "destructive",
       });
       return;
     }
-    
-    // Check if file size is under 1MB
-    if (file.size > 1024 * 1024) {
-      toast({
-        title: "File too large",
-        description: "Favicon should be under 1MB",
-        variant: "destructive", // Changed from "warning" to "destructive"
-      });
-      return;
-    }
-    
-    setIsUploading(true);
-    setProgress(0);
-    
+
+    setUploading(true);
+    setUploadProgress(null);
+
+    const filePath = `favicons/favicon_${Date.now()}.${file.name.split('.').pop()}`;
+
     try {
-      // Upload to Supabase storage
-      const { data, error } = await supabase.storage
-        .from('site-assets')
-        .upload(`favicon-${Date.now()}.${file.name.split('.').pop()}`, file, {
-          cacheControl: '3600',
-          upsert: false,
-          onUploadProgress: (progress) => {
-            setProgress(Math.round((progress.loaded / progress.total) * 100));
-          }
+      const { data, error } = await supabase.storage.from('public')
+        .upload(filePath, file);
+
+      if (error) {
+        console.error("Error uploading favicon:", error);
+        toast({
+          title: "Upload failed",
+          description: "There was an error uploading the favicon. Please try again.",
+          variant: "destructive",
         });
-        
-      if (error) throw error;
-      
-      // Get public URL
-      const { data: publicUrlData } = supabase.storage
-        .from('site-assets')
-        .getPublicUrl(data.path);
-        
-      // Save to site settings
-      const { error: settingsError } = await supabase
-        .from('site_settings')
-        .update({ favicon_url: publicUrlData.publicUrl })
-        .eq('id', 1);
-        
-      if (settingsError) throw settingsError;
-      
+      } else {
+        const newFaviconUrl = `${supabase.storageUrl}/public/${data.path}`;
+        onUploadComplete(newFaviconUrl);
+        toast({
+          title: "Upload successful",
+          description: "Favicon uploaded successfully!",
+          variant: "success",
+        });
+      }
+    } catch (err) {
+      console.error("Unexpected error during upload:", err);
       toast({
-        title: "Favicon updated",
-        description: "The site favicon has been updated",
-        variant: "default",
-      });
-        
-    } catch (error: any) {
-      console.error('Error uploading favicon:', error);
-      toast({
-        title: "Upload failed",
-        description: error.message || "Failed to upload favicon",
+        title: "Unexpected error",
+        description: "An unexpected error occurred during the upload process.",
         variant: "destructive",
       });
     } finally {
-      setIsUploading(false);
+      setUploading(false);
     }
   };
-  
+
   return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <input
-          type="file"
-          id="favicon-upload"
-          accept="image/*"
-          className="hidden"
-          onChange={handleUpload}
-          disabled={isUploading}
-        />
-        <Button
-          variant="outline"
-          onClick={() => document.getElementById('favicon-upload')?.click()}
-          disabled={isUploading}
-        >
-          <Upload className="mr-2 h-4 w-4" />
-          Upload Favicon
-        </Button>
-        {isUploading && <span className="text-sm text-gray-500">{progress}%</span>}
+    <div>
+      <div {...getRootProps()} className="relative border-2 border-dashed rounded-md cursor-pointer p-4 bg-gray-50 hover:bg-gray-100 transition-colors">
+        <Input {...getInputProps()} id="favicon-upload" className="hidden" />
+        <div className="text-center">
+          <p className="text-sm text-gray-500">
+            Drag 'n' drop your favicon here, or click to select files
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            (Only *.png, *.jpeg, *.jpg and *.ico images will be accepted)
+          </p>
+        </div>
       </div>
-      <p className="text-sm text-gray-500">
-        Upload a square image (ideally 32x32 or 64x64) that will be used as the site favicon
-      </p>
+      {file && (
+        <aside className="mt-4 flex items-center space-x-2">
+          <img
+            src={URL.createObjectURL(file)}
+            alt="Uploaded Favicon Preview"
+            className="h-10 w-10 rounded-sm"
+          />
+          <p className="text-sm text-gray-700">{file.name} - {file.size} bytes</p>
+        </aside>
+      )}
+      <Button onClick={handleUpload} disabled={uploading} className="mt-4">
+        {uploading ? 'Uploading...' : 'Upload Favicon'}
+      </Button>
+      {uploadProgress && (
+        <progress value={uploadProgress.loaded} max={uploadProgress.total} />
+      )}
+      {currentFaviconUrl && (
+        <div className="mt-4">
+          <Label>Current Favicon:</Label>
+          <img src={currentFaviconUrl} alt="Current Favicon" className="h-10 w-10 rounded-sm" />
+        </div>
+      )}
     </div>
   );
 };

@@ -10,7 +10,7 @@ export const useUserEvents = (
   currentUserId: string | undefined,
   friendshipStatus: 'none' | 'pending' | 'requested' | 'accepted'
 ) => {
-  const { handleRsvp: handleRsvpAction } = useRsvpActions(currentUserId);
+  const { handleRsvp: handleRsvpAction } = useRsvpActions();
   
   // Consider all non-accepted statuses as 'none' for event queries
   const normalizedStatus = friendshipStatus === 'accepted' ? 'accepted' : 

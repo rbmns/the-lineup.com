@@ -2,7 +2,7 @@
 import React from 'react';
 import { 
   Copy, Facebook, MessageCircle, Share, Instagram, 
-  Send, SnapchatGhost, History, Link2
+  History, Link2
 } from 'lucide-react';
 import { handleNativeShare, canUseNativeShare } from '@/utils/sharing/nativeShare';
 import { shareToWhatsApp, shareToFacebook, shareToInstagram, 
@@ -10,6 +10,10 @@ import { shareToWhatsApp, shareToFacebook, shareToInstagram,
 import { copyToClipboard } from '@/utils/sharing/clipboardUtils';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
+import { 
+  WhatsAppIcon, FacebookIcon, InstagramIcon,
+  TikTokIcon, SnapchatIcon
+} from './ShareIcons';
 
 interface ShareButtonsProps {
   url: string;
@@ -91,7 +95,7 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
         onClick={handleWhatsAppShare}
         className="flex items-center gap-2 justify-center"
       >
-        <MessageCircle className="h-4 w-4 text-green-600" />
+        <WhatsAppIcon className="h-4 w-4" />
         <span>WhatsApp</span>
       </Button>
       
@@ -100,7 +104,7 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
         onClick={handleFacebookShare}
         className="flex items-center gap-2 justify-center"
       >
-        <Facebook className="h-4 w-4 text-blue-600" />
+        <FacebookIcon className="h-4 w-4" />
         <span>Facebook</span>
       </Button>
       
@@ -109,7 +113,7 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
         onClick={handleInstagramShare}
         className="flex items-center gap-2 justify-center"
       >
-        <Instagram className="h-4 w-4 text-pink-600" />
+        <InstagramIcon className="h-4 w-4" />
         <span>Instagram</span>
       </Button>
       
@@ -127,7 +131,7 @@ export const ShareButtons: React.FC<ShareButtonsProps> = ({
         onClick={handleSnapchatShare}
         className="flex items-center gap-2 justify-center"
       >
-        <SnapchatGhost className="h-4 w-4 text-yellow-400" />
+        <SnapchatIcon className="h-4 w-4" />
         <span>Snapchat</span>
       </Button>
       

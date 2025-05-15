@@ -17,7 +17,7 @@ const EventsPage = () => {
   
   const { user } = useAuth();
   const { data: events = [], isLoading } = useEvents(user?.id);
-  const { handleRsvp, loading: rsvpLoading } = useOptimisticRsvp(user?.id);
+  const { handleRsvp } = useOptimisticRsvp(user?.id);
   const rsvpInProgressRef = useRef(false);
   
   // Set page metadata
@@ -91,7 +91,7 @@ const EventsPage = () => {
             mainEvents={displayEvents}
             relatedEvents={[]}
             isLoading={isLoading}
-            isRsvpLoading={rsvpLoading}
+            isRsvpLoading={false}
             onRsvp={user ? handleEventRsvp : undefined}
             showRsvpButtons={!!user}
             hasActiveFilters={false}
