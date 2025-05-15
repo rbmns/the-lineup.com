@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
@@ -33,6 +34,16 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
     setError(null);
 
     try {
+      // Check if eventId is valid before querying
+      if (!eventId) {
+        console.error('Error: Missing eventId parameter');
+        setError('Event ID is missing');
+        setIsLoading(false);
+        return;
+      }
+
+      console.log(`Fetching event details for eventId=${eventId}`);
+      
       const { data, error } = await supabase
         .from('events')
         .select('*')
@@ -56,7 +67,9 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
   };
 
   useEffect(() => {
-    fetchEventDetails();
+    if (eventId) {
+      fetchEventDetails();
+    }
   }, [eventId]);
 
   // Handle RSVP for a specific event

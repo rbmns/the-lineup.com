@@ -3,7 +3,7 @@ import React from 'react';
 import { Event } from '@/types';
 import EventCard from '@/components/EventCard';
 import { useAuth } from '@/contexts/AuthContext';
-import { useEventNavigation } from '@/hooks/useEventNavigation';
+import { useNavigate } from 'react-router-dom';
 
 interface UserFeedProps {
   events: Event[];
@@ -12,16 +12,16 @@ interface UserFeedProps {
 
 export const UserFeed: React.FC<UserFeedProps> = ({ events, handleRsvpAction }) => {
   const { isAuthenticated } = useAuth();
-  const { navigateToEvent } = useEventNavigation();
+  const navigate = useNavigate();
   
   const handleEventClick = (event: Event) => {
-    console.log("UserFeed: Navigating to event using SEO-friendly URL");
-    // Use the navigation hook for consistent URL structure
-    navigateToEvent({
-      ...event,
-      destination: event.destination,
-      slug: event.slug
-    });
+    console.log(`UserFeed: Navigating to event with ID: ${event.id}`);
+    // Use direct navigation to event ID for consistency
+    if (event && event.id) {
+      navigate(`/events/${event.id}`);
+    } else {
+      console.error("Cannot navigate: Missing event ID", event);
+    }
   };
 
   return (

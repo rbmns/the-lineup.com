@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { formatRelativeDate, formatEventTime, getEventDateTime } from '@/utils/dateUtils';
@@ -43,9 +42,12 @@ const EventCard: React.FC<EventCardProps> = ({
     
     if (onClick) {
       onClick();
-    } else {
-      // Always navigate using the event ID for consistency
+    } else if (event && event.id) {
+      // Make sure we have a valid event ID before navigating
+      console.log(`Navigating to event detail with ID: ${event.id}`);
       navigate(`/events/${event.id}`);
+    } else {
+      console.error("Cannot navigate: Missing event ID", event);
     }
   };
   

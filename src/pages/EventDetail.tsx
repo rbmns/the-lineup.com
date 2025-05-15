@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Event } from '@/types';
 import { EventDetailHeader } from '@/components/events/EventDetailHeader';
 import { EventDetailContent } from '@/components/events/EventDetailContent';
@@ -10,7 +10,6 @@ import { MobileRsvpFooter } from '@/components/events/MobileRsvpFooter';
 import { EventDetailErrorState } from '@/components/events/EventDetailErrorState';
 import { EventDetailLoadingState } from '@/components/events/EventDetailLoadingState';
 import { ShareDialog } from '@/components/events/share/ShareDialog';
-import { useEventDetailParams } from '@/hooks/useEventDetailParams';
 import { useEventDetails } from '@/hooks/useEventDetails';
 import { useEventImages } from '@/hooks/useEventImages';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
@@ -20,15 +19,24 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useDeviceDetection } from '@/hooks/useDeviceDetection';
 
 const EventDetail = () => {
-  const { eventId, eventSlug } = useEventDetailParams();
-  const { event, error, isLoading } = useEventDetails(eventId);
+  const { eventId } = useParams<{ eventId: string }>();
+  const navigate = useNavigate();
+
+  // Safety check for valid eventId
+  useEffect(() => {
+    if (!eventId) {
+      console.error("Missing event ID in URL params");
+      navigate('/events');
+    }
+  }, [eventId, navigate]);
+
+  const { event, error, isLoading } = useEventDetails(eventId || '');
   const { coverImage } = useEventImages(event);
   const metaTags = useEventMetaTags(event);
   const { handleRsvp } = useRsvpActions();
   const { navigateToEvent } = useEventNavigation();
   const { isMobile } = useDeviceDetection();
   const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
   
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   
