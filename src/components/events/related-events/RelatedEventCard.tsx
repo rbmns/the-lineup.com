@@ -4,7 +4,7 @@ import { Event } from '@/types';
 import EventCard from '@/components/EventCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOptimisticRsvp } from '@/hooks/event-rsvp/useOptimisticRsvp';
-import { useEventNavigation } from '@/hooks/useEventNavigation';
+import { useEventInteractions } from '@/hooks/events/useEventInteractions';
 
 interface RelatedEventCardProps {
   event: Event;
@@ -13,18 +13,9 @@ interface RelatedEventCardProps {
 export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({ event }) => {
   const { user, isAuthenticated } = useAuth();
   const { handleRsvp, loading: rsvpLoading } = useOptimisticRsvp(user?.id); 
-  const { navigateToEvent } = useEventNavigation();
+  const { handleEventClick } = useEventInteractions();
   const [localRsvpStatus, setLocalRsvpStatus] = useState<'Going' | 'Interested' | undefined>(event.rsvp_status);
   
-  // Enhanced navigation with smooth transitions
-  const handleClick = () => {
-    navigateToEvent({
-      ...event,
-      destination: event.destination,
-      slug: event.slug
-    });
-  };
-
   // RSVP handler with optimistic UI updates
   const handleRsvpAction = async (eventId: string, status: 'Going' | 'Interested') => {
     if (!user?.id || rsvpLoading) return false;
@@ -83,7 +74,7 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({ event }) => 
         showRsvpButtons={isAuthenticated}
         compact={true}
         className="h-full border hover:shadow-md transition-all duration-300"
-        onClick={handleClick}
+        onClick={() => handleEventClick(event)}
         onRsvp={isAuthenticated ? handleRsvpAction : undefined}
       />
     </div>

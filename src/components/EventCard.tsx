@@ -1,9 +1,7 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { formatRelativeDate, formatEventTime, getEventDateTime } from '@/utils/dateUtils';
 import { useEventImages } from '@/hooks/useEventImages';
-import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { cn } from '@/lib/utils';
@@ -29,7 +27,6 @@ const EventCard: React.FC<EventCardProps> = ({
   onShare
 }) => {
   const { getEventImageUrl } = useEventImages();
-  const { navigateToEvent } = useEventNavigation();
   const navigate = useNavigate();
   
   const imageUrl = getEventImageUrl(event);
@@ -46,7 +43,8 @@ const EventCard: React.FC<EventCardProps> = ({
     if (onClick) {
       onClick();
     } else {
-      navigateToEvent(event);
+      // Default navigation behavior if no onClick handler provided
+      navigate(`/events/${event.id}`);
     }
   };
   

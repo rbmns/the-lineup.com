@@ -1,12 +1,13 @@
 
 import { useState, useCallback } from 'react';
 import { Event } from '@/types';
-import { useEventNavigation } from '@/hooks/useEventNavigation';
+import { useNavigate } from 'react-router-dom';
+import { getEventUrl } from '@/utils/canonicalUtils';
 
 export const useEventInteractions = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const { navigateToEvent } = useEventNavigation();
+  const navigate = useNavigate();
   
   const handleEventClick = useCallback((event: Event) => {
     console.log("useEventInteractions: handleEventClick", event);
@@ -16,9 +17,28 @@ export const useEventInteractions = () => {
       return;
     }
     
-    // Always pass the full event object for SEO-friendly URLs
-    navigateToEvent(event);
-  }, [navigateToEvent]);
+    // Generate the event URL based on event ID
+    const eventUrl = `/events/${event.id}`;
+    
+    // Navigate to the event detail page
+    navigate(eventUrl, {
+      state: { 
+        fromDirectNavigation: true,
+        forceRefresh: true,
+        timestamp: Date.now()
+      }
+    });
+  }, [navigate]);
+  
+  const navigateToEvent = useCallback((event: Event) => {
+    if (!event?.id) {
+      console.error("Cannot navigate: event is missing ID");
+      return;
+    }
+    
+    const eventUrl = `/events/${event.id}`;
+    navigate(eventUrl);
+  }, [navigate]);
   
   const handleEventDetailOpen = useCallback((event: Event) => {
     setSelectedEvent(event);
