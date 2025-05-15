@@ -25,7 +25,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
 }) => {
   return (
     <div 
-      className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4", className)} 
+      className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6", className)} 
       style={style}
     >
       {events.map((event) => (
@@ -35,7 +35,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
             onRsvp={onRsvp}
             showRsvpButtons={showRsvpButtons}
             view="grid"
-            compact={true}
+            compact={false}
             isLoading={loadingEventId === event.id}
           />
         </div>

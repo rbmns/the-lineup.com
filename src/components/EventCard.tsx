@@ -98,7 +98,7 @@ const EventCard: React.FC<EventCardProps> = ({
     <div
       className={cn(
         "group relative rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer bg-white flex flex-col h-full",
-        compact ? "max-h-[320px]" : "",
+        compact ? "max-h-[340px]" : "",
         className
       )}
       onClick={handleClick}
@@ -117,7 +117,7 @@ const EventCard: React.FC<EventCardProps> = ({
           <div className="absolute top-2 left-2 z-10">
             <CategoryPill 
               category={event.event_type} 
-              size="xs" 
+              size="sm" 
               showIcon={false}
             />
           </div>
@@ -125,27 +125,27 @@ const EventCard: React.FC<EventCardProps> = ({
       </div>
 
       {/* Content Section */}
-      <div className="p-3 flex flex-col flex-grow">
+      <div className="p-4 flex flex-col flex-grow">
         {/* Title */}
-        <h3 className="font-semibold text-gray-900 text-base line-clamp-1 mb-1">
+        <h3 className="font-semibold text-gray-900 text-lg md:text-xl line-clamp-1 mb-2">
           {event.title}
         </h3>
         
         {/* Date & Time */}
-        <div className="flex items-center text-xs text-gray-600 mb-1">
-          <Calendar className="h-3 w-3 mr-1 flex-shrink-0" />
+        <div className="flex items-center text-sm md:text-base text-gray-600 mb-1">
+          <Calendar className="h-4 w-4 mr-1.5 flex-shrink-0" />
           {event.start_time && formatDateDisplay(event.start_time)}
         </div>
         
         {/* Time */}
-        <div className="flex items-center text-xs text-gray-600 mb-1">
-          <Clock className="h-3 w-3 mr-1 flex-shrink-0" />
+        <div className="flex items-center text-sm md:text-base text-gray-600 mb-1">
+          <Clock className="h-4 w-4 mr-1.5 flex-shrink-0" />
           {event.start_time && getEventTimeDisplay(event)}
         </div>
         
         {/* Venue/Location */}
-        <div className="flex items-center text-xs text-gray-600 mb-2">
-          <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+        <div className="flex items-center text-sm md:text-base text-gray-600 mb-3">
+          <MapPin className="h-4 w-4 mr-1.5 flex-shrink-0" />
           <span className="truncate">{event.venues?.name || event.location || 'No location'}</span>
         </div>
         
@@ -159,7 +159,7 @@ const EventCard: React.FC<EventCardProps> = ({
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
-              size="sm"
+              size="default"
               isLoading={isLoading}
             />
           </div>

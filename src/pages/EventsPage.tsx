@@ -40,11 +40,11 @@ const EventsPage = () => {
   const displayEvents = filterUpcomingEvents(events || []);
 
   return (
-    <div className="w-full px-4 md:px-6 py-6">
+    <div className="w-full px-4 md:px-6 py-8">
       <div className="max-w-7xl mx-auto">
         <EventsPageHeader title="Upcoming Events" />
         
-        <div className="space-y-6 mt-6">
+        <div className="space-y-8 mt-8">
           {/* Events List Section - grid view only now */}
           <LazyEventsList 
             mainEvents={displayEvents}
@@ -54,7 +54,7 @@ const EventsPage = () => {
             onRsvp={user ? handleEventRsvp : undefined}
             showRsvpButtons={!!user}
             hasActiveFilters={false}
-            compact={true}
+            compact={false}
             loadingEventId={loadingEventId}
           />
         </div>
