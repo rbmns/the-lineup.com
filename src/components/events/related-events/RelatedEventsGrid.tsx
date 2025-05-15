@@ -2,6 +2,7 @@
 import React from 'react';
 import { Event } from '@/types';
 import RelatedEventCard from './RelatedEventCard';
+import { EventCardMeta } from '@/components/events/EventCardMeta';
 
 interface RelatedEventsGridProps {
   events: Event[];

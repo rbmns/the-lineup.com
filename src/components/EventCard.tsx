@@ -89,10 +89,14 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
 
+  // Determine max height for compact vs standard view
+  const cardHeightClass = compact ? "max-h-[280px]" : "";
+
   return (
     <div
       className={cn(
         "group relative rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer bg-white flex flex-col h-full",
+        cardHeightClass,
         className
       )}
       onClick={handleClick}
@@ -119,7 +123,7 @@ const EventCard: React.FC<EventCardProps> = ({
       </div>
 
       {/* Content Section */}
-      <div className="p-4 flex flex-col flex-grow">
+      <div className="p-4 flex flex-col flex-grow space-y-2">
         {/* Title - First */}
         <h3 className={cn(
           "font-semibold text-gray-900",
@@ -129,7 +133,7 @@ const EventCard: React.FC<EventCardProps> = ({
         </h3>
         
         {/* Date & Time */}
-        <div className="text-sm text-gray-600 font-medium mt-2">
+        <div className="text-sm text-gray-600 font-medium">
           {event.start_time && (
             <>
               {formatDateDisplay(event.start_time)} • {getEventTimeDisplay(event)}
@@ -138,25 +142,25 @@ const EventCard: React.FC<EventCardProps> = ({
         </div>
         
         {/* Venue/Location */}
-        <div className="flex items-center text-sm text-gray-500 mt-1">
+        <div className="flex items-center text-sm text-gray-500">
           <MapPin className="h-3.5 w-3.5 mr-1 flex-shrink-0" />
           <span className="truncate">{event.venues?.name || event.location || 'No location'}</span>
         </div>
         
         {/* Spacer to push RSVP buttons to bottom */}
-        <div className="flex-grow min-h-[8px] mt-2"></div>
+        <div className="flex-grow min-h-[8px]"></div>
         
-        {/* RSVP Buttons - only if needed, aligned to bottom */}
+        {/* RSVP Buttons - only if needed */}
         {showRsvpButtons && (
           <div 
-            className="mt-auto pt-2" 
+            className="mt-2" 
             data-rsvp-container="true"
             onClick={(e) => e.stopPropagation()}
           >
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
-              size="md"
+              size="default"
             />
           </div>
         )}

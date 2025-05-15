@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin } from 'lucide-react';
@@ -153,7 +152,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
               <EventRsvpButtons
                 currentStatus={event.rsvp_status || null}
                 onRsvp={handleRsvp}
-                size="xs"
+                size="sm"
                 showStatusOnly={!showRsvpButtons && showRsvpStatus}
               />
             </div>
