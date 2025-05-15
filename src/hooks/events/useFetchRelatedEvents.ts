@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Event } from '@/types';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { useSimilarEvents } from '../events/useSimilarEvents';
 
 interface UseFetchRelatedEventsProps {
@@ -20,7 +20,8 @@ export const useFetchRelatedEvents = ({
   userId,
   tags,
   vibe,
-  minResults = 2
+  minResults = 2, // Default to minimum 2 results
+  startDate
 }: UseFetchRelatedEventsProps) => {
   const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -249,7 +250,7 @@ export const useFetchRelatedEvents = ({
     } else {
       setLoading(false);
     }
-  }, [eventType, currentEventId, userId, minResults, tags, vibe, fetchSimilarEvents]); 
+  }, [eventType, currentEventId, userId, minResults, tags, vibe, fetchSimilarEvents, startDate]); 
   
   return { relatedEvents, loading };
 };

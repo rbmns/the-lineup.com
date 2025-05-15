@@ -17,7 +17,7 @@ import { ShareDialog } from '@/components/events/share/ShareDialog';
 import { MainEventContent } from '@/components/events/MainEventContent';
 import { SidebarContent } from '@/components/events/SidebarContent';
 import { MobileRsvpFooter } from '@/components/events/MobileRsvpFooter';
-import { RelatedEventsSection } from '@/components/events/RelatedEventsSection';
+import { RelatedEvents } from '@/components/events/related-events/RelatedEvents';
 
 const EventDetail = () => {
   // Use our comprehensive params hook to get all URL parameters
@@ -147,9 +147,15 @@ const EventDetail = () => {
         </div>
       </div>
       
-      {/* Related Events Section - always show at the bottom of the page */}
+      {/* Related Events Section - properly implemented */}
       <div className="mt-12">
-        <RelatedEventsSection events={[event]} /> {/* Fix: Pass as an array */}
+        <RelatedEvents 
+          eventId={event.id} 
+          eventType={event.event_type || ''}
+          startDate={event.start_date || ''}
+          tags={event.tags}
+          vibe={event.vibe}
+        />
       </div>
           
       {/* Bottom back to events button - desktop and mobile */}

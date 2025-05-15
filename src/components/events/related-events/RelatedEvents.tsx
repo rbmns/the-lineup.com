@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { RelatedEventsGrid } from './RelatedEventsGrid';
 import { RelatedEventsLoader } from './RelatedEventsLoader';
 import { useFetchRelatedEvents } from '@/hooks/events/useFetchRelatedEvents';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface RelatedEventsProps {
   eventId: string;
@@ -20,6 +21,7 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
   vibe
 }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -62,8 +64,9 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
     currentEventId: eventId,
     tags: eventTags,
     vibe: vibe ? String(vibe) : undefined,
-    minResults: 2,
-    startDate
+    minResults: 2, // Ensure we get at least 2 events
+    startDate,
+    userId: user?.id
   });
 
   // Always render the loader or results section since we want to show it even if empty
