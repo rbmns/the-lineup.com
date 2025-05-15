@@ -1,49 +1,40 @@
 
 /**
- * Social media sharing utilities
+ * Utility functions for sharing to social media platforms
  */
 
-/**
- * Generate Twitter/X share URL
- */
-export const getTwitterShareUrl = (text: string, url: string, hashtags?: string[]): string => {
-  const params = new URLSearchParams({
-    text,
-    url
-  });
-  
-  if (hashtags && hashtags.length > 0) {
-    params.append('hashtags', hashtags.join(','));
-  }
-  
-  return `https://twitter.com/intent/tweet?${params.toString()}`;
+export const shareToWhatsApp = (text: string, url: string): void => {
+  const encodedText = encodeURIComponent(`${text}\n\n${url}`);
+  window.open(`https://wa.me/?text=${encodedText}`, '_blank');
 };
 
-/**
- * Generate Facebook share URL
- */
-export const getFacebookShareUrl = (url: string): string => {
-  return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+export const shareToFacebook = (url: string): void => {
+  window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
 };
 
-/**
- * Generate WhatsApp share URL
- */
-export const getWhatsAppShareUrl = (text: string, url: string): string => {
-  const message = `${text} ${url}`;
-  return `https://wa.me/?text=${encodeURIComponent(message)}`;
+export const shareToInstagram = (url: string): void => {
+  // Instagram doesn't have a direct share URL like other platforms
+  // Instead, we'll copy to clipboard and provide instructions
+  navigator.clipboard.writeText(url)
+    .then(() => {
+      alert('URL copied! Instagram doesn\'t support direct sharing via web. Please paste the URL in your Instagram post or story.');
+    })
+    .catch(err => {
+      console.error('Failed to copy URL: ', err);
+    });
 };
 
-/**
- * Generate LinkedIn share URL
- */
-export const getLinkedInShareUrl = (url: string, title: string): string => {
-  return `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`;
+export const shareToTikTok = (url: string): void => {
+  // Similar to Instagram, TikTok doesn't support direct web sharing
+  navigator.clipboard.writeText(url)
+    .then(() => {
+      alert('URL copied! TikTok doesn\'t support direct sharing via web. Please paste the URL in your TikTok video description.');
+    })
+    .catch(err => {
+      console.error('Failed to copy URL: ', err);
+    });
 };
 
-/**
- * Generate Telegram share URL
- */
-export const getTelegramShareUrl = (url: string, text: string): string => {
-  return `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+export const shareToSnapchat = (url: string): void => {
+  window.open(`https://www.snapchat.com/scan?attachmentUrl=${encodeURIComponent(url)}`, '_blank');
 };

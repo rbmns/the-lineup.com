@@ -44,6 +44,7 @@ export const useEventImages = () => {
       if (Array.isArray(event.tags)) {
         tags = event.tags;
       } else if (typeof event.tags === 'string') {
+        // Fix: Use type guard to check if event.tags is a string before calling split
         tags = event.tags.split(',').map(tag => tag.trim());
       }
     }

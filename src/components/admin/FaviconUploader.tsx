@@ -1,126 +1,111 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from '@/hooks/use-toast';
 import { Upload } from 'lucide-react';
-import { uploadFavicon } from '@/lib/seo';
+import { supabase } from '@/lib/supabase';
+import { toast } from '@/hooks/use-toast';
 
-const FaviconUploader: React.FC = () => {
-  const [uploading, setUploading] = useState(false);
-  const [faviconUrl, setFaviconUrl] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) {
+const FaviconUploader = () => {
+  const [isUploading, setIsUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Check if file is an image and has appropriate size
+    if (!file.type.match('image.*')) {
+      toast({
+        title: "Invalid file",
+        description: "Please select an image file",
+        variant: "destructive",
+      });
       return;
     }
     
-    const file = e.target.files[0];
-    await handleUpload(file);
-  };
-
-  const handleUpload = async (file: File) => {
+    // Check if file size is under 1MB
+    if (file.size > 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Favicon should be under 1MB",
+        variant: "destructive", // Changed from "warning" to "destructive"
+      });
+      return;
+    }
+    
+    setIsUploading(true);
+    setProgress(0);
+    
     try {
-      setUploading(true);
-      
-      // Check file type - prefer SVG or PNG with transparency
-      const fileType = file.type;
-      if (!['image/svg+xml', 'image/png'].includes(fileType)) {
-        toast({
-          title: 'Warning',
-          description: 'For best results, use SVG or PNG with transparency',
-          variant: 'warning'
-        });
-      }
-      
-      // Upload through our SEO service
-      const { url, error } = await uploadFavicon(file);
-      
-      if (error) {
-        throw error;
-      }
-      
-      if (url) {
-        setFaviconUrl(url);
-        toast({
-          title: 'Favicon updated',
-          description: 'Your favicon has been uploaded successfully'
+      // Upload to Supabase storage
+      const { data, error } = await supabase.storage
+        .from('site-assets')
+        .upload(`favicon-${Date.now()}.${file.name.split('.').pop()}`, file, {
+          cacheControl: '3600',
+          upsert: false,
+          onUploadProgress: (progress) => {
+            setProgress(Math.round((progress.loaded / progress.total) * 100));
+          }
         });
         
-        // Update the favicon in the document head
-        const faviconLink = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
-        if (faviconLink) {
-          faviconLink.href = url;
-          faviconLink.type = fileType;
-        }
-      }
+      if (error) throw error;
+      
+      // Get public URL
+      const { data: publicUrlData } = supabase.storage
+        .from('site-assets')
+        .getPublicUrl(data.path);
+        
+      // Save to site settings
+      const { error: settingsError } = await supabase
+        .from('site_settings')
+        .update({ favicon_url: publicUrlData.publicUrl })
+        .eq('id', 1);
+        
+      if (settingsError) throw settingsError;
+      
+      toast({
+        title: "Favicon updated",
+        description: "The site favicon has been updated",
+        variant: "default",
+      });
+        
     } catch (error: any) {
       console.error('Error uploading favicon:', error);
       toast({
-        title: 'Upload failed',
-        description: error.message || 'There was a problem uploading your favicon',
-        variant: 'destructive'
+        title: "Upload failed",
+        description: error.message || "Failed to upload favicon",
+        variant: "destructive",
       });
     } finally {
-      setUploading(false);
+      setIsUploading(false);
     }
   };
-
+  
   return (
-    <Card className="border border-gray-200 shadow-sm">
-      <CardHeader>
-        <CardTitle className="text-lg">Favicon Uploader</CardTitle>
-        <CardDescription>
-          Upload a transparent favicon (SVG or PNG recommended)
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div 
-          className="border-2 border-dashed rounded-md p-6 cursor-pointer hover:border-black transition-colors flex flex-col items-center justify-center"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          {faviconUrl ? (
-            <div className="flex flex-col items-center">
-              <img 
-                src={faviconUrl} 
-                alt="Current favicon" 
-                className="w-16 h-16 mb-2 bg-gray-100 p-1 rounded" 
-              />
-              <p className="text-sm text-gray-600">Click to upload a new favicon</p>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center">
-              <Upload className="w-8 h-8 text-gray-400 mb-2" />
-              <p className="text-sm">Click to upload a favicon</p>
-              <p className="text-xs text-gray-500 mt-1">SVG or PNG with transparency recommended</p>
-            </div>
-          )}
-        </div>
-        <input 
-          type="file" 
-          ref={fileInputRef} 
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <input
+          type="file"
+          id="favicon-upload"
+          accept="image/*"
           className="hidden"
-          accept=".svg,.png" 
-          onChange={handleFileSelect}
+          onChange={handleUpload}
+          disabled={isUploading}
         />
-        
-        {uploading && (
-          <div className="mt-4 text-center">
-            <p className="text-sm">Uploading favicon...</p>
-          </div>
-        )}
-        
-        {faviconUrl && (
-          <div className="mt-4 p-3 bg-gray-50 rounded-md">
-            <p className="text-xs font-medium">Favicon URL:</p>
-            <code className="text-xs block mt-1 overflow-x-auto p-2 bg-white border rounded">
-              {faviconUrl}
-            </code>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        <Button
+          variant="outline"
+          onClick={() => document.getElementById('favicon-upload')?.click()}
+          disabled={isUploading}
+        >
+          <Upload className="mr-2 h-4 w-4" />
+          Upload Favicon
+        </Button>
+        {isUploading && <span className="text-sm text-gray-500">{progress}%</span>}
+      </div>
+      <p className="text-sm text-gray-500">
+        Upload a square image (ideally 32x32 or 64x64) that will be used as the site favicon
+      </p>
+    </div>
   );
 };
 

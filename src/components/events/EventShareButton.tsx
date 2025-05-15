@@ -1,88 +1,68 @@
 
-import React, { useState, useEffect } from 'react';
-import { Dialog } from "@/components/ui/dialog";
-import { useDeviceDetection } from '@/hooks/useDeviceDetection';
-import { handleNativeShare } from '@/utils/sharing';
-import { ShareDialog } from './share/ShareDialog';
-import { ShareTrigger } from './share/ShareTrigger';
-import { useShareData } from '@/hooks/useShareData';
+import React, { useState } from 'react';
+import { Share } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { canUseNativeShare, handleNativeShare } from '@/utils/sharing';
+import { Event } from '@/types';
+import { useEventImages } from '@/hooks/useEventImages';
+import { ShareButtons } from './share/ShareButtons';
 
 interface EventShareButtonProps {
-  title: string;
   url: string;
-  imageUrl?: string;
+  title: string;
   description?: string;
-  event?: any; // Add event object for SEO-friendly URLs
+  className?: string;
+  event?: Event;
 }
 
-export const EventShareButton = ({ title, url, imageUrl, description, event }: EventShareButtonProps) => {
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const { isMobile, canNativeShare, isIOS, isAndroid } = useDeviceDetection();
+export const EventShareButton: React.FC<EventShareButtonProps> = ({
+  url,
+  title,
+  description = '',
+  className = '',
+  event
+}) => {
+  const [showDialog, setShowDialog] = useState(false);
+  const { getShareImageUrl } = useEventImages();
   
-  // Don't render the component if there's no title or URL
-  if (!title || !url) {
-    return null;
-  }
-  
-  // Get optimized share data from our custom hook
-  const shareData = useShareData({ title, url, imageUrl, event });
-
-  // Ensure proper viewport setup for mobile sharing
-  useEffect(() => {
-    const metaViewport = document.querySelector('meta[name="viewport"]');
-    if (metaViewport && isMobile) {
-      // Store the original content
-      const originalContent = metaViewport.getAttribute('content') || '';
+  const handleShare = async () => {
+    // Try native sharing first, fall back to dialog
+    if (canUseNativeShare()) {
+      const imageUrl = event ? getShareImageUrl(event) : undefined;
+      const success = await handleNativeShare({ 
+        title, 
+        text: description, 
+        url 
+      });
       
-      // Set optimized viewport for mobile sharing
-      metaViewport.setAttribute(
-        'content', 
-        'width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover'
-      );
-      
-      return () => {
-        // Restore original viewport settings when component unmounts
-        metaViewport.setAttribute('content', originalContent);
-      };
-    }
-  }, [isMobile, dialogOpen]);
-
-  const handleShareButtonClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    // Always try native sharing on mobile first
-    if (isMobile && canNativeShare) {
-      attemptNativeShare();
+      if (!success) {
+        setShowDialog(true);
+      }
     } else {
-      // Show dialog for desktop or if native sharing isn't available
-      setDialogOpen(true);
-    }
-  };
-
-  const attemptNativeShare = async () => {
-    console.log("Attempting native share");
-    const success = await handleNativeShare(shareData);
-    if (!success) {
-      // If native sharing fails or is cancelled, show the dialog
-      console.log("Native share failed, showing dialog");
-      setDialogOpen(true);
+      setShowDialog(true);
     }
   };
 
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <ShareTrigger 
-        onClick={handleShareButtonClick} 
-        disabled={!shareData || !shareData.url}
-      />
-      <ShareDialog 
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        shareData={shareData}
-        canNativeShare={canNativeShare}
-        attemptNativeShare={attemptNativeShare}
-      />
-    </Dialog>
+    <>
+      <Button 
+        variant="secondary"
+        size="icon" 
+        className={`h-10 w-10 rounded-full bg-white/80 text-gray-800 hover:bg-white border border-gray-200 ${className}`}
+        onClick={handleShare}
+      >
+        <Share className="h-5 w-5" />
+      </Button>
+      
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Share this event</DialogTitle>
+          </DialogHeader>
+          <ShareButtons url={url} title={title} description={description} />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };

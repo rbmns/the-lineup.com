@@ -1,6 +1,6 @@
 
 import { Event } from '@/types';
-import { fallbackImages } from './eventImages';
+import { eventImageMap } from './eventImages';
 
 export const getEventTypeColor = (eventType: string | null | undefined) => {
   switch (eventType?.toLowerCase()) {
@@ -73,14 +73,14 @@ export const getEventTypeIconSvg = (eventType: string): string => {
 };
 
 export const getFallbackProfileImage = (status?: string) => {
-  // Using local image instead of external placeholder to avoid CSP issues
-  return `${fallbackImages.default}`;
+  // Using default image from eventImageMap instead of non-existent fallbackImages
+  return eventImageMap.default;
 };
 
 export const getEventDefaultImage = (eventType: string | null | undefined): string => {
-  if (!eventType) return fallbackImages.default;
+  if (!eventType) return eventImageMap.default;
   const normalizedType = eventType.toLowerCase();
-  return fallbackImages[normalizedType as keyof typeof fallbackImages] || fallbackImages.default;
+  return eventImageMap[normalizedType as keyof typeof eventImageMap] || eventImageMap.default;
 };
 
 export const getInitials = (name: string): string => {

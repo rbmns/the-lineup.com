@@ -1,41 +1,30 @@
 
 /**
- * Utility for native web sharing functionality
+ * Utility functions for native sharing features
  */
 
-interface ShareData {
-  title: string;
-  text?: string;
-  url: string;
-}
-
-/**
- * Check if the browser supports native sharing
- */
+// Check if the browser supports the Web Share API
 export const canUseNativeShare = (): boolean => {
-  return !!navigator.share;
+  return typeof navigator !== 'undefined' && !!navigator.share;
 };
 
-/**
- * Share content using the browser's native share API
- */
-export const nativeShare = async (data: ShareData): Promise<boolean> => {
+// Handle native sharing with the Web Share API
+export const handleNativeShare = async (data: { 
+  title?: string; 
+  text?: string; 
+  url: string;
+  files?: File[];
+}): Promise<boolean> => {
+  if (!canUseNativeShare()) {
+    return false;
+  }
+
   try {
-    if (!canUseNativeShare()) {
-      console.log('Native sharing not supported');
-      return false;
-    }
-    
-    await navigator.share({
-      title: data.title,
-      text: data.text || '',
-      url: data.url
-    });
-    
+    await navigator.share(data);
     return true;
   } catch (error) {
-    // User cancelled or sharing failed
-    console.error('Error sharing content:', error);
+    // User canceled or sharing failed
+    console.error('Error sharing:', error);
     return false;
   }
 };
