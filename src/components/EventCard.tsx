@@ -1,161 +1,148 @@
 
 import React from 'react';
 import { Event } from '@/types';
-import { formatRelativeDate, formatEventTime, getEventDateTime } from '@/utils/dateUtils';
-import { useEventImages } from '@/hooks/useEventImages';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
-import { CategoryPill } from '@/components/ui/category-pill';
+import { MapPin } from 'lucide-react';
+import { formatInTimeZone } from 'date-fns-tz';
 import { cn } from '@/lib/utils';
+import { CategoryPill } from '@/components/ui/category-pill';
+import { useEventImages } from '@/hooks/useEventImages';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
-import { toast } from '@/hooks/use-toast';
+import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
+import { formatEventTime, formatDate, AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
 
 interface EventCardProps {
   event: Event;
-  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
-  showRsvpButtons?: boolean;
   compact?: boolean;
+  showRsvpButtons?: boolean;
+  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   className?: string;
-  onClick?: () => void;
-  onShare?: (event: Event) => void;
 }
 
-const EventCard: React.FC<EventCardProps> = ({ 
-  event, 
-  onRsvp, 
-  showRsvpButtons = true,
+const EventCard: React.FC<EventCardProps> = ({
+  event,
   compact = false,
-  className,
-  onClick,
-  onShare
+  showRsvpButtons = false,
+  onRsvp,
+  className
 }) => {
   const { getEventImageUrl } = useEventImages();
   const { navigateToEvent } = useEventNavigation();
-  
   const imageUrl = getEventImageUrl(event);
-  
-  const handleCardClick = (e: React.MouseEvent) => {
-    // Don't navigate if clicking on RSVP buttons or anything with data-rsvp-button or data-rsvp-container attribute
-    if ((e.target as HTMLElement).closest('[data-rsvp-button]') || 
-        (e.target as HTMLElement).closest('[data-rsvp-container]')) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
+
+  // Format date for display - now using European format (DD-MM-YYYY)
+  const formatDateDisplay = (dateStr: string): string => {
+    try {
+      const date = new Date(dateStr);
+      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, d MMM yyyy");
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return dateStr;
     }
+  };
+  
+  // Format time using the 24-hour time format
+  const getEventTimeDisplay = (event: Event): string => {
+    if (!event.start_time) return '';
     
-    if (onClick) {
-      onClick();
-    } else if (event && event.id) {
-      // Use the navigation hook for consistent navigation behavior
-      console.log(`Navigating to event detail with ID: ${event.id}`);
-      try {
-        navigateToEvent(event);
-      } catch (error) {
-        console.error("Error navigating to event:", error);
-        toast({
-          title: "Navigation Error",
-          description: "Could not navigate to event page",
-          variant: "destructive",
-        });
-      }
+    return formatEventTime(event.start_time, event.end_time);
+  };
+
+  const handleClick = () => {
+    // Make sure we have all required properties for proper navigation
+    if (event && event.id) {
+      navigateToEvent({
+        ...event,
+        id: event.id,
+        destination: event.destination,
+        slug: event.slug,
+        start_time: event.start_time,
+        title: event.title
+      });
     } else {
       console.error("Cannot navigate: Missing event ID", event);
     }
   };
-  
+
+  // Handle RSVP and ensure we always return a Promise<boolean>
   const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp) return false;
     
     try {
       const result = await onRsvp(event.id, status);
+      // Convert any result (including void) to a boolean
       return result === undefined ? true : !!result;
     } catch (error) {
       console.error('Error in EventCard RSVP handler:', error);
       return false;
     }
   };
-  
-  const handleShare = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    if (onShare) {
-      onShare(event);
-    }
-  };
-  
-  // Generate the start time string from the combined date and time
-  const eventStartTime = getEventDateTime(event);
-  const eventEndTime = event.end_time;
-  
-  // Use card dimensions based on compact mode
-  const cardHeight = compact ? 'h-[360px]' : 'h-[400px]';
-  const imageHeight = compact ? 'h-[160px]' : 'h-[200px]';
-  const contentPadding = compact ? 'p-3' : 'p-4';
-  
+
+  // Determine max height for compact vs standard view
+  const cardHeightClass = compact ? "max-h-[280px]" : "max-h-[380px]";
+
   return (
-    <div 
+    <div
       className={cn(
-        `bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-300`,
-        cardHeight,
+        "group relative rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer bg-white",
+        cardHeightClass,
         className
       )}
-      onClick={handleCardClick}
+      onClick={handleClick}
       data-event-id={event.id}
     >
-      <AspectRatio 
-        ratio={16/9} 
-        className={cn("bg-gray-100 overflow-hidden", imageHeight)}
-      >
-        {imageUrl ? (
-          <img 
-            src={imageUrl} 
-            alt={event.title}
-            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">
-            No image
-          </div>
-        )}
+      {/* Image container with absolute positioned category pill */}
+      <div className="aspect-[16/9] relative overflow-hidden">
+        <img
+          src={imageUrl}
+          alt={event.title}
+          className="h-full w-full object-cover transition-transform group-hover:scale-105 duration-300"
+        />
         
         {/* Event type pill positioned at top of image */}
         {event.event_type && (
           <div className="absolute top-3 left-3 z-10">
-            <CategoryPill
-              category={event.event_type}
-              size="sm"
-              showIcon={true}
+            <CategoryPill 
+              category={event.event_type} 
+              size="sm" 
+              showIcon={true} 
               className="bg-white/90 backdrop-blur-sm shadow-sm"
             />
           </div>
         )}
-      </AspectRatio>
-      
-      <div className={cn("flex flex-col justify-between", contentPadding, compact ? 'h-[200px]' : 'h-[200px]')}>
-        <div className="space-y-2">
-          <h3 className={cn("font-bold line-clamp-2", compact ? 'text-base' : 'text-lg')}>
-            {event.title}
-          </h3>
-          
-          <div className="flex flex-col text-sm text-gray-500 space-y-1">
-            <p>{eventStartTime ? formatRelativeDate(eventStartTime) : 'Date not set'}</p>
-            <p>{eventStartTime ? formatEventTime(eventStartTime, eventEndTime) : 'Time not set'}</p>
-            {event.location && (
-              <p className="line-clamp-1">{event.location}</p>
-            )}
-          </div>
+      </div>
+
+      {/* Content Section - Updated layout */}
+      <div className="p-4 space-y-2">
+        {/* Title - Now first */}
+        <h3 className={cn(
+          "font-semibold text-gray-900",
+          compact ? "text-base line-clamp-2" : "text-xl line-clamp-2"
+        )}>
+          {event.title}
+        </h3>
+        
+        {/* Date & Time - Now second */}
+        <div className="text-sm text-gray-600 font-medium">
+          {event.start_time && (
+            <>
+              {formatDateDisplay(event.start_time)} • {getEventTimeDisplay(event)}
+            </>
+          )}
         </div>
         
-        {showRsvpButtons && onRsvp && (
-          <div 
-            className="mt-auto pt-3" 
-            data-rsvp-container="true" 
-            onClick={(e) => e.stopPropagation()}
-          >
-            <EventRsvpButtons 
-              currentStatus={event.rsvp_status} 
+        {/* Venue/Location - Now third */}
+        <div className="flex items-center text-sm text-gray-500">
+          <MapPin className="h-3.5 w-3.5 mr-1 flex-shrink-0" />
+          <span className="truncate">{event.venues?.name || event.location || 'No location'}</span>
+        </div>
+        
+        {/* RSVP Buttons - only if needed */}
+        {showRsvpButtons && (
+          <div className="pt-3">
+            <EventRsvpButtons
+              currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
-              size={compact ? 'sm' : 'md'}
+              size="sm"
             />
           </div>
         )}
@@ -164,5 +151,4 @@ const EventCard: React.FC<EventCardProps> = ({
   );
 };
 
-export { EventCard };
 export default EventCard;

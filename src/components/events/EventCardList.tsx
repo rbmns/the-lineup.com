@@ -9,9 +9,7 @@ import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { useEventImages } from '@/hooks/useEventImages';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { toast } from '@/hooks/use-toast';
-
-// Amsterdam timezone for date formatting
-const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
+import { formatEventTime, AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
 
 interface EventCardListProps {
   event: Event;
@@ -56,11 +54,11 @@ const EventCardList: React.FC<EventCardListProps> = ({
     }
   };
 
-  // Format date for display
+  // Format date for display - European format
   const formatDate = (dateStr: string): string => {
     try {
       const date = new Date(dateStr);
-      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEEE, MMMM d · h:mm a");
+      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEEE, d MMMM");
     } catch (error) {
       console.error('Error formatting date:', error);
       return dateStr;
@@ -111,25 +109,34 @@ const EventCardList: React.FC<EventCardListProps> = ({
         )}
       </div>
       
-      {/* Content */}
+      {/* Content - Updated layout */}
       <div className="flex flex-col flex-1 p-4 pt-0 sm:pt-4 justify-between">
+        {/* Title - Now first */}
         <div>
           <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">
             {event.title}
           </h3>
           
+          {/* Date and Time - Now second row */}
           <div className="flex items-center gap-4 text-sm text-gray-500 mb-2">
             <div className="flex items-center gap-1">
               <Calendar className="h-3.5 w-3.5" />
-              <span>{event.start_time ? formatDate(event.start_time) : 'Date not set'}</span>
-            </div>
-            
-            <div className="flex items-center gap-1">
-              <MapPin className="h-3.5 w-3.5" />
-              <span className="truncate max-w-[150px]">
-                {event.venues?.name || event.location || 'No location'}
+              <span>
+                {event.start_time ? (
+                  <>
+                    {formatDate(event.start_time)} • {formatEventTime(event.start_time, event.end_time)}
+                  </>
+                ) : 'Date not set'}
               </span>
             </div>
+          </div>
+          
+          {/* Location - Now third row */}
+          <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
+            <MapPin className="h-3.5 w-3.5" />
+            <span className="truncate max-w-[250px]">
+              {event.venues?.name || event.location || 'No location'}
+            </span>
           </div>
           
           <p className="text-sm text-gray-600 line-clamp-2 mb-3">

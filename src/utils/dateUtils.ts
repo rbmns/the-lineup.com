@@ -1,3 +1,4 @@
+
 import { format, parseISO, isPast, isFuture, isToday, addDays, startOfWeek, endOfWeek, startOfDay, isSameDay, isFriday, isSaturday, isSunday, nextFriday, nextMonday, addWeeks, isWithinInterval, compareAsc, subMinutes } from 'date-fns';
 import { formatInTimeZone, toZonedTime } from 'date-fns-tz';
 import { Event } from '@/types';
@@ -143,6 +144,7 @@ export const formatRelativeDate = (dateTimeStr: string | null): string => {
 
 /**
  * Format event time from start to end time (e.g., "13:30 - 15:00")
+ * Using 24-hour format for European style
  */
 export const formatEventTime = (startTimeStr: string | null, endTimeStr?: string | null): string => {
   try {
