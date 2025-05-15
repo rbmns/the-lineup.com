@@ -102,30 +102,31 @@ const EventCardList: React.FC<EventCardListProps> = ({
           alt={event.title}
           className="h-full w-full object-cover"
         />
-        
-        {/* Event type pill positioned at top of image */}
-        {event.event_type && (
-          <div className="absolute top-2 left-2">
-            <CategoryPill 
-              category={event.event_type} 
-              size="sm" 
-              showIcon={true} 
-              className="bg-white/90 backdrop-blur-sm shadow-sm"
-            />
-          </div>
-        )}
       </div>
       
       {/* Content - Updated layout */}
       <div className="flex flex-col flex-1 p-4 pt-0 sm:pt-4 justify-between">
         {/* Title - Now first */}
         <div className="space-y-2">
-          <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">
-            {event.title}
-          </h3>
+          <div className="flex flex-col space-y-2">
+            <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">
+              {event.title}
+            </h3>
+            
+            {/* Event type pill after the title */}
+            {event.event_type && (
+              <div className="flex">
+                <CategoryPill 
+                  category={event.event_type} 
+                  size="sm" 
+                  showIcon={true} 
+                />
+              </div>
+            )}
+          </div>
           
-          {/* Date and Time - Now second row */}
-          <div className="flex items-center gap-4 text-sm text-gray-500 mb-2">
+          {/* Date and Time */}
+          <div className="flex items-center gap-4 text-sm text-gray-500 mb-2 mt-2">
             <div className="flex items-center gap-1">
               <Calendar className="h-3.5 w-3.5" />
               <span>
@@ -138,7 +139,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
             </div>
           </div>
           
-          {/* Location - Now third row */}
+          {/* Location */}
           <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
             <MapPin className="h-3.5 w-3.5" />
             <span className="truncate max-w-full">

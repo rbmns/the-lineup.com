@@ -7,9 +7,7 @@ import { CategoryPill } from '@/components/ui/category-pill';
 import { useEventImages } from '@/hooks/useEventImages';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
-
-// Amsterdam/Netherlands timezone
-const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
+import { formatEventTime, formatDate, AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
 
 export interface EventCardProps {
   event: Event;
@@ -32,8 +30,8 @@ const EventCard: React.FC<EventCardProps> = ({
   const { navigateToEvent } = useEventNavigation();
   const imageUrl = getEventImageUrl(event);
 
-  // Format date for display - using European format
-  const formatDate = (dateStr: string): string => {
+  // Format date for display - now using European format (DD-MM-YYYY)
+  const formatDateDisplay = (dateStr: string): string => {
     try {
       const date = new Date(dateStr);
       return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, d MMM yyyy");
@@ -43,28 +41,19 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
   
-  // Format time using 24-hour time format
+  // Format time using the 24-hour time format
   const getEventTimeDisplay = (event: Event): string => {
     if (!event.start_time) return '';
     
-    try {
-      const startTime = new Date(event.start_time);
-      const startFormatted = formatInTimeZone(startTime, AMSTERDAM_TIMEZONE, "HH:mm");
-      
-      if (event.end_time) {
-        const endTime = new Date(event.end_time);
-        const endFormatted = formatInTimeZone(endTime, AMSTERDAM_TIMEZONE, "HH:mm");
-        return `${startFormatted} - ${endFormatted}`;
-      }
-      
-      return startFormatted;
-    } catch (error) {
-      console.error('Error formatting event time:', error);
-      return '';
-    }
+    return formatEventTime(event.start_time, event.end_time);
   };
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    // Check if click originated from RSVP buttons
+    if ((e.target as HTMLElement).closest('[data-rsvp-container="true"]')) {
+      return; // Don't navigate if clicked on RSVP buttons
+    }
+    
     if (onClick) {
       // Use the provided onClick handler if available
       onClick(event);
@@ -113,7 +102,7 @@ const EventCard: React.FC<EventCardProps> = ({
       onClick={handleClick}
       data-event-id={event.id}
     >
-      {/* Image container with absolute positioned category pill */}
+      {/* Image container with event type label positioned on top */}
       <div className="aspect-[16/9] relative overflow-hidden">
         <img
           src={imageUrl}
@@ -126,17 +115,16 @@ const EventCard: React.FC<EventCardProps> = ({
           <div className="absolute top-3 left-3 z-10">
             <CategoryPill 
               category={event.event_type} 
-              size="sm" 
-              showIcon={true} 
-              className="bg-white/90 backdrop-blur-sm shadow-sm"
+              size="default" 
+              showIcon={true}
             />
           </div>
         )}
       </div>
 
-      {/* Content Section - Updated layout with proper spacing */}
+      {/* Content Section */}
       <div className="p-4 flex flex-col flex-grow space-y-2">
-        {/* Title - Now first */}
+        {/* Title - First */}
         <h3 className={cn(
           "font-semibold text-gray-900",
           compact ? "text-base line-clamp-2" : "text-xl line-clamp-2"
@@ -144,27 +132,31 @@ const EventCard: React.FC<EventCardProps> = ({
           {event.title}
         </h3>
         
-        {/* Date & Time - Now second */}
+        {/* Date & Time */}
         <div className="text-sm text-gray-600 font-medium">
           {event.start_time && (
             <>
-              {formatDate(event.start_time)} • {getEventTimeDisplay(event)}
+              {formatDateDisplay(event.start_time)} • {getEventTimeDisplay(event)}
             </>
           )}
         </div>
         
-        {/* Venue/Location - Now third */}
+        {/* Venue/Location */}
         <div className="flex items-center text-sm text-gray-500">
           <MapPin className="h-3.5 w-3.5 mr-1 flex-shrink-0" />
           <span className="truncate">{event.venues?.name || event.location || 'No location'}</span>
         </div>
         
         {/* Spacer to push RSVP buttons to bottom */}
-        <div className="flex-grow"></div>
+        <div className="flex-grow min-h-[8px]"></div>
         
         {/* RSVP Buttons - only if needed */}
         {showRsvpButtons && (
-          <div className="mt-2">
+          <div 
+            className="mt-2" 
+            data-rsvp-container="true"
+            onClick={(e) => e.stopPropagation()}
+          >
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
