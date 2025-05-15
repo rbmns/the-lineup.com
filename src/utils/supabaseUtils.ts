@@ -301,7 +301,7 @@ export function safeFetchProfile(profileData: any): UserProfile | null {
       location: profileData.location || null,
       status: profileData.status || null,
       tagline: profileData.tagline || null,
-      status_details: profileData.status_details || null, // Include status_details
+      status_details: profileData.status_details || null,
       created_at: profileData.created_at || '',
       updated_at: profileData.updated_at || '',
       location_category: profileData.location_category || null

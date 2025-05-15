@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
@@ -147,7 +146,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           status: null,
           tagline: null,
           created_at: null,
-          updated_at: null
+          updated_at: null,
+          location_category: null
         };
         
         await ensureUserProfileExists(authData.user.id, email, username || email.split('@')[0]);

@@ -10,6 +10,7 @@ import { DiscoverTabContent } from '@/components/friends/DiscoverTabContent';
 import { FriendsTabs } from '@/components/friends/FriendsTabs';
 import { LoginPrompt } from '@/components/friends/LoginPrompt';
 import { useQueryClient } from '@tanstack/react-query';
+import { UserProfile } from '@/types/index';
 
 const Friends = () => {
   const { user, loading: authLoading } = useAuth();
@@ -214,7 +215,7 @@ const Friends = () => {
         pendingRequestsCount={pendingRequestsCount}
         friendsContent={
           <FriendsTabContent
-            friends={friends || []}
+            friends={(friends || []) as UserProfile[]}
             loading={friendsLoading || authLoading}
             requests={formattedRequests}
             onAcceptRequest={handleAcceptFriendRequest}
