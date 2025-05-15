@@ -110,7 +110,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
             onRsvp={handleRsvp}
             size={buttonSize}
             className="w-full"
-            isLoading={isLoading} {/* Changed from loading to isLoading */}
+            isLoading={isLoading}
           />
         </div>
       )}
