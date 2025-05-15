@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useQueryClient } from '@tanstack/react-query';
 import { useScrollPosition } from './useScrollPosition';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 export const useRsvpActions = (userId: string | undefined) => {
   const [loading, setLoading] = useState(false);

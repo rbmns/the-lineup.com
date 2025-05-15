@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from '@/hooks/use-toast';
+import { toast, useToast } from '@/hooks/use-toast';
 import { AlertCircle, AlertTriangle } from 'lucide-react';
 import { completeLogout, checkEmailRateLimit, markAuthAttempt, resetRateLimit } from '@/integrations/supabase/client';
 
