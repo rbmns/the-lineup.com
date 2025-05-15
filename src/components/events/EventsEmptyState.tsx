@@ -1,27 +1,39 @@
 
 import React from 'react';
 import { CalendarX } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-export interface EventsEmptyStateProps {
+interface EventsEmptyStateProps {
+  onResetFilters?: () => void;
   hasActiveFilters?: boolean;
+  title?: string;
   message?: string;
+  actionLabel?: string;
 }
 
 export const EventsEmptyState: React.FC<EventsEmptyStateProps> = ({
+  onResetFilters,
   hasActiveFilters = false,
-  message = 'No events found'
+  title = hasActiveFilters ? "No events match your filters" : "No events found",
+  message = hasActiveFilters 
+    ? "Try adjusting your search filters to find more events." 
+    : "There are no events to display at the moment.",
+  actionLabel = "Reset filters",
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center py-12 text-center">
-      <div className="rounded-full bg-gray-100 p-3 mb-4">
-        <CalendarX className="h-8 w-8 text-gray-400" />
+    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+      <div className="bg-gray-100 p-4 rounded-full mb-4">
+        <CalendarX className="h-12 w-12 text-gray-400" />
       </div>
-      <h3 className="text-lg font-medium text-gray-900 mb-1">{message}</h3>
-      <p className="text-gray-500 max-w-md">
-        {hasActiveFilters 
-          ? 'Try adjusting your filters or search criteria to find more events.' 
-          : 'Check back later for new events or try a different search.'}
-      </p>
+      
+      <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>
+      <p className="text-gray-600 max-w-md mb-6">{message}</p>
+      
+      {hasActiveFilters && onResetFilters && (
+        <Button onClick={onResetFilters} variant="default">
+          {actionLabel}
+        </Button>
+      )}
     </div>
   );
 };

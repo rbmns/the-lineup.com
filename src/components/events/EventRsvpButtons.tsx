@@ -1,115 +1,94 @@
 
 import React from 'react';
-import { Check, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/contexts/AuthContext';
+import { CheckCircle2, StarIcon } from 'lucide-react';
 
 interface EventRsvpButtonsProps {
   currentStatus: 'Going' | 'Interested' | null;
   onRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
-  className?: string;
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
+  className?: string;
+  showStatusOnly?: boolean;
 }
 
 export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   currentStatus,
   onRsvp,
-  className,
   size = 'md',
-  loading = false
+  loading = false,
+  className,
+  showStatusOnly = false,
 }) => {
-  const { user } = useAuth();
-  const [isUpdating, setIsUpdating] = React.useState(false);
-  const [localStatus, setLocalStatus] = React.useState(currentStatus);
-  
-  // Update local state when prop changes
-  React.useEffect(() => {
-    setLocalStatus(currentStatus);
-  }, [currentStatus]);
+  // If we're only showing status, render a simple indicator
+  if (showStatusOnly && currentStatus) {
+    return (
+      <div className="flex items-center text-sm">
+        <div className={cn(
+          "px-2 py-1 rounded-full flex items-center gap-1 text-xs",
+          currentStatus === 'Going' 
+            ? "bg-green-100 text-green-700" 
+            : "bg-amber-100 text-amber-700"
+        )}>
+          {currentStatus === 'Going' ? (
+            <>
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              <span>Going</span>
+            </>
+          ) : (
+            <>
+              <StarIcon className="h-3.5 w-3.5" />
+              <span>Interested</span>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
 
-  const handleRsvp = async (status: 'Going' | 'Interested') => {
-    if (!user) return false;
-    if (isUpdating || loading) return false;
-    
-    try {
-      setIsUpdating(true);
-      
-      // Optimistic update
-      const isSameStatus = localStatus === status;
-      setLocalStatus(isSameStatus ? null : status);
-      
-      // Make API call
-      const success = await onRsvp(status);
-      
-      // If API call failed, revert optimistic update
-      if (!success) {
-        setLocalStatus(currentStatus);
-      }
-      
-      return success;
-    } catch (error) {
-      console.error('RSVP error:', error);
-      setLocalStatus(currentStatus);
-      return false;
-    } finally {
-      setIsUpdating(false);
-    }
+  // Size configurations
+  const buttonSizeClasses = {
+    sm: 'h-8 px-3 text-xs',
+    md: 'h-9 px-4',
+    lg: 'h-10 px-5',
   };
 
-  // Size-specific properties
-  const getSizeClasses = () => {
-    switch (size) {
-      case 'sm':
-        return "text-sm py-1 px-3 h-8 gap-1";
-      case 'lg':
-        return "text-base py-3 px-5 h-12 gap-2";
-      case 'md':
-      default:
-        return "text-sm py-2 px-4 h-10 gap-1.5";
-    }
-  };
-
-  const isGoing = localStatus === 'Going';
-  const isInterested = localStatus === 'Interested';
+  // Base classes for buttons
+  const buttonClasses = buttonSizeClasses[size] || buttonSizeClasses.md;
 
   return (
     <div className={cn("flex gap-2", className)}>
-      <Button
-        type="button"
-        variant={isGoing ? "default" : "outline"}
+      <Button 
+        variant={currentStatus === 'Going' ? "default" : "outline"}
         className={cn(
-          getSizeClasses(),
-          isGoing ? "bg-green-500 hover:bg-green-600 text-white border-green-500" : 
-                   "border-gray-300 text-gray-700 hover:bg-gray-50"
+          buttonClasses,
+          "flex items-center gap-1.5",
+          currentStatus === 'Going' && "bg-green-600 hover:bg-green-700"
         )}
-        disabled={isUpdating || loading}
-        onClick={(e) => {
-          e.stopPropagation();
-          handleRsvp('Going');
+        disabled={loading}
+        onClick={async () => {
+          await onRsvp('Going');
         }}
       >
-        <Check className={cn("h-4 w-4", size === 'lg' ? "h-5 w-5" : "")} />
-        Going
+        <CheckCircle2 className="h-4 w-4" />
+        <span>{currentStatus === 'Going' ? 'Going' : 'Going'}</span>
       </Button>
       
-      <Button
-        type="button"
-        variant={isInterested ? "default" : "outline"}
+      <Button 
+        variant={currentStatus === 'Interested' ? "default" : "outline"}
         className={cn(
-          getSizeClasses(),
-          isInterested ? "bg-blue-500 hover:bg-blue-600 text-white border-blue-500" : 
-                       "border-gray-300 text-gray-700 hover:bg-gray-50"
+          buttonClasses,
+          "flex items-center gap-1.5",
+          currentStatus === 'Interested' && "bg-amber-500 hover:bg-amber-600"
         )}
-        disabled={isUpdating || loading}
-        onClick={(e) => {
-          e.stopPropagation();
-          handleRsvp('Interested');
+        disabled={loading}
+        onClick={async () => {
+          await onRsvp('Interested');
         }}
       >
-        <Star className={cn("h-4 w-4", size === 'lg' ? "h-5 w-5" : "")} />
-        Interested
+        <StarIcon className="h-4 w-4" />
+        <span>Interested</span>
       </Button>
     </div>
   );

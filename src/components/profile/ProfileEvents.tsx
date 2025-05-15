@@ -25,6 +25,7 @@ const ProfileEvents = ({ events, isLoading, onRsvp }: ProfileEventsProps) => {
           <EventCardList 
             event={event} 
             showRsvpStatus={true} 
+            onRsvp={onRsvp}
           />
         </div>
       ))}

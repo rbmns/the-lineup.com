@@ -64,6 +64,7 @@ export const UserPastEvents: React.FC<UserPastEventsProps> = ({
             key={event.id}
             event={event}
             showRsvpButtons={false}
+            showRsvpStatus={true}
           />
         ))}
       </div>

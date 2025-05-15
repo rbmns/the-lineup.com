@@ -16,6 +16,7 @@ interface EventCardListProps {
   event: Event;
   compact?: boolean;
   showRsvpButtons?: boolean;
+  showRsvpStatus?: boolean;
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   className?: string;
 }
@@ -24,6 +25,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
   event,
   compact = false,
   showRsvpButtons = false,
+  showRsvpStatus = false,
   onRsvp,
   className,
 }) => {
@@ -116,12 +118,13 @@ const EventCardList: React.FC<EventCardListProps> = ({
         </div>
         
         {/* RSVP Buttons - only if needed */}
-        {showRsvpButtons && onRsvp && (
+        {(showRsvpButtons || showRsvpStatus) && onRsvp && (
           <div className="mt-auto">
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
               size="sm"
+              showStatusOnly={!showRsvpButtons && showRsvpStatus}
             />
           </div>
         )}

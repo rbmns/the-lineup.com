@@ -96,7 +96,7 @@ export const UserRsvpedEvents: React.FC<UserRsvpedEventsProps> = ({
             <EventCardList
               key={event.id}
               event={event}
-              showRsvpStatus={isCurrentUser}
+              showRsvpStatus={true}
             />
           ))}
         </div>
