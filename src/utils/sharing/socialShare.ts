@@ -16,28 +16,12 @@ export const shareToFacebook = (data: SocialShare) => {
   return true;
 };
 
-export const shareToTwitter = (data: SocialShare) => {
-  const url = new URL('https://twitter.com/intent/tweet');
-  url.searchParams.append('text', data.title);
-  url.searchParams.append('url', data.url);
-  
-  if (data.hashTags && data.hashTags.length > 0) {
-    url.searchParams.append('hashtags', data.hashTags.join(','));
-  }
-  
-  window.open(url.toString(), 'twitter-share', 'width=550,height=235');
-  return true;
-};
-
-export const shareToLinkedIn = (data: SocialShare) => {
-  const url = new URL('https://www.linkedin.com/shareArticle');
-  url.searchParams.append('mini', 'true');
-  url.searchParams.append('url', data.url);
-  url.searchParams.append('title', data.title);
-  url.searchParams.append('summary', data.text);
-  
-  window.open(url.toString(), 'linkedin-share', 'width=750,height=500');
-  return true;
+export const shareToInstagram = (data: SocialShare) => {
+  // Instagram doesn't have a direct web sharing API like other platforms
+  // We'll use a toast to tell users to copy the link and share manually
+  // This is a common pattern for Instagram sharing
+  alert('Instagram does not support direct sharing. Copy the link and share via Instagram app.');
+  return false;
 };
 
 export const shareToWhatsApp = (data: SocialShare) => {
@@ -62,5 +46,14 @@ export const shareToTelegram = (data: SocialShare) => {
   url.searchParams.append('text', data.title);
   
   window.open(url.toString(), 'telegram-share', 'width=580,height=296');
+  return true;
+};
+
+export const shareToSnapchat = (data: SocialShare) => {
+  // Snapchat has a web sharing API but it's not as widely supported
+  const url = new URL('https://www.snapchat.com/share');
+  url.searchParams.append('url', data.url);
+  
+  window.open(url.toString(), 'snapchat-share', 'width=580,height=296');
   return true;
 };

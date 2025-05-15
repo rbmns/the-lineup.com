@@ -3,6 +3,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Event } from "@/types";
 import { ShareButtons } from "./ShareButtons";
 import { copyToClipboard } from "@/utils/sharing/clipboardUtils";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { toast } from "@/hooks/use-toast";
+import { ShareTrigger } from "./ShareTrigger";
 
 export interface EventShareDialogProps {
   event: Event;
@@ -11,6 +14,8 @@ export interface EventShareDialogProps {
 }
 
 export function EventShareDialog({ event, isOpen, onOpenChange }: EventShareDialogProps) {
+  const isMobile = useIsMobile();
+  
   const getEventUrl = () => {
     const path = event.slug 
       ? `/events/${event.slug}` 
@@ -22,16 +27,26 @@ export function EventShareDialog({ event, isOpen, onOpenChange }: EventShareDial
   const handleCopyLink = async () => {
     const success = await copyToClipboard(getEventUrl());
     if (success) {
-      console.log("Link copied to clipboard");
+      toast({
+        title: "Link copied to clipboard",
+        description: "You can now paste it anywhere you want",
+      });
       onOpenChange(false);
     } else {
-      console.error("Failed to copy link to clipboard");
+      toast({
+        title: "Failed to copy link",
+        description: "Please try again or share manually",
+        variant: "destructive"
+      });
     }
   };
 
+  // Adjust dialog size for mobile
+  const dialogContentClass = isMobile ? "px-3 py-4" : "sm:max-w-md";
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className={dialogContentClass}>
         <DialogHeader>
           <DialogTitle>Share {event.title}</DialogTitle>
         </DialogHeader>
