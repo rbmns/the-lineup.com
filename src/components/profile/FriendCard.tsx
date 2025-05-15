@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { UserProfile } from '@/types';
-import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFriendship } from '@/hooks/useFriendship';
@@ -14,6 +13,7 @@ import { isProfileClickable } from '@/utils/friendshipUtils';
 import { MapPin } from 'lucide-react';
 import { FriendCardButtons } from '@/components/friends/FriendCardButtons';
 import { StatusBadgeRenderer } from '@/components/friends/StatusBadgeRenderer';
+import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 
 interface FriendCardProps {
   // Updated to accept either a profile object or individual properties
@@ -54,7 +54,12 @@ export const FriendCard: React.FC<FriendCardProps> = ({
 }) => {
   const isMobile = useIsMobile();
   const { user } = useAuth();
-  const { initiateFriendRequest, acceptFriendRequest, declineFriendRequest, isLoading } = useFriendship();
+  const { 
+    initiateFriendRequest, 
+    acceptFriendRequest: acceptFriendshipRequest, 
+    declineFriendRequest: declineFriendshipRequest,
+    isLoading 
+  } = useFriendship();
   const navigate = useNavigate();
   
   // Use either passed individual props or extract from profile object
@@ -130,6 +135,23 @@ export const FriendCard: React.FC<FriendCardProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if ((e.key === 'Enter' || e.key === ' ') && canNavigateToProfile) {
       navigateToProfile(e);
+    }
+  };
+  
+  // Wrapper functions to handle different return types from acceptFriendRequest and declineFriendRequest
+  const acceptFriendRequest = async (id: string): Promise<void> => {
+    try {
+      await acceptFriendshipRequest(id);
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+    }
+  };
+  
+  const declineFriendRequest = async (id: string): Promise<void> => {
+    try {
+      await declineFriendshipRequest(id);
+    } catch (error) {
+      console.error('Error declining friend request:', error);
     }
   };
   

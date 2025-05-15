@@ -28,3 +28,11 @@ export interface OgTags {
   url?: string;
   type?: string;
 }
+
+// Add MetaTags interface for useEventMetaTags hook
+export interface MetaTags {
+  title: string;
+  description: string;
+  imageUrl: string;
+  path: string;
+}

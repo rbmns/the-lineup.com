@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,17 +16,18 @@ import { DiscoverTabContent } from '@/components/friends/DiscoverTabContent';
 import { FriendRequestsSection } from '@/components/friends/FriendRequestsSection';
 import { useUserEvents } from '@/hooks/useUserEvents';
 import { useRsvpActions } from '@/hooks/useRsvpActions';
+import { UserProfile } from '@/types';
 
 const Friends = () => {
   const { user, isAuthenticated, profile } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('friends');
-  const [friendsList, setFriendsList] = useState<any[]>([]);
-  const [friendRequests, setFriendRequests] = useState<any[]>([]);
-  const [sentRequests, setSentRequests] = useState<any[]>([]);
+  const [friendsList, setFriendsList] = useState<UserProfile[]>([]);
+  const [friendRequests, setFriendRequests] = useState<UserProfile[]>([]);
+  const [sentRequests, setSentRequests] = useState<UserProfile[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   
   // Import event-related hooks
@@ -114,7 +114,7 @@ const Friends = () => {
           username: item.profiles?.username,
           avatar_url: item.profiles?.avatar_url,
           status: item.profiles?.status,
-        })) || [];
+        })).filter(item => item.id) || [];
 
         // Format the requests data
         const formattedRequests = requestsData?.map(item => ({
@@ -122,7 +122,7 @@ const Friends = () => {
           username: item.profiles?.username,
           avatar_url: item.profiles?.avatar_url,
           status: item.profiles?.status,
-        })) || [];
+        })).filter(item => item.id) || [];
 
         // Format the sent requests data
         const formattedSentRequests = sentData?.map(item => ({
@@ -130,7 +130,7 @@ const Friends = () => {
           username: item.profiles?.username,
           avatar_url: item.profiles?.avatar_url,
           status: item.profiles?.status,
-        })) || [];
+        })).filter(item => item.id) || [];
 
         setFriendsList(formattedFriends);
         setFriendRequests(formattedRequests);
@@ -382,12 +382,9 @@ const Friends = () => {
                     {searchResults.map(user => (
                       <FriendCard
                         key={user.id}
-                        id={user.id}
-                        username={user.username}
-                        avatarUrl={user.avatar_url}
-                        status={user.status}
+                        profile={user}
                         relationship="none"
-                        onAction={() => handleSendFriendRequest(user.id)}
+                        onAddFriend={() => handleSendFriendRequest(user.id)}
                         actionLabel="Send Request"
                       />
                     ))}
@@ -405,10 +402,7 @@ const Friends = () => {
                       {sentRequests.map(user => (
                         <FriendCard
                           key={user.id}
-                          id={user.id}
-                          username={user.username}
-                          avatarUrl={user.avatar_url}
-                          status={user.status}
+                          profile={user}
                           relationship="sent"
                           onAction={() => handleCancelFriendRequest(user.id)}
                           actionLabel="Cancel Request"
@@ -434,10 +428,7 @@ const Friends = () => {
                       {friendRequests.map(user => (
                         <FriendCard
                           key={user.id}
-                          id={user.id}
-                          username={user.username}
-                          avatarUrl={user.avatar_url}
-                          status={user.status}
+                          profile={user}
                           relationship="received"
                           onAction={() => handleAcceptFriendRequest(user.id)}
                           onSecondaryAction={() => handleDeclineFriendRequest(user.id)}

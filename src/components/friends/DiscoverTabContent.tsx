@@ -3,6 +3,7 @@ import React from 'react';
 import { UserProfile } from '@/types';
 import { FriendSearchBar } from './FriendSearchBar';
 import { FriendSearch } from './FriendSearch';
+import { FriendCard } from '@/components/profile/FriendCard';
 
 interface DiscoverTabContentProps {
   searchQuery: string;
@@ -31,12 +32,29 @@ export const DiscoverTabContent = ({
       </div>
       
       <FriendSearch
-        searchQuery={searchQuery}
-        searchResults={searchResults}
-        onAddFriend={onAddFriend}
-        loading={isSearching}
-        pendingRequestIds={pendingRequestIds}
+        query={searchQuery}
+        onQueryChange={(query: string) => {
+          if (onSearchChange) {
+            onSearchChange({ target: { value: query } } as React.ChangeEvent<HTMLInputElement>);
+          }
+        }}
+        isSearching={isSearching}
       />
+      
+      {/* Display search results separately */}
+      {searchResults.length > 0 && (
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {searchResults.map(profile => (
+            <FriendCard
+              key={profile.id}
+              profile={profile}
+              relationship="none"
+              onAddFriend={onAddFriend}
+              actionLabel="Send Request"
+            />
+          ))}
+        </div>
+      )}
     </>
   );
 };
