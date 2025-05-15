@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
-import { filterEventsByDate } from '@/utils/dateUtils';
+import { filterEventsByDate, filterEventsByDateRange } from '@/utils/dateUtils';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
 import { useCanonical } from '@/hooks/useCanonical';
 import { pageSeoTags } from '@/utils/seoUtils';
@@ -12,7 +12,7 @@ import { EventFilterSection } from '@/components/events/filters/EventFilterSecti
 import { FilterSummary } from '@/components/events/FilterSummary';
 import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
 import { LazyEventsList } from '@/components/events/LazyEventsList';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 const CategoryFilteredEventsPage = () => {
   // Apply meta tags
@@ -108,7 +108,7 @@ const CategoryFilteredEventsPage = () => {
       
       // Date filter
       if (selectedDateFilter || dateRange) {
-        const isInRange = filterEventsInDateRange(event, selectedDateFilter, dateRange);
+        const isInRange = filterEventsByDateRange(event, selectedDateFilter, dateRange);
         if (!isInRange) {
           return false;
         }
@@ -139,33 +139,45 @@ const CategoryFilteredEventsPage = () => {
     setSelectedVenues([]);
     setDateRange(undefined);
     setSelectedDateFilter('');
-    toast("All filters reset");
+    toast({
+      title: "All filters reset"
+    });
   };
   
   const selectAllEventTypes = useCallback(() => {
     setSelectedEventTypes(availableEventTypes.map(et => et.value));
-    toast("All categories selected");
+    toast({
+      title: "All categories selected"
+    });
   }, [availableEventTypes, setSelectedEventTypes]);
   
   const deselectAllEventTypes = useCallback(() => {
     setSelectedEventTypes([]);
-    toast("All categories deselected");
+    toast({
+      title: "All categories deselected"
+    });
   }, [setSelectedEventTypes]);
 
   const handleRemoveEventType = (type: string) => {
     setSelectedEventTypes(prev => prev.filter(t => t !== type));
-    toast(`Removed filter: ${type}`);
+    toast({
+      title: `Removed filter: ${type}`
+    });
   };
   
   const handleRemoveVenue = (venue: string) => {
     setSelectedVenues(prev => prev.filter(v => v !== venue));
-    toast("Removed venue filter");
+    toast({
+      title: "Removed venue filter"
+    });
   };
   
   const handleClearDateFilter = () => {
     setDateRange(undefined);
     setSelectedDateFilter('');
-    toast("Date filter cleared");
+    toast({
+      title: "Date filter cleared"
+    });
   };
   
   // RSVP handler function
@@ -183,7 +195,9 @@ const CategoryFilteredEventsPage = () => {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       console.log(`EventsPage - RSVP completed for event: ${eventId}, status: ${status}`);
-      toast(`RSVP updated to ${status}`);
+      toast({
+        title: `RSVP updated to ${status}`
+      });
       
       // Refetch events to update the list
       await refetch();
@@ -191,7 +205,10 @@ const CategoryFilteredEventsPage = () => {
       return true;
     } catch (error) {
       console.error("Error in EventsPage RSVP handler:", error);
-      toast("Failed to update RSVP status");
+      toast({
+        title: "Failed to update RSVP status",
+        variant: "destructive"
+      });
       return false;
     } finally {
       setRsvpLoading(false);
