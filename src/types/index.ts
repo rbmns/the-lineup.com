@@ -1,4 +1,3 @@
-
 export interface UserProfile {
   id: string;
   username: string;
@@ -41,7 +40,7 @@ export interface Event {
     going: number;
     interested: number;
   };
-  rsvp_status?: 'Going' | 'Interested';
+  rsvp_status?: 'Going' | 'Interested' | null;
   area?: {
     longitude: number;
     latitude: number;
@@ -65,6 +64,16 @@ export interface Event {
   recurring_count?: number;
   isExactMatch?: boolean;
   start_date?: string | null;
+  cover_image?: string | null;
+  share_image?: string | null;
+  user_rsvp_status?: 'Going' | 'Interested' | null;
+}
+
+export interface EventImage {
+  id: string;
+  url: string;
+  alt?: string;
+  type: 'cover' | 'gallery' | 'share';
 }
 
 export interface FriendRequest {

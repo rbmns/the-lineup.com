@@ -1,72 +1,95 @@
 
 import React, { useState } from 'react';
-import { Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { canUseNativeShare, handleNativeShare } from '@/utils/sharing';
-import { Event } from '@/types';
-import { useEventImages } from '@/hooks/useEventImages';
 import { ShareButtons } from './share/ShareButtons';
+import { Share2 } from 'lucide-react';
+import { Event } from '@/types';
+import { toast } from '@/hooks/use-toast';
+import { shareToNative } from '@/utils/sharing/nativeShare';
+import { copyToClipboard } from '@/utils/sharing/clipboardUtils';
 
 interface EventShareButtonProps {
-  url: string;
-  title: string;
-  description?: string;
-  className?: string;
-  event?: Event;
+  event: Event;
+  variant?: 'default' | 'outline' | 'secondary' | 'destructive' | 'ghost' | 'link';
+  label?: string;
 }
 
-export const EventShareButton: React.FC<EventShareButtonProps> = ({
-  url,
-  title,
-  description = '',
-  className = '',
-  event
-}) => {
-  const [showDialog, setShowDialog] = useState(false);
-  const { getShareImageUrl } = useEventImages();
+const EventShareButton = ({
+  event,
+  variant = 'secondary',
+  label = 'Share'
+}: EventShareButtonProps) => {
+  const [isOpen, setIsOpen] = useState(false);
   
+  const getEventUrl = () => {
+    // Use event slug if available, otherwise use ID
+    const path = event.slug 
+      ? `/events/${event.slug}` 
+      : `/events/${event.id}`;
+    
+    return `${window.location.origin}${path}`;
+  };
+
   const handleShare = async () => {
-    // Try native sharing first, fall back to dialog
-    if (canUseNativeShare()) {
-      const imageUrl = event ? getShareImageUrl(event) : undefined;
-      const success = await handleNativeShare({ 
-        title, 
-        text: description, 
-        url 
+    try {
+      const eventUrl = getEventUrl();
+      const shared = await shareToNative({
+        url: eventUrl,
+        title: event.title,
+        text: event.description
       });
       
-      if (!success) {
-        setShowDialog(true);
+      if (!shared) {
+        // If native sharing fails or isn't available, open the dialog
+        setIsOpen(true);
       }
+    } catch (error) {
+      setIsOpen(true);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    const success = await copyToClipboard(getEventUrl());
+    if (success) {
+      toast({
+        title: "Link copied",
+        description: "Event link copied to clipboard",
+      });
+      setIsOpen(false);
     } else {
-      setShowDialog(true);
+      toast({
+        title: "Failed to copy",
+        description: "Please try again or share manually",
+        variant: "destructive",
+      });
     }
   };
 
   return (
     <>
-      <Button 
-        variant="secondary"
-        size="icon" 
-        className={`h-10 w-10 rounded-full bg-white/80 text-gray-800 hover:bg-white border border-gray-200 ${className}`}
-        onClick={handleShare}
-      >
-        <Share className="h-5 w-5" />
+      <Button variant={variant} onClick={handleShare}>
+        <Share2 size={16} className="mr-2" />
+        {label}
       </Button>
-      
-      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Share this event</DialogTitle>
+            <DialogTitle>Share {event.title}</DialogTitle>
           </DialogHeader>
-          <ShareButtons 
-            url={url} 
-            title={title} 
-            description={description} 
-          />
+          <div className="flex flex-col gap-4">
+            <ShareButtons 
+              title={event.title} 
+              description={event.description || ""} 
+              url={getEventUrl()}
+              onCopyLink={handleCopyLink}
+            />
+          </div>
         </DialogContent>
       </Dialog>
     </>
   );
 };
+
+export default EventShareButton;

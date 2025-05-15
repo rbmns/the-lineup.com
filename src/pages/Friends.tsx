@@ -1,618 +1,449 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Skeleton } from "@/components/ui/skeleton"
+import { FriendsList } from '@/components/friends/FriendsList';
+import { FriendSearch } from '@/components/friends/FriendSearch';
+import { FriendCard } from '@/components/friends/FriendCard';
+import { FriendRequests } from '@/components/friends/FriendRequests';
 import { Button } from '@/components/ui/button';
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { toast } from "@/hooks/use-toast"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { LoginPrompt } from '@/components/friends/LoginPrompt';
+import { ProfileCard } from '@/components/profile/ProfileCard';
+import { supabase } from '@/lib/supabase';
+import { FriendsTabs } from '@/components/friends/FriendsTabs';
+import { FriendsTabContent } from '@/components/friends/FriendsTabContent';
+import { DiscoverTabContent } from '@/components/friends/DiscoverTabContent';
+import { FriendRequestsSection } from '@/components/friends/FriendRequestsSection';
 import { useUserEvents } from '@/hooks/useUserEvents';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-import EventCard from '@/components/EventCard';
-import { filterUpcomingEvents, sortEventsByDate } from '@/utils/dateUtils';
-import { useCanonical } from '@/hooks/useCanonical';
-import { pageSeoTags } from '@/utils/seoUtils';
-
-interface Person {
-  id: string;
-  username: string;
-  avatar_url: string | null;
-  status: string | null;
-}
+import { useRsvpActions } from '@/hooks/useRsvpActions';
 
 const Friends = () => {
-  useCanonical('/friends', pageSeoTags.friends.title);
-
-  const { user, isAuthenticated } = useAuth();
-  const [friends, setFriends] = useState<Person[]>([]);
-  const [friendRequests, setFriendRequests] = useState<Person[]>([]);
-  const [sentRequests, setSentRequests] = useState<Person[]>([]);
+  const { user, isAuthenticated, profile } = useAuth();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('friends');
+  const [friendsList, setFriendsList] = useState<any[]>([]);
+  const [friendRequests, setFriendRequests] = useState<any[]>([]);
+  const [sentRequests, setSentRequests] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Person[]>([]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [selectedFriendId, setSelectedFriendId] = useState<string | null>(null);
-  const [friendshipStatus, setFriendshipStatus] = useState<'none' | 'pending' | 'requested' | 'accepted'>('none');
-
-  const {
-    userEvents,
+  
+  // Import event-related hooks
+  const { 
+    events: userEvents, 
     isLoading: isUserEventsLoading,
     upcomingEvents,
     pastEvents,
-    handleRsvp,
-    refetch
-  } = useUserEvents(selectedFriendId, user?.id, friendshipStatus);
-
+    refetch 
+  } = useUserEvents(user?.id);
+  
+  const { handleRsvp: handleEventRsvp } = useRsvpActions();
+  
   useEffect(() => {
-    document.title = pageSeoTags.friends.title;
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) metaDescription.setAttribute('content', pageSeoTags.friends.description);
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    const ogDesc = document.querySelector('meta[property="og:description"]');
-    if (ogTitle) ogTitle.setAttribute('content', pageSeoTags.friends.title);
-    if (ogDesc) ogDesc.setAttribute('content', pageSeoTags.friends.description);
-  }, []);
+    document.title = 'Friends';
 
-  useEffect(() => {
-    if (!isAuthenticated || !user) {
-      setIsLoading(false);
-      return;
+    // Redirect to login if not authenticated
+    if (!isAuthenticated && !user) {
+      navigate('/login', { state: { from: '/friends' } });
     }
+  }, [isAuthenticated, user, navigate]);
 
-    const fetchFriends = async () => {
-      setIsLoading(true);
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchFriendsData = async () => {
       try {
-        // Fetch accepted friends
-        const { data: acceptedFriends, error: acceptedError } = await supabase
-          .from('friends')
-          .select('person1_id, person2_id, profiles(id, username, avatar_url, status)')
-          .or(`person1_id.eq.${user.id},person2_id.eq.${user.id}`)
+        setIsLoading(true);
+
+        // Fetch current user's friends
+        const { data: friendsData, error: friendsError } = await supabase
+          .from('friendships')
+          .select(`
+            friend_id,
+            profiles!friendships_friend_id_fkey (
+              id,
+              username,
+              avatar_url,
+              status
+            )
+          `)
+          .eq('user_id', user.id)
           .eq('status', 'accepted');
 
-        if (acceptedError) {
-          console.error('Error fetching accepted friends:', acceptedError);
-          toast({
-            title: "Error",
-            description: "Failed to load friends.",
-            variant: "destructive",
-          })
-          return;
-        }
+        if (friendsError) throw friendsError;
 
-        const friendList: Person[] = [];
-        acceptedFriends.forEach(friendship => {
-          const friendProfile = (friendship.person1_id === user.id) ? friendship.profiles : (friendship.profiles as any);
-          if (friendProfile) {
-            friendList.push({
-              id: friendProfile.id,
-              username: friendProfile.username,
-              avatar_url: friendProfile.avatar_url,
-              status: friendProfile.status
-            });
-          }
-        });
-        setFriends(friendList);
-
-        // Fetch friend requests
-        const { data: friendRequestsData, error: friendRequestsError } = await supabase
-          .from('friends')
-          .select('person1_id, profiles(id, username, avatar_url, status)')
-          .eq('person2_id', user.id)
+        // Fetch friend requests received
+        const { data: requestsData, error: requestsError } = await supabase
+          .from('friendships')
+          .select(`
+            user_id,
+            profiles!friendships_user_id_fkey (
+              id,
+              username,
+              avatar_url,
+              status
+            )
+          `)
+          .eq('friend_id', user.id)
           .eq('status', 'pending');
 
-        if (friendRequestsError) {
-          console.error('Error fetching friend requests:', friendRequestsError);
-          toast({
-            title: "Error",
-            description: "Failed to load friend requests.",
-            variant: "destructive",
-          })
-          return;
-        }
+        if (requestsError) throw requestsError;
 
-        const friendRequestsList: Person[] = friendRequestsData.map(request => ({
-          id: request.profiles.id,
-          username: request.profiles.username,
-          avatar_url: request.profiles.avatar_url,
-          status: request.profiles.status
-        }));
-        setFriendRequests(friendRequestsList);
-
-        // Fetch sent requests
-        const { data: sentRequestsData, error: sentRequestsError } = await supabase
-          .from('friends')
-          .select('person2_id, profiles(id, username, avatar_url, status)')
-          .eq('person1_id', user.id)
+        // Fetch friend requests sent
+        const { data: sentData, error: sentError } = await supabase
+          .from('friendships')
+          .select(`
+            friend_id,
+            profiles!friendships_friend_id_fkey (
+              id,
+              username,
+              avatar_url,
+              status
+            )
+          `)
+          .eq('user_id', user.id)
           .eq('status', 'pending');
 
-        if (sentRequestsError) {
-          console.error('Error fetching sent requests:', sentRequestsError);
-          toast({
-            title: "Error",
-            description: "Failed to load sent friend requests.",
-            variant: "destructive",
-          })
-          return;
-        }
+        if (sentError) throw sentError;
 
-        const sentRequestsList: Person[] = sentRequestsData.map(request => ({
-          id: request.profiles.id,
-          username: request.profiles.username,
-          avatar_url: request.profiles.avatar_url,
-          status: request.profiles.status
+        // Format the friends data
+        const formattedFriends = friendsData.map(item => ({
+          id: item.profiles.id,
+          username: item.profiles.username,
+          avatar_url: item.profiles.avatar_url,
+          status: item.profiles.status,
         }));
-        setSentRequests(sentRequestsList);
 
+        // Format the requests data
+        const formattedRequests = requestsData.map(item => ({
+          id: item.profiles.id,
+          username: item.profiles.username,
+          avatar_url: item.profiles.avatar_url,
+          status: item.profiles.status,
+        }));
+
+        // Format the sent requests data
+        const formattedSentRequests = sentData.map(item => ({
+          id: item.profiles.id,
+          username: item.profiles.username,
+          avatar_url: item.profiles.avatar_url,
+          status: item.profiles.status,
+        }));
+
+        setFriendsList(formattedFriends);
+        setFriendRequests(formattedRequests);
+        setSentRequests(formattedSentRequests);
       } catch (error) {
-        console.error('Unexpected error fetching friends:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load friends.",
-          variant: "destructive",
-        })
+        console.error('Error fetching friends data:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchFriends();
-  }, [user, isAuthenticated]);
+    fetchFriendsData();
+  }, [user]);
 
-  const handleSearch = async () => {
-    setIsSearching(true);
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
     try {
+      setIsSearching(true);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .ilike('username', `%${searchQuery}%`)
-        .not('id', 'eq', user?.id);
+        .ilike('username', `%${query}%`)
+        .neq('id', user?.id || '') // Don't include current user
+        .limit(10);
 
-      if (error) {
-        console.error('Error searching users:', error);
-        toast({
-          title: "Error",
-          description: "Failed to search users.",
-          variant: "destructive",
-        })
-        return;
-      }
-
-      setSearchResults(data as Person[]);
+      if (error) throw error;
+      
+      // Filter out users that are already friends or have pending requests
+      const filteredResults = data.filter(result => {
+        const isAlreadyFriend = friendsList.some(friend => friend.id === result.id);
+        const hasPendingRequest = friendRequests.some(request => request.id === result.id);
+        const hasSentRequest = sentRequests.some(sent => sent.id === result.id);
+        return !isAlreadyFriend && !hasPendingRequest && !hasSentRequest;
+      });
+      
+      setSearchResults(filteredResults);
     } catch (error) {
-      console.error('Unexpected error searching users:', error);
-      toast({
-        title: "Error",
-        description: "Failed to search users.",
-        variant: "destructive",
-      })
+      console.error('Error searching users:', error);
     } finally {
       setIsSearching(false);
     }
   };
 
-  const handleAddFriend = async (friendId: string) => {
+  const handleSendFriendRequest = async (friendId: string) => {
+    if (!user) return;
+
     try {
       const { error } = await supabase
-        .from('friends')
-        .insert([{ person1_id: user?.id, person2_id: friendId, status: 'pending' }]);
+        .from('friendships')
+        .insert([
+          { user_id: user.id, friend_id: friendId, status: 'pending' }
+        ]);
 
-      if (error) {
-        console.error('Error sending friend request:', error);
-        toast({
-          title: "Error",
-          description: "Failed to send friend request.",
-          variant: "destructive",
-        })
-        return;
-      }
+      if (error) throw error;
 
-      setSearchResults(prevResults => prevResults.filter(person => person.id !== friendId));
-      setSentRequests(prevRequests => [...prevRequests, { id: friendId, username: '', avatar_url: null, status: null }]);
-      toast({
-        title: "Success",
-        description: "Friend request sent!",
-        variant: "default",
-      })
+      // Update UI
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url, status')
+        .eq('id', friendId)
+        .single();
+
+      setSentRequests([...sentRequests, data]);
+      
+      // Remove from search results
+      setSearchResults(prevResults => 
+        prevResults.filter(result => result.id !== friendId)
+      );
     } catch (error) {
-      console.error('Unexpected error sending friend request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to send friend request.",
-        variant: "destructive",
-      })
+      console.error('Error sending friend request:', error);
     }
   };
 
-  const handleAcceptRequest = async (friendId: string) => {
+  const handleAcceptFriendRequest = async (friendId: string) => {
+    if (!user) return;
+
     try {
+      // Update the friendship status
       const { error } = await supabase
-        .from('friends')
+        .from('friendships')
         .update({ status: 'accepted' })
-        .eq('person1_id', friendId)
-        .eq('person2_id', user?.id);
+        .eq('user_id', friendId)
+        .eq('friend_id', user.id);
 
-      if (error) {
-        console.error('Error accepting friend request:', error);
-        toast({
-          title: "Error",
-          description: "Failed to accept friend request.",
-          variant: "destructive",
-        })
-        return;
+      if (error) throw error;
+
+      // Create reverse friendship entry
+      await supabase
+        .from('friendships')
+        .insert([
+          { user_id: user.id, friend_id: friendId, status: 'accepted' }
+        ]);
+
+      // Update UI
+      const acceptedFriend = friendRequests.find(req => req.id === friendId);
+      if (acceptedFriend) {
+        setFriendsList([...friendsList, acceptedFriend]);
+        setFriendRequests(friendRequests.filter(req => req.id !== friendId));
       }
-
-      setFriendRequests(prevRequests => prevRequests.filter(person => person.id !== friendId));
-      setFriends(prevFriends => [...prevFriends, { id: friendId, username: '', avatar_url: null, status: null }]);
-      toast({
-        title: "Success",
-        description: "Friend request accepted!",
-        variant: "default",
-      })
     } catch (error) {
-      console.error('Unexpected error accepting friend request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to accept friend request.",
-        variant: "destructive",
-      })
+      console.error('Error accepting friend request:', error);
     }
   };
 
-  const handleRejectRequest = async (friendId: string) => {
+  const handleDeclineFriendRequest = async (friendId: string) => {
+    if (!user) return;
+
     try {
+      // Delete the friendship request
       const { error } = await supabase
-        .from('friends')
+        .from('friendships')
         .delete()
-        .eq('person1_id', friendId)
-        .eq('person2_id', user?.id);
+        .eq('user_id', friendId)
+        .eq('friend_id', user.id);
 
-      if (error) {
-        console.error('Error rejecting friend request:', error);
-        toast({
-          title: "Error",
-          description: "Failed to reject friend request.",
-          variant: "destructive",
-        })
-        return;
-      }
+      if (error) throw error;
 
-      setFriendRequests(prevRequests => prevRequests.filter(person => person.id !== friendId));
-      toast({
-        title: "Success",
-        description: "Friend request rejected!",
-        variant: "default",
-      })
+      // Update UI
+      setFriendRequests(friendRequests.filter(req => req.id !== friendId));
     } catch (error) {
-      console.error('Unexpected error rejecting friend request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to reject friend request.",
-        variant: "destructive",
-      })
+      console.error('Error declining friend request:', error);
+    }
+  };
+
+  const handleCancelFriendRequest = async (friendId: string) => {
+    if (!user) return;
+
+    try {
+      // Delete the sent request
+      const { error } = await supabase
+        .from('friendships')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('friend_id', friendId);
+
+      if (error) throw error;
+
+      // Update UI
+      setSentRequests(sentRequests.filter(req => req.id !== friendId));
+    } catch (error) {
+      console.error('Error canceling friend request:', error);
     }
   };
 
   const handleRemoveFriend = async (friendId: string) => {
+    if (!user) return;
+
     try {
-      const { error } = await supabase
-        .from('friends')
+      // Delete both friendship records
+      await supabase
+        .from('friendships')
         .delete()
-        .or(`and(person1_id.eq.${user?.id},person2_id.eq.${friendId}),and(person1_id.eq.${friendId},person2_id.eq.${user?.id})`);
+        .eq('user_id', user.id)
+        .eq('friend_id', friendId);
 
-      if (error) {
-        console.error('Error removing friend:', error);
-        toast({
-          title: "Error",
-          description: "Failed to remove friend.",
-          variant: "destructive",
-        })
-        return;
-      }
+      await supabase
+        .from('friendships')
+        .delete()
+        .eq('user_id', friendId)
+        .eq('friend_id', user.id);
 
-      setFriends(prevFriends => prevFriends.filter(person => person.id !== friendId));
-      toast({
-        title: "Success",
-        description: "Friend removed!",
-        variant: "default",
-      })
+      // Update UI
+      setFriendsList(friendsList.filter(friend => friend.id !== friendId));
     } catch (error) {
-      console.error('Unexpected error removing friend:', error);
-      toast({
-        title: "Error",
-        description: "Failed to remove friend.",
-        variant: "destructive",
-      })
+      console.error('Error removing friend:', error);
     }
   };
 
-  const selectFriend = async (friend: Person) => {
-    setSelectedFriendId(friend.id);
-    setFriendshipStatus('accepted');
-  };
+  if (!isAuthenticated) {
+    return <LoginPrompt />;
+  }
 
-  const selectFriendRequest = async (friend: Person) => {
-    setSelectedFriendId(friend.id);
-    setFriendshipStatus('requested');
+  const handleRsvp = async (eventId: string, status: 'Going' | 'Interested') => {
+    if (handleEventRsvp) {
+      await handleEventRsvp(eventId, status);
+      refetch();
+    }
+    return true;
   };
-
-  const selectSentRequest = async (friend: Person) => {
-    setSelectedFriendId(friend.id);
-    setFriendshipStatus('pending');
-  };
-
-  const clearSelectedFriend = () => {
-    setSelectedFriendId(null);
-    setFriendshipStatus('none');
-  };
-
-  // Get the user events for the currently selected friend
-  const {
-    userEvents,
-    isLoading: isUserEventsLoading,
-    upcomingEvents,
-    pastEvents,
-    handleRsvp,
-    refetch
-  } = useUserEvents(selectedFriendId, user?.id, friendshipStatus);
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-4">Friends</h1>
-
-      {isLoading ? (
-        <div className="flex flex-col gap-2">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Friends</h1>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left sidebar with user profile */}
+        <div className="lg:col-span-1">
+          {profile && (
+            <ProfileCard profile={profile} />
+          )}
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Left Panel: Friends List */}
-          <div className="md:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle>Friends</CardTitle>
-                <CardDescription>Manage your friends and connections.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {friends.length > 0 ? (
-                  <ul className="space-y-2">
-                    {friends.map((friend) => (
-                      <li key={friend.id} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3" onClick={() => selectFriend(friend)}>
-                          <Avatar>
-                            <AvatarImage src={friend.avatar_url || ""} />
-                            <AvatarFallback>{friend.username?.charAt(0).toUpperCase()}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="text-sm font-medium leading-none">{friend.username}</p>
-                            <p className="text-sm text-muted-foreground">Status: {friend.status || 'N/A'}</p>
-                          </div>
-                        </div>
-                        <Button variant="outline" size="icon" onClick={() => handleRemoveFriend(friend.id)}>
-                          Remove
-                        </Button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No friends yet.</p>
+        
+        {/* Main content area */}
+        <div className="lg:col-span-2">
+          <Tabs defaultValue="friends" value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="w-full mb-6">
+              <TabsTrigger value="friends" className="flex-1">My Friends</TabsTrigger>
+              <TabsTrigger value="discover" className="flex-1">Discover</TabsTrigger>
+              <TabsTrigger value="requests" className="flex-1">
+                Friend Requests
+                {friendRequests.length > 0 && (
+                  <span className="ml-2 bg-primary text-primary-foreground rounded-full w-6 h-6 flex items-center justify-center text-xs">
+                    {friendRequests.length}
+                  </span>
                 )}
-              </CardContent>
-            </Card>
-
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle>Friend Requests</CardTitle>
-                <CardDescription>Approve or reject incoming friend requests.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {friendRequests.length > 0 ? (
-                  <ul className="space-y-2">
-                    {friendRequests.map(request => (
-                      <li key={request.id} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3" onClick={() => selectFriendRequest(request)}>
-                          <Avatar>
-                            <AvatarImage src={request.avatar_url || ""} />
-                            <AvatarFallback>{request.username?.charAt(0).toUpperCase()}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="text-sm font-medium leading-none">{request.username}</p>
-                            <p className="text-sm text-muted-foreground">Status: {request.status || 'N/A'}</p>
-                          </div>
-                        </div>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="icon" onClick={() => handleAcceptRequest(request.id)}>
-                            Accept
-                          </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleRejectRequest(request.id)}>
-                            Reject
-                          </Button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No friend requests.</p>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card className="mt-6">
-              <CardHeader>
-                <CardTitle>Sent Requests</CardTitle>
-                <CardDescription>Manage your sent friend requests.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {sentRequests.length > 0 ? (
-                  <ul className="space-y-2">
-                    {sentRequests.map(request => (
-                      <li key={request.id} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-3" onClick={() => selectSentRequest(request)}>
-                          <Avatar>
-                            <AvatarImage src={request.avatar_url || ""} />
-                            <AvatarFallback>{request.username?.charAt(0).toUpperCase()}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="text-sm font-medium leading-none">{request.username}</p>
-                            <p className="text-sm text-muted-foreground">Status: {request.status || 'N/A'}</p>
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No sent requests.</p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Middle Panel: Search Users */}
-          <div className="md:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle>Search Users</CardTitle>
-                <CardDescription>Find new friends by searching for their username.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="search">Username</Label>
-                  <Input
-                    id="search"
-                    placeholder="Enter username"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="friends">
+              {isLoading ? (
+                <div className="text-center py-8">Loading friends...</div>
+              ) : (
+                <div className="space-y-6">
+                  {friendsList.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500 mb-4">You don't have any friends yet.</p>
+                      <Button onClick={() => setActiveTab('discover')}>
+                        Discover People
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <FriendsList 
+                        friends={friendsList}
+                        onRemoveFriend={handleRemoveFriend}
+                      />
+                    </>
+                  )}
                 </div>
-                <Button onClick={handleSearch} disabled={isSearching}>
-                  {isSearching ? "Searching..." : "Search"}
-                </Button>
-
-                {searchResults.length > 0 && (
-                  <div className="mt-4">
-                    <h3 className="text-lg font-semibold mb-2">Search Results</h3>
-                    <ul className="space-y-2">
-                      {searchResults.map(person => (
-                        <li key={person.id} className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <Avatar>
-                              <AvatarImage src={person.avatar_url || ""} />
-                              <AvatarFallback>{person.username?.charAt(0).toUpperCase()}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="text-sm font-medium leading-none">{person.username}</p>
-                              <p className="text-sm text-muted-foreground">Status: {person.status || 'N/A'}</p>
-                            </div>
-                          </div>
-                          <Button variant="outline" size="icon" onClick={() => handleAddFriend(person.id)}>
-                            Add Friend
-                          </Button>
-                        </li>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="discover">
+              <div className="space-y-6">
+                <FriendSearch 
+                  onSearch={handleSearch} 
+                  isSearching={isSearching} 
+                />
+                
+                {searchResults.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {searchResults.map(user => (
+                      <FriendCard
+                        key={user.id}
+                        user={user}
+                        relationship="none"
+                        onAction={() => handleSendFriendRequest(user.id)}
+                        actionLabel="Send Request"
+                      />
+                    ))}
+                  </div>
+                ) : searchQuery ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">No users found matching "{searchQuery}"</p>
+                  </div>
+                ) : null}
+                
+                {sentRequests.length > 0 && (
+                  <div className="mt-8">
+                    <h3 className="text-xl font-medium mb-4">Sent Requests</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {sentRequests.map(user => (
+                        <FriendCard
+                          key={user.id}
+                          user={user}
+                          relationship="sent"
+                          onAction={() => handleCancelFriendRequest(user.id)}
+                          actionLabel="Cancel Request"
+                        />
                       ))}
-                    </ul>
+                    </div>
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right Panel: Selected Friend's Events */}
-          <div className="md:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle>
-                  {selectedFriendId ? "Friend's Events" : "Select a Friend"}
-                </CardTitle>
-                <CardDescription>
-                  View upcoming and past events of your selected friend.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {selectedFriendId ? (
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="upcoming">
-                      <AccordionTrigger>Upcoming Events</AccordionTrigger>
-                      <AccordionContent>
-                        {isUserEventsLoading ? (
-                          <div className="flex flex-col gap-2">
-                            <Skeleton className="h-32 w-full" />
-                            <Skeleton className="h-32 w-full" />
-                            <Skeleton className="h-32 w-full" />
-                          </div>
-                        ) : upcomingEvents.length > 0 ? (
-                          <div className="grid grid-cols-1 gap-4">
-                            {upcomingEvents.map((event) => (
-                              <EventCard
-                                key={event.id}
-                                event={event}
-                                onRsvp={handleRsvp}
-                                showRsvpButtons={false}
-                                compact={true}
-                              />
-                            ))}
-                          </div>
-                        ) : (
-                          <p>No upcoming events.</p>
-                        )}
-                      </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="past">
-                      <AccordionTrigger>Past Events</AccordionTrigger>
-                      <AccordionContent>
-                        {isUserEventsLoading ? (
-                          <div className="flex flex-col gap-2">
-                            <Skeleton className="h-32 w-full" />
-                            <Skeleton className="h-32 w-full" />
-                            <Skeleton className="h-32 w-full" />
-                          </div>
-                        ) : pastEvents.length > 0 ? (
-                          <div className="grid grid-cols-1 gap-4">
-                            {pastEvents.map((event) => (
-                              <EventCard
-                                key={event.id}
-                                event={event}
-                                onRsvp={handleRsvp}
-                                showRsvpButtons={false}
-                                compact={true}
-                              />
-                            ))}
-                          </div>
-                        ) : (
-                          <p>No past events.</p>
-                        )}
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                ) : (
-                  <p>Select a friend to view their events.</p>
-                )}
-              </CardContent>
-              {selectedFriendId && (
-                <CardFooter>
-                  <Button variant="secondary" onClick={clearSelectedFriend}>Clear Selection</Button>
-                </CardFooter>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="requests">
+              {isLoading ? (
+                <div className="text-center py-8">Loading requests...</div>
+              ) : (
+                <>
+                  {friendRequests.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">You don't have any friend requests.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {friendRequests.map(user => (
+                        <FriendCard
+                          key={user.id}
+                          user={user}
+                          relationship="received"
+                          onAction={() => handleAcceptFriendRequest(user.id)}
+                          onSecondaryAction={() => handleDeclineFriendRequest(user.id)}
+                          actionLabel="Accept"
+                          secondaryActionLabel="Decline"
+                        />
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
-            </Card>
-          </div>
+            </TabsContent>
+          </Tabs>
         </div>
-      )}
+      </div>
     </div>
   );
 };

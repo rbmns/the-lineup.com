@@ -1,90 +1,76 @@
-import { useState, useCallback, useMemo } from 'react';
+
+import { useState, useEffect } from 'react';
 import { Event, EventImage } from '@/types';
 import { supabase } from '@/lib/supabase';
 
-export type UseEventImagesReturn = {
-  images: EventImage[];
-  processInitialImages: () => EventImage[];
-  uploadEventImage: (file: File) => Promise<string>;
-  loading: boolean;
-  getEventImageUrl: (event: Event) => string | null;
-  getShareImageUrl: (event: Event) => string | null;
-};
+interface EventImageResult {
+  coverImage: string | null;
+  shareImage: string | null;
+  galleryImages: EventImage[];
+  isLoading: boolean;
+  error: Error | null;
+}
 
-export const useEventImages = (): UseEventImagesReturn => {
-  const [images, setImages] = useState<EventImage[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+export const useEventImages = (event: Event | null): EventImageResult => {
+  const [coverImage, setCoverImage] = useState<string | null>(null);
+  const [shareImage, setShareImage] = useState<string | null>(null);
+  const [galleryImages, setGalleryImages] = useState<EventImage[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  const processInitialImages = useCallback(() => {
-    // This is a placeholder for processing initial images
-    return images;
-  }, [images]);
-
-  const uploadEventImage = useCallback(async (file: File): Promise<string> => {
-    setLoading(true);
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `event-images/${fileName}`;
-
-      const { data, error } = await supabase.storage.from('public').upload(filePath, file);
-
-      if (error) {
-        console.error('Error uploading image:', error);
-        throw error;
+  useEffect(() => {
+    const loadImages = async () => {
+      if (!event) {
+        setIsLoading(false);
+        return;
       }
 
-      const imageUrl = `${supabase.storageUrl}/public/${data.path}`;
-      
-      // Add to local state
-      setImages(prev => [...prev, { url: imageUrl, file_name: fileName }]);
-      
-      return imageUrl;
-    } catch (error) {
-      console.error('Error in uploadEventImage:', error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+      try {
+        setIsLoading(true);
+        setError(null);
 
-  // Function to get the main event image URL
-  const getEventImageUrl = useCallback((event: Event): string | null => {
-    if (!event) return null;
+        // Process cover image
+        if (event.cover_image) {
+          // Check if cover_image is a full URL or just a path
+          if (event.cover_image.startsWith('http')) {
+            setCoverImage(event.cover_image);
+          } else {
+            // Construct URL using Supabase storage
+            const storageUrl = supabase.supabaseUrl; // Fix for accessing protected storageUrl property
+            setCoverImage(`${storageUrl}/storage/v1/object/public/${event.cover_image}`);
+          }
+        } else {
+          // Default fallback image
+          setCoverImage('/placeholder.svg');
+        }
 
-    // First check for image_urls array
-    if (event.image_urls && event.image_urls.length > 0) {
-      return event.image_urls[0];
-    }
+        // Process share image
+        if (event.share_image) {
+          // Check if share_image is a full URL or just a path
+          if (event.share_image.startsWith('http')) {
+            setShareImage(event.share_image);
+          } else {
+            // Construct URL using Supabase storage
+            const storageUrl = supabase.supabaseUrl; // Fix for accessing protected storageUrl property
+            setShareImage(`${storageUrl}/storage/v1/object/public/${event.share_image}`);
+          }
+        } else {
+          // Use cover image as fallback for share image
+          setShareImage(coverImage);
+        }
 
-    // Then check for a cover_image property 
-    if (event.cover_image) {
-      return event.cover_image;
-    }
+        // TODO: Load gallery images if needed
 
-    // Fallback to a default image
-    return null;
-  }, []);
-  
-  // Function to get the image URL specifically for sharing
-  const getShareImageUrl = useCallback((event: Event): string | null => {
-    if (!event) return null;
-    
-    // For sharing, we might want to use a specific sharing image if available
-    if (event.share_image) {
-      return event.share_image;
-    }
-    
-    // Otherwise fall back to the regular image
-    return getEventImageUrl(event);
-  }, [getEventImageUrl]);
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Error loading event images:', err);
+        setError(err instanceof Error ? err : new Error('Failed to load images'));
+        setIsLoading(false);
+      }
+    };
 
-  return {
-    images,
-    processInitialImages,
-    uploadEventImage,
-    loading,
-    getEventImageUrl,
-    getShareImageUrl
-  };
+    loadImages();
+  }, [event]);
+
+  return { coverImage, shareImage, galleryImages, isLoading, error };
 };

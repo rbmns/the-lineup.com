@@ -1,30 +1,43 @@
 
-/**
- * Utility functions for native sharing features
- */
+import { toast } from '@/hooks/use-toast';
 
-// Check if the browser supports the Web Share API
-export const canUseNativeShare = (): boolean => {
-  return typeof navigator !== 'undefined' && !!navigator.share;
-};
-
-// Handle native sharing with the Web Share API
-export const handleNativeShare = async (data: { 
-  title?: string; 
-  text?: string; 
+export interface NativeShareData {
   url: string;
-  files?: File[];
-}): Promise<boolean> => {
-  if (!canUseNativeShare()) {
-    return false;
-  }
+  title?: string;
+  text?: string;
+}
 
-  try {
-    await navigator.share(data);
-    return true;
-  } catch (error) {
-    // User canceled or sharing failed
-    console.error('Error sharing:', error);
+/**
+ * Share content using the Web Share API if available
+ */
+export const shareToNative = async (data: NativeShareData): Promise<boolean> => {
+  // Check if native sharing is available
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        url: data.url,
+        title: data.title,
+        text: data.text
+      });
+      return true;
+    } catch (error: any) {
+      // User canceled or share failed
+      if (error.name !== 'AbortError') {
+        console.error('Error sharing content:', error);
+        toast({
+          title: "Sharing failed",
+          description: "There was a problem sharing this content.",
+          variant: "destructive"
+        });
+      }
+      return false;
+    }
+  } else {
+    toast({
+      title: "Sharing not supported",
+      description: "Your browser doesn't support direct sharing.",
+      variant: "default"
+    });
     return false;
   }
 };

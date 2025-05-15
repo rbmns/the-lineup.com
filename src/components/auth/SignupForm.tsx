@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle, CheckCircle } from 'lucide-react';
 
 // Define form schema with zod
 const formSchema = z.object({
@@ -29,6 +31,8 @@ const formSchema = z.object({
 export default function SignupForm({ onToggleMode }: { onToggleMode: () => void }) {
   const [step, setStep] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
+  const [registrationComplete, setRegistrationComplete] = useState<boolean>(false);
+  const [registeredEmail, setRegisteredEmail] = useState<string>("");
   const navigate = useNavigate();
   
   const form = useForm<z.infer<typeof formSchema>>({
@@ -44,6 +48,13 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
     setLoading(true);
     
     try {
+      // Clean up any lingering auth state
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        // Ignore errors during signout
+      }
+      
       // Register the user with Supabase
       const { data, error } = await supabase.auth.signUp({
         email: values.email,
@@ -57,13 +68,13 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
         throw error;
       }
 
-      // Show success message if no error
+      // Show success message
+      setRegistrationComplete(true);
+      setRegisteredEmail(values.email);
+      
       toast.success("Sign up successful!", {
         description: "Please check your email for verification.",
       });
-      
-      // Navigate to the login page
-      navigate('/login');
     } catch (error: any) {
       // Show error message
       toast.error("Sign up failed", {
@@ -87,6 +98,30 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
   const prevStep = () => {
     setStep(1);
   };
+
+  if (registrationComplete) {
+    return (
+      <div className="space-y-4 max-w-md w-full">
+        <Alert className="bg-green-50 border-green-200">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <AlertTitle className="text-green-800">Registration successful!</AlertTitle>
+          <AlertDescription className="text-green-700">
+            We've sent a confirmation email to <strong>{registeredEmail}</strong>.
+            Please check your inbox and click the verification link to activate your account.
+          </AlertDescription>
+        </Alert>
+        
+        <div className="space-y-2 mt-4">
+          <p className="text-sm text-gray-600">
+            Don't see the email? Check your spam folder or try logging in anyway.
+          </p>
+          <Button variant="outline" className="w-full" onClick={onToggleMode}>
+            Go to Login
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 max-w-md w-full">
