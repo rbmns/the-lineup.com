@@ -6,6 +6,7 @@ import { useFriendData } from '@/hooks/useFriendData';
 import { useFriendRequests } from '@/hooks/useFriendRequests';
 import { FriendsTabContent } from '@/components/friends/FriendsTabContent';
 import { FriendsTabs } from '@/components/friends/FriendsTabs';
+import { UserProfile } from '@/types';
 
 const Friends: React.FC = () => {
   const { user } = useAuth();
@@ -69,7 +70,7 @@ const Friends: React.FC = () => {
           pendingRequestsCount={requests?.length || 0}
           friendsContent={
             <FriendsTabContent
-              friends={friends}
+              friends={friends as UserProfile[]}
               loading={friendsLoading}
               requests={requests || []}
               onAcceptRequest={onAcceptRequest}
