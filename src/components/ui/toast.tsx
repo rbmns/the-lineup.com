@@ -117,6 +117,15 @@ type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
 
 type ToastActionElement = React.ReactElement<typeof ToastAction>
 
+// Fixed ToasterToast interface to match the expected properties
+export interface ToasterToast extends ToastProps {
+  id: string;
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  action?: ToastActionElement;
+  icon?: React.ReactNode;
+}
+
 export {
   type ToastProps,
   type ToastActionElement,
@@ -127,15 +136,6 @@ export {
   ToastDescription,
   ToastClose,
   ToastAction,
-}
-
-// Add appropriate types for toast
-export interface ToasterToast extends ToastProps {
-  id: string;
-  title?: React.ReactNode;
-  description?: React.ReactNode;
-  action?: ToastActionElement;
-  icon?: React.ReactNode; // Add the missing icon property
 }
 
 // Export the useToast hook

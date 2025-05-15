@@ -1,5 +1,5 @@
 
-import { toast as sonnerToast } from 'sonner';
+import { toast as sonnerToast, useToast as useSonnerToast } from 'sonner';
 import { type ToastProps } from '@/components/ui/toast';
 
 // Enhanced toast function that accepts title and description
@@ -12,21 +12,38 @@ interface ToastOptions {
   duration?: number;
 }
 
+// Fixed toast function to properly handle string input and undefined options
 const toast = (options: ToastOptions | string) => {
   if (typeof options === 'string') {
+    // If options is a string, use it as the description
     return sonnerToast(options);
   }
   
-  const { title, description, variant, action, icon, duration } = options;
+  // Safely destructure with defaults to avoid undefined errors
+  const { 
+    title = '', 
+    description, 
+    variant = 'default', 
+    action, 
+    icon, 
+    duration = 3000 
+  } = options || {};
   
-  return sonnerToast(title || '', {
+  // Use sonnerToast with proper parameters
+  return sonnerToast(title, {
     description,
     icon,
-    duration: duration || 3000,
-    // Map variants to sonner's style if needed
-    // Add any additional props needed
+    duration,
+    // Map variant to sonner style if needed
+    style: variant === 'destructive' ? { backgroundColor: '#FEE2E2', borderColor: '#EF4444' } : undefined,
+    action,
   });
 };
 
-// Re-expose the useToast hook from sonner for consistency
-export { toast, toast as useToast };
+// Create properly typed useToast hook that returns the toast function
+const useToast = () => {
+  const sonnerHook = useSonnerToast();
+  return { ...sonnerHook, toast };
+};
+
+export { toast, useToast };

@@ -75,7 +75,7 @@ export function Toaster() {
           // Keep the toast only if it doesn't match any filter
           return !shouldFilterTitle && !shouldFilterDesc;
         })
-        .map(function ({ id, title, description, action, icon, ...props }) {
+        .map(function ({ id, title, description, action, ...props }) {
           return (
             <Toast 
               key={id} 
@@ -87,12 +87,12 @@ export function Toaster() {
               style={{ zIndex: 1000 }}
             >
               <div className="grid gap-1">
-                {icon && (
+                {props.icon && (
                   <div className="absolute left-4 top-4">
-                    {icon}
+                    {props.icon}
                   </div>
                 )}
-                <div className={icon ? "pl-6" : ""}>
+                <div className={props.icon ? "pl-6" : ""}>
                   {title && <ToastTitle className="text-sm font-bold text-black">{title}</ToastTitle>}
                   {description && typeof description === 'string' && (
                     <ToastDescription className="text-xs text-gray-600">{description}</ToastDescription>
