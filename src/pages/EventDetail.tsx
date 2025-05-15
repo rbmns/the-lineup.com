@@ -25,7 +25,7 @@ const EventDetail = () => {
   const { coverImage } = useEventImages(event);
   const metaTags = useEventMetaTags(event);
   const { handleRsvp } = useRsvpActions();
-  const { navigateToEvent, navigateToDestinationEvents } = useEventNavigation();
+  const { navigateToEvent } = useEventNavigation();
   const { isMobile } = useDeviceDetection();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -96,7 +96,7 @@ const EventDetail = () => {
             </div>
           )}
           
-          {/* Use the correct prop name for RelatedEventsSection */}
+          {/* Pass the entire event object to RelatedEventsSection */}
           <RelatedEventsSection event={event} />
         </div>
       </div>
@@ -113,6 +113,8 @@ const EventDetail = () => {
         title={event.title}
         description={event.description || ""}
         eventUrl={`${window.location.origin}/events/${event.slug || event.id}`}
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
       />
     </div>
   );

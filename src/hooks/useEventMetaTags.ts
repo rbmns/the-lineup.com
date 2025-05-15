@@ -1,7 +1,14 @@
 
 import { useEffect } from 'react';
 import { Event } from '@/types';
-import { MetaTags } from '@/types/seo';
+
+// Define the MetaTags interface if it doesn't exist
+interface MetaTags {
+  title: string;
+  description: string;
+  imageUrl: string;
+  path: string;
+}
 
 export const useEventMetaTags = (event: Event | null | undefined) => {
   if (!event) {
