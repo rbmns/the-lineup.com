@@ -140,7 +140,7 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
   };
   
   // Check if we have a booking link
-  const bookingLink = event.booking_link || event.external_url || null;
+  const bookingLink = event.booking_link || event.organizer_link || null;
   
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-12">

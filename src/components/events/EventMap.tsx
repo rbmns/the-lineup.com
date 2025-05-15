@@ -9,16 +9,21 @@ interface EventMapProps {
 }
 
 export const EventMap: React.FC<EventMapProps> = ({ latitude, longitude, name }) => {
-  // For now, we'll create a placeholder component that can be improved later
-  // with actual map integration
+  // This is a placeholder component for the event map
+  // In a real implementation, you would use a map library like Leaflet or Mapbox
+  
   return (
-    <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-center p-4 text-center">
-      <MapPin className="h-8 w-8 text-purple-600 mb-2" />
-      <h3 className="font-medium text-gray-800">{name}</h3>
-      <p className="text-sm text-gray-600">
-        Located at {latitude.toFixed(4)}, {longitude.toFixed(4)}
-      </p>
-      <p className="mt-2 text-xs text-gray-500">Interactive map would be displayed here</p>
+    <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-center">
+      <MapPin className="h-8 w-8 text-red-500 mb-2" />
+      <div className="text-center px-4">
+        <p className="font-medium">{name}</p>
+        <p className="text-sm text-gray-600">
+          {latitude.toFixed(6)}, {longitude.toFixed(6)}
+        </p>
+        <p className="text-xs text-gray-500 mt-4">
+          Map view is a placeholder. See the actual location on map in a live implementation.
+        </p>
+      </div>
     </div>
   );
 };

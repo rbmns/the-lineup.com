@@ -58,6 +58,20 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
 
+  // Handle RSVP and ensure we always return a Promise<boolean>
+  const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    if (!onRsvp) return false;
+    
+    try {
+      const result = await onRsvp(event.id, status);
+      // Convert any result (including void) to a boolean
+      return result === undefined ? true : !!result;
+    } catch (error) {
+      console.error('Error in EventCard RSVP handler:', error);
+      return false;
+    }
+  };
+
   // Determine max height for compact vs standard view
   const cardHeightClass = compact ? "max-h-[280px]" : "max-h-[380px]";
 
@@ -117,7 +131,7 @@ const EventCard: React.FC<EventCardProps> = ({
           <div className="pt-3">
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
-              onRsvp={(status) => onRsvp ? onRsvp(event.id, status) : Promise.resolve(false)}
+              onRsvp={handleRsvp}
               size="sm"
             />
           </div>

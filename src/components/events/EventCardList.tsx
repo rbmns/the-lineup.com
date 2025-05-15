@@ -1,70 +1,58 @@
 
 import React from 'react';
 import { Event } from '@/types';
-import { MapPin } from 'lucide-react';
+import { Calendar, MapPin } from 'lucide-react';
 import { formatInTimeZone } from 'date-fns-tz';
 import { cn } from '@/lib/utils';
-import { CategoryPill } from '@/components/ui/category-pill';
-import { useEventImages } from '@/hooks/useEventImages';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
+import { useEventImages } from '@/hooks/useEventImages';
+import { CategoryPill } from '@/components/ui/category-pill';
 
-// Amsterdam/Netherlands timezone
+// Amsterdam timezone for date formatting
 const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
 
 interface EventCardListProps {
   event: Event;
+  compact?: boolean;
   showRsvpButtons?: boolean;
-  showRsvpStatus?: boolean;
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   className?: string;
 }
 
 const EventCardList: React.FC<EventCardListProps> = ({
   event,
+  compact = false,
   showRsvpButtons = false,
-  showRsvpStatus = false,
   onRsvp,
-  className
+  className,
 }) => {
-  const { getEventImageUrl } = useEventImages();
   const { navigateToEvent } = useEventNavigation();
+  const { getEventImageUrl } = useEventImages();
   const imageUrl = getEventImageUrl(event);
-  
-  // Format date for display - show only day of week and date
+
+  const handleClick = () => {
+    navigateToEvent(event);
+  };
+
+  // Format date for display
   const formatDate = (dateStr: string): string => {
     try {
       const date = new Date(dateStr);
-      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, MMM d");
+      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEEE, MMMM d · h:mm a");
     } catch (error) {
       console.error('Error formatting date:', error);
       return dateStr;
     }
   };
-  
-  const handleClick = () => {
-    // Make sure we have all required properties for proper navigation
-    if (event && event.id) {
-      console.log(`EventCardList: Navigating to event with ID: ${event.id}`);
-      navigateToEvent({
-        ...event,
-        id: event.id,
-        destination: event.destination,
-        slug: event.slug,
-        start_time: event.start_time,
-        title: event.title
-      });
-    } else {
-      console.error("Cannot navigate: Missing event ID", event);
-    }
-  };
 
-  // Safely handle RSVP
+  // Handle RSVP and ensure we always return a Promise<boolean>
   const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp) return false;
     
     try {
       const result = await onRsvp(event.id, status);
+      // Convert any result (including void) to a boolean
       return result === undefined ? true : !!result;
     } catch (error) {
       console.error('Error in EventCardList RSVP handler:', error);
@@ -75,69 +63,61 @@ const EventCardList: React.FC<EventCardListProps> = ({
   return (
     <div 
       className={cn(
-        "flex border border-gray-200 rounded-lg overflow-hidden hover:bg-gray-50 relative",
-        "shadow-sm transition-all duration-200",
+        "flex flex-col sm:flex-row gap-4 sm:h-[140px] bg-white rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden",
         className
       )}
       onClick={handleClick}
     >
-      {/* Left: Event image - Full height with event type pill */}
-      <div className="relative h-auto w-20 sm:w-24">
+      {/* Image */}
+      <div className="relative h-[120px] sm:h-auto sm:w-[180px] overflow-hidden bg-gray-100">
         <img 
           src={imageUrl} 
-          alt={event.title} 
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{ height: '100%' }}
+          alt={event.title}
+          className="h-full w-full object-cover"
         />
         
         {/* Event type pill positioned at top of image */}
         {event.event_type && (
-          <div className="absolute top-1 left-1 z-10">
+          <div className="absolute top-2 left-2">
             <CategoryPill 
               category={event.event_type} 
-              size="xs" 
+              size="sm" 
               showIcon={true} 
-              className="bg-white/90 backdrop-blur-sm shadow-sm text-xs py-0.5 px-1.5"
+              className="bg-white/90 backdrop-blur-sm shadow-sm"
             />
           </div>
         )}
       </div>
-
-      {/* Center: Event details */}
-      <div className="flex-1 min-w-0 p-3 flex flex-col justify-between">
-        <div className="space-y-1.5">
-          {/* Date */}
-          <div className="text-sm text-gray-600 font-medium">
-            {event.start_time && formatDate(event.start_time)}
-          </div>
+      
+      {/* Content */}
+      <div className="flex flex-col flex-1 p-4 pt-0 sm:pt-4 justify-between">
+        <div>
+          <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">
+            {event.title}
+          </h3>
           
-          {/* Event title */}
-          <h3 className="font-medium text-base line-clamp-1">{event.title}</h3>
-          
-          {/* Location and RSVP status on the same line */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center text-xs text-gray-500">
-              <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
-              <span className="truncate">{event.venues?.name || event.location || 'No location'}</span>
+          <div className="flex items-center gap-4 text-sm text-gray-500 mb-2">
+            <div className="flex items-center gap-1">
+              <Calendar className="h-3.5 w-3.5" />
+              <span>{event.start_time ? formatDate(event.start_time) : 'Date not set'}</span>
             </div>
             
-            {/* Display RSVP status if not showing buttons */}
-            {!showRsvpButtons && showRsvpStatus && event.rsvp_status && (
-              <div 
-                className={cn(
-                  "ml-2 px-2 py-0.5 text-xs font-medium rounded",
-                  event.rsvp_status === 'Going' ? "bg-green-100 text-green-700 border border-green-200" : "bg-blue-100 text-blue-700 border border-blue-200"
-                )}
-              >
-                {event.rsvp_status}
-              </div>
-            )}
+            <div className="flex items-center gap-1">
+              <MapPin className="h-3.5 w-3.5" />
+              <span className="truncate max-w-[150px]">
+                {event.venues?.name || event.location || 'No location'}
+              </span>
+            </div>
           </div>
+          
+          <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+            {event.description || 'No description available'}
+          </p>
         </div>
         
-        {/* RSVP buttons - only shown when onRsvp handler is provided */}
+        {/* RSVP Buttons - only if needed */}
         {showRsvpButtons && onRsvp && (
-          <div className="flex items-center justify-end mt-2 gap-1">
+          <div className="mt-auto">
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}

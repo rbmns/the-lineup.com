@@ -7,12 +7,14 @@ interface EventsEmptyStateProps {
   message?: string;
   subMessage?: string;
   resetFilters?: () => void;
+  hasActiveFilters?: boolean;
 }
 
 export const EventsEmptyState: React.FC<EventsEmptyStateProps> = ({ 
   message = "No events found", 
   subMessage = "Try adjusting your filters or search terms",
-  resetFilters
+  resetFilters,
+  hasActiveFilters = false
 }) => {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
@@ -21,7 +23,7 @@ export const EventsEmptyState: React.FC<EventsEmptyStateProps> = ({
         <h3 className="text-xl font-medium text-gray-900 mb-2">{message}</h3>
         <p className="text-gray-600 mb-6">{subMessage}</p>
         
-        {resetFilters && (
+        {resetFilters && hasActiveFilters && (
           <Button 
             variant="outline" 
             onClick={resetFilters}

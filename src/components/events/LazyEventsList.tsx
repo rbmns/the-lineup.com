@@ -54,7 +54,11 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
     if (mainEvents.length === 0) {
       return (
         <EventsEmptyState 
-          hasActiveFilters={hasActiveFilters} 
+          message={hasActiveFilters ? "No events match your filters" : "No events found"}
+          subMessage={hasActiveFilters 
+            ? "Try adjusting your filters or search criteria to find more events."
+            : "Check back later for new events or try a different search."}
+          resetFilters={hasActiveFilters ? () => {} : undefined}
         />
       );
     }
