@@ -16,7 +16,7 @@ export const RelatedEventsGrid: React.FC<RelatedEventsGridProps> = ({ events }) 
   // Ensure we're working with a stable array
   const eventsArray = Array.isArray(events) ? events : [];
   
-  // Show up to 3 events in a single row
+  // Always show up to 3 events in a single row
   const eventsToShow = eventsArray.slice(0, 3);
 
   return (

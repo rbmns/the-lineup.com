@@ -2,7 +2,6 @@
 import React from 'react';
 import { CalendarIcon, MapPin } from 'lucide-react';
 import { formatInTimeZone } from 'date-fns-tz';
-import { getEventDateTime } from '@/utils/dateUtils';
 
 // Amsterdam/Netherlands timezone
 const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
