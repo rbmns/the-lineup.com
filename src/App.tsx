@@ -29,7 +29,6 @@ function App() {
             <Route path="*" element={<EventsPageRefactored />} />
           </Route>
         </Routes>
-        <Toaster />
       </ToastProvider>
     </AuthProvider>
   );
