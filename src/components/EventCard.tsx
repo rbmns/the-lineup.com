@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { formatRelativeDate, formatEventTime, getEventDateTime } from '@/utils/dateUtils';
@@ -43,7 +44,7 @@ const EventCard: React.FC<EventCardProps> = ({
     if (onClick) {
       onClick();
     } else {
-      // Default navigation behavior if no onClick handler provided
+      // Always navigate using the event ID for consistency
       navigate(`/events/${event.id}`);
     }
   };

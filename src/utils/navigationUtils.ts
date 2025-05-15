@@ -1,10 +1,10 @@
 
 import { NavigateFunction } from 'react-router-dom';
 import { isProfileClickable } from './friendshipUtils';
-import { getEventUrl } from './canonicalUtils';
 
 /**
  * Utility function to navigate to a user profile page with improved reliability
+ * Always uses ID-based URLs
  * @param userId The ID of the user to navigate to
  * @param navigate React Router's navigate function
  * @param friendshipStatus Optional friendship status to check before navigation
@@ -38,7 +38,7 @@ export const navigateToUserProfile = (
     // Clear any existing navigation state to prevent issues
     sessionStorage.removeItem('lastProfileNavigation');
     
-    // Add state to the navigation to prevent unwanted redirects
+    // Use ID-based URL for navigation
     navigate(`/users/${userId}`, { 
       state: { 
         fromDirectNavigation: true,
@@ -63,10 +63,10 @@ export const navigateToUserProfile = (
 };
 
 /**
- * Utility function to navigate to an event detail page using SEO-friendly URLs
+ * Utility function to navigate to an event detail page using ID-based URLs
  * @param eventId The ID of the event to navigate to
  * @param navigate React Router's navigate function
- * @param event Optional event object for SEO-friendly URLs
+ * @param event Optional event object (not used for URL generation, only for state)
  * @param preserveSource Whether to preserve source information in navigation state
  */
 export const navigateToEvent = (
@@ -92,22 +92,13 @@ export const navigateToEvent = (
       originalEventId: eventId   // Always preserve the original ID for fallback
     };
     
-    // Always use SEO-friendly URL format with destination priority
-    if (event) {
-      const url = getEventUrl(event, true);
-      console.log(`Navigating to SEO URL: ${url}`, { event });
-      navigate(url, { 
-        state: navigationState,
-        replace: false
-      });
-    } else {
-      // If we only have ID, use the basic format but log a warning
-      console.warn(`Limited navigation data: only ID ${eventId} available. Using basic URL format.`);
-      navigate(`/events/${eventId}`, { 
-        state: navigationState,
-        replace: false
-      });
-    }
+    // Always use ID-based URL for consistent internal navigation
+    navigate(`/events/${eventId}`, { 
+      state: navigationState,
+      replace: false
+    });
+    
+    console.log(`Navigating to event with ID: ${eventId}`);
   } catch (error) {
     console.error("Navigation error:", error);
   }

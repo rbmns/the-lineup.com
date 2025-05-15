@@ -2,7 +2,6 @@
 import { useState, useCallback } from 'react';
 import { Event } from '@/types';
 import { useNavigate } from 'react-router-dom';
-import { getEventUrl } from '@/utils/canonicalUtils';
 
 export const useEventInteractions = () => {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -17,7 +16,7 @@ export const useEventInteractions = () => {
       return;
     }
     
-    // Generate the event URL based on event ID
+    // Always navigate using UUID for consistency
     const eventUrl = `/events/${event.id}`;
     
     // Navigate to the event detail page
@@ -36,6 +35,7 @@ export const useEventInteractions = () => {
       return;
     }
     
+    // Always use ID-based URLs for internal navigation
     const eventUrl = `/events/${event.id}`;
     navigate(eventUrl);
   }, [navigate]);

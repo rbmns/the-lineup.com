@@ -1,12 +1,10 @@
 
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getEventUrl } from '@/utils/canonicalUtils';
 
 /**
  * Hook to provide consistent event navigation across the app,
- * ensuring all event links use the SEO-friendly URL format
- * with smooth transitions between events
+ * ensuring all event links use ID-based navigation for consistency
  */
 export const useEventNavigation = () => {
   const navigate = useNavigate();
@@ -24,26 +22,19 @@ export const useEventNavigation = () => {
       return;
     }
     
-    // Always use SEO-friendly format with destination when available
-    // Force using slugs instead of IDs whenever possible
-    const url = getEventUrl(event, true);
-    console.log(`Enhanced navigation to event URL: ${url}`, event);
+    // Always use ID-based URLs for internal navigation
+    const url = `/events/${event.id}`;
+    console.log(`Navigation to event URL: ${url}`, event);
     
-    // Debug log to help identify if we're still using IDs
-    if (url.includes('/events/') && !url.includes('-') && !url.includes('/destinations/')) {
-      console.warn('Using ID-based URL for navigation - missing date-based slug:', url);
-    }
-    
-    // Force navigation to the generated URL rather than using the event ID
-    // Add transition state to enable smooth animations between events
+    // Force navigation to the ID-based URL
     navigate(url, { 
       replace: false,
       state: { 
         fromDirectNavigation: true,
         forceRefresh: true,
-        fromEventNavigation: true, // Flag to indicate we're navigating between events
-        useTransition: true, // Enable transitions
-        originalEventId: event.id, // Always preserve the original ID for fallback
+        fromEventNavigation: true,
+        useTransition: true,
+        originalEventId: event.id,
         timestamp: Date.now()
       }
     });
