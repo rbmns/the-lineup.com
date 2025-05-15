@@ -4,10 +4,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import EventsPageRefactored from "./pages/EventsPageRefactored";
 import EventDetail from "./pages/EventDetail";
 import Index from "./pages/Index";
-import { Layout } from "./components/Layout";
-import { Friends } from "./pages/Friends";
-import { UserProfilePage } from "./pages/UserProfilePage";
-import { Login } from "./pages/Login";
+import Layout from "./components/Layout";
+import Friends from "./pages/Friends";
+import UserProfilePage from "./pages/UserProfilePage";
+import Login from "./pages/Login";
 import { AuthProvider } from "./contexts/AuthContext";
 import { useToast } from "./hooks/use-toast";
 import { Toaster } from "./components/ui/toaster";
