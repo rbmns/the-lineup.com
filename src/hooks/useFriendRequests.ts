@@ -1,9 +1,7 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { FriendRequest } from '@/types/friends';
-import { toast } from '@/hooks/use-toast';
-// Remove the import of Check component since we can't use JSX in .ts files
-// import { Check } from 'lucide-react';
 
 export const useFriendRequests = (userId: string | undefined) => {
   const [requests, setRequests] = useState<FriendRequest[]>([]);
@@ -64,31 +62,7 @@ export const useFriendRequests = (userId: string | undefined) => {
         
       if (acceptedError) throw acceptedError;
       
-      // Check for newly accepted requests (within last 5 minutes)
-      if (acceptedRequests && acceptedRequests.length > 0) {
-        const fiveMinutesAgo = new Date();
-        fiveMinutesAgo.setMinutes(fiveMinutesAgo.getMinutes() - 5);
-        
-        // Filter to only recently accepted requests
-        const recentlyAccepted = acceptedRequests.filter(req => {
-          const updatedAt = new Date(req.updated_at);
-          return updatedAt > fiveMinutesAgo;
-        });
-        
-        // Show notification for each recently accepted request with the friend's username
-        recentlyAccepted.forEach(req => {
-          // Get friend's username from the joined profiles data
-          const friendProfile = req.profiles;
-          if (friendProfile && friendProfile.username) {
-            // Show notification without using JSX for the icon
-            toast({
-              title: "Friend request accepted",
-              description: `${friendProfile.username} has accepted your friend request`,
-              // Remove the icon property completely since we can't use JSX in .ts files
-            });
-          }
-        });
-      }
+      // No toast notifications for accepted requests now
       
     } catch (err) {
       console.error('Error fetching friend requests:', err);
@@ -110,26 +84,10 @@ export const useFriendRequests = (userId: string | undefined) => {
           table: 'friendships',
           filter: `user_id=eq.${userId}`,
         }, (payload) => {
-          // If status changed to Accepted, show notification
+          // If status changed to Accepted, no toast notification now
           if (payload.new && payload.new.status === 'Accepted') {
-            // Fetch the friend's profile to get their username
-            supabase
-              .from('profiles')
-              .select('username')
-              .eq('id', payload.new.friend_id)
-              .single()
-              .then(({ data, error }) => {
-                if (!error && data) {
-                  toast({
-                    title: "Friend request accepted",
-                    description: `${data.username} has accepted your friend request`,
-                    // Remove the icon property completely since we can't use JSX in .ts files
-                  });
-                }
-                
-                // Refresh requests data
-                fetchRequests();
-              });
+            // Just refresh requests data
+            fetchRequests();
           }
         })
         .subscribe();
@@ -152,17 +110,11 @@ export const useFriendRequests = (userId: string | undefined) => {
       // Remove the request from the local state
       setRequests(prevRequests => prevRequests.filter(req => req.id !== requestId));
       
-      // No toast for accepting a request - removed
+      // No toast for accepting a request
       
       return true;
     } catch (err) {
       console.error('Error accepting friend request:', err);
-      // Keep error toast as it's critical
-      toast({
-        title: "Error",
-        description: "Failed to accept friend request",
-        variant: "destructive"
-      });
       return false;
     }
   };
@@ -184,12 +136,6 @@ export const useFriendRequests = (userId: string | undefined) => {
       return true;
     } catch (err) {
       console.error('Error declining friend request:', err);
-      // Keep error toast as it's critical
-      toast({
-        title: "Error",
-        description: "Failed to decline friend request",
-        variant: "destructive"
-      });
       return false;
     }
   };

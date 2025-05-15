@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useFriendData } from '@/hooks/useFriendData';
@@ -9,7 +9,6 @@ import { FriendsTabs } from '@/components/friends/FriendsTabs';
 import { UserProfile } from '@/types';
 import { DiscoverTabContent } from '@/components/friends/DiscoverTabContent';
 import { supabase } from '@/lib/supabase';
-import { toast } from '@/hooks/use-toast';
 
 const Friends: React.FC = () => {
   const { user } = useAuth();
@@ -66,7 +65,7 @@ const Friends: React.FC = () => {
   }, [friendsSearchQuery, friends]);
 
   // Handle search for new people
-  const handleSearch = async () => {
+  const handleSearch = useCallback(async () => {
     if (!searchQuery.trim() || !user) return;
     
     setIsSearching(true);
@@ -89,15 +88,10 @@ const Friends: React.FC = () => {
       setSearchResults(filteredResults as UserProfile[]);
     } catch (error) {
       console.error('Error searching for users:', error);
-      toast({
-        title: 'Search failed',
-        description: 'There was a problem searching for users. Please try again.',
-        variant: 'destructive',
-      });
     } finally {
       setIsSearching(false);
     }
-  };
+  }, [searchQuery, user, friends]);
 
   // Handle search when typing in discover tab
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,21 +116,11 @@ const Friends: React.FC = () => {
         
       if (error) throw error;
       
-      toast({
-        title: 'Friend request sent',
-        description: 'Your friend request has been sent successfully.',
-      });
-      
       // Update pending request IDs
       refreshFriendsData();
       
     } catch (error) {
       console.error('Error sending friend request:', error);
-      toast({
-        title: 'Request failed',
-        description: 'There was a problem sending your friend request.',
-        variant: 'destructive',
-      });
     }
   };
 
@@ -170,7 +154,7 @@ const Friends: React.FC = () => {
     return () => {
       window.removeEventListener('keypress', handleKeyPress);
     };
-  }, [activeTab, searchQuery]);
+  }, [activeTab, handleSearch]);
 
   if (!user) {
     return null; // Will redirect in the effect
@@ -205,6 +189,7 @@ const Friends: React.FC = () => {
               onAddFriend={handleAddFriend}
               isSearching={isSearching}
               pendingRequestIds={pendingRequestIds || []}
+              onSearch={handleSearch}
             />
           }
         />

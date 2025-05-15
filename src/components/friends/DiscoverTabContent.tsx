@@ -1,9 +1,7 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { UserProfile } from '@/types';
 import { FriendSearchBar } from './FriendSearchBar';
-import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
 import { FriendCard } from '@/components/profile/FriendCard';
 
 interface DiscoverTabContentProps {
@@ -13,6 +11,7 @@ interface DiscoverTabContentProps {
   onAddFriend: (id: string) => void;
   isSearching: boolean;
   pendingRequestIds: string[];
+  onSearch: () => void;
 }
 
 export const DiscoverTabContent = ({
@@ -21,27 +20,26 @@ export const DiscoverTabContent = ({
   searchResults,
   onAddFriend,
   isSearching,
-  pendingRequestIds
+  pendingRequestIds,
+  onSearch
 }: DiscoverTabContentProps) => {
+  // Trigger search when typing
+  useEffect(() => {
+    if (searchQuery.trim().length >= 2) {
+      onSearch();
+    }
+  }, [searchQuery, onSearch]);
+
   return (
     <>
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-4">Find Friends</h2>
-        <div className="flex space-x-2">
-          <div className="flex-grow">
-            <FriendSearchBar
-              searchQuery={searchQuery}
-              onSearchChange={onSearchChange}
-              placeholder="Search friends by name or location..."
-            />
-          </div>
-          <Button 
-            onClick={() => document.dispatchEvent(new KeyboardEvent('keypress', { key: 'Enter' }))}
-            disabled={isSearching || !searchQuery.trim()}
-          >
-            <Search className="h-4 w-4 mr-2" />
-            Search
-          </Button>
+        <div className="w-full">
+          <FriendSearchBar
+            searchQuery={searchQuery}
+            onSearchChange={onSearchChange}
+            placeholder="Search friends by name or location..."
+          />
         </div>
       </div>
       

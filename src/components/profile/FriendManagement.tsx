@@ -13,9 +13,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useFriendship } from '@/hooks/useFriendship';
 import { supabase } from '@/lib/supabase';
-import { toast } from '@/hooks/use-toast';
 import { UserProfile } from '@/types';
-import { Check, X, UserMinus } from 'lucide-react';
+import { UserMinus } from 'lucide-react';
 
 interface FriendManagementProps {
   profile: UserProfile | null;
@@ -38,11 +37,6 @@ export const FriendManagement: React.FC<FriendManagementProps> = ({
 
   const handleAddFriend = async () => {
     if (!currentUserId || !profile?.id) {
-      toast({
-        title: "Error",
-        description: "Unable to send friend request",
-        variant: "destructive"
-      });
       return;
     }
 
@@ -51,15 +45,10 @@ export const FriendManagement: React.FC<FriendManagementProps> = ({
       const result = await initiateFriendRequest(profile.id);
       if (result) {
         setFriendshipStatus('pending');
-        // Toast kept for sent request
+        // No toast message
       }
     } catch (err) {
       console.error('Error sending friend request:', err);
-      toast({
-        title: "Error",
-        description: "Failed to send friend request",
-        variant: "destructive"
-      });
     } finally {
       setIsProcessing(false);
     }
@@ -71,11 +60,6 @@ export const FriendManagement: React.FC<FriendManagementProps> = ({
   
   const confirmUnfriend = async () => {
     if (!currentUserId || !profile?.id) {
-      toast({
-        title: "Error",
-        description: "Unable to remove friend",
-        variant: "destructive"
-      });
       return;
     }
     
@@ -83,7 +67,7 @@ export const FriendManagement: React.FC<FriendManagementProps> = ({
     try {
       const result = await removeFriendship(currentUserId, profile.id);
       if (result) {
-        // No toast for friend removal to reduce notifications
+        // No toast for friend removal
         
         setFriendshipStatus('none');
         
@@ -93,11 +77,6 @@ export const FriendManagement: React.FC<FriendManagementProps> = ({
       }
     } catch (error) {
       console.error('Error removing friend:', error);
-      toast({
-        title: "Error",
-        description: "Failed to remove friend",
-        variant: "destructive"
-      });
     } finally {
       setIsProcessing(false);
       setShowUnfriendDialog(false);
@@ -181,15 +160,10 @@ export const FriendManagement: React.FC<FriendManagementProps> = ({
       
       setFriendshipStatus('accepted');
       
-      // No toast message when accepting request - we're the logged-in user accepting
+      // No toast message when accepting request
       
     } catch (err) {
       console.error('Error accepting friend request:', err);
-      toast({
-        title: "Error",
-        description: "Failed to accept friend request",
-        variant: "destructive"
-      });
     } finally {
       setIsProcessing(false);
     }
@@ -228,11 +202,6 @@ export const FriendManagement: React.FC<FriendManagementProps> = ({
       // No toast for declined request
     } catch (err) {
       console.error('Error declining friend request:', err);
-      toast({
-        title: "Error",
-        description: "Failed to decline friend request",
-        variant: "destructive"
-      });
     } finally {
       setIsProcessing(false);
     }
