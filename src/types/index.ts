@@ -1,7 +1,8 @@
+
 export interface UserProfile {
   id: string;
-  username: string;
-  email: string;
+  username: string | null;
+  email: string | null;
   avatar_url: string[] | null; // Must be string[] to match DB structure
   location: string | null;
   status: string | null;
@@ -21,11 +22,11 @@ export interface Venue {
   street: string;
   postal_code: string;
   city: string;
-  website?: string;
-  google_maps?: string;
-  region?: string;
-  tags?: string | null;
-  slug?: string; // Added missing property
+  website?: string | null;
+  google_maps?: string | null;
+  region?: string | null;
+  tags?: string[] | null;
+  slug?: string | null; // Added missing property
 }
 
 export interface Event {
@@ -34,10 +35,10 @@ export interface Event {
   description: string;
   location?: string;  // Adding back the location property as optional
   event_type?: string;
-  start_time: string;
-  end_time: string;
-  created_at: string;
-  updated_at: string;
+  start_time: string | null;
+  end_time?: string | null;
+  created_at?: string;
+  updated_at?: string;
   image_urls?: string[];
   attendees?: {
     going: number;
@@ -56,7 +57,7 @@ export interface Event {
   venues?: Venue | null;
   venue_id?: string;
   fee?: number;
-  extra_info?: string;
+  extra_info?: string | null;
   tags?: string[];
   coordinates?: [number, number]; // Adding coordinates property
   created_by?: string; // Adding created_by property

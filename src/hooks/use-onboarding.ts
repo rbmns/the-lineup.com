@@ -1,184 +1,254 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { User } from '@supabase/supabase-js';
-import { UserProfile } from '@/types';
-import { toast } from '@/hooks/use-toast';
 
-interface OnboardingStep {
-  id: string;
-  label: string;
-  description: string;
+import { useState } from 'react';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
+import { UserProfile } from '@/types';
+import { toast } from '../hooks/use-toast';
+
+export interface OnboardingData {
+  username: string;
+  avatar_url: string;
+  location: string;
+  location_category: string;
+  status: string;
+  status_details: string;
+  tagline: string;
 }
 
-const steps: OnboardingStep[] = [
-  {
-    id: 'location',
-    label: 'Set your location',
-    description: 'Find events happening near you.',
-  },
-  {
-    id: 'interests',
-    label: 'Choose your interests',
-    description: 'Get personalized event recommendations.',
-  },
-  {
-    id: 'profile',
-    label: 'Customize your profile',
-    description: 'Let others know what you\'re up to.',
-  },
-];
+interface OnboardingStepFields {
+  step1: string[];
+  step2: string[];
+  step3: string[];
+}
 
-export const useOnboarding = (profile: UserProfile | null) => {
-  const [currentStep, setCurrentStep] = useState<string>(steps[0].id);
-  const [completedSteps, setCompletedSteps] = useState<string[]>([]);
-  const [isComplete, setIsComplete] = useState(false);
-  const { updateProfile } = useAuth();
+// Update these definitions as needed
+interface OnboardingStep {
+  title: string;
+  description: string;
+  type: string;
+  fields: string[];
+}
 
-  useEffect(() => {
-    if (profile?.onboarded) {
-      setIsComplete(true);
-      return;
+interface UseOnboardingReturn {
+  currentStep: number;
+  totalSteps: number;
+  steps: OnboardingStep[];
+  stepFields: OnboardingStepFields;
+  onboardingData: Partial<OnboardingData>;
+  loading: boolean;
+  progress: number;
+  completed: boolean;
+  error: string | null;
+  setOnboardingData: (data: Partial<OnboardingData>) => void;
+  moveToNextStep: () => void;
+  moveToPreviousStep: () => void;
+  submitCurrentStep: () => Promise<boolean>;
+  completeOnboarding: () => Promise<boolean>;
+}
+
+export const useOnboarding = (): UseOnboardingReturn => {
+  const { user } = useAuth();
+  const [currentStep, setCurrentStep] = useState(0);
+  const [onboardingData, setOnboardingData] = useState<Partial<OnboardingData>>({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Define steps for onboarding
+  const steps: OnboardingStep[] = [
+    {
+      title: 'Create Your Profile',
+      description: 'Let\'s set up your profile to help connect with others',
+      type: 'profile',
+      fields: ['username', 'avatar_url']
+    },
+    {
+      title: 'Your Location',
+      description: 'Share your location to discover nearby events and people',
+      type: 'location',
+      fields: ['location', 'location_category']
+    },
+    {
+      title: 'Your Status',
+      description: 'Let others know about your current status',
+      type: 'status',
+      fields: ['status', 'status_details', 'tagline']
+    },
+  ];
+
+  const totalSteps = steps.length;
+
+  // Define fields for each step
+  const stepFields: OnboardingStepFields = {
+    step1: ['username', 'avatar_url'],
+    step2: ['location', 'location_category'],
+    step3: ['status', 'status_details', 'tagline'],
+  };
+
+  // Calculate progress
+  const progress = Math.round(((currentStep + 1) / totalSteps) * 100);
+
+  // Check if onboarding is completed
+  const completed = currentStep >= totalSteps;
+
+  // Move to next step
+  const moveToNextStep = () => {
+    if (currentStep < totalSteps - 1) {
+      setCurrentStep(currentStep + 1);
     }
-    
+  };
+
+  // Move to previous step
+  const moveToPreviousStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  // Submit current step
+  const submitCurrentStep = async (): Promise<boolean> => {
+    if (!user) {
+      toast({
+        title: 'Authentication required',
+        description: 'You need to be logged in to complete onboarding.',
+        variant: 'destructive'
+      });
+      return false;
+    }
+
+    setLoading(true);
+    setError(null);
+
     try {
-      if (profile?.onboarding_data) {
-        const savedData = JSON.parse(profile.onboarding_data as string);
-        setCompletedSteps(savedData.completedSteps || []);
-        setCurrentStep(savedData.currentStep || steps[0].id);
+      // Create partial data with only the fields for the current step
+      const stepIndex = currentStep;
+      const stepKey = `step${stepIndex + 1}` as keyof OnboardingStepFields;
+      const fieldsToUpdate = stepFields[stepKey];
+      
+      const updatedData: Partial<UserProfile> = {};
+      
+      fieldsToUpdate.forEach(field => {
+        if (field in onboardingData) {
+          (updatedData as any)[field] = (onboardingData as any)[field];
+        }
+      });
+
+      // Save data to database
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update(updatedData)
+        .eq('id', user.id);
+
+      if (updateError) {
+        throw new Error(updateError.message);
       }
-    } catch (error) {
-      console.error('Error parsing onboarding data:', error);
-    }
-  }, [profile]);
 
-  useEffect(() => {
-    if (completedSteps.length === steps.length) {
-      setIsComplete(true);
-    } else {
-      setIsComplete(false);
-    }
-  }, [completedSteps]);
+      // Move to the next step if not on the last step
+      if (currentStep < totalSteps - 1) {
+        moveToNextStep();
+      }
 
-  const nextStep = () => {
-    const currentIndex = steps.findIndex(step => step.id === currentStep);
-    if (currentIndex < steps.length - 1) {
-      const nextStepId = steps[currentIndex + 1].id;
-      setCurrentStep(nextStepId);
+      toast({
+        title: 'Step completed',
+        description: 'Your information has been saved successfully.'
+      });
+
+      return true;
+    } catch (error: any) {
+      console.error('Error submitting step:', error);
+      setError(error.message);
+      
+      toast({
+        title: 'Error',
+        description: `Failed to save your information: ${error.message}`,
+        variant: 'destructive'
+      });
+      
+      return false;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const prevStep = () => {
-    const currentIndex = steps.findIndex(step => step.id === currentStep);
-    if (currentIndex > 0) {
-      const prevStepId = steps[currentIndex - 1].id;
-      setCurrentStep(prevStepId);
+  // Complete onboarding
+  const completeOnboarding = async (): Promise<boolean> => {
+    if (!user) {
+      toast({
+        title: 'Authentication required',
+        description: 'You need to be logged in to complete onboarding.',
+        variant: 'destructive'
+      });
+      return false;
     }
-  };
 
-  const markComplete = async (user: User | null) => {
-    if (!user) return false;
-    
+    setLoading(true);
+    setError(null);
+
     try {
-      const updatedProfile: Partial<UserProfile> = {
+      // Get the fields for the current step
+      const stepIndex = currentStep;
+      const stepKey = `step${stepIndex + 1}` as keyof OnboardingStepFields;
+      const fieldsToUpdate = stepFields[stepKey];
+      
+      const updatedData: Partial<UserProfile> = {
         onboarded: true,
-        onboarding_data: JSON.stringify({
-          completedSteps: steps.map(s => s.id),
-          currentStep: steps[steps.length - 1].id
-        })
+        onboarding_data: JSON.stringify(onboardingData)
       };
       
-      const { error } = await updateProfile(updatedProfile);
-      
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Could not update profile",
-          variant: "destructive"
-        });
-        return false;
-      }
-      
-      setCompletedSteps(steps.map(s => s.id));
-      setIsComplete(true);
-      return true;
-    } catch (error) {
-      console.error('Error completing onboarding:', error);
-      return false;
-    }
-  };
+      // Also include the fields from the current step
+      fieldsToUpdate.forEach(field => {
+        if (field in onboardingData) {
+          (updatedData as any)[field] = (onboardingData as any)[field];
+        }
+      });
 
-  const saveProgress = async (user: User | null, completedSteps: string[], currentStep: string) => {
-    if (!user) return false;
-    
-    try {
-      const updatedProfile: Partial<UserProfile> = {
-        onboarding_data: JSON.stringify({
-          completedSteps,
-          currentStep,
-        })
-      };
-      
-      const { error } = await updateProfile(updatedProfile);
-      
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Could not save onboarding progress",
-          variant: "destructive"
-        });
-        return false;
-      }
-      
-      setCompletedSteps(completedSteps);
-      setCurrentStep(currentStep);
-      return true;
-    } catch (error) {
-      console.error('Error saving onboarding progress:', error);
-      return false;
-    }
-  };
+      // Save data to database
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update(updatedData)
+        .eq('id', user.id);
 
-  const markOnboardingComplete = async (user: User | null) => {
-    if (!user) return false;
-    
-    try {
-      const updatedProfile: Partial<UserProfile> = {
-        onboarded: true,
-        onboarding_data: JSON.stringify({
-          completedSteps: steps.map(s => s.id),
-          currentStep: steps[steps.length - 1].id
-        })
-      };
-      
-      const { error } = await updateProfile(updatedProfile);
-      
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Could not complete onboarding",
-          variant: "destructive"
-        });
-        return false;
+      if (updateError) {
+        throw new Error(updateError.message);
       }
-      
-      setCompletedSteps(steps.map(s => s.id));
-      setIsComplete(true);
+
+      toast({
+        title: 'Onboarding completed',
+        description: 'Your profile has been set up successfully.'
+      });
+
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error completing onboarding:', error);
+      setError(error.message);
+      
+      toast({
+        title: 'Error',
+        description: `Failed to complete onboarding: ${error.message}`,
+        variant: 'destructive'
+      });
+      
       return false;
+    } finally {
+      setLoading(false);
     }
   };
 
   return {
-    steps,
     currentStep,
-    completedSteps,
-    isComplete,
-    nextStep,
-    prevStep,
-    markComplete,
-    saveProgress,
-    markOnboardingComplete
+    totalSteps,
+    steps,
+    stepFields,
+    onboardingData,
+    loading,
+    progress,
+    completed,
+    error,
+    setOnboardingData,
+    moveToNextStep,
+    moveToPreviousStep,
+    submitCurrentStep,
+    completeOnboarding,
   };
 };
+
+export default useOnboarding;

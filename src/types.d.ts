@@ -1,3 +1,4 @@
+
 export interface UserProfile {
   id: string;
   username: string | null;
@@ -45,7 +46,7 @@ export interface Event {
     going: number;
     interested: number;
   };
-  rsvp_status?: 'Interested' | 'Going';
+  rsvp_status?: 'Interested' | 'Going' | null;
   area?: string | null;
   google_maps?: string | null;
   organizer_link?: string | null;

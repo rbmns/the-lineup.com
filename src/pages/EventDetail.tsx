@@ -119,9 +119,9 @@ const EventDetail = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main event content - takes up 2/3 of the screen on desktop - image always at the top */}
-        <div className="lg:col-span-2 order-first">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Main event content - takes up 8/12 of the screen on desktop */}
+        <div className="lg:col-span-8 order-first">
           <MainEventContent 
             event={event}
             attendees={attendees}
@@ -137,8 +137,8 @@ const EventDetail = () => {
           />
         </div>
         
-        {/* Sidebar content - takes up 1/3 of the screen on desktop */}
-        <div className="lg:col-span-1 order-last">
+        {/* Sidebar content - takes up 4/12 of the screen on desktop */}
+        <div className="lg:col-span-4 order-last">
           <SidebarContent 
             event={event}
             attendees={attendees}

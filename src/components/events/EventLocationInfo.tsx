@@ -1,144 +1,53 @@
 
 import React from 'react';
 import { Venue } from '@/types';
-import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, Map } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface EventLocationInfoProps {
-  venue?: Venue | null;
-  compact?: boolean;
-  className?: string;
-  style?: React.CSSProperties;
+  venue: Venue | null;
 }
 
-export const EventLocationInfo: React.FC<EventLocationInfoProps> = ({
-  venue,
-  compact = false,
-  className = "",
-  style
-}) => {
-  // Don't render anything if no venue data
+export const EventLocationInfo: React.FC<EventLocationInfoProps> = ({ venue }) => {
   if (!venue) {
-    return null;
+    return (
+      <div className="text-gray-500 italic">No location information available</div>
+    );
   }
-  
-  // Extract venue details
-  const { name, street, city, region, slug } = venue;
-  const hasAddress = !!street;
-  const hasName = !!name;
-  
-  // Skip rendering if no useful information
-  if (!hasName && !hasAddress && !city) {
-    return null;
-  }
-  
-  // Create Google Maps URL for directions
-  const getMapsUrl = () => {
-    let query = '';
-    
-    if (name) {
-      query += encodeURIComponent(name);
-    }
-    
-    if (street) {
-      if (query) query += ', ';
-      query += encodeURIComponent(street);
-    }
-    
-    if (city) {
-      if (query) query += ', ';
-      query += encodeURIComponent(city);
-    }
-    
-    if (region) {
-      if (query) query += ', ';
-      query += encodeURIComponent(region);
-    }
-    
-    return `https://www.google.com/maps/search/?api=1&query=${query}`;
-  };
 
-  // Card classes based on compact mode
-  const cardClasses = compact 
-    ? "shadow-sm border border-gray-200" 
-    : "shadow-md border border-gray-200";
+  const formattedAddress = [
+    venue.street,
+    venue.postal_code,
+    venue.city
+  ].filter(Boolean).join(', ');
 
-  // Render venue name as link if slug is available
-  const renderVenueName = () => {
-    if (!hasName) return null;
-    
-    if (slug) {
-      return (
-        <Link 
-          to={`/venues/${slug}`}
-          className="text-gray-900 font-medium hover:text-blue-600 hover:underline"
-        >
-          {name}
-        </Link>
-      );
-    }
-    
-    return <div className="text-gray-900 font-medium">{name}</div>;
-  };
+  const googleMapsUrl = venue.google_maps || 
+    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+      `${venue.name} ${formattedAddress}`
+    )}`;
 
   return (
-    <Card className={`overflow-hidden ${cardClasses} ${className}`} style={style}>
-      <CardContent className={compact ? "p-3" : "p-5"}>
-        <h3 className={`font-medium ${compact ? "text-base mb-2" : "text-lg mb-3"}`}>
-          Location
-        </h3>
-        
-        <div className="space-y-2">
-          {/* Venue name */}
-          {hasName && (
-            <div className="flex items-start gap-2">
-              <MapPin className="h-5 w-5 mt-0.5 text-gray-600 flex-shrink-0" />
-              <div>
-                {renderVenueName()}
-                {hasAddress && (
-                  <div className="text-gray-600 text-sm">{street}</div>
-                )}
-                {(city || region) && (
-                  <div className="text-gray-600 text-sm">
-                    {[city, region].filter(Boolean).join(', ')}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-          
-          {/* Just address if no venue name */}
-          {!hasName && hasAddress && (
-            <div className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-gray-600 flex-shrink-0" />
-              <div className="text-gray-700">
-                {street}
-                {(city || region) && (
-                  <span className="block">
-                    {[city, region].filter(Boolean).join(', ')}
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
+    <div className="space-y-3">
+      <div className="flex items-start gap-2">
+        <MapPin className="h-5 w-5 text-gray-500 mt-1 flex-shrink-0" />
+        <div>
+          <h4 className="font-medium text-base">{venue.name}</h4>
+          <p className="text-gray-600">{formattedAddress}</p>
         </div>
-        
-        {/* Map link */}
-        {(hasName || hasAddress || city) && (
-          <div className={compact ? "mt-2" : "mt-3"}>
-            <a 
-              href={getMapsUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline mt-2"
-            >
-              <Map className="h-4 w-4" />
-              View on map
-            </a>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+      </div>
+      
+      <div className="pt-2">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="w-full"
+          onClick={() => window.open(googleMapsUrl, '_blank')}
+        >
+          View on map
+        </Button>
+      </div>
+    </div>
   );
 };
+
+export default EventLocationInfo;

@@ -6,8 +6,6 @@ import { EventDetailHeader } from '@/components/events/EventDetailHeader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar } from 'lucide-react';
 import { EventDescription } from '@/components/events/EventDescription';
-import { EventLocationInfo } from '@/components/events/EventLocationInfo';
-import { BookingInformation } from '@/components/events/BookingInformation';
 import { AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
 import { formatInTimeZone } from 'date-fns-tz';
 
@@ -120,16 +118,6 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
 
           {/* Event description section */}
           <EventDescription description={event.description} isMobile={isMobile} />
-
-          {/* Location Info */}
-          <div className="pt-4 pb-2">
-            <EventLocationInfo venue={event.venues} />
-          </div>
-
-          {/* Booking Info */}
-          <div className="pb-4">
-            <BookingInformation event={event} />
-          </div>
         </div>
       </CardContent>
     </Card>
