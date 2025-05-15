@@ -5,7 +5,7 @@ import { Check, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface EventRsvpButtonsProps {
-  currentStatus: string | null | undefined;
+  currentStatus?: string | null | undefined;
   onRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
   fullWidth?: boolean;
   size?: 'sm' | 'default' | 'lg';

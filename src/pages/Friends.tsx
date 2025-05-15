@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { FriendsList } from '@/components/friends/FriendsList';
 import { FriendSearch } from '@/components/friends/FriendSearch';
-import { FriendCard } from '@/components/friends/FriendCard';
+import { FriendCard } from '@/components/profile/FriendCard';
 import { FriendRequests } from '@/components/friends/FriendRequests';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -109,28 +109,28 @@ const Friends = () => {
         if (sentError) throw sentError;
 
         // Format the friends data
-        const formattedFriends = friendsData.map(item => ({
+        const formattedFriends = friendsData?.map(item => ({
           id: item.profiles?.id,
           username: item.profiles?.username,
           avatar_url: item.profiles?.avatar_url,
           status: item.profiles?.status,
-        }));
+        })) || [];
 
         // Format the requests data
-        const formattedRequests = requestsData.map(item => ({
+        const formattedRequests = requestsData?.map(item => ({
           id: item.profiles?.id,
           username: item.profiles?.username,
           avatar_url: item.profiles?.avatar_url,
           status: item.profiles?.status,
-        }));
+        })) || [];
 
         // Format the sent requests data
-        const formattedSentRequests = sentData.map(item => ({
+        const formattedSentRequests = sentData?.map(item => ({
           id: item.profiles?.id,
           username: item.profiles?.username,
           avatar_url: item.profiles?.avatar_url,
           status: item.profiles?.status,
-        }));
+        })) || [];
 
         setFriendsList(formattedFriends);
         setFriendRequests(formattedRequests);
@@ -318,17 +318,6 @@ const Friends = () => {
     return true;
   };
 
-  // Create mocked props for components that might be expecting different prop types
-  const mockedFriendsListProps = {
-    friends: friendsList,
-    onRemoveFriend: handleRemoveFriend
-  };
-
-  const mockedFriendSearchProps = {
-    onSearch: handleSearch,
-    isSearching: isSearching
-  };
-
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Friends</h1>
@@ -371,7 +360,6 @@ const Friends = () => {
                     </div>
                   ) : (
                     <>
-                      {/* Pass individual props instead of spreading to avoid type issues */}
                       <FriendsList 
                         friends={friendsList}
                       />
@@ -383,7 +371,6 @@ const Friends = () => {
             
             <TabsContent value="discover">
               <div className="space-y-6">
-                {/* Pass individual props instead of spreading to avoid type issues */}
                 <FriendSearch 
                   query={searchQuery}
                   onQueryChange={handleSearch}

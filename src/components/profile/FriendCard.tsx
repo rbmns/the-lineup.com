@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { UserProfile } from '@/types';
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
@@ -15,45 +16,79 @@ import { FriendCardButtons } from '@/components/friends/FriendCardButtons';
 import { StatusBadgeRenderer } from '@/components/friends/StatusBadgeRenderer';
 
 interface FriendCardProps {
-  profile: UserProfile | UserProfileWithFriendship;
+  // Updated to accept either a profile object or individual properties
+  profile?: UserProfile | UserProfileWithFriendship;
+  // Individual properties for when called with separate props
+  id?: string;
+  username?: string;
+  avatarUrl?: string;
+  status?: string;
   showStatus?: boolean;
   linkToProfile?: boolean;
   friendshipStatus?: 'none' | 'pending' | 'accepted';
+  relationship?: string;
   pendingRequestIds?: string[];
   onAddFriend?: (id: string) => void;
+  onAction?: () => void;
+  onSecondaryAction?: () => void;
+  actionLabel?: string;
+  secondaryActionLabel?: string;
 }
 
 export const FriendCard: React.FC<FriendCardProps> = ({
   profile,
+  id,
+  username,
+  avatarUrl,
+  status,
   showStatus = true,
   linkToProfile = true,
   friendshipStatus = 'none',
+  relationship,
   pendingRequestIds = [],
-  onAddFriend
+  onAddFriend,
+  onAction,
+  onSecondaryAction,
+  actionLabel,
+  secondaryActionLabel
 }) => {
   const isMobile = useIsMobile();
   const { user } = useAuth();
   const { initiateFriendRequest, acceptFriendRequest, declineFriendRequest, isLoading } = useFriendship();
   const navigate = useNavigate();
   
-  const isCurrentUser = user?.id === profile.id;
+  // Use either passed individual props or extract from profile object
+  const profileId = id || profile?.id;
+  const profileUsername = username || profile?.username || 'Anonymous User';
+  const profileAvatarUrl = avatarUrl || profile?.avatar_url;
+  const profileStatus = status || profile?.status;
+  
+  // Create a profile object for components that need it
+  const profileObj = profile || {
+    id: profileId,
+    username: profileUsername,
+    avatar_url: profileAvatarUrl,
+    status: profileStatus
+  };
+  
+  const isCurrentUser = user?.id === profileId;
   
   // Check if profile should be clickable
   const canNavigateToProfile = linkToProfile && isProfileClickable(friendshipStatus, isCurrentUser);
   
   // Improved navigation function using our utility
   const navigateToProfile = (e: React.MouseEvent | React.KeyboardEvent) => {
-    if (!profile.id || !canNavigateToProfile) return;
+    if (!profileId || !canNavigateToProfile) return;
     
     // Stop propagation and prevent default to avoid any parent handling
     e.stopPropagation();
     e.preventDefault();
     
-    console.log(`FriendCard: Navigating to profile: ${profile.id} (at ${new Date().toISOString()})`);
+    console.log(`FriendCard: Navigating to profile: ${profileId} (at ${new Date().toISOString()})`);
     console.log("FriendCard: Event target:", e.target);
     console.log("FriendCard: Current URL:", window.location.href);
     
-    navigateToUserProfile(profile.id, navigate, friendshipStatus, isCurrentUser);
+    navigateToUserProfile(profileId, navigate, friendshipStatus, isCurrentUser);
   };
 
   const handleAddFriend = (id: string) => {
@@ -76,7 +111,7 @@ export const FriendCard: React.FC<FriendCardProps> = ({
           if (success) {
             toast({
               title: "Friend request sent",
-              description: `Friend request sent to ${profile.username}`,
+              description: `Friend request sent to ${profileUsername}`,
               variant: "default"
             });
           }
@@ -98,6 +133,15 @@ export const FriendCard: React.FC<FriendCardProps> = ({
     }
   };
   
+  // Handle actions passed via props
+  const handleAction = () => {
+    if (onAction) {
+      onAction();
+    } else if (relationship === 'none' && profileId) {
+      handleAddFriend(profileId);
+    }
+  };
+  
   // Determine card styling based on clickability
   const cardCursorClass = canNavigateToProfile ? 
     'overflow-hidden transition-all duration-300 p-4 flex flex-col h-full border-gray-200 hover:shadow-md cursor-pointer active:translate-y-0.5' : 
@@ -108,16 +152,16 @@ export const FriendCard: React.FC<FriendCardProps> = ({
       className={cardCursorClass}
       onClick={canNavigateToProfile ? navigateToProfile : undefined}
       role={canNavigateToProfile ? "link" : undefined}
-      aria-label={canNavigateToProfile ? `View ${profile.username}'s profile` : undefined}
+      aria-label={canNavigateToProfile ? `View ${profileUsername}'s profile` : undefined}
       tabIndex={canNavigateToProfile ? 0 : undefined}
       onKeyDown={canNavigateToProfile ? handleKeyDown : undefined}
-      data-profile-id={profile.id}
+      data-profile-id={profileId}
     >
       <div className="flex items-center justify-between flex-1">
         <div className="flex items-center space-x-3 min-w-0">
           <div className="flex-shrink-0">
             <ProfileAvatar
-              profile={profile}
+              profile={profileObj}
               size={isMobile ? "sm" : "md"}
               className="shadow-md"
             />
@@ -126,37 +170,45 @@ export const FriendCard: React.FC<FriendCardProps> = ({
           <div className="flex-1 min-w-0 truncate">
             <div className="text-black transition-colors">
               <h3 className={`font-medium truncate ${canNavigateToProfile ? 'text-gray-800 font-inter hover:underline' : 'text-gray-800 font-inter'}`}>
-                {profile.username || 'Anonymous User'}
+                {profileUsername}
               </h3>
             </div>
 
-            {profile.location && (
+            {/* Location info from profile */}
+            {profile?.location && (
               <div className="flex items-center text-xs text-gray-600 truncate font-inter">
                 <MapPin className="h-3 w-3 mr-1 text-purple flex-shrink-0" />
                 <span className="truncate">{profile.location}</span>
               </div>
             )}
 
-            {showStatus && profile.status && (
+            {showStatus && profileStatus && (
               <div className="flex items-center mt-2">
-                <StatusBadgeRenderer status={profile.status} />
+                <StatusBadgeRenderer status={profileStatus} />
               </div>
             )}
           </div>
         </div>
 
-        {/* Friendship action buttons */}
-        <FriendCardButtons
-          profileId={profile.id}
-          username={profile.username || 'User'}
-          isCurrentUser={isCurrentUser}
-          friendshipStatus={friendshipStatus}
-          isLoading={isLoading}
-          pendingRequestIds={pendingRequestIds}
-          onAddFriend={handleAddFriend}
-          onAcceptRequest={acceptFriendRequest}
-          onDeclineRequest={declineFriendRequest}
-        />
+        {/* Use either the relationship pattern with the FriendCardButtons component, or direct action buttons */}
+        {profileId && relationship ? (
+          <FriendCardButtons
+            profileId={profileId}
+            username={profileUsername}
+            isCurrentUser={isCurrentUser}
+            friendshipStatus={friendshipStatus}
+            isLoading={isLoading} 
+            pendingRequestIds={pendingRequestIds}
+            onAddFriend={handleAddFriend}
+            onAcceptRequest={acceptFriendRequest}
+            onDeclineRequest={declineFriendRequest}
+            relationship={relationship}
+            onAction={onAction}
+            onSecondaryAction={onSecondaryAction}
+            actionLabel={actionLabel}
+            secondaryActionLabel={secondaryActionLabel}
+          />
+        ) : null}
       </div>
     </Card>
   );

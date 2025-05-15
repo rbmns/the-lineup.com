@@ -1,86 +1,58 @@
 
 import { useEffect } from 'react';
 import { Event } from '@/types';
-import { useEventImages } from '@/hooks/useEventImages';
+import { MetaTags } from '@/types/seo';
 
-export const useEventMetaTags = (event: Event | null) => {
-  const { coverImage, getEventImageUrl } = useEventImages();
-
-  useEffect(() => {
-    if (!event) return;
-
+export const useEventMetaTags = (event: Event | null | undefined) => {
+  if (!event) {
+    return null;
+  }
+  
+  const setMetaTags = ({ title, description, imageUrl, path }: MetaTags) => {
     // Set page title
-    document.title = event.title 
-      ? `${event.title} - Event Details` 
-      : 'Event Details';
-
-    // Get OG image - use coverImage from hook or get it directly
-    const imageUrl = coverImage || (getEventImageUrl ? getEventImageUrl(event) : null);
-
-    // Set Open Graph meta tags
+    document.title = title;
+    
+    // Set meta tags
     const metaTags = {
-      'og:title': event.title,
-      'og:description': event.description || `Join us for ${event.title}`,
-      'og:type': 'website',
-      'og:url': window.location.href,
-      'twitter:card': 'summary_large_image',
-      'twitter:title': event.title,
-      'twitter:description': event.description || `Join us for ${event.title}`,
+      'og:title': title,
+      'og:description': description,
+      'og:image': imageUrl,
+      'og:url': `${window.location.origin}${path}`,
+      'twitter:title': title,
+      'twitter:description': description,
+      'twitter:image': imageUrl,
+      'description': description
     };
-
-    if (imageUrl) {
-      metaTags['og:image'] = imageUrl;
-      metaTags['twitter:image'] = imageUrl;
-    }
-
+    
     // Update or create meta tags
     Object.entries(metaTags).forEach(([name, content]) => {
-      let meta = document.querySelector(`meta[property="${name}"]`);
+      if (!content) return;
+      
+      let meta = document.querySelector(`meta[property="${name}"]`) || 
+                 document.querySelector(`meta[name="${name}"]`);
+      
       if (!meta) {
         meta = document.createElement('meta');
-        meta.setAttribute('property', name);
+        if (name.startsWith('og:') || name.startsWith('twitter:')) {
+          meta.setAttribute('property', name);
+        } else {
+          meta.setAttribute('name', name);
+        }
         document.head.appendChild(meta);
       }
+      
       meta.setAttribute('content', content);
     });
-
-    // Clean up function to remove meta tags when component unmounts
-    return () => {
-      // We could remove the tags here, but typically it's better to leave them
-      // in case the page is indexed while navigating away
-    };
-  }, [event, coverImage, getEventImageUrl]);
-  
-  // Return a function to add meta tags manually if needed
-  return {
-    setMetaTags: (metaData: { title: string, description: string, imageUrl: string, path: string }) => {
-      // Implementation for manual meta tag setting
-      document.title = metaData.title;
-      
-      const tags = {
-        'og:title': metaData.title,
-        'og:description': metaData.description,
-        'og:type': 'website',
-        'og:url': `${window.location.origin}${metaData.path}`,
-        'twitter:card': 'summary_large_image',
-        'twitter:title': metaData.title,
-        'twitter:description': metaData.description,
-      };
-      
-      if (metaData.imageUrl) {
-        tags['og:image'] = metaData.imageUrl;
-        tags['twitter:image'] = metaData.imageUrl;
-      }
-      
-      Object.entries(tags).forEach(([name, content]) => {
-        let meta = document.querySelector(`meta[property="${name}"]`);
-        if (!meta) {
-          meta = document.createElement('meta');
-          meta.setAttribute('property', name);
-          document.head.appendChild(meta);
-        }
-        meta.setAttribute('content', content);
-      });
+    
+    // Set canonical link
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
     }
+    canonical.setAttribute('href', `${window.location.origin}${path}`);
   };
+  
+  return { setMetaTags };
 };

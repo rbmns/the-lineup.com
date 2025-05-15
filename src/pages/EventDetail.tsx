@@ -96,7 +96,8 @@ const EventDetail = () => {
             </div>
           )}
           
-          <RelatedEventsSection eventId={event.id} />
+          {/* Use the correct prop name for RelatedEventsSection */}
+          <RelatedEventsSection event={event} />
         </div>
       </div>
       
@@ -109,9 +110,9 @@ const EventDetail = () => {
       )}
       
       <ShareDialog 
-        isOpen={shareDialogOpen} 
-        onOpenChange={setShareDialogOpen}
-        event={event}
+        title={event.title}
+        description={event.description || ""}
+        eventUrl={`${window.location.origin}/events/${event.slug || event.id}`}
       />
     </div>
   );

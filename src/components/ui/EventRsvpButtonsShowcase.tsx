@@ -19,6 +19,7 @@ export const EventRsvpButtonsShowcase = () => {
           <div>
             <h3 className="text-lg font-medium mb-3">Default RSVP Button</h3>
             <EventRsvpButtons
+              currentStatus={null}
               onRsvp={handleDemoRsvp}
             />
           </div>
@@ -51,6 +52,7 @@ export const EventRsvpButtonsShowcase = () => {
               <div>
                 <p className="text-sm text-gray-500 mb-2">Small</p>
                 <EventRsvpButtons
+                  currentStatus={null}
                   onRsvp={handleDemoRsvp}
                   size="sm"
                 />
@@ -58,12 +60,14 @@ export const EventRsvpButtonsShowcase = () => {
               <div>
                 <p className="text-sm text-gray-500 mb-2">Default</p>
                 <EventRsvpButtons
+                  currentStatus={null}
                   onRsvp={handleDemoRsvp}
                 />
               </div>
               <div>
                 <p className="text-sm text-gray-500 mb-2">Large</p>
                 <EventRsvpButtons
+                  currentStatus={null}
                   onRsvp={handleDemoRsvp}
                   size="lg"
                 />
