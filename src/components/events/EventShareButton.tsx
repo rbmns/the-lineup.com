@@ -5,7 +5,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ShareButtons } from './share/ShareButtons';
 import { Share2 } from 'lucide-react';
 import { Event } from '@/types';
-import { toast } from '@/hooks/use-toast';
 import { shareToNative } from '@/utils/sharing/nativeShare';
 import { copyToClipboard } from '@/utils/sharing/clipboardUtils';
 
@@ -50,20 +49,8 @@ const EventShareButton = ({
   };
 
   const handleCopyLink = async () => {
-    const success = await copyToClipboard(getEventUrl());
-    if (success) {
-      toast({
-        title: "Link copied",
-        description: "Event link copied to clipboard",
-      });
-      setIsOpen(false);
-    } else {
-      toast({
-        title: "Failed to copy",
-        description: "Please try again or share manually",
-        variant: "destructive",
-      });
-    }
+    await copyToClipboard(getEventUrl());
+    setIsOpen(false);
   };
 
   return (

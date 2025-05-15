@@ -4,7 +4,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ShareButtons } from './ShareButtons';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { copyToClipboard } from '@/utils/sharing/clipboardUtils';
-import { toast } from '@/hooks/use-toast';
 
 interface ShareDialogProps {
   title: string;
@@ -24,20 +23,8 @@ export const ShareDialog: React.FC<ShareDialogProps> = ({
   const isMobile = useIsMobile();
 
   const handleCopyLink = async () => {
-    const success = await copyToClipboard(eventUrl);
-    if (success) {
-      toast({
-        title: "Link copied to clipboard",
-        description: "You can now paste it anywhere you want",
-      });
-      onOpenChange?.(false);
-    } else {
-      toast({
-        title: "Failed to copy link",
-        description: "Please try again or share manually",
-        variant: "destructive"
-      });
-    }
+    await copyToClipboard(eventUrl);
+    onOpenChange?.(false);
   };
 
   // Adjust dialog size for mobile

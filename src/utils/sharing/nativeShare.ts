@@ -1,7 +1,4 @@
 
-import { toast } from '@/hooks/use-toast';
-import { useIsMobile } from '@/hooks/use-mobile';
-
 export interface NativeShareData {
   url: string;
   title?: string;
@@ -41,11 +38,6 @@ export const shareToNative = async (data: NativeShareData): Promise<boolean> => 
       // User canceled or share failed
       if (error.name !== 'AbortError') {
         console.error('Error sharing content:', error);
-        toast({
-          title: "Sharing failed",
-          description: "There was a problem sharing this content.",
-          variant: "destructive"
-        });
       }
       return false;
     }
@@ -69,13 +61,5 @@ export const shareToNative = async (data: NativeShareData): Promise<boolean> => 
     }
   }
   
-  // If no sharing method worked, notify the user
-  toast({
-    title: "Sharing not supported",
-    description: "Your browser doesn't support direct sharing. You can copy the link instead.",
-    variant: "default"
-  });
-  
   return false;
 };
-

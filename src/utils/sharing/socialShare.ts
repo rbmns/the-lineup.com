@@ -16,36 +16,20 @@ export const shareToFacebook = (data: SocialShare) => {
   return true;
 };
 
-export const shareToInstagram = (data: SocialShare) => {
-  // Instagram doesn't have a direct web sharing API like other platforms
-  // We'll use a toast to tell users to copy the link and share manually
-  // This is a common pattern for Instagram sharing
-  alert('Instagram does not support direct sharing. Copy the link and share via Instagram app.');
-  return false;
-};
-
 export const shareToWhatsApp = (data: SocialShare) => {
   const text = `${data.title} - ${data.url}`;
-  const url = new URL('https://api.whatsapp.com/send');
-  url.searchParams.append('text', text);
+  let whatsappUrl;
   
-  window.open(url.toString(), 'whatsapp-share', 'width=580,height=296');
-  return true;
-};
-
-export const shareToEmail = (data: SocialShare) => {
-  const subject = encodeURIComponent(data.title);
-  const body = encodeURIComponent(`${data.text}\n\n${data.url}`);
-  window.location.href = `mailto:?subject=${subject}&body=${body}`;
-  return true;
-};
-
-export const shareToTelegram = (data: SocialShare) => {
-  const url = new URL('https://t.me/share/url');
-  url.searchParams.append('url', data.url);
-  url.searchParams.append('text', data.title);
+  // Check if it's mobile or desktop
+  if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    // Mobile
+    whatsappUrl = `whatsapp://send?text=${encodeURIComponent(text)}`;
+  } else {
+    // Desktop
+    whatsappUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+  }
   
-  window.open(url.toString(), 'telegram-share', 'width=580,height=296');
+  window.open(whatsappUrl, '_blank');
   return true;
 };
 

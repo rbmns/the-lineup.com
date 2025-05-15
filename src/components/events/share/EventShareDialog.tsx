@@ -4,7 +4,6 @@ import { Event } from "@/types";
 import { ShareButtons } from "./ShareButtons";
 import { copyToClipboard } from "@/utils/sharing/clipboardUtils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { toast } from "@/hooks/use-toast";
 import { ShareTrigger } from "./ShareTrigger";
 
 export interface EventShareDialogProps {
@@ -25,20 +24,8 @@ export function EventShareDialog({ event, isOpen, onOpenChange }: EventShareDial
   };
 
   const handleCopyLink = async () => {
-    const success = await copyToClipboard(getEventUrl());
-    if (success) {
-      toast({
-        title: "Link copied to clipboard",
-        description: "You can now paste it anywhere you want",
-      });
-      onOpenChange(false);
-    } else {
-      toast({
-        title: "Failed to copy link",
-        description: "Please try again or share manually",
-        variant: "destructive"
-      });
-    }
+    await copyToClipboard(getEventUrl());
+    onOpenChange(false);
   };
 
   // Adjust dialog size for mobile
