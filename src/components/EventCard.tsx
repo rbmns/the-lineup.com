@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { MapPin } from 'lucide-react';
@@ -10,12 +9,13 @@ import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { formatEventTime, formatDate, AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
 
-interface EventCardProps {
+export interface EventCardProps {
   event: Event;
   compact?: boolean;
   showRsvpButtons?: boolean;
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   className?: string;
+  onClick?: (event: Event) => void; // Added onClick handler
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -23,7 +23,8 @@ const EventCard: React.FC<EventCardProps> = ({
   compact = false,
   showRsvpButtons = false,
   onRsvp,
-  className
+  className,
+  onClick
 }) => {
   const { getEventImageUrl } = useEventImages();
   const { navigateToEvent } = useEventNavigation();
@@ -48,18 +49,24 @@ const EventCard: React.FC<EventCardProps> = ({
   };
 
   const handleClick = () => {
-    // Make sure we have all required properties for proper navigation
-    if (event && event.id) {
-      navigateToEvent({
-        ...event,
-        id: event.id,
-        destination: event.destination,
-        slug: event.slug,
-        start_time: event.start_time,
-        title: event.title
-      });
+    if (onClick) {
+      // Use the provided onClick handler if available
+      onClick(event);
     } else {
-      console.error("Cannot navigate: Missing event ID", event);
+      // Otherwise use the default navigation
+      // Make sure we have all required properties for proper navigation
+      if (event && event.id) {
+        navigateToEvent({
+          ...event,
+          id: event.id,
+          destination: event.destination,
+          slug: event.slug,
+          start_time: event.start_time,
+          title: event.title
+        });
+      } else {
+        console.error("Cannot navigate: Missing event ID", event);
+      }
     }
   };
 

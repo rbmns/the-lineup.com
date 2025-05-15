@@ -28,7 +28,7 @@ export const UserFeed: React.FC<UserFeedProps> = ({ events, handleRsvpAction }) 
             event={event}
             onRsvp={handleRsvpAction}
             showRsvpButtons={isAuthenticated}
-            onClick={() => handleEventClick(event)}
+            onClick={handleEventClick}
           />
         </div>
       ))}

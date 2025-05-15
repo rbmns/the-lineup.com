@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
@@ -370,7 +369,7 @@ const DesignSystem = () => {
               <div className="space-y-2">
                 <p className="text-sm font-medium">Going</p>
                 <div className="flex gap-2">
-                  <Button variant="success" size="sm" className="flex items-center gap-1.5">
+                  <Button variant="default" size="sm" className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700">
                     <Check className="h-4 w-4" /> Going
                   </Button>
                   <Button variant="outline" size="sm" className="flex items-center gap-1.5">
@@ -385,7 +384,7 @@ const DesignSystem = () => {
                   <Button variant="outline" size="sm" className="flex items-center gap-1.5">
                     <Check className="h-4 w-4" /> Going
                   </Button>
-                  <Button variant="primary" size="sm" className="flex items-center gap-1.5 bg-blue-500">
+                  <Button variant="default" size="sm" className="flex items-center gap-1.5 bg-blue-500 hover:bg-blue-600">
                     <Star className="h-4 w-4" /> Interested
                   </Button>
                 </div>
