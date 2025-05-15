@@ -1,40 +1,36 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Event } from '@/types';
-import { EventDetailHeader } from '@/components/events/EventDetailHeader';
-import { EventDetailContent } from '@/components/events/EventDetailContent';
-import { RelatedEventsSection } from '@/components/events/RelatedEventsSection';
-import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
-import { MobileRsvpFooter } from '@/components/events/MobileRsvpFooter';
-import { EventDetailErrorState } from '@/components/events/EventDetailErrorState';
-import { EventDetailLoadingState } from '@/components/events/EventDetailLoadingState';
-import { ShareDialog } from '@/components/events/share/ShareDialog';
 import { useEventDetailParams } from '@/hooks/useEventDetailParams';
 import { useEventDetails } from '@/hooks/useEventDetails';
 import { useEventImages } from '@/hooks/useEventImages';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { useEventMetaTags } from '@/hooks/useEventMetaTags';
-import { useRsvpActions } from '@/hooks/useRsvpActions';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDeviceDetection } from '@/hooks/useDeviceDetection';
 import { useEventDetailHandlers } from '@/hooks/useEventDetailHandlers';
 import { toast } from '@/hooks/use-toast';
+import { ChevronLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { EventDetailErrorState } from '@/components/events/EventDetailErrorState';
+import { EventDetailLoadingState } from '@/components/events/EventDetailLoadingState';
+import { ShareDialog } from '@/components/events/share/ShareDialog';
+import { MainEventContent } from '@/components/events/MainEventContent';
+import { EventLocationInfo } from '@/components/events/EventLocationInfo';
+import { BookingInformation } from '@/components/events/BookingInformation';
+import { EventFriendRsvps } from '@/components/events/EventFriendRsvps';
+import { MobileRsvpFooter } from '@/components/events/MobileRsvpFooter';
+import { RelatedEventsSection } from '@/components/events/RelatedEventsSection';
 
 const EventDetail = () => {
   // Use our comprehensive params hook to get all URL parameters
   const { id, eventId, eventSlug, hasTransitionState } = useEventDetailParams();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { isMobile } = useDeviceDetection();
   
   // Use proper ID for data fetching, prefer explicit ID over slug
   const effectiveId = id || eventId || '';
-  
-  // Log for debugging
-  useEffect(() => {
-    console.log(`EventDetail page: Rendering with ID: ${effectiveId}, eventId: ${eventId}, eventSlug: ${eventSlug}`);
-  }, [effectiveId, eventId, eventSlug]);
   
   // Safety check - if no valid ID is available, redirect to events page
   useEffect(() => {
@@ -71,7 +67,7 @@ const EventDetail = () => {
     wrapRsvpWithScrollPreservation
   } = useEventDetailHandlers();
   
-  // Enhanced RSVP with scroll preservation - Fix the return type issue
+  // Enhanced RSVP with scroll preservation
   const handleRsvpEvent = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     try {
       await handleRsvp(status);
@@ -81,6 +77,11 @@ const EventDetail = () => {
       return false;
     }
   };
+  
+  // Format date for display
+  const formattedDate = event?.start_time ? new Date(event.start_time).toLocaleDateString(
+    'en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }
+  ) : null;
   
   // Set metadata for SEO
   useEffect(() => {
@@ -109,38 +110,78 @@ const EventDetail = () => {
     );
   }
 
+  const shareUrl = `${window.location.origin}/events/${event.slug || event.id}`;
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <EventDetailHeader 
-        event={event}
-        coverImage={coverImage}
-        onEventTypeClick={() => handleEventTypeClick(event.event_type)}
-      />
-      
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="container mx-auto px-4 pt-6 pb-16">
+      {/* Back button for mobile */}
+      {isMobile && (
+        <div className="mb-4">
+          <Button 
+            variant="ghost" 
+            onClick={handleBackToEvents}
+            size="sm"
+            className="flex items-center gap-1.5 text-gray-600"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back to Events
+          </Button>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main event content - takes up 2/3 of the screen on desktop */}
         <div className="lg:col-span-2">
-          <EventDetailContent 
+          <MainEventContent 
             event={event}
-            onRsvp={handleRsvpEvent}
-            isRsvpLoading={rsvpLoading}
-            isOwner={event.created_by === event.creator?.id}
+            attendees={attendees}
+            isAuthenticated={isAuthenticated}
+            rsvpLoading={rsvpLoading}
+            handleRsvp={handleRsvpEvent}
+            isMobile={isMobile}
+            imageUrl={coverImage}
+            formattedDate={formattedDate}
+            shareUrl={shareUrl}
+            handleEventTypeClick={handleEventTypeClick}
+            handleBackToEvents={handleBackToEvents}
+          />
+
+          {/* Related Events Section - always show */}
+          <div className="mt-12">
+            <RelatedEventsSection event={event} />
+          </div>
+        </div>
+        
+        {/* Sidebar content - takes up 1/3 of the screen on desktop */}
+        <div className="space-y-6 order-first lg:order-last">
+          {/* Location Card */}
+          <EventLocationInfo 
+            venue={event.venues} 
+            className="shadow-md"
           />
           
-          {!isMobile && isAuthenticated && (
-            <div className="mt-8 flex space-x-4">
-              <EventRsvpButtons 
-                currentStatus={event.rsvp_status} 
-                onRsvp={handleRsvpEvent}
-                className="w-full"
-                size="lg"
-              />
+          {/* Booking Information Card */}
+          <BookingInformation 
+            event={event} 
+            className="shadow-md"
+          />
+          
+          {/* Friends/Attendees Card */}
+          {isAuthenticated && (
+            <div className="bg-white rounded-lg border shadow-md">
+              <div className="p-5">
+                <h3 className="text-md font-semibold mb-3">Friends Attending</h3>
+                <EventFriendRsvps 
+                  going={attendees?.going || []} 
+                  interested={attendees?.interested || []} 
+                />
+              </div>
             </div>
           )}
-          
-          <RelatedEventsSection event={event} />
         </div>
       </div>
       
+      {/* Mobile RSVP Footer */}
       {isMobile && isAuthenticated && (
         <MobileRsvpFooter 
           currentStatus={event.rsvp_status} 
@@ -149,10 +190,11 @@ const EventDetail = () => {
         />
       )}
       
+      {/* Share Dialog */}
       <ShareDialog 
         title={event.title}
         description={event.description || ""}
-        eventUrl={`${window.location.origin}/events/${event.slug || event.id}`}
+        eventUrl={shareUrl}
         open={shareDialogOpen}
         onOpenChange={setShareDialogOpen}
       />

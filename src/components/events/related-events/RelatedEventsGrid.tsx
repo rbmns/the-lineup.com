@@ -8,10 +8,13 @@ interface RelatedEventsGridProps {
 }
 
 export const RelatedEventsGrid: React.FC<RelatedEventsGridProps> = ({ events }) => {
-  // We always want to show at least 2 events, but we handle that in the parent component
-  // This component should just render what it's given
+  // If no events, show a message
   if (!events || events.length === 0) {
-    return null;
+    return (
+      <div className="p-4 bg-gray-50 rounded-md text-center">
+        <p className="text-gray-500">No similar events found</p>
+      </div>
+    );
   }
 
   // Ensure we're working with a stable array

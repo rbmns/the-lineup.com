@@ -11,7 +11,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface RelatedEventsProps {
-  eventId: string;  // Changed from currentEventId to eventId
+  eventId: string;
   venueId?: string;
   eventType?: string;
   tags?: string[];
@@ -19,21 +19,21 @@ interface RelatedEventsProps {
 }
 
 export const RelatedEvents: React.FC<RelatedEventsProps> = ({ 
-  eventId, // Changed from currentEventId to match what RelatedEventsSection passes
+  eventId,
   venueId,
-  eventType = '', // Set default value for eventType
+  eventType = '',
   tags,
   vibe
 }) => {
-  const { user } = useAuth(); // Get the current user to pass to the hook
+  const { user } = useAuth();
   const hasFetchedRef = useRef(false);
   const { relatedEvents, loading } = useFetchRelatedEvents({
     eventType,
-    currentEventId: eventId, // Map eventId to currentEventId
-    userId: user?.id, // Pass the userId to fetch RSVP status
+    currentEventId: eventId,
+    userId: user?.id,
     tags,
     vibe,
-    minResults: 2
+    minResults: 2 // Always ensure at least 2 results
   });
   
   const navigate = useNavigate();
@@ -53,10 +53,8 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
     return <RelatedEventsLoader />;
   }
   
-  // If no related events found, return null (hide the component completely)
-  if (relatedEvents.length === 0) {
-    return null;
-  }
+  // Always show the component even if we have no related events
+  // The hook will try its best to find at least 2 events
   
   return (
     <div className="animate-fade-in space-y-4" style={{ animationDelay: '400ms' }}>
