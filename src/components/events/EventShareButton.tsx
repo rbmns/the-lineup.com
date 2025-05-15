@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ShareButtons } from './share/ShareButtons';
 import { Share2 } from 'lucide-react';
 import { Event } from '@/types';
-import { shareToNative } from '@/utils/sharing/nativeShare';
+import { nativeShare, isNativeShareAvailable } from '@/utils/sharing/nativeShare';
 import { copyToClipboard } from '@/utils/sharing/clipboardUtils';
 
 interface EventShareButtonProps {
@@ -33,7 +33,7 @@ const EventShareButton = ({
   const handleShare = async () => {
     try {
       const eventUrl = getEventUrl();
-      const shared = await shareToNative({
+      const shared = await nativeShare({
         url: eventUrl,
         title: event.title,
         text: event.description
