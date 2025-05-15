@@ -113,15 +113,14 @@ const ToastDescription = React.forwardRef<
 ))
 ToastDescription.displayName = ToastPrimitives.Description.displayName
 
-type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
-
 type ToastActionElement = React.ReactElement<typeof ToastAction>
 
-export type ToasterToast = ToastProps & {
+export type ToasterToast = {
   id: string
   title?: React.ReactNode
   description?: React.ReactNode
   action?: ToastActionElement
+  variant?: "default" | "destructive" | "success" | "warning" | "info"
 }
 
 type ToasterProps = React.ComponentPropsWithoutRef<typeof ToastProvider> & {
@@ -150,27 +149,6 @@ export const Toaster = ({ toasts = [], ...props }: ToasterProps) => {
   )
 }
 
-export type { ToastProps, ToastActionElement }
-
-export {
-  Toast,
-  ToastAction,
-  ToastClose,
-  ToastDescription,
-  ToastProvider,
-  ToastTitle,
-  ToastViewport,
-}
-
-// Add the missing useToast function with proper typing
-type ToastType = ToasterToast & {
-  id: string
-  title?: React.ReactNode
-  description?: React.ReactNode
-  action?: ToastActionElement
-  variant?: "default" | "destructive" | "success" | "warning" | "info"
-}
-
 const TOAST_LIMIT = 5
 const TOAST_REMOVE_DELAY = 1000000
 
@@ -193,11 +171,11 @@ type ActionType = typeof actionTypes
 type Action =
   | {
       type: ActionType["ADD_TOAST"]
-      toast: ToastType
+      toast: ToasterToast
     }
   | {
       type: ActionType["UPDATE_TOAST"]
-      toast: Partial<ToastType>
+      toast: Partial<ToasterToast>
     }
   | {
       type: ActionType["DISMISS_TOAST"]
@@ -209,7 +187,7 @@ type Action =
     }
 
 interface State {
-  toasts: ToastType[]
+  toasts: ToasterToast[]
 }
 
 const toastTimeouts = new Map()
@@ -316,7 +294,7 @@ export function useToast() {
   }
 }
 
-export type ToastProps = Partial<ToastType>
+export type ToastProps = ToasterToast
 
 export function toast(props: ToastProps) {
   const id = genId()
@@ -346,4 +324,14 @@ export function toast(props: ToastProps) {
     dismiss,
     update,
   }
+}
+
+export {
+  Toast,
+  ToastAction,
+  ToastClose,
+  ToastDescription,
+  ToastProvider,
+  ToastTitle,
+  ToastViewport,
 }

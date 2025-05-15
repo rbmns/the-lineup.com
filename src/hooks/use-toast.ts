@@ -33,3 +33,5 @@ export const toast = (props: ToastProps) => {
   // Call the original toast function
   return toastOriginal(props);
 };
+
+export type { ToastProps };
