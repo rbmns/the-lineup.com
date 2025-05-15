@@ -1,6 +1,6 @@
 
 import { useToast as useToastOriginal } from "@/components/ui/toast";
-import { toast as toastOriginal } from "@/components/ui/use-toast";
+import { toast as toastOriginal, type ToastProps } from "@/components/ui/toast";
 
 // Re-export toast functionality with enhanced behavior
 export const useToast = () => {
@@ -14,10 +14,12 @@ export const useToast = () => {
 let lastToastMessage = '';
 let lastToastTimestamp = 0;
 
-export const toast = (props: Parameters<typeof toastOriginal>[0]) => {
+export const toast = (props: ToastProps) => {
   // If toast is called with the same message within 2 seconds, ignore it
   const currentTime = Date.now();
-  const message = typeof props === 'string' ? props : props.description || props.title || '';
+  const message = typeof props === 'string' 
+    ? props 
+    : (props?.description?.toString() || props?.title?.toString() || '');
   
   if (message === lastToastMessage && currentTime - lastToastTimestamp < 2000) {
     console.log('Prevented duplicate toast:', message);

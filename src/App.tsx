@@ -9,8 +9,6 @@ import Friends from "./pages/Friends";
 import UserProfilePage from "./pages/UserProfilePage";
 import Login from "./pages/Login";
 import { AuthProvider } from "./contexts/AuthContext";
-import { useToast } from "./hooks/use-toast";
-import { Toaster } from "./components/ui/toaster";
 import { ToastProvider } from "./contexts/ToastContext";
 
 const App: React.FC = () => {
@@ -28,7 +26,6 @@ const App: React.FC = () => {
             <Route path="*" element={<EventsPageRefactored />} />
           </Route>
         </Routes>
-        <Toaster />
       </ToastProvider>
     </AuthProvider>
   );

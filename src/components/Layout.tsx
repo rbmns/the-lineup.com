@@ -5,7 +5,6 @@ import MainNav from './MainNav';
 import { Footer } from './ui/footer';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
-import { Toaster } from "@/components/ui/toaster";
 
 const Layout: React.FC = () => {
   const location = useLocation();
@@ -46,9 +45,6 @@ const Layout: React.FC = () => {
       
       {/* Only show footer on certain pages */}
       {!isLoginOrGoodbye && <Footer />}
-      
-      {/* Add Toaster component for notifications */}
-      <Toaster />
     </div>
   );
 };
