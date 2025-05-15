@@ -2,7 +2,6 @@
 import { supabase } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
 import { useState } from 'react';
 
 export const useRsvpActions = (userId?: string) => {
@@ -14,11 +13,7 @@ export const useRsvpActions = (userId?: string) => {
     setLoading(true);
     
     if (!isAuthenticated || !user) {
-      toast({
-        title: "Authentication required",
-        description: "Please log in to RSVP to events",
-        variant: "destructive",
-      });
+      // Removed toast message
       navigate('/login');
       return false;
     }
@@ -42,20 +37,11 @@ export const useRsvpActions = (userId?: string) => {
 
           if (error) {
             console.error('Error updating RSVP:', error);
-            toast({
-              title: "RSVP Error",
-              description: "Failed to update your RSVP status",
-              variant: "destructive",
-            });
             setLoading(false);
             return false;
           }
-
-          toast({
-            title: "RSVP Updated",
-            description: `You're now marked as ${status}`,
-            variant: "default",
-          });
+          
+          // Removed toast message
           setLoading(false);
           return true;
         } else {
@@ -67,20 +53,11 @@ export const useRsvpActions = (userId?: string) => {
 
           if (error) {
             console.error('Error removing RSVP:', error);
-            toast({
-              title: "RSVP Error",
-              description: "Failed to remove your RSVP",
-              variant: "destructive",
-            });
             setLoading(false);
             return false;
           }
-
-          toast({
-            title: "RSVP Removed",
-            description: "Your RSVP has been removed",
-            variant: "default",
-          });
+          
+          // Removed toast message
           setLoading(false);
           return true;
         }
@@ -92,30 +69,16 @@ export const useRsvpActions = (userId?: string) => {
 
         if (error) {
           console.error('Error creating RSVP:', error);
-          toast({
-            title: "RSVP Error",
-            description: `Failed to mark you as ${status}`,
-            variant: "destructive",
-          });
           setLoading(false);
           return false;
         }
-
-        toast({
-          title: "RSVP Confirmed",
-          description: `You're now marked as ${status}`,
-          variant: "default",
-        });
+        
+        // Removed toast message
         setLoading(false);
         return true;
       }
     } catch (error) {
       console.error('Error in RSVP process:', error);
-      toast({
-        title: "RSVP Error",
-        description: "Failed to update RSVP status",
-        variant: "destructive",
-      });
       setLoading(false);
       return false;
     }

@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { CheckCircle2, Star } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
 
 interface EventRsvpButtonsProps {
   currentStatus: 'Going' | 'Interested' | null;
@@ -77,29 +76,16 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       setOptimisticStatus(newStatus);
       
       // Call the actual RSVP handler
-      const success = await onRsvp(status);
+      await onRsvp(status);
       
-      if (!success) {
-        // Revert optimistic update if the backend call fails
-        setOptimisticStatus(currentStatus);
-        
-        toast({
-          title: "RSVP failed",
-          description: "Could not update your RSVP status. Please try again.",
-          variant: "destructive"
-        });
-      }
+      // No toast messages as requested
     } catch (error) {
       console.error('Error updating RSVP:', error);
       
       // Revert optimistic update
       setOptimisticStatus(currentStatus);
       
-      toast({
-        title: "RSVP Error",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive"
-      });
+      // No toast message on error either
     } finally {
       // Add a small delay to prevent rapid re-clicking
       setTimeout(() => setLocalLoading(false), 300);

@@ -56,85 +56,85 @@ const getCategoryColor = (category: string): string => {
   
   // Festival - Amber/Orange
   if (lowerCategory.includes('festival')) {
-    return 'bg-amber-100 text-amber-800 hover:bg-amber-200 border-amber-200';
+    return 'bg-amber-500 text-white hover:bg-amber-600';
   }
   
-  // Wellness - Lime
+  // Wellness - Lime Green
   if (lowerCategory.includes('wellness')) {
-    return 'bg-lime-100 text-lime-800 hover:bg-lime-200 border-lime-200';
+    return 'bg-lime-500 text-white hover:bg-lime-600';
   }
   
-  // Kite - Ocean Deep
+  // Kite - Deep Teal
   if (lowerCategory.includes('kite')) {
-    return 'bg-[#005F73] text-white hover:bg-opacity-90 border-[#005F73]';
+    return 'bg-[#005F73] text-white hover:bg-opacity-90';
   }
   
-  // Beach - Sand
+  // Beach - Soft Orange
   if (lowerCategory.includes('beach')) {
-    return 'bg-[#FFCC99] text-[#CA6702] hover:bg-opacity-90 border-[#FFCC99]';
+    return 'bg-[#FFCC99] text-[#CA6702] hover:bg-[#FFBB77]';
   }
   
   // Game - Purple
   if (lowerCategory.includes('game')) {
-    return 'bg-purple-100 text-purple-800 hover:bg-purple-200 border-purple-200';
+    return 'bg-purple-600 text-white hover:bg-purple-700';
   }
   
   // Sports
   if (lowerCategory.includes('sports') || lowerCategory.includes('fitness')) {
-    return 'bg-[#66CC66] text-white hover:bg-opacity-90 border-[#66CC66]';
+    return 'bg-[#66CC66] text-white hover:bg-[#55BB55]';
   }
   
   // Surf
   if (lowerCategory.includes('surf')) {
-    return 'bg-[#0099CC] text-white hover:bg-opacity-90 border-[#0099CC]';
+    return 'bg-[#0099CC] text-white hover:bg-[#0088BB]';
   }
   
   // Party - Coral
   if (lowerCategory.includes('party')) {
-    return 'bg-[#FF6666] text-white hover:bg-opacity-90 border-[#FF6666]';
+    return 'bg-[#FF6666] text-white hover:bg-[#FF5555]';
   }
   
-  // Yoga - Lime/Green
+  // Yoga - Bright Green
   if (lowerCategory.includes('yoga')) {
-    return 'bg-[#99CC33] text-white hover:bg-opacity-90 border-[#99CC33]';
+    return 'bg-[#99CC33] text-white hover:bg-[#88BB22]';
   }
   
-  // Community - Dusk
+  // Community - Purple
   if (lowerCategory.includes('community') || 
       lowerCategory.includes('networking') ||
       lowerCategory.includes('meetup')) {
-    return 'bg-[#9966FF] text-white hover:bg-opacity-90 border-[#9966FF]';
+    return 'bg-[#9966FF] text-white hover:bg-[#8855EE]';
   }
   
   // Water - Teal
   if (lowerCategory.includes('water')) {
-    return 'bg-[#00CCCC] text-white hover:bg-opacity-90 border-[#00CCCC]';
+    return 'bg-[#00CCCC] text-white hover:bg-[#00BBBB]';
   }
   
-  // Music - Twilight
+  // Music - Purple/Blue
   if (lowerCategory.includes('music') || 
       lowerCategory.includes('concert')) {
-    return 'bg-[#5E60CE] text-white hover:bg-opacity-90 border-[#5E60CE]';
+    return 'bg-[#5E60CE] text-white hover:bg-[#4D4FBD]';
   }
   
-  // Food - Coral
+  // Food - Coral Red
   if (lowerCategory.includes('food') || 
       lowerCategory.includes('dining')) {
-    return 'bg-[#FF6666] text-white hover:bg-opacity-90 border-[#FF6666]';
+    return 'bg-[#FF6666] text-white hover:bg-[#FF5555]';
   }
   
-  // Market - Sunset
+  // Market - Orange
   if (lowerCategory.includes('market')) {
-    return 'bg-[#FF9933] text-white hover:bg-opacity-90 border-[#FF9933]';
+    return 'bg-[#FF9933] text-white hover:bg-[#FF8822]';
   }
   
   // Other - Gray (default)
   if (lowerCategory.includes('other')) {
-    return 'bg-gray-100 text-gray-800 hover:bg-gray-200 border-gray-200';
+    return 'bg-gray-500 text-white hover:bg-gray-600';
   }
   
-  // Default
-  return 'bg-gray-100 text-gray-800 hover:bg-gray-200 border-gray-200';
+  // Default - if no match is found
+  return 'bg-gray-500 text-white hover:bg-gray-600';
 };
 
 interface CategoryPillProps {
@@ -176,7 +176,7 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
   return (
     <div
       className={cn(
-        'rounded-full font-medium transition-colors flex items-center border',
+        'rounded-full font-medium transition-colors flex items-center',
         colorClasses,
         sizeClasses[size],
         onClick ? 'cursor-pointer' : 'cursor-default',

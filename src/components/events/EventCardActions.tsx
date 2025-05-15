@@ -4,7 +4,6 @@ import { EventRsvpButtons } from './EventRsvpButtons';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Users } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
 
 interface EventCardActionsProps {
   eventId: string;
@@ -71,10 +70,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       // Revert if the operation failed
       if (!success) {
         setLocalRsvpStatus(currentRsvpStatus);
-        toast({
-          description: "Failed to update RSVP status",
-          variant: "destructive"
-        });
+        // Removed toast
       }
       
       return success;
