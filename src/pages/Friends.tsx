@@ -11,6 +11,7 @@ import { toast } from '@/hooks/use-toast';
 import { useFriendship, Friendship } from '@/hooks/useFriendship';
 import { UserProfile } from '@/types'; // Import as a type alias
 import { FriendsTabContent } from '@/components/friends/FriendsTabContent';
+import { FriendRequestWithProfile } from '@/types/friends-extended';
 
 // Define a type for the friend item that includes the profile
 interface FriendItem {
@@ -22,7 +23,7 @@ interface FriendItem {
   profile: {
     id: string;
     username: string;
-    avatar_url: string | null;
+    avatar_url: string[] | null;  // Changed to array to match profile structure
     email: string;
   };
 }
@@ -94,7 +95,7 @@ const Friends = () => {
             profile: {
               id: friendProfile.id,
               username: friendProfile.username,
-              avatar_url: Array.isArray(friendProfile.avatar_url) && friendProfile.avatar_url.length > 0 ? friendProfile.avatar_url[0] : null,
+              avatar_url: friendProfile.avatar_url, // Keep as array as it comes from the database
               email: friendProfile.email
             }
           };
@@ -145,7 +146,7 @@ const Friends = () => {
             profile: {
               id: requestProfile.id,
               username: requestProfile.username,
-              avatar_url: Array.isArray(requestProfile.avatar_url) && requestProfile.avatar_url.length > 0 ? requestProfile.avatar_url[0] : null,
+              avatar_url: requestProfile.avatar_url, // Keep as array as it comes from the database
               email: requestProfile.email
             }
           };
@@ -325,7 +326,7 @@ const Friends = () => {
   const formattedFriends = friends?.map(friend => ({
     id: friend.profile.id,
     username: friend.profile.username,
-    avatar_url: friend.profile.avatar_url ? [friend.profile.avatar_url] : null,
+    avatar_url: friend.profile.avatar_url, // This stays as an array
     email: friend.profile.email,
     location: null,
     status: null,
@@ -342,16 +343,16 @@ const Friends = () => {
     profile: {
       id: request.profile.id,
       username: request.profile.username,
-      avatar_url: request.profile.avatar_url ? [request.profile.avatar_url] : null,
+      avatar_url: request.profile.avatar_url, // This stays as an array
       email: request.profile.email
     }
   })) || [];
 
   return (
     <FriendsTabContent
-      friends={formattedFriends as unknown as UserProfile[]}
+      friends={formattedFriends as UserProfile[]}
       loading={friendsLoading || authLoading}
-      requests={formattedRequests}
+      requests={formattedRequests as FriendRequestWithProfile[]}
       onAcceptRequest={handleAcceptFriendRequest}
       onDeclineRequest={handleRejectFriendRequest}
       showFriendRequests={true}
