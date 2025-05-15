@@ -1,8 +1,7 @@
 
 import React from 'react';
 import { EventTypeIcon } from "@/components/ui/EventTypeIcon";
-import { X, Calendar } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Calendar } from "lucide-react";
 import { EventShareButton } from './EventShareButton';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { useEventImages } from '@/hooks/useEventImages';
@@ -55,6 +54,14 @@ export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({
           src={imageToUse}
           alt={title}
           className="w-full aspect-[3/2] md:aspect-[16/9] object-cover transition-all duration-700"
+          onError={(e) => {
+            // Handle image load errors by setting a default
+            const target = e.target as HTMLImageElement;
+            if (!target.src.includes('default')) {
+              console.log('Image failed to load, using default');
+              target.src = "https://res.cloudinary.com/dita7stkt/image/upload/v1745876584/default_yl5ndt.jpg";
+            }
+          }}
         />
         
         {/* Desktop overlay with title and date - only shown on desktop */}
@@ -82,8 +89,8 @@ export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({
           <EventShareButton 
             title={title}
             url={shareUrl}
-            description="" // Skip description for better social sharing
-            event={event} // Pass the event object for SEO-friendly URLs
+            description={description || ""}
+            event={event}
           />
         </div>
         

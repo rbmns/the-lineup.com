@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { EventCategoryIcon } from './event-category-icon';
+import { EventCategoryIcon, IconSize } from './event-category-icon';
 import { eventTypeColors } from '@/utils/eventImages';
 import { cn } from '@/lib/utils';
 
@@ -34,6 +34,16 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
     lg: "px-4 py-1.5 text-base"
   };
   
+  // Map component size to icon size
+  const getIconSize = (): IconSize => {
+    switch (size) {
+      case 'sm': return 'sm';
+      case 'lg': return 'lg';
+      case 'default':
+      default: return 'md';
+    }
+  };
+  
   // Base styling with hover and active states
   const pillClass = cn(
     colorConfig.default.bg,
@@ -53,7 +63,10 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
     >
       {showIcon ? (
         <div className="flex items-center gap-1">
-          <EventCategoryIcon category={normalizedCategory} size={size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md'} />
+          <EventCategoryIcon 
+            category={normalizedCategory} 
+            size={getIconSize()} 
+          />
           <span>{category}</span>
         </div>
       ) : (

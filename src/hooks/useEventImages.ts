@@ -2,7 +2,6 @@
 import { Event } from '@/types';
 import { getEventFallbackImage } from '@/utils/eventImages';
 import { processImageUrls } from '@/utils/imageUtils';
-import { defaultSeoTags } from '@/utils/seoUtils';
 
 // Default fallback image for any event
 const DEFAULT_EVENT_IMAGE = "https://res.cloudinary.com/dita7stkt/image/upload/v1745876584/default_yl5ndt.jpg";
@@ -11,8 +10,8 @@ export const useEventImages = () => {
   /**
    * Get a fallback image for an event type and optional tags
    */
-  const getDefaultEventImage = (eventType: Event['event_type'], tags?: string[]) => {
-    // Try to get an image based on event type
+  const getDefaultEventImage = (eventType: Event['event_type'], tags?: string[]): string => {
+    // Try to get an image based on event type and tags
     const typeFallback = getEventFallbackImage(eventType, tags);
     
     // If no specific type fallback is found, use the default fallback
@@ -22,8 +21,6 @@ export const useEventImages = () => {
   /**
    * Processes image URLs from events and returns a valid URL or fallback
    * Ensures consistent image representation across the app
-   * @param event The event object containing possible image URLs
-   * @returns A valid image URL or fallback image URL
    */
   const getEventImageUrl = (event: Event | null): string => {
     if (!event) return DEFAULT_EVENT_IMAGE;
@@ -40,22 +37,18 @@ export const useEventImages = () => {
       }
     }
     
-    // Get tags from the event if available
+    // Extract tags from the event if available
     let tags: string[] | undefined;
     if (event.tags) {
       // Handle tags whether they're already an array or a string that needs parsing
       if (Array.isArray(event.tags)) {
         tags = event.tags;
       } else if (typeof event.tags === 'string') {
-        // Explicitly check the type again to help TypeScript narrow the type
-        const tagString: string = event.tags;
-        tags = tagString.split(',').map(tag => tag.trim());
+        tags = event.tags.split(',').map(tag => tag.trim());
       }
-      // If event.tags exists but is neither array nor string,
-      // tags will remain undefined
     }
     
-    // Use consistent fallback logic, with DEFAULT_EVENT_IMAGE as the ultimate fallback
+    // Use the fallback system to find an appropriate image
     return getDefaultEventImage(event.event_type, tags);
   };
 

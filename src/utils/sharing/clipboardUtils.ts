@@ -1,40 +1,37 @@
 
-import { toast } from '@/hooks/use-toast';
+/**
+ * Clipboard sharing utilities
+ */
 
 /**
- * Copies URL to clipboard and shows toast notification
- * with improved handling for iOS and Android differences
+ * Check if the clipboard API is available
  */
-export const copyToClipboard = (url: string) => {
-  navigator.clipboard.writeText(url)
-    .then(() => {
-      toast({
-        description: "Link copied to clipboard!",
-      });
-    })
-    .catch(() => {
-      // Fallback method for older browsers or restricted environments
-      const textarea = document.createElement('textarea');
-      textarea.value = url;
-      textarea.style.position = 'fixed';
-      textarea.style.opacity = '0';
-      document.body.appendChild(textarea);
-      textarea.focus();
-      textarea.select();
-      
-      try {
-        document.execCommand('copy');
-        toast({
-          description: "Link copied to clipboard!",
-        });
-      } catch (err) {
-        toast({
-          title: "Couldn't copy",
-          description: "Please manually copy the URL from your browser's address bar.",
-        });
-      }
-      
-      document.body.removeChild(textarea);
-    });
-  return true;
+export const canUseClipboard = (): boolean => {
+  return !!navigator.clipboard;
+};
+
+/**
+ * Copy text to clipboard
+ */
+export const copyToClipboard = async (text: string): Promise<boolean> => {
+  try {
+    if (!canUseClipboard()) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      return successful;
+    }
+    
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch (error) {
+    console.error('Error copying to clipboard:', error);
+    return false;
+  }
 };
