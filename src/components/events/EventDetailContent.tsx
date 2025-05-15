@@ -1,3 +1,4 @@
+
 import { useMemo } from 'react';
 import { Event } from '@/types';
 import {
@@ -74,7 +75,7 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
     }
   }, [event.start_time, event.end_time]);
   
-  // Process tags for display - carefully handling all possible types
+  // Process tags for display - properly handle all possible types
   const eventTags = useMemo(() => {
     // If tags is undefined or null, return empty array
     if (!event.tags) return [];
