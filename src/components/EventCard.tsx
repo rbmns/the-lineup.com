@@ -49,7 +49,12 @@ const EventCard: React.FC<EventCardProps> = ({
     return formatEventTime(event.start_time, event.end_time);
   };
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    // Check if click originated from RSVP buttons
+    if ((e.target as HTMLElement).closest('[data-rsvp-container="true"]')) {
+      return; // Don't navigate if clicked on RSVP buttons
+    }
+    
     if (onClick) {
       // Use the provided onClick handler if available
       onClick(event);
@@ -98,30 +103,18 @@ const EventCard: React.FC<EventCardProps> = ({
       onClick={handleClick}
       data-event-id={event.id}
     >
-      {/* Image container with absolute positioned category pill */}
+      {/* Image container - removed the category pill */}
       <div className="aspect-[16/9] relative overflow-hidden">
         <img
           src={imageUrl}
           alt={event.title}
           className="h-full w-full object-cover transition-transform group-hover:scale-105 duration-300"
         />
-        
-        {/* Event type pill positioned at top of image */}
-        {event.event_type && (
-          <div className="absolute top-3 left-3 z-10">
-            <CategoryPill 
-              category={event.event_type} 
-              size="sm" 
-              showIcon={true} 
-              className="bg-white/90 backdrop-blur-sm shadow-sm"
-            />
-          </div>
-        )}
       </div>
 
       {/* Content Section - Updated layout */}
       <div className="p-4 flex flex-col flex-grow space-y-2">
-        {/* Title - Now first */}
+        {/* Title - First */}
         <h3 className={cn(
           "font-semibold text-gray-900",
           compact ? "text-base line-clamp-2" : "text-xl line-clamp-2"
@@ -129,7 +122,18 @@ const EventCard: React.FC<EventCardProps> = ({
           {event.title}
         </h3>
         
-        {/* Date & Time - Now second */}
+        {/* Event Category - Now placed after the title */}
+        {event.event_type && (
+          <div className="flex flex-wrap gap-2 my-1">
+            <CategoryPill 
+              category={event.event_type} 
+              size="sm" 
+              showIcon={true}
+            />
+          </div>
+        )}
+        
+        {/* Date & Time */}
         <div className="text-sm text-gray-600 font-medium">
           {event.start_time && (
             <>
@@ -138,18 +142,22 @@ const EventCard: React.FC<EventCardProps> = ({
           )}
         </div>
         
-        {/* Venue/Location - Now third */}
+        {/* Venue/Location */}
         <div className="flex items-center text-sm text-gray-500">
           <MapPin className="h-3.5 w-3.5 mr-1 flex-shrink-0" />
           <span className="truncate">{event.venues?.name || event.location || 'No location'}</span>
         </div>
         
         {/* Spacer to push RSVP buttons to bottom */}
-        <div className="flex-grow"></div>
+        <div className="flex-grow min-h-[8px]"></div>
         
         {/* RSVP Buttons - only if needed */}
         {showRsvpButtons && (
-          <div className="mt-2">
+          <div 
+            className="mt-2" 
+            data-rsvp-container="true"
+            onClick={(e) => e.stopPropagation()}
+          >
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}

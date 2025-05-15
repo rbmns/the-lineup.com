@@ -1,7 +1,8 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import "./styles/rsvp-animations.css";
 
 @layer base {
   :root {

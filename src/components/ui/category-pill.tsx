@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Calendar, Music, Globe, Users, Film, Book, Dumbbell, Utensils, Tag, Waves, Tent, Leaf, Sun, Sailboat, PartyPopper, BadgeCheck } from 'lucide-react';
+import { Calendar, Music, Globe, Users, Film, Book, Dumbbell, Utensils, Tag, Waves, Tent, Leaf, Sun, Sailboat, PartyPopper, BadgeCheck, Gamepad } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type CategoryIconMapping = {
@@ -32,7 +31,9 @@ const categoryIconMapping: CategoryIconMapping = {
   'beach': Sun,
   'kite': Sailboat,
   'party': PartyPopper,
-  'market': BadgeCheck
+  'market': BadgeCheck,
+  'game': Gamepad,
+  'other': Calendar
 };
 
 const getCategoryIcon = (category: string): React.ElementType => {
@@ -49,85 +50,91 @@ const getCategoryIcon = (category: string): React.ElementType => {
   return Tag;
 };
 
+// Enhanced color mapping based on the design system color palette
 const getCategoryColor = (category: string): string => {
   const lowerCategory = category.toLowerCase();
   
-  // Festival
+  // Festival - Amber/Orange
   if (lowerCategory.includes('festival')) {
-    return 'bg-amber-100 text-amber-800 hover:bg-amber-200';
+    return 'bg-amber-100 text-amber-800 hover:bg-amber-200 border-amber-200';
   }
   
-  // Wellness
+  // Wellness - Lime
   if (lowerCategory.includes('wellness')) {
-    return 'bg-lime-100 text-lime-800 hover:bg-lime-200';
+    return 'bg-lime-100 text-lime-800 hover:bg-lime-200 border-lime-200';
   }
   
-  // Kite
+  // Kite - Ocean Deep
   if (lowerCategory.includes('kite')) {
-    return 'bg-ocean-deep text-white hover:bg-opacity-90';
+    return 'bg-[#005F73] text-white hover:bg-opacity-90 border-[#005F73]';
   }
   
-  // Beach
+  // Beach - Sand
   if (lowerCategory.includes('beach')) {
-    return 'bg-sand text-sandstone hover:bg-opacity-90';
+    return 'bg-[#FFCC99] text-[#CA6702] hover:bg-opacity-90 border-[#FFCC99]';
   }
   
-  // Game
+  // Game - Purple
   if (lowerCategory.includes('game')) {
-    return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
+    return 'bg-purple-100 text-purple-800 hover:bg-purple-200 border-purple-200';
   }
   
   // Sports
   if (lowerCategory.includes('sports') || lowerCategory.includes('fitness')) {
-    return 'bg-leaf text-white hover:bg-opacity-90';
+    return 'bg-[#66CC66] text-white hover:bg-opacity-90 border-[#66CC66]';
   }
   
   // Surf
   if (lowerCategory.includes('surf')) {
-    return 'bg-ocean-medium text-white hover:bg-opacity-90';
+    return 'bg-[#0099CC] text-white hover:bg-opacity-90 border-[#0099CC]';
   }
   
-  // Party
+  // Party - Coral
   if (lowerCategory.includes('party')) {
-    return 'bg-coral text-white hover:bg-opacity-90';
+    return 'bg-[#FF6666] text-white hover:bg-opacity-90 border-[#FF6666]';
   }
   
-  // Yoga
+  // Yoga - Lime/Green
   if (lowerCategory.includes('yoga')) {
-    return 'bg-lime text-white hover:bg-opacity-90';
+    return 'bg-[#99CC33] text-white hover:bg-opacity-90 border-[#99CC33]';
   }
   
-  // Community
+  // Community - Dusk
   if (lowerCategory.includes('community') || 
       lowerCategory.includes('networking') ||
       lowerCategory.includes('meetup')) {
-    return 'bg-dusk text-white hover:bg-opacity-90';
+    return 'bg-[#9966FF] text-white hover:bg-opacity-90 border-[#9966FF]';
   }
   
-  // Water
+  // Water - Teal
   if (lowerCategory.includes('water')) {
-    return 'bg-teal text-white hover:bg-opacity-90';
+    return 'bg-[#00CCCC] text-white hover:bg-opacity-90 border-[#00CCCC]';
   }
   
-  // Music
+  // Music - Twilight
   if (lowerCategory.includes('music') || 
       lowerCategory.includes('concert')) {
-    return 'bg-twilight text-white hover:bg-opacity-90';
+    return 'bg-[#5E60CE] text-white hover:bg-opacity-90 border-[#5E60CE]';
   }
   
-  // Food
+  // Food - Coral
   if (lowerCategory.includes('food') || 
       lowerCategory.includes('dining')) {
-    return 'bg-coral text-white hover:bg-opacity-90';
+    return 'bg-[#FF6666] text-white hover:bg-opacity-90 border-[#FF6666]';
   }
   
-  // Market
+  // Market - Sunset
   if (lowerCategory.includes('market')) {
-    return 'bg-sunset text-white hover:bg-opacity-90';
+    return 'bg-[#FF9933] text-white hover:bg-opacity-90 border-[#FF9933]';
+  }
+  
+  // Other - Gray (default)
+  if (lowerCategory.includes('other')) {
+    return 'bg-gray-100 text-gray-800 hover:bg-gray-200 border-gray-200';
   }
   
   // Default
-  return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+  return 'bg-gray-100 text-gray-800 hover:bg-gray-200 border-gray-200';
 };
 
 interface CategoryPillProps {
@@ -169,7 +176,7 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
   return (
     <div
       className={cn(
-        'rounded-full font-medium transition-colors flex items-center',
+        'rounded-full font-medium transition-colors flex items-center border',
         colorClasses,
         sizeClasses[size],
         onClick ? 'cursor-pointer' : 'cursor-default',

@@ -1,6 +1,7 @@
+
 import { useState, useCallback } from 'react';
 import { useOptimisticRsvp } from '@/hooks/event-rsvp/useOptimisticRsvp';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/use-toast';
 
 /**
  * Enhanced RSVP handler that combines optimistic updates with better UI feedback
@@ -26,10 +27,14 @@ export const useEnhancedRsvp = (userId: string | undefined) => {
       // Handle the RSVP with optimistic UI updates
       const result = await optimisticRsvp(eventId, status);
       
-      // Success case doesn't need a toast, removed
+      // Success but no toast needed - the UI updates optimistically
       return result;
     } catch (error) {
       console.error('Error in enhanced RSVP handler:', error);
+      toast({
+        description: "Failed to update your RSVP. Please try again.",
+        variant: "destructive"
+      });
       return false;
     } finally {
       // Clear loading state after completion

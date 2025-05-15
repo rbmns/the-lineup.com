@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { CheckCircle2, Star } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 interface EventRsvpButtonsProps {
   currentStatus: 'Going' | 'Interested' | null;
@@ -21,21 +22,23 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   className,
   showStatusOnly = false,
 }) => {
-  // Add local loading state to prevent double-clicks
+  // Add local loading state to prevent double-clicks and show optimistic updates
   const [localLoading, setLocalLoading] = useState(false);
+  const [optimisticStatus, setOptimisticStatus] = useState<'Going' | 'Interested' | null>(currentStatus);
+  
   const isLoading = loading || localLoading;
 
   // If we're only showing status, render a simple indicator
-  if (showStatusOnly && currentStatus) {
+  if (showStatusOnly && optimisticStatus) {
     return (
       <div className="flex items-center text-sm">
         <div className={cn(
           "px-2 py-1 rounded-full flex items-center gap-1 text-xs",
-          currentStatus === 'Going' 
+          optimisticStatus === 'Going' 
             ? "bg-green-100 text-green-700" 
             : "bg-blue-100 text-blue-700"
         )}>
-          {currentStatus === 'Going' ? (
+          {optimisticStatus === 'Going' ? (
             <>
               <CheckCircle2 className="h-3.5 w-3.5" />
               <span>Going</span>
@@ -66,45 +69,81 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     
     try {
       setLocalLoading(true);
-      await onRsvp(status);
+      
+      // Determine the new status (toggle behavior)
+      const newStatus = optimisticStatus === status ? null : status;
+      
+      // Update optimistically for better UX
+      setOptimisticStatus(newStatus);
+      
+      // Call the actual RSVP handler
+      const success = await onRsvp(status);
+      
+      if (!success) {
+        // Revert optimistic update if the backend call fails
+        setOptimisticStatus(currentStatus);
+        
+        toast({
+          title: "RSVP failed",
+          description: "Could not update your RSVP status. Please try again.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error updating RSVP:', error);
+      
+      // Revert optimistic update
+      setOptimisticStatus(currentStatus);
+      
+      toast({
+        title: "RSVP Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       // Add a small delay to prevent rapid re-clicking
-      setTimeout(() => setLocalLoading(false), 500);
+      setTimeout(() => setLocalLoading(false), 300);
     }
   };
 
   return (
-    <div className={cn("flex gap-2", className)}>
+    <div 
+      className={cn("flex gap-2", className)}
+      data-no-navigation="true"
+      onClick={(e) => e.stopPropagation()}
+    >
       <Button 
-        variant={currentStatus === 'Going' ? "default" : "outline"}
+        variant={optimisticStatus === 'Going' ? "default" : "outline"}
         className={cn(
           buttonClasses,
-          "flex items-center gap-1.5",
-          currentStatus === 'Going' 
+          "flex items-center gap-1.5 flex-1 sm:flex-none",
+          optimisticStatus === 'Going' 
             ? "bg-green-600 hover:bg-green-700 text-white rsvp-going-animation"
             : "hover:border-green-600 hover:text-green-600"
         )}
         disabled={isLoading}
         onClick={() => handleRsvp('Going')}
+        data-no-navigation="true"
       >
         <CheckCircle2 className="h-4 w-4" />
-        <span>{currentStatus === 'Going' ? 'Going' : 'Going'}</span>
+        <span className="whitespace-nowrap">{optimisticStatus === 'Going' ? 'Going' : 'Going'}</span>
       </Button>
       
       <Button 
-        variant={currentStatus === 'Interested' ? "default" : "outline"}
+        variant={optimisticStatus === 'Interested' ? "default" : "outline"}
         className={cn(
           buttonClasses,
-          "flex items-center gap-1.5",
-          currentStatus === 'Interested' 
+          "flex items-center gap-1.5 flex-1 sm:flex-none",
+          optimisticStatus === 'Interested' 
             ? "bg-blue-600 hover:bg-blue-700 text-white rsvp-interested-animation" 
             : "hover:border-blue-600 hover:text-blue-600"
         )}
         disabled={isLoading}
         onClick={() => handleRsvp('Interested')}
+        data-no-navigation="true"
       >
         <Star className="h-4 w-4" />
-        <span>Interested</span>
+        <span className="whitespace-nowrap">Interested</span>
       </Button>
     </div>
   );

@@ -1,252 +1,171 @@
 
-import { useState, useCallback, useRef } from 'react';
-import { supabase } from '@/lib/supabase';
-import { toast } from 'sonner';
+import { useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
+import { toast } from '@/components/ui/use-toast';
 
-/**
- * Hook that provides optimistic RSVP actions using React Query's cache
- */
 export const useOptimisticRsvp = (userId: string | undefined) => {
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
-  const isProcessingRef = useRef(false);
-  const toastShownRef = useRef(false);
+
+  // Helper to update all relevant caches with the new RSVP status
+  const updateCaches = useCallback((eventId: string, status: 'Going' | 'Interested' | null, oldStatus?: 'Going' | 'Interested' | null) => {
+    // Update events in the cache
+    queryClient.setQueriesData({ queryKey: ['events'] }, (oldData: any) => {
+      if (!Array.isArray(oldData)) return oldData;
+      
+      return oldData.map((event: Event) => {
+        if (event.id === eventId) {
+          // Update the event with new RSVP status
+          return {
+            ...event,
+            rsvp_status: status,
+            // Update attendee counts
+            attendees: {
+              ...event.attendees,
+              going: updateAttendeeCount(event.attendees?.going || 0, 'Going', oldStatus, status),
+              interested: updateAttendeeCount(event.attendees?.interested || 0, 'Interested', oldStatus, status),
+            }
+          };
+        }
+        return event;
+      });
+    });
+    
+    // Update single event in the cache if it exists
+    queryClient.setQueryData(['event', eventId], (oldData: any) => {
+      if (!oldData) return oldData;
+      
+      return {
+        ...oldData,
+        rsvp_status: status,
+        attendees: {
+          ...oldData.attendees,
+          going: updateAttendeeCount(oldData.attendees?.going || 0, 'Going', oldStatus, status),
+          interested: updateAttendeeCount(oldData.attendees?.interested || 0, 'Interested', oldStatus, status),
+        }
+      };
+    });
+    
+    // Also update user events if present
+    queryClient.setQueriesData({ queryKey: ['user-events'] }, (oldData: any) => {
+      if (!Array.isArray(oldData)) return oldData;
+      
+      // Map through any user events and update those with matching eventId
+      return oldData.map((item: any) => {
+        // Handle different formats of user events data
+        const eventToUpdate = item.event || item;
+        
+        if (eventToUpdate.id === eventId) {
+          return {
+            ...item,
+            rsvp_status: status,
+            event: item.event ? {
+              ...item.event,
+              rsvp_status: status
+            } : undefined
+          };
+        }
+        return item;
+      });
+    });
+  }, [queryClient]);
+  
+  // Helper function to calculate new attendee counts
+  const updateAttendeeCount = (
+    currentCount: number,
+    countType: 'Going' | 'Interested',
+    oldStatus?: 'Going' | 'Interested' | null,
+    newStatus?: 'Going' | 'Interested' | null
+  ): number => {
+    let count = currentCount;
+    
+    // Remove from old count if needed
+    if (oldStatus === countType && newStatus !== countType) {
+      count = Math.max(0, count - 1);
+    }
+    
+    // Add to new count if needed
+    if (oldStatus !== countType && newStatus === countType) {
+      count += 1;
+    }
+    
+    return count;
+  };
 
   const handleRsvp = useCallback(async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
-    // Prevent concurrent RSVP operations
-    if (isProcessingRef.current) {
-      console.log("Already processing an RSVP request, ignoring");
-      return false;
-    }
+    if (!userId) return false;
+    setLoading(true);
 
-    if (!userId) {
-      // Only show toast once per session to avoid spamming
-      if (!toastShownRef.current) {
-        toast("Please log in to RSVP to events");
-        toastShownRef.current = true;
-        // Reset after 5 seconds
-        setTimeout(() => { toastShownRef.current = false }, 5000);
-      }
-      return false;
-    }
-
-    console.log(`OptimisticRsvp: Starting - User ${userId}, Event ${eventId}, Status ${status}`);
-    
     try {
-      isProcessingRef.current = true;
+      console.log(`OptimisticRsvp: Processing RSVP for event ${eventId} with status ${status}`);
       
-      // Store current scroll position right at the beginning
-      const scrollPosition = window.scrollY;
-      
-      // Capture existing cache state for potential rollback
-      const previousEventsData = queryClient.getQueryData<Event[]>(['events', userId]);
-      const previousEventData = queryClient.getQueryData<Event>(['event', eventId]);
-      
-      // Get current RSVP status for optimistic update
+      // Check current RSVP status first
       const { data: existingRsvp, error: checkError } = await supabase
         .from('event_rsvps')
         .select('id, status')
-        .eq('user_id', userId)
         .eq('event_id', eventId)
+        .eq('user_id', userId)
         .maybeSingle();
+
+      if (checkError) throw checkError;
+
+      // Store the old status for cache updates
+      const oldStatus = existingRsvp?.status as 'Going' | 'Interested' | null;
       
-      if (checkError) {
-        console.error("Error checking existing RSVP:", checkError);
-        throw checkError;
-      }
-      
-      const oldStatus = existingRsvp?.status as 'Going' | 'Interested' | undefined;
-      console.log("Current RSVP status:", oldStatus);
-      
-      // Calculate what the new status will be
-      let newRsvpStatus: 'Going' | 'Interested' | null = status;
-      
-      // Toggle behavior - if same status is clicked, it will turn off
+      // Determine if we're toggling or changing status
+      let newStatus: 'Going' | 'Interested' | null = status;
       if (oldStatus === status) {
-        newRsvpStatus = null;
-        console.log("Toggling off RSVP status");
+        // If clicking the same status, remove it (toggle off)
+        newStatus = null;
       }
+
+      // Update UI optimistically before the network request completes
+      updateCaches(eventId, newStatus, oldStatus);
       
-      // Perform optimistic UI updates
-      setLoading(true);
-      
-      // Update events cache (main events list) - careful not to trigger re-renders
-      queryClient.setQueriesData<Event[]>({ queryKey: ['events'] }, (oldData) => {
-        if (!oldData) return oldData;
-        
-        return oldData.map(event => {
-          if (event.id === eventId) {
-            return {
-              ...event,
-              rsvp_status: newRsvpStatus || undefined,
-              attendees: {
-                going: calculateAttendeeCount(event, 'going', oldStatus, newRsvpStatus),
-                interested: calculateAttendeeCount(event, 'interested', oldStatus, newRsvpStatus)
-              }
-            };
-          }
-          return event;
-        });
-      });
-      
-      // Update individual event cache if it exists
-      queryClient.setQueriesData<Event>({ queryKey: ['event', eventId] }, (oldData) => {
-        if (!oldData) return oldData;
-        
-        return {
-          ...oldData,
-          rsvp_status: newRsvpStatus || undefined,
-          attendees: {
-            going: calculateAttendeeCount(oldData, 'going', oldStatus, newRsvpStatus),
-            interested: calculateAttendeeCount(oldData, 'interested', oldStatus, newRsvpStatus)
-          }
-        };
-      });
-      
-      // Create a promise to track the save operation
-      const savePromise = (async () => {
-        try {
-          // Perform the database operation
-          console.log("Updating database in background...");
-          
-          if (existingRsvp && newRsvpStatus === null) {
-            // Delete the RSVP if toggling off
-            console.log("Deleting RSVP (toggle off)");
-            const { error: deleteError } = await supabase
-              .from('event_rsvps')
-              .delete()
-              .eq('id', existingRsvp.id);
-              
-            if (deleteError) {
-              console.error("Error deleting RSVP:", deleteError);
-              throw deleteError;
-            }
-          } else if (existingRsvp) {
-            // Update existing RSVP
-            console.log("Updating RSVP to:", newRsvpStatus);
-            const { error: updateError } = await supabase
-              .from('event_rsvps')
-              .update({ status: newRsvpStatus })
-              .eq('id', existingRsvp.id);
-              
-            if (updateError) {
-              console.error("Error updating RSVP:", updateError);
-              throw updateError;
-            }
-          } else if (newRsvpStatus) {
-            // Create new RSVP
-            console.log("Creating new RSVP with status:", newRsvpStatus);
-            const { error: insertError } = await supabase
-              .from('event_rsvps')
-              .insert({
-                user_id: userId,
-                event_id: eventId,
-                status: newRsvpStatus
-              });
-              
-            if (insertError) {
-              console.error("Error creating RSVP:", insertError);
-              throw insertError;
-            }
-          }
-          
-          // Limited toast notification to prevent disruptive UX
-          if (!toastShownRef.current) {
-            const action = newRsvpStatus === null ? "Removed" : 
-                          newRsvpStatus === "Going" ? "Going to" : "Interested in";
-            toast(`${action} event`, {
-              duration: 1500,
-            });
-            
-            // Limit toast frequency
-            toastShownRef.current = true;
-            setTimeout(() => { toastShownRef.current = false }, 3000);
-          }
-          
-          console.log("Database update completed successfully");
-          return true;
-        } catch (error) {
-          console.error("Database operation failed:", error);
-          return false;
-        }
-      })();
-      
-      // Wait for the save promise to complete
-      const result = await savePromise;
-      
-      if (!result) {
-        throw new Error("Database operation failed");
+      // Perform the actual database update
+      if (existingRsvp && newStatus === null) {
+        // Delete the RSVP
+        const { error } = await supabase
+          .from('event_rsvps')
+          .delete()
+          .eq('id', existingRsvp.id);
+
+        if (error) throw error;
+      } else if (existingRsvp) {
+        // Update existing RSVP
+        const { error } = await supabase
+          .from('event_rsvps')
+          .update({ status: newStatus })
+          .eq('id', existingRsvp.id);
+
+        if (error) throw error;
+      } else {
+        // Create new RSVP
+        const { error } = await supabase
+          .from('event_rsvps')
+          .insert([{ event_id: eventId, user_id: userId, status }]);
+
+        if (error) throw error;
       }
-      
-      // Restore scroll position
-      setTimeout(() => {
-        window.scrollTo({
-          top: scrollPosition,
-          behavior: 'auto'
-        });
-      }, 10);
-      
-      console.log(`OptimisticRsvp: Completed successfully for event ${eventId}`);
+
+      // No toast needed - we're using optimistic UI updates
+      console.log(`OptimisticRsvp: Successfully processed RSVP`);
       return true;
     } catch (error) {
-      console.error("Error in OptimisticRsvp:", error);
+      console.error('OptimisticRsvp error:', error);
       
-      // Store the variables in this scope for rollback
-      const previousEventsData = queryClient.getQueryData<Event[]>(['events', userId]);
-      const previousEventData = queryClient.getQueryData<Event>(['event', eventId]);
+      // Revert the optimistic update in the cache
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] });
+      queryClient.invalidateQueries({ queryKey: ['user-events'] });
       
-      // Revert optimistic updates if there was an error
-      if (previousEventsData) {
-        queryClient.setQueryData(['events', userId], previousEventsData);
-      }
-      
-      if (previousEventData) {
-        queryClient.setQueryData(['event', eventId], previousEventData);
-      }
-      
-      // Limit toast frequency
-      if (!toastShownRef.current) {
-        toast("Failed to update RSVP status");
-        toastShownRef.current = true;
-        setTimeout(() => { toastShownRef.current = false }, 3000);
-      }
       return false;
     } finally {
       setLoading(false);
-      
-      // Reset processing flag after a small delay
-      setTimeout(() => {
-        isProcessingRef.current = false;
-      }, 300);
     }
-  }, [userId, queryClient]);
-
-  // Helper function to calculate new attendee counts
-  const calculateAttendeeCount = (
-    event: Event, 
-    type: 'going' | 'interested',
-    oldStatus?: 'Going' | 'Interested',
-    newStatus?: 'Going' | 'Interested' | null
-  ) => {
-    const currentCount = event.attendees?.[type] || 0;
-    
-    if (oldStatus === capitalizeFirst(type) && newStatus !== capitalizeFirst(type)) {
-      return Math.max(0, currentCount - 1);
-    }
-    
-    if (newStatus === capitalizeFirst(type) && oldStatus !== capitalizeFirst(type)) {
-      return currentCount + 1;
-    }
-    
-    return currentCount;
-  };
-  
-  // Helper to capitalize first letter
-  const capitalizeFirst = (str: string): string => {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
+  }, [userId, updateCaches, queryClient]);
 
   return {
     handleRsvp,

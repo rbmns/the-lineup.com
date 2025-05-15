@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { EventRsvpButtons } from './EventRsvpButtons';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Users } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 interface EventCardActionsProps {
   eventId: string;
@@ -30,6 +31,9 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
   compact = false,
   useSmallButtons = false
 }) => {
+  const [localRsvpStatus, setLocalRsvpStatus] = useState<'Going' | 'Interested' | undefined>(currentRsvpStatus);
+  const [isLoading, setIsLoading] = useState(false);
+
   // If we don't need to show any actions, return null
   if (!showRsvpButtons && !showRsvpStatus && !showFriendRsvp) {
     return null;
@@ -40,6 +44,11 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
     
     try {
       console.log('EventCardActions - Handling RSVP for event:', eventId, status);
+      setIsLoading(true);
+      
+      // Set optimistic status update
+      const newStatus = localRsvpStatus === status ? undefined : status;
+      setLocalRsvpStatus(newStatus);
       
       // Add improved visual feedback with animation
       const eventCard = document.querySelector(`[data-event-id="${eventId}"]`);
@@ -57,10 +66,24 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       }
       
       const result = await onRsvp(eventId, status);
-      return result === undefined ? true : !!result; // Convert void to boolean if needed
+      const success = result === undefined ? true : !!result;
+      
+      // Revert if the operation failed
+      if (!success) {
+        setLocalRsvpStatus(currentRsvpStatus);
+        toast({
+          description: "Failed to update RSVP status",
+          variant: "destructive"
+        });
+      }
+      
+      return success;
     } catch (error) {
       console.error('EventCardActions - Error handling RSVP:', error);
+      setLocalRsvpStatus(currentRsvpStatus); // Revert on error
       return false;
+    } finally {
+      setTimeout(() => setIsLoading(false), 300); // Small delay to prevent rapid clicks
     }
   };
 
@@ -76,6 +99,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       )}
       data-no-navigation="true"
       data-rsvp-container="true"
+      onClick={(e) => e.stopPropagation()}
     >
       {/* RSVP Buttons */}
       {showRsvpButtons && onRsvp && (
@@ -83,29 +107,31 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
           className="event-rsvp-buttons animate-fade-in" 
           data-no-navigation="true"
           style={{ animationDuration: '150ms' }}
+          onClick={(e) => e.stopPropagation()}
         >
           <EventRsvpButtons
-            currentStatus={currentRsvpStatus}
+            currentStatus={localRsvpStatus || null}
             onRsvp={handleRsvp}
             size={buttonSize}
             className="w-full"
+            loading={isLoading}
           />
         </div>
       )}
 
       {/* RSVP Status Display (no buttons) */}
-      {showRsvpStatus && currentRsvpStatus && !onRsvp && (
+      {showRsvpStatus && localRsvpStatus && !onRsvp && (
         <div className="mt-2 animate-fade-in" data-no-navigation="true">
           <Badge
             variant="outline"
             className={cn(
               "py-1 px-3 text-xs font-medium transition-all duration-200",
-              currentRsvpStatus === 'Going' 
+              localRsvpStatus === 'Going' 
                 ? "bg-green-50 text-green-700 border-green-200" 
                 : "bg-blue-50 text-blue-700 border-blue-200"
             )}
           >
-            {currentRsvpStatus}
+            {localRsvpStatus}
           </Badge>
         </div>
       )}
@@ -114,7 +140,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       {showFriendRsvp && friendUsername && (
         <div className="mt-2 flex items-center gap-1 text-xs text-gray-600 animate-fade-in" data-no-navigation="true">
           <Users className="h-3 w-3" />
-          <span>{friendUsername} is {currentRsvpStatus?.toLowerCase()}</span>
+          <span>{friendUsername} is {localRsvpStatus?.toLowerCase()}</span>
         </div>
       )}
 
