@@ -12,11 +12,11 @@ interface EventWithCoordinates extends Event {
   coordinates?: [number, number]; // This is now part of the Event interface
 }
 
-// Define the profile interface with the missing properties to match the DB schema
+// Updated profile interface to match the actual structure from Supabase
 interface Profile {
   id: string;
-  username?: string;
-  avatar_url?: string[] | null;
+  username?: string | null;
+  avatar_url?: string | string[] | null; // Accept both string and string[] to handle different formats
   location?: string | null;
   location_category?: string | null;
   status?: string | null;
@@ -145,7 +145,8 @@ const Explore = () => {
     }
 
     if (friendProfiles) {
-      friendProfiles.forEach((profile: Profile) => {
+      // Use type assertion to treat the profiles as Profile[]
+      (friendProfiles as unknown as Profile[]).forEach((profile) => {
         if (profile.location) {
           const locationParts = profile.location.split(',');
           
@@ -161,7 +162,7 @@ const Explore = () => {
                 coordinates: [lng, lat],
                 username: profile.username,
                 status: profile.status || undefined,
-                avatar_url: Array.isArray(profile.avatar_url) ? profile.avatar_url[0] : null,
+                avatar_url: profile.avatar_url ? (Array.isArray(profile.avatar_url) ? profile.avatar_url[0] : profile.avatar_url) : null,
                 location_category: profile.location_category || undefined
               });
             } else {

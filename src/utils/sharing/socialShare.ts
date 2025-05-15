@@ -9,39 +9,50 @@ export interface SocialShare {
 
 // Share to WhatsApp
 export const shareToWhatsApp = (data: SocialShare): void => {
-  const text = encodeURIComponent(`${data.title}\n\n${data.text || ''}\n\n${data.url}`);
-  const whatsappUrl = `https://wa.me/?text=${text}`;
+  const text = data.text ? `${data.title}: ${data.text}` : data.title;
+  const encodedText = encodeURIComponent(text);
+  const encodedUrl = encodeURIComponent(data.url);
+  const whatsappUrl = `https://wa.me/?text=${encodedText}%20${encodedUrl}`;
   window.open(whatsappUrl, '_blank');
+};
+
+// Share to Twitter/X
+export const shareToTwitter = (data: SocialShare): void => {
+  const text = data.text ? `${data.title}: ${data.text}` : data.title;
+  const encodedText = encodeURIComponent(text);
+  const encodedUrl = encodeURIComponent(data.url);
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`;
+  window.open(twitterUrl, '_blank');
 };
 
 // Share to Facebook
 export const shareToFacebook = (data: SocialShare): void => {
-  const url = encodeURIComponent(data.url);
-  const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-  window.open(fbShareUrl, '_blank', 'width=600,height=400');
+  const encodedUrl = encodeURIComponent(data.url);
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+  window.open(facebookUrl, '_blank');
+};
+
+// Share to LinkedIn
+export const shareToLinkedIn = (data: SocialShare): void => {
+  const encodedUrl = encodeURIComponent(data.url);
+  const encodedTitle = encodeURIComponent(data.title);
+  const encodedSummary = data.text ? encodeURIComponent(data.text) : '';
+  const linkedInUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodedTitle}&summary=${encodedSummary}`;
+  window.open(linkedInUrl, '_blank');
+};
+
+// Share to Telegram
+export const shareToTelegram = (data: SocialShare): void => {
+  const text = data.text ? `${data.title}: ${data.text}` : data.title;
+  const encodedText = encodeURIComponent(text);
+  const encodedUrl = encodeURIComponent(data.url);
+  const telegramUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
+  window.open(telegramUrl, '_blank');
 };
 
 // Share to Snapchat
 export const shareToSnapchat = (data: SocialShare): void => {
-  const url = encodeURIComponent(data.url);
-  const snapchatUrl = `https://snapchat.com/scan?attachmentUrl=${url}`;
+  const encodedUrl = encodeURIComponent(data.url);
+  const snapchatUrl = `https://www.snapchat.com/scan?attachmentUrl=${encodedUrl}`;
   window.open(snapchatUrl, '_blank');
-};
-
-// Create a share URL for any platform (helper function)
-export const createShareUrl = (platform: string, data: SocialShare): string => {
-  const url = encodeURIComponent(data.url);
-  const title = encodeURIComponent(data.title);
-  const text = data.text ? encodeURIComponent(data.text) : '';
-  
-  switch (platform.toLowerCase()) {
-    case 'facebook':
-      return `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-    case 'whatsapp':
-      return `https://wa.me/?text=${encodeURIComponent(`${data.title}\n\n${data.text || ''}\n\n${data.url}`)}`;
-    case 'snapchat':
-      return `https://snapchat.com/scan?attachmentUrl=${url}`;
-    default:
-      return '';
-  }
 };
