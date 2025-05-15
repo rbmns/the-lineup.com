@@ -55,18 +55,24 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
         // Ignore errors during signout
       }
       
+      // Get the current base URL for redirects
+      const baseUrl = window.location.origin;
+      console.log('Signup with redirect URL:', `${baseUrl}/profile/edit?welcome=true`);
+      
       // Register the user with Supabase
       const { data, error } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/profile/edit?welcome=true`,
+          emailRedirectTo: `${baseUrl}/profile/edit?welcome=true`,
         }
       });
 
       if (error) {
         throw error;
       }
+      
+      console.log('Signup response:', data);
 
       // Show success message
       setRegistrationComplete(true);

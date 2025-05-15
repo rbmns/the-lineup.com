@@ -1,1 +1,7 @@
+
 project_id = "vbxhcqlcbusqwsqesoxw"
+
+[auth]
+# Configure proper site URL for authentication redirects
+site_url = "https://vbxhcqlcbusqwsqesoxw.supabase.co"
+additional_redirect_urls = ["https://localhost:5173", "https://localhost:3000", "https://localhost", "http://localhost", "http://localhost:5173", "http://localhost:3000"]
