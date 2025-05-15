@@ -1,203 +1,181 @@
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Event } from '@/types';
-import { filterUpcomingEvents, filterEventsByDateFilter, isEventStillRelevant } from '@/utils/dateUtils';
+import { filterEventsByType } from '@/utils/eventUtils';
+import { filterEventsByVenue } from '@/utils/eventUtils';
+import { filterEventsByDate } from '@/utils/dateUtils';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
-import { subMinutes } from 'date-fns';
+import { DateRange } from 'react-day-picker';
+import { subDays } from 'date-fns';
 
 export const useEventFiltersLogic = (
   events: Event[] | undefined = [],
   userId: string | undefined = undefined,
-  selectedEventTypes: string[],
-  selectedVenues: string[],
-  dateRange: any,
-  selectedDateFilter: string
+  selectedEventTypes: string[] = [],
+  selectedVenues: string[] = [],
+  dateRange: DateRange | undefined = undefined,
+  selectedDateFilter: string = ''
 ) => {
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
-  const [isFilterLoading, setIsFilterLoading] = useState(false);
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>(events || []);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Apply filters
-  const applyFilters = useCallback(async () => {
+  // Filter events based on selected criteria
+  useEffect(() => {
+    // If no events, set filteredEvents to empty array
     if (!events || events.length === 0) {
       setFilteredEvents([]);
       return;
     }
 
-    setIsFilterLoading(true);
-    
+    // Apply client-side filters by default
+    applyClientSideFilters();
+
+    // If we have specific filters and a user ID, we can try to use server-side filtering
+    if (userId && (selectedEventTypes.length > 0 || selectedVenues.length > 0 || dateRange || selectedDateFilter)) {
+      applyServerSideFilters();
+    }
+  }, [events, selectedEventTypes, selectedVenues, dateRange, selectedDateFilter, userId]);
+
+  // Apply client-side filters only
+  const applyClientSideFilters = () => {
+    // Log the current filters and events count for debugging
+    console.info(`Base events count for filtering: ${events?.length}`);
+
+    let result = [...(events || [])];
+
+    // Apply event type filter
+    if (selectedEventTypes.length > 0) {
+      result = filterEventsByType(result, selectedEventTypes);
+    }
+
+    // Apply venue filter
+    if (selectedVenues.length > 0) {
+      result = filterEventsByVenue(result, selectedVenues);
+    }
+
+    // Apply date filter based on selected option or date range
+    if (dateRange || selectedDateFilter) {
+      result = filterEventsByDate(result, selectedDateFilter, dateRange);
+    }
+
+    // Update state with filtered events
+    setFilteredEvents(result);
+  };
+
+  // Apply server-side filters
+  const applyServerSideFilters = async () => {
     try {
-      // Create a map of event IDs to their RSVP statuses from the original events
-      const rsvpStatusMap = new Map<string, 'Going' | 'Interested' | undefined>();
-      events.forEach(event => {
-        if (event.id && event.rsvp_status) {
-          rsvpStatusMap.set(event.id, event.rsvp_status);
-        }
-      });
+      setIsLoading(true);
       
-      console.log('RSVP status map before filtering:', Object.fromEntries(rsvpStatusMap));
-      
-      let query = supabase.from('events').select(`
-        *,
-        creator:profiles(id, username, avatar_url, email, location, status, tagline),
-        venues:venue_id(*),
-        event_rsvps(id, user_id, status)
-      `);
-      
-      const hasFilters = selectedEventTypes.length > 0 || selectedVenues.length > 0 || 
-                         dateRange?.from || selectedDateFilter;
-      
-      // Apply 30 minute cutoff filter
-      const thirtyMinutesAgo = subMinutes(new Date(), 30);
-      query = query.gte('start_time', thirtyMinutesAgo.toISOString());
-      
+      // Start building the query
+      let query = supabase
+        .from('events')
+        .select(`
+          *,
+          creator:profiles(id, username, avatar_url, email, location, status, tagline),
+          venues:venue_id(*),
+          event_rsvps(id, user_id, status)
+        `);
+
       // Apply event type filter
       if (selectedEventTypes.length > 0) {
         query = query.in('event_type', selectedEventTypes);
       }
-      
+
       // Apply venue filter
       if (selectedVenues.length > 0) {
         query = query.in('venue_id', selectedVenues);
       }
-      
-      // Apply date filter logic - enhanced for better range filtering
-      if (dateRange?.from) {
-        // For start date, we want events that start on or after this date
-        const fromDate = new Date(dateRange.from);
-        fromDate.setHours(0, 0, 0, 0); // Beginning of the day
-        
-        query = query.gte('start_time', fromDate.toISOString());
-        
-        if (dateRange.to) {
-          // For end date, we want events that start on or before this date
-          const toDate = new Date(dateRange.to);
-          toDate.setHours(23, 59, 59, 999); // End of the day
-          query = query.lte('start_time', toDate.toISOString());
-        }
-        
-        console.log(`Applying date range filter: ${fromDate.toISOString()} to ${dateRange.to ? new Date(dateRange.to).toISOString() : 'none'}`);
-      } else if (selectedDateFilter) {
-        // If using predefined date filter like "today", "this week", etc.
-        // We'll apply this later in memory since it requires more complex logic
-        console.log(`Selected date filter: ${selectedDateFilter} - will be applied after database query`);
-      }
-      
-      // Execute query
-      const { data, error } = await query.order('start_time', { ascending: true });
-      
-      if (error) throw error;
-      
-      // If there are no filters, return all upcoming events with preserved RSVP status
-      if (!hasFilters) {
-        const upcomingEvents = filterUpcomingEvents(events).map(event => {
-          if (event.id) {
-            return {...event};
-          }
-          return event;
-        });
-        setFilteredEvents(upcomingEvents);
-        setIsFilterLoading(false);
-        return;
-      }
-      
-      if (data && data.length > 0) {
-        // Process data into Event objects
-        const formatted = data.map(item => {
-          const eventRsvps = item.event_rsvps || [];
-          
-          // Get the user's RSVP status for this event
-          let userRsvpStatus: 'Going' | 'Interested' | undefined = undefined;
-          
-          // First check if we have it in our map from the original events
-          if (item.id && rsvpStatusMap.has(item.id)) {
-            userRsvpStatus = rsvpStatusMap.get(item.id);
-          }
-          
-          // If not found in map, check if we have it in the current query results
-          if (!userRsvpStatus && userId) {
-            const userRsvp = eventRsvps.find((rsvp: any) => rsvp.user_id === userId);
-            if (userRsvp) {
-              userRsvpStatus = userRsvp.status as 'Going' | 'Interested';
-            }
-          }
-          
-          return {
-            id: item.id,
-            title: item.title,
-            description: item.description,
-            start_time: item.start_time,
-            end_time: item.end_time,
-            created_at: item.created_at,
-            updated_at: item.updated_at,
-            venue_id: item.venue_id,
-            venues: item.venues,
-            event_type: item.event_type,
-            creator: item.creator,
-            image_urls: item.image_urls || [],
-            fee: item.fee,
-            tags: item.tags,
-            rsvp_status: userRsvpStatus, // Preserve the user's RSVP status
-            attendees: {
-              going: eventRsvps.filter((rsvp: any) => rsvp.status === 'Going').length,
-              interested: eventRsvps.filter((rsvp: any) => rsvp.status === 'Interested').length
-            },
-            isExactMatch: true // Mark these as exact matches since they match database queries
-          } as Event;
-        });
-        
-        // Apply additional date filter if using predefined filter
-        let finalEvents = formatted;
-        if (selectedDateFilter && !dateRange?.from) {
-          console.log(`Applying client-side date filter: ${selectedDateFilter}`);
-          finalEvents = filterEventsByDateFilter(finalEvents, selectedDateFilter);
-          console.log(`After date filter: ${finalEvents.length} events remain`);
-        }
-        
-        // Apply the 30-minute cutoff again as a safeguard (just in case)
-        const relevantEvents = finalEvents.filter(event => {
-          return event.start_time && isEventStillRelevant(event.start_time);
-        });
-        
-        console.log(`Final filtered events: ${relevantEvents.length}`);
-        console.log('RSVP statuses in filtered events:', relevantEvents.map(e => ({id: e.id, status: e.rsvp_status})));
-        setFilteredEvents(relevantEvents);
-      } else {
-        // No matches found, return empty array
-        setFilteredEvents([]);
-      }
-    } catch (err) {
-      console.error('Error applying filters:', err);
-      toast.error('Error filtering events');
-      
-      // Fall back to client-side filtering for basic functionality
-      if (events.length > 0) {
-        const upcomingEvents = filterUpcomingEvents(events);
-        setFilteredEvents(upcomingEvents);
-      } else {
-        setFilteredEvents([]);
-      }
-    } finally {
-      setIsFilterLoading(false);
-    }
-  }, [events, selectedEventTypes, selectedVenues, dateRange, selectedDateFilter, userId]);
-  
-  // Effect hook to apply filters when filter values change
-  useEffect(() => {
-    console.log("Filters changed. Applying filters with these parameters:", {
-      eventTypesCount: selectedEventTypes.length,
-      venuesCount: selectedVenues.length,
-      dateRange: dateRange,
-      dateFilter: selectedDateFilter
-    });
-    
-    // Even if no filters are active, we want to show upcoming events
-    applyFilters();
-    
-  }, [selectedEventTypes, selectedVenues, dateRange, selectedDateFilter, applyFilters]);
 
-  return {
-    filteredEvents,
-    isFilterLoading
+      // Apply date filter based on date range or predefined filters
+      if (dateRange && dateRange.from) {
+        const fromDate = dateRange.from.toISOString().split('T')[0]; // Get YYYY-MM-DD
+        query = query.gte('start_date', fromDate);
+
+        if (dateRange.to) {
+          const toDate = dateRange.to.toISOString().split('T')[0]; // Get YYYY-MM-DD
+          query = query.lte('start_date', toDate);
+        }
+      } else if (selectedDateFilter) {
+        // Handle predefined filters
+        let filterDate;
+        
+        switch (selectedDateFilter) {
+          case 'today':
+            filterDate = new Date().toISOString().split('T')[0]; // Today in YYYY-MM-DD
+            query = query.eq('start_date', filterDate);
+            break;
+            
+          case 'tomorrow':
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            filterDate = tomorrow.toISOString().split('T')[0]; // Tomorrow in YYYY-MM-DD
+            query = query.eq('start_date', filterDate);
+            break;
+            
+          case 'this-weekend':
+            // Calculate this weekend's dates
+            const today = new Date();
+            const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ...
+            const daysUntilFriday = dayOfWeek <= 5 ? 5 - dayOfWeek : 5 + (7 - dayOfWeek);
+            const friday = new Date(today);
+            friday.setDate(today.getDate() + daysUntilFriday);
+            
+            const sunday = new Date(friday);
+            sunday.setDate(friday.getDate() + 2);
+            
+            query = query
+              .gte('start_date', friday.toISOString().split('T')[0])
+              .lte('start_date', sunday.toISOString().split('T')[0]);
+            break;
+            
+          case 'next-week':
+            // Calculate next week's dates (Monday to Sunday)
+            const currentDate = new Date();
+            const nextMonday = new Date();
+            const currentDay = currentDate.getDay() || 7; // Convert Sunday (0) to 7
+            nextMonday.setDate(currentDate.getDate() + (8 - currentDay)); // Next Monday
+            
+            const nextSunday = new Date(nextMonday);
+            nextSunday.setDate(nextMonday.getDate() + 6);
+            
+            query = query
+              .gte('start_date', nextMonday.toISOString().split('T')[0])
+              .lte('start_date', nextSunday.toISOString().split('T')[0]);
+            break;
+            
+          default:
+            // If none of the above, just filter by today or later
+            filterDate = new Date().toISOString().split('T')[0]; // Today in YYYY-MM-DD
+            query = query.gte('start_date', filterDate);
+        }
+      }
+
+      // Always sort by date and time
+      query = query.order('start_date', { ascending: true }).order('start_time', { ascending: true });
+
+      // Execute query
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error applying filters:', error);
+        toast.error('Error loading filtered events');
+        // Fall back to client-side filtering
+        applyClientSideFilters();
+      } else if (data) {
+        // Process the data and update state
+        setFilteredEvents(data as unknown as Event[]);
+      }
+    } catch (error) {
+      console.error('Error applying filters:', error);
+      toast.error('Error loading filtered events');
+      // Fall back to client-side filtering
+      applyClientSideFilters();
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  return { filteredEvents, isLoading };
 };
