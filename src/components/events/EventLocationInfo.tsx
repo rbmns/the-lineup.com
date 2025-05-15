@@ -2,7 +2,6 @@
 import React from 'react';
 import { Venue } from '@/types';
 import { MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 interface EventLocationInfoProps {
   venue: Venue | null;
@@ -37,14 +36,14 @@ export const EventLocationInfo: React.FC<EventLocationInfoProps> = ({ venue }) =
       </div>
       
       <div className="pt-2">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="w-full"
-          onClick={() => window.open(googleMapsUrl, '_blank')}
+        <a 
+          href={googleMapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-800 hover:underline inline-flex items-center"
         >
           View on map
-        </Button>
+        </a>
       </div>
     </div>
   );
