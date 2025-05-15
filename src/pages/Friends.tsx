@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,14 +9,31 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Loader2, UserPlus, UserMinus, Check, X } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useFriendship } from '@/hooks/useFriendship';
-import { UserProfile as UserProfileType } from '@/types'; // Import as a type alias
+import { UserProfile } from '@/types'; // Import as a type alias
+import { FriendsTabContent } from '@/components/friends/FriendsTabContent';
+
+// Define a type for the friend item that includes the profile
+interface FriendItem {
+  id: string;
+  created_at: string;
+  user_id: string;
+  friend_id: string;
+  status: string;
+  profile: {
+    id: string;
+    username: string;
+    avatar_url: string | null;
+    email: string;
+  };
+}
 
 const Friends = () => {
   const { user, isAuthenticated, loading: authLoading } = useAuth();
-  const [friends, setFriends] = useState<any[] | null>(null);
-  const [friendRequests, setFriendRequests] = useState<any[] | null>(null);
+  const [friends, setFriends] = useState<FriendItem[] | null>(null);
+  const [friendRequests, setFriendRequests] = useState<FriendItem[] | null>(null);
   const [friendsLoading, setFriendsLoading] = useState(true);
   const navigate = useNavigate();
+  const { acceptFriendRequest, declineFriendRequest, removeFriend } = useFriendship();
 
   useEffect(() => {
     if (!isAuthenticated && !authLoading) {
@@ -76,7 +94,7 @@ const Friends = () => {
               email: friendProfile.email
             }
           };
-        }).filter(friendship => friendship?.profile?.id !== user.id).filter(Boolean);
+        }).filter(friendship => friendship?.profile?.id !== user.id).filter(Boolean) as FriendItem[];
 
         setFriends(friendsList);
 
@@ -127,7 +145,7 @@ const Friends = () => {
               email: requestProfile.email
             }
           };
-        }).filter(Boolean);
+        }).filter(Boolean) as FriendItem[];
 
         setFriendRequests(formattedRequests);
       } catch (error) {
@@ -151,7 +169,6 @@ const Friends = () => {
     if (!user?.id) return;
 
     try {
-      const { acceptFriendRequest } = useFriendship();
       const success = await acceptFriendRequest(friendshipId);
 
       if (success) {
@@ -209,7 +226,7 @@ const Friends = () => {
                 email: friendProfile.email
               }
             };
-          }).filter(friendship => friendship?.profile?.id !== user.id).filter(Boolean);
+          }).filter(friendship => friendship?.profile?.id !== user.id).filter(Boolean) as FriendItem[];
 
           setFriends(friendsList);
         };
@@ -235,8 +252,7 @@ const Friends = () => {
     if (!user?.id) return;
 
     try {
-      const { rejectFriendRequest } = useFriendship();
-      const success = await rejectFriendRequest(friendshipId);
+      const success = await declineFriendRequest(friendshipId);
 
       if (success) {
         toast({
@@ -266,7 +282,6 @@ const Friends = () => {
     if (!user?.id) return;
 
     try {
-      const { removeFriend } = useFriendship();
       const success = await removeFriend(friendId);
 
       if (success) {
@@ -275,7 +290,7 @@ const Friends = () => {
           description: "Friend removed.",
         });
         // Optimistically update the UI
-        setFriends(prevFriends => prevFriends?.filter(friend => friend?.profile?.id !== friendId) || []);
+        setFriends(prevFriends => prevFriends?.filter(friend => friend.profile.id !== friendId) || []);
       } else {
         toast({
           title: "Error",
@@ -293,6 +308,18 @@ const Friends = () => {
     }
   };
 
+  // Convert friends and requests to appropriate format for FriendsTabContent
+  const formattedFriends = friends?.map(friend => ({
+    id: friend.profile.id,
+    username: friend.profile.username,
+    avatar_url: friend.profile.avatar_url,
+    email: friend.profile.email,
+    location: null,
+    status: null,
+    tagline: null,
+    location_category: null
+  })) || [];
+
   const formattedRequests = friendRequests?.map(request => ({
     id: request.id,
     created_at: request.created_at,
@@ -302,123 +329,20 @@ const Friends = () => {
     profile: {
       id: request.profile.id,
       username: request.profile.username,
-      avatar_url: Array.isArray(request.profile.avatar_url) && request.profile.avatar_url.length > 0 ? request.profile.avatar_url[0] : null,
+      avatar_url: request.profile.avatar_url,
       email: request.profile.email
     }
   })) || [];
 
   return (
     <FriendsTabContent
-      friends={friends as UserProfileType[]} // Cast to explicit type
+      friends={formattedFriends as UserProfile[]}
       loading={friendsLoading || authLoading}
       requests={formattedRequests}
       onAcceptRequest={handleAcceptFriendRequest}
-      onRejectRequest={handleRejectFriendRequest}
-      onRemoveFriend={handleRemoveFriend}
+      onDeclineRequest={handleRejectFriendRequest}
+      showFriendRequests={true}
     />
-  );
-};
-
-interface FriendsTabContentProps {
-  friends: UserProfileType[] | null;
-  loading: boolean;
-  requests: any[] | null;
-  onAcceptRequest: (friendshipId: string) => Promise<void>;
-  onRejectRequest: (friendshipId: string) => Promise<void>;
-  onRemoveFriend: (friendId: string) => Promise<void>;
-}
-
-const FriendsTabContent: React.FC<FriendsTabContentProps> = ({
-  friends,
-  loading,
-  requests,
-  onAcceptRequest,
-  onRejectRequest,
-  onRemoveFriend
-}) => {
-  if (loading) {
-    return (
-      <div className="container py-8 flex items-center justify-center min-h-[50vh]">
-        <div className="flex flex-col items-center space-y-4">
-          <Loader2 className="h-12 w-12 animate-spin text-purple" />
-          <p className="text-gray-600">Loading your friends...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="container max-w-3xl py-6">
-      <h1 className="text-2xl font-bold mb-4">Friends</h1>
-
-      {requests && requests.length > 0 && (
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-3">Friend Requests</h2>
-          <div className="space-y-3">
-            {requests.map(request => (
-              <Card key={request.id} className="border border-gray-200 shadow-sm">
-                <CardContent className="flex items-center justify-between p-4">
-                  <div className="flex items-center space-x-4">
-                    <Avatar>
-                      <AvatarImage src={request.profile.avatar_url || ""} alt={request.profile.username} />
-                      <AvatarFallback>{request.profile.username?.charAt(0).toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{request.profile.username}</p>
-                      <p className="text-gray-500 text-sm">{request.profile.email}</p>
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button variant="ghost" size="sm" onClick={() => onAcceptRequest(request.id)}>
-                      <Check className="h-4 w-4 mr-2" />
-                      Accept
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => onRejectRequest(request.id)}>
-                      <X className="h-4 w-4 mr-2" />
-                      Reject
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div>
-        <h2 className="text-lg font-semibold mb-3">Your Friends</h2>
-        {friends && friends.length > 0 ? (
-          <div className="space-y-3">
-            {friends.map(friend => (
-              <Card key={friend?.profile?.id} className="border border-gray-200 shadow-sm">
-                <CardContent className="flex items-center justify-between p-4">
-                  <div className="flex items-center space-x-4">
-                    <Avatar>
-                      <AvatarImage src={friend?.profile?.avatar_url || ""} alt={friend?.profile?.username} />
-                      <AvatarFallback>{friend?.profile?.username?.charAt(0).toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{friend?.profile?.username}</p>
-                      <p className="text-gray-500 text-sm">{friend?.profile?.email}</p>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={() => onRemoveFriend(friend?.profile?.id)}>
-                    <UserMinus className="h-4 w-4 mr-2" />
-                    Remove
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <Card className="border border-gray-200 shadow-sm">
-            <CardContent className="p-4 text-center">
-              <p className="text-gray-500">No friends yet. Start connecting with people!</p>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-    </div>
   );
 };
 
