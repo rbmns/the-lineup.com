@@ -1,3 +1,4 @@
+
 export interface UserProfile {
   id: string;
   username: string | null;
@@ -74,6 +75,10 @@ export interface Event {
   // Adding the missing properties related to RSVP counts
   going_count?: number;
   interested_count?: number;
+  
+  // Add formatted date and time properties to the Event interface
+  formattedDate?: string;
+  formattedTime?: string;
 }
 
 export interface EventImage {

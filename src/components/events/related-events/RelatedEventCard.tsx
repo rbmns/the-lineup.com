@@ -20,7 +20,7 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({ event }) => 
   
   // Format event date and time according to requirements
   const formatEventDateTime = (event: Event) => {
-    if (!event.start_date) return '';
+    if (!event.start_date) return { date: '', time: '' };
     
     try {
       // Convert start_date to a Date object
@@ -104,8 +104,8 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({ event }) => 
   // Create a modified event with the formatted date/time
   const eventWithFormattedDateTime = {
     ...event,
-    formattedDate: eventDateTime.date,
-    formattedTime: eventDateTime.time,
+    formattedDate: eventDateTime.date || '',
+    formattedTime: eventDateTime.time || '',
     rsvp_status: localRsvpStatus // Use the local state for RSVP status
   };
 

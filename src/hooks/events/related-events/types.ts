@@ -1,4 +1,3 @@
-
 import { Event } from '@/types';
 
 export interface UseFetchRelatedEventsProps {
@@ -20,11 +19,4 @@ export interface EventRsvpMap {
   [eventId: string]: 'Going' | 'Interested';
 }
 
-// Define extended Event interface with formatting properties
-export interface ExtendedEvent extends Event {
-  formattedDate?: string;
-  formattedTime?: string;
-}
-
-// We'll use the normal Event type from @/types, but our code will ensure
-// that formattedDate and formattedTime properties are set before use
+// We now use the Event type from @/types that has formattedDate and formattedTime properties
