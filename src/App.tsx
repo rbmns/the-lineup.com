@@ -1,37 +1,37 @@
 
-import React from 'react';
-import { Route, Routes } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
-import { ToastProvider } from './contexts/ToastContext';
-import EventDetail from './pages/EventDetail';
-import EventsPageRefactored from './pages/EventsPageRefactored';
-import Friends from './pages/Friends';
-import UserProfilePage from './pages/UserProfilePage';
-import { Toaster } from './components/ui/toaster';
-import Layout from './components/Layout';
-import Index from './pages/Index';
-import Login from './pages/Login';  // Added import for Login page
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import EventsPageRefactored from "./pages/EventsPageRefactored";
+import EventDetail from "./pages/EventDetail";
+import Index from "./pages/Index";
+import { Layout } from "./components/Layout";
+import { Friends } from "./pages/Friends";
+import { UserProfilePage } from "./pages/UserProfilePage";
+import { Login } from "./pages/Login";
+import { AuthProvider } from "./contexts/AuthContext";
+import { useToast } from "./hooks/use-toast";
+import { Toaster } from "./components/ui/toaster";
+import { ToastProvider } from "./contexts/ToastContext";
 
-function App() {
+const App: React.FC = () => {
   return (
     <AuthProvider>
       <ToastProvider>
         <Routes>
-          <Route path="/login" element={<Login />} />  {/* Standalone route for login */}
+          <Route index element={<Index />} />
           <Route path="/" element={<Layout />}>
-            <Route index element={<Index />} />
             <Route path="/events" element={<EventsPageRefactored />} />
-            <Route path="/events/:eventId" element={<EventDetail />} />
+            <Route path="/events/:id" element={<EventDetail />} />
             <Route path="/friends" element={<Friends />} />
             <Route path="/users/:userId" element={<UserProfilePage />} />
-            
-            {/* Not Found Route - fallback for all other routes */}
+            <Route path="/login" element={<Login />} />
             <Route path="*" element={<EventsPageRefactored />} />
           </Route>
         </Routes>
+        <Toaster />
       </ToastProvider>
     </AuthProvider>
   );
-}
+};
 
 export default App;

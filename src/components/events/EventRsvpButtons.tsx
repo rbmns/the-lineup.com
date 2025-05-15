@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { CheckCircle2, StarIcon } from 'lucide-react';
+import { CheckCircle2, Star } from 'lucide-react';
 
 interface EventRsvpButtonsProps {
   currentStatus: 'Going' | 'Interested' | null;
@@ -29,7 +29,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
           "px-2 py-1 rounded-full flex items-center gap-1 text-xs",
           currentStatus === 'Going' 
             ? "bg-green-100 text-green-700" 
-            : "bg-amber-100 text-amber-700"
+            : "bg-blue-100 text-blue-700"
         )}>
           {currentStatus === 'Going' ? (
             <>
@@ -38,7 +38,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
             </>
           ) : (
             <>
-              <StarIcon className="h-3.5 w-3.5" />
+              <Star className="h-3.5 w-3.5" />
               <span>Interested</span>
             </>
           )}
@@ -64,7 +64,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         className={cn(
           buttonClasses,
           "flex items-center gap-1.5",
-          currentStatus === 'Going' && "bg-green-600 hover:bg-green-700"
+          currentStatus === 'Going' && "bg-green-600 hover:bg-green-700 text-white"
         )}
         disabled={loading}
         onClick={async () => {
@@ -80,14 +80,14 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         className={cn(
           buttonClasses,
           "flex items-center gap-1.5",
-          currentStatus === 'Interested' && "bg-amber-500 hover:bg-amber-600"
+          currentStatus === 'Interested' && "bg-blue-600 hover:bg-blue-700 text-white"
         )}
         disabled={loading}
         onClick={async () => {
           await onRsvp('Interested');
         }}
       >
-        <StarIcon className="h-4 w-4" />
+        <Star className="h-4 w-4" />
         <span>Interested</span>
       </Button>
     </div>
