@@ -10,6 +10,10 @@ import { toast } from '@/hooks/use-toast';
 export const useEventNavigation = () => {
   const navigate = useNavigate();
   
+  /**
+   * Navigate to event detail page using consistent ID-based URL
+   * and with appropriate navigation state for smooth transitions
+   */
   const navigateToEvent = useCallback((event: { 
     id: string; 
     unique_id?: string; 

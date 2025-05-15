@@ -1,3 +1,4 @@
+
 import { useState, useRef, useMemo, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -36,6 +37,15 @@ export const useEventDetailParams = () => {
     [location.state]
   );
 
+  // Log the parameters for debugging
+  useEffect(() => {
+    console.log(`useEventDetailParams: eventId=${eventId}, eventSlug=${eventSlug}, destination=${destination}`);
+    console.log(`Route path: ${location.pathname}`);
+    if (location.state) {
+      console.log("Route state:", location.state);
+    }
+  }, [eventId, eventSlug, destination, location]);
+
   // Determine the actual ID to use for fetching, prioritizing explicit IDs
   const id = useMemo(() => {
     // First, use an explicit ID from the route if available
@@ -48,9 +58,15 @@ export const useEventDetailParams = () => {
     // Otherwise, if we have an ID in the location state, use that
     if (location.state?.originalEventId) return location.state.originalEventId;
     
+    // Check if the pathname itself contains a UUID
+    const pathMatch = location.pathname.match(/\/events\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
+    if (pathMatch && pathMatch[1]) {
+      return pathMatch[1];
+    }
+    
     // Last resort, return null as we can't determine an ID
     return null;
-  }, [eventId, eventSlug, location.state]);
+  }, [eventId, eventSlug, location.pathname, location.state]);
   
   // Reset initialFetchDone when the route changes
   useEffect(() => {
