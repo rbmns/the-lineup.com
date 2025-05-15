@@ -14,11 +14,14 @@ export const useEventFilters = (initialCategories: EventCategory[] = []) => {
   const [isFilterLoading, setIsFilterLoading] = useState(false);
 
   // Convert string categories to filter objects
-  const filters = initialCategories.map(cat => ({
-    id: cat.toLowerCase().replace(/\s+/g, '-'),
-    name: cat,
-    active: activeFilters[cat.toLowerCase().replace(/\s+/g, '-')] || false
-  }));
+  // Sort the filters alphabetically by name
+  const filters = initialCategories
+    .map(cat => ({
+      id: cat.toLowerCase().replace(/\s+/g, '-'),
+      name: cat,
+      active: activeFilters[cat.toLowerCase().replace(/\s+/g, '-')] || false
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const toggleFilter = (filterId: string) => {
     setActiveFilters(prev => ({

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { Event } from '@/types';
 import { filterEventsByType, filterEventsByVenue } from '@/utils/eventUtils';
@@ -7,7 +8,7 @@ import { DateRange } from 'react-day-picker';
 
 interface EventFilterOptions {
   event_type: string;
-  venues: { name: string };
+  venues: { name: string; id: string; };
 }
 
 export const useEventsFiltering = (events: Event[] = [], userId: string | undefined = undefined) => {
@@ -74,12 +75,20 @@ export const useEventsFiltering = (events: Event[] = [], userId: string | undefi
     if (events && events.length > 0) {
       // Extract unique event types
       const uniqueEventTypes = [...new Set(events.map(event => event.event_type).filter(Boolean))]
-        .map(type => ({ value: type, label: type }));
+        .map(type => ({ value: type, label: type }))
+        .sort((a, b) => a.label.localeCompare(b.label));
       setAvailableEventTypes(uniqueEventTypes);
 
       // Extract unique venues
-      const uniqueVenues = [...new Set(events.map(event => event.venues?.name).filter(Boolean))]
-        .map(venueName => ({ value: venueName, label: venueName }));
+      const uniqueVenues = [...new Set(events
+        .filter(event => event.venues?.name && event.venue_id)
+        .map(event => ({ name: event.venues?.name, id: event.venue_id }))
+        .filter(Boolean)
+        .map(venue => JSON.stringify(venue)))]
+        .map(venueStr => JSON.parse(venueStr))
+        .map(venue => ({ value: venue.id, label: venue.name }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+      
       setAvailableVenues(uniqueVenues);
     }
   }, [events]);

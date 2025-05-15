@@ -51,13 +51,16 @@ export const VenueFilter: React.FC<VenueFilterProps> = ({
     }
   };
 
+  // Sort venues alphabetically by label
+  const sortedVenues = [...venues].sort((a, b) => a.label.localeCompare(b.label));
+
   return (
     <div className="space-y-2">
       <Command className="rounded-md border shadow-none bg-white">
         <CommandList className="max-h-64">
           <CommandEmpty>No venue found.</CommandEmpty>
           <CommandGroup className="max-h-64 overflow-y-auto">
-            {venues.map((venue) => (
+            {sortedVenues.map((venue) => (
               <VenueFilterItem
                 key={venue.value}
                 value={venue.value}
