@@ -1,4 +1,3 @@
-
 /**
  * Utility functions for working with Supabase
  */
@@ -167,7 +166,8 @@ export function toUserProfile(data: any): UserProfile | null {
       tagline: data.tagline || null,
       status_details: data.status_details || null,
       created_at: data.created_at || '',
-      updated_at: data.updated_at || ''
+      updated_at: data.updated_at || '',
+      location_category: data.location_category || null
     };
   } catch (e) {
     console.error('Error converting to UserProfile:', e);
@@ -269,10 +269,11 @@ export function createDefaultUserProfile(userId: string, email?: string, usernam
     avatar_url: null,
     location: null,
     status: null,
-    status_details: null,
     tagline: null,
+    status_details: null,
     created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
+    updated_at: new Date().toISOString(),
+    location_category: null
   };
 }
 
@@ -299,10 +300,11 @@ export function safeFetchProfile(profileData: any): UserProfile | null {
       avatar_url: profileData.avatar_url || null,
       location: profileData.location || null,
       status: profileData.status || null,
-      status_details: profileData.status_details || null,
       tagline: profileData.tagline || null,
+      status_details: profileData.status_details || null, // Include status_details
       created_at: profileData.created_at || '',
-      updated_at: profileData.updated_at || ''
+      updated_at: profileData.updated_at || '',
+      location_category: profileData.location_category || null
     };
   } catch (e) {
     console.error('Error handling profile data:', e);

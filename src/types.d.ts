@@ -2,12 +2,15 @@
 export interface UserProfile {
   id: string;
   username: string | null;
-  avatar_url: string | null;
+  avatar_url: string[] | null; // Changed to string[] to be consistent with types/index.ts
   email: string | null;
   location: string | null;
   location_category: string | null;
   status: string | null;
+  status_details?: string | null; // Added to match other UserProfile
   tagline: string | null;
+  created_at?: string; // Added to match other UserProfile
+  updated_at?: string; // Added to match other UserProfile
 }
 
 export interface Venue {
@@ -20,10 +23,10 @@ export interface Venue {
   google_maps?: string | null;
   region?: string | null;
   tags?: string[] | null;
-  slug?: string | null; // Added missing property
+  slug?: string | null;
 }
 
-// Add or update the Event type definition to include the new fields
+// Update the Event type definition to include all required fields
 export interface Event {
   id: string;
   title: string;
@@ -32,7 +35,7 @@ export interface Event {
   event_type: string;
   start_time: string | null;
   end_time?: string | null;
-  start_date?: string | null;  // New field for the date portion
+  start_date?: string | null;
   created_at?: string;
   updated_at?: string;
   image_urls: string[];
@@ -54,9 +57,11 @@ export interface Event {
   slug?: string;
   recurring_count?: number;
   isQueryOnly?: boolean;
-  booking_link?: string | null; // Added missing property
-  organiser_name?: string | null; // Added missing property
-  vibe?: string | null; // Added missing property
+  booking_link?: string | null;
+  organiser_name?: string | null;
+  vibe?: string | null;
+  coordinates?: [number, number]; // Added coordinates property
+  created_by?: string; // Added created_by property
 }
 
 export interface EventsResponse {

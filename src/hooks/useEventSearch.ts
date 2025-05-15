@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
@@ -53,6 +52,12 @@ export const useEventSearch = () => {
       fee: event.fee,
       tags: event.tags,
       vibe: event.vibe,
+      attendees: {
+        going: event.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Going').length || 0,
+        interested: event.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Interested').length || 0
+      },
+      coordinates: event.coordinates,
+      created_by: event.created_by,
     };
   };
 

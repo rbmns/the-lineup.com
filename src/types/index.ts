@@ -3,7 +3,7 @@ export interface UserProfile {
   id: string;
   username: string;
   email: string;
-  avatar_url: string[] | null; // Using string[] to match DB structure
+  avatar_url: string[] | null; // Must be string[] to match DB structure
   location: string | null;
   status: string | null;
   tagline: string | null;
@@ -48,8 +48,8 @@ export interface Event {
   } | null;
   google_maps?: string | null;
   organizer_link?: string | null;
-  organiser_name?: string | null; // Added new field for organiser name
-  booking_link?: string | null;  // Adding booking_link property
+  organiser_name?: string | null;
+  booking_link?: string | null;
   creator?: UserProfile | null;
   venues?: Venue | null;
   venue_id?: string;
@@ -58,13 +58,13 @@ export interface Event {
   tags?: string[];
   coordinates?: [number, number]; // Adding coordinates property
   created_by?: string; // Adding created_by property
-  vibe?: string | null; // Adding vibe property
-  unique_id?: string; // Adding unique_id property to fix the error
-  slug?: string; // Adding slug property to fix the error
-  destination?: string; // Adding destination property for city-based URLs
-  recurring_count?: number; // Adding recurring_count property to fix the error
-  isExactMatch?: boolean; // Adding isExactMatch property for filtering
-  start_date?: string | null; // Adding new field for the date portion
+  vibe?: string | null;
+  unique_id?: string;
+  slug?: string;
+  destination?: string;
+  recurring_count?: number;
+  isExactMatch?: boolean;
+  start_date?: string | null;
 }
 
 export interface FriendRequest {

@@ -1,30 +1,21 @@
 
-import { type ToasterToast } from '@/components/ui/toast';
+import { toast as sonnerToast } from "sonner";
+import { type ToasterToast } from "@/components/ui/toast";
 
-// No-op toast function that doesn't actually display anything
-interface ToastOptions {
-  title?: string;
-  description?: string;
-  variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info';
-  action?: React.ReactNode;
-  icon?: React.ReactNode;
-  duration?: number;
-}
-
-// This is now a no-op function that returns an empty string as ID
-const toast = (options: ToastOptions | string): string => {
-  // We're intentionally not showing any toasts
-  // Just return an empty ID
-  return '';
+// Simplified toast function that doesn't display any toasts
+const toast = (options: ToasterToast | string) => {
+  // For debugging purposes, log the toast request
+  console.log('Toast request:', options);
+  
+  // Return a dummy id for compatibility
+  return { id: Math.random().toString() };
 };
 
-// No-op useToast hook
-const useToast = () => {
-  return {
-    toast,
-    dismiss: () => {},
-    toasts: [] as ToasterToast[],
-  };
-};
+// Mock useToast hook that doesn't actually show toasts
+const useToast = () => ({
+  toast,
+  dismiss: () => {},
+  toasts: [] as ToasterToast[],
+});
 
 export { toast, useToast };
