@@ -13,6 +13,8 @@ export const RelatedEventsSection: React.FC<RelatedEventsSectionProps> = ({ even
       eventId={event.id}
       eventType={event.event_type || ''}
       startDate={event.start_date || ''}
+      tags={event.tags}
+      vibe={event.vibe}
     />
   );
 };
