@@ -31,8 +31,8 @@ export const processFormData = (data: any, userId: string): SafeEventData => {
   const startDateTime = combineDateTime(data.start_date, data.start_time);
   const endDateTime = combineDateTime(data.end_date, data.end_time);
   
-  if (!startDateTime || !endDateTime) {
-    throw new Error('Invalid date or time format');
+  if (!startDateTime) {
+    throw new Error('Invalid start date or time format');
   }
   
   // Process tags - split by commas and trim whitespace
@@ -54,13 +54,24 @@ export const processFormData = (data: any, userId: string): SafeEventData => {
   
   const slug = `${formattedDate}-${titleSlug}`;
   
+  // Format the date and time components separately
+  const startDate = format(startDateTime, 'yyyy-MM-dd');
+  const startTime = format(startDateTime, 'HH:mm:ss');
+  
+  // Format end time if available
+  let endTime = null;
+  if (endDateTime) {
+    endTime = format(endDateTime, 'HH:mm:ss');
+  }
+  
   // Create the event data object
   return {
     title: data.title,
     description: data.description,
     event_type: data.event_type,
-    start_time: startDateTime.toISOString(),
-    end_time: endDateTime.toISOString(),
+    start_date: startDate,
+    start_time: startTime,
+    end_time: endTime,
     venue_id: data.venue_id || null,
     organizer_link: data.organizer_link,
     fee: parseFloat(data.fee) || 0, // Convert string to number
@@ -84,6 +95,7 @@ export const extractEventValues = (event: any): SafeEventData => {
       title: event.title || '',
       description: event.description || '',
       event_type: event.event_type || 'other',
+      start_date: event.start_date,
       start_time: event.start_time,
       end_time: event.end_time,
       venue_id: event.venue_id || '',

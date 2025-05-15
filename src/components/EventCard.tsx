@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Event } from '@/types';
-import { formatRelativeDate, formatEventTime } from '@/utils/dateUtils';
+import { formatRelativeDate, formatEventTime, getEventDateTime } from '@/utils/dateUtils';
 import { useEventImages } from '@/hooks/useEventImages';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
@@ -64,6 +63,10 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
   
+  // Generate the start time string from the combined date and time
+  const eventStartTime = getEventDateTime(event);
+  const eventEndTime = event.end_time;
+  
   // Use card dimensions based on compact mode
   const cardHeight = compact ? 'h-[360px]' : 'h-[400px]';
   const imageHeight = compact ? 'h-[160px]' : 'h-[200px]';
@@ -107,8 +110,8 @@ const EventCard: React.FC<EventCardProps> = ({
           </h3>
           
           <div className="flex flex-col text-sm text-gray-500 space-y-1">
-            <p>{formatRelativeDate(event.start_time)}</p>
-            <p>{formatEventTime(event.start_time, event.end_time)}</p>
+            <p>{eventStartTime ? formatRelativeDate(eventStartTime) : 'Date not set'}</p>
+            <p>{eventStartTime ? formatEventTime(eventStartTime, eventEndTime) : 'Time not set'}</p>
             {event.location && (
               <p className="line-clamp-1">{event.location}</p>
             )}

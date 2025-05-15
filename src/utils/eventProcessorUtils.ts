@@ -1,6 +1,7 @@
 
 import { Event, UserProfile, Venue } from '@/types';
 import { getEventFallbackImage } from '@/utils/eventImages';
+import { combineDateAndTime, getEventDateTime, getEventEndDateTime } from '@/utils/dateUtils';
 
 /**
  * Process raw event data from Supabase into the application's Event type
@@ -52,6 +53,10 @@ export function processEventData(event: any, userId?: string | undefined): Event
     const userRsvp = userId && event.event_rsvps
       ? event.event_rsvps.find((rsvp: any) => rsvp.user_id === userId)?.status
       : undefined;
+    
+    // Generate the start and end time ISO strings from the new date and time fields
+    const startTimeISO = getEventDateTime(event);
+    const endTimeISO = getEventEndDateTime(event);
       
     return {
       id: event.id,
@@ -59,8 +64,9 @@ export function processEventData(event: any, userId?: string | undefined): Event
       description: event.description || '',
       location: venueData?.city || 'Location not specified',
       event_type: event.event_type,
-      start_time: event.start_time,
-      end_time: event.end_time,
+      start_time: startTimeISO,
+      end_time: endTimeISO,
+      start_date: event.start_date,  // Include original fields for compatibility
       created_at: event.created_at,
       updated_at: event.updated_at,
       image_urls: imageUrls,
@@ -78,7 +84,9 @@ export function processEventData(event: any, userId?: string | undefined): Event
       fee: event.fee,
       venue_id: event.venue_id,
       tags: Array.isArray(event.tags) ? event.tags : 
-            (typeof event.tags === 'string' ? [event.tags] : [])
+            (typeof event.tags === 'string' ? [event.tags] : []),
+      destination: event.destination,
+      slug: event.slug
     } as Event;
   } catch (error) {
     console.error('Error processing event data:', error, event);

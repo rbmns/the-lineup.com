@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { Event } from '@/types';
 import { supabase } from '@/lib/supabase';
@@ -7,6 +6,7 @@ import { asEqParam } from '@/utils/supabaseTypeUtils';
 import { useEventLookup } from './useEventLookup';
 import { useEventRSVP } from './event-rsvp/useEventRSVP';
 import { toast } from './use-toast';
+import { getEventDateTime } from '@/utils/dateUtils';
 
 export const useEventFetcher = (
   userId?: string

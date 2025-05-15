@@ -20,7 +20,7 @@ export const EventService = {
     try {
       // Get the current time minus 30 minutes to filter events
       const thirtyMinutesAgo = subMinutes(new Date(), 30);
-      const cutoffTime = toZonedTime(thirtyMinutesAgo, AMSTERDAM_TIMEZONE).toISOString();
+      const cutoffDate = toZonedTime(thirtyMinutesAgo, AMSTERDAM_TIMEZONE).toISOString().split('T')[0];
       
       const { data, error } = await supabase
         .from('events')
@@ -29,7 +29,8 @@ export const EventService = {
           creator:profiles(id, username, avatar_url),
           venues:venue_id(*)
         `)
-        .gte('start_time', cutoffTime) // Only fetch events that started less than 30 minutes ago or in the future
+        .gte('start_date', cutoffDate) // Use start_date for initial filtering
+        .order('start_date', { ascending: true })
         .order('start_time', { ascending: true });
       
       if (error) {
@@ -153,8 +154,27 @@ export const EventService = {
       if (eventData.title !== undefined) updateData.title = eventData.title;
       if (eventData.description !== undefined) updateData.description = eventData.description;
       if (eventData.event_type !== undefined) updateData.event_type = eventData.event_type;
-      if (eventData.start_time !== undefined) updateData.start_time = eventData.start_time;
-      if (eventData.end_time !== undefined) updateData.end_time = eventData.end_time;
+      
+      // Handle the new date/time fields
+      if (eventData.start_time !== undefined) {
+        if (typeof eventData.start_time === 'string' && eventData.start_time.includes('T')) {
+          // If ISO datetime string is provided, split into date and time parts
+          const datePart = eventData.start_time.split('T')[0];
+          const timePart = eventData.start_time.split('T')[1].substring(0, 8); // HH:MM:SS
+          updateData.start_date = datePart;
+          updateData.start_time = timePart;
+        }
+      }
+      
+      if (eventData.end_time !== undefined) {
+        if (typeof eventData.end_time === 'string' && eventData.end_time.includes('T')) {
+          // If ISO datetime string is provided, extract time part
+          updateData.end_time = eventData.end_time.split('T')[1].substring(0, 8); // HH:MM:SS
+        } else {
+          updateData.end_time = eventData.end_time;
+        }
+      }
+      
       if (eventData.venue_id !== undefined) updateData.venue_id = eventData.venue_id;
       if (eventData.image_urls !== undefined) updateData.image_urls = eventData.image_urls;
       if (eventData.organizer_link !== undefined) updateData.organizer_link = eventData.organizer_link;

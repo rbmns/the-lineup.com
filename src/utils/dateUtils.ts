@@ -1,23 +1,91 @@
 import { format, parseISO, isPast, isFuture, isToday, addDays, startOfWeek, endOfWeek, startOfDay, isSameDay, isFriday, isSaturday, isSunday, nextFriday, nextMonday, addWeeks, isWithinInterval, compareAsc, subMinutes } from 'date-fns';
-import { formatInTimeZone, toZonedTime } from 'date-fns-tz';
+import { formatInTimeZone } from 'date-fns-tz';
 import { Event } from '@/types';
 
 // Amsterdam/Netherlands timezone
 export const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
 
-// Function to sort events by date (ascending)
-export const sortEventsByDate = <T extends { start_time?: string | null }>(events: T[]): T[] => {
-  return [...events].sort((a, b) => {
-    // Handle null or undefined start_time
-    if (!a.start_time) return 1;
-    if (!b.start_time) return -1;
+/**
+ * Combine date and time parts into a single Date object
+ */
+export const combineDateAndTime = (
+  dateStr: string | null | undefined, 
+  timeStr: string | null | undefined
+): Date | null => {
+  try {
+    if (!dateStr || !timeStr) return null;
     
-    // Parse dates and convert to Amsterdam timezone
-    const dateA = toZonedTime(new Date(a.start_time), AMSTERDAM_TIMEZONE);
-    const dateB = toZonedTime(new Date(b.start_time), AMSTERDAM_TIMEZONE);
+    // Parse the date string (assumed format 'YYYY-MM-DD')
+    const [year, month, day] = dateStr.split('-').map(Number);
+    if (isNaN(year) || isNaN(month) || isNaN(day)) return null;
+    
+    // Parse the time string (assumed format 'HH:MM:SS')
+    const [hours, minutes, seconds] = timeStr.split(':').map(Number);
+    if (isNaN(hours) || isNaN(minutes)) return null;
+    
+    // Create a new Date object with the combined parts
+    const combinedDate = new Date(year, month - 1, day, hours, minutes, seconds || 0);
+    
+    if (isNaN(combinedDate.getTime())) return null;
+    return combinedDate;
+  } catch (error) {
+    console.error('Error combining date and time:', error);
+    return null;
+  }
+};
+
+/**
+ * Get the combined date-time string from an event in ISO format
+ */
+export const getEventDateTime = (event: any): string | null => {
+  try {
+    if (event.start_time && typeof event.start_time === 'string' && event.start_time.includes('T')) {
+      // Legacy format - already a full ISO datetime string
+      return event.start_time;
+    } else if (event.start_date && event.start_time) {
+      // New format - separate date and time fields
+      const combined = combineDateAndTime(event.start_date, event.start_time);
+      return combined ? combined.toISOString() : null;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error getting event datetime:', error, event);
+    return null;
+  }
+};
+
+/**
+ * Get the combined end date-time string from an event in ISO format
+ */
+export const getEventEndDateTime = (event: any): string | null => {
+  try {
+    if (event.end_time && typeof event.end_time === 'string' && event.end_time.includes('T')) {
+      // Legacy format - already a full ISO datetime string
+      return event.end_time;
+    } else if (event.start_date && event.end_time) {
+      // New format - use start_date with end_time
+      const combined = combineDateAndTime(event.start_date, event.end_time);
+      return combined ? combined.toISOString() : null;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error getting event end datetime:', error, event);
+    return null;
+  }
+};
+
+// Function to sort events by date (ascending)
+export const sortEventsByDate = <T extends { start_date?: string | null; start_time?: string | null }>(events: T[]): T[] => {
+  return [...events].sort((a, b) => {
+    // Handle null or undefined date/time
+    const dateTimeA = getEventDateTime(a);
+    const dateTimeB = getEventDateTime(b);
+    
+    if (!dateTimeA) return 1;
+    if (!dateTimeB) return -1;
     
     // Compare dates (ascending order - soonest first)
-    return compareAsc(dateA, dateB);
+    return compareAsc(new Date(dateTimeA), new Date(dateTimeB));
   });
 };
 
@@ -27,7 +95,6 @@ export const sortEventsByDate = <T extends { start_time?: string | null }>(event
 export const formatDate = (dateStr: string): string => {
   try {
     const date = parseISO(dateStr);
-    const amsterdamDate = toZonedTime(date, AMSTERDAM_TIMEZONE);
     return formatInTimeZone(date, AMSTERDAM_TIMEZONE, 'EEEE, d MMMM yyyy');
   } catch (error) {
     console.error('Error formatting date:', error);
@@ -52,10 +119,12 @@ export const formatTime = (dateStr: string): string => {
 /**
  * Format the relative date of an event (e.g., "Today", "Tomorrow", "In 3 days")
  */
-export const formatRelativeDate = (dateStr: string): string => {
+export const formatRelativeDate = (dateTimeStr: string | null): string => {
   try {
-    const date = toZonedTime(parseISO(dateStr), AMSTERDAM_TIMEZONE);
-    const now = toZonedTime(new Date(), AMSTERDAM_TIMEZONE);
+    if (!dateTimeStr) return 'Date not set';
+    
+    const date = new Date(dateTimeStr);
+    const now = new Date();
     const diffMs = date.getTime() - now.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
     
@@ -68,15 +137,17 @@ export const formatRelativeDate = (dateStr: string): string => {
     return formatInTimeZone(date, AMSTERDAM_TIMEZONE, 'd MMM yyyy');
   } catch (error) {
     console.error('Error formatting relative date:', error);
-    return dateStr;
+    return dateTimeStr || 'Date not set';
   }
 };
 
 /**
  * Format event time from start to end time (e.g., "13:30 - 15:00")
  */
-export const formatEventTime = (startTimeStr: string, endTimeStr?: string): string => {
+export const formatEventTime = (startTimeStr: string | null, endTimeStr?: string | null): string => {
   try {
+    if (!startTimeStr) return 'Time not set';
+    
     const startFormatted = formatTime(startTimeStr);
     
     if (endTimeStr) {
@@ -87,21 +158,21 @@ export const formatEventTime = (startTimeStr: string, endTimeStr?: string): stri
     return startFormatted;
   } catch (error) {
     console.error('Error formatting event time:', error);
-    return startTimeStr;
+    return startTimeStr || 'Time not set';
   }
 };
 
 /**
  * Filter events based on date range or predefined filter
  */
-export const filterEventsInDateRange = <T extends { start_time?: string | null }>(
+export const filterEventsInDateRange = <T extends { start_date?: string | null }>(
   event: T,
   dateFilter: string,
   dateRange: any
 ): boolean => {
-  if (!event.start_time) return false;
+  if (!event.start_date) return false;
   
-  const eventDate = startOfDay(new Date(event.start_time));
+  const eventDate = startOfDay(new Date(event.start_date));
   const today = startOfDay(new Date());
   
   // If date range is provided, check if the event is within that range
@@ -230,7 +301,7 @@ export const isEventStillRelevant = (startTimeStr: string): boolean => {
 /**
  * Filter events based on date filter
  */
-export const filterEventsByDateFilter = <T extends { start_time?: string | null }>(
+export const filterEventsByDateFilter = <T extends { start_date?: string | null; start_time?: string | null }>(
   events: T[], 
   dateFilter: string
 ): T[] => {
@@ -239,8 +310,10 @@ export const filterEventsByDateFilter = <T extends { start_time?: string | null 
   const today = startOfDay(new Date());
   
   return events.filter(event => {
-    if (!event.start_time) return false;
-    const eventDate = startOfDay(new Date(event.start_time));
+    const dateTimeStr = getEventDateTime(event);
+    if (!dateTimeStr) return false;
+    
+    const eventDate = startOfDay(new Date(dateTimeStr));
     
     // Skip events in the past
     if (isPast(eventDate) && !isToday(eventDate)) return false;
@@ -286,13 +359,15 @@ export const filterEventsByDateFilter = <T extends { start_time?: string | null 
 /**
  * Filter events to get only upcoming events (including those that started less than 30 minutes ago)
  */
-export const filterUpcomingEvents = <T extends { start_time?: string | null }>(events: T[]): T[] => {
-  const now = toZonedTime(new Date(), AMSTERDAM_TIMEZONE);
+export const filterUpcomingEvents = <T extends { start_date?: string | null; start_time?: string | null }>(events: T[]): T[] => {
+  const now = new Date();
   const thirtyMinutesBeforeNow = subMinutes(now, 30);
   
   const filtered = events.filter(event => {
-    if (!event.start_time) return false; // Skip events with no start time
-    const startDate = toZonedTime(new Date(event.start_time), AMSTERDAM_TIMEZONE);
+    const dateTimeStr = getEventDateTime(event);
+    if (!dateTimeStr) return false; // Skip events with no start time
+    
+    const startDate = new Date(dateTimeStr);
     
     // Include events that start in the future OR started less than 30 minutes ago
     return startDate > thirtyMinutesBeforeNow;
@@ -305,13 +380,15 @@ export const filterUpcomingEvents = <T extends { start_time?: string | null }>(e
 /**
  * Filter events to get only past events (those that started more than 30 minutes ago)
  */
-export const filterPastEvents = <T extends { start_time?: string | null }>(events: T[]): T[] => {
-  const now = toZonedTime(new Date(), AMSTERDAM_TIMEZONE);
+export const filterPastEvents = <T extends { start_date?: string | null; start_time?: string | null }>(events: T[]): T[] => {
+  const now = new Date();
   const thirtyMinutesBeforeNow = subMinutes(now, 30);
   
   const filtered = events.filter(event => {
-    if (!event.start_time) return false; // Skip events with no start time
-    const startDate = toZonedTime(new Date(event.start_time), AMSTERDAM_TIMEZONE);
+    const dateTimeStr = getEventDateTime(event);
+    if (!dateTimeStr) return false; // Skip events with no start time
+    
+    const startDate = new Date(dateTimeStr);
     
     // Include events that started more than 30 minutes ago
     return startDate <= thirtyMinutesBeforeNow;
@@ -319,9 +396,9 @@ export const filterPastEvents = <T extends { start_time?: string | null }>(event
   
   // Sort by date (descending - most recent first)
   return [...filtered].sort((a, b) => {
-    if (!a.start_time || !b.start_time) return 0;
-    const dateA = toZonedTime(new Date(a.start_time), AMSTERDAM_TIMEZONE);
-    const dateB = toZonedTime(new Date(b.start_time), AMSTERDAM_TIMEZONE);
+    if (!a.start_date || !b.start_date) return 0;
+    const dateA = new Date(getEventDateTime(a) || '');
+    const dateB = new Date(getEventDateTime(b) || '');
     return compareAsc(dateB, dateA); // Reverse order for past events
   });
 };
@@ -381,13 +458,13 @@ export const formatWeekDate = (date: Date): string => {
 /**
  * Get events for a specific date
  */
-export const getEventsForDate = <T extends { start_time?: string | null }>(
+export const getEventsForDate = <T extends { start_date?: string | null }>(
   events: T[],
   date: Date
 ): T[] => {
   return events.filter(event => {
-    if (!event.start_time) return false;
-    const eventDate = startOfDay(new Date(event.start_time));
+    if (!event.start_date) return false;
+    const eventDate = startOfDay(new Date(event.start_date));
     return isSameDay(eventDate, date);
   });
 };

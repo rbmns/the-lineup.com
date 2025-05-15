@@ -16,6 +16,9 @@ export const useEvents = (userId: string | undefined = undefined): UseEventsResu
     queryKey: ['events', userId],
     queryFn: async () => {
       try {
+        // Get the current date as YYYY-MM-DD for filtering
+        const currentDate = new Date().toISOString().split('T')[0];
+        
         // Updated query to include event_types_tags relationship
         const { data, error } = await supabase
           .from('events')
@@ -25,6 +28,8 @@ export const useEvents = (userId: string | undefined = undefined): UseEventsResu
             venues:venue_id(*),
             event_rsvps(id, user_id, status)
           `)
+          .gte('start_date', currentDate) // Filter events from today onwards
+          .order('start_date', { ascending: true })
           .order('start_time', { ascending: true });
         
         if (error) {

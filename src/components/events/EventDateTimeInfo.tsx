@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Calendar, Clock, RepeatIcon } from 'lucide-react';
 import { Event } from '@/types';
 import { formatInTimeZone } from 'date-fns-tz';
-import { AMSTERDAM_TIMEZONE, formatDate, formatTime } from '@/utils/dateUtils';
+import { AMSTERDAM_TIMEZONE, formatDate, formatTime, getEventDateTime } from '@/utils/dateUtils';
 import { Badge } from '../ui/badge';
 
 interface EventDateTimeInfoProps {
@@ -22,7 +21,10 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
   recurringEvents = []
 }) => {
   // Check if we have valid date information
-  if (!event.start_time) {
+  const eventStartTime = getEventDateTime(event);
+  const eventEndTime = event.end_time;
+  
+  if (!eventStartTime) {
     return (
       <div className={`flex items-center gap-2 text-gray-500 italic ${className}`}>
         <Calendar className={`h-4 w-4 flex-shrink-0 ${iconClassName}`} />
@@ -52,11 +54,11 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
     }
   };
 
-  const startDate = formatDateStr(event.start_time);
-  const startTime = formatTimeStr(event.start_time);
-  const endTime = event.end_time ? formatTimeStr(event.end_time) : null;
-  const isMultiDay = event.end_time && formatDateStr(event.start_time) !== formatDateStr(event.end_time);
-  const endDate = event.end_time ? formatDateStr(event.end_time) : null;
+  const startDate = formatDateStr(eventStartTime);
+  const startTime = formatTimeStr(eventStartTime);
+  const endTime = eventEndTime ? formatTimeStr(eventEndTime) : null;
+  const isMultiDay = eventEndTime && formatDateStr(eventStartTime) !== formatDateStr(eventEndTime);
+  const endDate = eventEndTime ? formatDateStr(eventEndTime) : null;
   
   const isRecurring = recurringEvents && recurringEvents.length > 0;
 
@@ -93,15 +95,17 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
           <div className="ml-6 space-y-2">
             <div className="text-xs uppercase font-medium text-gray-500">Other dates:</div>
             <div className="space-y-1.5">
-              {recurringEvents.map((recEvent) => (
-                <div key={recEvent.id} className="text-sm">
-                  <Badge variant="outline" className="mr-2">
-                    {formatDate(recEvent.start_time || '')}
-                  </Badge>
-                  {formatTime(recEvent.start_time || '')}
-                  {recEvent.end_time && ` - ${formatTime(recEvent.end_time)}`}
-                </div>
-              ))}
+              {recurringEvents.map((recEvent) => {
+                const recEventDateTime = getEventDateTime(recEvent);
+                return (
+                  <div key={recEvent.id} className="text-sm">
+                    <Badge variant="outline" className="mr-2">
+                      {recEventDateTime ? formatDate(recEventDateTime) : 'Date not set'}
+                    </Badge>
+                    {recEventDateTime ? formatTime(recEventDateTime) : ''}{recEvent.end_time && ` - ${formatTime(recEvent.end_time)}`}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
