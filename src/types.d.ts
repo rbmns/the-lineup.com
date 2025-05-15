@@ -1,4 +1,3 @@
-
 export interface UserProfile {
   id: string;
   username: string | null;
@@ -11,6 +10,9 @@ export interface UserProfile {
   tagline: string | null;
   created_at?: string; // Added to match other UserProfile
   updated_at?: string; // Added to match other UserProfile
+  onboarded?: boolean | null;
+  onboarding_data?: string | null;
+  role?: string | null;
 }
 
 export interface Venue {

@@ -10,6 +10,9 @@ export interface UserProfile {
   created_at?: string;
   updated_at?: string;
   location_category?: string | null;
+  onboarded?: boolean | null;
+  onboarding_data?: string | null;
+  role?: string | null;
 }
 
 export interface Venue {
