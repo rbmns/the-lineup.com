@@ -1,4 +1,3 @@
-
 export interface UserProfile {
   id: string;
   username: string | null;
@@ -59,8 +58,8 @@ export interface Event {
   fee?: number;
   extra_info?: string | null;
   tags?: string[];
-  coordinates?: [number, number]; // Adding coordinates property
-  created_by?: string; // Adding created_by property
+  coordinates?: [number, number]; 
+  created_by?: string; 
   vibe?: string | null;
   unique_id?: string;
   slug?: string;
@@ -72,7 +71,7 @@ export interface Event {
   share_image?: string | null;
   user_rsvp_status?: 'Going' | 'Interested' | null;
   
-  // Adding the missing properties from the error messages
+  // Adding the missing properties related to RSVP counts
   going_count?: number;
   interested_count?: number;
 }

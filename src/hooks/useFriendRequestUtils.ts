@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import { FriendRequest } from '@/types/friends';
 import { UserProfile } from '@/types';
+import { toast } from '@/components/ui/use-toast';
 
 // Function to fetch friend requests for a specific user
 export async function fetchPendingRequests(userId: string): Promise<FriendRequest[]> {
@@ -43,7 +44,8 @@ export async function fetchPendingRequests(userId: string): Promise<FriendReques
       friend_id: item.friend_id,
       sender_id: item.user_id,
       receiver_id: item.friend_id,
-      profile: item.profiles as UserProfile
+      // Fix: Cast the single profile object correctly instead of treating it as an array
+      profile: item.profiles as unknown as UserProfile
     }));
     
     return requests;
