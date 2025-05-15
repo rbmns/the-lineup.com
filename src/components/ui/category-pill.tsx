@@ -3,6 +3,7 @@ import React from 'react';
 import { EventCategoryIcon, IconSize } from './event-category-icon';
 import { eventTypeColors } from '@/utils/eventImages';
 import { cn } from '@/lib/utils';
+import { NATURE_COLORS } from '@/constants';
 
 interface CategoryPillProps {
   category: string;

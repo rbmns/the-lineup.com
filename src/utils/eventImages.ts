@@ -1,3 +1,4 @@
+
 /**
  * Utility for handling event images and fallback images
  */
@@ -65,105 +66,180 @@ export const getEventFallbackImage = (eventType: string | undefined, tags?: stri
   return eventImageMap.default;
 };
 
-// Event type color mapping
+// Event type color mapping with nature-inspired colors
 export const eventTypeColors = {
-  music: {
-    default: {
-      bg: 'bg-orange-50',
-      text: 'text-orange-500'
-    },
-    active: {
-      bg: 'bg-orange-500',
-      text: 'text-orange-50'
-    }
-  },
+  // Water-themed events
   surf: {
     default: {
       bg: 'bg-blue-50',
-      text: 'text-blue-500'
+      text: 'text-blue-600'
     },
     active: {
-      bg: 'bg-blue-500',
+      bg: 'bg-blue-600',
       text: 'text-blue-50'
     }
   },
   kite: {
     default: {
-      bg: 'bg-teal-50',
-      text: 'text-teal-500'
+      bg: 'bg-cyan-50',
+      text: 'text-cyan-600'
     },
     active: {
-      bg: 'bg-teal-500',
-      text: 'text-teal-50'
+      bg: 'bg-cyan-600',
+      text: 'text-cyan-50'
     }
   },
   beach: {
     default: {
-      bg: 'bg-yellow-50',
-      text: 'text-yellow-500'
+      bg: 'bg-amber-50',
+      text: 'text-amber-500'
     },
     active: {
-      bg: 'bg-yellow-500',
-      text: 'text-yellow-50'
+      bg: 'bg-amber-500',
+      text: 'text-amber-50'
     }
   },
+  water: {
+    default: {
+      bg: 'bg-sky-50',
+      text: 'text-sky-600'
+    },
+    active: {
+      bg: 'bg-sky-600',
+      text: 'text-sky-50'
+    }
+  },
+  
+  // Earth/food themed events
   food: {
     default: {
-      bg: 'bg-red-50',
-      text: 'text-red-500'
+      bg: 'bg-orange-50',
+      text: 'text-orange-600'
     },
     active: {
-      bg: 'bg-red-500',
-      text: 'text-red-50'
+      bg: 'bg-orange-600',
+      text: 'text-orange-50'
     }
   },
-  yoga: {
+  market: {
     default: {
-      bg: 'bg-rose-50',
-      text: 'text-rose-500'
+      bg: 'bg-amber-50',
+      text: 'text-amber-600'
     },
     active: {
-      bg: 'bg-rose-500',
-      text: 'text-rose-50'
+      bg: 'bg-amber-600', 
+      text: 'text-amber-50'
     }
   },
-  community: {
+  
+  // Music/Art themed events
+  music: {
     default: {
       bg: 'bg-purple-50',
-      text: 'text-purple-500'
+      text: 'text-purple-600'
     },
     active: {
-      bg: 'bg-purple-500',
+      bg: 'bg-purple-600',
       text: 'text-purple-50'
     }
   },
-   wellness: {
+  concert: {
     default: {
-      bg: 'bg-lime-50',
-      text: 'text-lime-500'
+      bg: 'bg-indigo-50',
+      text: 'text-indigo-600'
     },
     active: {
-      bg: 'bg-lime-500',
-      text: 'text-lime-50'
+      bg: 'bg-indigo-600',
+      text: 'text-indigo-50'
     }
   },
-  sports: {
+  band: {
     default: {
-      bg: 'bg-fuchsia-50',
-      text: 'text-fuchsia-500'
+      bg: 'bg-violet-50',
+      text: 'text-violet-600'
     },
     active: {
-      bg: 'bg-fuchsia-500',
+      bg: 'bg-violet-600',
+      text: 'text-violet-50'
+    }
+  },
+  
+  // Nature/Wellness themed events
+  yoga: {
+    default: {
+      bg: 'bg-emerald-50',
+      text: 'text-emerald-600'
+    },
+    active: {
+      bg: 'bg-emerald-600',
+      text: 'text-emerald-50'
+    }
+  },
+  wellness: {
+    default: {
+      bg: 'bg-green-50',
+      text: 'text-green-600'
+    },
+    active: {
+      bg: 'bg-green-600',
+      text: 'text-green-50'
+    }
+  },
+  
+  // Community events
+  community: {
+    default: {
+      bg: 'bg-fuchsia-50',
+      text: 'text-fuchsia-600'
+    },
+    active: {
+      bg: 'bg-fuchsia-600',
       text: 'text-fuchsia-50'
     }
   },
+  
+  // Sports events
+  sports: {
+    default: {
+      bg: 'bg-lime-50',
+      text: 'text-lime-600'
+    },
+    active: {
+      bg: 'bg-lime-600',
+      text: 'text-lime-50'
+    }
+  },
+  
+  // Special events
+  party: {
+    default: {
+      bg: 'bg-pink-50',
+      text: 'text-pink-600'
+    },
+    active: {
+      bg: 'bg-pink-600',
+      text: 'text-pink-50'
+    }
+  },
+  festival: {
+    default: {
+      bg: 'bg-rose-50',
+      text: 'text-rose-600'
+    },
+    active: {
+      bg: 'bg-rose-600',
+      text: 'text-rose-50'
+    }
+  },
+  
+  // Default/other events
   other: {
     default: {
       bg: 'bg-gray-50',
-      text: 'text-gray-500'
+      text: 'text-gray-600'
     },
     active: {
-      bg: 'bg-gray-500',
+      bg: 'bg-gray-600',
       text: 'text-gray-50'
     }
   }

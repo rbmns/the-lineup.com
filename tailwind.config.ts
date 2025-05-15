@@ -81,27 +81,68 @@ export default {
           DEFAULT: '#FF6666', // Rose from palette
           foreground: '#FFFFFF'
         },
-        // Nature colors from palette
+        
+        // Nature-inspired colors from the new palette
         ocean: {
-          DEFAULT: '#0099CC', // Ocean from palette
+          deep: '#005F73',
+          medium: '#0099CC',
+          light: '#94D2BD',
+          foam: '#E9F5F5',
+          DEFAULT: '#0099CC',
           foreground: '#FFFFFF'
         },
         sand: {
-          DEFAULT: '#FFCC99', // Sand from palette
+          DEFAULT: '#FFCC99',
           foreground: '#121212'
         },
         sunset: {
-          DEFAULT: '#FF9933', // Sunset from palette
+          DEFAULT: '#FF9933',
           foreground: '#FFFFFF'
         },
         coral: {
-          DEFAULT: '#FF6666', // Coral from palette
+          DEFAULT: '#FF6666',
+          foreground: '#FFFFFF'
+        },
+        amber: {
+          DEFAULT: '#EE9B00',
+          sandstone: '#CA6702',
           foreground: '#FFFFFF'
         },
         leaf: {
-          DEFAULT: '#66CC66', // Leaf from palette
+          DEFAULT: '#66CC66',
           foreground: '#FFFFFF'
         },
+        lime: {
+          DEFAULT: '#99CC33',
+          foreground: '#FFFFFF'
+        },
+        jungle: {
+          DEFAULT: '#2D6A4F',
+          palm: '#40916C',
+          moss: '#74C69D',
+          foreground: '#FFFFFF'
+        },
+        dawn: {
+          DEFAULT: '#FFADAD',
+          foreground: '#121212'
+        },
+        dusk: {
+          DEFAULT: '#9966FF',
+          foreground: '#FFFFFF'
+        },
+        daylight: {
+          DEFAULT: '#AED9E0',
+          foreground: '#121212'
+        },
+        twilight: {
+          DEFAULT: '#5E60CE',
+          foreground: '#FFFFFF'
+        },
+        night: {
+          DEFAULT: '#3a0CA3',
+          foreground: '#FFFFFF'
+        },
+        
         // Status colors from palette
         destructive: {
           DEFAULT: '#FF3333', // Destructive from palette
