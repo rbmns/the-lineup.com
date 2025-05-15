@@ -90,19 +90,10 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
       return event.tags.split(',').map(tag => tag.trim()).filter(Boolean);
     }
     
-    // For any other type, try to convert to string
-    try {
-      const tagsStr = String(event.tags);
-      // Only proceed if we have a non-empty string
-      if (tagsStr && tagsStr !== "[object Object]" && tagsStr !== "undefined" && tagsStr !== "null") {
-        return tagsStr.split(',').map(tag => tag.trim()).filter(Boolean);
-      }
-    } catch (e) {
-      console.error('Error processing tags:', e);
-    }
-    
-    // Fallback
+    // For any other type, return empty array
+    console.error('Unexpected tags format:', event.tags);
     return [];
+    
   }, [event.tags]);
   
   // Safely extract coordinates from different possible formats
