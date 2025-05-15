@@ -1,23 +1,32 @@
 
-import { type ToastActionElement, type ToastProps } from "@/components/ui/toast"
+import { toast as sonnerToast } from 'sonner';
+import { type ToastProps } from '@/components/ui/toast';
 
-// Import the useToast hook from toast.tsx
-import { useToast, toast as toastPrimitive } from "@/components/ui/toast"
-
-// Re-export sonner toast for convenience
-import { toast as sonnerToast } from "sonner"
-
-// Create a unified toast API
-export const toast = sonnerToast;
-
-// Export the useToast hook
-export { useToast }
-
-export type ToastActionProps = React.ComponentPropsWithoutRef<typeof ToastActionElement>
-
-export interface ToastOwnProps extends ToastProps {
-  title?: React.ReactNode
-  description?: React.ReactNode
-  action?: ToastActionElement
-  icon?: React.ReactNode
+// Enhanced toast function that accepts title and description
+interface ToastOptions {
+  title?: string;
+  description?: string;
+  variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info';
+  action?: React.ReactNode;
+  icon?: React.ReactNode;
+  duration?: number;
 }
+
+const toast = (options: ToastOptions | string) => {
+  if (typeof options === 'string') {
+    return sonnerToast(options);
+  }
+  
+  const { title, description, variant, action, icon, duration } = options;
+  
+  return sonnerToast(title || '', {
+    description,
+    icon,
+    duration: duration || 3000,
+    // Map variants to sonner's style if needed
+    // Add any additional props needed
+  });
+};
+
+// Re-expose the useToast hook from sonner for consistency
+export { toast, toast as useToast };

@@ -23,7 +23,7 @@ export interface Venue {
   google_maps?: string;
   region?: string;
   tags?: string | null;
-  slug?: string;
+  slug?: string; // Added missing property
 }
 
 export interface Event {
@@ -64,6 +64,7 @@ export interface Event {
   destination?: string; // Adding destination property for city-based URLs
   recurring_count?: number; // Adding recurring_count property to fix the error
   isExactMatch?: boolean; // Adding isExactMatch property for filtering
+  start_date?: string | null; // Adding new field for the date portion
 }
 
 export interface FriendRequest {

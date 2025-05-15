@@ -1,3 +1,4 @@
+
 export interface UserProfile {
   id: string;
   username: string | null;
@@ -19,6 +20,7 @@ export interface Venue {
   google_maps?: string | null;
   region?: string | null;
   tags?: string[] | null;
+  slug?: string | null; // Added missing property
 }
 
 // Add or update the Event type definition to include the new fields
@@ -52,6 +54,9 @@ export interface Event {
   slug?: string;
   recurring_count?: number;
   isQueryOnly?: boolean;
+  booking_link?: string | null; // Added missing property
+  organiser_name?: string | null; // Added missing property
+  vibe?: string | null; // Added missing property
 }
 
 export interface EventsResponse {

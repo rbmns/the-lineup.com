@@ -24,6 +24,7 @@ export type SafeEventData = {
   event_type?: string;
   start_time?: string;
   end_time?: string;
+  start_date?: string; // Added this field
   venue_id?: string;
   organizer_link?: string;
   fee?: number; // Changed from string | number to number to match Event type
