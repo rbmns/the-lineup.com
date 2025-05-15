@@ -91,7 +91,9 @@ const EventDetail = () => {
         <div className="lg:col-span-2">
           <EventDetailContent 
             event={event}
-            handleEventTypeClick={handleEventTypeClick}
+            onRsvp={(status) => handleRsvp(event.id, status)}
+            isRsvpLoading={false}
+            isOwner={event.created_by === event.creator?.id}
           />
           
           {!isMobile && isAuthenticated && (
@@ -99,7 +101,8 @@ const EventDetail = () => {
               <EventRsvpButtons 
                 currentStatus={event.rsvp_status} 
                 onRsvp={handleRsvpEvent}
-                fullWidth={true}
+                className="w-full"
+                size="lg"
               />
             </div>
           )}

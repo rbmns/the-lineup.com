@@ -10,13 +10,15 @@ interface EventRsvpButtonsProps {
   onRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
+  loading?: boolean;  // Added loading prop
 }
 
 export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   currentStatus,
   onRsvp,
   className,
-  size = 'md'
+  size = 'md',
+  loading = false
 }) => {
   const { user } = useAuth();
   const [isUpdating, setIsUpdating] = React.useState(false);
@@ -29,7 +31,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
 
   const handleRsvp = async (status: 'Going' | 'Interested') => {
     if (!user) return;
-    if (isUpdating) return;
+    if (isUpdating || loading) return;
     
     try {
       setIsUpdating(true);
@@ -60,6 +62,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         return "text-sm py-1 px-3 h-8 gap-1";
       case 'lg':
         return "text-base py-3 px-5 h-12 gap-2";
+      case 'md':
       default:
         return "text-sm py-2 px-4 h-10 gap-1.5";
     }
@@ -78,7 +81,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
           isGoing ? "bg-green-500 hover:bg-green-600 text-white border-green-500" : 
                    "border-gray-300 text-gray-700 hover:bg-gray-50"
         )}
-        disabled={isUpdating}
+        disabled={isUpdating || loading}
         onClick={(e) => {
           e.stopPropagation();
           handleRsvp('Going');
@@ -96,7 +99,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
           isInterested ? "bg-blue-500 hover:bg-blue-600 text-white border-blue-500" : 
                        "border-gray-300 text-gray-700 hover:bg-gray-50"
         )}
-        disabled={isUpdating}
+        disabled={isUpdating || loading}
         onClick={(e) => {
           e.stopPropagation();
           handleRsvp('Interested');
