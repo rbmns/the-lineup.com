@@ -36,7 +36,7 @@ const CategoryFilteredEventsPage = () => {
     selectedDateFilter,
     setSelectedDateFilter,
     isFilterLoading,
-    rsvpLoading,
+    // rsvpLoading, // This state is used by handleEventRsvp within the hook
     availableEventTypes,
     availableVenues,
     showNoExactMatchesMessage,
@@ -89,7 +89,7 @@ const CategoryFilteredEventsPage = () => {
             similarEvents={similarEvents}
             isLoading={isLoading}
             isFilterLoading={isFilterLoading}
-            rsvpLoading={rsvpLoading}
+            // rsvpLoading prop removed as it's not defined in CategoryFilteredEventsContentProps
             hasActiveFilters={hasActiveFilters}
             onRsvp={user ? handleEventRsvp : undefined}
           />
@@ -100,3 +100,4 @@ const CategoryFilteredEventsPage = () => {
 };
 
 export default CategoryFilteredEventsPage;
+
