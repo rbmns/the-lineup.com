@@ -72,7 +72,7 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
 
   return (
     <Card className="overflow-hidden border border-gray-200 shadow-md hover:shadow-xl transition-all duration-500 animate-fade-in">
-      {/* Image header - ALWAYS at the top for all screen sizes; pass title/date for overlay */}
+      {/* Image header */}
       <EventDetailHeader
         event={event}
         coverImage={imageUrl}
@@ -109,7 +109,7 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
               <EventRsvpButtons 
                 currentStatus={event?.rsvp_status}
                 onRsvp={handleRsvpWrapped}
-                loading={rsvpLoading}
+                isLoading={rsvpLoading} /* Changed from loading to isLoading */
                 className="w-full"
                 size="lg"
               />

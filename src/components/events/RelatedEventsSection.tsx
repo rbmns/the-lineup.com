@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { CardContent, Card } from '@/components/ui/card';
@@ -38,7 +37,8 @@ export const RelatedEventsSection: React.FC<RelatedEventsSectionProps> = ({ even
             event={event}
             showRsvpButtons={false}
             compact={true} // Make sure all cards are compact
-            featured={false} // No featured cards
+            // featured={false} // Removed, 'featured' prop does not exist on EventCard
+            // loadingEventId can be passed here if available and needed for related event cards
           />
         ))}
       </div>

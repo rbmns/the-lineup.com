@@ -50,7 +50,7 @@ const EventsPage = () => {
             mainEvents={displayEvents}
             relatedEvents={[]}
             isLoading={isLoading}
-            isRsvpLoading={false} // Don't use global loading state
+            // isRsvpLoading={false} // Removed, loadingEventId is used instead
             onRsvp={user ? handleEventRsvp : undefined}
             showRsvpButtons={!!user}
             hasActiveFilters={false}

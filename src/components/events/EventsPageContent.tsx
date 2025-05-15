@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { EventFilterSection } from '@/components/events/filters/EventFilterSection';
 import { FilterSummary } from '@/components/events/FilterSummary';
@@ -32,7 +31,7 @@ interface EventsPageContentProps {
   similarEvents: any[];
   isLoading: boolean;
   isFilterLoading: boolean;
-  rsvpLoading: boolean;
+  // rsvpLoading: boolean; // This prop is part of EventsPageContentProps but not directly used by LazyEventsList anymore
   handleEventRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   user: any;
 }
@@ -64,7 +63,7 @@ export const EventsPageContent: React.FC<EventsPageContentProps> = ({
   similarEvents,
   isLoading,
   isFilterLoading,
-  rsvpLoading,
+  // rsvpLoading, // This prop is part of EventsPageContentProps but not directly used by LazyEventsList anymore
   handleEventRsvp,
   user
 }) => {
@@ -113,10 +112,12 @@ export const EventsPageContent: React.FC<EventsPageContentProps> = ({
         mainEvents={exactMatches}
         relatedEvents={similarEvents}
         isLoading={isLoading || isFilterLoading}
-        isRsvpLoading={rsvpLoading}
+        // isRsvpLoading={rsvpLoading} // Removed, LazyEventsList uses loadingEventId
         onRsvp={user ? handleEventRsvp : undefined}
         showRsvpButtons={!!user}
         hasActiveFilters={hasActiveFilters}
+        // loadingEventId should be passed here if available in EventsPageContentProps
+        // For now, it's not, so it will be undefined, which is acceptable.
       />
     </div>
   );

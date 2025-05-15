@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 interface EventsListProps {
   events: Event[];
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
-  isRsvpLoading?: boolean;
+  // isRsvpLoading?: boolean; // Removed as per error and refactor plan
   showRsvpButtons?: boolean;
   compact?: boolean;
   className?: string;
@@ -18,7 +18,7 @@ interface EventsListProps {
 export const EventsList: React.FC<EventsListProps> = ({
   events,
   onRsvp,
-  isRsvpLoading,
+  // isRsvpLoading, // Removed
   showRsvpButtons = true,
   compact = false,
   className,
@@ -36,10 +36,10 @@ export const EventsList: React.FC<EventsListProps> = ({
             event={event}
             onRsvp={onRsvp}
             showRsvpButtons={showRsvpButtons}
-            view="grid"
+            // view="grid" // Removed, 'view' prop does not exist on EventCard
             compact={compact || true} // Always compact
-            featured={false} // No featured cards
-            isLoading={loadingEventId === event.id}
+            // featured={false} // Removed, 'featured' prop does not exist on EventCard
+            loadingEventId={loadingEventId} // Pass loadingEventId directly
             className="h-full"
           />
         </div>
