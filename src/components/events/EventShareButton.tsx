@@ -44,6 +44,7 @@ const EventShareButton = ({
         setIsOpen(true);
       }
     } catch (error) {
+      // If there's an error, open the dialog as fallback
       setIsOpen(true);
     }
   };

@@ -88,8 +88,8 @@ export const uploadAvatar = async (userId: string, file: File) => {
       throw profileError;
     }
     
-    // Always use a single-item array with just the new URL - this replaces any existing avatar
-    const avatarUrls = [urlData.publicUrl];
+    // Always use a single URL string, not an array
+    const avatarUrl = urlData.publicUrl;
     
     // If no profile exists, create one
     if (!profileData) {
@@ -109,7 +109,7 @@ export const uploadAvatar = async (userId: string, file: File) => {
             id: userId,
             email: userData.user.email,
             username: userData.user.email?.split('@')[0] || 'User',
-            avatar_url: avatarUrls
+            avatar_url: avatarUrl
           });
           
         if (insertError) {
@@ -117,15 +117,15 @@ export const uploadAvatar = async (userId: string, file: File) => {
           throw insertError;
         }
         
-        console.log("Created new profile with avatar URL:", avatarUrls);
-        return avatarUrls;
+        console.log("Created new profile with avatar URL:", avatarUrl);
+        return avatarUrl;
       }
     } else {
-      // Update profile with the new avatar URL array (replacing the old one)
+      // Update profile with the new avatar URL string
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ 
-          avatar_url: avatarUrls 
+          avatar_url: avatarUrl 
         })
         .eq('id', userId);
         
@@ -135,8 +135,8 @@ export const uploadAvatar = async (userId: string, file: File) => {
       }
     }
     
-    console.log("Avatar URL updated successfully to:", avatarUrls);
-    return avatarUrls;
+    console.log("Avatar URL updated successfully to:", avatarUrl);
+    return avatarUrl;
   } catch (error) {
     console.error('Error uploading avatar:', error);
     throw error;

@@ -4,7 +4,6 @@ import { Event } from "@/types";
 import { ShareButtons } from "./ShareButtons";
 import { copyToClipboard } from "@/utils/sharing/clipboardUtils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ShareTrigger } from "./ShareTrigger";
 
 export interface EventShareDialogProps {
   event: Event;

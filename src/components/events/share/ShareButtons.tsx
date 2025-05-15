@@ -31,7 +31,7 @@ export function ShareButtons({ title, description, url, onCopyLink }: ShareButto
   };
 
   // Determine grid columns based on mobile vs desktop
-  const gridClass = isMobile ? "grid-cols-2 gap-4" : "grid-cols-3 gap-2";
+  const gridClass = isMobile ? "grid-cols-2 gap-4" : "grid-cols-2 gap-2";
 
   return (
     <div className={`grid ${gridClass}`}>
@@ -61,6 +61,15 @@ export function ShareButtons({ title, description, url, onCopyLink }: ShareButto
       >
         <Icons.link className="h-6 w-6 mb-1" />
         <span className="text-xs">Copy Link</span>
+      </Button>
+      <Button
+        variant="outline"
+        size={isMobile ? "default" : "sm"}
+        className="flex flex-col items-center justify-center h-16 sm:h-20"
+        onClick={() => handleShare("snapchat")}
+      >
+        <Icons.snapchat className="h-6 w-6 mb-1" />
+        <span className="text-xs">Snapchat</span>
       </Button>
     </div>
   );

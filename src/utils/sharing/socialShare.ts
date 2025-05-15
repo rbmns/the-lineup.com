@@ -1,43 +1,41 @@
 
-export interface SocialShare {
-  title: string;
-  text: string;
-  url: string;
-  image?: string;
-  hashTags?: string[];
-  description?: string;
-}
+import { SocialShare } from '@/types/seo';
 
-export const shareToFacebook = (data: SocialShare) => {
-  const url = new URL('https://www.facebook.com/sharer/sharer.php');
-  url.searchParams.append('u', data.url);
-  
-  window.open(url.toString(), 'facebook-share', 'width=580,height=296');
-  return true;
-};
-
-export const shareToWhatsApp = (data: SocialShare) => {
-  const text = `${data.title} - ${data.url}`;
-  let whatsappUrl;
-  
-  // Check if it's mobile or desktop
-  if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-    // Mobile
-    whatsappUrl = `whatsapp://send?text=${encodeURIComponent(text)}`;
-  } else {
-    // Desktop
-    whatsappUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-  }
-  
+// Share to WhatsApp
+export const shareToWhatsApp = (data: SocialShare): void => {
+  const text = encodeURIComponent(`${data.title}\n\n${data.text || ''}\n\n${data.url}`);
+  const whatsappUrl = `https://wa.me/?text=${text}`;
   window.open(whatsappUrl, '_blank');
-  return true;
 };
 
-export const shareToSnapchat = (data: SocialShare) => {
-  // Snapchat has a web sharing API but it's not as widely supported
-  const url = new URL('https://www.snapchat.com/share');
-  url.searchParams.append('url', data.url);
+// Share to Facebook
+export const shareToFacebook = (data: SocialShare): void => {
+  const url = encodeURIComponent(data.url);
+  const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+  window.open(fbShareUrl, '_blank', 'width=600,height=400');
+};
+
+// Share to Snapchat
+export const shareToSnapchat = (data: SocialShare): void => {
+  const url = encodeURIComponent(data.url);
+  const snapchatUrl = `https://snapchat.com/scan?attachmentUrl=${url}`;
+  window.open(snapchatUrl, '_blank');
+};
+
+// Create a share URL for any platform (helper function)
+export const createShareUrl = (platform: string, data: SocialShare): string => {
+  const url = encodeURIComponent(data.url);
+  const title = encodeURIComponent(data.title);
+  const text = data.text ? encodeURIComponent(data.text) : '';
   
-  window.open(url.toString(), 'snapchat-share', 'width=580,height=296');
-  return true;
+  switch (platform.toLowerCase()) {
+    case 'facebook':
+      return `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+    case 'whatsapp':
+      return `https://wa.me/?text=${encodeURIComponent(`${data.title}\n\n${data.text || ''}\n\n${data.url}`)}`;
+    case 'snapchat':
+      return `https://snapchat.com/scan?attachmentUrl=${url}`;
+    default:
+      return '';
+  }
 };

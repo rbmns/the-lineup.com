@@ -1,22 +1,37 @@
 
-import { supabase } from '@/integrations/supabase/client';
 import { SeoMetadata } from '@/types/seo';
 import { defaultSeoTags } from '@/utils/seoUtils';
 
+/**
+ * Instead of using a table that doesn't exist, we'll use a local storage approach
+ * for storing SEO metadata in the client
+ */
 export const getSeoMetadata = async (): Promise<SeoMetadata | null> => {
   try {
-    const { data, error } = await supabase
-      .from('seo_metadata')
-      .select('*')
-      .limit(1)
-      .maybeSingle();
+    // Try to get from localStorage
+    const storedMetadata = localStorage.getItem('seo_metadata');
     
-    if (error) {
-      console.error('Error fetching SEO metadata:', error);
-      return null;
+    if (storedMetadata) {
+      return JSON.parse(storedMetadata) as SeoMetadata;
     }
     
-    return data;
+    // Return default metadata if nothing is stored
+    const defaultMetadata: SeoMetadata = {
+      id: 'default',
+      title: 'The Lineup',
+      description: 'Find local events and see who\'s joining',
+      og_image_url: defaultSeoTags.ogImage,
+      favicon_url: null,
+      keywords: null,
+      author: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+    
+    // Store the default metadata
+    localStorage.setItem('seo_metadata', JSON.stringify(defaultMetadata));
+    
+    return defaultMetadata;
   } catch (error) {
     console.error('Exception in getSeoMetadata:', error);
     return null;
@@ -27,39 +42,30 @@ export const updateSeoMetadata = async (
   updates: Partial<SeoMetadata>
 ): Promise<{ error: any }> => {
   try {
-    // First check if any record exists
-    const { data: existingData } = await supabase
-      .from('seo_metadata')
-      .select('id')
-      .limit(1)
-      .maybeSingle();
-    
-    const updateData = {
-      title: updates.title || 'The Lineup',
-      description: updates.description || 'Find local events and see who\'s joining',
-      og_image_url: updates.og_image_url || defaultSeoTags.ogImage,
-      favicon_url: updates.favicon_url || null,
-      keywords: updates.keywords || null,
-      author: updates.author || null,
+    // Get current metadata
+    const current = await getSeoMetadata() || {
+      id: 'default',
+      title: 'The Lineup',
+      description: 'Find local events and see who\'s joining',
+      og_image_url: defaultSeoTags.ogImage,
+      favicon_url: null,
+      keywords: null,
+      author: null,
+      created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
-
-    if (existingData) {
-      // Update existing record
-      const { error } = await supabase
-        .from('seo_metadata')
-        .update(updateData)
-        .eq('id', existingData.id);
-      
-      return { error };
-    } else {
-      // Insert new record
-      const { error } = await supabase
-        .from('seo_metadata')
-        .insert([updateData]);
-      
-      return { error };
-    }
+    
+    // Update with new values
+    const updated: SeoMetadata = {
+      ...current,
+      ...updates,
+      updated_at: new Date().toISOString()
+    };
+    
+    // Store updated metadata
+    localStorage.setItem('seo_metadata', JSON.stringify(updated));
+    
+    return { error: null };
   } catch (error) {
     console.error('Error updating SEO metadata:', error);
     return { error };
@@ -70,36 +76,14 @@ export const uploadFavicon = async (
   file: File
 ): Promise<{ url: string | null; error: Error | null }> => {
   try {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `favicon-${Date.now()}.${fileExt}`;
-    const filePath = fileName;
-
-    console.log(`Starting favicon upload: ${filePath}`);
-
-    const { error: uploadError, data: uploadData } = await supabase.storage
-      .from('seo')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: true
-      });
-
-    if (uploadError) {
-      console.error('Error uploading favicon:', uploadError);
-      throw uploadError;
-    }
-
-    console.log('Favicon uploaded successfully:', uploadData);
-
-    const { data } = supabase.storage
-      .from('seo')
-      .getPublicUrl(filePath);
-
-    console.log('Generated public URL for favicon:', data.publicUrl);
+    // For now, use a simple URL.createObjectURL approach for local preview
+    const url = URL.createObjectURL(file);
+    console.log('Created object URL for favicon:', url);
     
-    await updateSeoMetadata({ favicon_url: data.publicUrl });
+    await updateSeoMetadata({ favicon_url: url });
     
     return {
-      url: data.publicUrl,
+      url,
       error: null,
     };
   } catch (error) {
@@ -115,36 +99,14 @@ export const uploadOgImage = async (
   file: File
 ): Promise<{ url: string | null; error: Error | null }> => {
   try {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `og-image-${Date.now()}.${fileExt}`;
-    const filePath = fileName;
-
-    console.log(`Starting OG image upload: ${filePath}`);
-
-    const { error: uploadError, data: uploadData } = await supabase.storage
-      .from('seo')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: true
-      });
-
-    if (uploadError) {
-      console.error('Error uploading OG image:', uploadError);
-      throw uploadError;
-    }
-
-    console.log('OG image uploaded successfully:', uploadData);
-
-    const { data } = supabase.storage
-      .from('seo')
-      .getPublicUrl(filePath);
-
-    console.log('Generated public URL for OG image:', data.publicUrl);
+    // For now, use a simple URL.createObjectURL approach for local preview
+    const url = URL.createObjectURL(file);
+    console.log('Created object URL for OG image:', url);
     
-    await updateSeoMetadata({ og_image_url: data.publicUrl });
+    await updateSeoMetadata({ og_image_url: url });
     
     return {
-      url: data.publicUrl,
+      url,
       error: null,
     };
   } catch (error) {
@@ -171,4 +133,3 @@ export const initializeSeoMetadata = async (): Promise<void> => {
     console.error('Error initializing SEO metadata:', error);
   }
 };
-
