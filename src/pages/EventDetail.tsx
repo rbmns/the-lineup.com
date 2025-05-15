@@ -9,7 +9,6 @@ import { useEventMetaTags } from '@/hooks/useEventMetaTags';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDeviceDetection } from '@/hooks/useDeviceDetection';
 import { useEventDetailHandlers } from '@/hooks/useEventDetailHandlers';
-import { toast } from '@/hooks/use-toast';
 import { ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EventDetailErrorState } from '@/components/events/EventDetailErrorState';
@@ -34,11 +33,6 @@ const EventDetail = () => {
   useEffect(() => {
     if (!effectiveId) {
       console.error("Missing event ID in URL parameters");
-      toast({
-        title: "Error",
-        description: "Could not load the event due to missing ID", 
-        variant: "destructive"
-      });
       navigate('/events');
     }
   }, [effectiveId, navigate]);
@@ -126,8 +120,8 @@ const EventDetail = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main event content - takes up 2/3 of the screen on desktop */}
-        <div className="lg:col-span-2">
+        {/* Main event content - takes up 2/3 of the screen on desktop - image always at the top */}
+        <div className="lg:col-span-2 order-first">
           <MainEventContent 
             event={event}
             attendees={attendees}
@@ -162,7 +156,7 @@ const EventDetail = () => {
         </div>
         
         {/* Sidebar content - takes up 1/3 of the screen on desktop */}
-        <div className="lg:order-last order-first">
+        <div className="lg:col-span-1 order-last">
           <SidebarContent 
             event={event}
             attendees={attendees}

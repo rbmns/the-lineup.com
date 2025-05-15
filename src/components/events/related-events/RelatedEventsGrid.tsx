@@ -11,8 +11,9 @@ export const RelatedEventsGrid: React.FC<RelatedEventsGridProps> = ({ events }) 
   // If no events, show a message
   if (!events || events.length === 0) {
     return (
-      <div className="p-4 bg-gray-50 rounded-md text-center">
-        <p className="text-gray-500">No similar events found</p>
+      <div className="p-6 bg-gray-50 rounded-lg text-center">
+        <p className="text-gray-500">No similar events found at the moment</p>
+        <p className="text-sm text-gray-400 mt-1">Check back later for more events</p>
       </div>
     );
   }

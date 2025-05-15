@@ -38,7 +38,7 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
     userId: user?.id,
     tags,
     vibe,
-    minResults: 2 // Always ensure at least 2 results
+    minResults: 3 // Increase minimum results to ensure we show something
   });
   
   const navigate = useNavigate();
@@ -52,30 +52,35 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
         hasFetchedRef.current = true;
         
         try {
+          console.log('Fetching fallback events for event type:', eventType);
+          
           // First try: Get upcoming events of the same type
           let { data: typeEvents, error: typeError } = await supabase
             .from('events')
-            .select('*')
+            .select('*, venues:venue_id(*), creator:profiles(*)')
             .neq('id', eventId)
             .eq('event_type', eventType)
             .gte('start_time', new Date().toISOString())
             .order('start_time', { ascending: true })
-            .limit(3);
+            .limit(5);
             
           // Second try: If not enough, get any upcoming events
           if (!typeEvents || typeEvents.length < 2) {
+            console.log('Not enough type-matched events, fetching any upcoming events');
             const { data: anyEvents, error: anyError } = await supabase
               .from('events')
-              .select('*')
+              .select('*, venues:venue_id(*), creator:profiles(*)')
               .neq('id', eventId)
               .gte('start_time', new Date().toISOString())
               .order('start_time', { ascending: true })
               .limit(5);
               
             if (anyEvents && anyEvents.length > 0) {
+              console.log('Found fallback events:', anyEvents.length);
               setFallbackEvents(anyEvents);
             }
           } else {
+            console.log('Found type-matched events:', typeEvents.length);
             setFallbackEvents(typeEvents);
           }
         } catch (err) {
@@ -112,6 +117,9 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
       }
     });
   }
+
+  // Debug log to check if we have any events
+  console.log('Combined events for display:', combinedEvents.length);
   
   return (
     <div className="animate-fade-in space-y-4" style={{ animationDelay: '400ms' }}>

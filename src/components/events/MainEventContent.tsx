@@ -37,12 +37,18 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
 }) => {
   // Wrapper for handleRsvp to meet type requirements
   const handleRsvpWrapped = async (status: 'Going' | 'Interested'): Promise<boolean> => {
-    await handleRsvp(status);
-    return true;
+    try {
+      await handleRsvp(status);
+      return true;
+    } catch (error) {
+      console.error('Error handling RSVP:', error);
+      return false;
+    }
   };
 
   return (
     <Card className="overflow-hidden border border-gray-200 shadow-md hover:shadow-xl transition-all duration-500 animate-fade-in">
+      {/* Image header - ALWAYS at the top for all screen sizes */}
       <EventDetailHeader
         event={event}
         coverImage={imageUrl}

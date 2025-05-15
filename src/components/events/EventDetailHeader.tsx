@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import EventShareButton from './EventShareButton';
 import { cn } from '@/lib/utils';
 import { useEventImages } from '@/hooks/useEventImages';
+import { CategoryPill } from '@/components/ui/category-pill';
 
 interface EventDetailHeaderProps {
   event: Event;
@@ -59,6 +60,17 @@ export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({
         {/* Overlay gradient for text visibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         
+        {/* Event type badge - Always visible in top left */}
+        {eventType && (
+          <div className="absolute top-4 left-4">
+            <CategoryPill 
+              category={eventType}
+              size="sm"
+              showIcon={true}
+            />
+          </div>
+        )}
+        
         {/* Title overlay - Only shown on desktop/tablet */}
         {showTitleOverlay && (
           <div className="absolute bottom-0 left-0 p-6 text-white">
@@ -66,7 +78,6 @@ export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({
             
             {(event.organiser_name || eventType) && (
               <p className="text-base md:text-lg opacity-90">
-                {eventType ? `${eventType}` : ''}
                 {event.organiser_name ? `By ${event.organiser_name}` : ''}
               </p>
             )}

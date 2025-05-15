@@ -130,11 +130,11 @@ const getCategoryColor = (category: string): string => {
   
   // Other - Gray (default)
   if (lowerCategory.includes('other')) {
-    return 'bg-gray-500 text-white hover:bg-gray-600';
+    return 'bg-gray-600 text-white hover:bg-gray-700';
   }
   
   // Default - if no match is found
-  return 'bg-gray-500 text-white hover:bg-gray-600';
+  return 'bg-gray-600 text-white hover:bg-gray-700';
 };
 
 interface CategoryPillProps {
