@@ -20,12 +20,11 @@ export interface EventRsvpMap {
   [eventId: string]: 'Going' | 'Interested';
 }
 
-// Extend the Event type with formatting properties
-declare global {
-  namespace '@/types' {
-    interface Event {
-      formattedDate?: string;
-      formattedTime?: string;
-    }
-  }
+// Define extended Event interface with formatting properties
+export interface ExtendedEvent extends Event {
+  formattedDate?: string;
+  formattedTime?: string;
 }
+
+// We'll use the normal Event type from @/types, but our code will ensure
+// that formattedDate and formattedTime properties are set before use
