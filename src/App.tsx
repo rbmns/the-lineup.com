@@ -1,13 +1,13 @@
 
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { Toaster } from 'sonner';
+import { Toaster } from '@/components/ui/toaster'; // Use our custom Toaster
 
 // Pages
 import Profile from './pages/Profile';
 import ProfileEdit from './pages/ProfileEdit';
 import Friends from './pages/Friends';
-import EventsPageRefactored from './pages/EventsPageRefactored'; // Updated import
+import EventsPageRefactored from './pages/EventsPageRefactored';
 import EventDetail from './pages/EventDetail';
 import Explore from './pages/Explore';
 import Login from './pages/Login';
@@ -19,7 +19,7 @@ import GoodbyePage from './pages/GoodbyePage';
 import AdminSettings from './pages/AdminSettings';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
-import VenueEvents from './pages/VenueEvents'; // Add this import
+import VenueEvents from './pages/VenueEvents';
 
 // Components
 import { AuthProvider } from './contexts/AuthContext';
@@ -65,7 +65,7 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
-        <Toaster position="top-center" richColors />
+        <Toaster />
         <CookieConsent />
       </div>
     </AuthProvider>

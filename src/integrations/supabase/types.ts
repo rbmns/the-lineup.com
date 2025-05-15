@@ -150,7 +150,7 @@ export type Database = {
           creator: string | null
           description: string | null
           destination: string | null
-          end_time2: string | null
+          end_time: string | null
           event_type: string | null
           "Extra info": string | null
           fee: number | null
@@ -160,7 +160,7 @@ export type Database = {
           organizer_link: string | null
           slug: string | null
           start_date: string | null
-          start_time2: string | null
+          start_time: string | null
           tags: string | null
           title: string
           updated_at: string | null
@@ -173,7 +173,7 @@ export type Database = {
           creator?: string | null
           description?: string | null
           destination?: string | null
-          end_time2?: string | null
+          end_time?: string | null
           event_type?: string | null
           "Extra info"?: string | null
           fee?: number | null
@@ -183,7 +183,7 @@ export type Database = {
           organizer_link?: string | null
           slug?: string | null
           start_date?: string | null
-          start_time2?: string | null
+          start_time?: string | null
           tags?: string | null
           title: string
           updated_at?: string | null
@@ -196,7 +196,7 @@ export type Database = {
           creator?: string | null
           description?: string | null
           destination?: string | null
-          end_time2?: string | null
+          end_time?: string | null
           event_type?: string | null
           "Extra info"?: string | null
           fee?: number | null
@@ -206,7 +206,7 @@ export type Database = {
           organizer_link?: string | null
           slug?: string | null
           start_date?: string | null
-          start_time2?: string | null
+          start_time?: string | null
           tags?: string | null
           title?: string
           updated_at?: string | null

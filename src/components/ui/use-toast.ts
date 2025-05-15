@@ -1,7 +1,3 @@
 
-// Export from toast.tsx and sonner.tsx
-export * from "@/components/ui/toast";
-export * from "@/components/ui/sonner";
-
-// Re-export sonner toast for convenience - prevent double imports
-export { toast } from "sonner";
+// This file redirects to the main use-toast implementation in the hooks directory
+export { useToast, toast } from "@/hooks/use-toast"

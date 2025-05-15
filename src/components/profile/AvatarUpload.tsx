@@ -4,7 +4,7 @@ import { supabase, ensureAvatarsBucketExists } from '@/integrations/supabase/cli
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from '@/hooks/use-toast';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Loader2 } from 'lucide-react';
 import { typeAssert } from '@/utils/supabaseUtils';
@@ -13,7 +13,6 @@ const AvatarUpload = () => {
   const [uploading, setUploading] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const { user, profile, refreshProfile } = useAuth();
-  const { toast } = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,7 +55,6 @@ const AvatarUpload = () => {
     } catch (error: any) {
       console.error("Avatar upload failed:", error);
       toast({
-        title: "Upload failed",
         description: error.message || "Failed to upload your avatar. Please try again.",
         variant: "destructive"
       });
@@ -79,7 +77,6 @@ const AvatarUpload = () => {
       if (error) throw error;
       
       toast({
-        title: "Avatar updated",
         description: "Your profile picture has been updated."
       });
       
@@ -88,7 +85,6 @@ const AvatarUpload = () => {
       console.error("Error updating avatar in profile:", error);
       
       toast({
-        title: "Update failed",
         description: error.message || "Failed to update your avatar in your profile.",
         variant: "destructive"
       });
