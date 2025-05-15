@@ -1,8 +1,7 @@
 
-import { toast as sonnerToast, useToast as useSonnerToast } from 'sonner';
-import { type ToastProps } from '@/components/ui/toast';
+import { type ToasterToast } from '@/components/ui/toast';
 
-// Enhanced toast function that accepts title and description
+// No-op toast function that doesn't actually display anything
 interface ToastOptions {
   title?: string;
   description?: string;
@@ -12,38 +11,20 @@ interface ToastOptions {
   duration?: number;
 }
 
-// Fixed toast function to properly handle string input and undefined options
-const toast = (options: ToastOptions | string) => {
-  if (typeof options === 'string') {
-    // If options is a string, use it as the description
-    return sonnerToast(options);
-  }
-  
-  // Safely destructure with defaults to avoid undefined errors
-  const { 
-    title = '', 
-    description, 
-    variant = 'default', 
-    action, 
-    icon, 
-    duration = 3000 
-  } = options || {};
-  
-  // Use sonnerToast with proper parameters
-  return sonnerToast(title, {
-    description,
-    icon,
-    duration,
-    // Map variant to sonner style if needed
-    style: variant === 'destructive' ? { backgroundColor: '#FEE2E2', borderColor: '#EF4444' } : undefined,
-    action,
-  });
+// This is now a no-op function that returns an empty string as ID
+const toast = (options: ToastOptions | string): string => {
+  // We're intentionally not showing any toasts
+  // Just return an empty ID
+  return '';
 };
 
-// Create properly typed useToast hook that returns the toast function
+// No-op useToast hook
 const useToast = () => {
-  const sonnerHook = useSonnerToast();
-  return { ...sonnerHook, toast };
+  return {
+    toast,
+    dismiss: () => {},
+    toasts: [] as ToasterToast[],
+  };
 };
 
 export { toast, useToast };
