@@ -67,14 +67,14 @@ export const useFetchRelatedEvents = ({
         if (data && data.length > 0) {
           // Filter to just future events
           // Use type assertion to handle the attendees property that will be added later
-          filteredEvents = data as unknown as Event[];
+          const rawEvents = data as unknown as Omit<Event, 'attendees'>[];
           
           // If we have a userId, fetch RSVP status for each event
           if (userId) {
             console.log(`Fetching RSVP status for user ${userId} for related events`);
             
             // Get all event IDs
-            const eventIds = filteredEvents.map(event => event.id);
+            const eventIds = rawEvents.map(event => event.id);
             
             // Fetch RSVP status for these events for the current user
             if (eventIds.length > 0) {
@@ -93,11 +93,14 @@ export const useFetchRelatedEvents = ({
                   rsvpMap.set(rsvp.event_id, rsvp.status);
                 });
                 
-                // Update the events with their RSVP status
-                filteredEvents = filteredEvents.map(event => ({
+                // Update the events with their RSVP status and proper attendees object
+                filteredEvents = rawEvents.map(event => ({
                   ...event,
                   rsvp_status: rsvpMap.get(event.id) as 'Going' | 'Interested' | undefined,
-                  attendees: [] // Add empty attendees array to satisfy the Event type
+                  attendees: {
+                    going: 0,
+                    interested: 0
+                  }
                 }));
                 
                 console.log('RSVP status applied to related events:', 
@@ -105,10 +108,13 @@ export const useFetchRelatedEvents = ({
               }
             }
           } else {
-            // Add empty attendees array to satisfy the Event type
-            filteredEvents = filteredEvents.map(event => ({
+            // Add proper attendees object to satisfy the Event type
+            filteredEvents = rawEvents.map(event => ({
               ...event,
-              attendees: [] // Add empty attendees array
+              attendees: {
+                going: 0,
+                interested: 0
+              }
             }));
           }
         }
@@ -132,12 +138,15 @@ export const useFetchRelatedEvents = ({
           
           if (!fallbackError && fallbackData && fallbackData.length > 0) {
             // Cast to Event[] with attendees property
-            let additionalEvents = fallbackData as unknown as Event[];
+            let additionalEvents = fallbackData as unknown as Omit<Event, 'attendees'>[];
             
-            // Add empty attendees array to satisfy the Event type
+            // Add proper attendees object to satisfy the Event type
             additionalEvents = additionalEvents.map(event => ({
               ...event,
-              attendees: []
+              attendees: {
+                going: 0,
+                interested: 0
+              }
             }));
             
             // If we have tags, prefer events with matching tags
@@ -209,7 +218,10 @@ export const useFetchRelatedEvents = ({
               })
               .map(event => ({
                 ...event,
-                attendees: []
+                attendees: {
+                  going: 0,
+                  interested: 0
+                }
               }));
             
             // Add RSVP status if available
