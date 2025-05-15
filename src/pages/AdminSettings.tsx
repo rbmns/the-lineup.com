@@ -1,15 +1,62 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import LogoUploader from '@/components/admin/LogoUploader';
 import FaviconUploader from '@/components/admin/FaviconUploader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { getSeoMetadata, updateSeoMetadata } from '@/lib/seo';
+import { toast } from '@/hooks/use-toast';
+import { SeoMetadata } from '@/types/seo';
 
 const AdminSettings = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [seoMetadata, setSeoMetadata] = useState<SeoMetadata | null>(null);
+  
+  // Fetch SEO metadata on component mount
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      const metadata = await getSeoMetadata();
+      if (metadata) {
+        setSeoMetadata(metadata);
+      }
+    };
+    
+    fetchMetadata();
+  }, []);
+
+  // Handle favicon upload complete
+  const handleFaviconUploadComplete = async (newFaviconUrl: string) => {
+    try {
+      const { error } = await updateSeoMetadata({
+        favicon_url: newFaviconUrl
+      });
+      
+      if (error) {
+        toast({
+          title: "Update failed",
+          description: "Failed to update favicon metadata.",
+          variant: "destructive"
+        });
+      } else {
+        setSeoMetadata(prev => prev ? {...prev, favicon_url: newFaviconUrl} : null);
+        toast({
+          title: "Metadata updated",
+          description: "Favicon URL was updated in the metadata.",
+          variant: "success"
+        });
+      }
+    } catch (error) {
+      console.error("Error updating metadata:", error);
+      toast({
+        title: "Unexpected error",
+        description: "An error occurred while updating metadata.",
+        variant: "destructive"
+      });
+    }
+  };
   
   // Redirect if not authenticated
   React.useEffect(() => {
@@ -35,7 +82,20 @@ const AdminSettings = () => {
           <div className="grid gap-6">
             <div className="grid md:grid-cols-2 gap-6">
               <LogoUploader />
-              <FaviconUploader />
+              <Card>
+                <CardHeader>
+                  <CardTitle>Favicon</CardTitle>
+                  <CardDescription>
+                    Upload a favicon to display in browser tabs
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <FaviconUploader 
+                    currentFaviconUrl={seoMetadata?.favicon_url || null} 
+                    onUploadComplete={handleFaviconUploadComplete} 
+                  />
+                </CardContent>
+              </Card>
             </div>
             
             <Card>

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Button } from '@/components/ui/button';
@@ -5,16 +6,20 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
+import { uploadFavicon } from '@/lib/seo';
 
 interface FaviconUploaderProps {
-  currentFaviconUrl: string | null;
-  onUploadComplete: (newFaviconUrl: string) => void;
+  currentFaviconUrl?: string | null;
+  onUploadComplete?: (newFaviconUrl: string) => void;
 }
 
-const FaviconUploader: React.FC<FaviconUploaderProps> = ({ currentFaviconUrl, onUploadComplete }) => {
+const FaviconUploader: React.FC<FaviconUploaderProps> = ({ 
+  currentFaviconUrl, 
+  onUploadComplete = () => {} 
+}) => {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<ProgressEvent | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<{ loaded: number; total: number } | null>(null);
   
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
@@ -41,11 +46,9 @@ const FaviconUploader: React.FC<FaviconUploaderProps> = ({ currentFaviconUrl, on
     setUploading(true);
     setUploadProgress(null);
 
-    const filePath = `favicons/favicon_${Date.now()}.${file.name.split('.').pop()}`;
-
     try {
-      const { data, error } = await supabase.storage.from('public')
-        .upload(filePath, file);
+      // Use the uploadFavicon utility from lib/seo instead of direct storage access
+      const { url, error } = await uploadFavicon(file);
 
       if (error) {
         console.error("Error uploading favicon:", error);
@@ -54,9 +57,8 @@ const FaviconUploader: React.FC<FaviconUploaderProps> = ({ currentFaviconUrl, on
           description: "There was an error uploading the favicon. Please try again.",
           variant: "destructive",
         });
-      } else {
-        const newFaviconUrl = `${supabase.storageUrl}/public/${data.path}`;
-        onUploadComplete(newFaviconUrl);
+      } else if (url) {
+        onUploadComplete(url);
         toast({
           title: "Upload successful",
           description: "Favicon uploaded successfully!",
