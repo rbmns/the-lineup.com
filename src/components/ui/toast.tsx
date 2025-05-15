@@ -122,6 +122,8 @@ export interface ToasterToast {
   description?: React.ReactNode
   action?: ToastActionElement
   variant?: "default" | "destructive" | "success" | "warning" | "info"
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 // Input type that doesn't require the id field
