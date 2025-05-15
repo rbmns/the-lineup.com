@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Loader2, UserPlus, UserMinus, Check, X } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { useFriendship } from '@/hooks/useFriendship';
+import { useFriendship, Friendship } from '@/hooks/useFriendship';
 import { UserProfile } from '@/types'; // Import as a type alias
 import { FriendsTabContent } from '@/components/friends/FriendsTabContent';
 
@@ -33,7 +33,11 @@ const Friends = () => {
   const [friendRequests, setFriendRequests] = useState<FriendItem[] | null>(null);
   const [friendsLoading, setFriendsLoading] = useState(true);
   const navigate = useNavigate();
-  const { acceptFriendRequest, declineFriendRequest, removeFriend } = useFriendship();
+  const { 
+    acceptFriendRequest, 
+    declineFriendRequest, 
+    removeFriend 
+  } = useFriendship();
 
   useEffect(() => {
     if (!isAuthenticated && !authLoading) {
@@ -312,7 +316,7 @@ const Friends = () => {
   const formattedFriends = friends?.map(friend => ({
     id: friend.profile.id,
     username: friend.profile.username,
-    avatar_url: friend.profile.avatar_url,
+    avatar_url: friend.profile.avatar_url ? [friend.profile.avatar_url] : null,
     email: friend.profile.email,
     location: null,
     status: null,
@@ -329,14 +333,14 @@ const Friends = () => {
     profile: {
       id: request.profile.id,
       username: request.profile.username,
-      avatar_url: request.profile.avatar_url,
+      avatar_url: request.profile.avatar_url ? [request.profile.avatar_url] : null,
       email: request.profile.email
     }
   })) || [];
 
   return (
     <FriendsTabContent
-      friends={formattedFriends as UserProfile[]}
+      friends={formattedFriends as unknown as UserProfile[]}
       loading={friendsLoading || authLoading}
       requests={formattedRequests}
       onAcceptRequest={handleAcceptFriendRequest}

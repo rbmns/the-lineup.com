@@ -248,6 +248,77 @@ export const useFriendship = () => {
     }
   };
   
+  // Method for removing a friend (relationship already accepted)
+  const removeFriend = async (friendId: string) => {
+    if (!user?.id) return false;
+    
+    try {
+      setIsLoading(true);
+      
+      // Find the friendship record
+      const { data, error: findError } = await supabase
+        .from('friendships')
+        .select('id')
+        .or(`and(user_id.eq.${user.id},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${user.id})`)
+        .eq('status', 'Accepted')
+        .maybeSingle();
+        
+      if (findError) {
+        console.error("Error finding friendship:", findError);
+        toast({
+          title: 'Error',
+          description: 'Failed to remove friend. Please try again.',
+          variant: 'destructive'
+        });
+        return false;
+      }
+      
+      if (!data) {
+        console.error("Friendship not found");
+        toast({
+          title: 'Error',
+          description: 'Friendship not found.',
+          variant: 'destructive'
+        });
+        return false;
+      }
+      
+      console.log(`Found friendship with ID: ${data.id}, updating to Removed`);
+      
+      // Update the friendship record to Removed status instead of deleting
+      const { error: updateError } = await supabase
+        .from('friendships')
+        .update({ 
+          status: 'Removed',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', data.id);
+        
+      if (updateError) {
+        console.error("Error updating friendship:", updateError);
+        toast({
+          title: 'Error',
+          description: 'Failed to remove friend. Please try again.',
+          variant: 'destructive'
+        });
+        return false;
+      }
+      
+      console.log("Friendship successfully marked as Removed");
+      return true;
+    } catch (error) {
+      console.error('Error removing friend:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to remove friend. Please try again.',
+        variant: 'destructive'
+      });
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   // For backward compatibility
   const handleAcceptRequest = acceptFriendRequest;
   const handleDeclineRequest = declineFriendRequest;
@@ -269,5 +340,6 @@ export const useFriendship = () => {
     initiateFriendRequest,
     acceptFriendRequest,
     declineFriendRequest,
+    removeFriend,
   };
 };
