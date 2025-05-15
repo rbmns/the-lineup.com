@@ -11,6 +11,7 @@ interface UseFetchRelatedEventsProps {
   tags?: string[];
   vibe?: string;
   minResults?: number;
+  startDate?: string; // <-- added startDate to the type definition
 }
 
 export const useFetchRelatedEvents = ({ 
