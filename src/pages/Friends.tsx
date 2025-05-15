@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useFriendData } from '@/hooks/useFriendData';
@@ -7,18 +7,27 @@ import { useFriendRequests } from '@/hooks/useFriendRequests';
 import { FriendsTabContent } from '@/components/friends/FriendsTabContent';
 import { FriendsTabs } from '@/components/friends/FriendsTabs';
 import { UserProfile } from '@/types';
+import { DiscoverTabContent } from '@/components/friends/DiscoverTabContent';
+import { supabase } from '@/lib/supabase';
+import { toast } from '@/hooks/use-toast';
 
 const Friends: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('friends');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [friendsSearchQuery, setFriendsSearchQuery] = useState('');
+  const [filteredFriends, setFilteredFriends] = useState<UserProfile[]>([]);
 
   // Fetch friend data including current friends list
   const { 
     friends,
     requests: friendRequests,
     loading: friendsLoading,
-    refreshFriendsData
+    refreshFriendsData,
+    pendingRequestIds
   } = useFriendData(user?.id);
 
   // Get friend request handling functionality
@@ -36,6 +45,100 @@ const Friends: React.FC = () => {
       navigate('/login');
     }
   }, [user, navigate]);
+
+  // Filter friends based on search query
+  useEffect(() => {
+    if (!friends) return;
+    
+    if (!friendsSearchQuery) {
+      setFilteredFriends(friends as UserProfile[]);
+      return;
+    }
+    
+    const query = friendsSearchQuery.toLowerCase();
+    const filtered = friends.filter(friend => 
+      friend.username?.toLowerCase().includes(query) || 
+      friend.location?.toLowerCase().includes(query) ||
+      friend.status?.toLowerCase().includes(query)
+    );
+    
+    setFilteredFriends(filtered as UserProfile[]);
+  }, [friendsSearchQuery, friends]);
+
+  // Handle search for new people
+  const handleSearch = async () => {
+    if (!searchQuery.trim() || !user) return;
+    
+    setIsSearching(true);
+    
+    try {
+      // Search for users by username or location
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .or(`username.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%`)
+        .neq('id', user.id) // Exclude the current user
+        .limit(10);
+        
+      if (error) throw error;
+      
+      // Filter out users who are already friends
+      const friendIds = friends?.map(f => f.id) || [];
+      const filteredResults = (data || []).filter(profile => !friendIds.includes(profile.id));
+      
+      setSearchResults(filteredResults as UserProfile[]);
+    } catch (error) {
+      console.error('Error searching for users:', error);
+      toast({
+        title: 'Search failed',
+        description: 'There was a problem searching for users. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Handle search when typing in discover tab
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    if (e.target.value === '') {
+      setSearchResults([]);
+    }
+  };
+
+  // Handle sending a friend request
+  const handleAddFriend = async (friendId: string) => {
+    if (!user) return;
+    
+    try {
+      const { error } = await supabase
+        .from('friendships')
+        .insert({
+          user_id: user.id,
+          friend_id: friendId,
+          status: 'Pending'
+        });
+        
+      if (error) throw error;
+      
+      toast({
+        title: 'Friend request sent',
+        description: 'Your friend request has been sent successfully.',
+      });
+      
+      // Update pending request IDs
+      refreshFriendsData();
+      
+    } catch (error) {
+      console.error('Error sending friend request:', error);
+      toast({
+        title: 'Request failed',
+        description: 'There was a problem sending your friend request.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   // Handle accepting a friend request with refresh
   const onAcceptRequest = async (requestId: string) => {
@@ -55,6 +158,20 @@ const Friends: React.FC = () => {
     return success;
   };
 
+  // Effect to trigger search when Enter key is pressed
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && activeTab === 'discover') {
+        handleSearch();
+      }
+    };
+    
+    window.addEventListener('keypress', handleKeyPress);
+    return () => {
+      window.removeEventListener('keypress', handleKeyPress);
+    };
+  }, [activeTab, searchQuery]);
+
   if (!user) {
     return null; // Will redirect in the effect
   }
@@ -70,18 +187,25 @@ const Friends: React.FC = () => {
           pendingRequestsCount={requests?.length || 0}
           friendsContent={
             <FriendsTabContent
-              friends={friends as UserProfile[]}
+              friends={filteredFriends as UserProfile[]}
               loading={friendsLoading}
               requests={requests || []}
               onAcceptRequest={onAcceptRequest}
               onDeclineRequest={onDeclineRequest}
               showFriendRequests={true}
+              searchQuery={friendsSearchQuery}
+              onSearchChange={(e) => setFriendsSearchQuery(e.target.value)}
             />
           }
           discoverContent={
-            <div className="min-h-[200px] flex items-center justify-center bg-gray-50 rounded-lg">
-              <p className="text-gray-500">Discover new people coming soon!</p>
-            </div>
+            <DiscoverTabContent
+              searchQuery={searchQuery}
+              onSearchChange={handleSearchChange}
+              searchResults={searchResults}
+              onAddFriend={handleAddFriend}
+              isSearching={isSearching}
+              pendingRequestIds={pendingRequestIds || []}
+            />
           }
         />
       </div>

@@ -6,17 +6,19 @@ import { Input } from '@/components/ui/input';
 interface FriendSearchBarProps {
   searchQuery: string;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
 }
 
 export const FriendSearchBar = ({
   searchQuery,
-  onSearchChange
+  onSearchChange,
+  placeholder = "Search by username, location or status..."
 }: FriendSearchBarProps) => {
   return (
     <div className="relative">
       <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
       <Input
-        placeholder="Search by username, location or status..."
+        placeholder={placeholder}
         className="pl-9 bg-white border-gray-300 focus-visible:ring-black text-black shadow-sm"
         value={searchQuery}
         onChange={onSearchChange}

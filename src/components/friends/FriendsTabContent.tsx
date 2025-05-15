@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { UserProfile } from '@/types';
 import { FriendsList } from './FriendsList';
 import { FriendRequestsSection } from './FriendRequestsSection';
+import { FriendSearchBar } from './FriendSearchBar';
 
 interface FriendsTabContentProps {
   friends: UserProfile[];
@@ -11,6 +12,8 @@ interface FriendsTabContentProps {
   onAcceptRequest: (requestId: string) => Promise<boolean>;
   onDeclineRequest: (requestId: string) => Promise<boolean>;
   showFriendRequests: boolean;
+  searchQuery?: string;
+  onSearchChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const FriendsTabContent = ({
@@ -19,20 +22,31 @@ export const FriendsTabContent = ({
   requests,
   onAcceptRequest,
   onDeclineRequest,
-  showFriendRequests
+  showFriendRequests,
+  searchQuery = '',
+  onSearchChange
 }: FriendsTabContentProps) => {
   // Only show friend requests section if there are pending requests
   const hasPendingRequests = requests && requests.length > 0;
   
   return (
     <>
+      {/* Search bar for filtering friends */}
+      {onSearchChange && (
+        <div className="mb-4">
+          <FriendSearchBar 
+            searchQuery={searchQuery} 
+            onSearchChange={onSearchChange} 
+          />
+        </div>
+      )}
+      
       {hasPendingRequests && showFriendRequests && (
         <div className="mb-8">
           <FriendRequestsSection
             requests={requests}
             onAccept={async (requestId) => {
               const success = await onAcceptRequest(requestId);
-              // Refresh is not needed here since we handle the state update in the parent component
               return success;
             }}
             onDecline={onDeclineRequest}
