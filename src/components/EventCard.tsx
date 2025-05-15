@@ -28,7 +28,7 @@ const EventCard: React.FC<EventCardProps> = ({
   onClick,
   onShare
 }) => {
-  const { images, getEventImageUrl } = useEventImages();
+  const { getEventImageUrl } = useEventImages();
   const { navigateToEvent } = useEventNavigation();
   const navigate = useNavigate();
   
@@ -50,10 +50,12 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
   
-  const handleRsvp = async (status: 'Going' | 'Interested') => {
+  const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (onRsvp) {
-      await onRsvp(event.id, status);
+      const result = await onRsvp(event.id, status);
+      return result === undefined ? true : !!result;
     }
+    return false;
   };
   
   const handleShare = (e: React.MouseEvent) => {
@@ -139,4 +141,3 @@ const EventCard: React.FC<EventCardProps> = ({
 
 export { EventCard };
 export default EventCard;
-

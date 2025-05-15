@@ -4,6 +4,8 @@ export interface SocialShare {
   text: string;
   url: string;
   image?: string;
+  hashTags?: string[];
+  description?: string;
 }
 
 export const shareToFacebook = (data: SocialShare) => {
@@ -18,6 +20,10 @@ export const shareToTwitter = (data: SocialShare) => {
   const url = new URL('https://twitter.com/intent/tweet');
   url.searchParams.append('text', data.title);
   url.searchParams.append('url', data.url);
+  
+  if (data.hashTags && data.hashTags.length > 0) {
+    url.searchParams.append('hashtags', data.hashTags.join(','));
+  }
   
   window.open(url.toString(), 'twitter-share', 'width=550,height=235');
   return true;
@@ -58,4 +64,3 @@ export const shareToTelegram = (data: SocialShare) => {
   window.open(url.toString(), 'telegram-share', 'width=580,height=296');
   return true;
 };
-

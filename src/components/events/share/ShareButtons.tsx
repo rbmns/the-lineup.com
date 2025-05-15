@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Icons } from "./ShareIcons";
-import { socialShare } from "@/utils/sharing/socialShare";
+import { shareToFacebook, shareToTwitter, shareToLinkedIn, shareToWhatsApp } from "@/utils/sharing/socialShare";
 
 export interface ShareButtonsProps {
   title: string;
@@ -12,7 +12,22 @@ export interface ShareButtonsProps {
 
 export function ShareButtons({ title, description, url, onCopyLink }: ShareButtonsProps) {
   const handleShare = (platform: string) => {
-    socialShare(platform, { title, description, url });
+    switch (platform) {
+      case "twitter":
+        shareToTwitter({ title, text: description, url });
+        break;
+      case "facebook":
+        shareToFacebook({ title, text: description, url });
+        break;
+      case "linkedin":
+        shareToLinkedIn({ title, text: description, url });
+        break;
+      case "whatsapp":
+        shareToWhatsApp({ title, text: description, url });
+        break;
+      default:
+        console.log(`Share to ${platform} not implemented`);
+    }
   };
 
   return (

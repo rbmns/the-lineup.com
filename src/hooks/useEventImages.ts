@@ -1,7 +1,15 @@
 
 import { useState, useEffect } from 'react';
-import { Event, EventImage } from '@/types';
+import { Event } from '@/types';
 import { supabase } from '@/lib/supabase';
+import { getEventFallbackImage } from '@/utils/eventImages';
+
+export interface EventImage {
+  id: string;
+  url: string;
+  alt?: string;
+  type: 'cover' | 'gallery' | 'share';
+}
 
 interface EventImageResult {
   coverImage: string | null;
@@ -9,14 +17,26 @@ interface EventImageResult {
   galleryImages: EventImage[];
   isLoading: boolean;
   error: Error | null;
+  getEventImageUrl: (event: Event) => string | null;
 }
 
-export const useEventImages = (event: Event | null): EventImageResult => {
+export const useEventImages = (event?: Event | null): EventImageResult => {
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const [shareImage, setShareImage] = useState<string | null>(null);
   const [galleryImages, setGalleryImages] = useState<EventImage[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
+
+  // Function to get image URL for any event (useful when rendering lists)
+  const getEventImageUrl = (eventData: Event): string | null => {
+    // Check for image_urls array first
+    if (eventData.image_urls && eventData.image_urls.length > 0) {
+      return eventData.image_urls[0];
+    }
+    
+    // Use fallback based on event type and tags
+    return getEventFallbackImage(eventData.event_type, eventData.tags);
+  };
 
   useEffect(() => {
     const loadImages = async () => {
@@ -30,36 +50,16 @@ export const useEventImages = (event: Event | null): EventImageResult => {
         setError(null);
 
         // Process cover image
-        if (event.cover_image) {
-          // Check if cover_image is a full URL or just a path
-          if (event.cover_image.startsWith('http')) {
-            setCoverImage(event.cover_image);
-          } else {
-            // Construct URL using Supabase storage
-            const storageUrl = supabase.supabaseUrl; // Fix for accessing protected storageUrl property
-            setCoverImage(`${storageUrl}/storage/v1/object/public/${event.cover_image}`);
-          }
+        if (event.image_urls && event.image_urls.length > 0) {
+          setCoverImage(event.image_urls[0]);
         } else {
-          // Default fallback image
-          setCoverImage('/placeholder.svg');
+          // Use fallback image based on event type
+          const fallbackImage = getEventFallbackImage(event.event_type, event.tags);
+          setCoverImage(fallbackImage);
         }
 
-        // Process share image
-        if (event.share_image) {
-          // Check if share_image is a full URL or just a path
-          if (event.share_image.startsWith('http')) {
-            setShareImage(event.share_image);
-          } else {
-            // Construct URL using Supabase storage
-            const storageUrl = supabase.supabaseUrl; // Fix for accessing protected storageUrl property
-            setShareImage(`${storageUrl}/storage/v1/object/public/${event.share_image}`);
-          }
-        } else {
-          // Use cover image as fallback for share image
-          setShareImage(coverImage);
-        }
-
-        // TODO: Load gallery images if needed
+        // Use the same image for share image or fallback
+        setShareImage(coverImage || getEventFallbackImage(event.event_type, event.tags));
 
         setIsLoading(false);
       } catch (err) {
@@ -72,5 +72,12 @@ export const useEventImages = (event: Event | null): EventImageResult => {
     loadImages();
   }, [event]);
 
-  return { coverImage, shareImage, galleryImages, isLoading, error };
+  return { 
+    coverImage, 
+    shareImage, 
+    galleryImages, 
+    isLoading, 
+    error, 
+    getEventImageUrl 
+  };
 };

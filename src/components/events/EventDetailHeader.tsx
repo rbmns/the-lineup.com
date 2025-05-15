@@ -1,110 +1,56 @@
 
 import React from 'react';
-import { EventTypeIcon } from "@/components/ui/EventTypeIcon";
-import { Calendar } from "lucide-react";
-import { EventShareButton } from './EventShareButton';
-import { CategoryPill } from '@/components/ui/category-pill';
+import { Event } from '@/types';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { Skeleton } from '@/components/ui/skeleton';
+import EventShareButton from './EventShareButton';
+import { cn } from '@/lib/utils';
 import { useEventImages } from '@/hooks/useEventImages';
-import { formatInTimeZone } from 'date-fns-tz';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface EventDetailHeaderProps {
-  image?: string | null;
-  eventType: string;
-  onClose: () => void;
-  shareUrl: string;
-  title: string;
-  description?: string;
-  tags?: string[];
-  onEventTypeClick?: () => void;
-  event?: any; // Add event prop for SEO-friendly sharing
-  startTime?: string;
-  showTitleOverlay?: boolean;
+  event: Event;
+  coverImage?: string | null;
 }
 
-export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({
-  image,
-  eventType,
-  onClose,
-  shareUrl,
-  title,
-  description,
-  tags,
-  onEventTypeClick,
+export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({ 
   event,
-  startTime,
-  showTitleOverlay = true
+  coverImage: providedCoverImage
 }) => {
   const { getEventImageUrl } = useEventImages();
-  const imageToUse = image || (event ? getEventImageUrl(event) : "https://res.cloudinary.com/dita7stkt/image/upload/v1745876584/default_yl5ndt.jpg");
-  const isMobile = useIsMobile();
   
-  // Format the date if provided - using Amsterdam timezone
-  const formattedDate = startTime ? formatInTimeZone(
-    new Date(startTime), 
-    'Europe/Amsterdam', 
-    "EEE, d MMM yyyy • HH:mm"
-  ) : null;
+  // Use provided coverImage or get from hook
+  const imageUrl = providedCoverImage || getEventImageUrl(event);
   
   return (
-    <div className="relative animate-fade-in">
-      {/* Image */}
-      <div className="relative w-full bg-gray-100">
-        <img
-          src={imageToUse}
-          alt={title}
-          className="w-full aspect-[3/2] md:aspect-[16/9] object-cover transition-all duration-700"
-          onError={(e) => {
-            // Handle image load errors by setting a default
-            const target = e.target as HTMLImageElement;
-            if (!target.src.includes('default')) {
-              console.log('Image failed to load, using default');
-              target.src = "https://res.cloudinary.com/dita7stkt/image/upload/v1745876584/default_yl5ndt.jpg";
-            }
-          }}
-        />
-        
-        {/* Desktop overlay with title and date - only shown on desktop */}
-        {!isMobile && showTitleOverlay && (
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent p-6 pt-16 text-white">
-            <h1 className="text-2xl md:text-3xl font-semibold leading-tight mb-1">
-              {title || 'Untitled Event'}
-            </h1>
-            {formattedDate && (
-              <div className="flex items-center gap-1 text-sm md:text-base text-gray-100">
-                <Calendar className="h-4 w-4" />
-                <span>{formattedDate}</span>
-                {event?.recurring_count && event.recurring_count > 0 && (
-                  <span className="ml-1 text-xs bg-white/20 px-1.5 py-0.5 rounded text-white">
-                    +{event.recurring_count} more dates
-                  </span>
-                )}
-              </div>
-            )}
+    <div className="relative">
+      <AspectRatio ratio={21/9} className="overflow-hidden rounded-lg bg-gray-100 mb-6">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={event.title}
+            className="object-cover w-full h-full"
+            loading="eager"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-200">
+            <span className="text-gray-400">No image available</span>
           </div>
         )}
         
-        {/* Overlay controls */}
-        <div className="absolute top-4 right-4 flex gap-2 animate-fade-in">
-          <EventShareButton 
-            title={title}
-            url={shareUrl}
-            description={description || ""}
-            event={event}
-          />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        
+        <div className="absolute bottom-0 left-0 p-6 text-white">
+          <h1 className="text-4xl font-bold mb-2">{event.title}</h1>
+          
+          {event.organiser_name && (
+            <p className="text-lg opacity-90">By {event.organiser_name}</p>
+          )}
         </div>
         
-        {/* Event type badge */}
-        <div className="absolute top-4 left-4 animate-fade-in">
-          <CategoryPill
-            category={eventType}
-            onClick={onEventTypeClick}
-            showIcon={true}
-            size="default"
-            className="shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-          />
+        <div className="absolute top-4 right-4">
+          <EventShareButton event={event} variant="outline" />
         </div>
-      </div>
+      </AspectRatio>
     </div>
   );
 };
