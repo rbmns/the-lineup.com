@@ -206,11 +206,11 @@ export const useFetchRelatedEvents = ({
           } else {
             // Last resort - try similar events
             console.log('Trying similar events as last resort...');
-            const similarEvents = await fetchSimilarEvents([eventType]);
+            const rawSimilarEvents = await fetchSimilarEvents([eventType]);
           
             // Filter out the current event and past events and add attendees
             const now = new Date();
-            const additionalEvents = similarEvents
+            const additionalEvents = rawSimilarEvents
               .filter(event => {
                 if (event.id === currentEventId) return false;
                 if (!event.start_time) return false;
