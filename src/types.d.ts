@@ -1,3 +1,4 @@
+
 export interface UserProfile {
   id: string;
   username: string | null;
@@ -66,6 +67,8 @@ export interface Event {
   created_by?: string;
   going_count?: number;
   interested_count?: number;
+  formattedDate?: string; // Add the missing property
+  formattedTime?: string; // Add the missing property
 }
 
 export interface EventsResponse {
