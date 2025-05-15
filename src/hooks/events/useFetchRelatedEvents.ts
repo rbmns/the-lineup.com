@@ -67,7 +67,7 @@ export const useFetchRelatedEvents = ({
         if (data && data.length > 0) {
           // Filter to just future events
           // Use type assertion to handle the attendees property that will be added later
-          const rawEvents = data as unknown as Omit<Event, 'attendees'>[];
+          const rawEvents = data as unknown as any[];
           
           // If we have a userId, fetch RSVP status for each event
           if (userId) {
@@ -137,8 +137,8 @@ export const useFetchRelatedEvents = ({
           const { data: fallbackData, error: fallbackError } = await fallbackQuery;
           
           if (!fallbackError && fallbackData && fallbackData.length > 0) {
-            // Cast to Event[] with attendees property
-            let additionalEvents = fallbackData as unknown as Omit<Event, 'attendees'>[];
+            // Cast to any[] first since we'll add the attendees property
+            let additionalEvents = fallbackData as unknown as any[];
             
             // Add proper attendees object to satisfy the Event type
             additionalEvents = additionalEvents.map(event => ({
