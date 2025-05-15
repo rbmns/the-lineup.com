@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
@@ -17,7 +18,7 @@ const VenueEvents = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { handleRsvp } = useRsvpActions();
+  const { handleRsvp: rsvpToEvent } = useRsvpActions();
   
   useEffect(() => {
     const fetchVenueAndEvents = async () => {
@@ -79,9 +80,9 @@ const VenueEvents = () => {
     fetchVenueAndEvents();
   }, [venueSlug, user?.id, navigate]);
   
-  const handleRsvp = async (eventId: string, status: 'Going' | 'Interested') => {
-    if (handleRsvp) {
-      await handleRsvp(eventId, status);
+  const handleLocalRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<void> => {
+    if (rsvpToEvent) {
+      await rsvpToEvent(eventId, status);
       
       // Update the local events state to reflect the new RSVP status
       const updatedEvents = events.map(event => {
@@ -149,7 +150,7 @@ const VenueEvents = () => {
         noResultsFound={!isLoading && events.length === 0}
         similarEvents={[]}
         resetFilters={() => {}}
-        handleRsvpAction={handleRsvp}
+        handleRsvpAction={handleLocalRsvp}
         isAuthenticated={!!user}
       />
     </div>

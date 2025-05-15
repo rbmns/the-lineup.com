@@ -3,12 +3,16 @@ import { supabase } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { useState } from 'react';
 
 export const useRsvpActions = (userId?: string) => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const handleRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
+    setLoading(true);
+    
     if (!isAuthenticated || !user) {
       toast({
         title: "Authentication required",
@@ -43,6 +47,7 @@ export const useRsvpActions = (userId?: string) => {
               description: "Failed to update your RSVP status",
               variant: "destructive",
             });
+            setLoading(false);
             return false;
           }
 
@@ -51,6 +56,7 @@ export const useRsvpActions = (userId?: string) => {
             description: `You're now marked as ${status}`,
             variant: "default",
           });
+          setLoading(false);
           return true;
         } else {
           // If clicking the same status, remove the RSVP
@@ -66,6 +72,7 @@ export const useRsvpActions = (userId?: string) => {
               description: "Failed to remove your RSVP",
               variant: "destructive",
             });
+            setLoading(false);
             return false;
           }
 
@@ -74,6 +81,7 @@ export const useRsvpActions = (userId?: string) => {
             description: "Your RSVP has been removed",
             variant: "default",
           });
+          setLoading(false);
           return true;
         }
       } else {
@@ -89,6 +97,7 @@ export const useRsvpActions = (userId?: string) => {
             description: `Failed to mark you as ${status}`,
             variant: "destructive",
           });
+          setLoading(false);
           return false;
         }
 
@@ -97,6 +106,7 @@ export const useRsvpActions = (userId?: string) => {
           description: `You're now marked as ${status}`,
           variant: "default",
         });
+        setLoading(false);
         return true;
       }
     } catch (error) {
@@ -106,12 +116,13 @@ export const useRsvpActions = (userId?: string) => {
         description: "Failed to update RSVP status",
         variant: "destructive",
       });
+      setLoading(false);
       return false;
     }
   };
 
   return { 
     handleRsvp,
-    loading: false // Add a loading state property
+    loading
   };
 };

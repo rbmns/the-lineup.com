@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
@@ -9,49 +10,57 @@ import { useRsvpActions } from '@/hooks/useRsvpActions';
 interface UseEventDetailsResult {
   event: Event | null;
   isLoading: boolean;
-  error: string | null;
+  error: Error | string | null;
+  attendees: { going: any[]; interested: any[] };
+  rsvpLoading: boolean;
   handleRsvp: (status: 'Going' | 'Interested') => Promise<void>;
+  handleRsvpAction: (eventId: string, status: 'Going' | 'Interested') => Promise<void>;
+  refreshData: () => Promise<void>;
 }
 
 export const useEventDetails = (eventId: string): UseEventDetailsResult => {
   const [event, setEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Error | string | null>(null);
+  const [attendees, setAttendees] = useState<{ going: any[]; interested: any[] }>({ going: [], interested: [] });
+  const [rsvpLoading, setRsvpLoading] = useState<boolean>(false);
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { handleRsvp } = useRsvpActions();
+  const { handleRsvp: hookHandleRsvp, loading: rsvpLoadingState } = useRsvpActions();
+
+  // Fetch event data
+  const fetchEventDetails = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .eq('id', eventId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching event details:', error);
+        setError('Failed to load event details.');
+      }
+
+      if (data) {
+        setEvent(data);
+      }
+    } catch (err) {
+      console.error('Unexpected error fetching event details:', err);
+      setError('An unexpected error occurred.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchEventDetails = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const { data, error } = await supabase
-          .from('events')
-          .select('*')
-          .eq('id', eventId)
-          .single();
-
-        if (error) {
-          console.error('Error fetching event details:', error);
-          setError('Failed to load event details.');
-        }
-
-        if (data) {
-          setEvent(data);
-        }
-      } catch (err) {
-        console.error('Unexpected error fetching event details:', err);
-        setError('An unexpected error occurred.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchEventDetails();
   }, [eventId]);
 
+  // Handle RSVP for a specific event
   const rsvpToEvent = async (status: 'Going' | 'Interested') => {
     if (!user) {
       toast({
@@ -73,7 +82,7 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
         return;
       }
 
-      const result = await handleRsvp(eventId, status);
+      const result = await hookHandleRsvp(eventId, status);
       if (result) {
         // success handling
         // Optimistically update the event state
@@ -94,10 +103,24 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
     }
   };
 
+  // Handle RSVP for any event (used for passing to components)
+  const handleRsvpAction = async (eventId: string, status: 'Going' | 'Interested') => {
+    await hookHandleRsvp(eventId, status);
+  };
+
+  // Refresh all event data
+  const refreshData = async () => {
+    await fetchEventDetails();
+  };
+
   return {
     event,
     isLoading,
     error,
+    attendees,
+    rsvpLoading: rsvpLoadingState,
     handleRsvp: rsvpToEvent,
+    handleRsvpAction,
+    refreshData
   };
 };
