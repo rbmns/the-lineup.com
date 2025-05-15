@@ -16,9 +16,7 @@ import { EventDetailErrorState } from '@/components/events/EventDetailErrorState
 import { EventDetailLoadingState } from '@/components/events/EventDetailLoadingState';
 import { ShareDialog } from '@/components/events/share/ShareDialog';
 import { MainEventContent } from '@/components/events/MainEventContent';
-import { EventLocationInfo } from '@/components/events/EventLocationInfo';
-import { BookingInformation } from '@/components/events/BookingInformation';
-import { EventFriendRsvps } from '@/components/events/EventFriendRsvps';
+import { SidebarContent } from '@/components/events/SidebarContent';
 import { MobileRsvpFooter } from '@/components/events/MobileRsvpFooter';
 import { RelatedEventsSection } from '@/components/events/RelatedEventsSection';
 
@@ -113,21 +111,19 @@ const EventDetail = () => {
   const shareUrl = `${window.location.origin}/events/${event.slug || event.id}`;
 
   return (
-    <div className="container mx-auto px-4 pt-6 pb-16">
-      {/* Back button for mobile */}
-      {isMobile && (
-        <div className="mb-4">
-          <Button 
-            variant="ghost" 
-            onClick={handleBackToEvents}
-            size="sm"
-            className="flex items-center gap-1.5 text-gray-600"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Back to Events
-          </Button>
-        </div>
-      )}
+    <div className="container mx-auto px-4 pt-6 pb-24">
+      {/* Back button for all screen sizes */}
+      <div className="mb-4">
+        <Button 
+          variant="ghost" 
+          onClick={handleBackToEvents}
+          size={isMobile ? "sm" : "default"}
+          className="flex items-center gap-1.5 text-gray-600"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          Back to Events
+        </Button>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main event content - takes up 2/3 of the screen on desktop */}
@@ -150,34 +146,28 @@ const EventDetail = () => {
           <div className="mt-12">
             <RelatedEventsSection event={event} />
           </div>
+          
+          {/* Bottom back to events button - desktop and mobile */}
+          <div className="mt-8 mb-4">
+            <Button 
+              variant="outline" 
+              onClick={handleBackToEvents}
+              className="flex items-center gap-2 shadow-sm hover:shadow-md transition-all w-full"
+              size="lg"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              <span>Back to Events</span>
+            </Button>
+          </div>
         </div>
         
         {/* Sidebar content - takes up 1/3 of the screen on desktop */}
-        <div className="space-y-6 order-first lg:order-last">
-          {/* Location Card */}
-          <EventLocationInfo 
-            venue={event.venues} 
-            className="shadow-md"
+        <div className="order-first lg:order-last">
+          <SidebarContent 
+            event={event}
+            attendees={attendees}
+            isAuthenticated={isAuthenticated}
           />
-          
-          {/* Booking Information Card */}
-          <BookingInformation 
-            event={event} 
-            className="shadow-md"
-          />
-          
-          {/* Friends/Attendees Card */}
-          {isAuthenticated && (
-            <div className="bg-white rounded-lg border shadow-md">
-              <div className="p-5">
-                <h3 className="text-md font-semibold mb-3">Friends Attending</h3>
-                <EventFriendRsvps 
-                  going={attendees?.going || []} 
-                  interested={attendees?.interested || []} 
-                />
-              </div>
-            </div>
-          )}
         </div>
       </div>
       

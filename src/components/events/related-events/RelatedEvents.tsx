@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useFetchRelatedEvents } from '@/hooks/events/useFetchRelatedEvents';
 import RelatedEventsLoader from './RelatedEventsLoader';
 import RelatedEventsGrid from './RelatedEventsGrid';
@@ -9,6 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
+import { Event } from '@/types';
 
 interface RelatedEventsProps {
   eventId: string;
@@ -27,6 +29,9 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
 }) => {
   const { user } = useAuth();
   const hasFetchedRef = useRef(false);
+  const [fallbackEvents, setFallbackEvents] = useState<Event[]>([]);
+  
+  // Get related events based on primary criteria
   const { relatedEvents, loading } = useFetchRelatedEvents({
     eventType,
     currentEventId: eventId,
@@ -39,6 +44,48 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
   const navigate = useNavigate();
   const { navigateToDestinationEvents } = useEventNavigation();
   const isMobile = useIsMobile();
+
+  // If we don't have at least 2 related events, fetch some fallbacks
+  useEffect(() => {
+    const fetchFallbackEvents = async () => {
+      if (!loading && relatedEvents.length < 2 && !hasFetchedRef.current) {
+        hasFetchedRef.current = true;
+        
+        try {
+          // First try: Get upcoming events of the same type
+          let { data: typeEvents, error: typeError } = await supabase
+            .from('events')
+            .select('*')
+            .neq('id', eventId)
+            .eq('event_type', eventType)
+            .gte('start_time', new Date().toISOString())
+            .order('start_time', { ascending: true })
+            .limit(3);
+            
+          // Second try: If not enough, get any upcoming events
+          if (!typeEvents || typeEvents.length < 2) {
+            const { data: anyEvents, error: anyError } = await supabase
+              .from('events')
+              .select('*')
+              .neq('id', eventId)
+              .gte('start_time', new Date().toISOString())
+              .order('start_time', { ascending: true })
+              .limit(5);
+              
+            if (anyEvents && anyEvents.length > 0) {
+              setFallbackEvents(anyEvents);
+            }
+          } else {
+            setFallbackEvents(typeEvents);
+          }
+        } catch (err) {
+          console.error('Error fetching fallback events:', err);
+        }
+      }
+    };
+    
+    fetchFallbackEvents();
+  }, [eventId, eventType, loading, relatedEvents]);
 
   const handleBackToEvents = () => {
     navigate('/events', {
@@ -53,8 +100,18 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
     return <RelatedEventsLoader />;
   }
   
-  // Always show the component even if we have no related events
-  // The hook will try its best to find at least 2 events
+  // Combine related events with fallback events but remove duplicates
+  const combinedEvents = [...relatedEvents];
+  
+  // Only add fallback events if we need more
+  if (combinedEvents.length < 2) {
+    fallbackEvents.forEach(fallbackEvent => {
+      // Make sure the event isn't already in the list and isn't the current event
+      if (!combinedEvents.find(e => e.id === fallbackEvent.id) && fallbackEvent.id !== eventId) {
+        combinedEvents.push(fallbackEvent);
+      }
+    });
+  }
   
   return (
     <div className="animate-fade-in space-y-4" style={{ animationDelay: '400ms' }}>
@@ -63,7 +120,7 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
       </h2>
       
       <div className="pb-2">
-        <RelatedEventsGrid events={relatedEvents} />
+        <RelatedEventsGrid events={combinedEvents.slice(0, 3)} />
       </div>
       
       {/* Back button shown only on mobile, placed below related events */}

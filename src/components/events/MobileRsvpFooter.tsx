@@ -29,19 +29,23 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
             variant={isGoing ? "default" : "outline"}
             className={cn(
               "flex items-center gap-1.5 flex-1",
-              isGoing && "bg-green-600 hover:bg-green-700 text-white"
+              isGoing 
+                ? "bg-green-600 hover:bg-green-700 text-white" 
+                : "hover:border-green-600 hover:text-green-600"
             )}
             disabled={loading}
             onClick={() => onRsvp('Going')}
           >
             <CheckCircle2 className="h-4 w-4" />
-            <span>{isGoing ? "Going" : "Going"}</span>
+            <span>Going</span>
           </Button>
           <Button
             variant={isInterested ? "default" : "outline"}
             className={cn(
               "flex items-center gap-1.5 flex-1",
-              isInterested && "bg-blue-600 hover:bg-blue-700 text-white"
+              isInterested 
+                ? "bg-blue-600 hover:bg-blue-700 text-white"
+                : "hover:border-blue-600 hover:text-blue-600"
             )}
             disabled={loading}
             onClick={() => onRsvp('Interested')}

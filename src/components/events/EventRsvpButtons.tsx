@@ -64,7 +64,9 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         className={cn(
           buttonClasses,
           "flex items-center gap-1.5",
-          currentStatus === 'Going' && "bg-green-600 hover:bg-green-700 text-white"
+          currentStatus === 'Going' 
+            ? "bg-green-600 hover:bg-green-700 text-white rsvp-going-animation"
+            : "hover:border-green-600 hover:text-green-600"
         )}
         disabled={loading}
         onClick={async () => {
@@ -80,7 +82,9 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         className={cn(
           buttonClasses,
           "flex items-center gap-1.5",
-          currentStatus === 'Interested' && "bg-blue-600 hover:bg-blue-700 text-white"
+          currentStatus === 'Interested' 
+            ? "bg-blue-600 hover:bg-blue-700 text-white rsvp-interested-animation" 
+            : "hover:border-blue-600 hover:text-blue-600"
         )}
         disabled={loading}
         onClick={async () => {

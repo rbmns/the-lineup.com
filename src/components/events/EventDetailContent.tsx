@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { formatInTimeZone } from 'date-fns-tz';
 import { formatDistanceToNow } from 'date-fns';
 import { toast } from '@/hooks/use-toast';
+import '@/styles/rsvp-animations.css';
 
 const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
 

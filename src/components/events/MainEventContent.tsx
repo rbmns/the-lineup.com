@@ -4,12 +4,8 @@ import { Event } from '@/types';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { EventDetailHeader } from '@/components/events/EventDetailHeader';
 import { EventMetaInfo } from '@/components/events/EventMetaInfo';
-import { EventFriendRsvps } from '@/components/events/EventFriendRsvps';
-import { EventLocationInfo } from '@/components/events/EventLocationInfo';
-import { BookingInformation } from '@/components/events/BookingInformation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar } from 'lucide-react';
-import { formatInTimeZone } from 'date-fns-tz';
 import { EventDescription } from '@/components/events/EventDescription';
 
 interface MainEventContentProps {
@@ -64,7 +60,7 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
           {/* Mobile title and date - only shown on mobile */}
           {isMobile && (
             <div className="mb-2">
-              <h1 className="text-xl font-semibold leading-tight mb-2">
+              <h1 className="text-xl font-semibold leading-tight mb-2 text-gray-900">
                 {event?.title || 'Event'}
               </h1>
               {formattedDate && (
@@ -96,36 +92,6 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
 
           {/* Event description section */}
           <EventDescription description={event.description} isMobile={isMobile} />
-          
-          {/* Mobile-only components */}
-          <div className="lg:hidden space-y-4">
-            {/* Friends attending section in Card style - mobile only */}
-            {isAuthenticated && attendees && (attendees.going.length > 0 || attendees.interested.length > 0) && (
-              <Card className="shadow-md border border-gray-200 animate-fade-in" style={{ animationDelay: '200ms' }}>
-                <CardContent className="p-5">
-                  <EventFriendRsvps
-                    going={attendees?.going || []}
-                    interested={attendees?.interested || []}
-                  />
-                </CardContent>
-              </Card>
-            )}
-            
-            {/* Mobile-only location and booking info cards */}
-            <EventLocationInfo 
-              venue={event.venues} 
-              className="animate-fade-in"
-              style={{ animationDelay: '150ms' }}
-              compact={true}
-            />
-            
-            <BookingInformation 
-              event={event} 
-              className="animate-fade-in"
-              style={{ animationDelay: '200ms' }}
-              compact={true}
-            />
-          </div>
         </div>
       </CardContent>
     </Card>
