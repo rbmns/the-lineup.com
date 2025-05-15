@@ -1,5 +1,3 @@
 
-// Re-export sharing-related utilities from the correct path
-export * from '@/utils/sharing/nativeShare';
-export * from '@/utils/sharing/clipboardUtils';
-export * from '@/utils/sharing/socialShare';
+// Re-export all sharing utilities from the dedicated sharing folder
+export * from '../sharing';

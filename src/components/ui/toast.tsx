@@ -117,7 +117,7 @@ type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
 
 type ToastActionElement = React.ReactElement<typeof ToastAction>
 
-// Fixed ToasterToast interface to NOT extend ToastProps - created as a separate interface
+// Fix the ToasterToast interface to better match the usage patterns
 export interface ToasterToast {
   id: string;
   title?: React.ReactNode;
