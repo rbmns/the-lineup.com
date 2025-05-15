@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { MapPin, Calendar, Clock, Check, Star } from 'lucide-react';
@@ -48,7 +47,7 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
   
-  // Format time using the 24-hour time format
+  // Format time using the 24-hour time format without seconds
   const getEventTimeDisplay = (event: Event): string => {
     if (!event.start_time) return '';
     

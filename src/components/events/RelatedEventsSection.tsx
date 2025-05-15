@@ -11,8 +11,18 @@ export interface RelatedEventsSectionProps {
 export const RelatedEventsSection: React.FC<RelatedEventsSectionProps> = ({ events }) => {
   if (!events || events.length === 0) return null;
   
-  // Don't show duplicate events
-  const uniqueEvents = Array.from(new Map(events.map(event => [event.id, event])).values());
+  // Don't show duplicate events or the same event that's currently being viewed
+  const currentPath = window.location.pathname;
+  const currentEventId = currentPath.split('/').pop(); // Extract event ID from URL
+  
+  // Filter out current event and duplicates
+  const uniqueEvents = Array.from(
+    new Map(
+      events
+        .filter(event => event.id !== currentEventId) // Remove current event
+        .map(event => [event.id, event])
+    ).values()
+  );
   
   if (uniqueEvents.length === 0) return null;
   

@@ -150,10 +150,21 @@ export const formatEventTime = (startTimeStr: string | null, endTimeStr?: string
   try {
     if (!startTimeStr) return 'Time not set';
     
-    const startFormatted = formatTime(startTimeStr);
+    // Format without seconds by using HH:mm format (no :ss)
+    const formatTimeWithoutSeconds = (timeStr: string): string => {
+      try {
+        const date = parseISO(timeStr);
+        return formatInTimeZone(date, AMSTERDAM_TIMEZONE, 'HH:mm');
+      } catch (error) {
+        console.error('Error formatting time:', error);
+        return timeStr;
+      }
+    };
+    
+    const startFormatted = formatTimeWithoutSeconds(startTimeStr);
     
     if (endTimeStr) {
-      const endFormatted = formatTime(endTimeStr);
+      const endFormatted = formatTimeWithoutSeconds(endTimeStr);
       return `${startFormatted} - ${endFormatted}`;
     }
     
