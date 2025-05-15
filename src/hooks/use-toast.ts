@@ -14,6 +14,7 @@ export const useToast = () => {
 let lastToastMessage = '';
 let lastToastTimestamp = 0;
 
+// Modified toast function that handles ToastProps correctly
 export const toast = (props: ToastProps) => {
   // If toast is called with the same message within 2 seconds, ignore it
   const currentTime = Date.now();

@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -115,8 +116,16 @@ ToastDescription.displayName = ToastPrimitives.Description.displayName
 
 type ToastActionElement = React.ReactElement<typeof ToastAction>
 
-export type ToasterToast = {
+export interface ToasterToast {
   id: string
+  title?: React.ReactNode
+  description?: React.ReactNode
+  action?: ToastActionElement
+  variant?: "default" | "destructive" | "success" | "warning" | "info"
+}
+
+// Input type that doesn't require the id field
+export interface ToastProps {
   title?: React.ReactNode
   description?: React.ReactNode
   action?: ToastActionElement
@@ -294,8 +303,7 @@ export function useToast() {
   }
 }
 
-export type ToastProps = ToasterToast
-
+// Modified toast function that adds an id automatically if one isn't provided
 export function toast(props: ToastProps) {
   const id = genId()
 
