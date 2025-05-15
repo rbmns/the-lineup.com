@@ -39,7 +39,7 @@ const EventDetail = () => {
   // Safety check - if no valid ID is available, redirect to events page
   useEffect(() => {
     if (!effectiveId) {
-      console.error("Missing valid event ID in URL parameters");
+      console.error("Missing event ID in URL parameters");
       toast({
         title: "Error",
         description: "Could not load the event due to missing ID", 
@@ -71,8 +71,16 @@ const EventDetail = () => {
     wrapRsvpWithScrollPreservation
   } = useEventDetailHandlers();
   
-  // Enhanced RSVP with scroll preservation
-  const handleRsvpEvent = wrapRsvpWithScrollPreservation(handleRsvp);
+  // Enhanced RSVP with scroll preservation - Fix the return type issue
+  const handleRsvpEvent = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    try {
+      await handleRsvp(status);
+      return true;
+    } catch (error) {
+      console.error('Error handling RSVP:', error);
+      return false;
+    }
+  };
   
   // Set metadata for SEO
   useEffect(() => {

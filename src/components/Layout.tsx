@@ -5,7 +5,7 @@ import MainNav from './MainNav';
 import { Footer } from './ui/footer';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
-import { Toaster } from "@/components/ui/toaster"; // Use our custom Toaster
+import { Toaster } from "@/components/ui/toaster";
 
 const Layout: React.FC = () => {
   const location = useLocation();
