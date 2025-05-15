@@ -16,6 +16,39 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({ event }) => 
   const { handleEventClick } = useEventInteractions();
   const [localRsvpStatus, setLocalRsvpStatus] = useState<'Going' | 'Interested' | undefined>(event.rsvp_status);
   
+  // Format event time to ensure it's displayed as HH:mm without seconds
+  const formatEventTime = (event: Event) => {
+    if (!event.start_time) return '';
+    
+    let startTime = event.start_time;
+    // If start_time has seconds (HH:MM:SS format), remove them
+    if (startTime.includes(':') && startTime.split(':').length > 2) {
+      const [hours, minutes] = startTime.split(':');
+      startTime = `${hours}:${minutes}`;
+    }
+    
+    let timeStr = startTime;
+    
+    // If we also have end_time, format it as a range
+    if (event.end_time) {
+      let endTime = event.end_time;
+      // If end_time has seconds, remove them
+      if (endTime.includes(':') && endTime.split(':').length > 2) {
+        const [hours, minutes] = endTime.split(':');
+        endTime = `${hours}:${minutes}`;
+      }
+      timeStr = `${startTime} - ${endTime}`;
+    }
+    
+    return timeStr;
+  };
+  
+  // Create a modified event with the formatted time
+  const eventWithFormattedTime = {
+    ...event,
+    formattedTime: formatEventTime(event)
+  };
+  
   // RSVP handler with optimistic UI updates
   const handleRsvpAction = async (eventId: string, status: 'Going' | 'Interested') => {
     if (!user?.id || rsvpLoading) return false;

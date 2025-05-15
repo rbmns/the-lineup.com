@@ -102,6 +102,7 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
     queryFn: async () => {
       // Get current date to filter out past events
       const today = dateRanges.today;
+      let allRelatedEvents: any[] = [];
       
       // First priority: Same event type, same day
       if (eventType && dateRanges.sameDay) {
@@ -112,16 +113,20 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
           .eq('event_type', eventType)
           .eq('start_date', dateRanges.sameDay)
           .gte('start_date', today) // Only future events
-          .limit(4);
+          .limit(6);
           
-        if (sameTypeAndDay && sameTypeAndDay.length >= 3) {
+        if (sameTypeAndDay && sameTypeAndDay.length >= 2) {
           console.log('Found related events with same type and day:', sameTypeAndDay.length);
           return sameTypeAndDay;
+        }
+        
+        if (sameTypeAndDay && sameTypeAndDay.length > 0) {
+          allRelatedEvents = [...allRelatedEvents, ...sameTypeAndDay];
         }
       }
       
       // Second priority: Same event type, next day
-      if (eventType && dateRanges.nextDay) {
+      if (eventType && dateRanges.nextDay && allRelatedEvents.length < 2) {
         const { data: sameTypeNextDay } = await supabase
           .from('events')
           .select('*')
@@ -129,32 +134,41 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
           .eq('event_type', eventType)
           .eq('start_date', dateRanges.nextDay)
           .gte('start_date', today) // Only future events
-          .limit(4);
+          .limit(6);
           
-        if (sameTypeNextDay && sameTypeNextDay.length >= 2) {
+        if (sameTypeNextDay && sameTypeNextDay.length > 0) {
           console.log('Found related events with same type and next day:', sameTypeNextDay.length);
-          return sameTypeNextDay;
+          allRelatedEvents = [...allRelatedEvents, ...sameTypeNextDay];
+          if (allRelatedEvents.length >= 2) {
+            // Remove duplicates before returning
+            return Array.from(new Map(allRelatedEvents.map(item => [item.id, item])).values());
+          }
         }
       }
       
       // Third priority: Same event type, previous day if it's not in the past
-      if (eventType && dateRanges.prevDay && dateRanges.prevDay >= today) {
+      if (eventType && dateRanges.prevDay && dateRanges.prevDay >= today && allRelatedEvents.length < 2) {
         const { data: sameTypePrevDay } = await supabase
           .from('events')
           .select('*')
           .neq('id', eventId) // Exclude current event
           .eq('event_type', eventType)
           .eq('start_date', dateRanges.prevDay)
-          .limit(4);
+          .gte('start_date', today) // Only future events
+          .limit(6);
           
-        if (sameTypePrevDay && sameTypePrevDay.length >= 2) {
+        if (sameTypePrevDay && sameTypePrevDay.length > 0) {
           console.log('Found related events with same type and previous day:', sameTypePrevDay.length);
-          return sameTypePrevDay;
+          allRelatedEvents = [...allRelatedEvents, ...sameTypePrevDay];
+          if (allRelatedEvents.length >= 2) {
+            // Remove duplicates before returning
+            return Array.from(new Map(allRelatedEvents.map(item => [item.id, item])).values());
+          }
         }
       }
       
       // Fourth priority: Same event type, within next week
-      if (eventType && dateRanges.sameDay && dateRanges.nextWeek) {
+      if (eventType && dateRanges.sameDay && dateRanges.nextWeek && allRelatedEvents.length < 2) {
         const { data: sameTypeNextWeek } = await supabase
           .from('events')
           .select('*')
@@ -162,16 +176,20 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
           .eq('event_type', eventType)
           .gte('start_date', today) // Only future events
           .lte('start_date', dateRanges.nextWeek)
-          .limit(5);
+          .limit(6);
           
-        if (sameTypeNextWeek && sameTypeNextWeek.length >= 2) {
+        if (sameTypeNextWeek && sameTypeNextWeek.length > 0) {
           console.log('Found related events with same type in next week:', sameTypeNextWeek.length);
-          return sameTypeNextWeek;
+          allRelatedEvents = [...allRelatedEvents, ...sameTypeNextWeek];
+          if (allRelatedEvents.length >= 2) {
+            // Remove duplicates before returning
+            return Array.from(new Map(allRelatedEvents.map(item => [item.id, item])).values());
+          }
         }
       }
       
-      // Last priority: Same event type, any future date
-      if (eventType) {
+      // Fifth priority: Same event type, any future date
+      if (eventType && allRelatedEvents.length < 2) {
         const { data: sameType } = await supabase
           .from('events')
           .select('*')
@@ -183,12 +201,16 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
           
         if (sameType && sameType.length > 0) {
           console.log('Found related events with same type:', sameType.length);
-          return sameType;
+          allRelatedEvents = [...allRelatedEvents, ...sameType];
+          if (allRelatedEvents.length >= 2) {
+            // Remove duplicates before returning
+            return Array.from(new Map(allRelatedEvents.map(item => [item.id, item])).values());
+          }
         }
       }
       
-      // Fallback: Any events with matching tags
-      if (eventTags.length > 0) {
+      // Sixth priority: Any events with matching tags
+      if (eventTags.length > 0 && allRelatedEvents.length < 2) {
         let tagMatches: Event[] = [];
         
         for (const tag of eventTags) {
@@ -198,33 +220,42 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
             .neq('id', eventId) // Exclude current event
             .ilike('tags', `%${tag}%`)
             .gte('start_date', today) // Only future events
-            .limit(5);
+            .limit(6);
             
           if (matchingTag && matchingTag.length > 0) {
             tagMatches = [...tagMatches, ...matchingTag];
           }
         }
         
-        // Remove duplicates
-        const uniqueTagMatches = Array.from(new Map(tagMatches.map(event => [event.id, event])).values());
-        
-        if (uniqueTagMatches.length > 0) {
-          console.log('Found related events with matching tags:', uniqueTagMatches.length);
-          return uniqueTagMatches.slice(0, 5);
+        if (tagMatches.length > 0) {
+          allRelatedEvents = [...allRelatedEvents, ...tagMatches];
+          // Remove duplicates
+          allRelatedEvents = Array.from(new Map(allRelatedEvents.map(item => [item.id, item])).values());
+          if (allRelatedEvents.length >= 2) {
+            return allRelatedEvents;
+          }
         }
       }
       
-      // Very last resort: Any future events, excluding current
-      const { data: anyEvents } = await supabase
-        .from('events')
-        .select('*')
-        .neq('id', eventId) // Exclude current event
-        .gte('start_date', today) // Only future events
-        .order('start_date')
-        .limit(5);
-        
-      console.log('Found fallback related events:', anyEvents?.length || 0);
-      return anyEvents || [];
+      // Last resort: Any future events, excluding current
+      if (allRelatedEvents.length < 2) {
+        const { data: anyEvents } = await supabase
+          .from('events')
+          .select('*')
+          .neq('id', eventId) // Exclude current event
+          .gte('start_date', today) // Only future events
+          .order('start_date')
+          .limit(6);
+          
+        if (anyEvents && anyEvents.length > 0) {
+          console.log('Found fallback related events:', anyEvents.length);
+          allRelatedEvents = [...allRelatedEvents, ...anyEvents];
+          // Remove duplicates
+          allRelatedEvents = Array.from(new Map(allRelatedEvents.map(item => [item.id, item])).values());
+        }
+      }
+      
+      return allRelatedEvents;
     },
     enabled: isVisible && !!eventId, // Only run when section is visible and eventId exists
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
@@ -236,11 +267,7 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
     return null;
   }
 
-  // Render nothing if there are no related events yet
-  if (!isLoading && (!relatedEvents || relatedEvents.length === 0)) {
-    return null;
-  }
-
+  // Always render the loader or results section since we want to show it even if empty
   return (
     <div id="related-events-section" className="w-full">
       <h2 className="text-2xl font-bold mb-6">Similar Events</h2>
