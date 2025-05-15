@@ -7,7 +7,7 @@ import { CheckCircle2, Star } from 'lucide-react';
 interface EventRsvpButtonsProps {
   currentStatus: 'Going' | 'Interested' | null;
   onRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'xs' | 'sm' | 'md' | 'lg';
   loading?: boolean;
   className?: string;
   showStatusOnly?: boolean;
@@ -53,12 +53,16 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     );
   }
 
-  // Size configurations - make the sm size even more compact
+  // Size configurations - make the xs and sm sizes more compact
   const buttonSizeClasses = {
-    sm: 'h-7 px-2 text-xs',
+    xs: 'h-6 px-1.5 text-xs',
+    sm: 'h-7 px-3 text-xs',
     md: 'h-9 px-4',
     lg: 'h-10 px-5',
   };
+
+  // Text visibility by size
+  const showTextForSize = size !== 'xs';
 
   // Base classes for buttons
   const buttonClasses = buttonSizeClasses[size] || buttonSizeClasses.md;
@@ -111,8 +115,8 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         onClick={() => handleRsvp('Going')}
         data-no-navigation="true"
       >
-        <CheckCircle2 className={size === 'sm' ? "h-3 w-3" : "h-4 w-4"} />
-        <span className="whitespace-nowrap">{size === 'sm' ? '' : 'Going'}</span>
+        <CheckCircle2 className={size === 'xs' ? "h-3 w-3" : "h-4 w-4"} />
+        {showTextForSize && <span className="whitespace-nowrap">Going</span>}
       </Button>
       
       <Button 
@@ -128,8 +132,8 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         onClick={() => handleRsvp('Interested')}
         data-no-navigation="true"
       >
-        <Star className={size === 'sm' ? "h-3 w-3" : "h-4 w-4"} />
-        <span className="whitespace-nowrap">{size === 'sm' ? '' : 'Interested'}</span>
+        <Star className={size === 'xs' ? "h-3 w-3" : "h-4 w-4"} />
+        {showTextForSize && <span className="whitespace-nowrap">Interested</span>}
       </Button>
     </div>
   );

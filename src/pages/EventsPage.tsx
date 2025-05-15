@@ -5,7 +5,6 @@ import { useEvents } from '@/hooks/useEvents';
 import { filterUpcomingEvents } from '@/utils/dateUtils';
 import { pageSeoTags } from '@/utils/seoUtils';
 import { LazyEventsList } from '@/components/events/LazyEventsList';
-import { useLocation } from 'react-router-dom';
 import { useCanonical } from '@/hooks/useCanonical';
 import { EventsPageHeader } from '@/components/events/EventsPageHeader';
 import { useOptimisticRsvp } from '@/hooks/event-rsvp/useOptimisticRsvp';

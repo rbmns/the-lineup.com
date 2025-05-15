@@ -65,7 +65,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
   const formatDate = (dateStr: string): string => {
     try {
       const date = new Date(dateStr);
-      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEEE, d MMMM");
+      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, d MMM");
     } catch (error) {
       console.error('Error formatting date:', error);
       return dateStr;
@@ -89,43 +89,40 @@ const EventCardList: React.FC<EventCardListProps> = ({
   return (
     <div 
       className={cn(
-        "flex flex-col sm:flex-row gap-4 sm:h-auto bg-white rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden",
+        "flex flex-col sm:flex-row gap-4 sm:h-24 bg-white rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden",
         className
       )}
       onClick={handleClick}
       data-event-id={event.id}
     >
-      {/* Image */}
-      <div className="relative h-[100px] sm:h-auto sm:w-[140px] overflow-hidden bg-gray-100 flex-shrink-0">
+      {/* Image with event type pill */}
+      <div className="relative h-[100px] sm:h-auto sm:w-[120px] overflow-hidden bg-gray-100 flex-shrink-0">
         <img 
           src={imageUrl} 
           alt={event.title}
           className="h-full w-full object-cover"
         />
+        {/* Event type pill */}
+        {event.event_type && (
+          <div className="absolute top-2 left-2">
+            <CategoryPill 
+              category={event.event_type} 
+              size="xs" 
+              showIcon={false} 
+            />
+          </div>
+        )}
       </div>
       
       {/* Content - More compact layout */}
-      <div className="flex flex-col flex-1 p-3 justify-between">
-        {/* Top row with title and event type */}
-        <div className="flex flex-wrap items-start justify-between gap-2 mb-1">
-          <h3 className="font-semibold text-gray-900 text-base line-clamp-1 mr-2">
-            {event.title}
-          </h3>
-            
-          {/* Event type pill - Now on the same line as title if it fits */}
-          {event.event_type && (
-            <div className="flex-shrink-0">
-              <CategoryPill 
-                category={event.event_type} 
-                size="sm" 
-                showIcon={true} 
-              />
-            </div>
-          )}
-        </div>
+      <div className="flex flex-col flex-1 p-3 py-2 justify-between">
+        {/* Title */}
+        <h3 className="font-semibold text-gray-900 text-base line-clamp-1">
+          {event.title}
+        </h3>
           
         {/* Date and Time */}
-        <div className="flex items-center gap-1 text-xs text-gray-500 mt-1 mb-1">
+        <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
           <Calendar className="h-3 w-3" />
           <span>
             {event.start_time ? (
@@ -156,7 +153,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
               <EventRsvpButtons
                 currentStatus={event.rsvp_status || null}
                 onRsvp={handleRsvp}
-                size="sm"
+                size="xs"
                 showStatusOnly={!showRsvpButtons && showRsvpStatus}
               />
             </div>
