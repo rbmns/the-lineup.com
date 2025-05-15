@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { MapPin } from 'lucide-react';
@@ -12,12 +11,13 @@ import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 // Amsterdam/Netherlands timezone
 const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
 
-interface EventCardProps {
+export interface EventCardProps {
   event: Event;
   compact?: boolean;
   showRsvpButtons?: boolean;
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   className?: string;
+  onClick?: (event: Event) => void;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -25,36 +25,64 @@ const EventCard: React.FC<EventCardProps> = ({
   compact = false,
   showRsvpButtons = false,
   onRsvp,
-  className
+  className,
+  onClick
 }) => {
   const { getEventImageUrl } = useEventImages();
   const { navigateToEvent } = useEventNavigation();
   const imageUrl = getEventImageUrl(event);
 
-  // Format date for display
+  // Format date for display - using European format
   const formatDate = (dateStr: string): string => {
     try {
       const date = new Date(dateStr);
-      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, MMM d · h:mm a");
+      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, d MMM yyyy");
     } catch (error) {
       console.error('Error formatting date:', error);
       return dateStr;
     }
   };
+  
+  // Format time using 24-hour time format
+  const getEventTimeDisplay = (event: Event): string => {
+    if (!event.start_time) return '';
+    
+    try {
+      const startTime = new Date(event.start_time);
+      const startFormatted = formatInTimeZone(startTime, AMSTERDAM_TIMEZONE, "HH:mm");
+      
+      if (event.end_time) {
+        const endTime = new Date(event.end_time);
+        const endFormatted = formatInTimeZone(endTime, AMSTERDAM_TIMEZONE, "HH:mm");
+        return `${startFormatted} - ${endFormatted}`;
+      }
+      
+      return startFormatted;
+    } catch (error) {
+      console.error('Error formatting event time:', error);
+      return '';
+    }
+  };
 
   const handleClick = () => {
-    // Make sure we have all required properties for proper navigation
-    if (event && event.id) {
-      navigateToEvent({
-        ...event,
-        id: event.id,
-        destination: event.destination,
-        slug: event.slug,
-        start_time: event.start_time,
-        title: event.title
-      });
+    if (onClick) {
+      // Use the provided onClick handler if available
+      onClick(event);
     } else {
-      console.error("Cannot navigate: Missing event ID", event);
+      // Otherwise use the default navigation
+      // Make sure we have all required properties for proper navigation
+      if (event && event.id) {
+        navigateToEvent({
+          ...event,
+          id: event.id,
+          destination: event.destination,
+          slug: event.slug,
+          start_time: event.start_time,
+          title: event.title
+        });
+      } else {
+        console.error("Cannot navigate: Missing event ID", event);
+      }
     }
   };
 
@@ -73,16 +101,17 @@ const EventCard: React.FC<EventCardProps> = ({
   };
 
   // Determine max height for compact vs standard view
-  const cardHeightClass = compact ? "max-h-[280px]" : "max-h-[380px]";
+  const cardHeightClass = compact ? "max-h-[280px]" : "";
 
   return (
     <div
       className={cn(
-        "group relative rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer bg-white",
+        "group relative rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer bg-white flex flex-col h-full",
         cardHeightClass,
         className
       )}
       onClick={handleClick}
+      data-event-id={event.id}
     >
       {/* Image container with absolute positioned category pill */}
       <div className="aspect-[16/9] relative overflow-hidden">
@@ -105,14 +134,9 @@ const EventCard: React.FC<EventCardProps> = ({
         )}
       </div>
 
-      {/* Content Section */}
-      <div className="p-4 space-y-2">
-        {/* Date */}
-        <div className="text-sm text-gray-600 font-medium">
-          {event.start_time && formatDate(event.start_time)}
-        </div>
-        
-        {/* Title */}
+      {/* Content Section - Updated layout with proper spacing */}
+      <div className="p-4 flex flex-col flex-grow space-y-2">
+        {/* Title - Now first */}
         <h3 className={cn(
           "font-semibold text-gray-900",
           compact ? "text-base line-clamp-2" : "text-xl line-clamp-2"
@@ -120,15 +144,27 @@ const EventCard: React.FC<EventCardProps> = ({
           {event.title}
         </h3>
         
-        {/* Venue/Location */}
+        {/* Date & Time - Now second */}
+        <div className="text-sm text-gray-600 font-medium">
+          {event.start_time && (
+            <>
+              {formatDate(event.start_time)} • {getEventTimeDisplay(event)}
+            </>
+          )}
+        </div>
+        
+        {/* Venue/Location - Now third */}
         <div className="flex items-center text-sm text-gray-500">
           <MapPin className="h-3.5 w-3.5 mr-1 flex-shrink-0" />
           <span className="truncate">{event.venues?.name || event.location || 'No location'}</span>
         </div>
         
+        {/* Spacer to push RSVP buttons to bottom */}
+        <div className="flex-grow"></div>
+        
         {/* RSVP Buttons - only if needed */}
         {showRsvpButtons && (
-          <div className="pt-3">
+          <div className="mt-2">
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}

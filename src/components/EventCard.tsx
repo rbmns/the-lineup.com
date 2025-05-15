@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { MapPin } from 'lucide-react';
@@ -15,7 +16,7 @@ export interface EventCardProps {
   showRsvpButtons?: boolean;
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   className?: string;
-  onClick?: (event: Event) => void; // Added onClick handler
+  onClick?: (event: Event) => void;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -85,12 +86,12 @@ const EventCard: React.FC<EventCardProps> = ({
   };
 
   // Determine max height for compact vs standard view
-  const cardHeightClass = compact ? "max-h-[280px]" : "max-h-[380px]";
+  const cardHeightClass = compact ? "max-h-[280px]" : "";
 
   return (
     <div
       className={cn(
-        "group relative rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer bg-white",
+        "group relative rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer bg-white flex flex-col h-full",
         cardHeightClass,
         className
       )}
@@ -119,7 +120,7 @@ const EventCard: React.FC<EventCardProps> = ({
       </div>
 
       {/* Content Section - Updated layout */}
-      <div className="p-4 space-y-2">
+      <div className="p-4 flex flex-col flex-grow space-y-2">
         {/* Title - Now first */}
         <h3 className={cn(
           "font-semibold text-gray-900",
@@ -143,9 +144,12 @@ const EventCard: React.FC<EventCardProps> = ({
           <span className="truncate">{event.venues?.name || event.location || 'No location'}</span>
         </div>
         
+        {/* Spacer to push RSVP buttons to bottom */}
+        <div className="flex-grow"></div>
+        
         {/* RSVP Buttons - only if needed */}
         {showRsvpButtons && (
-          <div className="pt-3">
+          <div className="mt-2">
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}

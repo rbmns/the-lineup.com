@@ -109,7 +109,7 @@ export const formatDate = (dateStr: string): string => {
 export const formatTime = (dateStr: string): string => {
   try {
     const date = parseISO(dateStr);
-    // Use 24-hour format for the Netherlands
+    // Use 24-hour format for European style
     return formatInTimeZone(date, AMSTERDAM_TIMEZONE, 'HH:mm');
   } catch (error) {
     console.error('Error formatting time:', error);

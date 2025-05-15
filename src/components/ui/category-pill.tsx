@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calendar, Music, Globe, Users, Film, Book, Dumbbell, Utensils, Tag } from 'lucide-react';
+import { Calendar, Music, Globe, Users, Film, Book, Dumbbell, Utensils, Tag, Waves, Tent, Leaf, Sun, Sailboat, Party, BadgeCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type CategoryIconMapping = {
@@ -24,7 +24,15 @@ const categoryIconMapping: CategoryIconMapping = {
   'literature': Book,
   'reading': Book,
   'culture': Globe,
-  'travel': Globe
+  'travel': Globe,
+  'water': Waves,
+  'surf': Waves,
+  'wellness': Leaf,
+  'yoga': Leaf,
+  'beach': Sun,
+  'kite': Sailboat,
+  'party': Party,
+  'market': BadgeCheck
 };
 
 const getCategoryIcon = (category: string): React.ElementType => {
@@ -44,49 +52,78 @@ const getCategoryIcon = (category: string): React.ElementType => {
 const getCategoryColor = (category: string): string => {
   const lowerCategory = category.toLowerCase();
   
-  // Music related categories
-  if (lowerCategory.includes('music') || 
-      lowerCategory.includes('concert') || 
-      lowerCategory.includes('festival')) {
+  // Festival
+  if (lowerCategory.includes('festival')) {
+    return 'bg-amber-100 text-amber-800 hover:bg-amber-200';
+  }
+  
+  // Wellness
+  if (lowerCategory.includes('wellness')) {
+    return 'bg-lime-100 text-lime-800 hover:bg-lime-200';
+  }
+  
+  // Kite
+  if (lowerCategory.includes('kite')) {
+    return 'bg-ocean-deep text-white hover:bg-opacity-90';
+  }
+  
+  // Beach
+  if (lowerCategory.includes('beach')) {
+    return 'bg-sand text-sandstone hover:bg-opacity-90';
+  }
+  
+  // Game
+  if (lowerCategory.includes('game')) {
     return 'bg-purple-100 text-purple-800 hover:bg-purple-200';
   }
   
-  // Community related categories
-  if (lowerCategory.includes('conference') || 
+  // Sports
+  if (lowerCategory.includes('sports') || lowerCategory.includes('fitness')) {
+    return 'bg-leaf text-white hover:bg-opacity-90';
+  }
+  
+  // Surf
+  if (lowerCategory.includes('surf')) {
+    return 'bg-ocean-medium text-white hover:bg-opacity-90';
+  }
+  
+  // Party
+  if (lowerCategory.includes('party')) {
+    return 'bg-coral text-white hover:bg-opacity-90';
+  }
+  
+  // Yoga
+  if (lowerCategory.includes('yoga')) {
+    return 'bg-lime text-white hover:bg-opacity-90';
+  }
+  
+  // Community
+  if (lowerCategory.includes('community') || 
       lowerCategory.includes('networking') ||
-      lowerCategory.includes('meetup') || 
-      lowerCategory.includes('community')) {
-    return 'bg-blue-100 text-blue-800 hover:bg-blue-200';
+      lowerCategory.includes('meetup')) {
+    return 'bg-dusk text-white hover:bg-opacity-90';
   }
   
-  // Active categories
-  if (lowerCategory.includes('fitness') || 
-      lowerCategory.includes('sports')) {
-    return 'bg-green-100 text-green-800 hover:bg-green-200';
+  // Water
+  if (lowerCategory.includes('water')) {
+    return 'bg-teal text-white hover:bg-opacity-90';
   }
   
-  // Food related
+  // Music
+  if (lowerCategory.includes('music') || 
+      lowerCategory.includes('concert')) {
+    return 'bg-twilight text-white hover:bg-opacity-90';
+  }
+  
+  // Food
   if (lowerCategory.includes('food') || 
       lowerCategory.includes('dining')) {
-    return 'bg-orange-100 text-orange-800 hover:bg-orange-200';
+    return 'bg-coral text-white hover:bg-opacity-90';
   }
   
-  // Entertainment
-  if (lowerCategory.includes('film') || 
-      lowerCategory.includes('movie')) {
-    return 'bg-red-100 text-red-800 hover:bg-red-200';
-  }
-  
-  // Literature
-  if (lowerCategory.includes('literature') || 
-      lowerCategory.includes('reading')) {
-    return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200';
-  }
-  
-  // Culture/Travel
-  if (lowerCategory.includes('culture') || 
-      lowerCategory.includes('travel')) {
-    return 'bg-teal-100 text-teal-800 hover:bg-teal-200';
+  // Market
+  if (lowerCategory.includes('market')) {
+    return 'bg-sunset text-white hover:bg-opacity-90';
   }
   
   // Default
@@ -112,7 +149,7 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
 }) => {
   const Icon = getCategoryIcon(category);
   const colorClasses = active 
-    ? 'bg-purple-500 text-white' 
+    ? 'bg-purple-600 text-white hover:bg-purple-700' 
     : getCategoryColor(category);
     
   const sizeClasses = {
@@ -132,7 +169,7 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
   return (
     <div
       className={cn(
-        'rounded-full font-medium transition-colors cursor-pointer flex items-center',
+        'rounded-full font-medium transition-colors flex items-center',
         colorClasses,
         sizeClasses[size],
         onClick ? 'cursor-pointer' : 'cursor-default',

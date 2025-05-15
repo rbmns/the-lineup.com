@@ -18,6 +18,7 @@ interface EventCardListProps {
   showRsvpStatus?: boolean;
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   className?: string;
+  onClick?: (event: Event) => void;
 }
 
 const EventCardList: React.FC<EventCardListProps> = ({
@@ -27,6 +28,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
   showRsvpStatus = false,
   onRsvp,
   className,
+  onClick,
 }) => {
   const { navigateToEvent } = useEventNavigation();
   const { getEventImageUrl } = useEventImages();
@@ -38,6 +40,11 @@ const EventCardList: React.FC<EventCardListProps> = ({
         (e.target as HTMLElement).closest('[data-rsvp-container]')) {
       e.preventDefault();
       e.stopPropagation();
+      return;
+    }
+    
+    if (onClick) {
+      onClick(event);
       return;
     }
     
@@ -82,14 +89,14 @@ const EventCardList: React.FC<EventCardListProps> = ({
   return (
     <div 
       className={cn(
-        "flex flex-col sm:flex-row gap-4 sm:h-[140px] bg-white rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden",
+        "flex flex-col sm:flex-row gap-4 sm:h-auto bg-white rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden",
         className
       )}
       onClick={handleClick}
       data-event-id={event.id}
     >
       {/* Image */}
-      <div className="relative h-[120px] sm:h-auto sm:w-[180px] overflow-hidden bg-gray-100">
+      <div className="relative h-[120px] sm:h-auto sm:w-[180px] overflow-hidden bg-gray-100 flex-shrink-0">
         <img 
           src={imageUrl} 
           alt={event.title}
@@ -112,7 +119,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
       {/* Content - Updated layout */}
       <div className="flex flex-col flex-1 p-4 pt-0 sm:pt-4 justify-between">
         {/* Title - Now first */}
-        <div>
+        <div className="space-y-2">
           <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">
             {event.title}
           </h3>
@@ -134,7 +141,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
           {/* Location - Now third row */}
           <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
             <MapPin className="h-3.5 w-3.5" />
-            <span className="truncate max-w-[250px]">
+            <span className="truncate max-w-full">
               {event.venues?.name || event.location || 'No location'}
             </span>
           </div>
