@@ -38,10 +38,10 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
 
   // Map size to appropriate button sizes
   const buttonSizeClasses = {
-    sm: 'h-8 text-sm py-1 px-3',
-    default: 'h-10 text-base py-2 px-4',
-    lg: 'h-11 text-lg py-2 px-5',
-    xl: 'h-12 text-xl py-2.5 px-6'
+    sm: 'h-7 text-xs py-1 px-2.5',
+    default: 'h-9 text-sm py-1.5 px-3',
+    lg: 'h-10 text-base py-2 px-4',
+    xl: 'h-11 text-lg py-2 px-5'
   };
 
   // If showStatusOnly is true and there's a current status, only show a badge
@@ -51,7 +51,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         <Badge
           variant="outline"
           className={cn(
-            "py-1 px-3 text-base font-medium transition-all duration-200",
+            "py-1 px-2 text-xs font-medium transition-all duration-200",
             localStatus === 'Going' 
               ? "bg-green-50 text-green-700 border-green-200" 
               : "bg-blue-50 text-blue-700 border-blue-200"
@@ -75,7 +75,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       return 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700';
     }
     
-    return 'bg-gray-100 border-gray-300 hover:bg-gray-200 text-gray-800';
+    return 'bg-gray-100 border-gray-300 hover:bg-gray-200 text-gray-700';
   };
 
   // Handle RSVP with optimistic UI updates
@@ -85,7 +85,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     try {
       setLocalLoading(status);
       
-      // Optimistically update the UI
+      // Immediately update UI state for instant feedback
       const newStatus = localStatus === status ? null : status;
       setLocalStatus(newStatus);
       
@@ -93,6 +93,14 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       const button = document.getElementById(`rsvp-${status.toLowerCase()}`);
       if (button) {
         button.classList.add('button-click-animation');
+        
+        // Immediately update button appearance
+        if (newStatus) {
+          button.classList.add(status === 'Going' ? 'bg-green-500' : 'bg-blue-500', 'text-white');
+        } else {
+          button.classList.remove('bg-green-500', 'bg-blue-500', 'text-white');
+        }
+        
         setTimeout(() => button.classList.remove('button-click-animation'), 200);
       }
       
@@ -102,6 +110,15 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       // If the call failed, revert the UI
       if (!success) {
         setLocalStatus(currentStatus);
+        
+        // Also revert button appearance if needed
+        if (button) {
+          if (currentStatus === status) {
+            button.classList.add(status === 'Going' ? 'bg-green-500' : 'bg-blue-500', 'text-white');
+          } else {
+            button.classList.remove('bg-green-500', 'bg-blue-500', 'text-white');
+          }
+        }
       }
     } catch (error) {
       console.error('RSVP error:', error);
@@ -119,25 +136,25 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     
     if (isButtonLoading) {
       return (
-        <span className="flex items-center gap-1.5">
-          <Loader2 className="h-4 w-4 animate-spin" />
-          {variant !== 'minimal' && status}
+        <span className="flex items-center gap-1">
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          {variant !== 'minimal' && size !== 'sm' && status}
         </span>
       );
     }
     
     if (status === 'Going') {
       return (
-        <span className="flex items-center gap-1.5">
-          <Check className="h-4 w-4" />
-          {variant !== 'minimal' && 'Going'}
+        <span className="flex items-center gap-1">
+          <Check className="h-3.5 w-3.5" />
+          {variant !== 'minimal' && size !== 'sm' && 'Going'}
         </span>
       );
     } else {
       return (
-        <span className="flex items-center gap-1.5">
-          <Star className="h-4 w-4" />
-          {variant !== 'minimal' && 'Interested'}
+        <span className="flex items-center gap-1">
+          <Star className="h-3.5 w-3.5" />
+          {variant !== 'minimal' && size !== 'sm' && 'Interested'}
         </span>
       );
     }
@@ -153,7 +170,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
           variant="outline"
           size="icon"
           className={cn(
-            'rounded-md w-9 h-9',
+            'rounded-md w-8 h-8',
             getButtonStyle(isGoing, 'Going'),
             loading || disabled ? 'opacity-50 cursor-not-allowed' : ''
           )}
@@ -163,9 +180,9 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
           data-rsvp-button="true"
         >
           {localLoading === 'Going' ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <Check className="h-5 w-5" />
+            <Check className="h-4 w-4" />
           )}
         </Button>
         
@@ -175,7 +192,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
           variant="outline"
           size="icon"
           className={cn(
-            'rounded-md w-9 h-9',
+            'rounded-md w-8 h-8',
             getButtonStyle(isInterested, 'Interested'),
             loading || disabled ? 'opacity-50 cursor-not-allowed' : ''
           )}
@@ -185,9 +202,9 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
           data-rsvp-button="true"
         >
           {localLoading === 'Interested' ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <Star className="h-5 w-5" />
+            <Star className="h-4 w-4" />
           )}
         </Button>
       </div>
@@ -204,7 +221,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
           variant="outline"
           size="sm"
           className={cn(
-            'rounded-md text-xs',
+            'rounded-md text-xs py-1 px-2',
             getButtonStyle(isGoing, 'Going'),
             loading || disabled ? 'opacity-50 cursor-not-allowed' : ''
           )}
@@ -221,7 +238,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
           variant="outline"
           size="sm"
           className={cn(
-            'rounded-md text-xs',
+            'rounded-md text-xs py-1 px-2',
             getButtonStyle(isInterested, 'Interested'),
             loading || disabled ? 'opacity-50 cursor-not-allowed' : ''
           )}
