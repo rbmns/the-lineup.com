@@ -1,4 +1,3 @@
-
 export interface UserProfile {
   id: string;
   username: string | null;
@@ -63,8 +62,10 @@ export interface Event {
   booking_link?: string | null;
   organiser_name?: string | null;
   vibe?: string | null;
-  coordinates?: [number, number]; // Added coordinates property
-  created_by?: string; // Added created_by property
+  coordinates?: [number, number]; 
+  created_by?: string;
+  going_count?: number;
+  interested_count?: number;
 }
 
 export interface EventsResponse {

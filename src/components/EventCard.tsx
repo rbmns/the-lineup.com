@@ -169,15 +169,15 @@ const EventCard: React.FC<EventCardProps> = ({
         </div>
         
         {/* RSVP count display */}
-        {event.going_count > 0 || event.interested_count > 0 ? (
+        {(event.going_count ?? 0) > 0 || (event.interested_count ?? 0) > 0 ? (
           <div className="flex items-center text-xs text-gray-500 mb-2">
-            {event.going_count > 0 && (
+            {(event.going_count ?? 0) > 0 && (
               <span className="mr-3 flex items-center">
                 <Check className="h-3 w-3 mr-1 text-green-500" />
                 {event.going_count} going
               </span>
             )}
-            {event.interested_count > 0 && (
+            {(event.interested_count ?? 0) > 0 && (
               <span className="flex items-center">
                 <Star className="h-3 w-3 mr-1 text-blue-500" />
                 {event.interested_count} interested
