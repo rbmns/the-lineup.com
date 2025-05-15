@@ -1,5 +1,5 @@
 
-import { UserProfile } from './index';
+import { UserProfile, Profile } from './index';
 
 export interface UserProfileWithFriendship extends UserProfile {
   friendshipId?: string;

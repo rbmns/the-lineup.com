@@ -2,11 +2,14 @@
 import { useEffect } from 'react';
 import { Event } from '@/types';
 
+// Define the type for the fetchSimilarEvents function
+type FetchSimilarEvents = (eventTypes: string[], eventsData?: Event[]) => Promise<Event[]>;
+
 export const useSimilarEventsHandler = (
   exactMatches: Event[],
   hasActiveFilters: boolean,
   selectedEventTypes: string[],
-  fetchSimilarEvents: (eventTypes: string[]) => Promise<Event[]>,
+  fetchSimilarEvents: FetchSimilarEvents,
   setSimilarEvents: (events: Event[]) => void
 ) => {
   useEffect(() => {

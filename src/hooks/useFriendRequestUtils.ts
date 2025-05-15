@@ -1,50 +1,57 @@
-
-import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 import { FriendRequest } from '@/types/friends';
+import { UserProfile } from '@/types';
 
 // Function to fetch friend requests for a specific user
-export const fetchPendingRequests = async (userId: string): Promise<FriendRequest[]> => {
-  if (!userId) return [];
-  
+export async function fetchPendingRequests(userId: string): Promise<FriendRequest[]> {
   try {
-    // Get requests sent to this user
-    const { data: friendshipData, error } = await supabase
+    if (!userId) return [];
+    
+    // Get pending friend requests where the user is the receiver
+    const { data, error } = await supabase
       .from('friendships')
-      .select('*')
+      .select(`
+        id, 
+        status, 
+        created_at,
+        user_id,
+        friend_id,
+        profiles!friendships_user_id_fkey(
+          id, 
+          username, 
+          avatar_url, 
+          email, 
+          location,
+          status,
+          tagline
+        )
+      `)
       .eq('friend_id', userId)
       .eq('status', 'Pending');
-      
-    if (error) throw error;
     
-    // If no pending requests, return empty array
-    if (!friendshipData?.length) return [];
+    if (error) {
+      console.error('Error fetching pending requests:', error);
+      return [];
+    }
     
-    // Fetch user profiles for the senders
-    const senderIds = friendshipData.map(req => req.user_id);
+    // Map to the correct type
+    const requests: FriendRequest[] = data.map(item => ({
+      id: item.id,
+      status: item.status.toLowerCase() as 'pending' | 'accepted' | 'declined',
+      created_at: item.created_at,
+      user_id: item.user_id,
+      friend_id: item.friend_id,
+      sender_id: item.user_id,
+      receiver_id: item.friend_id,
+      profile: item.profiles as UserProfile
+    }));
     
-    const { data: profiles, error: profileError } = await supabase
-      .from('profiles')
-      .select('*')
-      .in('id', senderIds);
-      
-    if (profileError) throw profileError;
-    
-    // Process the data into the friendships format
-    return friendshipData.map(req => ({
-      id: req.id,
-      status: req.status.toLowerCase(),
-      created_at: req.created_at,
-      user_id: req.user_id,
-      friend_id: req.friend_id,
-      profile: profiles?.find(p => p.id === req.user_id)
-    })).filter(req => req.profile);
-    
-  } catch (err) {
-    console.error('Error fetching pending friend requests:', err);
+    return requests;
+  } catch (error) {
+    console.error('Error in fetchPendingRequests:', error);
     return [];
   }
-};
+}
 
 // Function to check for recently accepted friend requests
 export const checkRecentlyAcceptedRequests = async (userId: string): Promise<void> => {

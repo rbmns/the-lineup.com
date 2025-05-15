@@ -6,7 +6,11 @@ export type FriendRequest = {
   status: 'pending' | 'accepted' | 'declined';
   created_at: string;
   user_id: string;
+  friend_id?: string;
+  sender_id?: string;
+  receiver_id?: string;
   profile: UserProfile;
+  sender_profile?: UserProfile;
 };
 
 export type FriendsData = {

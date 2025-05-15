@@ -71,6 +71,10 @@ export interface Event {
   cover_image?: string | null;
   share_image?: string | null;
   user_rsvp_status?: 'Going' | 'Interested' | null;
+  
+  // Adding the missing properties from the error messages
+  going_count?: number;
+  interested_count?: number;
 }
 
 export interface EventImage {
@@ -88,3 +92,6 @@ export interface FriendRequest {
   status: 'Pending' | 'Accepted' | 'Rejected';
   profile?: UserProfile;
 }
+
+// Adding a Profile type to fix the import issues
+export type Profile = UserProfile;
