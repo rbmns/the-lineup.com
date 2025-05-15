@@ -46,23 +46,74 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
       
       const { data, error } = await supabase
         .from('events')
-        .select('*')
+        .select(`
+          *,
+          creator:profiles(*),
+          venues:venue_id(*),
+          event_rsvps(id, user_id, status)
+        `)
         .eq('id', eventId)
         .single();
 
       if (error) {
         console.error('Error fetching event details:', error);
         setError('Failed to load event details.');
-      }
-
-      if (data) {
+        toast({
+          title: "Error loading event",
+          description: "We couldn't load the event details. Please try again.",
+          variant: "destructive"
+        });
+      } else if (data) {
+        console.log('Event data loaded:', data);
         setEvent(data);
+        
+        // Fetch attendees
+        fetchAttendees(eventId);
+      } else {
+        setError('Event not found');
+        toast({
+          title: "Event not found",
+          description: "The event you're looking for doesn't exist or has been removed.",
+          variant: "destructive"
+        });
       }
     } catch (err) {
       console.error('Unexpected error fetching event details:', err);
       setError('An unexpected error occurred.');
+      toast({
+        title: "Error",
+        description: "Something went wrong while loading the event. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchAttendees = async (eventId: string) => {
+    try {
+      const { data: goingData, error: goingError } = await supabase
+        .from('event_rsvps')
+        .select('user_id, profiles:user_id(*)')
+        .eq('event_id', eventId)
+        .eq('status', 'Going');
+      
+      const { data: interestedData, error: interestedError } = await supabase
+        .from('event_rsvps')
+        .select('user_id, profiles:user_id(*)')
+        .eq('event_id', eventId)
+        .eq('status', 'Interested');
+      
+      if (goingError || interestedError) {
+        console.error('Error fetching attendees:', goingError || interestedError);
+      } else {
+        setAttendees({
+          going: goingData?.map(item => item.profiles) || [],
+          interested: interestedData?.map(item => item.profiles) || []
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching attendees:', err);
     }
   };
 
@@ -75,7 +126,6 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
   // Handle RSVP for a specific event
   const rsvpToEvent = async (status: 'Going' | 'Interested') => {
     if (!user) {
-      // Keep this important toast for authentication feedback
       toast({
         title: "Authentication required",
         description: "Please log in to RSVP to events",
@@ -100,9 +150,22 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
           }
           return prevEvent;
         });
+        
+        // Refresh attendees data
+        fetchAttendees(eventId);
+        
+        toast({
+          title: "RSVP Updated",
+          description: `You're now ${status.toLowerCase()} to this event.`
+        });
       }
     } catch (err) {
       console.error('Error during RSVP:', err);
+      toast({
+        title: "RSVP Failed",
+        description: "We couldn't update your RSVP. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
