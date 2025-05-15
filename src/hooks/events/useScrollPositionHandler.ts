@@ -1,54 +1,61 @@
 
-import { useEffect, MutableRefObject } from 'react';
-import { useScrollPosition } from '@/hooks/useScrollPosition';
+import { useEffect, RefObject } from 'react';
 import { Event } from '@/types';
+import { useScrollPosition } from '@/hooks/useScrollPosition';
 
 export const useScrollPositionHandler = (
-  initialRenderRef: MutableRefObject<boolean>,
-  scrollRestoredRef: MutableRefObject<boolean>,
-  rsvpInProgressRef: MutableRefObject<boolean>,
-  filteredEvents: Event[],
+  initialRenderRef: RefObject<boolean>,
+  scrollRestoredRef: RefObject<boolean>,
+  rsvpInProgressRef: RefObject<boolean>,
+  events: Event[]
 ) => {
-  const { savePosition, restorePositionAndState } = useScrollPosition();
-  
-  // Restore scroll position and URL state on initial render
-  useEffect(() => {
-    if (scrollRestoredRef.current) return;
-    
-    // After a brief delay to let the component fully render
-    const timeoutId = setTimeout(() => {
-      // Call restorePositionAndState without parameters, the hook will handle it
-      restorePositionAndState();
-      scrollRestoredRef.current = true;
-    }, 100);
-    
-    return () => clearTimeout(timeoutId);
-  }, [restorePositionAndState, scrollRestoredRef]);
+  const { savePosition, restorePosition, savePositionAndState, restorePositionAndState } = useScrollPosition();
 
-  // Save scroll position on initial render and when filteredEvents changes
+  // Restore scroll position after RSVP operations
   useEffect(() => {
-    // Skip on initial render to avoid interfering with browser's natural scroll restoration
-    if (initialRenderRef.current) {
-      initialRenderRef.current = false;
-      return;
+    // Only run this effect once on initial render
+    if (!initialRenderRef.current) {
+      initialRenderRef.current = true;
+      
+      // Get position from sessionStorage
+      const storedPosition = sessionStorage.getItem('eventsScrollPosition');
+      
+      if (storedPosition && !scrollRestoredRef.current) {
+        // Restore position after data is loaded and components are rendered
+        setTimeout(() => {
+          try {
+            const position = parseInt(storedPosition, 10);
+            restorePosition(position);
+            
+            // Mark scroll as restored to prevent duplicate restoration
+            scrollRestoredRef.current = true;
+            
+            // Clear the stored position
+            sessionStorage.removeItem('eventsScrollPosition');
+            
+            console.log('Scroll position restored:', position);
+          } catch (error) {
+            console.error('Error restoring scroll position:', error);
+          }
+        }, 100);
+      }
     }
     
-    // Skip saving position if we're in the middle of an RSVP action
-    if (rsvpInProgressRef.current) {
-      return;
-    }
-    
-    // When filters/results change, we still want to preserve our position
-    // Use a short delay to ensure the DOM has updated
-    const timeoutId = setTimeout(() => {
-      savePosition();
-    }, 200);
-    
-    return () => clearTimeout(timeoutId);
-  }, [filteredEvents, savePosition, initialRenderRef, rsvpInProgressRef]);
-  
-  return {
-    savePosition,
-    restorePositionAndState
-  };
+    // Save scroll position before unmount
+    return () => {
+      // Don't save position during RSVP operations
+      if (!rsvpInProgressRef.current && events.length > 0) {
+        const position = savePosition();
+        sessionStorage.setItem('eventsScrollPosition', String(position));
+        console.log('Saved scroll position on unmount:', position);
+      }
+    };
+  }, [
+    initialRenderRef, 
+    scrollRestoredRef, 
+    rsvpInProgressRef, 
+    events, 
+    savePosition, 
+    restorePosition
+  ]);
 };

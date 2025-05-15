@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Event } from '@/types';
 import { EventsList } from '@/components/events/EventsList';
@@ -40,6 +41,13 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   // Determine if we should show the "no results" message
   const showNoResults = !isLoading && mainEvents.length === 0 && !hasActiveFilters;
 
+  // Dummy resetFilters function for NoResultsFound component
+  const resetFilters = () => {
+    console.log("Reset filters clicked");
+    // This would typically dispatch an action or call a prop function
+    // But we're providing a stub implementation for now
+  };
+
   return (
     <div className={cn('space-y-6', compact ? 'compact-view' : '')}>
       {/* Loading Skeleton */}
@@ -51,7 +59,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
 
       {/* No Results Message */}
       {showNoResults && (
-        <NoResultsFound />
+        <NoResultsFound resetFilters={resetFilters} />
       )}
       
       {/* Display options header */}
@@ -112,7 +120,10 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
 
       {/* No results message when filters are active */}
       {!isLoading && mainEvents.length === 0 && hasActiveFilters && (
-        <NoResultsFound message="No events found with the current filters." />
+        <NoResultsFound 
+          message="No events found with the current filters."
+          resetFilters={resetFilters}
+        />
       )}
     </div>
   );

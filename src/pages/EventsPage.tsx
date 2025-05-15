@@ -58,7 +58,7 @@ const EventsPage = () => {
         <EventsPageHeader title="What's Happening?" />
         
         <div className="space-y-6 mt-6">
-          {/* Events List Section - use grid view by default */}
+          {/* Events List Section - set default view to grid as requested */}
           <LazyEventsList 
             mainEvents={displayEvents}
             relatedEvents={[]}

@@ -1,20 +1,28 @@
 
 import React from 'react';
 import { Event } from '@/types';
-import { RelatedEvents } from '@/components/events/related-events/RelatedEvents';
+import { CardContent, Card } from '@/components/ui/card';
+import EventCard from '@/components/EventCard';
 
 export interface RelatedEventsSectionProps {
-  event: Event;
+  events: Event[];
 }
 
-export const RelatedEventsSection: React.FC<RelatedEventsSectionProps> = ({ event }) => {
+export const RelatedEventsSection: React.FC<RelatedEventsSectionProps> = ({ events }) => {
+  if (!events || events.length === 0) return null;
+  
   return (
-    <RelatedEvents 
-      eventId={event.id}
-      eventType={event.event_type || ''}
-      startDate={event.start_date || ''}
-      tags={event.tags}
-      vibe={event.vibe}
-    />
+    <div className="mt-8">
+      <h3 className="text-xl font-semibold mb-4">Related Events</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {events.map(event => (
+          <EventCard 
+            key={event.id} 
+            event={event}
+            showRsvpButtons={false}
+          />
+        ))}
+      </div>
+    </div>
   );
 };
