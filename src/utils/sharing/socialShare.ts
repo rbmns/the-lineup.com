@@ -1,5 +1,11 @@
 
-import { SocialShare } from '@/types/seo';
+// Define SocialShare interface and export it
+export interface SocialShare {
+  title: string;
+  text?: string;
+  url: string;
+  imageUrl?: string;
+}
 
 // Share to WhatsApp
 export const shareToWhatsApp = (data: SocialShare): void => {

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,6 +10,21 @@ import { Event } from '@/types';
 
 interface EventWithCoordinates extends Event {
   coordinates?: [number, number]; // This is now part of the Event interface
+}
+
+// Define the profile interface with the missing properties to match the DB schema
+interface Profile {
+  id: string;
+  username?: string;
+  avatar_url?: string[] | null;
+  location?: string | null;
+  location_category?: string | null;
+  status?: string | null;
+  onboarded?: boolean;
+  onboarding_data?: string;
+  role?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 const processEventData = (event: any): Event => {
@@ -129,7 +145,7 @@ const Explore = () => {
     }
 
     if (friendProfiles) {
-      friendProfiles.forEach(profile => {
+      friendProfiles.forEach((profile: Profile) => {
         if (profile.location) {
           const locationParts = profile.location.split(',');
           
@@ -144,9 +160,9 @@ const Explore = () => {
                 type: 'friend',
                 coordinates: [lng, lat],
                 username: profile.username,
-                status: profile.status,
+                status: profile.status || undefined,
                 avatar_url: Array.isArray(profile.avatar_url) ? profile.avatar_url[0] : null,
-                location_category: profile.location_category
+                location_category: profile.location_category || undefined
               });
             } else {
               console.log(`Profile ${profile.id} has invalid coordinates in location string`);

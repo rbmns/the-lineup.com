@@ -1,6 +1,4 @@
 
-import { toast } from '@/hooks/use-toast';
-
 interface ShareData {
   url: string;
   title?: string;
