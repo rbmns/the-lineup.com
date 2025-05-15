@@ -3,7 +3,7 @@ import React from 'react';
 import { Event } from '@/types';
 import EventCard from '@/components/EventCard';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useEventNavigation } from '@/hooks/useEventNavigation';
 
 interface UserFeedProps {
   events: Event[];
@@ -12,16 +12,12 @@ interface UserFeedProps {
 
 export const UserFeed: React.FC<UserFeedProps> = ({ events, handleRsvpAction }) => {
   const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  const { navigateToEvent } = useEventNavigation();
   
   const handleEventClick = (event: Event) => {
     console.log(`UserFeed: Navigating to event with ID: ${event.id}`);
-    // Use direct navigation to event ID for consistency
-    if (event && event.id) {
-      navigate(`/events/${event.id}`);
-    } else {
-      console.error("Cannot navigate: Missing event ID", event);
-    }
+    // Use the consistent navigation hook instead of direct navigation
+    navigateToEvent(event);
   };
 
   return (

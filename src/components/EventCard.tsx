@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { formatRelativeDate, formatEventTime, getEventDateTime } from '@/utils/dateUtils';
@@ -8,6 +7,7 @@ import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { useEventNavigation } from '@/hooks/useEventNavigation';
 
 interface EventCardProps {
   event: Event;
@@ -30,6 +30,7 @@ const EventCard: React.FC<EventCardProps> = ({
 }) => {
   const { getEventImageUrl } = useEventImages();
   const navigate = useNavigate();
+  const { navigateToEvent } = useEventNavigation();
   
   const imageUrl = getEventImageUrl(event);
   
@@ -45,9 +46,9 @@ const EventCard: React.FC<EventCardProps> = ({
     if (onClick) {
       onClick();
     } else if (event && event.id) {
-      // Make sure we have a valid event ID before navigating
+      // Use the navigation hook for consistent navigation behavior
       console.log(`Navigating to event detail with ID: ${event.id}`);
-      navigate(`/events/${event.id}`);
+      navigateToEvent(event);
     } else {
       console.error("Cannot navigate: Missing event ID", event);
     }

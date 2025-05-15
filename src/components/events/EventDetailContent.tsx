@@ -1,4 +1,3 @@
-
 import { useMemo } from 'react';
 import { Event } from '@/types';
 import {
