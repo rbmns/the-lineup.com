@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -91,12 +90,12 @@ const EventsPageRefactored = () => {
   const hasExactMatches = exactMatches.length > 0;
   const showNoExactMatchesMessage = hasActiveFilters && !hasExactMatches;
   
-  // Handle similar events loading
+  // Handle similar events loading with corrected types
   useSimilarEventsHandler(
     exactMatches,
     hasActiveFilters,
     selectedEventTypes,
-    fetchSimilarEvents,
+    (eventTypes) => fetchSimilarEvents(eventTypes, events),
     setSimilarEvents
   );
 

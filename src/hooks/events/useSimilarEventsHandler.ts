@@ -9,25 +9,35 @@ export const useSimilarEventsHandler = (
   fetchSimilarEvents: (eventTypes: string[]) => Promise<Event[]>,
   setSimilarEvents: (events: Event[]) => void
 ) => {
-  // Handle similar events loading
   useEffect(() => {
-    const loadSimilarEvents = async () => {
-      if (exactMatches.length === 0 && hasActiveFilters && selectedEventTypes.length > 0) {
-        console.log("Loading similar events based on event types:", selectedEventTypes);
+    // Clear similar events when there are no filters or when there are exact matches
+    if (!hasActiveFilters || exactMatches.length > 0) {
+      setSimilarEvents([]);
+      return;
+    }
+
+    // Only fetch similar events if we have event types to filter by
+    if (selectedEventTypes.length > 0) {
+      const loadSimilarEvents = async () => {
         try {
-          // Pass the array of event types directly
-          const similarEvents = await fetchSimilarEvents(selectedEventTypes);
-          setSimilarEvents(similarEvents);
-        } catch (error) {
-          console.error("Error fetching similar events:", error);
+          // Fetch similar events based on selected event types
+          const similar = await fetchSimilarEvents(selectedEventTypes);
+          setSimilarEvents(similar);
+        } catch (err) {
+          console.error('Error fetching similar events:', err);
           setSimilarEvents([]);
         }
-      } else if (!hasActiveFilters || exactMatches.length > 0) {
-        // Clear similar events when no filters active or we have exact matches
-        setSimilarEvents([]);
-      }
-    };
-    
-    loadSimilarEvents();
-  }, [exactMatches, hasActiveFilters, selectedEventTypes, fetchSimilarEvents, setSimilarEvents]);
+      };
+
+      loadSimilarEvents();
+    } else {
+      setSimilarEvents([]);
+    }
+  }, [
+    exactMatches.length,
+    hasActiveFilters,
+    selectedEventTypes,
+    fetchSimilarEvents,
+    setSimilarEvents
+  ]);
 };

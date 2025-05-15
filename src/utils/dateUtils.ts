@@ -172,7 +172,80 @@ export const filterEventsByDate = <T extends { start_date?: string | null }>(
 ): T[] => {
   if (!dateFilter && !dateRange) return events;
   
-  return events.filter(event => filterEventsInDateRange(event, dateFilter, dateRange));
+  return events.filter(event => filterEventsByDateRange(event, dateFilter, dateRange));
+};
+
+/**
+ * Check if an event falls within the specified date range or filter
+ */
+export const filterEventsByDateRange = <T extends { start_date?: string | null; start_time?: string | null }>(
+  event: T, 
+  dateFilter: string,
+  dateRange?: any
+): boolean => {
+  // If no filters are applied, include the event
+  if (!dateFilter && !dateRange) return true;
+  
+  const dateTimeStr = getEventDateTime(event);
+  if (!dateTimeStr) return false;
+  
+  const eventDate = startOfDay(new Date(dateTimeStr));
+  const today = startOfDay(new Date());
+  
+  // Skip events in the past
+  if (isPast(eventDate) && !isToday(eventDate)) return false;
+  
+  // If a date range is specified, check if the event falls within it
+  if (dateRange?.from) {
+    const rangeStart = startOfDay(dateRange.from);
+    if (dateRange.to) {
+      const rangeEnd = startOfDay(dateRange.to);
+      return eventDate >= rangeStart && eventDate <= rangeEnd;
+    }
+    return eventDate >= rangeStart;
+  }
+  
+  // If a date filter is specified, apply it
+  if (dateFilter) {
+    switch (dateFilter.toLowerCase()) {
+      case 'today':
+        return isToday(eventDate);
+        
+      case 'tomorrow':
+        const tomorrow = addDays(today, 1);
+        return isSameDay(eventDate, tomorrow);
+        
+      case 'this week':
+        const endOfCurrentWeek = addDays(today, 7);
+        return eventDate >= today && eventDate < endOfCurrentWeek;
+        
+      case 'this weekend':
+        // Get the next weekend (Fri, Sat, Sun) from today
+        const fridayDate = isFriday(today) ? today : nextFriday(today);
+        const saturdayDate = addDays(fridayDate, 1);
+        const sundayDate = addDays(fridayDate, 2);
+        
+        return isSameDay(eventDate, fridayDate) || 
+               isSameDay(eventDate, saturdayDate) || 
+               isSameDay(eventDate, sundayDate);
+        
+      case 'next week':
+        // Next Monday to Sunday
+        const nextMondayDate = nextMonday(today);
+        const endOfNextWeek = addDays(nextMondayDate, 7);
+        return eventDate >= nextMondayDate && eventDate < endOfNextWeek;
+        
+      case 'later':
+        const twoWeeksLater = addWeeks(today, 2);
+        return eventDate >= twoWeeksLater;
+        
+      default:
+        return true;
+    }
+  }
+  
+  // If we get here, include the event by default
+  return true;
 };
 
 /**

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
-import { filterEventsInDateRange } from '@/utils/dateUtils';
+import { filterEventsByDate } from '@/utils/dateUtils';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
 import { useCanonical } from '@/hooks/useCanonical';
 import { pageSeoTags } from '@/utils/seoUtils';
