@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -73,6 +74,11 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
         // Check for existing account error
         if (error.message.includes("User already registered")) {
           setErrorMessage("This email is already registered. Please use a different email or try logging in.");
+          toast({
+            title: "Account already exists",
+            description: "This email address is already registered. Please try logging in instead.",
+            variant: "destructive"
+          });
           return;
         }
         
@@ -85,10 +91,9 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
       setRegistrationComplete(true);
       setRegisteredEmail(values.email);
       
-      // Keep this important toast for registration confirmation
       toast({
         title: "Sign up successful!",
-        description: "Please check your email for verification.",
+        description: "We've sent you a confirmation email. Please check your inbox and verify your account.",
         variant: "success"
       });
     } catch (error: any) {
@@ -96,10 +101,9 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
       console.error("Signup failed:", error.message);
       setErrorMessage(error.message || "Something went wrong");
       
-      // Keep this important toast for error feedback
       toast({
         title: "Sign up failed",
-        description: error.message || "Something went wrong",
+        description: error.message || "Something went wrong with your registration. Please try again.",
         variant: "destructive"
       });
     } finally {

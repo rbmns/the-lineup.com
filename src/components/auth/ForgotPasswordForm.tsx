@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -56,6 +57,12 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
     setRateLimited(true);
     setWaitTime(30); // Reset to 30 seconds wait time
     setError("Too many password reset attempts. Please wait a moment before trying again.");
+    
+    toast({
+      title: "Too many attempts",
+      description: "Please wait a moment before requesting another password reset.",
+      variant: "destructive"
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -102,8 +109,20 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
         if (error.message?.toLowerCase().includes('rate limit') || 
             error.message?.toLowerCase().includes('too many requests')) {
           handleRateLimitError();
+        } else if (error.message?.toLowerCase().includes('email not found')) {
+          setError("We couldn't find an account with that email address.");
+          toast({
+            title: "Email not found",
+            description: "We couldn't find an account with that email address.",
+            variant: "destructive"
+          });
         } else {
           setError(error.message || "Failed to send password reset email. Please try again.");
+          toast({
+            title: "Password reset failed",
+            description: error.message || "Failed to send password reset email. Please try again.",
+            variant: "destructive"
+          });
         }
         return;
       }
@@ -112,10 +131,16 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
       toast({
         title: "Password reset email sent",
         description: "Check your inbox for instructions to reset your password.",
+        variant: "success"
       });
     } catch (error: any) {
       console.error("Password reset failed:", error.message);
       setError(error.message || "Failed to send password reset email. Please try again.");
+      toast({
+        title: "Password reset failed",
+        description: error.message || "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
