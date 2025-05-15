@@ -41,15 +41,19 @@ const EventCardList: React.FC<EventCardListProps> = ({
   
   const handleClick = () => {
     // Make sure we have all required properties for proper navigation
-    // This will use the date-first slug pattern for URLs
-    navigateToEvent({
-      ...event,
-      id: event.id,
-      destination: event.destination,
-      slug: event.slug,
-      start_time: event.start_time,
-      title: event.title
-    });
+    if (event && event.id) {
+      console.log(`EventCardList: Navigating to event with ID: ${event.id}`);
+      navigateToEvent({
+        ...event,
+        id: event.id,
+        destination: event.destination,
+        slug: event.slug,
+        start_time: event.start_time,
+        title: event.title
+      });
+    } else {
+      console.error("Cannot navigate: Missing event ID", event);
+    }
   };
 
   const handleRsvpClick = async (e: React.MouseEvent, status: 'Going' | 'Interested') => {
@@ -92,10 +96,14 @@ const EventCardList: React.FC<EventCardListProps> = ({
             </div>
           </div>
           
-          {/* Event type pill - Moved above the title */}
+          {/* Event type pill */}
           {event.event_type && (
             <div className="mb-1">
-              <CategoryPill category={event.event_type} />
+              <CategoryPill 
+                category={event.event_type} 
+                size="sm"
+                showIcon={true}
+              />
             </div>
           )}
           

@@ -32,6 +32,7 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
   const [loading, setLoading] = useState<boolean>(false);
   const [registrationComplete, setRegistrationComplete] = useState<boolean>(false);
   const [registeredEmail, setRegisteredEmail] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const navigate = useNavigate();
   
   const form = useForm<z.infer<typeof formSchema>>({
@@ -45,6 +46,7 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
+    setErrorMessage("");
     
     try {
       // Clean up any lingering auth state
@@ -68,6 +70,12 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
       });
 
       if (error) {
+        // Check for existing account error
+        if (error.message.includes("User already registered")) {
+          setErrorMessage("This email is already registered. Please use a different email or try logging in.");
+          return;
+        }
+        
         throw error;
       }
       
@@ -86,6 +94,7 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
     } catch (error: any) {
       // Show error message
       console.error("Signup failed:", error.message);
+      setErrorMessage(error.message || "Something went wrong");
       
       // Keep this important toast for error feedback
       toast({
@@ -110,6 +119,7 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
 
   const prevStep = () => {
     setStep(1);
+    setErrorMessage("");
   };
 
   if (registrationComplete) {
@@ -138,6 +148,15 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
 
   return (
     <div className="space-y-4 max-w-md w-full">
+      {errorMessage && (
+        <Alert variant="destructive" className="bg-red-50 border-red-200">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription className="font-normal text-red-800">
+            {errorMessage}
+          </AlertDescription>
+        </Alert>
+      )}
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           {step === 1 && (

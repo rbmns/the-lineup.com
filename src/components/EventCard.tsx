@@ -1,9 +1,11 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { formatRelativeDate, formatEventTime, getEventDateTime } from '@/utils/dateUtils';
 import { useEventImages } from '@/hooks/useEventImages';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
+import { CategoryPill } from '@/components/ui/category-pill';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
@@ -105,9 +107,15 @@ const EventCard: React.FC<EventCardProps> = ({
       
       <div className={cn("flex flex-col justify-between", contentPadding, compact ? 'h-[200px]' : 'h-[200px]')}>
         <div className="space-y-2">
-          <div className="text-xs text-blue-600 font-medium">
-            {event.event_type}
-          </div>
+          {event.event_type && (
+            <div className="mb-1">
+              <CategoryPill
+                category={event.event_type}
+                size={compact ? "sm" : "default"}
+                showIcon={true}
+              />
+            </div>
+          )}
           
           <h3 className={cn("font-bold line-clamp-2", compact ? 'text-base' : 'text-lg')}>
             {event.title}
