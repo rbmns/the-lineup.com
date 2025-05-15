@@ -117,7 +117,7 @@ type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
 
 type ToastActionElement = React.ReactElement<typeof ToastAction>
 
-// Make id optional in ToasterToast to allow calling code to omit it
+// Make id optional in ToasterToast
 export interface ToasterToast {
   id?: string;  // Made optional
   title?: React.ReactNode;
@@ -129,17 +129,17 @@ export interface ToasterToast {
   duration?: number;
 }
 
-// Implement the actual useToast hook here
+// Define the options type for the toast function
 type ToasterToastOptions = Partial<
   Omit<ToasterToast, "id">
 >;
 
-// Create a dummy state that would normally manage toasts
+// Create a simple toast hook that logs toast calls
+// This minimalistic implementation just logs toast calls but doesn't show UI toasts
 const useToast = () => {
   return {
     toast: (opts: ToasterToastOptions) => {
       console.log('Toast called:', opts);
-      // In a real implementation, this would add the toast to some state
       return { id: '1', ...opts };
     },
     dismiss: (toastId?: string) => {
@@ -148,7 +148,7 @@ const useToast = () => {
   };
 };
 
-// Create the toast function
+// Simple toast function for components that need it
 const toast = (opts: ToasterToastOptions) => {
   const { toast: addToast } = useToast();
   return addToast(opts);

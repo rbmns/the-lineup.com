@@ -1,3 +1,3 @@
 
-// This file redirects to the main use-toast implementation in the hooks directory
+// This file redirects to the toast component implementation
 export { useToast, toast } from "@/components/ui/toast";

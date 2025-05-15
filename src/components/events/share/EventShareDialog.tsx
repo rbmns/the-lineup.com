@@ -1,9 +1,7 @@
 
-import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Event } from "@/types";
 import { ShareButtons } from "./ShareButtons";
-import { toast } from "@/hooks/use-toast";
 import { copyToClipboard } from "@/utils/sharing/clipboardUtils";
 
 export interface EventShareDialogProps {
@@ -24,17 +22,10 @@ export function EventShareDialog({ event, isOpen, onOpenChange }: EventShareDial
   const handleCopyLink = async () => {
     const success = await copyToClipboard(getEventUrl());
     if (success) {
-      toast({
-        title: "Link copied",
-        description: "Event link copied to clipboard",
-      });
+      console.log("Link copied to clipboard");
       onOpenChange(false);
     } else {
-      toast({
-        title: "Failed to copy",
-        description: "Please try again or share manually",
-        variant: "destructive",
-      });
+      console.error("Failed to copy link to clipboard");
     }
   };
 

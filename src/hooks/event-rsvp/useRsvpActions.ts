@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { useCacheUpdater } from './useCacheUpdater';
@@ -11,6 +10,7 @@ export const useRsvpActions = (userId: string | undefined) => {
 
   const handleRsvp = async (eventId: string, status: 'Interested' | 'Going') => {
     if (!userId) {
+      // Keep this important authentication toast
       toast({
         description: "You need to be logged in to RSVP to events",
         variant: "destructive"
@@ -29,15 +29,13 @@ export const useRsvpActions = (userId: string | undefined) => {
         throw new Error('RSVP mutation failed');
       }
       
-      // Show feedback to the user
-      toast({ description: toastMessage });
-      
       // Update the cache directly
       updateAllCaches(eventId, userId, newStatus, oldStatus);
       
       return true;
     } catch (error) {
       console.error("Error RSVPing to event:", error);
+      // Keep this important error toast
       toast({
         description: "Failed to update RSVP status. Please try again.",
         variant: "destructive"

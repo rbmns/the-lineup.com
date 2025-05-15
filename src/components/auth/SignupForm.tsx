@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -6,11 +5,11 @@ import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { toast } from 'sonner';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle, CheckCircle } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 // Define form schema with zod
 const formSchema = z.object({
@@ -78,13 +77,21 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
       setRegistrationComplete(true);
       setRegisteredEmail(values.email);
       
-      toast.success("Sign up successful!", {
+      // Keep this important toast for registration confirmation
+      toast({
+        title: "Sign up successful!",
         description: "Please check your email for verification.",
+        variant: "success"
       });
     } catch (error: any) {
       // Show error message
-      toast.error("Sign up failed", {
+      console.error("Signup failed:", error.message);
+      
+      // Keep this important toast for error feedback
+      toast({
+        title: "Sign up failed",
         description: error.message || "Something went wrong",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
@@ -63,6 +62,7 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
   // Handle RSVP for a specific event
   const rsvpToEvent = async (status: 'Going' | 'Interested') => {
     if (!user) {
+      // Keep this important toast for authentication feedback
       toast({
         title: "Authentication required",
         description: "Please log in to RSVP to events",
@@ -74,17 +74,12 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
 
     try {
       if (!eventId) {
-        toast({
-          title: "Error",
-          description: "Event ID is missing.",
-          variant: "destructive",
-        });
+        console.error("Error: Event ID is missing.");
         return;
       }
 
       const result = await hookHandleRsvp(eventId, status);
       if (result) {
-        // success handling
         // Optimistically update the event state
         setEvent((prevEvent) => {
           if (prevEvent) {
@@ -95,11 +90,6 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
       }
     } catch (err) {
       console.error('Error during RSVP:', err);
-      toast({
-        title: "RSVP Error",
-        description: "Failed to update RSVP status",
-        variant: "destructive",
-      });
     }
   };
 

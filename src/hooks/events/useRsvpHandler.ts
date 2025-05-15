@@ -1,6 +1,5 @@
 
-import { useCallback, RefObject, MutableRefObject } from 'react';
-import { toast } from 'sonner';
+import { useCallback, MutableRefObject } from 'react';
 
 export const useRsvpHandler = (
   user: any,
@@ -9,7 +8,7 @@ export const useRsvpHandler = (
 ) => {
   const handleEventRsvp = useCallback(async (eventId: string, status: 'Going' | 'Interested') => {
     if (!user) {
-      toast.error("Please log in to RSVP to events");
+      console.log("User not logged in, cannot RSVP");
       return false;
     }
     
@@ -50,7 +49,6 @@ export const useRsvpHandler = (
       return result;
     } catch (error) {
       console.error("Error in EventsPage RSVP handler:", error);
-      toast.error("Failed to update RSVP");
       return false;
     } finally {
       // Wait a moment before allowing scroll position saves again

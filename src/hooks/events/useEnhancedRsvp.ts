@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { useOptimisticRsvp } from '@/hooks/event-rsvp/useOptimisticRsvp';
 import { toast } from '@/hooks/use-toast';
@@ -12,6 +11,7 @@ export const useEnhancedRsvp = (userId: string | undefined) => {
 
   const handleRsvp = useCallback(async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!userId) {
+      // Keep this important toast for authentication feedback
       toast({
         description: "Please sign in to RSVP to events"
       });
@@ -26,13 +26,7 @@ export const useEnhancedRsvp = (userId: string | undefined) => {
       // Handle the RSVP with optimistic UI updates
       const result = await optimisticRsvp(eventId, status);
       
-      if (result) {
-        // Show minimal success toast for confirmation
-        toast({
-          description: status === 'Going' ? "You're going!" : "You're interested!"
-        });
-      }
-      
+      // Success case doesn't need a toast, removed
       return result;
     } catch (error) {
       console.error('Error in enhanced RSVP handler:', error);
