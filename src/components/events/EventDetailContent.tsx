@@ -16,6 +16,7 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Badge } from '@/components/ui/badge';
 import { formatInTimeZone } from 'date-fns-tz';
 import { formatDistanceToNow } from 'date-fns';
+import { toast } from '@/hooks/use-toast';
 
 const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
 
@@ -76,6 +77,7 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
   
   // Process tags for display - carefully handling all possible types
   const eventTags = useMemo(() => {
+    // If tags is undefined or null, return empty array
     if (!event.tags) return [];
     
     // If tags is already an array, return it
@@ -136,7 +138,25 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
   // Handle RSVP
   const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp) return false;
-    return onRsvp(event.id, status);
+    
+    try {
+      const result = await onRsvp(event.id, status);
+      if (result) {
+        toast({
+          title: `You're ${status.toLowerCase()} to this event`,
+          description: `Your RSVP for "${event.title}" has been updated.`
+        });
+      }
+      return result;
+    } catch (error) {
+      console.error('RSVP error:', error);
+      toast({
+        title: "RSVP failed",
+        description: "There was an error updating your RSVP status.",
+        variant: "destructive"
+      });
+      return false;
+    }
   };
   
   // Check if we have a booking link
@@ -246,16 +266,28 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
                 variant="outline"
                 className="w-full flex items-center justify-center gap-2" 
                 onClick={() => {
-                  navigator.share?.({
-                    title: event.title,
-                    text: `Check out this event: ${event.title}`,
-                    url: window.location.href
-                  }).catch(error => {
-                    console.error('Error sharing:', error);
-                    // Fallback: copy to clipboard
+                  if (navigator.share) {
+                    navigator.share({
+                      title: event.title,
+                      text: `Check out this event: ${event.title}`,
+                      url: window.location.href
+                    }).catch(error => {
+                      console.error('Error sharing:', error);
+                      // Fallback: copy to clipboard
+                      navigator.clipboard.writeText(window.location.href);
+                      toast({
+                        title: "Link copied to clipboard",
+                        description: "You can now paste it anywhere you want."
+                      });
+                    });
+                  } else {
+                    // Fallback for browsers that don't support navigator.share
                     navigator.clipboard.writeText(window.location.href);
-                    alert('Link copied to clipboard!');
-                  });
+                    toast({
+                      title: "Link copied to clipboard",
+                      description: "You can now paste it anywhere you want."
+                    });
+                  }
                 }}
               >
                 <Share2 className="h-4 w-4" />
