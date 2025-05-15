@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -33,7 +32,7 @@ export const FriendManagement: React.FC<FriendManagementProps> = ({
 }) => {
   const [showUnfriendDialog, setShowUnfriendDialog] = React.useState(false);
   const [isProcessing, setIsProcessing] = React.useState(false);
-  const { initiateFriendRequest } = useFriendship();
+  const { initiateFriendRequest } = useFriendship(currentUserId);
 
   const handleAddFriend = async () => {
     if (!currentUserId || !profile?.id) {
