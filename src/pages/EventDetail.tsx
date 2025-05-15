@@ -9,7 +9,7 @@ import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { MobileRsvpFooter } from '@/components/events/MobileRsvpFooter';
 import { EventDetailErrorState } from '@/components/events/EventDetailErrorState';
 import { EventDetailLoadingState } from '@/components/events/EventDetailLoadingState';
-import { EventShareDialog } from '@/components/events/share/ShareDialog';
+import { ShareDialog } from '@/components/events/share/ShareDialog';
 import { useEventDetailParams } from '@/hooks/useEventDetailParams';
 import { useEventDetails } from '@/hooks/useEventDetails';
 import { useEventImages } from '@/hooks/useEventImages';
@@ -21,11 +21,11 @@ import { useDeviceDetection } from '@/hooks/useDeviceDetection';
 
 const EventDetail = () => {
   const { eventId, eventSlug } = useEventDetailParams();
-  const { event, error, isLoading } = useEventDetails(eventId, eventSlug);
+  const { event, error, isLoading } = useEventDetails(eventId);
   const { coverImage } = useEventImages(event);
-  const { addMetaTags } = useEventMetaTags();
+  const metaTags = useEventMetaTags(event);
   const { handleRsvp } = useRsvpActions();
-  const { navigateToEvents } = useEventNavigation();
+  const { navigateToEvent, navigateToDestinationEvents } = useEventNavigation();
   const { isMobile } = useDeviceDetection();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -33,15 +33,15 @@ const EventDetail = () => {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   
   useEffect(() => {
-    if (event) {
-      addMetaTags({
+    if (event && metaTags) {
+      metaTags.setMetaTags({
         title: event.title,
         description: event.description || '',
         imageUrl: coverImage || '',
         path: `/events/${event.slug || event.id}`
       });
     }
-  }, [event, coverImage, addMetaTags]);
+  }, [event, coverImage, metaTags]);
 
   if (isLoading) {
     return <EventDetailLoadingState />;
@@ -51,7 +51,7 @@ const EventDetail = () => {
     return (
       <EventDetailErrorState 
         error={error ? new Error(error.toString()) : new Error("Event not found")}
-        onBackToEvents={() => navigateToEvents()}
+        onBackToEvents={() => navigate('/events')}
       />
     );
   }
@@ -62,6 +62,14 @@ const EventDetail = () => {
 
   const handleShare = () => {
     setShareDialogOpen(true);
+  };
+
+  const handleRsvpEvent = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    if (handleRsvp) {
+      await handleRsvp(event.id, status);
+      return true;
+    }
+    return false;
   };
 
   return (
@@ -81,26 +89,26 @@ const EventDetail = () => {
           {!isMobile && isAuthenticated && (
             <div className="mt-8 flex space-x-4">
               <EventRsvpButtons 
-                currentStatus={event.user_rsvp_status} 
-                onRsvp={(status) => handleRsvp(event.id, status)}
+                currentStatus={event.rsvp_status} 
+                onRsvp={handleRsvpEvent}
                 fullWidth={true}
               />
             </div>
           )}
           
-          <RelatedEventsSection eventId={event.id} venueId={event.venue_id} />
+          <RelatedEventsSection eventId={event.id} />
         </div>
       </div>
       
       {isMobile && isAuthenticated && (
         <MobileRsvpFooter 
-          currentStatus={event.user_rsvp_status} 
-          onRsvp={(status) => handleRsvp(event.id, status)}
+          currentStatus={event.rsvp_status} 
+          onRsvp={handleRsvpEvent}
           onShare={handleShare}
         />
       )}
       
-      <EventShareDialog 
+      <ShareDialog 
         isOpen={shareDialogOpen} 
         onOpenChange={setShareDialogOpen}
         event={event}

@@ -4,8 +4,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 
 export const EventRsvpButtonsShowcase = () => {
-  const handleDemoRsvp = (status: 'Going' | 'Interested') => {
+  const handleDemoRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     console.log(`Demo RSVP: ${status}`);
+    return true;
   };
 
   return (

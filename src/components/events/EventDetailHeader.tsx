@@ -10,16 +10,32 @@ import { useEventImages } from '@/hooks/useEventImages';
 interface EventDetailHeaderProps {
   event: Event;
   coverImage?: string | null;
+  image?: string | null; // Added for backward compatibility
+  eventType?: string;
+  onClose?: () => void;
+  shareUrl?: string;
+  title?: string;
+  onEventTypeClick?: () => void;
+  startTime?: string;
+  showTitleOverlay?: boolean;
 }
 
 export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({ 
   event,
-  coverImage: providedCoverImage
+  coverImage: providedCoverImage,
+  image, // Added for backward compatibility
+  eventType,
+  onClose,
+  shareUrl,
+  title,
+  onEventTypeClick,
+  startTime,
+  showTitleOverlay
 }) => {
   const { getEventImageUrl } = useEventImages();
   
-  // Use provided coverImage or get from hook
-  const imageUrl = providedCoverImage || getEventImageUrl(event);
+  // Use provided coverImage or image prop or get from hook
+  const imageUrl = providedCoverImage || image || getEventImageUrl(event);
   
   return (
     <div className="relative">
@@ -27,7 +43,7 @@ export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({
         {imageUrl ? (
           <img
             src={imageUrl}
-            alt={event.title}
+            alt={title || event.title}
             className="object-cover w-full h-full"
             loading="eager"
           />
@@ -40,15 +56,21 @@ export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         
         <div className="absolute bottom-0 left-0 p-6 text-white">
-          <h1 className="text-4xl font-bold mb-2">{event.title}</h1>
+          <h1 className="text-4xl font-bold mb-2">{title || event.title}</h1>
           
-          {event.organiser_name && (
-            <p className="text-lg opacity-90">By {event.organiser_name}</p>
+          {(event.organiser_name || eventType) && (
+            <p className="text-lg opacity-90">
+              {eventType ? `${eventType}` : ''}
+              {event.organiser_name ? `By ${event.organiser_name}` : ''}
+            </p>
           )}
         </div>
         
         <div className="absolute top-4 right-4">
-          <EventShareButton event={event} variant="outline" />
+          <EventShareButton 
+            event={event} 
+            variant="outline" 
+          />
         </div>
       </AspectRatio>
     </div>

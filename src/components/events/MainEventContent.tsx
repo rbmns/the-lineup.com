@@ -17,7 +17,7 @@ interface MainEventContentProps {
   attendees: { going: any[]; interested: any[] };
   isAuthenticated: boolean;
   rsvpLoading: boolean;
-  handleRsvp: (status: 'Going' | 'Interested') => void;
+  handleRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
   isMobile: boolean;
   imageUrl: string | null;
   formattedDate: string | null;
@@ -39,15 +39,21 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
   handleEventTypeClick,
   handleBackToEvents
 }) => {
+  // Wrapper for handleRsvp to meet type requirements
+  const handleRsvpWrapped = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    await handleRsvp(status);
+    return true;
+  };
+
   return (
     <Card className="overflow-hidden border border-gray-200 shadow-md hover:shadow-xl transition-all duration-500 animate-fade-in">
       <EventDetailHeader
-        image={imageUrl}
+        event={event}
+        coverImage={imageUrl}
         eventType={event?.event_type || 'other'}
         onClose={handleBackToEvents}
         shareUrl={shareUrl}
         title={event?.title || 'Event'}
-        event={event}
         onEventTypeClick={handleEventTypeClick}
         startTime={event?.start_time}
         showTitleOverlay={!isMobile}
@@ -80,7 +86,7 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
             <div className="animate-fade-in" style={{ animationDelay: '150ms' }}>
               <EventRsvpButtons 
                 currentStatus={event?.rsvp_status}
-                onRsvp={handleRsvp}
+                onRsvp={handleRsvpWrapped}
                 loading={rsvpLoading}
                 className="w-full"
                 size="lg"

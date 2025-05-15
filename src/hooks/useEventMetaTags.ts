@@ -4,7 +4,7 @@ import { Event } from '@/types';
 import { useEventImages } from '@/hooks/useEventImages';
 
 export const useEventMetaTags = (event: Event | null) => {
-  const { getShareImageUrl } = useEventImages();
+  const { coverImage, getEventImageUrl } = useEventImages();
 
   useEffect(() => {
     if (!event) return;
@@ -14,8 +14,8 @@ export const useEventMetaTags = (event: Event | null) => {
       ? `${event.title} - Event Details` 
       : 'Event Details';
 
-    // Get OG image
-    const imageUrl = getShareImageUrl(event);
+    // Get OG image - use coverImage from hook or get it directly
+    const imageUrl = coverImage || (getEventImageUrl ? getEventImageUrl(event) : null);
 
     // Set Open Graph meta tags
     const metaTags = {
@@ -49,5 +49,38 @@ export const useEventMetaTags = (event: Event | null) => {
       // We could remove the tags here, but typically it's better to leave them
       // in case the page is indexed while navigating away
     };
-  }, [event, getShareImageUrl]);
+  }, [event, coverImage, getEventImageUrl]);
+  
+  // Return a function to add meta tags manually if needed
+  return {
+    setMetaTags: (metaData: { title: string, description: string, imageUrl: string, path: string }) => {
+      // Implementation for manual meta tag setting
+      document.title = metaData.title;
+      
+      const tags = {
+        'og:title': metaData.title,
+        'og:description': metaData.description,
+        'og:type': 'website',
+        'og:url': `${window.location.origin}${metaData.path}`,
+        'twitter:card': 'summary_large_image',
+        'twitter:title': metaData.title,
+        'twitter:description': metaData.description,
+      };
+      
+      if (metaData.imageUrl) {
+        tags['og:image'] = metaData.imageUrl;
+        tags['twitter:image'] = metaData.imageUrl;
+      }
+      
+      Object.entries(tags).forEach(([name, content]) => {
+        let meta = document.querySelector(`meta[property="${name}"]`);
+        if (!meta) {
+          meta = document.createElement('meta');
+          meta.setAttribute('property', name);
+          document.head.appendChild(meta);
+        }
+        meta.setAttribute('content', content);
+      });
+    }
+  };
 };

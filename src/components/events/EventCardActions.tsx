@@ -35,8 +35,8 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
     return null;
   }
 
-  const handleRsvp = async (status: 'Going' | 'Interested') => {
-    if (!onRsvp) return;
+  const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    if (!onRsvp) return false;
     
     try {
       console.log('EventCardActions - Handling RSVP for event:', eventId, status);
@@ -56,9 +56,11 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
         }
       }
       
-      await onRsvp(eventId, status);
+      const result = await onRsvp(eventId, status);
+      return result === undefined ? true : !!result; // Convert void to boolean if needed
     } catch (error) {
       console.error('EventCardActions - Error handling RSVP:', error);
+      return false;
     }
   };
 

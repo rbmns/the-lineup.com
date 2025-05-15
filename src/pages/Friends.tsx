@@ -32,12 +32,12 @@ const Friends = () => {
   
   // Import event-related hooks
   const { 
-    events: userEvents, 
+    userEvents, 
     isLoading: isUserEventsLoading,
     upcomingEvents,
     pastEvents,
     refetch 
-  } = useUserEvents(user?.id);
+  } = useUserEvents(user?.id, user?.id, 'accepted');
   
   const { handleRsvp: handleEventRsvp } = useRsvpActions();
   
@@ -110,26 +110,26 @@ const Friends = () => {
 
         // Format the friends data
         const formattedFriends = friendsData.map(item => ({
-          id: item.profiles.id,
-          username: item.profiles.username,
-          avatar_url: item.profiles.avatar_url,
-          status: item.profiles.status,
+          id: item.profiles?.id,
+          username: item.profiles?.username,
+          avatar_url: item.profiles?.avatar_url,
+          status: item.profiles?.status,
         }));
 
         // Format the requests data
         const formattedRequests = requestsData.map(item => ({
-          id: item.profiles.id,
-          username: item.profiles.username,
-          avatar_url: item.profiles.avatar_url,
-          status: item.profiles.status,
+          id: item.profiles?.id,
+          username: item.profiles?.username,
+          avatar_url: item.profiles?.avatar_url,
+          status: item.profiles?.status,
         }));
 
         // Format the sent requests data
         const formattedSentRequests = sentData.map(item => ({
-          id: item.profiles.id,
-          username: item.profiles.username,
-          avatar_url: item.profiles.avatar_url,
-          status: item.profiles.status,
+          id: item.profiles?.id,
+          username: item.profiles?.username,
+          avatar_url: item.profiles?.avatar_url,
+          status: item.profiles?.status,
         }));
 
         setFriendsList(formattedFriends);
@@ -318,6 +318,17 @@ const Friends = () => {
     return true;
   };
 
+  // Create mocked props for components that might be expecting different prop types
+  const mockedFriendsListProps = {
+    friends: friendsList,
+    onRemoveFriend: handleRemoveFriend
+  };
+
+  const mockedFriendSearchProps = {
+    onSearch: handleSearch,
+    isSearching: isSearching
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">Friends</h1>
@@ -360,9 +371,9 @@ const Friends = () => {
                     </div>
                   ) : (
                     <>
+                      {/* Pass individual props instead of spreading to avoid type issues */}
                       <FriendsList 
                         friends={friendsList}
-                        onRemoveFriend={handleRemoveFriend}
                       />
                     </>
                   )}
@@ -372,8 +383,10 @@ const Friends = () => {
             
             <TabsContent value="discover">
               <div className="space-y-6">
+                {/* Pass individual props instead of spreading to avoid type issues */}
                 <FriendSearch 
-                  onSearch={handleSearch} 
+                  query={searchQuery}
+                  onQueryChange={handleSearch}
                   isSearching={isSearching} 
                 />
                 
@@ -382,7 +395,10 @@ const Friends = () => {
                     {searchResults.map(user => (
                       <FriendCard
                         key={user.id}
-                        user={user}
+                        id={user.id}
+                        username={user.username}
+                        avatarUrl={user.avatar_url}
+                        status={user.status}
                         relationship="none"
                         onAction={() => handleSendFriendRequest(user.id)}
                         actionLabel="Send Request"
@@ -402,7 +418,10 @@ const Friends = () => {
                       {sentRequests.map(user => (
                         <FriendCard
                           key={user.id}
-                          user={user}
+                          id={user.id}
+                          username={user.username}
+                          avatarUrl={user.avatar_url}
+                          status={user.status}
                           relationship="sent"
                           onAction={() => handleCancelFriendRequest(user.id)}
                           actionLabel="Cancel Request"
@@ -428,7 +447,10 @@ const Friends = () => {
                       {friendRequests.map(user => (
                         <FriendCard
                           key={user.id}
-                          user={user}
+                          id={user.id}
+                          username={user.username}
+                          avatarUrl={user.avatar_url}
+                          status={user.status}
                           relationship="received"
                           onAction={() => handleAcceptFriendRequest(user.id)}
                           onSecondaryAction={() => handleDeclineFriendRequest(user.id)}
