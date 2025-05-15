@@ -58,25 +58,55 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
   // Get the event tags as an array
   const eventTags = parseTags(tags);
 
+  // Parse date for more intelligent date filtering
+  const parseEventDate = (dateStr: string): Date | null => {
+    try {
+      return new Date(dateStr);
+    } catch (error) {
+      console.error('Error parsing date:', error);
+      return null;
+    }
+  };
+
+  const eventDate = parseEventDate(startDate);
+  
+  // Calculate date ranges for more intelligent similar event finding
+  const getDateRanges = (): { sameDay: string, nextDay: string, nextWeek: string, prevDay: string } => {
+    const today = eventDate || new Date();
+    
+    // Clone the date to avoid mutation
+    const nextDay = new Date(today);
+    nextDay.setDate(today.getDate() + 1);
+    
+    const prevDay = new Date(today);
+    prevDay.setDate(today.getDate() - 1);
+    
+    const nextWeek = new Date(today);
+    nextWeek.setDate(today.getDate() + 7);
+    
+    return {
+      sameDay: today.toISOString().split('T')[0],
+      nextDay: nextDay.toISOString().split('T')[0],
+      prevDay: prevDay.toISOString().split('T')[0],
+      nextWeek: nextWeek.toISOString().split('T')[0]
+    };
+  };
+
+  const dateRanges = getDateRanges();
+
   // Query for related events
   const { data: relatedEvents, isLoading, error } = useQuery({
     queryKey: ['related-events', eventId, eventType, startDate, tags, vibe],
     queryFn: async () => {
-      // Extract the date part only from startDate for date-based matching
-      const eventDate = startDate ? new Date(startDate) : null;
-      const startOfDay = eventDate ? new Date(eventDate.setHours(0, 0, 0, 0)).toISOString() : null;
-      const endOfDay = eventDate ? new Date(eventDate.setHours(23, 59, 59, 999)).toISOString() : null;
-      
-      // First try: same event type, same day
-      if (eventType && startOfDay && endOfDay) {
+      // First priority: Same event type, same day
+      if (eventType && dateRanges.sameDay) {
         const { data: sameTypeAndDay } = await supabase
           .from('events')
           .select('*')
-          .neq('id', eventId)
+          .neq('id', eventId) // Exclude current event
           .eq('event_type', eventType)
-          .gte('start_date', startOfDay)
-          .lte('start_date', endOfDay)
-          .limit(3);
+          .eq('start_date', dateRanges.sameDay)
+          .limit(4);
           
         if (sameTypeAndDay && sameTypeAndDay.length >= 3) {
           console.log('Found related events with same type and day:', sameTypeAndDay.length);
@@ -84,33 +114,80 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
         }
       }
       
-      // Second try: same event type, any day
+      // Second priority: Same event type, next day
+      if (eventType && dateRanges.nextDay) {
+        const { data: sameTypeNextDay } = await supabase
+          .from('events')
+          .select('*')
+          .neq('id', eventId) // Exclude current event
+          .eq('event_type', eventType)
+          .eq('start_date', dateRanges.nextDay)
+          .limit(4);
+          
+        if (sameTypeNextDay && sameTypeNextDay.length >= 2) {
+          console.log('Found related events with same type and next day:', sameTypeNextDay.length);
+          return sameTypeNextDay;
+        }
+      }
+      
+      // Third priority: Same event type, previous day
+      if (eventType && dateRanges.prevDay) {
+        const { data: sameTypePrevDay } = await supabase
+          .from('events')
+          .select('*')
+          .neq('id', eventId) // Exclude current event
+          .eq('event_type', eventType)
+          .eq('start_date', dateRanges.prevDay)
+          .limit(4);
+          
+        if (sameTypePrevDay && sameTypePrevDay.length >= 2) {
+          console.log('Found related events with same type and previous day:', sameTypePrevDay.length);
+          return sameTypePrevDay;
+        }
+      }
+      
+      // Fourth priority: Same event type, within next week
+      if (eventType && dateRanges.sameDay && dateRanges.nextWeek) {
+        const { data: sameTypeNextWeek } = await supabase
+          .from('events')
+          .select('*')
+          .neq('id', eventId) // Exclude current event
+          .eq('event_type', eventType)
+          .gte('start_date', dateRanges.sameDay)
+          .lte('start_date', dateRanges.nextWeek)
+          .limit(5);
+          
+        if (sameTypeNextWeek && sameTypeNextWeek.length >= 2) {
+          console.log('Found related events with same type in next week:', sameTypeNextWeek.length);
+          return sameTypeNextWeek;
+        }
+      }
+      
+      // Last priority: Same event type, any date
       if (eventType) {
         const { data: sameType } = await supabase
           .from('events')
           .select('*')
-          .neq('id', eventId)
+          .neq('id', eventId) // Exclude current event
           .eq('event_type', eventType)
           .order('start_date')
-          .limit(5);
+          .limit(6);
           
-        if (sameType && sameType.length >= 3) {
+        if (sameType && sameType.length > 0) {
           console.log('Found related events with same type:', sameType.length);
           return sameType;
         }
       }
       
-      // Third try: matching tags (if available)
+      // Fallback: Any events with matching tags
       if (eventTags.length > 0) {
-        // For each tag, try to find matching events
         let tagMatches: Event[] = [];
         
-        // Try to find events matching at least one tag
         for (const tag of eventTags) {
           const { data: matchingTag } = await supabase
             .from('events')
             .select('*')
-            .neq('id', eventId)
+            .neq('id', eventId) // Exclude current event
             .ilike('tags', `%${tag}%`)
             .limit(5);
             
@@ -119,20 +196,20 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
           }
         }
         
-        // Remove duplicates and limit to 5
+        // Remove duplicates
         const uniqueTagMatches = Array.from(new Map(tagMatches.map(event => [event.id, event])).values());
         
-        if (uniqueTagMatches.length >= 3) {
+        if (uniqueTagMatches.length > 0) {
           console.log('Found related events with matching tags:', uniqueTagMatches.length);
           return uniqueTagMatches.slice(0, 5);
         }
       }
       
-      // Final fallback: any events, regardless of type or tags
+      // Very last resort: Any events, excluding current
       const { data: anyEvents } = await supabase
         .from('events')
         .select('*')
-        .neq('id', eventId)
+        .neq('id', eventId) // Exclude current event
         .order('start_date')
         .limit(5);
         

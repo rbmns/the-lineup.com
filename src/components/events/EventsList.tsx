@@ -25,25 +25,20 @@ export const EventsList: React.FC<EventsListProps> = ({
   style,
   loadingEventId
 }) => {
-  // Function to determine if an event should be featured based on its index
-  const isEventFeatured = (index: number): boolean => {
-    return index === 0 || index % 7 === 0; // First event and every 7th event
-  };
-
   return (
     <div 
       className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5", className)} 
       style={style}
     >
-      {events.map((event, index) => (
+      {events.map((event) => (
         <div key={event.id} className="event-list-item h-full" data-event-id={event.id}>
           <EventCard 
             event={event}
             onRsvp={onRsvp}
             showRsvpButtons={showRsvpButtons}
             view="grid"
-            compact={compact || (!isEventFeatured(index) && index % 3 !== 0)}
-            featured={isEventFeatured(index)}
+            compact={compact || true} // Always compact
+            featured={false} // No featured cards
             isLoading={loadingEventId === event.id}
             className="h-full"
           />
