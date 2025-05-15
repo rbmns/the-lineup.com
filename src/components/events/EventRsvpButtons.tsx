@@ -58,7 +58,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   
   // Handle button click with enhanced visual feedback and proper event prevention
   const handleButtonClick = (e: React.MouseEvent, status: 'Going' | 'Interested') => {
-    // Always prevent default and stop propagation to avoid page reloads
+    // Critical: Stop ALL event propagation and prevent default
     e.preventDefault();
     e.stopPropagation();
     
@@ -91,10 +91,17 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     
     // Call the onRsvp handler
     onRsvp(status);
+    
+    // Return false to ensure no form submission
+    return false;
   };
 
   return (
-    <div className={`flex gap-2 ${className}`} data-rsvp-button="container">
+    <div 
+      className={`flex gap-2 ${className}`} 
+      data-rsvp-button="container"
+      onClick={e => e.stopPropagation()}
+    >
       <Button
         type="button"
         className={`flex items-center justify-center rounded-md ${sizeClasses} ${getButtonStyles('Going')}`}

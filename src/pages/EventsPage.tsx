@@ -35,7 +35,7 @@ const EventsPage = () => {
   // Process events - just filter for upcoming events, no category filters
   const displayEvents = filterUpcomingEvents(events || []);
 
-  // Pass RSVP handler to event list component using the optimistic RSVP handler
+  // Use the optimistic RSVP handler
   const handleEventRsvp = async (eventId: string, status: 'Going' | 'Interested') => {
     if (!user) {
       console.log("User not logged in");
@@ -43,12 +43,8 @@ const EventsPage = () => {
     }
     
     try {
-      console.log(`EventsPage - RSVP handler called for event: ${eventId}, status: ${status}`);
-      
-      // Use the optimistic RSVP handler - this won't trigger full page refreshes
+      // Use the optimistic RSVP handler - no invalidation, just cache updates
       const result = await handleRsvp(eventId, status);
-      console.log(`EventsPage - RSVP result:`, result);
-      
       return result;
     } catch (error) {
       console.error("Error in EventsPage RSVP handler:", error);

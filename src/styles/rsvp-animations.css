@@ -1,0 +1,31 @@
+
+/* RSVP Button Animations */
+.button-click-animation {
+  animation: buttonPulse 0.1s ease-in-out;
+}
+
+@keyframes buttonPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.rsvp-going-animation {
+  animation: goingPulse 0.3s ease-in-out;
+}
+
+@keyframes goingPulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  50% { box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.3); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.rsvp-interested-animation {
+  animation: interestedPulse 0.3s ease-in-out;
+}
+
+@keyframes interestedPulse {
+  0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+  50% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3); }
+  100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+}

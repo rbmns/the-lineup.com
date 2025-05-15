@@ -38,8 +38,6 @@ const EventCard: React.FC<EventCardProps> = ({
     // Don't navigate if clicking on RSVP buttons or anything with data-rsvp-button attribute
     if ((e.target as HTMLElement).closest('[data-rsvp-button]') || 
         (e.target as HTMLElement).closest('[data-rsvp-container]')) {
-      e.preventDefault();
-      e.stopPropagation();
       return;
     }
     
@@ -116,7 +114,11 @@ const EventCard: React.FC<EventCardProps> = ({
         </div>
         
         {showRsvpButtons && onRsvp && (
-          <div className="mt-auto pt-3" data-rsvp-container="true">
+          <div 
+            className="mt-auto pt-3" 
+            data-rsvp-container="true" 
+            onClick={(e) => e.stopPropagation()}
+          >
             <EventRsvpButtons 
               currentStatus={event.rsvp_status} 
               onRsvp={handleRsvp}

@@ -4,7 +4,6 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 import { Event } from '@/types';
-import { useScrollPosition } from '../useScrollPosition';
 
 /**
  * Hook that provides optimistic RSVP actions using React Query's cache
@@ -12,7 +11,6 @@ import { useScrollPosition } from '../useScrollPosition';
 export const useOptimisticRsvp = (userId: string | undefined) => {
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
-  const { withScrollPreservation } = useScrollPosition();
   const isProcessingRef = useRef(false);
 
   const handleRsvp = useCallback(async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
@@ -23,7 +21,7 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
     }
 
     if (!userId) {
-      toast.error("Please log in to RSVP to events");
+      toast("Please log in to RSVP to events");
       return false;
     }
 
@@ -32,10 +30,12 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
     try {
       isProcessingRef.current = true;
       
+      // Store current scroll position right at the beginning
+      const scrollPosition = window.scrollY;
+      
       // Capture existing cache state for potential rollback
-      const previousEventsData = queryClient.getQueryData<Event[]>(['events']);
+      const previousEventsData = queryClient.getQueryData<Event[]>(['events', userId]);
       const previousEventData = queryClient.getQueryData<Event>(['event', eventId]);
-      const previousRelatedEventsData = queryClient.getQueryData<Event[]>(['related-events']);
       
       // Get current RSVP status for optimistic update
       const { data: existingRsvp, error: checkError } = await supabase
@@ -65,37 +65,20 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
       // Perform optimistic UI updates
       setLoading(true);
       
-      // Update events cache (main events list)
+      // Update events cache (main events list) - careful not to trigger re-renders
       queryClient.setQueriesData<Event[]>({ queryKey: ['events'] }, (oldData) => {
         if (!oldData) return oldData;
         
         return oldData.map(event => {
           if (event.id === eventId) {
-            const updatedEvent = { ...event };
-            
-            // Update RSVP status
-            updatedEvent.rsvp_status = newRsvpStatus || undefined;
-            
-            // Update attendee counts
-            if (!updatedEvent.attendees) {
-              updatedEvent.attendees = { going: 0, interested: 0 };
-            }
-            
-            // Adjust counts based on status changes
-            if (oldStatus === 'Going' && newRsvpStatus !== 'Going') {
-              updatedEvent.attendees.going = Math.max(0, updatedEvent.attendees.going - 1);
-            }
-            if (oldStatus === 'Interested' && newRsvpStatus !== 'Interested') {
-              updatedEvent.attendees.interested = Math.max(0, updatedEvent.attendees.interested - 1);
-            }
-            if (newRsvpStatus === 'Going' && oldStatus !== 'Going') {
-              updatedEvent.attendees.going += 1;
-            }
-            if (newRsvpStatus === 'Interested' && oldStatus !== 'Interested') {
-              updatedEvent.attendees.interested += 1;
-            }
-            
-            return updatedEvent;
+            return {
+              ...event,
+              rsvp_status: newRsvpStatus || undefined,
+              attendees: {
+                going: calculateAttendeeCount(event, 'going', oldStatus, newRsvpStatus),
+                interested: calculateAttendeeCount(event, 'interested', oldStatus, newRsvpStatus)
+              }
+            };
           }
           return event;
         });
@@ -113,20 +96,6 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
             interested: calculateAttendeeCount(oldData, 'interested', oldStatus, newRsvpStatus)
           }
         };
-      });
-      
-      // Update related events cache
-      queryClient.setQueriesData<Event[]>({ queryKey: ['related-events'] }, (oldData) => {
-        if (!oldData || !Array.isArray(oldData)) return oldData;
-        
-        return oldData.map(event => {
-          if (event.id === eventId) {
-            const updatedEvent = { ...event };
-            updatedEvent.rsvp_status = newRsvpStatus || undefined;
-            return updatedEvent;
-          }
-          return event;
-        });
       });
       
       // Create a promise to track the save operation
@@ -177,7 +146,7 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
           }
           
           // Show a toast notification for feedback
-          const action = newRsvpStatus === null ? "Cancelled" : 
+          const action = newRsvpStatus === null ? "Removed" : 
                          newRsvpStatus === "Going" ? "Going to" : "Interested in";
           toast(`${action} event`);
           
@@ -189,11 +158,8 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
         }
       })();
       
-      // Use withScrollPreservation to maintain scroll position
-      const result = await withScrollPreservation(async () => {
-        // Wait for the save promise to complete
-        return savePromise;
-      });
+      // Wait for the save promise to complete
+      const result = await savePromise;
       
       if (!result) {
         throw new Error("Database operation failed");
@@ -204,25 +170,20 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
     } catch (error) {
       console.error("Error in OptimisticRsvp:", error);
       
-      // Store the variables in this scope to fix the "Cannot find name" errors
-      const previousEventsData = queryClient.getQueryData<Event[]>(['events']);
+      // Store the variables in this scope for rollback
+      const previousEventsData = queryClient.getQueryData<Event[]>(['events', userId]);
       const previousEventData = queryClient.getQueryData<Event>(['event', eventId]);
-      const previousRelatedEventsData = queryClient.getQueryData<Event[]>(['related-events']);
       
       // Revert optimistic updates if there was an error
       if (previousEventsData) {
-        queryClient.setQueryData(['events'], previousEventsData);
+        queryClient.setQueryData(['events', userId], previousEventsData);
       }
       
       if (previousEventData) {
         queryClient.setQueryData(['event', eventId], previousEventData);
       }
       
-      if (previousRelatedEventsData) {
-        queryClient.setQueryData(['related-events'], previousRelatedEventsData);
-      }
-      
-      toast.error("Failed to update RSVP status");
+      toast("Failed to update RSVP status");
       return false;
     } finally {
       setLoading(false);
@@ -232,7 +193,7 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
         isProcessingRef.current = false;
       }, 300);
     }
-  }, [userId, queryClient, withScrollPreservation]);
+  }, [userId, queryClient]);
 
   // Helper function to calculate new attendee counts
   const calculateAttendeeCount = (
