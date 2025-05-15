@@ -135,24 +135,6 @@ const EventDetail = () => {
             handleEventTypeClick={handleEventTypeClick}
             handleBackToEvents={handleBackToEvents}
           />
-
-          {/* Related Events Section - always show */}
-          <div className="mt-12">
-            <RelatedEventsSection event={event} />
-          </div>
-          
-          {/* Bottom back to events button - desktop and mobile */}
-          <div className="mt-8 mb-4">
-            <Button 
-              variant="outline" 
-              onClick={handleBackToEvents}
-              className="flex items-center gap-2 shadow-sm hover:shadow-md transition-all w-full"
-              size="lg"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              <span>Back to Events</span>
-            </Button>
-          </div>
         </div>
         
         {/* Sidebar content - takes up 1/3 of the screen on desktop */}
@@ -163,6 +145,24 @@ const EventDetail = () => {
             isAuthenticated={isAuthenticated}
           />
         </div>
+      </div>
+      
+      {/* Related Events Section - always show at the bottom of the page */}
+      <div className="mt-12">
+        <RelatedEventsSection event={event} />
+      </div>
+          
+      {/* Bottom back to events button - desktop and mobile */}
+      <div className="mt-8 mb-4">
+        <Button 
+          variant="outline" 
+          onClick={handleBackToEvents}
+          className="flex items-center gap-2 shadow-sm hover:shadow-md transition-all w-full"
+          size="lg"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          <span>Back to Events</span>
+        </Button>
       </div>
       
       {/* Mobile RSVP Footer */}

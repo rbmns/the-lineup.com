@@ -3,14 +3,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useFetchRelatedEvents } from '@/hooks/events/useFetchRelatedEvents';
 import RelatedEventsLoader from './RelatedEventsLoader';
 import RelatedEventsGrid from './RelatedEventsGrid';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useEventNavigation } from '@/hooks/useEventNavigation';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { Event } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { Event } from '@/types';
 
 interface RelatedEventsProps {
   eventId: string;
@@ -40,10 +35,6 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
     vibe,
     minResults: 3 // Increase minimum results to ensure we show something
   });
-  
-  const navigate = useNavigate();
-  const { navigateToDestinationEvents } = useEventNavigation();
-  const isMobile = useIsMobile();
 
   // If we don't have at least 2 related events, fetch some fallbacks
   useEffect(() => {
@@ -91,15 +82,6 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
     
     fetchFallbackEvents();
   }, [eventId, eventType, loading, relatedEvents]);
-
-  const handleBackToEvents = () => {
-    navigate('/events', {
-      state: { 
-        fromEventDetail: true,
-        timestamp: Date.now()
-      }
-    });
-  };
   
   if (loading) {
     return <RelatedEventsLoader />;
@@ -130,21 +112,6 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
       <div className="pb-2">
         <RelatedEventsGrid events={combinedEvents.slice(0, 3)} />
       </div>
-      
-      {/* Back button shown only on mobile, placed below related events */}
-      {isMobile && (
-        <div className="pt-4 pb-20">
-          <Button 
-            variant="secondary" 
-            onClick={handleBackToEvents}
-            className="flex items-center gap-2 shadow-sm hover:shadow-md transition-all w-full"
-            size="lg"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            <span>Back to Events</span>
-          </Button>
-        </div>
-      )}
     </div>
   );
 };
