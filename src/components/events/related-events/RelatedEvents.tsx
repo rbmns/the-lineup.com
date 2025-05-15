@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { RelatedEventsGrid } from './RelatedEventsGrid';
 import { RelatedEventsLoader } from './RelatedEventsLoader';
-import { useFetchRelatedEvents } from '@/hooks/events/useFetchRelatedEvents';
+import { useFetchRelatedEvents } from '@/hooks/events/related-events';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface RelatedEventsProps {
