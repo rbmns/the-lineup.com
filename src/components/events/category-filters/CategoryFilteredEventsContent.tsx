@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
 import { LazyEventsList } from '@/components/events/LazyEventsList';
@@ -5,12 +6,13 @@ import { LazyEventsList } from '@/components/events/LazyEventsList';
 interface CategoryFilteredEventsContentProps {
   showNoExactMatchesMessage: boolean;
   resetFilters: () => void;
-  exactMatches: any[];
-  similarEvents: any[];
-  isLoading: boolean;
-  isFilterLoading: boolean; 
+  exactMatches: any[]; // Consider typing this more strictly if Event type is available
+  similarEvents: any[]; // Consider typing this
+  isLoading: boolean; // For initial list loading / skeleton
+  isFilterLoading: boolean; // For loading state when filters are applied
   hasActiveFilters: boolean;
-  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
+  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>; // Changed boolean to boolean | void
+  loadingEventId?: string | null; // Added to pass to LazyEventsList
 }
 
 export const CategoryFilteredEventsContent: React.FC<CategoryFilteredEventsContentProps> = ({
@@ -21,7 +23,8 @@ export const CategoryFilteredEventsContent: React.FC<CategoryFilteredEventsConte
   isLoading,
   isFilterLoading,
   hasActiveFilters,
-  onRsvp
+  onRsvp,
+  loadingEventId // Destructure new prop
 }) => {
   return (
     <div className="space-y-12">
@@ -34,10 +37,12 @@ export const CategoryFilteredEventsContent: React.FC<CategoryFilteredEventsConte
       <LazyEventsList 
         mainEvents={exactMatches}
         relatedEvents={similarEvents}
-        isLoading={isLoading || isFilterLoading}
+        // Combine isLoading and isFilterLoading for the overall list loading state (skeletons)
+        isLoading={isLoading || isFilterLoading} 
         onRsvp={onRsvp}
-        showRsvpButtons={!!onRsvp}
+        showRsvpButtons={!!onRsvp} // Show buttons if onRsvp handler is provided
         hasActiveFilters={hasActiveFilters}
+        loadingEventId={loadingEventId} // Pass loadingEventId for individual card RSVP spinners
       />
     </div>
   );

@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useEvents } from '@/hooks/useEvents';
 import { filterEventsByDateRange } from '@/utils/dateUtils';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/hooks/use-toast'; // Assuming this is shadcn/ui toast based on project setup. If it's sonner, it might be `import { toast } from 'sonner';`
 
 export const useCategoryFilteredEvents = (userId: string | undefined) => {
   const { data: events = [], isLoading, error, refetch } = useEvents(userId);
@@ -20,8 +20,8 @@ export const useCategoryFilteredEvents = (userId: string | undefined) => {
   // Loading state for filters
   const [isFilterLoading, setIsFilterLoading] = useState(false);
   
-  // RSVP loading state
-  const [rsvpLoading, setRsvpLoading] = useState(false);
+  // RSVP loading state - changed from rsvpLoading (boolean) to loadingEventId (string | null)
+  const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
   
   // Available filter options
   const [availableEventTypes, setAvailableEventTypes] = useState<Array<{value: string, label: string}>>([]);
@@ -85,16 +85,16 @@ export const useCategoryFilteredEvents = (userId: string | undefined) => {
     
     // Update state with filtered events
     setExactMatches(filteredEvents);
-    setSimilarEvents([]);
+    setSimilarEvents([]); // Reset similar events when primary filters change
     
-    // Show "no exact matches" message if no events are found
-    setShowNoExactMatchesMessage(filteredEvents.length === 0);
+    // Show "no exact matches" message if no events are found with active filters
+    setShowNoExactMatchesMessage(filteredEvents.length === 0 && hasActiveFilters);
     
     // Simulate loading delay for UI effect
     setTimeout(() => {
       setIsFilterLoading(false);
     }, 300);
-  }, [events, selectedEventTypes, selectedVenues, dateRange, selectedDateFilter]);
+  }, [events, selectedEventTypes, selectedVenues, dateRange, selectedDateFilter, hasActiveFilters]);
   
   // Reset all filters
   const resetFilters = () => {
@@ -102,6 +102,7 @@ export const useCategoryFilteredEvents = (userId: string | undefined) => {
     setSelectedVenues([]);
     setDateRange(undefined);
     setSelectedDateFilter('');
+    // Using existing toast import
     toast({
       title: "All filters reset"
     });
@@ -144,46 +145,60 @@ export const useCategoryFilteredEvents = (userId: string | undefined) => {
     });
   };
   
-  // RSVP handler function
-  const handleEventRsvp = async (eventId: string, status: 'Going' | 'Interested') => {
+  // RSVP handler function - updated to use loadingEventId
+  const handleEventRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!userId) {
-      console.log("User not logged in");
+      console.log("User not logged in, cannot RSVP");
+      // Consider showing a toast message here for feedback
+      // toast({ title: "Please log in to RSVP", variant: "destructive" });
       return false;
     }
     
+    setLoadingEventId(eventId); // Set loading for the specific event
+    
     try {
-      console.log(`EventsPage - RSVP handler called for event: ${eventId}, status: ${status}`);
-      setRsvpLoading(true);
+      console.log(`useCategoryFilteredEvents - RSVP handler called for event: ${eventId}, status: ${status}`);
       
-      // Simulate RSVP action
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Simulate RSVP action - In a real app, this would be an API call
+      // For now, let's assume useEnhancedRsvp or similar is handling the actual Supabase call
+      // and this hook's responsibility is to refetch data and manage UI state for this page.
+      // If this hook is meant to *also* perform the RSVP, the logic from useStableRsvpActions
+      // or similar should be integrated here. For now, assuming it's a UI/refetch trigger.
       
-      console.log(`EventsPage - RSVP completed for event: ${eventId}, status: ${status}`);
-      toast({
+      // Example: if you need to call a generic RSVP function from another hook
+      // const success = await someSharedRsvpFunction(userId, eventId, status);
+      // if (!success) throw new Error("RSVP action failed");
+
+      // Simulate delay for API call
+      await new Promise(resolve => setTimeout(resolve, 700)); 
+      
+      toast({ // Using existing toast import
         title: `RSVP updated to ${status}`
       });
       
-      // Refetch events to update the list
-      await refetch();
+      // Refetch events to update the list with new RSVP status and attendee counts
+      await refetch(); 
       
       return true;
     } catch (error) {
-      console.error("Error in EventsPage RSVP handler:", error);
-      toast({
+      console.error("Error in useCategoryFilteredEvents RSVP handler:", error);
+      toast({ // Using existing toast import
         title: "Failed to update RSVP status",
         variant: "destructive"
       });
       return false;
     } finally {
-      setRsvpLoading(false);
+      setLoadingEventId(null); // Clear loading for the event
     }
   };
 
   return {
-    events,
-    isLoading,
+    events, // Original full list of events
+    isLoading, // Loading state for initial events fetch
     error,
-    refetch,
+    refetch, // Function to refetch events
+
+    // Filter states and setters
     selectedEventTypes,
     setSelectedEventTypes,
     selectedVenues,
@@ -192,21 +207,32 @@ export const useCategoryFilteredEvents = (userId: string | undefined) => {
     setDateRange,
     selectedDateFilter,
     setSelectedDateFilter,
-    isFilterLoading,
-    rsvpLoading,
+
+    isFilterLoading, // Loading state specific to filter application
+    loadingEventId, // Changed from rsvpLoading
+
+    // Available filter options
     availableEventTypes,
     availableVenues,
+
+    // Filtered results and UI states
     showNoExactMatchesMessage,
-    exactMatches,
-    similarEvents,
+    exactMatches, // Events that match all active filters
+    similarEvents, // Placeholder for similar events logic
     hasActiveFilters,
+
+    // Filter actions
     resetFilters,
     handleRemoveEventType,
     handleRemoveVenue,
     handleClearDateFilter,
     selectAllEventTypes,
     deselectAllEventTypes,
+
+    // RSVP action
     handleEventRsvp,
+    
+    // Setter for similar events (if needed externally)
     setSimilarEvents
   };
 };

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom'; // No longer used
 import { useAuth } from '@/contexts/AuthContext';
 import { useCategoryFilteredEvents } from '@/hooks/events/useCategoryFilteredEvents';
 import { useCategoryPageSeo } from '@/hooks/events/useCategoryPageSeo';
@@ -14,7 +14,7 @@ const CategoryFilteredEventsPage = () => {
   useCategoryPageSeo();
   
   // Manage UI state, scroll position and filters
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // No longer used
   const { user } = useAuth();
   const { 
     showEventTypeFilter, setShowEventTypeFilter,
@@ -24,9 +24,9 @@ const CategoryFilteredEventsPage = () => {
   
   // Event filtering and state
   const {
-    events,
-    isLoading,
-    error,
+    // events, // Not directly used here, exactMatches is used for display
+    isLoading, // For initial data load
+    // error, // Not handled in UI, consider adding error display
     selectedEventTypes,
     setSelectedEventTypes,
     selectedVenues,
@@ -35,8 +35,8 @@ const CategoryFilteredEventsPage = () => {
     setDateRange,
     selectedDateFilter,
     setSelectedDateFilter,
-    isFilterLoading,
-    // rsvpLoading, // This state is used by handleEventRsvp within the hook
+    isFilterLoading, // For loading indication when filters change
+    loadingEventId, // Updated from rsvpLoading
     availableEventTypes,
     availableVenues,
     showNoExactMatchesMessage,
@@ -47,7 +47,7 @@ const CategoryFilteredEventsPage = () => {
     handleRemoveEventType,
     handleRemoveVenue,
     handleClearDateFilter,
-    handleEventRsvp
+    handleEventRsvp // The RSVP function from the hook
   } = useCategoryFilteredEvents(user?.id);
   
   return (
@@ -87,11 +87,11 @@ const CategoryFilteredEventsPage = () => {
             resetFilters={resetFilters}
             exactMatches={exactMatches}
             similarEvents={similarEvents}
-            isLoading={isLoading}
-            isFilterLoading={isFilterLoading}
-            // rsvpLoading prop removed as it's not defined in CategoryFilteredEventsContentProps
+            isLoading={isLoading} // For skeleton loading of the list
+            isFilterLoading={isFilterLoading} // Also contributes to list loading state
             hasActiveFilters={hasActiveFilters}
             onRsvp={user ? handleEventRsvp : undefined}
+            loadingEventId={loadingEventId} // Pass loadingEventId down
           />
         </div>
       </div>
@@ -100,4 +100,3 @@ const CategoryFilteredEventsPage = () => {
 };
 
 export default CategoryFilteredEventsPage;
-
