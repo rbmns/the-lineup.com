@@ -136,7 +136,7 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({
                 onClick={handleSignUpClick}
                 className="w-full bg-black hover:bg-gray-800 text-white font-medium"
               >
-                Sign up to see attendees
+                Sign up - it's free
               </Button>
             </div>
           )}
