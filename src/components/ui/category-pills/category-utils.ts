@@ -1,29 +1,29 @@
 
-import React, { ReactElement } from 'react';
+import React from 'react';
 import { 
-  Music, UtensilsCrossed, Tent, Dumbbell, WaterIcon, Users, 
-  Beach, MapIcon, Gamepad2, Yoga, Palette, PartyPopper, 
+  Music, UtensilsCrossed, Tent, Dumbbell, Waves, Users, 
+  Umbrella, MapPin, Gamepad2, FlowerIcon, Palette, PartyPopper, 
   Wind, Sparkles, BookOpen, Coffee
 } from 'lucide-react';
 
 export type CategoryIconMapping = {
-  [key: string]: ReactElement;
+  [key: string]: React.ComponentType<any>;
 };
 
 // Function to map category names to icon components
 export const getCategoryIcon = (category: string) => {
   // Get the appropriate icon component based on category name
-  const iconMap: Record<string, any> = {
+  const iconMap: Record<string, React.ComponentType<any>> = {
     'Music': Music,
     'Food': UtensilsCrossed,
     'Festival': Tent,
     'Sports': Dumbbell,
-    'Water': WaterIcon,
+    'Water': Waves,
     'Community': Users,
-    'Beach': Beach,
-    'Market': MapIcon,
+    'Beach': Umbrella,
+    'Market': MapPin,
     'Game': Gamepad2,
-    'Yoga': Yoga,
+    'Yoga': FlowerIcon,
     'Kite': Wind,
     'Art': Palette,
     'Party': PartyPopper,
@@ -34,7 +34,7 @@ export const getCategoryIcon = (category: string) => {
   
   // Return the icon component (not the JSX element)
   // The actual JSX rendering will happen in the components that use this function
-  const Icon = iconMap[category] || MapIcon;
+  const Icon = iconMap[category] || MapPin;
   return Icon;
 };
 
