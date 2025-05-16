@@ -1,3 +1,4 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { filterPastEvents, sortEventsByDate } from '@/utils/date-filtering';
@@ -13,7 +14,7 @@ interface UseUserEventsResult {
 }
 
 export const useUserEvents = (userId: string | undefined): UseUserEventsResult => {
-  const { data, isLoading, error, refetch } = useQuery({
+  const { data, isLoading, error, refetch: originalRefetch } = useQuery({
     queryKey: ['userEvents', userId],
     queryFn: async () => {
       if (!userId) {
@@ -56,6 +57,11 @@ export const useUserEvents = (userId: string | undefined): UseUserEventsResult =
     refetchOnWindowFocus: true,
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
+
+  // Create a wrapper for refetch that returns a void promise
+  const refetch = async () => {
+    await originalRefetch();
+  };
 
   return {
     pastEvents: data?.pastEvents || [],

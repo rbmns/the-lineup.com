@@ -32,11 +32,7 @@ const UserProfilePage: React.FC = () => {
     upcomingEvents, 
     pastEvents, 
     isLoading: eventsLoading 
-  } = useUserEvents(
-    profileId,
-    user?.id,
-    isOwnProfile ? 'accepted' : friendshipStatus
-  );
+  } = useUserEvents(profileId);
   
   // Redirect to login if trying to view own profile but not logged in
   useEffect(() => {

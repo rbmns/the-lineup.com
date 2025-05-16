@@ -1,126 +1,106 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
 import { UserProfile } from '@/types';
 
-export const useProfileData = (userId?: string) => {
+interface UseProfileDataResult {
+  profile: UserProfile | null;
+  loading: boolean;
+  error: string;
+  isNotFound: boolean;
+  fetchProfileData: (forceRefetch?: boolean) => Promise<void>;
+  refreshProfile: (forceRefresh?: boolean) => Promise<void>;
+  updateProfile: (formData: any) => Promise<{ error: any }>;
+}
+
+export const useProfileData = (profileIdOrUsername?: string | null): UseProfileDataResult => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { user, refreshProfile: authRefreshProfile } = useAuth();
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
+  const [isNotFound, setIsNotFound] = useState<boolean>(false);
 
-  const fetchProfile = useCallback(async (forceRefresh: boolean = false) => {
-    if (!userId) {
-      console.error('User ID is missing');
+  const fetchProfileData = async (forceRefetch = false) => {
+    if (!profileIdOrUsername) {
       setLoading(false);
       return;
     }
 
-    // Skip if we already have the profile data and don't need to force refresh
-    if (profile && profile.id === userId && !forceRefresh) {
-      console.log('Using cached profile data');
-      setLoading(false);
-      return;
-    }
+    setLoading(true);
+    setError('');
+    setIsNotFound(false);
 
     try {
-      console.log(`Fetching profile data for user: ${userId}`);
-      setLoading(true);
-      setError(null);
+      let query = supabase.from('profiles').select('*');
       
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (profileError) {
-        console.error('Error fetching profile:', profileError);
-        
-        if (profileError.code === 'PGRST116') {
-          // No rows returned, profile doesn't exist
-          toast({
-            title: "User not found",
-            description: "This user profile does not exist",
-            variant: "destructive"
-          });
-          
-          if (window.location.pathname === '/profile') {
-            // If on own profile page but profile doesn't exist, try refreshing the auth profile
-            await authRefreshProfile();
-          }
-        }
-        
-        setError(profileError.message);
-        setProfile(null);
-        setLoading(false);
-        return;
+      // Check if the input is a UUID (Supabase user ID) or username
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(profileIdOrUsername);
+      
+      if (isUUID) {
+        query = query.eq('id', profileIdOrUsername);
+      } else {
+        query = query.eq('username', profileIdOrUsername);
       }
+      
+      const { data, error: fetchError } = await query.single();
 
-      console.log('Profile data fetched successfully:', profileData?.username);
-      setProfile(profileData);
-      setError(null);
+      if (fetchError) {
+        if (fetchError.code === 'PGRST116') {
+          // Code PGRST116 means no rows returned
+          setIsNotFound(true);
+          setError(`Profile not found for ${isUUID ? 'ID' : 'username'}: ${profileIdOrUsername}`);
+        } else {
+          setError(`Error fetching profile: ${fetchError.message}`);
+        }
+        setProfile(null);
+      } else if (data) {
+        setProfile(data as UserProfile);
+      }
     } catch (error: any) {
-      console.error('Exception fetching profile:', error);
-      setError(error.message || 'Could not load user profile');
-      setProfile(null);
-      toast({
-        title: "Error",
-        description: "Could not load user profile",
-        variant: "destructive"
-      });
+      console.error('Error in useProfileData:', error);
+      setError(`Unexpected error: ${error.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
-  }, [userId, authRefreshProfile, profile]);
+  };
 
-  // Fetch profile on mount or when userId changes
   useEffect(() => {
-    if (userId) {
-      fetchProfile();
-    }
-  }, [fetchProfile, userId]);
+    fetchProfileData();
+  }, [profileIdOrUsername]);
 
-  // Expose refreshProfile function so it can be called from outside
-  const refreshProfile = useCallback((forceRefresh: boolean = true) => {
-    console.log("Refreshing profile data...");
-    return fetchProfile(forceRefresh);
-  }, [fetchProfile]);
+  // Alias for fetchProfileData for compatibility
+  const refreshProfile = fetchProfileData;
 
-  // Function to update profile
-  const updateProfile = useCallback(async (formData: any) => {
-    if (!userId) {
-      const errorMsg = "Cannot update: User ID is missing";
-      setError(errorMsg);
-      return { error: new Error(errorMsg) };
-    }
-
+  const updateProfile = async (formData: any) => {
     try {
-      // Remove the location_category field if it exists in the form data
-      const { location_category, ...dataToUpdate } = formData;
-      
+      if (!profile?.id) {
+        throw new Error('No profile ID available for update');
+      }
+
       const { error: updateError } = await supabase
         .from('profiles')
-        .update(dataToUpdate)
-        .eq('id', userId);
+        .update(formData)
+        .eq('id', profile.id);
 
       if (updateError) {
-        setError(updateError.message);
         return { error: updateError };
       }
 
-      // Refresh profile data after update
-      await fetchProfile(true);
+      // Refresh the profile data after update
+      await fetchProfileData(true);
       return { error: null };
     } catch (error: any) {
-      setError(error.message || 'Failed to update profile');
+      console.error('Error updating profile:', error);
       return { error };
     }
-  }, [userId, fetchProfile]);
+  };
 
-  return { profile, loading, error, refreshProfile, updateProfile };
+  return {
+    profile,
+    loading,
+    error,
+    isNotFound,
+    fetchProfileData,
+    refreshProfile,
+    updateProfile
+  };
 };

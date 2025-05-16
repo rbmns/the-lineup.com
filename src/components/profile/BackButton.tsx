@@ -8,15 +8,22 @@ import { safeGoBack } from '@/utils/navigationUtils';
 interface BackButtonProps {
   className?: string;
   defaultPath?: string;
+  onClick?: () => void;
 }
 
 export const BackButton: React.FC<BackButtonProps> = ({ 
   className = '', 
-  defaultPath = '/events' 
+  defaultPath = '/events',
+  onClick
 }) => {
   const navigate = useNavigate();
 
   const handleBackNavigation = () => {
+    if (onClick) {
+      onClick();
+      return;
+    }
+    
     try {
       // Use our safer back navigation utility
       safeGoBack(navigate, defaultPath);

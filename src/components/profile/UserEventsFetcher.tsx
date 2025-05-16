@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Event } from '@/types';
 import { supabase } from '@/lib/supabase';
-import { processEventData } from '@/utils/eventProcessorUtils';
+import { processEventsData } from '@/utils/eventProcessorUtils';
 
 interface UserEventsFetcherProps {
   currentUserId?: string;
@@ -57,7 +57,9 @@ export const UserEventsFetcher: React.FC<UserEventsFetcherProps> = ({
           .filter(item => item.events)
           .map(item => {
             const eventData = item.events as any;
-            const processedEvent = processEventData(eventData, currentUserId);
+            // Fix: Use processEventsData instead of processEventData
+            const processedEvents = processEventsData([eventData], currentUserId);
+            const processedEvent = processedEvents[0];
             return {
               ...processedEvent,
               rsvp_status: item.status as 'Going' | 'Interested'

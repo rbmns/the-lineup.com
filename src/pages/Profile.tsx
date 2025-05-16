@@ -28,10 +28,11 @@ const Profile = () => {
   
   const { 
     profile, 
-    isLoading, 
+    loading, 
     error, 
     isNotFound,
-    fetchProfileData 
+    fetchProfileData,
+    refreshProfile
   } = useProfileData(username);
   
   // Add canonical URL for SEO - providing the username as required parameter
@@ -157,7 +158,7 @@ const Profile = () => {
     navigate(-1);
   };
   
-  if (isLoading) {
+  if (loading) {
     return <ProfileLoading />;
   }
   
@@ -174,36 +175,33 @@ const Profile = () => {
       
       <ProfileHeader
         profile={profile}
-        isOwnProfile={isOwnProfile}
       />
       
-      {!isOwnProfile && user && (
+      {!isOwnProfile && user && profileId && (
         <FriendManagement
-          userId={user.id}
-          profileId={profileId || ''}
-          isFriend={isFriend}
-          friendRequestSent={friendRequestSent}
-          friendRequestReceived={friendRequestReceived}
-          isBlocked={isBlocked}
-          setIsFriend={setIsFriend}
-          setFriendRequestSent={setFriendRequestSent}
-          setFriendRequestReceived={setFriendRequestReceived}
-          setIsBlocked={setIsBlocked}
-          fetchProfileData={fetchProfileData}
+          profile={profile}
+          currentUserId={user.id}
+          onUpdateFriendship={(status) => {
+            setIsFriend(status === 'accepted');
+            setFriendRequestSent(status === 'requested');
+            setFriendRequestReceived(status === 'pending');
+          }}
+          onBlock={(blocked) => setIsBlocked(blocked)}
+          refreshProfile={() => refreshProfile()}
         />
       )}
       
       {isOwnProfile && user && (
         <ProfileAccessControl
           profile={profile}
-          fetchProfileData={fetchProfileData}
+          onUpdate={() => refreshProfile()}
         />
       )}
       
       <UserProfileContent
         profile={profile}
-        events={sortedPastEvents}
-        loadingEvents={loadingEvents}
+        pastEvents={sortedPastEvents}
+        isLoading={loadingEvents}
       />
     </div>
   );

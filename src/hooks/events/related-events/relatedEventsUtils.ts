@@ -1,8 +1,10 @@
+
 import { Event } from '@/types';
 import { compareAsc } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
 import { EventRsvpMap } from './types';
+import { supabase } from '@/lib/supabase';
 
 /**
  * Apply RSVP status to events and format them correctly
