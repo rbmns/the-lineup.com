@@ -1,104 +1,116 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Event } from '@/types';
+import { EventsList } from './list-components/EventsList';
+import { PrimaryResults } from './list-components/PrimaryResults';
 import { EventsLoadingState } from './list-components/EventsLoadingState';
 import { NoResultsFound } from './list-components/NoResultsFound';
-import { EventsEmptyState } from './list-components/EventsEmptyState';
-import { PrimaryResults } from './list-components/PrimaryResults';
-import { SecondaryResults } from './list-components/SecondaryResults';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface LazyEventsListProps {
-  mainEvents: Event[];
-  relatedEvents: Event[];
+  events: Event[];
   isLoading?: boolean;
-  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   showRsvpButtons?: boolean;
-  hasActiveFilters?: boolean;
+  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   loadingEventId?: string | null;
-  noCategoriesSelected?: boolean;
+  emptyMessage?: string;
+  searchQuery?: string;
+  initialVisibleCount?: number;
+  loadMoreIncrement?: number;
+  renderSignUpTeaser?: boolean;
   renderTeaserAfterRow?: number | false;
+  showTeaser?: boolean;
   teaser?: React.ReactNode;
 }
 
 export const LazyEventsList: React.FC<LazyEventsListProps> = ({
-  mainEvents,
-  relatedEvents,
+  events,
   isLoading = false,
+  showRsvpButtons = false,
   onRsvp,
-  showRsvpButtons = true,
-  hasActiveFilters = false,
   loadingEventId,
-  noCategoriesSelected = false,
+  emptyMessage = "No events found",
+  searchQuery = "",
+  initialVisibleCount = 9,
+  loadMoreIncrement = 6,
+  renderSignUpTeaser = false,
   renderTeaserAfterRow = false,
+  showTeaser = false,
   teaser
 }) => {
-  const isMobile = useIsMobile();
-  const [showTeaser, setShowTeaser] = useState<boolean>(false);
+  const [visibleCount, setVisibleCount] = useState(initialVisibleCount);
   
-  // Determine when to show teaser
+  // Reset visible count when events or search changes
   useEffect(() => {
-    if (renderTeaserAfterRow !== false && mainEvents.length >= renderTeaserAfterRow) {
-      setShowTeaser(true);
-    } else {
-      setShowTeaser(false);
-    }
-  }, [mainEvents.length, renderTeaserAfterRow]);
+    setVisibleCount(initialVisibleCount);
+  }, [events.length, searchQuery, initialVisibleCount]);
   
-  // Show loading state
+  const visibleEvents = events.slice(0, visibleCount);
+  const hasMore = events.length > visibleCount;
+  
+  const loadMore = useCallback(() => {
+    setVisibleCount(prev => prev + loadMoreIncrement);
+  }, [loadMoreIncrement]);
+  
+  // Handle RSVP with proper return type
+  const handleRsvp = useCallback(
+    async (eventId: string, status: 'Going' | 'Interested'): Promise<void> => {
+      if (onRsvp) {
+        await onRsvp(eventId, status);
+      }
+    },
+    [onRsvp]
+  );
+  
   if (isLoading) {
     return <EventsLoadingState />;
   }
   
-  // Show message when no categories are selected
-  if (noCategoriesSelected) {
-    return <NoResultsFound 
-      message="No event categories selected"
-      actionText="Show all events" 
-      showFiltersHint={true}
-    />;
+  if (events.length === 0) {
+    return (
+      <NoResultsFound 
+        message={emptyMessage} 
+        searchQuery={searchQuery}
+        // Add all the props that might be needed
+        events={[]}
+        isLoading={isLoading}
+        onRsvp={handleRsvp}
+        showRsvpButtons={showRsvpButtons}
+        visibleCount={visibleCount}
+        hasMore={hasMore}
+        onLoadMore={loadMore}
+      />
+    );
   }
   
-  // Show message when no events are found with active filters
-  if (mainEvents.length === 0 && hasActiveFilters) {
-    return <NoResultsFound 
-      message="No events match your filters"
-      actionText="Clear filters"
-      showFiltersHint={true}
-    />;
-  }
-  
-  // Show empty state when no events exist at all
-  if (mainEvents.length === 0 && !hasActiveFilters) {
-    return <EventsEmptyState />;
-  }
-  
-  // Calculate teaser position based on events count and screen size
-  // For mobile screens, insert teaser after fewer events
-  const teaserPosition = isMobile && renderTeaserAfterRow && renderTeaserAfterRow > 1 
-    ? Math.min(1, renderTeaserAfterRow - 1)
-    : renderTeaserAfterRow;
-    
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <PrimaryResults 
-        events={mainEvents} 
-        onRsvp={onRsvp} 
+        events={visibleEvents}
+        onRsvp={handleRsvp}
         showRsvpButtons={showRsvpButtons}
         loadingEventId={loadingEventId}
-        renderTeaserAfterRow={teaserPosition}
-        teaser={teaser}
+        renderTeaserAfterRow={renderTeaserAfterRow}
         showTeaser={showTeaser}
+        teaser={teaser}
+        searchQuery={searchQuery}
+        isLoading={isLoading}
+        visibleCount={visibleCount}
+        hasMore={hasMore}
+        onLoadMore={loadMore}
       />
       
-      {relatedEvents.length > 0 && (
-        <SecondaryResults 
-          relatedEvents={relatedEvents}
-          onRsvp={onRsvp}
-          showRsvpButtons={showRsvpButtons}
-          loadingEventId={loadingEventId}
-        />
+      {hasMore && (
+        <div className="flex justify-center pt-4">
+          <button 
+            onClick={loadMore}
+            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md transition-colors"
+          >
+            Load More
+          </button>
+        </div>
       )}
     </div>
   );
 };
+
+export default LazyEventsList;

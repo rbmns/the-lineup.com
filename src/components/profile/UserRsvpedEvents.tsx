@@ -43,7 +43,7 @@ export const UserRsvpedEvents: React.FC<UserRsvpedEventsProps> = ({
     ? events.filter(event => !matchingRsvps.some(matchEvent => matchEvent.id === event.id))
     : events;
 
-  // Direct event navigation using utility
+  // Direct event navigation using utility - pass navigate object correctly
   const handleEventClick = useCallback((eventId: string) => {
     navigateToEvent(navigate, eventId);
   }, [navigate]);

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { navigateToUserProfile } from '@/utils/navigationUtils';
@@ -5,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getInitials } from '@/utils/stringUtils';
+import { getInitials } from '@/utils/string-utils';
 import { Users } from 'lucide-react';
 
 interface Friend {

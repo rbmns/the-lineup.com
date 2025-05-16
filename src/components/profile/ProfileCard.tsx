@@ -1,18 +1,18 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { navigateToUserProfile } from '@/utils/navigationUtils';
 
 interface ProfileCardProps {
-  // Add your props here
   userId: string;
-  // Add other props
+  // Add other props as needed
 }
 
-const ProfileCard: React.FC<ProfileCardProps> = ({ userId, /* other props */ }) => {
+const ProfileCard: React.FC<ProfileCardProps> = ({ userId /* other props */ }) => {
   const navigate = useNavigate();
   
   const handleProfileClick = () => {
-    // This should be calling navigateToUserProfile with 2 arguments, not 4
+    // Fixed to use only 2 arguments instead of 4
     navigateToUserProfile(navigate, userId);
   };
   

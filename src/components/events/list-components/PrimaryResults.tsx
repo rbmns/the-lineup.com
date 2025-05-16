@@ -12,11 +12,11 @@ interface PrimaryResultsProps {
   renderTeaserAfterRow?: number | false;
   teaser?: React.ReactNode;
   showTeaser?: boolean;
-  searchQuery?: string;  // Add this property to match FilteredEventsList usage
-  isLoading?: boolean;   // Add this property to match FilteredEventsList usage
-  visibleCount?: number; // Add this property to match FilteredEventsList usage
-  hasMore?: boolean;     // Add this property to match FilteredEventsList usage
-  onLoadMore?: () => void; // Add this property to match FilteredEventsList usage
+  searchQuery?: string;
+  isLoading?: boolean;
+  visibleCount?: number;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
 }
 
 export const PrimaryResults: React.FC<PrimaryResultsProps> = ({ 
@@ -79,3 +79,5 @@ export const PrimaryResults: React.FC<PrimaryResultsProps> = ({
     </div>
   );
 };
+
+export default PrimaryResults;
