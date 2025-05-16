@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
 import { trackEvent } from '@/utils/analytics';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface EventsTeaserProps {
   className?: string;
@@ -11,6 +12,7 @@ interface EventsTeaserProps {
 
 export const EventsTeaser: React.FC<EventsTeaserProps> = ({ className }) => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const handleSignUpClick = () => {
     // Track the click event
@@ -19,25 +21,31 @@ export const EventsTeaser: React.FC<EventsTeaserProps> = ({ className }) => {
       component: 'events_teaser'
     });
     
-    navigate('/login', { state: { initialMode: 'register' } });
+    // Navigate to login page with register mode and scroll to top
+    navigate('/login', { 
+      state: { initialMode: 'register' } 
+    });
+    
+    // Ensure scroll to top
+    window.scrollTo(0, 0);
   };
 
   return (
     <div className={`bg-white rounded-lg border border-gray-200 shadow-sm p-4 ${className}`}>
-      <div className="flex items-center gap-4">
+      <div className={`flex ${isMobile ? 'flex-col' : 'items-center'} gap-4`}>
         <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
           <Calendar className="h-6 w-6 text-purple-500" />
         </div>
 
-        <div className="flex-grow">
+        <div className={`${isMobile ? 'mt-2' : ''} flex-grow`}>
           <h3 className="font-medium text-gray-900">Connect with attendees</h3>
           <p className="text-sm text-gray-600">Sign up to save your RSVPs, add to your calendar and see who's going</p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className={`${isMobile ? 'mt-4 w-full' : ''} flex items-center`}>
           <Button 
             onClick={handleSignUpClick}
-            className="bg-black hover:bg-gray-800 text-white font-medium"
+            className={`bg-black hover:bg-gray-800 text-white font-medium ${isMobile ? 'w-full' : ''}`}
           >
             Create an account - it's free
           </Button>

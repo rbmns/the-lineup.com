@@ -1,6 +1,5 @@
-
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { LoginForm } from '@/components/auth/LoginForm';
@@ -8,6 +7,7 @@ import SignupForm from '@/components/auth/SignupForm';
 import { ForgotPasswordForm } from '@/components/auth/ForgotPasswordForm';
 import { toast } from 'sonner';
 import { completeLogout, clearAllRateLimits } from '@/integrations/supabase/client';
+import { handlePostNavigation } from '@/utils/navigationUtils';
 
 interface LocationState {
   initialMode?: 'login' | 'register';

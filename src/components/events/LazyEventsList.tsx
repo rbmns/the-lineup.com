@@ -1,14 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { Event } from '@/types';
-import { EventGrid } from '@/components/events/EventGrid';
-import { EventsList } from '@/components/events/EventsList';
-import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
-import { EventsLoadingState } from '@/components/events/list-components/EventsLoadingState';
+import { EventsListLoading } from './list-components/EventsLoadingState';
+import { NoResultsFound } from './list-components/NoResultsFound';
+import { EventsEmptyState } from './list-components/EventsEmptyState';
+import { PrimaryResults } from './list-components/PrimaryResults';
+import { SecondaryResults } from './list-components/SecondaryResults';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface LazyEventsListProps {
   mainEvents: Event[];
-  relatedEvents?: Event[];
+  relatedEvents: Event[];
   isLoading?: boolean;
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   showRsvpButtons?: boolean;
@@ -20,8 +22,8 @@ interface LazyEventsListProps {
 }
 
 export const LazyEventsList: React.FC<LazyEventsListProps> = ({
-  mainEvents = [],
-  relatedEvents = [],
+  mainEvents,
+  relatedEvents,
   isLoading = false,
   onRsvp,
   showRsvpButtons = true,
@@ -31,106 +33,71 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   renderTeaserAfterRow = false,
   teaser
 }) => {
-  const [visibleEvents, setVisibleEvents] = useState<Event[]>([]);
-  const eventsPerRow = 3; // Standard number of events per row for a 3-column grid
-
+  const isMobile = useIsMobile();
+  const [showTeaser, setShowTeaser] = useState<boolean>(false);
+  
+  // Determine when to show teaser
   useEffect(() => {
-    // Reset visible events when main events change
-    setVisibleEvents(mainEvents.slice(0, 6));
-  }, [mainEvents]);
-
+    if (renderTeaserAfterRow !== false && mainEvents.length >= renderTeaserAfterRow) {
+      setShowTeaser(true);
+    } else {
+      setShowTeaser(false);
+    }
+  }, [mainEvents.length, renderTeaserAfterRow]);
+  
   // Show loading state
   if (isLoading) {
-    return <EventsLoadingState />;
+    return <EventsListLoading />;
   }
-
-  // Show empty state for no selected categories
-  if (noCategoriesSelected) {
-    return (
-      <NoResultsFound 
-        message="Please select at least one category to see events" 
-        showFiltersHint={false}
-      />
-    );
-  }
-
-  // Show no results found when filters are active but no events match
-  if (mainEvents.length === 0 && hasActiveFilters) {
-    return (
-      <NoResultsFound 
-        message="No events match your filters" 
-        showFiltersHint={true}
-      />
-    );
-  }
-
-  // If no events at all, show generic no results
-  if (mainEvents.length === 0) {
-    return (
-      <NoResultsFound 
-        message="No events found" 
-        showFiltersHint={false}
-      />
-    );
-  }
-
-  // Calculate which events go before and after the teaser
-  let eventsBeforeTeaser: Event[] = [];
-  let eventsAfterTeaser: Event[] = [];
   
-  if (renderTeaserAfterRow && typeof renderTeaserAfterRow === 'number') {
-    const splitIndex = renderTeaserAfterRow * eventsPerRow;
-    eventsBeforeTeaser = mainEvents.slice(0, splitIndex);
-    eventsAfterTeaser = mainEvents.slice(splitIndex);
-  } else {
-    eventsBeforeTeaser = mainEvents;
+  // Show message when no categories are selected
+  if (noCategoriesSelected) {
+    return <NoResultsFound 
+      message="No event categories selected"
+      actionText="Show all events" 
+      showFiltersHint={true}
+    />;
   }
-
+  
+  // Show message when no events are found with active filters
+  if (mainEvents.length === 0 && hasActiveFilters) {
+    return <NoResultsFound 
+      message="No events match your filters"
+      actionText="Clear filters"
+      showFiltersHint={true}
+    />;
+  }
+  
+  // Show empty state when no events exist at all
+  if (mainEvents.length === 0 && !hasActiveFilters) {
+    return <EventsEmptyState />;
+  }
+  
+  // Calculate teaser position based on events count and screen size
+  // For mobile screens, insert teaser after fewer events
+  const teaserPosition = isMobile && renderTeaserAfterRow && renderTeaserAfterRow > 1 
+    ? Math.min(1, renderTeaserAfterRow - 1)
+    : renderTeaserAfterRow;
+    
   return (
-    <div className="space-y-12">
-      {/* First set of events */}
-      <div className="space-y-6">
-        {eventsBeforeTeaser.length > 0 && (
-          <EventsList
-            events={eventsBeforeTeaser}
-            onRsvp={onRsvp}
-            showRsvpButtons={showRsvpButtons}
-            loadingEventId={loadingEventId}
-          />
-        )}
-      </div>
+    <div className="space-y-10">
+      <PrimaryResults 
+        events={mainEvents} 
+        onRsvp={onRsvp} 
+        showRsvpButtons={showRsvpButtons}
+        loadingEventId={loadingEventId}
+        renderTeaserAfterRow={teaserPosition}
+        teaser={teaser}
+        showTeaser={showTeaser}
+      />
       
-      {/* Teaser after specified row */}
-      {renderTeaserAfterRow && teaser && (
-        <div className="my-8">
-          {teaser}
-        </div>
-      )}
-      
-      {/* Remaining events */}
-      {eventsAfterTeaser.length > 0 && (
-        <div className="space-y-6 mt-8">
-          <EventsList
-            events={eventsAfterTeaser}
-            onRsvp={onRsvp}
-            showRsvpButtons={showRsvpButtons}
-            loadingEventId={loadingEventId}
-          />
-        </div>
-      )}
-      
-      {/* Related events if any */}
       {relatedEvents.length > 0 && (
-        <div className="mt-12 pt-8 border-t border-gray-200">
-          <h2 className="text-xl font-medium mb-6">You might also be interested in</h2>
-          <EventsList
-            events={relatedEvents}
-            onRsvp={onRsvp}
-            showRsvpButtons={showRsvpButtons}
-            compact={true}
-            loadingEventId={loadingEventId}
-          />
-        </div>
+        <SecondaryResults 
+          relatedEvents={relatedEvents}
+          onRsvp={onRsvp}
+          showRsvpButtons={showRsvpButtons}
+          loadingEventId={loadingEventId}
+        />
       )}
     </div>
   );

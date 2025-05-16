@@ -13,3 +13,59 @@
     display: none;
   }
 }
+
+/* Responsive utilities */
+@layer utilities {
+  .responsive-container {
+    @apply w-full px-4 md:px-6 lg:px-8 mx-auto;
+    max-width: min(1200px, 100%);
+  }
+  
+  .responsive-padding {
+    @apply px-4 md:px-6 lg:px-8;
+  }
+  
+  .responsive-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6;
+  }
+  
+  .flex-responsive {
+    @apply flex flex-col sm:flex-row;
+  }
+}
+
+/* Ensure buttons are properly sized on mobile */
+@media (max-width: 640px) {
+  button.full-width-mobile {
+    width: 100%;
+  }
+}
+
+/* Enhanced RSVP Button Animations */
+@keyframes buttonClickPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.button-click-animation {
+  animation: buttonClickPulse 0.15s ease-out;
+}
+
+@keyframes rsvpGoingPulse {
+  0% { box-shadow: 0 0 0 0px rgba(34, 197, 94, 0.1); }
+  100% { box-shadow: 0 0 0 4px rgba(34, 197, 94, 0); }
+}
+
+.rsvp-going-animation {
+  animation: rsvpGoingPulse 0.3s ease-out;
+}
+
+@keyframes rsvpInterestedPulse {
+  0% { box-shadow: 0 0 0 0px rgba(59, 130, 246, 0.1); }
+  100% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0); }
+}
+
+.rsvp-interested-animation {
+  animation: rsvpInterestedPulse 0.3s ease-out;
+}
