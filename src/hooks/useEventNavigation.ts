@@ -38,14 +38,14 @@ export const useEventNavigation = () => {
       const url = `/events/${event.id}`;
       console.log(`Navigation to event URL: ${url}`, event);
       
-      // Preserve essential information including RSVP status
+      // Preserve essential information including RSVP status with higher specificity
       const originalEvent = {
         id: event.id,
         title: event.title,
-        rsvp_status: event.rsvp_status
+        rsvp_status: event.rsvp_status || null
       };
       
-      // Force navigation to the ID-based URL
+      // Force navigation to the ID-based URL with enhanced RSVP status handling
       navigate(url, { 
         replace: false,
         state: { 
@@ -54,8 +54,8 @@ export const useEventNavigation = () => {
           fromEventNavigation: true,
           useTransition: true,
           originalEventId: event.id,
-          // Include RSVP status in navigation state
-          rsvpStatus: event.rsvp_status,
+          // Ensure RSVP status is explicitly included and prioritized
+          rsvpStatus: event.rsvp_status || null,
           originalEvent,
           timestamp: Date.now()
         }

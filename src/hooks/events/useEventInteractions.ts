@@ -22,17 +22,17 @@ export const useEventInteractions = () => {
     // Scroll to top before navigation
     window.scrollTo(0, 0);
     
-    // Pass RSVP status in navigation state to ensure it's available immediately on the detail page
+    // Ensure we're passing the complete RSVP information in state
     navigate(eventUrl, {
       state: { 
         fromDirectNavigation: true,
         forceRefresh: true,
         timestamp: Date.now(),
-        // Include the RSVP status to maintain synchronization between views
-        rsvpStatus: event.rsvp_status,
+        // Explicitly include the RSVP status with higher specificity
+        rsvpStatus: event.rsvp_status || null,
         originalEvent: {
           id: event.id,
-          rsvp_status: event.rsvp_status,
+          rsvp_status: event.rsvp_status || null,
           title: event.title
         }
       }
@@ -48,15 +48,15 @@ export const useEventInteractions = () => {
     // Scroll to top before navigation
     window.scrollTo(0, 0);
     
-    // Always use ID-based URLs for internal navigation and preserve RSVP status
+    // Enhance the navigation state with explicit RSVP status
     const eventUrl = `/events/${event.id}`;
     navigate(eventUrl, {
       state: {
         fromEventNavigation: true,
         useTransition: true,
         originalEventId: event.id,
-        // Include RSVP status in navigation state
-        rsvpStatus: event.rsvp_status,
+        // Include RSVP status in navigation state with higher specificity
+        rsvpStatus: event.rsvp_status || null,
         timestamp: Date.now()
       }
     });

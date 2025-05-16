@@ -32,8 +32,9 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   // localLoading is for the button's own optimistic click feedback
   const [localLoading, setLocalLoading] = useState<'Going' | 'Interested' | null>(null); 
 
+  // Update localStatus whenever currentStatus prop changes - with debug log
   useEffect(() => {
-    // Sync localStatus if currentStatus prop changes from parent (e.g., after successful RSVP)
+    console.log(`EventRsvpButtons: currentStatus changed to ${currentStatus} from ${localStatus}`);
     setLocalStatus(currentStatus);
   }, [currentStatus]);
   

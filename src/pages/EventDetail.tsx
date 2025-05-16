@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEventDetailParams } from '@/hooks/useEventDetailParams';
@@ -55,7 +54,7 @@ const EventDetail = () => {
 
   // Apply initial RSVP status from navigation state to ensure consistency
   useEffect(() => {
-    if (event && initialRsvpStatus && !event.rsvp_status) {
+    if (event && initialRsvpStatus) {
       console.log(`Applying initial RSVP status from navigation: ${initialRsvpStatus}`);
       // Update the local event state with the RSVP status from navigation
       event.rsvp_status = initialRsvpStatus;
@@ -66,7 +65,8 @@ const EventDetail = () => {
       console.log("Using original event data from navigation to supplement current event data");
       
       // Only supplement properties that might be missing
-      if (!event.rsvp_status && originalEvent.rsvp_status) {
+      if (originalEvent.rsvp_status) {
+        console.log(`Setting RSVP status from originalEvent: ${originalEvent.rsvp_status}`);
         event.rsvp_status = originalEvent.rsvp_status;
       }
     }

@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useRsvpActions } from '@/hooks/useRsvpActions';
 
 interface UseEventDetailsResult {
@@ -26,7 +26,11 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
   const [rsvpLoading, setRsvpLoading] = useState<boolean>(false);
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { handleRsvp: hookHandleRsvp, loading: rsvpLoadingState } = useRsvpActions();
+  
+  // Get RSVP status from location state if available
+  const initialRsvpStatus = location.state?.rsvpStatus || null;
 
   // Fetch event data
   const fetchEventDetails = async () => {
@@ -65,6 +69,13 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
         });
       } else if (data) {
         console.log('Event data loaded:', data);
+        
+        // Apply RSVP status from navigation state if available
+        if (initialRsvpStatus && !data.rsvp_status) {
+          console.log(`Applying initial RSVP status from navigation to loaded event: ${initialRsvpStatus}`);
+          data.rsvp_status = initialRsvpStatus;
+        }
+        
         setEvent(data);
         
         // Fetch attendees
@@ -122,6 +133,14 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
       fetchEventDetails();
     }
   }, [eventId]);
+  
+  // Apply RSVP status from location state when it changes
+  useEffect(() => {
+    if (initialRsvpStatus && event && !event.rsvp_status) {
+      console.log(`Applying RSVP status from location state: ${initialRsvpStatus}`);
+      setEvent(prev => prev ? {...prev, rsvp_status: initialRsvpStatus} : null);
+    }
+  }, [initialRsvpStatus, event]);
 
   // Handle RSVP for a specific event
   const rsvpToEvent = async (status: 'Going' | 'Interested') => {
