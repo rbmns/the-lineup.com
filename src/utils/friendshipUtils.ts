@@ -56,3 +56,27 @@ export const checkRealTimeFriendshipStatus = async (
     return 'none';
   }
 };
+
+/**
+ * Determines if a profile should be clickable based on friendship status and whether it's the current user's profile
+ * @param friendshipStatus The current friendship status: 'none', 'pending', or 'accepted'
+ * @param isCurrentUser Whether this is the current user's own profile
+ * @returns Boolean indicating if the profile should be clickable
+ */
+export const isProfileClickable = (
+  friendshipStatus: 'none' | 'pending' | 'accepted' | undefined, 
+  isCurrentUser: boolean
+): boolean => {
+  // Always allow clicking on your own profile
+  if (isCurrentUser) {
+    return true;
+  }
+  
+  // Allow clicking on friends' profiles
+  if (friendshipStatus === 'accepted') {
+    return true;
+  }
+  
+  // In all other cases (no friendship or pending request), prevent profile navigation
+  return false;
+};
