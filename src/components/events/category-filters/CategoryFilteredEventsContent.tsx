@@ -6,11 +6,58 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EventsLoadingState } from '../list-components/EventsLoadingState';
 import NoResultsFound from '../list-components/NoResultsFound';
-import CategoryFilterBar from './CategoryFilterBar';
 import { EventsEmptyState } from '../list-components/EventsEmptyState';
 import EventsHeader from '../list-components/EventsHeader';
 import EventsSignUpTeaser from '../list-components/EventsSignUpTeaser';
 import { useAuth } from '@/contexts/AuthContext';
+
+// First, let's create the CategoryFilterBar component
+import { Button as ButtonUI } from '@/components/ui/button';
+import { X } from 'lucide-react';
+
+interface CategoryFilterBarProps {
+  selectedCategories: string[];
+  onCategoryChange: (category: string) => void;
+  onClearFilters: () => void;
+}
+
+export const CategoryFilterBar: React.FC<CategoryFilterBarProps> = ({
+  selectedCategories,
+  onCategoryChange,
+  onClearFilters
+}) => {
+  if (selectedCategories.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 mb-4">
+      {selectedCategories.map(category => (
+        <ButtonUI
+          key={category}
+          variant="secondary"
+          size="sm"
+          className="bg-purple-100 text-purple-800 hover:bg-purple-200 flex items-center"
+          onClick={() => onCategoryChange(category)}
+        >
+          {category}
+          <X className="ml-1 h-3 w-3" />
+        </ButtonUI>
+      ))}
+      
+      {selectedCategories.length > 0 && (
+        <ButtonUI
+          variant="ghost"
+          size="sm"
+          onClick={onClearFilters}
+          className="text-gray-600"
+        >
+          Clear all
+        </ButtonUI>
+      )}
+    </div>
+  );
+};
 
 interface CategoryFilteredEventsContentProps {
   mainEvents: Event[];
@@ -189,3 +236,4 @@ const CategoryFilteredEventsContent: React.FC<CategoryFilteredEventsContentProps
 };
 
 export default CategoryFilteredEventsContent;
+export { CategoryFilteredEventsContent };

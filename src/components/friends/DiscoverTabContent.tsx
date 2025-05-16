@@ -10,7 +10,7 @@ interface DiscoverTabContentProps {
   searchResults: UserProfile[];
   onAddFriend: (id: string) => void;
   isSearching: boolean;
-  pendingRequestIds: string[];
+  pendingRequestIds: string[]; // This is correct as an array
   onSearch: () => void;
 }
 
@@ -75,7 +75,8 @@ export const DiscoverTabContent = ({
               username={profile.username || ''}
               avatarUrl={profile.avatar_url}
               onAddFriend={() => onAddFriend(profile.id)}
-              pendingRequestIds={pendingRequestIds}
+              isPending={pendingRequestIds.includes(profile.id)}
+              pendingFriendIds={pendingRequestIds}
             />
           ))}
         </div>

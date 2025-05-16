@@ -1,26 +1,27 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Event } from '@/types';
 import { LazyEventsList } from '@/components/events/LazyEventsList';
-import { EventsHeader } from '@/components/events/EventsHeader';
-import { EventsFilters } from '@/components/events/EventsFilters';
+import EventsHeader from '@/components/events/list-components/EventsHeader';
+import EventsFilters from '@/components/events/list-components/EventsFilters';
 import { EventsEmptyState } from '@/components/events/EventsEmptyState';
-import { EventsSignUpTeaser } from '@/components/events/EventsSignUpTeaser';
-import { useEventRsvp } from '@/hooks/useEventRsvp';
+import EventsSignUpTeaser from '@/components/events/list-components/EventsSignUpTeaser';
+import useEventRsvp from '@/hooks/useEventRsvp';
 import { useEvents } from '@/hooks/useEvents';
-import { useCategories } from '@/hooks/useCategories';
-import { useFilters } from '@/hooks/useFilters';
+import useCategories from '@/hooks/useCategories';
+import useFilters from '@/hooks/useFilters';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { filterEvents } from '@/utils/event-filters';
-import { EventsSidebar } from '@/components/events/EventsSidebar';
-import { EventsPageSkeleton } from '@/components/events/EventsPageSkeleton';
+import EventsSidebar from '@/components/events/EventsSidebar';
+import EventsPageSkeleton from '@/components/events/EventsPageSkeleton';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const EventsPageRefactored: React.FC = () => {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
@@ -28,13 +29,26 @@ const EventsPageRefactored: React.FC = () => {
   
   // Get events data
   const { 
-    events, 
-    featuredEvents,
-    popularEvents,
+    data: events = [], 
     isLoading: eventsLoading,
     error: eventsError,
-    refreshEvents
+    refetch: refreshEvents
   } = useEvents();
+  
+  // For sidebar content
+  const featuredEvents = useMemo(() => 
+    events
+      .filter(event => event.is_featured)
+      .slice(0, 4),
+    [events]
+  );
+  
+  const popularEvents = useMemo(() => 
+    events
+      .sort((a, b) => (b.attendees_count || 0) - (a.attendees_count || 0))
+      .slice(0, 4),
+    [events]
+  );
   
   // Get categories for filters
   const { categories, isLoading: categoriesLoading } = useCategories();
@@ -64,17 +78,17 @@ const EventsPageRefactored: React.FC = () => {
   }, [events, activeFilters, searchQuery]);
   
   // Determine if we should show the signup teaser
-  const showSignUpTeaser = !user && !authLoading && filteredEvents.length > 0;
+  const showSignUpTeaser = !isAuthenticated && !eventsLoading && filteredEvents.length > 0;
   
   // Determine where to show the teaser
   const renderTeaserAfterRow = showSignUpTeaser ? 1 : false;
   
   // Loading state
-  const isLoading = eventsLoading || categoriesLoading || authLoading;
+  const isLoading = eventsLoading || categoriesLoading;
   
   // Handle create event button click
   const handleCreateEvent = () => {
-    if (!user) {
+    if (!isAuthenticated) {
       toast({
         title: "Authentication required",
         description: "Please sign in to create an event",
@@ -89,7 +103,7 @@ const EventsPageRefactored: React.FC = () => {
   
   // Handle RSVP with authentication check
   const onRsvp = async (eventId: string, status: 'Going' | 'Interested') => {
-    if (!user) {
+    if (!isAuthenticated) {
       toast({
         title: "Authentication required",
         description: "Please sign in to RSVP to events",

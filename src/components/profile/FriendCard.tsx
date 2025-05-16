@@ -6,9 +6,18 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { getInitials } from '@/utils/string-utils';
 import { UserPlus, UserMinus, UserCheck, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+// Create a utility function to get initials
+const getInitials = (name: string): string => {
+  return name
+    .split(' ')
+    .map(part => part[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+};
 
 interface FriendCardProps {
   id: string;
@@ -27,6 +36,8 @@ interface FriendCardProps {
   showActions?: boolean;
   compact?: boolean;
   mutualFriends?: number;
+  pendingRequestIds?: string[];
+  pendingFriendIds?: string[];
 }
 
 export const FriendCard: React.FC<FriendCardProps> = ({
@@ -45,9 +56,19 @@ export const FriendCard: React.FC<FriendCardProps> = ({
   className = '',
   showActions = true,
   compact = false,
-  mutualFriends = 0
+  mutualFriends = 0,
+  pendingRequestIds,
+  pendingFriendIds
 }) => {
   const navigate = useNavigate();
+  
+  // Check if this user is in the pending requests list
+  const isPendingRequest = React.useMemo(() => {
+    if (isPending) return true;
+    if (pendingRequestIds?.includes(id)) return true;
+    if (pendingFriendIds?.includes(id)) return true;
+    return false;
+  }, [id, isPending, pendingRequestIds, pendingFriendIds]);
   
   const handleProfileClick = () => {
     navigateToUserProfile(navigate, id);
@@ -141,7 +162,7 @@ export const FriendCard: React.FC<FriendCardProps> = ({
                     <UserMinus className="h-4 w-4" />
                   </Button>
                 </>
-              ) : isPending ? (
+              ) : isPendingRequest ? (
                 <Button
                   variant="outline"
                   size="sm"
