@@ -2,7 +2,7 @@
 import { useState } from 'react';
 
 export const useCategoryFilterSelection = (allCategories: string[] = []) => {
-  // Initialize with an empty array, not all categories selected by default
+  // Initialize with all categories selected by default
   const [selectedCategories, setSelectedCategories] = useState<string[]>(allCategories);
 
   const toggleCategory = (category: string) => {

@@ -2,7 +2,6 @@
 import React from 'react';
 import { CategoryPill, AllCategoryPill } from '@/components/ui/category-pill';
 import { cn } from '@/lib/utils';
-import { toast } from '@/components/ui/use-toast';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -35,10 +34,8 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
   const handleAllClick = () => {
     if (allSelected) {
       onDeselectAll();
-      toast({ title: "No categories selected" });
     } else {
       onSelectAll();
-      toast({ title: "Showing all categories" });
     }
   };
   
@@ -53,7 +50,6 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
       setTimeout(() => {
         onToggleEventType(category);
       }, 0);
-      toast({ title: `Showing only ${category} events` });
     } else {
       // Normal toggle behavior for subsequent clicks
       onToggleEventType(category);

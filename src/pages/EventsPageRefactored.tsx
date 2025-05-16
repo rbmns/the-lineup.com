@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -20,7 +21,7 @@ const EventsPageRefactored = () => {
     return [...new Set(types)];
   }, [events]);
   
-  // Filter events by selected event types
+  // Filter events by selected event types - all selected by default
   const {
     selectedCategories,
     toggleCategory,
@@ -36,7 +37,7 @@ const EventsPageRefactored = () => {
       return [];
     }
     
-    // If all categories are selected, show all events
+    // If all categories are selected or selectedCategories matches allEventTypes length, show all events
     if (selectedCategories.length === allEventTypes.length) {
       return events;
     }

@@ -1,7 +1,6 @@
 
 import { useState } from 'react';
 import { DateRange } from 'react-day-picker';
-import { toast } from '@/hooks/use-toast';
 
 export const useEventFilterState = () => {
   const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
@@ -21,23 +20,19 @@ export const useEventFilterState = () => {
     setSelectedVenues([]);
     setDateRange(undefined);
     setSelectedDateFilter('');
-    toast({ title: "All filters reset" });
   };
 
   const handleRemoveEventType = (type: string) => {
     setSelectedEventTypes((prev) => prev.filter((t) => t !== type));
-    toast({ title: `Removed filter: ${type}` });
   };
 
   const handleRemoveVenue = (venue: string) => {
     setSelectedVenues((prev) => prev.filter((v) => v !== venue));
-    toast({ title: "Removed venue filter" });
   };
 
   const handleClearDateFilter = () => {
     setDateRange(undefined);
     setSelectedDateFilter('');
-    toast({ title: "Date filter cleared" });
   };
 
   return {
