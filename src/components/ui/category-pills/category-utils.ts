@@ -17,6 +17,9 @@ import {
   Tent 
 } from 'lucide-react';
 
+// Define the type for category icon mapping
+export type CategoryIconMapping = Record<string, React.ElementType>;
+
 // Get the correct icon component for each category
 export const getCategoryIcon = (category: string) => {
   const normalizedCategory = category?.toLowerCase() || 'event';
