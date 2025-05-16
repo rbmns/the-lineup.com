@@ -19,8 +19,11 @@ export const useEventFilterProcessor = (
 
   // Apply all filters and get displayEvents
   const displayEvents = useMemo(() => {
-    // Start with events that already have event type and venue filters applied
-    const baseEvents = filteredEvents.length > 0 ? filteredEvents : (events ? filterUpcomingEvents(events) : []);
+    // If we have filtered events, use those, otherwise use all upcoming events
+    // Important: filteredEvents is empty when no specific filters are applied (default state)
+    const baseEvents = filteredEvents.length > 0 ? 
+      filteredEvents : 
+      (events ? filterUpcomingEvents(events) : []);
     
     console.log("Base events count for filtering:", baseEvents.length);
     

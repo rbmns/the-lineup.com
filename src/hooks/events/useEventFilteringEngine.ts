@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Event } from '@/types'; 
-import { filterEventsByDate, filterEventsByDateRange } from '@/utils/date-filtering'; 
+import { filterEventsByDate } from '@/utils/date-filtering'; 
 
 interface UseEventFilteringEngineProps {
   events: Event[] | undefined;
@@ -35,16 +35,28 @@ export const useEventFilteringEngine = ({
     setIsFilterLoading(true);
     setShowNoExactMatchesMessage(false);
 
+    // Default state - show all events when no filters are actively selected
+    if (selectedEventTypes.length === 0 && selectedVenues.length === 0 && !selectedDateFilter && !dateRange) {
+      setExactMatches(events);
+      setShowNoExactMatchesMessage(false);
+      setIsFilterLoading(false);
+      return;
+    }
+
+    // Apply filters when they are actively selected
     const filteredEvents = events.filter(event => {
+      // Event type filter - if no types selected, show all events
       if (selectedEventTypes.length > 0 && event.event_type && !selectedEventTypes.includes(event.event_type)) {
         return false;
       }
+      
+      // Venue filter - if no venues selected, show all events
       if (selectedVenues.length > 0 && event.venues?.name && !selectedVenues.includes(event.venues.name)) {
         return false;
       }
       
-      // Use the filterEventsByDate function directly
-      if (selectedDateFilter || dateRange) {
+      // Date filter - only apply if a specific date filter is selected
+      if (selectedDateFilter || (dateRange && dateRange.from)) {
         const dateFilteredEvents = filterEventsByDate([event], selectedDateFilter, dateRange);
         return dateFilteredEvents.length > 0;
       }
