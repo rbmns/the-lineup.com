@@ -3,3 +3,6 @@
 interface Window {
   dataLayer?: any[];
 }
+
+// Make sure TypeScript knows about the global dataLayer variable
+declare var dataLayer: any[];
