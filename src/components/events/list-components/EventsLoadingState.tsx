@@ -4,12 +4,16 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export interface EventsLoadingStateProps {
   compact?: boolean;
+  numberOfSkeletons?: number;
 }
 
-export const EventsLoadingState: React.FC<EventsLoadingStateProps> = ({ compact = false }) => {
+export const EventsLoadingState: React.FC<EventsLoadingStateProps> = ({ 
+  compact = false,
+  numberOfSkeletons = 6 
+}) => {
   return (
     <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-      {[1, 2, 3, 4, 5, 6].map((index) => (
+      {Array.from({ length: numberOfSkeletons }).map((_, index) => (
         <div key={index} className="rounded-lg overflow-hidden shadow-sm">
           {/* Image skeleton */}
           <Skeleton className="w-full h-48" />

@@ -45,7 +45,10 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
 
   if (showLoading) {
     // Pass the compact prop to the loading state component
-    return <EventsLoadingState compact={compact} />;
+    return <EventsLoadingState 
+      compact={compact} 
+      numberOfSkeletons={6} 
+    />;
   }
 
   // Special case: No categories selected

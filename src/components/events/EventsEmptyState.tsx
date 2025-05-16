@@ -8,6 +8,7 @@ interface EventsEmptyStateProps {
   hasActiveFilters?: boolean;
   title?: string;
   message?: string;
+  description?: string;
   actionLabel?: string;
   noCategoriesSelected?: boolean;
 }
@@ -24,8 +25,12 @@ export const EventsEmptyState: React.FC<EventsEmptyStateProps> = ({
     : (hasActiveFilters 
       ? "Try adjusting your search filters to find more events." 
       : "There are no events to display at the moment."),
+  description,
   actionLabel = noCategoriesSelected ? "Show all events" : "Reset filters",
 }) => {
+  // Use description if provided, otherwise fall back to message
+  const displayMessage = description || message;
+  
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
       <div className="bg-gray-100 p-4 rounded-full mb-4">
@@ -33,7 +38,7 @@ export const EventsEmptyState: React.FC<EventsEmptyStateProps> = ({
       </div>
       
       <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>
-      <p className="text-gray-600 max-w-md mb-6">{message}</p>
+      <p className="text-gray-600 max-w-md mb-6">{displayMessage}</p>
       
       {(hasActiveFilters || noCategoriesSelected) && onResetFilters && (
         <Button onClick={onResetFilters} variant="default">
