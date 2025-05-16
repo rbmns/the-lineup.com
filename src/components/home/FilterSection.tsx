@@ -2,7 +2,7 @@
 import React from 'react';
 import { X, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { CategoryPill } from '@/components/ui/category-pill';
+import { CategoryPill } from '@/components/ui/category-pills';
 import { DateFilterPill } from '@/components/events/DateFilterPill';
 
 interface FilterSectionProps {

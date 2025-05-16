@@ -2,7 +2,7 @@
 import React from 'react';
 import { X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { CategoryPill } from '@/components/ui/category-pill';
+import { CategoryPill } from '@/components/ui/category-pills';
 import { cn } from '@/lib/utils';
 
 interface EventCategoryPillsProps {

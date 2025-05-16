@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Filter, X } from 'lucide-react';
 import { EventCategoryFilters } from './EventCategoryFilters';
@@ -10,7 +9,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { CategoryPill } from '@/components/ui/category-pill';
+import { CategoryPill } from '@/components/ui/category-pills';
 
 interface EventFilterBarProps {
   allEventTypes: string[];

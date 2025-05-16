@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { CategoryPill, AllCategoryPill } from '@/components/ui/category-pill';
+import { CategoryPill, AllCategoryPill } from '@/components/ui/category-pills';
 import { cn } from '@/lib/utils';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';

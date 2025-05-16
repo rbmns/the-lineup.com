@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { CategoryPill, AllCategoryPill } from './category-pill';
+import { CategoryPill, AllCategoryPill } from './category-pills';
 
 export const CategoryPillShowcase = () => {
   const eventTypes = [
