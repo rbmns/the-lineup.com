@@ -16,6 +16,7 @@ import { VenueFilter } from '@/components/events/VenueFilter';
 import { DateRange } from 'react-day-picker';
 import { useEventFilterState } from '@/hooks/events/useEventFilterState';
 import { filterEventsByDate, filterEventsByVenue } from '@/utils/eventUtils';
+import { EventsTeaser } from '@/components/events/EventsTeaser';
 
 const EventsPage = () => {
   // Add canonical URL for SEO - providing the path as required parameter
@@ -117,6 +118,13 @@ const EventsPage = () => {
     <div className="w-full px-4 md:px-6 py-8">
       <div className="max-w-7xl mx-auto">
         <EventsPageHeader title="What's Happening?" />
+        
+        {/* Show teaser for non-authenticated users */}
+        {!user && (
+          <div className="mt-6 mb-4">
+            <EventsTeaser />
+          </div>
+        )}
         
         {/* Filter section with fixed height */}
         <div className="mt-6 mb-8 relative">

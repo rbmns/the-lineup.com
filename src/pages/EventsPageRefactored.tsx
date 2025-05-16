@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -14,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { filterEventsByVenue } from '@/utils/eventUtils';
 import { filterEventsByDate } from '@/utils/eventUtils';
 import { supabase } from '@/lib/supabase';
+import { EventsTeaser } from '@/components/events/EventsTeaser';
 
 const EventsPageRefactored = () => {
   useEventPageMeta();
@@ -135,6 +137,13 @@ const EventsPageRefactored = () => {
     <div className="w-full px-4 md:px-6 py-8">
       <div className="max-w-7xl mx-auto">
         <EventsPageHeader title="What's Happening?" />
+        
+        {/* Show teaser for non-authenticated users */}
+        {!user && (
+          <div className="mt-6 mb-4">
+            <EventsTeaser />
+          </div>
+        )}
         
         <div className="mt-6 mb-2 flex flex-wrap justify-between items-center gap-4">
           {/* Category Pills in fixed height container */}
