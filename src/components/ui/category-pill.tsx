@@ -181,8 +181,7 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
     'lg': 'h-4.5 w-4.5 mr-2'
   };
   
-  // Opacity for inactive pills
-  const opacityClasses = active ? 'opacity-100' : 'opacity-80 hover:opacity-100';
+  // Remove opacity classes - pills should not have transparency
   
   // Interactive classes
   const interactiveClasses = onClick 
@@ -196,7 +195,6 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
         colorClasses,
         borderClasses,
         sizeClasses[size],
-        opacityClasses,
         interactiveClasses,
         className
       )}

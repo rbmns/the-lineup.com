@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Filter } from 'lucide-react';
+import { Filter, X } from 'lucide-react';
 import { EventCategoryFilters } from './EventCategoryFilters';
 import { Button } from '@/components/ui/button';
 import { 
@@ -36,6 +36,7 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
   className
 }) => {
   const [showMobileFilters, setShowMobileFilters] = React.useState(false);
+  const allSelected = allEventTypes.length === selectedEventTypes.length;
   
   return (
     <div className={cn("w-full", className)}>
@@ -68,14 +69,14 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
               >
                 <Filter className="h-4 w-4" />
                 <span>Filters</span>
-                {selectedEventTypes.length > 0 && selectedEventTypes.length < allEventTypes.length && (
+                {!allSelected && selectedEventTypes.length > 0 && (
                   <span className="bg-primary text-white rounded-full px-1.5 py-0.5 text-xs">
                     {selectedEventTypes.length}
                   </span>
                 )}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[280px] p-4">
+            <DropdownMenuContent align="end" className="w-[280px] p-4 bg-white">
               <EventCategoryFilters
                 allEventTypes={allEventTypes}
                 selectedEventTypes={selectedEventTypes}
@@ -108,7 +109,7 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
         </div>
         
         {/* Show selected filters in a scrollable row on mobile */}
-        {selectedEventTypes.length > 0 && selectedEventTypes.length < allEventTypes.length && (
+        {!allSelected && selectedEventTypes.length > 0 && (
           <div className="flex overflow-x-auto gap-2 pt-3 pb-1 -mx-2 px-2 snap-x scrollbar-hide">
             {selectedEventTypes.map(category => (
               <div 
