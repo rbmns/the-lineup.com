@@ -29,7 +29,7 @@ interface FriendCardProps {
   mutualFriends?: number;
 }
 
-const FriendCard: React.FC<FriendCardProps> = ({
+export const FriendCard: React.FC<FriendCardProps> = ({
   id,
   name,
   username,
@@ -174,4 +174,5 @@ const FriendCard: React.FC<FriendCardProps> = ({
   );
 };
 
+// Add default export as well for backward compatibility
 export default FriendCard;

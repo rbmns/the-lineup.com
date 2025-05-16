@@ -1,8 +1,7 @@
-
 import React from 'react';
+import EventFriendRsvps from '@/components/events/EventFriendRsvps';
 import { Event } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
-import { EventFriendRsvps } from '@/components/events/EventFriendRsvps';
 import { EventLocationInfo } from '@/components/events/EventLocationInfo';
 import { EventAttendeesList } from '@/components/events/EventAttendeesList';
 import { MapPin, Ticket, Globe, CalendarClock, Lock, UserPlus } from 'lucide-react';

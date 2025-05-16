@@ -70,10 +70,12 @@ export const DiscoverTabContent = ({
           {searchResults.map(profile => (
             <FriendCard
               key={profile.id}
-              profile={profile}
-              relationship="none"
+              id={profile.id}
+              name={profile.username || ''}
+              username={profile.username || ''}
+              avatarUrl={profile.avatar_url}
+              bio={profile.bio}
               onAddFriend={() => onAddFriend(profile.id)}
-              actionLabel="Send Request"
               pendingRequestIds={pendingRequestIds}
             />
           ))}

@@ -8,11 +8,11 @@ interface ProfileCardProps {
   // Add other props as needed
 }
 
-const ProfileCard: React.FC<ProfileCardProps> = ({ userId /* other props */ }) => {
+export const ProfileCard: React.FC<ProfileCardProps> = ({ userId /* other props */ }) => {
   const navigate = useNavigate();
   
   const handleProfileClick = () => {
-    // Fixed to use only 2 arguments instead of 4
+    // Using only 2 arguments for navigateToUserProfile
     navigateToUserProfile(navigate, userId);
   };
   

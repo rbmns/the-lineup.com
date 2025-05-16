@@ -4,7 +4,7 @@ import { Event } from '@/types';
 import { EventsList } from './EventsList';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-interface PrimaryResultsProps {
+export interface PrimaryResultsProps {
   events: Event[];
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   showRsvpButtons?: boolean;

@@ -70,14 +70,6 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
       <NoResultsFound 
         message={emptyMessage} 
         searchQuery={searchQuery}
-        // Add all the props that might be needed
-        events={[]}
-        isLoading={isLoading}
-        onRsvp={handleRsvp}
-        showRsvpButtons={showRsvpButtons}
-        visibleCount={visibleCount}
-        hasMore={hasMore}
-        onLoadMore={loadMore}
       />
     );
   }
