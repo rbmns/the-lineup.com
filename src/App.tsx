@@ -1,9 +1,8 @@
 
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import EventsPageRefactored from "./pages/EventsPageRefactored";
 import EventDetail from "./pages/EventDetail";
-import Index from "./pages/Index";
 import Layout from "./components/Layout";
 import Friends from "./pages/Friends";
 import UserProfilePage from "./pages/UserProfilePage"; 
@@ -18,8 +17,8 @@ const App: React.FC = () => {
     <AuthProvider>
       <ToastProvider>
         <Routes>
-          <Route index element={<Navigate to="/events" replace />} />
           <Route path="/" element={<Layout />}>
+            <Route index element={<Navigate to="/events" replace />} />
             <Route path="/events" element={<EventsPageRefactored />} />
             <Route path="/events/:id" element={<EventDetail />} />
             <Route path="/friends" element={<Friends />} />

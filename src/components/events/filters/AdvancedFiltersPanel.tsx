@@ -2,7 +2,6 @@
 import React from 'react';
 import { DateRange } from 'react-day-picker';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
@@ -13,8 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 interface AdvancedFiltersPanelProps {
   dateRange: DateRange | undefined;
   onDateRangeChange: (range: DateRange | undefined) => void;
-  selectedDateFilter: string;
-  onDateFilterChange: (filter: string) => void;
+  selectedDateFilter?: string;
+  onDateFilterChange?: (filter: string) => void;
   venues: Array<{ value: string, label: string }>;
   selectedVenues: string[];
   onVenueChange: (venues: string[]) => void;
@@ -27,6 +26,8 @@ interface AdvancedFiltersPanelProps {
 export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
   dateRange,
   onDateRangeChange,
+  selectedDateFilter,
+  onDateFilterChange,
   venues,
   selectedVenues,
   onVenueChange,

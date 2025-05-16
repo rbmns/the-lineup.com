@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { EventsList } from '@/components/events/EventsList';
+import { EventsList } from '@/components/events/list-components/EventsList';
 import { EventsLoadingState } from '@/components/events/list-components/EventsLoadingState';
 import { EventsEmptyState } from '@/components/events/EventsEmptyState';
 import { Event } from '@/types';
@@ -14,7 +14,7 @@ interface LazyEventsListProps {
   hasActiveFilters?: boolean;
   loadingEventId?: string | null;
   noCategoriesSelected?: boolean;
-  compact?: boolean; // Added compact prop to the interface
+  compact?: boolean;
 }
 
 export const LazyEventsList: React.FC<LazyEventsListProps> = ({
@@ -26,7 +26,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   hasActiveFilters = false,
   loadingEventId,
   noCategoriesSelected = false,
-  compact = false // Added with default value of false
+  compact = false
 }) => {
   // State to track if we should show loading state
   const [showLoading, setShowLoading] = useState(isLoading);
@@ -44,7 +44,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   }, [isLoading]);
 
   if (showLoading) {
-    return <EventsLoadingState />;
+    return <EventsLoadingState compact={compact} />;
   }
 
   // Special case: No categories selected
@@ -73,7 +73,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
         onRsvp={onRsvp}
         showRsvpButtons={showRsvpButtons}
         loadingEventId={loadingEventId}
-        compact={compact} // Pass the compact prop down to EventsList
+        compact={compact}
       />
       
       {/* If we have related events and they're different from main events, show them too */}
@@ -86,7 +86,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
             onRsvp={onRsvp}
             showRsvpButtons={showRsvpButtons}
             loadingEventId={loadingEventId}
-            compact={compact} // Pass the compact prop down to related events too
+            compact={compact}
           />
         </div>
       )}

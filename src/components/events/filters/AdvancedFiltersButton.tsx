@@ -40,10 +40,11 @@ export const AdvancedFiltersButton: React.FC<AdvancedFiltersButtonProps> = ({
     <Popover open={currentOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button 
-          variant="custom" 
+          variant={hasActiveFilters ? "secondary" : "outline"} 
           size="sm"
           className={cn(
-            "flex items-center gap-2 bg-black text-white hover:bg-gray-800", 
+            "flex items-center gap-2", 
+            hasActiveFilters && "bg-gray-100 border-gray-300",
             className
           )}
         >

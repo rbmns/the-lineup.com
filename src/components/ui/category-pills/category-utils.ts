@@ -1,6 +1,10 @@
 
 import { ReactElement } from 'react';
-import { Music, UtensilsCrossed, Tent, Dumbbell, WaterIcon, Users, Beach, MapIcon, Gamepad2, Yoga } from 'lucide-react';
+import { 
+  Music, UtensilsCrossed, Tent, Dumbbell, WaterIcon, Users, 
+  Beach, MapIcon, Gamepad2, Yoga, Palette, PartyPopper, 
+  Wind, Sparkles, BookOpen, Coffee
+} from 'lucide-react';
 
 export type CategoryIconMapping = {
   [key: string]: ReactElement;
@@ -19,6 +23,12 @@ export const getCategoryIcon = (category: string) => {
     'Market': MapIcon,
     'Game': Gamepad2,
     'Yoga': Yoga,
+    'Kite': Wind,
+    'Art': Palette,
+    'Party': PartyPopper,
+    'Wellness': Sparkles,
+    'Workshop': BookOpen,
+    'Coffee': Coffee
   };
   
   const Icon = iconMap[category] || MapIcon;
@@ -42,6 +52,9 @@ export const getCategoryColor = (category: string) => {
     'Wellness': 'bg-lime-500 hover:bg-lime-600',
     'Surf': 'bg-sky-500 hover:bg-sky-600',
     'Party': 'bg-rose-500 hover:bg-rose-600',
+    'Workshop': 'bg-teal-500 hover:bg-teal-600',
+    'Coffee': 'bg-amber-700 hover:bg-amber-800',
+    'Art': 'bg-fuchsia-500 hover:bg-fuchsia-600',
   };
   
   return colorMap[category] || 'bg-gray-500 hover:bg-gray-600';
