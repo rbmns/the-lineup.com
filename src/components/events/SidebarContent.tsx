@@ -135,7 +135,7 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({
                 <p className="text-gray-600 mb-1">Sign up to see who's attending this event</p>
                 <p className="text-sm text-gray-500">Join to connect with friends and discover events together</p>
               </div>
-              <div className="flex justify-start w-full">
+              <div className="flex justify-center w-full">
                 <Button 
                   className="bg-black hover:bg-gray-800 text-white font-medium"
                   onClick={handleSignUpClick}

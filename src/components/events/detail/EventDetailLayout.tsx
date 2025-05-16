@@ -97,7 +97,7 @@ export const EventDetailLayout: React.FC<EventDetailLayoutProps> = ({
         isMobile={isMobile} 
       />
       
-      {/* Mobile RSVP Footer */}
+      {/* Mobile RSVP Footer - non-sticky for non-authenticated users */}
       {isMobile && (
         isAuthenticated ? (
           <MobileRsvpFooter 
@@ -106,14 +106,20 @@ export const EventDetailLayout: React.FC<EventDetailLayoutProps> = ({
             onShare={() => setShareDialogOpen(true)}
           />
         ) : (
-          <div className="fixed bottom-0 left-0 right-0 p-3 bg-white border-t border-gray-200 shadow-lg z-30 flex justify-between items-center">
-            <Button 
-              onClick={() => navigate('/signup')} 
-              className="bg-black hover:bg-gray-800 text-white"
-              size="lg"
-            >
-              Sign up to see attendees
-            </Button>
+          <div className="p-4 mt-6 mb-10 bg-white border border-gray-200 rounded-lg shadow-sm">
+            <div className="flex flex-col items-center text-center mb-3">
+              <Lock className="h-8 w-8 text-gray-400 mb-2" />
+              <p className="text-sm font-medium mb-3">Sign up to see who's attending and RSVP to events</p>
+            </div>
+            <div className="flex justify-center">
+              <Button 
+                onClick={() => navigate('/signup')} 
+                className="bg-black hover:bg-gray-800 text-white"
+                size="lg"
+              >
+                Sign up to see attendees
+              </Button>
+            </div>
           </div>
         )
       )}
