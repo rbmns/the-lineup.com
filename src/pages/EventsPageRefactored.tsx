@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -37,14 +38,18 @@ const EventsPageRefactored: React.FC = () => {
   // For sidebar content
   const featuredEvents = useMemo(() => 
     events
-      .filter(event => event.is_featured)
+      .filter(event => event.tags?.includes('featured'))
       .slice(0, 4),
     [events]
   );
   
   const popularEvents = useMemo(() => 
     events
-      .sort((a, b) => (b.attendees_count || 0) - (a.attendees_count || 0))
+      .sort((a, b) => {
+        const aCount = (a.going_count || 0) + (a.interested_count || 0);
+        const bCount = (b.going_count || 0) + (b.interested_count || 0);
+        return bCount - aCount;
+      })
       .slice(0, 4),
     [events]
   );
