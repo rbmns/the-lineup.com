@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Event } from '@/types';
+import { Lock } from 'lucide-react';
 import { ShareDialog } from '@/components/events/share/ShareDialog';
 import { MainEventContent } from '@/components/events/MainEventContent';
 import { SidebarContent } from '@/components/events/SidebarContent';
