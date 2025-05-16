@@ -1,7 +1,7 @@
 
 import React, { useMemo } from 'react';
 import { Event } from '@/types';
-import { EventGrid } from './EventGrid';
+import { EventsList } from './EventsList';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface PrimaryResultsProps {
@@ -44,7 +44,7 @@ export const PrimaryResults: React.FC<PrimaryResultsProps> = ({
   return (
     <div className="space-y-8">
       {eventsBeforeTeaser.length > 0 && (
-        <EventGrid 
+        <EventsList 
           events={eventsBeforeTeaser}
           onRsvp={onRsvp}
           showRsvpButtons={showRsvpButtons}
@@ -59,7 +59,7 @@ export const PrimaryResults: React.FC<PrimaryResultsProps> = ({
       )}
       
       {eventsAfterTeaser.length > 0 && (
-        <EventGrid 
+        <EventsList 
           events={eventsAfterTeaser}
           onRsvp={onRsvp}
           showRsvpButtons={showRsvpButtons}

@@ -1,52 +1,64 @@
 
 import React from 'react';
-import { CalendarX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { FilterX } from 'lucide-react';
 
 export interface NoResultsFoundProps {
   message?: string;
   actionText?: string;
-  onAction?: () => void;
   showFiltersHint?: boolean;
-  searchQuery?: string;
   resetFilters?: () => void;
+  searchQuery?: string;
+  onAction?: () => void;
 }
 
 export const NoResultsFound: React.FC<NoResultsFoundProps> = ({
   message = "No events found",
-  actionText,
-  onAction,
+  actionText = "Clear filters",
   showFiltersHint = false,
+  resetFilters,
   searchQuery,
-  resetFilters
+  onAction
 }) => {
-  // Use searchQuery in the message if provided
-  const displayMessage = searchQuery 
-    ? `We couldn't find exact matches for "${searchQuery}".`
-    : message;
-    
-  // Use either the custom action or resetFilters
-  const handleAction = onAction || resetFilters;
-  const buttonText = actionText || "Clear all filters";
+  const handleAction = () => {
+    if (onAction) {
+      onAction();
+    } else if (resetFilters) {
+      resetFilters();
+    }
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 text-center">
-      <div className="h-16 w-16 bg-gray-100 flex items-center justify-center rounded-full mb-4">
-        <CalendarX className="h-8 w-8 text-gray-500" />
+    <div className="flex flex-col items-center justify-center py-20">
+      <div className="h-20 w-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+        <FilterX className="h-10 w-10 text-gray-400" />
       </div>
-      <h3 className="text-xl font-medium text-gray-900 mb-2">{displayMessage}</h3>
       
-      {showFiltersHint && (
-        <p className="text-gray-500 mb-4">
-          Try adjusting your filters to see more events.
+      <h2 className="text-2xl font-semibold text-gray-800 text-center">
+        {message}
+      </h2>
+      
+      {searchQuery && (
+        <p className="mt-2 text-gray-600 text-center">
+          No events matching "<span className="font-medium">{searchQuery}</span>"
         </p>
       )}
       
-      {handleAction && (
-        <Button onClick={handleAction} className="mt-4">
-          {buttonText}
+      {showFiltersHint && (
+        <p className="mt-2 text-gray-600 text-center max-w-md">
+          Try adjusting your filters or selecting different event categories
+        </p>
+      )}
+      
+      {(resetFilters || onAction) && (
+        <Button 
+          onClick={handleAction}
+          variant="outline" 
+          className="mt-6"
+        >
+          {actionText}
         </Button>
       )}
     </div>
   );
-}
+};

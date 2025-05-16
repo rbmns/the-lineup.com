@@ -21,7 +21,7 @@ export const EventsTeaser: React.FC<EventsTeaserProps> = ({ className }) => {
       component: 'events_teaser'
     });
     
-    // Navigate to login page with register mode and scroll to top
+    // Navigate to login page with register mode
     navigate('/login', { 
       state: { initialMode: 'register' } 
     });

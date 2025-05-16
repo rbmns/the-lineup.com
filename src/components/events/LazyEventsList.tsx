@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Event } from '@/types';
-import { EventsListLoading } from './list-components/EventsLoadingState';
+import { EventsLoadingState } from './list-components/EventsLoadingState';
 import { NoResultsFound } from './list-components/NoResultsFound';
 import { EventsEmptyState } from './list-components/EventsEmptyState';
 import { PrimaryResults } from './list-components/PrimaryResults';
@@ -47,7 +47,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   
   // Show loading state
   if (isLoading) {
-    return <EventsListLoading />;
+    return <EventsLoadingState />;
   }
   
   // Show message when no categories are selected
