@@ -32,7 +32,8 @@ export async function trackPageView(page: string) {
     const cookieConsent = localStorage.getItem('cookie-consent');
     if (cookieConsent === 'false') return;
 
-    const session = supabase.auth.session();
+    // Use the current API to get session information
+    const { data: { session } } = await supabase.auth.getSession();
     const userId = session?.user?.id || null;
     const sessionId = getOrCreateSessionId();
 
@@ -68,7 +69,8 @@ export async function trackEvent(eventName: string, eventData: Record<string, an
     const cookieConsent = localStorage.getItem('cookie-consent');
     if (cookieConsent === 'false') return;
 
-    const session = supabase.auth.session();
+    // Use the current API to get session information
+    const { data: { session } } = await supabase.auth.getSession();
     const userId = session?.user?.id || null;
     const sessionId = getOrCreateSessionId();
 
