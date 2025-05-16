@@ -114,7 +114,7 @@ export const EventDetailLayout: React.FC<EventDetailLayoutProps> = ({
             </div>
             <div className="flex justify-center">
               <Button 
-                onClick={() => navigate('/signup')} 
+                onClick={() => navigate('/login', { state: { initialMode: 'register' } })} 
                 className="bg-black hover:bg-gray-800 text-white"
                 size="lg"
               >

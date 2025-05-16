@@ -32,7 +32,7 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({
 
   // Handler for the sign up button
   const handleSignUpClick = () => {
-    navigate('/signup');
+    navigate('/login', { state: { initialMode: 'register' } });
   };
 
   return (
