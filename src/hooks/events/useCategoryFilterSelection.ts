@@ -4,22 +4,21 @@ import { toast } from '@/hooks/use-toast';
 export const useCategoryFilterSelection = (availableCategories: string[] = []) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   
-  // Initialize with all categories selected (empty array means "all")
+  // Initialize with all categories selected
   useEffect(() => {
     if (availableCategories.length > 0 && selectedCategories.length === 0) {
       setSelectedCategories([...availableCategories]);
     }
-  }, [availableCategories]);
+  }, [availableCategories, selectedCategories.length]);
 
   const toggleCategory = useCallback((category: string) => {
     setSelectedCategories(prev => {
       if (prev.includes(category)) {
-        // If it was the last selected category, select all instead
+        // If this is the last selected category, don't allow deselecting it
         if (prev.length === 1) {
           toast({ title: "At least one category must be selected" });
-          return availableCategories;
+          return prev;
         }
-        
         // Remove the category
         return prev.filter(c => c !== category);
       } else {
@@ -27,7 +26,7 @@ export const useCategoryFilterSelection = (availableCategories: string[] = []) =
         return [...prev, category];
       }
     });
-  }, [availableCategories]);
+  }, []);
 
   const selectAll = useCallback(() => {
     setSelectedCategories([...availableCategories]);
@@ -35,14 +34,16 @@ export const useCategoryFilterSelection = (availableCategories: string[] = []) =
   }, [availableCategories]);
 
   const deselectAll = useCallback(() => {
-    // Keep all (treat as showing all categories)
-    setSelectedCategories([...availableCategories]);
-    toast({ title: "All categories selected" });
+    if (availableCategories.length > 0) {
+      // Keep one category selected
+      setSelectedCategories([availableCategories[0]]);
+      toast({ title: "Showing only " + availableCategories[0] });
+    }
   }, [availableCategories]);
 
   const reset = useCallback(() => {
     setSelectedCategories([...availableCategories]);
-    toast({ title: "Categories reset to default" });
+    toast({ title: "Filters reset to default" });
   }, [availableCategories]);
 
   return {

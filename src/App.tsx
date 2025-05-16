@@ -18,7 +18,7 @@ const App: React.FC = () => {
     <AuthProvider>
       <ToastProvider>
         <Routes>
-          <Route index element={<Index />} />
+          <Route index element={<Navigate to="/events" replace />} />
           <Route path="/" element={<Layout />}>
             <Route path="/events" element={<EventsPageRefactored />} />
             <Route path="/events/:id" element={<EventDetail />} />
@@ -28,7 +28,7 @@ const App: React.FC = () => {
             <Route path="/profile/edit" element={<ProfileEdit />} />
             <Route path="/login" element={<Login />} />
             <Route path="/design-system" element={<DesignSystem />} />
-            <Route path="*" element={<EventsPageRefactored />} />
+            <Route path="*" element={<Navigate to="/events" replace />} />
           </Route>
         </Routes>
       </ToastProvider>
