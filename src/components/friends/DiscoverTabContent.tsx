@@ -73,7 +73,7 @@ export const DiscoverTabContent = ({
               id={profile.id}
               name={profile.username || ''}
               username={profile.username || ''}
-              avatarUrl={profile.avatar_url ? profile.avatar_url : null}
+              avatarUrl={profile.avatar_url && profile.avatar_url.length > 0 ? profile.avatar_url[0] : null}
               onAddFriend={() => onAddFriend(profile.id)}
               isPending={pendingRequestIds.includes(profile.id)}
               pendingFriendIds={pendingRequestIds}
