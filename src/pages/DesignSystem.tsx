@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button"
 import {
@@ -11,11 +12,17 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/use-toast"
+import { CategoryPillShowcase } from "@/components/ui/CategoryPillShowcase"
 
 export default function DesignSystem() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">Design System</h1>
+      
+      {/* Add the Category Pills Showcase */}
+      <section className="mb-12 p-6 bg-white rounded-lg shadow">
+        <CategoryPillShowcase />
+      </section>
 
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-2">Buttons</h2>

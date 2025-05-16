@@ -1,9 +1,8 @@
 
 import React from 'react';
-import { CategoryPill } from '@/components/ui/category-pill';
-import { Button } from '@/components/ui/button';
-import { Check, X } from 'lucide-react';
+import { CategoryPill, AllCategoryPill } from '@/components/ui/category-pill';
 import { cn } from '@/lib/utils';
+import { toast } from '@/components/ui/use-toast';
 
 interface EventCategoryFiltersProps {
   allEventTypes: string[];
@@ -26,50 +25,36 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
 }) => {
   const allSelected = allEventTypes.length > 0 && allEventTypes.length === selectedEventTypes.length;
   const noneSelected = selectedEventTypes.length === 0;
-  const someSelected = selectedEventTypes.length > 0 && !allSelected;
   
   // If no filters are selected (empty array), treat as "all selected" for UX purposes
   const effectiveSelectedTypes = noneSelected ? allEventTypes : selectedEventTypes;
+  
+  // Handle the "All" pill click
+  const handleAllClick = () => {
+    if (allSelected) {
+      onDeselectAll();
+      toast({ title: "Showing specific categories only" });
+    } else {
+      onSelectAll();
+      toast({ title: "Showing all categories" });
+    }
+  };
   
   return (
     <div className={cn("space-y-4", className)}>
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-medium">Event Categories</h3>
-        
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={allSelected ? onDeselectAll : onSelectAll}
-            className="text-sm h-8 px-3 py-1"
-          >
-            {allSelected ? (
-              <>
-                <X className="h-3.5 w-3.5 mr-1.5" />
-                <span>Deselect All</span>
-              </>
-            ) : (
-              <>
-                <Check className="h-3.5 w-3.5 mr-1.5" />
-                <span>Select All</span>
-              </>
-            )}
-          </Button>
-          
-          {someSelected && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={onReset}
-              className="text-sm h-8 px-3 py-1"
-            >
-              <span>Reset</span>
-            </Button>
-          )}
-        </div>
       </div>
       
       <div className="flex flex-wrap gap-2">
+        {/* Add an "All" filter option */}
+        <AllCategoryPill
+          active={allSelected}
+          onClick={handleAllClick}
+          size="default"
+        />
+
+        {/* Show the category pills */}
         {allEventTypes.map((category) => (
           <CategoryPill
             key={category}
