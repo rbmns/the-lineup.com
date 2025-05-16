@@ -45,7 +45,7 @@ export const UserRsvpedEvents: React.FC<UserRsvpedEventsProps> = ({
 
   // Direct event navigation using utility
   const handleEventClick = useCallback((eventId: string) => {
-    navigateToEvent(eventId, navigate);
+    navigateToEvent(navigate, eventId);
   }, [navigate]);
 
   if (isLoading || loading) {

@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { LoginForm } from '@/components/auth/LoginForm';

@@ -1,176 +1,122 @@
-
-import React, { useState } from 'react';
-import { UsersRound, Lock } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { navigateToUserProfile } from '@/utils/navigationUtils';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { getInitials } from '@/utils/stringUtils';
+import { Users } from 'lucide-react';
 
-interface User {
+interface Friend {
   id: string;
-  username?: string;
-  avatar_url?: string[];
+  username: string;
+  full_name?: string;
+  avatar_url?: string;
 }
 
 interface EventFriendRsvpsProps {
-  going: User[];
-  interested: User[];
-  className?: string;
-  isAuthenticated?: boolean;
+  friends: Friend[];
+  isLoading?: boolean;
+  title?: string;
+  emptyMessage?: string;
+  maxDisplay?: number;
+  showViewAllButton?: boolean;
+  onViewAllClick?: () => void;
 }
 
-export const EventFriendRsvps: React.FC<EventFriendRsvpsProps> = ({ 
-  going = [], 
-  interested = [],
-  className = '',
-  isAuthenticated = true
+const EventFriendRsvps: React.FC<EventFriendRsvpsProps> = ({
+  friends,
+  isLoading = false,
+  title = "Friends attending",
+  emptyMessage = "None of your friends are attending yet",
+  maxDisplay = 5,
+  showViewAllButton = false,
+  onViewAllClick
 }) => {
-  const isMobile = useIsMobile();
   const navigate = useNavigate();
-  const [isGoingDialogOpen, setIsGoingDialogOpen] = useState(false);
-  const [isInterestedDialogOpen, setIsInterestedDialogOpen] = useState(false);
   
-  // If not authenticated, don't show anything
-  if (!isAuthenticated) {
-    return null;
-  }
-  
-  // Return null if no attendees
-  if (going.length === 0 && interested.length === 0) {
-    return null;
-  }
-  
-  // Get display name for a user
-  const getDisplayName = (user: User): string => {
-    return user.username || 'Anonymous';
+  // Handle profile navigation
+  const handleProfileClick = (userId: string) => {
+    navigateToUserProfile(navigate, userId);
   };
   
-  // Get avatar URL for a user (first one if multiple)
-  const getAvatarUrl = (user: User): string | undefined => {
-    if (user.avatar_url && Array.isArray(user.avatar_url) && user.avatar_url.length > 0) {
-      return user.avatar_url[0];
-    }
-    return undefined;
-  };
-  
-  // Get initials for avatar fallback
-  const getInitials = (name: string): string => {
-    return name.substring(0, 2).toUpperCase();
-  };
-  
-  // Handle clicking on a user avatar/name
-  const handleUserClick = (userId: string) => {
-    navigateToUserProfile(userId, navigate);
-  };
-  
-  const renderAttendeeAvatars = (users: User[], status: string) => {
-    if (users.length === 0) return null;
-    
+  // Display loading state
+  if (isLoading) {
     return (
-      <div className="space-y-1.5">
-        <h4 className="text-sm font-medium text-gray-500 mb-2 flex items-center">
-          <UsersRound className="mr-1.5 h-4 w-4" /> 
-          {status === 'going' ? 'Going' : 'Interested'} 
-          <Badge variant="secondary" className="ml-2 text-xs py-0 px-2">
-            {users.length}
-          </Badge>
-        </h4>
-        
-        <div className="flex items-center">
-          <div className="flex -space-x-2 mr-2 overflow-hidden">
-            {users.slice(0, 5).map((user) => (
-              <TooltipProvider key={user.id} delayDuration={300}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Avatar 
-                      className="h-8 w-8 border-2 border-white cursor-pointer hover:opacity-80 transition-opacity"
-                      onClick={() => handleUserClick(user.id)}
-                    >
-                      <AvatarImage src={getAvatarUrl(user)} alt={getDisplayName(user)} />
-                      <AvatarFallback className="text-xs bg-gray-200">
-                        {getInitials(getDisplayName(user))}
-                      </AvatarFallback>
-                    </Avatar>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" className="bg-white border border-gray-200 shadow-md z-50">
-                    <p className="font-medium">{getDisplayName(user)}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            ))}
-          </div>
-          
-          {users.length > 5 && (
-            <button 
-              onClick={() => status === 'going' ? setIsGoingDialogOpen(true) : setIsInterestedDialogOpen(true)}
-              className="h-8 flex items-center justify-center bg-gray-100 text-gray-700 text-xs font-medium rounded-full px-3 hover:bg-gray-200 transition-colors"
-            >
-              +{users.length - 5} more
-            </button>
-          )}
+      <div className="mt-4">
+        <h3 className="text-sm font-medium mb-3 flex items-center">
+          <Users className="h-4 w-4 mr-1.5" />
+          {title}
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          {[...Array(3)].map((_, i) => (
+            <Skeleton key={i} className="h-8 w-8 rounded-full" />
+          ))}
         </div>
       </div>
     );
-  };
-
-  const renderAttendeesList = (users: User[], title: string) => {
+  }
+  
+  // No friends attending
+  if (!friends || friends.length === 0) {
     return (
-      <div className="space-y-4 py-2">
-        {users.map((user) => (
-          <div 
-            key={user.id} 
-            className="flex items-center p-3 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-            onClick={() => handleUserClick(user.id)}
-          >
-            <Avatar className="h-10 w-10 mr-3">
-              <AvatarImage src={getAvatarUrl(user)} alt={getDisplayName(user)} />
-              <AvatarFallback className="bg-gray-200">
-                {getInitials(getDisplayName(user))}
-              </AvatarFallback>
-            </Avatar>
-            <span className="font-medium">{getDisplayName(user)}</span>
-          </div>
-        ))}
+      <div className="mt-4">
+        <h3 className="text-sm font-medium mb-3 flex items-center">
+          <Users className="h-4 w-4 mr-1.5" />
+          {title}
+        </h3>
+        <Card className="bg-gray-50 border-gray-100">
+          <CardContent className="p-3 text-center text-sm text-gray-500">
+            {emptyMessage}
+          </CardContent>
+        </Card>
       </div>
     );
-  };
-
+  }
+  
+  // Limit the number of friends displayed
+  const displayFriends = friends.slice(0, maxDisplay);
+  const hasMore = friends.length > maxDisplay;
+  
   return (
-    <div className={`space-y-4 ${className}`}>
-      <h3 className="text-md font-semibold mb-3">Friends Attending</h3>
+    <div className="mt-4">
+      <h3 className="text-sm font-medium mb-3 flex items-center">
+        <Users className="h-4 w-4 mr-1.5" />
+        {title} {friends.length > 0 && <span className="text-gray-500 ml-1">({friends.length})</span>}
+      </h3>
       
-      {renderAttendeeAvatars(going, 'going')}
-      {renderAttendeeAvatars(interested, 'interested')}
+      <div className="flex flex-wrap gap-2">
+        {displayFriends.map((friend) => (
+          <Avatar 
+            key={friend.id}
+            className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-offset-2 hover:ring-primary transition-all"
+            onClick={() => handleProfileClick(friend.id)}
+          >
+            <AvatarImage src={friend.avatar_url || ''} alt={friend.username} />
+            <AvatarFallback className="text-xs bg-primary/10 text-primary">
+              {getInitials(friend.full_name || friend.username)}
+            </AvatarFallback>
+          </Avatar>
+        ))}
+        
+        {hasMore && !showViewAllButton && (
+          <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-xs text-gray-600 font-medium">
+            +{friends.length - maxDisplay}
+          </div>
+        )}
+      </div>
       
-      {/* Dialog for showing full list of users who are going */}
-      <Dialog open={isGoingDialogOpen} onOpenChange={setIsGoingDialogOpen}>
-        <DialogContent className="max-h-[80vh] overflow-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center">
-              <UsersRound className="mr-2 h-5 w-5" />
-              Friends Going ({going.length})
-            </DialogTitle>
-          </DialogHeader>
-          {renderAttendeesList(going, 'Going')}
-        </DialogContent>
-      </Dialog>
-      
-      {/* Dialog for showing full list of users who are interested */}
-      <Dialog open={isInterestedDialogOpen} onOpenChange={setIsInterestedDialogOpen}>
-        <DialogContent className="max-h-[80vh] overflow-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center">
-              <UsersRound className="mr-2 h-5 w-5" />
-              Friends Interested ({interested.length})
-            </DialogTitle>
-          </DialogHeader>
-          {renderAttendeesList(interested, 'Interested')}
-        </DialogContent>
-      </Dialog>
+      {showViewAllButton && hasMore && (
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="mt-2 text-xs h-7 px-2"
+          onClick={onViewAllClick}
+        >
+          View all {friends.length} friends
+        </Button>
+      )}
     </div>
   );
 };

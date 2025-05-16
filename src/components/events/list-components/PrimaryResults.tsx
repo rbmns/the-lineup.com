@@ -12,6 +12,11 @@ interface PrimaryResultsProps {
   renderTeaserAfterRow?: number | false;
   teaser?: React.ReactNode;
   showTeaser?: boolean;
+  searchQuery?: string;  // Add this property to match FilteredEventsList usage
+  isLoading?: boolean;   // Add this property to match FilteredEventsList usage
+  visibleCount?: number; // Add this property to match FilteredEventsList usage
+  hasMore?: boolean;     // Add this property to match FilteredEventsList usage
+  onLoadMore?: () => void; // Add this property to match FilteredEventsList usage
 }
 
 export const PrimaryResults: React.FC<PrimaryResultsProps> = ({ 
@@ -21,7 +26,12 @@ export const PrimaryResults: React.FC<PrimaryResultsProps> = ({
   loadingEventId,
   renderTeaserAfterRow = false,
   teaser,
-  showTeaser = false
+  showTeaser = false,
+  searchQuery,
+  isLoading,
+  visibleCount,
+  hasMore,
+  onLoadMore
 }) => {
   const isMobile = useIsMobile();
   
