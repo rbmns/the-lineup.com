@@ -1,199 +1,237 @@
 
 import React from 'react';
+import { UserProfile } from '@/types';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useAuth } from '@/contexts/AuthContext';
+import { useFriendship } from '@/hooks/useFriendship';
+import { toast } from '@/hooks/use-toast';
+import { Card } from '@/components/ui/card';
+import { UserProfileWithFriendship } from '@/types/friends-extended';
 import { useNavigate } from 'react-router-dom';
 import { navigateToUserProfile } from '@/utils/navigationUtils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { UserPlus, UserMinus, UserCheck, MessageSquare } from 'lucide-react';
-import { cn } from '@/lib/utils';
-
-// Create a utility function to get initials
-const getInitials = (name: string): string => {
-  return name
-    .split(' ')
-    .map(part => part[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
-};
+import { isProfileClickable } from '@/utils/friendshipUtils';
+import { MapPin } from 'lucide-react';
+import { FriendCardButtons } from '@/components/friends/FriendCardButtons';
+import { StatusBadgeRenderer } from '@/components/friends/StatusBadgeRenderer';
+import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 
 interface FriendCardProps {
-  id: string;
-  name: string;
-  username: string;
+  // Updated to accept either a profile object or individual properties
+  profile?: UserProfile | UserProfileWithFriendship;
+  // Individual properties for when called with separate props
+  id?: string;
+  username?: string;
   avatarUrl?: string;
-  bio?: string;
-  isFriend?: boolean;
-  isPending?: boolean;
-  isCurrentUser?: boolean;
-  onAddFriend?: (userId: string) => void;
-  onRemoveFriend?: (userId: string) => void;
-  onCancelRequest?: (userId: string) => void;
-  onMessage?: (userId: string) => void;
-  className?: string;
-  showActions?: boolean;
-  compact?: boolean;
-  mutualFriends?: number;
+  status?: string;
+  showStatus?: boolean;
+  linkToProfile?: boolean;
+  friendshipStatus?: 'none' | 'pending' | 'accepted';
+  relationship?: string;
   pendingRequestIds?: string[];
-  pendingFriendIds?: string[];
+  onAddFriend?: (id: string) => void;
+  onAction?: () => void;
+  onSecondaryAction?: () => void;
+  actionLabel?: string;
+  secondaryActionLabel?: string;
 }
 
 export const FriendCard: React.FC<FriendCardProps> = ({
+  profile,
   id,
-  name,
   username,
   avatarUrl,
-  bio,
-  isFriend = false,
-  isPending = false,
-  isCurrentUser = false,
+  status,
+  showStatus = true,
+  linkToProfile = true,
+  friendshipStatus = 'none',
+  relationship,
+  pendingRequestIds = [],
   onAddFriend,
-  onRemoveFriend,
-  onCancelRequest,
-  onMessage,
-  className = '',
-  showActions = true,
-  compact = false,
-  mutualFriends = 0,
-  pendingRequestIds,
-  pendingFriendIds
+  onAction,
+  onSecondaryAction,
+  actionLabel,
+  secondaryActionLabel
 }) => {
+  const isMobile = useIsMobile();
+  const { user } = useAuth();
+  const { 
+    initiateFriendRequest, 
+    acceptFriendRequest: acceptFriendshipRequest, 
+    declineFriendRequest: declineFriendshipRequest,
+    isLoading 
+  } = useFriendship();
   const navigate = useNavigate();
   
-  // Check if this user is in the pending requests list
-  const isPendingRequest = React.useMemo(() => {
-    if (isPending) return true;
-    if (pendingRequestIds?.includes(id)) return true;
-    if (pendingFriendIds?.includes(id)) return true;
-    return false;
-  }, [id, isPending, pendingRequestIds, pendingFriendIds]);
+  // Use either passed individual props or extract from profile object
+  const profileId = id || profile?.id;
+  const profileUsername = username || profile?.username || 'Anonymous User';
+  const profileAvatarUrl = avatarUrl || profile?.avatar_url;
+  const profileStatus = status || profile?.status;
   
-  const handleProfileClick = () => {
-    navigateToUserProfile(navigate, id);
+  // Create a profile object for components that need it
+  const profileObj = profile || {
+    id: profileId,
+    username: profileUsername,
+    avatar_url: profileAvatarUrl,
+    status: profileStatus
   };
   
-  const handleAddFriend = (e: React.MouseEvent) => {
+  const isCurrentUser = user?.id === profileId;
+  
+  // Check if profile should be clickable
+  const canNavigateToProfile = linkToProfile && isProfileClickable(friendshipStatus, isCurrentUser);
+  
+  // Improved navigation function using our utility
+  const navigateToProfile = (e: React.MouseEvent | React.KeyboardEvent) => {
+    if (!profileId || !canNavigateToProfile) return;
+    
+    // Stop propagation and prevent default to avoid any parent handling
     e.stopPropagation();
-    if (onAddFriend) onAddFriend(id);
+    e.preventDefault();
+    
+    console.log(`FriendCard: Navigating to profile: ${profileId} (at ${new Date().toISOString()})`);
+    console.log("FriendCard: Event target:", e.target);
+    console.log("FriendCard: Current URL:", window.location.href);
+    
+    navigateToUserProfile(profileId, navigate, friendshipStatus, isCurrentUser);
+  };
+
+  const handleAddFriend = (id: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to add friends",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (onAddFriend) {
+      // Use the prop function if available
+      onAddFriend(id);
+    } else {
+      // Otherwise use the hook
+      initiateFriendRequest(id)
+        .then(success => {
+          if (success) {
+            toast({
+              title: "Friend request sent",
+              description: `Friend request sent to ${profileUsername}`,
+              variant: "default"
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error sending friend request:', error);
+          toast({
+            title: "Error",
+            description: "Failed to send friend request",
+            variant: "destructive"
+          });
+        });
+    }
   };
   
-  const handleRemoveFriend = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onRemoveFriend) onRemoveFriend(id);
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if ((e.key === 'Enter' || e.key === ' ') && canNavigateToProfile) {
+      navigateToProfile(e);
+    }
   };
   
-  const handleCancelRequest = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onCancelRequest) onCancelRequest(id);
+  // Wrapper functions to handle different return types from acceptFriendRequest and declineFriendRequest
+  const acceptFriendRequest = async (id: string): Promise<void> => {
+    try {
+      await acceptFriendshipRequest(id);
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+    }
   };
   
-  const handleMessage = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (onMessage) onMessage(id);
+  const declineFriendRequest = async (id: string): Promise<void> => {
+    try {
+      await declineFriendshipRequest(id);
+    } catch (error) {
+      console.error('Error declining friend request:', error);
+    }
   };
   
+  // Handle actions passed via props
+  const handleAction = () => {
+    if (onAction) {
+      onAction();
+    } else if (relationship === 'none' && profileId) {
+      handleAddFriend(profileId);
+    }
+  };
+  
+  // Determine card styling based on clickability
+  const cardCursorClass = canNavigateToProfile ? 
+    'overflow-hidden transition-all duration-300 p-4 flex flex-col h-full border-gray-200 hover:shadow-md cursor-pointer active:translate-y-0.5' : 
+    'overflow-hidden transition-all duration-300 p-4 flex flex-col h-full border-gray-200';
+
   return (
     <Card 
-      className={cn(
-        "border border-gray-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer",
-        compact ? "p-2" : "p-4",
-        className
-      )}
-      onClick={handleProfileClick}
+      className={cardCursorClass}
+      onClick={canNavigateToProfile ? navigateToProfile : undefined}
+      role={canNavigateToProfile ? "link" : undefined}
+      aria-label={canNavigateToProfile ? `View ${profileUsername}'s profile` : undefined}
+      tabIndex={canNavigateToProfile ? 0 : undefined}
+      onKeyDown={canNavigateToProfile ? handleKeyDown : undefined}
+      data-profile-id={profileId}
     >
-      <CardContent className="p-0">
-        <div className="flex items-center gap-3">
-          <Avatar className={cn(compact ? "h-10 w-10" : "h-12 w-12")}>
-            <AvatarImage src={avatarUrl} alt={name} />
-            <AvatarFallback>{getInitials(name)}</AvatarFallback>
-          </Avatar>
-          
-          <div className="flex-grow min-w-0">
-            <div className="flex items-center gap-2">
-              <h3 className={cn(
-                "font-medium text-gray-900 truncate",
-                compact ? "text-sm" : "text-base"
-              )}>
-                {name}
+      <div className="flex items-center justify-between flex-1">
+        <div className="flex items-center space-x-3 min-w-0">
+          <div className="flex-shrink-0">
+            <ProfileAvatar
+              profile={profileObj}
+              size={isMobile ? "sm" : "md"}
+              className="shadow-md"
+            />
+          </div>
+
+          <div className="flex-1 min-w-0 truncate">
+            <div className="text-black transition-colors">
+              <h3 className={`font-medium truncate ${canNavigateToProfile ? 'text-gray-800 font-inter hover:underline' : 'text-gray-800 font-inter'}`}>
+                {profileUsername}
               </h3>
-              
-              {isCurrentUser && (
-                <Badge variant="outline" className="text-xs bg-gray-100 text-gray-600">
-                  You
-                </Badge>
-              )}
             </div>
-            
-            <p className={cn(
-              "text-gray-500 truncate",
-              compact ? "text-xs" : "text-sm"
-            )}>
-              @{username}
-            </p>
-            
-            {mutualFriends > 0 && (
-              <p className="text-xs text-purple-600 mt-1">
-                {mutualFriends} mutual {mutualFriends === 1 ? 'friend' : 'friends'}
-              </p>
+
+            {/* Location info from profile */}
+            {profile?.location && (
+              <div className="flex items-center text-xs text-gray-600 truncate font-inter">
+                <MapPin className="h-3 w-3 mr-1 text-purple flex-shrink-0" />
+                <span className="truncate">{profile.location}</span>
+              </div>
+            )}
+
+            {showStatus && profileStatus && (
+              <div className="flex items-center mt-2">
+                <StatusBadgeRenderer status={profileStatus} />
+              </div>
             )}
           </div>
-          
-          {showActions && !isCurrentUser && (
-            <div className="flex items-center gap-2">
-              {isFriend ? (
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 text-xs"
-                    onClick={handleMessage}
-                  >
-                    <MessageSquare className="h-3.5 w-3.5 mr-1" />
-                    Message
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-gray-500"
-                    onClick={handleRemoveFriend}
-                  >
-                    <UserMinus className="h-4 w-4" />
-                  </Button>
-                </>
-              ) : isPendingRequest ? (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 text-xs"
-                  onClick={handleCancelRequest}
-                >
-                  <UserCheck className="h-3.5 w-3.5 mr-1" />
-                  Pending
-                </Button>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-8 text-xs"
-                  onClick={handleAddFriend}
-                >
-                  <UserPlus className="h-3.5 w-3.5 mr-1" />
-                  Add Friend
-                </Button>
-              )}
-            </div>
-          )}
         </div>
-        
-        {bio && !compact && (
-          <p className="text-sm text-gray-600 mt-3 line-clamp-2">{bio}</p>
-        )}
-      </CardContent>
+
+        {/* Use either the relationship pattern with the FriendCardButtons component, or direct action buttons */}
+        {profileId && relationship ? (
+          <FriendCardButtons
+            profileId={profileId}
+            username={profileUsername}
+            isCurrentUser={isCurrentUser}
+            friendshipStatus={friendshipStatus}
+            isLoading={isLoading} 
+            pendingRequestIds={pendingRequestIds}
+            onAddFriend={handleAddFriend}
+            onAcceptRequest={acceptFriendRequest}
+            onDeclineRequest={declineFriendRequest}
+            relationship={relationship}
+            onAction={onAction}
+            onSecondaryAction={onSecondaryAction}
+            actionLabel={actionLabel}
+            secondaryActionLabel={secondaryActionLabel}
+          />
+        ) : null}
+      </div>
     </Card>
   );
 };
-
-// Add default export as well for backward compatibility
-export default FriendCard;

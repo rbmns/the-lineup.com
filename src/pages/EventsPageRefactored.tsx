@@ -1,214 +1,242 @@
-
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { Event } from '@/types';
-import { LazyEventsList } from '@/components/events/LazyEventsList';
-import EventsHeader from '@/components/events/list-components/EventsHeader';
-import EventsFilters from '@/components/events/list-components/EventsFilters';
-import { EventsEmptyState } from '@/components/events/EventsEmptyState';
-import EventsSignUpTeaser from '@/components/events/list-components/EventsSignUpTeaser';
-import { useEventRSVP } from '@/hooks/useEventRSVP'; // Updated import with correct casing
 import { useEvents } from '@/hooks/useEvents';
-import { useCategories } from '@/hooks/useCategories';
-import { useFilters } from '@/hooks/useFilters';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { filterEvents } from '@/utils/event-filters';
-import EventsSidebar from '@/components/events/EventsSidebar';
-import EventsPageSkeleton from '@/components/events/EventsPageSkeleton';
+import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp';
+import { EventsPageHeader } from '@/components/events/EventsPageHeader';
+import { LazyEventsList } from '@/components/events/LazyEventsList';
+import { EventFilterBar } from '@/components/events/filters/EventFilterBar';
+import { useCategoryFilterSelection } from '@/hooks/useCategoryFilterSelection';
+import { useEventPageMeta } from '@/components/events/EventsPageMeta';
+import { useEventFilterState } from '@/hooks/events/useEventFilterState';
+import { AdvancedFiltersButton } from '@/components/events/filters/AdvancedFiltersButton';
+import { AdvancedFiltersPanel } from '@/components/events/filters/AdvancedFiltersPanel';
 import { Button } from '@/components/ui/button';
-import { PlusIcon } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { filterEventsByVenue } from '@/utils/eventUtils';
+import { filterEventsByDate } from '@/utils/eventUtils';
+import { supabase } from '@/lib/supabase';
+import { EventsTeaser } from '@/components/events/EventsTeaser';
 
-const EventsPageRefactored: React.FC = () => {
-  const { user, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { toast } = useToast();
-  const isMobile = useIsMobile();
+const EventsPageRefactored = () => {
+  useEventPageMeta();
   
-  // Get events data
-  const { 
-    data: events = [], 
-    isLoading: eventsLoading,
-    error: eventsError,
-    refetch: refreshEvents
-  } = useEvents();
+  const { user } = useAuth();
+  const { data: events = [], isLoading: eventsLoading } = useEvents(user?.id);
+  const [venues, setVenues] = useState<Array<{ value: string, label: string }>>([]);
+  const [isVenuesLoading, setIsVenuesLoading] = useState(true);
   
-  // For sidebar content
-  const featuredEvents = useMemo(() => 
-    events
-      .filter(event => event.tags?.includes('featured'))
-      .slice(0, 4),
-    [events]
-  );
+  // Get all unique event types from events
+  const allEventTypes = React.useMemo(() => {
+    const types = events.map(event => event.event_type).filter(Boolean);
+    return [...new Set(types)];
+  }, [events]);
   
-  const popularEvents = useMemo(() => 
-    events
-      .sort((a, b) => {
-        const aCount = (a.going_count || 0) + (a.interested_count || 0);
-        const bCount = (b.going_count || 0) + (b.interested_count || 0);
-        return bCount - aCount;
-      })
-      .slice(0, 4),
-    [events]
-  );
-  
-  // Get categories for filters
-  const { categories, isLoading: categoriesLoading } = useCategories();
-  
-  // RSVP functionality
-  const { handleRsvp, loadingEventId } = useEventRSVP({
-    onSuccess: () => {
-      refreshEvents();
-    }
-  });
-  
-  // Filter state management
+  // Event filter state management
   const {
-    activeFilters,
-    setActiveFilters,
+    selectedEventTypes,
+    setSelectedEventTypes,
+    selectedVenues,
+    setSelectedVenues,
+    dateRange,
+    setDateRange,
+    selectedDateFilter,
+    setSelectedDateFilter,
+    isFilterLoading,
+    showAdvancedFilters,
+    setShowAdvancedFilters,
     hasActiveFilters,
-    handleFilterChange,
-    handleClearFilters,
-    handleSearchChange,
-    searchQuery
-  } = useFilters();
+    hasAdvancedFilters,
+    resetFilters,
+    handleRemoveEventType,
+    handleRemoveVenue,
+    handleClearDateFilter
+  } = useEventFilterState();
   
-  // Apply filters to events
-  const filteredEvents = useMemo(() => {
-    if (!events) return [];
-    return filterEvents(events, activeFilters, searchQuery);
-  }, [events, activeFilters, searchQuery]);
+  // Filter events by selected event types - all selected by default
+  const {
+    selectedCategories,
+    toggleCategory,
+    selectAll,
+    deselectAll,
+    reset
+  } = useCategoryFilterSelection(allEventTypes);
   
-  // Determine if we should show the signup teaser
-  const showSignUpTeaser = !isAuthenticated && !eventsLoading && filteredEvents.length > 0;
+  // Keep the category filter and event type filter in sync
+  useEffect(() => {
+    setSelectedEventTypes(selectedCategories);
+  }, [selectedCategories, setSelectedEventTypes]);
   
-  // Determine where to show the teaser
-  const renderTeaserAfterRow = showSignUpTeaser ? 1 : false;
+  // Fetch all venues for the filter
+  useEffect(() => {
+    const fetchVenues = async () => {
+      setIsVenuesLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('venues')
+          .select('id, name')
+          .order('name');
+          
+        if (error) throw error;
+        
+        if (data) {
+          const venueOptions = data.map(venue => ({
+            value: venue.id,
+            label: venue.name
+          }));
+          setVenues(venueOptions);
+        }
+      } catch (err) {
+        console.error('Error fetching venues:', err);
+      } finally {
+        setIsVenuesLoading(false);
+      }
+    };
+
+    fetchVenues();
+  }, []);
   
-  // Loading state
-  const isLoading = eventsLoading || categoriesLoading;
+  // Determine if we have no categories selected
+  const noCategoriesSelected = selectedCategories.length === 0;
   
-  // Handle create event button click
-  const handleCreateEvent = () => {
-    if (!isAuthenticated) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to create an event",
-        variant: "destructive"
-      });
-      navigate('/login');
-      return;
+  // Filter events based on all filters
+  const filteredEvents = React.useMemo(() => {
+    // Start with all events
+    let filtered = events;
+    
+    // If no categories are selected, return empty array (no events)
+    if (noCategoriesSelected) {
+      return [];
     }
     
-    navigate('/events/create');
-  };
-  
-  // Handle RSVP with authentication check
-  const onRsvp = async (eventId: string, status: 'Going' | 'Interested') => {
-    if (!isAuthenticated) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to RSVP to events",
-        variant: "destructive"
-      });
-      navigate('/login');
-      return false;
-    }
-    
-    return handleRsvp(eventId, status);
-  };
-  
-  // Render the events list or appropriate empty state
-  const renderContent = () => {
-    if (isLoading) {
-      return <EventsPageSkeleton />;
-    }
-    
-    if (eventsError) {
-      return (
-        <div className="text-center py-12">
-          <h2 className="text-xl font-semibold text-red-600">Error loading events</h2>
-          <p className="text-gray-600 mt-2">Please try again later</p>
-        </div>
+    // Apply event type filter only if not all categories are selected
+    if (selectedCategories.length !== allEventTypes.length) {
+      filtered = events.filter(event => 
+        event.event_type && selectedCategories.includes(event.event_type)
       );
     }
     
-    if (!events || events.length === 0) {
-      return <EventsEmptyState />;
+    // Apply venue filter
+    if (selectedVenues.length > 0) {
+      filtered = filterEventsByVenue(filtered, selectedVenues);
     }
     
-    if (filteredEvents.length === 0 && hasActiveFilters) {
-      return (
-        <div className="text-center py-12">
-          <h2 className="text-xl font-semibold">No events match your filters</h2>
-          <p className="text-gray-600 mt-2">Try adjusting your filters or search terms</p>
-          <Button 
-            variant="outline" 
-            className="mt-4"
-            onClick={handleClearFilters}
-          >
-            Clear Filters
-          </Button>
-        </div>
-      );
+    // Apply date filter
+    if (dateRange || selectedDateFilter) {
+      filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
     }
     
-    return (
-      <LazyEventsList
-        events={filteredEvents}
-        isLoading={isLoading}
-        onRsvp={onRsvp}
-        showRsvpButtons={!!user}
-        loadingEventId={loadingEventId}
-        renderTeaserAfterRow={renderTeaserAfterRow}
-        showTeaser={showSignUpTeaser}
-        teaser={<EventsSignUpTeaser />}
-        searchQuery={searchQuery}
-      />
-    );
-  };
+    return filtered;
+  }, [events, selectedCategories, allEventTypes.length, selectedVenues, dateRange, selectedDateFilter, noCategoriesSelected]);
+  
+  const { 
+    handleRsvp: enhancedHandleRsvp, 
+    loadingEventId
+  } = useEnhancedRsvp(user?.id);
   
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <EventsHeader />
+    <div className="w-full px-4 md:px-6 py-8">
+      <div className="max-w-7xl mx-auto">
+        <EventsPageHeader title="What's Happening?" />
         
-        <Button 
-          onClick={handleCreateEvent}
-          className="bg-purple-600 hover:bg-purple-700 text-white"
-        >
-          <PlusIcon className="h-4 w-4 mr-2" />
-          Create Event
-        </Button>
-      </div>
-      
-      <div className="flex flex-col md:flex-row gap-6">
-        <div className="w-full md:w-3/4">
-          <EventsFilters
-            categories={categories || []}
-            activeFilters={activeFilters}
-            onFilterChange={handleFilterChange}
-            onClearFilters={handleClearFilters}
-            onSearchChange={handleSearchChange}
-            searchQuery={searchQuery}
+        <div className="mt-6 mb-2 flex flex-wrap justify-between items-center gap-4">
+          {/* Category Pills in fixed height container */}
+          <EventFilterBar
+            allEventTypes={allEventTypes}
+            selectedEventTypes={selectedCategories}
+            onToggleEventType={toggleCategory}
+            onSelectAll={selectAll}
+            onDeselectAll={deselectAll}
+            onReset={reset}
+            className="flex-grow"
           />
           
-          <div className="mt-6">
-            {renderContent()}
+          {/* Advanced Filters Button */}
+          <div className="flex-shrink-0">
+            <AdvancedFiltersButton
+              hasActiveFilters={hasAdvancedFilters}
+              isOpen={showAdvancedFilters}
+              onOpen={setShowAdvancedFilters}
+              className="ml-auto"
+            >
+              <AdvancedFiltersPanel
+                dateRange={dateRange}
+                onDateRangeChange={setDateRange}
+                selectedDateFilter={selectedDateFilter}
+                onDateFilterChange={setSelectedDateFilter}
+                venues={venues}
+                selectedVenues={selectedVenues}
+                onVenueChange={setSelectedVenues}
+              />
+            </AdvancedFiltersButton>
           </div>
         </div>
         
-        {!isMobile && (
-          <div className="w-full md:w-1/4">
-            <EventsSidebar 
-              popularEvents={popularEvents || []}
-              featuredEvents={featuredEvents || []}
-              isLoading={isLoading}
-            />
+        {/* Active Filters Summary */}
+        {hasAdvancedFilters && (
+          <div className="mb-6">
+            <div className="flex flex-wrap gap-2 items-center mt-4">
+              <span className="text-sm text-gray-500">Active filters:</span>
+              
+              {selectedVenues.map(venueId => {
+                const venue = venues.find(v => v.value === venueId);
+                return venue ? (
+                  <div key={venueId} className="bg-[#9b87f5] text-white rounded-full px-3 py-1 text-xs flex items-center">
+                    <span>Venue: {venue.label}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="ml-1 h-4 w-4 p-0 text-white hover:text-white hover:bg-transparent" 
+                      onClick={() => handleRemoveVenue(venueId)}
+                    >
+                      &times;
+                    </Button>
+                  </div>
+                ) : null;
+              })}
+              
+              {(dateRange || selectedDateFilter) && (
+                <div className="bg-[#9b87f5] text-white rounded-full px-3 py-1 text-xs flex items-center">
+                  <span>
+                    Date: {selectedDateFilter || (dateRange ? 'Custom range' : '')}
+                  </span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="ml-1 h-4 w-4 p-0 text-white hover:text-white hover:bg-transparent" 
+                    onClick={handleClearDateFilter}
+                  >
+                    &times;
+                  </Button>
+                </div>
+              )}
+              
+              {hasAdvancedFilters && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-xs text-gray-500"
+                  onClick={resetFilters}
+                >
+                  Clear all filters
+                </Button>
+              )}
+            </div>
           </div>
         )}
+        
+        <div className="space-y-8 mt-8">
+          <LazyEventsList 
+            mainEvents={filteredEvents}
+            relatedEvents={[]} 
+            isLoading={eventsLoading || isVenuesLoading || isFilterLoading}
+            onRsvp={user ? enhancedHandleRsvp : undefined}
+            showRsvpButtons={!!user}
+            hasActiveFilters={hasActiveFilters}
+            loadingEventId={loadingEventId}
+            noCategoriesSelected={noCategoriesSelected}
+            renderTeaserAfterRow={!user && 2}
+            teaser={<EventsTeaser />}
+          />
+        </div>
       </div>
     </div>
   );

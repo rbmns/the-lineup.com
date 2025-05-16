@@ -5,7 +5,7 @@ import { useCategoryFilteredEvents } from '@/hooks/events/useCategoryFilteredEve
 import { useCategoryPageSeo } from '@/hooks/events/useCategoryPageSeo';
 import { useScrollPositionManager } from '@/hooks/events/useScrollPositionManager';
 import { EventsPageHeader } from '@/components/events/EventsPageHeader';
-import CategoryFilteredEventsContent from '@/components/events/category-filters/CategoryFilteredEventsContent';
+import { CategoryFilteredEventsContent } from '@/components/events/category-filters/CategoryFilteredEventsContent';
 import { NewFilterSection } from '@/components/events/NewFilterSection';
 import { useCategoryFilterSelection } from '@/hooks/events/useCategoryFilterSelection';
 
@@ -96,16 +96,15 @@ const CategoryFilteredEventsPage = () => {
 
           {/* Events Content Section */}
           <CategoryFilteredEventsContent 
-            mainEvents={exactMatches}
-            relatedEvents={similarEvents}
-            isLoading={isLoading || isFilterLoading}
-            onRsvp={user ? handleEventRsvp : undefined}
-            showRsvpButtons={!!user}
-            loadingEventId={loadingEventId}
+            showNoExactMatchesMessage={showNoExactMatchesMessage}
+            resetFilters={resetFilters}
+            exactMatches={exactMatches}
+            similarEvents={similarEvents}
+            isLoading={isLoading} // For skeleton loading of the list
+            isFilterLoading={isFilterLoading} // Also contributes to list loading state
             hasActiveFilters={hasActiveFilters}
-            selectedCategories={selectedEventTypes}
-            onCategoryChange={handleRemoveEventType}
-            onClearFilters={resetFilters}
+            onRsvp={user ? handleEventRsvp : undefined}
+            loadingEventId={loadingEventId} // Pass loadingEventId down
           />
         </div>
       </div>

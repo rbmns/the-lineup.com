@@ -1,97 +1,100 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Event } from '@/types';
-import { EventsList } from './EventsList';
-import { Button } from '@/components/ui/button';
+import { EventGrid } from './EventGrid';
 
-export interface PrimaryResultsProps {
+// Number of events to load initially and on each load more
+const EVENTS_PER_PAGE = 12;
+
+interface PrimaryResultsProps {
   events: Event[];
+  searchQuery?: string;
   isLoading: boolean;
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<void>;
-  showRsvpButtons: boolean;
-  loadingEventId?: string | null;
-  visibleCount: number;
-  hasMore: boolean;
-  onLoadMore: () => void;
-  renderTeaserAfterRow?: number | false;
-  showTeaser?: boolean;
-  teaser?: React.ReactNode;
-  searchQuery?: string;
+  showRsvpButtons?: boolean;
+  visibleCount?: number;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
 }
 
 export const PrimaryResults: React.FC<PrimaryResultsProps> = ({
   events,
+  searchQuery,
   isLoading,
   onRsvp,
-  showRsvpButtons,
-  loadingEventId,
-  visibleCount,
-  hasMore,
-  onLoadMore,
-  renderTeaserAfterRow,
-  showTeaser,
-  teaser,
-  searchQuery
+  showRsvpButtons = true,
+  visibleCount: externalVisibleCount,
+  hasMore: externalHasMore,
+  onLoadMore: externalOnLoadMore
 }) => {
-  // If we have no events, don't render anything
-  if (events.length === 0) return null;
+  const [internalVisibleCount, setInternalVisibleCount] = useState(EVENTS_PER_PAGE);
+  const [internalHasMore, setInternalHasMore] = useState(true);
+  const [initialized, setInitialized] = useState(false);
+  
+  // Use external or internal state management
+  const visibleCount = externalVisibleCount !== undefined ? externalVisibleCount : internalVisibleCount;
+  const hasMore = externalHasMore !== undefined ? externalHasMore : internalHasMore;
+  
+  // Reset visible count when search query or events change
+  useEffect(() => {
+    if (externalVisibleCount === undefined) {
+      setInternalVisibleCount(EVENTS_PER_PAGE);
+    }
+  }, [searchQuery, events, externalVisibleCount]);
+  
+  // Update hasMore state when event count changes
+  useEffect(() => {
+    if (externalHasMore === undefined) {
+      setInternalHasMore(visibleCount < events.length);
+    }
+    
+    // Mark as initialized after first render
+    if (!initialized) {
+      setInitialized(true);
+    }
+  }, [visibleCount, events.length, externalHasMore, initialized]);
+  
+  const loadMore = () => {
+    if (externalOnLoadMore) {
+      externalOnLoadMore();
+    } else {
+      setInternalVisibleCount(prev => prev + EVENTS_PER_PAGE);
+    }
+  };
 
-  // Get the visible events
-  const visibleEvents = events.slice(0, visibleCount);
+  // Safely handle RSVP with propagation prevention
+  const handleRsvp = async (eventId: string, status: 'Going' | 'Interested') => {
+    if (!onRsvp) return;
+    try {
+      console.log('PrimaryResults - Handling RSVP:', { eventId, status });
+      await onRsvp(eventId, status);
+    } catch (error) {
+      console.error('PrimaryResults - RSVP Error:', error);
+    }
+  };
 
-  // If we have a teaser to render after a specific row
-  let firstBatch, secondBatch;
-  if (renderTeaserAfterRow && showTeaser && teaser && visibleEvents.length > 0) {
-    const rowSize = 3; // Assuming 3 items per row
-    const breakpoint = Math.min(renderTeaserAfterRow * rowSize, visibleEvents.length);
-    firstBatch = visibleEvents.slice(0, breakpoint);
-    secondBatch = visibleEvents.slice(breakpoint);
-  }
+  // If no events and not initialized yet, don't render anything
+  // This prevents flash of "no results" during initial load
+  if (events.length === 0 && !initialized) return null;
 
   return (
-    <div className="space-y-8">
-      {renderTeaserAfterRow && showTeaser && teaser ? (
-        <>
-          <EventsList
-            events={firstBatch || []}
-            onRsvp={onRsvp}
-            showRsvpButtons={showRsvpButtons}
-            loadingEventId={loadingEventId}
-          />
-          
-          {teaser}
-          
-          {secondBatch && secondBatch.length > 0 && (
-            <EventsList
-              events={secondBatch}
-              onRsvp={onRsvp}
-              showRsvpButtons={showRsvpButtons}
-              loadingEventId={loadingEventId}
-            />
-          )}
-        </>
-      ) : (
-        <EventsList
-          events={visibleEvents}
-          onRsvp={onRsvp}
-          showRsvpButtons={showRsvpButtons}
-          loadingEventId={loadingEventId}
-        />
+    <div>
+      {searchQuery && events.length > 0 && (
+        <h3 className="text-lg font-medium text-gray-900 mb-6">
+          {events.length} {events.length === 1 ? 'result' : 'results'}
+          {searchQuery ? ` for "${searchQuery}"` : ''}
+        </h3>
       )}
-
-      {hasMore && (
-        <div className="text-center mt-6">
-          <Button
-            onClick={onLoadMore}
-            variant="outline"
-            className="mx-auto"
-          >
-            Load more events
-          </Button>
-        </div>
-      )}
+      
+      <EventGrid 
+        events={events}
+        visibleCount={visibleCount}
+        hasMore={hasMore}
+        isLoading={isLoading}
+        onLoadMore={loadMore}
+        onRsvp={onRsvp ? handleRsvp : undefined}
+        showRsvpButtons={showRsvpButtons}
+      />
     </div>
   );
 };
-
-export default PrimaryResults;

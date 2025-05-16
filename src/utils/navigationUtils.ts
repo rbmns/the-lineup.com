@@ -1,62 +1,135 @@
 
-/**
- * Utility for handling navigation with scroll restoration
- */
-
-import { NavigateFunction } from "react-router-dom";
+import { NavigateFunction } from 'react-router-dom';
+import { isProfileClickable } from './friendshipUtils';
 
 /**
- * Navigates to a URL and scrolls to the top of the page
- * @param url The URL to navigate to
+ * Utility function to navigate to a user profile page with improved reliability
+ * Always uses ID-based URLs
+ * @param userId The ID of the user to navigate to
+ * @param navigate React Router's navigate function
+ * @param friendshipStatus Optional friendship status to check before navigation
+ * @param isCurrentUser Optional flag indicating if this is the current user's profile
  */
-export const navigateAndScrollTop = (url: string) => {
-  // Change the URL
-  window.location.href = url;
+export const navigateToUserProfile = (
+  userId: string, 
+  navigate: NavigateFunction,
+  friendshipStatus?: 'none' | 'pending' | 'accepted',
+  isCurrentUser?: boolean
+) => {
+  if (!userId) {
+    console.error("Cannot navigate: missing user ID");
+    return;
+  }
   
-  // Scroll to the top
-  window.scrollTo(0, 0);
-};
-
-/**
- * Navigates to a user profile page
- * @param navigate The navigate function from useNavigate
- * @param userId The user ID to navigate to
- */
-export const navigateToUserProfile = (navigate: NavigateFunction, userId: string) => {
-  navigate(`/users/${userId}`);
-  window.scrollTo(0, 0);
-};
-
-/**
- * Navigates to an event detail page
- * @param navigate The navigate function from useNavigate
- * @param eventId The event ID to navigate to
- */
-export const navigateToEvent = (navigate: NavigateFunction, eventId: string) => {
-  navigate(`/events/${eventId}`);
-  window.scrollTo(0, 0);
-};
-
-/**
- * Safely navigate back or to a default path if there's no history
- * @param navigate The navigate function from useNavigate
- * @param defaultPath The default path to navigate to if there's no history
- */
-export const safeGoBack = (navigate: NavigateFunction, defaultPath: string = '/') => {
-  // Try to go back, if it fails, navigate to the default path
+  // When looking at our own profile or if status isn't provided, just navigate
+  if (isCurrentUser === true || friendshipStatus === undefined) {
+    console.log(`Navigating to user profile (own profile or undefined status): ${userId}`);
+  } else {
+    // Check if navigation should be allowed based on friendship status
+    const canNavigate = isProfileClickable(friendshipStatus, !!isCurrentUser);
+    if (!canNavigate) {
+      console.log(`Navigation blocked: User ${userId} profile is not accessible with status ${friendshipStatus}`);
+      return;
+    }
+    console.log(`Navigating to friend profile with status: ${friendshipStatus}`);
+  }
+  
   try {
-    window.history.back();
-  } catch (err) {
-    navigate(defaultPath);
-    window.scrollTo(0, 0);
+    // Clear any existing navigation state to prevent issues
+    sessionStorage.removeItem('lastProfileNavigation');
+    
+    // Use ID-based URL for navigation
+    navigate(`/users/${userId}`, { 
+      state: { 
+        fromDirectNavigation: true,
+        timestamp: Date.now(),
+        source: 'profile_navigation'
+      },
+      replace: false // Don't replace the current history entry
+    });
+    
+    // Set a flag in sessionStorage to track navigation
+    sessionStorage.setItem('lastProfileNavigation', JSON.stringify({
+      userId,
+      timestamp: Date.now(),
+      fromDirectNavigation: true
+    }));
+    
+    // Debug log the navigation
+    console.log(`Profile navigation completed to: /users/${userId}`);
+  } catch (error) {
+    console.error(`Navigation error:`, error);
   }
 };
 
 /**
- * Handles any post-navigation tasks like scrolling
- * Can be used in useEffect after navigation events
+ * Utility function to navigate to an event detail page using ID-based URLs
+ * @param eventId The ID of the event to navigate to
+ * @param navigate React Router's navigate function
+ * @param event Optional event object (not used for URL generation, only for state)
+ * @param preserveSource Whether to preserve source information in navigation state
  */
-export const handlePostNavigation = () => {
-  // Scroll to the top of the page
-  window.scrollTo(0, 0);
+export const navigateToEvent = (
+  eventId: string, 
+  navigate: NavigateFunction, 
+  event?: any,
+  preserveSource: boolean = false
+) => {
+  if (!eventId) {
+    console.error("Cannot navigate: missing event ID");
+    return;
+  }
+  
+  try {
+    // Extract RSVP status if event object is provided
+    const rsvpStatus = event?.rsvp_status || null;
+    console.log(`Navigation to event ${eventId} with RSVP status: ${rsvpStatus}`);
+    
+    // Build navigation state with transition flags and RSVP status
+    const navigationState = {
+      timestamp: Date.now(),
+      source: 'event_navigation',
+      fromDirectNavigation: true,
+      fromEventNavigation: true,   // Flag for transition effects
+      useTransition: true,         // Enable transitions
+      forceRefresh: true,          // Always force refresh of data
+      originalEventId: eventId,    // Always preserve the original ID for fallback
+      rsvpStatus: rsvpStatus,      // Explicitly include RSVP status
+      originalEvent: event ? {
+        id: eventId,
+        rsvp_status: rsvpStatus,
+        title: event.title
+      } : null
+    };
+    
+    // Always use ID-based URL for consistent internal navigation
+    navigate(`/events/${eventId}`, { 
+      state: navigationState,
+      replace: false
+    });
+    
+    console.log(`Navigating to event with ID: ${eventId}`);
+  } catch (error) {
+    console.error("Navigation error:", error);
+  }
+};
+
+/**
+ * Helper function to safely go back in navigation history
+ * @param navigate NavigateFunction from React Router
+ * @param fallbackPath Fallback path if history navigation fails
+ */
+export const safeGoBack = (navigate: NavigateFunction, fallbackPath: string = '/events') => {
+  try {
+    window.history.back();
+    
+    // Set a timeout to check if navigation was successful
+    setTimeout(() => {
+      // If we're still on the same page after a short delay, use the fallback
+      navigate(fallbackPath);
+    }, 300);
+  } catch (err) {
+    console.error("Navigation error going back:", err);
+    navigate(fallbackPath);
+  }
 };

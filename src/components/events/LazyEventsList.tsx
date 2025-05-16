@@ -1,108 +1,137 @@
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Event } from '@/types';
-import { EventsList } from './list-components/EventsList';
-import PrimaryResults from './list-components/PrimaryResults';
-import { EventsLoadingState } from './list-components/EventsLoadingState';
-import NoResultsFound from './list-components/NoResultsFound';
+import { EventGrid } from '@/components/events/EventGrid';
+import { EventsList } from '@/components/events/EventsList';
+import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
+import { EventsLoadingState } from '@/components/events/list-components/EventsLoadingState';
 
 interface LazyEventsListProps {
-  events: Event[];
+  mainEvents: Event[];
+  relatedEvents?: Event[];
   isLoading?: boolean;
-  showRsvpButtons?: boolean;
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
+  showRsvpButtons?: boolean;
+  hasActiveFilters?: boolean;
   loadingEventId?: string | null;
-  emptyMessage?: string;
-  searchQuery?: string;
-  initialVisibleCount?: number;
-  loadMoreIncrement?: number;
-  renderSignUpTeaser?: boolean;
+  noCategoriesSelected?: boolean;
   renderTeaserAfterRow?: number | false;
-  showTeaser?: boolean;
   teaser?: React.ReactNode;
 }
 
 export const LazyEventsList: React.FC<LazyEventsListProps> = ({
-  events,
+  mainEvents = [],
+  relatedEvents = [],
   isLoading = false,
-  showRsvpButtons = false,
   onRsvp,
+  showRsvpButtons = true,
+  hasActiveFilters = false,
   loadingEventId,
-  emptyMessage = "No events found",
-  searchQuery = "",
-  initialVisibleCount = 9,
-  loadMoreIncrement = 6,
-  renderSignUpTeaser = false,
+  noCategoriesSelected = false,
   renderTeaserAfterRow = false,
-  showTeaser = false,
   teaser
 }) => {
-  const [visibleCount, setVisibleCount] = useState(initialVisibleCount);
-  
-  // Reset visible count when events or search changes
+  const [visibleEvents, setVisibleEvents] = useState<Event[]>([]);
+  const eventsPerRow = 3; // Standard number of events per row for a 3-column grid
+
   useEffect(() => {
-    setVisibleCount(initialVisibleCount);
-  }, [events.length, searchQuery, initialVisibleCount]);
-  
-  const visibleEvents = events.slice(0, visibleCount);
-  const hasMore = events.length > visibleCount;
-  
-  const loadMore = useCallback(() => {
-    setVisibleCount(prev => prev + loadMoreIncrement);
-  }, [loadMoreIncrement]);
-  
-  // Handle RSVP with proper return type
-  const handleRsvp = useCallback(
-    async (eventId: string, status: 'Going' | 'Interested'): Promise<void> => {
-      if (onRsvp) {
-        await onRsvp(eventId, status);
-      }
-    },
-    [onRsvp]
-  );
-  
+    // Reset visible events when main events change
+    setVisibleEvents(mainEvents.slice(0, 6));
+  }, [mainEvents]);
+
+  // Show loading state
   if (isLoading) {
     return <EventsLoadingState />;
   }
-  
-  if (events.length === 0) {
+
+  // Show empty state for no selected categories
+  if (noCategoriesSelected) {
     return (
       <NoResultsFound 
-        message={emptyMessage} 
-        searchQuery={searchQuery}
+        message="Please select at least one category to see events" 
+        showFiltersHint={false}
       />
     );
   }
-  
-  return (
-    <div className="space-y-8">
-      <PrimaryResults 
-        events={visibleEvents}
-        onRsvp={handleRsvp}
-        showRsvpButtons={showRsvpButtons}
-        loadingEventId={loadingEventId}
-        renderTeaserAfterRow={renderTeaserAfterRow}
-        showTeaser={showTeaser}
-        teaser={teaser}
-        searchQuery={searchQuery}
-        isLoading={isLoading}
-        visibleCount={visibleCount}
-        hasMore={hasMore}
-        onLoadMore={loadMore}
+
+  // Show no results found when filters are active but no events match
+  if (mainEvents.length === 0 && hasActiveFilters) {
+    return (
+      <NoResultsFound 
+        message="No events match your filters" 
+        showFiltersHint={true}
       />
+    );
+  }
+
+  // If no events at all, show generic no results
+  if (mainEvents.length === 0) {
+    return (
+      <NoResultsFound 
+        message="No events found" 
+        showFiltersHint={false}
+      />
+    );
+  }
+
+  // Calculate which events go before and after the teaser
+  let eventsBeforeTeaser: Event[] = [];
+  let eventsAfterTeaser: Event[] = [];
+  
+  if (renderTeaserAfterRow && typeof renderTeaserAfterRow === 'number') {
+    const splitIndex = renderTeaserAfterRow * eventsPerRow;
+    eventsBeforeTeaser = mainEvents.slice(0, splitIndex);
+    eventsAfterTeaser = mainEvents.slice(splitIndex);
+  } else {
+    eventsBeforeTeaser = mainEvents;
+  }
+
+  return (
+    <div className="space-y-12">
+      {/* First set of events */}
+      <div className="space-y-6">
+        {eventsBeforeTeaser.length > 0 && (
+          <EventsList
+            events={eventsBeforeTeaser}
+            onRsvp={onRsvp}
+            showRsvpButtons={showRsvpButtons}
+            loadingEventId={loadingEventId}
+          />
+        )}
+      </div>
       
-      {hasMore && (
-        <div className="flex justify-center pt-4">
-          <button 
-            onClick={loadMore}
-            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md transition-colors"
-          >
-            Load More
-          </button>
+      {/* Teaser after specified row */}
+      {renderTeaserAfterRow && teaser && (
+        <div className="my-8">
+          {teaser}
+        </div>
+      )}
+      
+      {/* Remaining events */}
+      {eventsAfterTeaser.length > 0 && (
+        <div className="space-y-6 mt-8">
+          <EventsList
+            events={eventsAfterTeaser}
+            onRsvp={onRsvp}
+            showRsvpButtons={showRsvpButtons}
+            loadingEventId={loadingEventId}
+          />
+        </div>
+      )}
+      
+      {/* Related events if any */}
+      {relatedEvents.length > 0 && (
+        <div className="mt-12 pt-8 border-t border-gray-200">
+          <h2 className="text-xl font-medium mb-6">You might also be interested in</h2>
+          <EventsList
+            events={relatedEvents}
+            onRsvp={onRsvp}
+            showRsvpButtons={showRsvpButtons}
+            compact={true}
+            loadingEventId={loadingEventId}
+          />
         </div>
       )}
     </div>
   );
 };
-
-export default LazyEventsList;

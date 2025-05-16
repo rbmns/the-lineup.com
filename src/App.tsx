@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import EventsPage from "./pages/EventsPage";
+import EventsPageRefactored from "./pages/EventsPageRefactored";
 import EventDetail from "./pages/EventDetail";
 import Layout from "./components/Layout";
 import Friends from "./pages/Friends";
@@ -19,7 +19,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/events" replace />} />
-            <Route path="/events" element={<EventsPage />} />
+            <Route path="/events" element={<EventsPageRefactored />} />
             <Route path="/events/:id" element={<EventDetail />} />
             <Route path="/friends" element={<Friends />} />
             <Route path="/users/:userId" element={<UserProfilePage />} />

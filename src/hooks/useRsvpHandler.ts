@@ -1,47 +1,52 @@
 
-import { MutableRefObject } from 'react';
+import { useCallback, useRef } from 'react';
+import { User } from '@supabase/supabase-js';
+import { useQueryClient } from '@tanstack/react-query';
 
 /**
- * Hook to handle RSVP actions with proper UI feedback
- * @param user The current user object
- * @param handleRsvp The RSVP handler function
- * @param rsvpInProgressRef Reference to track if an RSVP is in progress
- * @returns Object with handleEventRsvp function
+ * A hook to handle RSVP actions with proper caching to maintain RSVP state across pages
  */
 export const useRsvpHandler = (
-  user: any | null,
-  handleRsvp: ((eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>) | undefined,
-  rsvpInProgressRef: MutableRefObject<boolean>
+  user: User | null | undefined,
+  handleRsvp: ((eventId: string, status: "Going" | "Interested") => Promise<boolean>) | undefined,
+  rsvpInProgressRef: React.MutableRefObject<boolean>
 ) => {
-  /**
-   * Handle RSVP with proper event isolation
-   * @param eventId The event ID
-   * @param status The RSVP status ('Going' or 'Interested')
-   * @returns Promise resolving to the result of the RSVP action
-   */
-  const handleEventRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean | void> => {
-    // Don't allow RSVPs if not logged in or if another RSVP is in progress
-    if (!user || !handleRsvp || rsvpInProgressRef.current) return false;
-    
+  const queryClient = useQueryClient();
+  
+  const handleEventRsvp = useCallback(async (
+    eventId: string, 
+    status: "Going" | "Interested"
+  ): Promise<boolean> => {
+    if (!user || !handleRsvp) {
+      return false;
+    }
+
+    if (rsvpInProgressRef.current) {
+      console.log('RSVP request in progress, please wait');
+      return false;
+    }
+
     try {
-      // Set RSVP in progress flag
       rsvpInProgressRef.current = true;
+      const success = await handleRsvp(eventId, status);
       
-      // Call the RSVP handler
-      const result = await handleRsvp(eventId, status);
+      if (success) {
+        // Invalidate all relevant queries to ensure fresh data
+        queryClient.invalidateQueries({ queryKey: ['events'] });
+        queryClient.invalidateQueries({ queryKey: ['event', eventId] });
+      }
       
-      // Return the result
-      return result;
+      return success;
     } catch (error) {
       console.error('Error in RSVP handler:', error);
       return false;
     } finally {
-      // Clear RSVP in progress flag
-      rsvpInProgressRef.current = false;
+      // Small delay to prevent multiple rapid clicks
+      setTimeout(() => {
+        rsvpInProgressRef.current = false;
+      }, 300);
     }
-  };
-  
+  }, [user, handleRsvp, rsvpInProgressRef, queryClient]);
+
   return { handleEventRsvp };
 };
-
-export default useRsvpHandler;

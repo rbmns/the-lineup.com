@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Event } from '@/types';
 import { Separator } from '@/components/ui/separator';
 import { EventsLoadingState } from './list-components/EventsLoadingState';
-import NoResultsFound from './list-components/NoResultsFound';
+import { NoResultsFound } from './list-components/NoResultsFound';
 import { PrimaryResults } from './list-components/PrimaryResults';
 import { SecondaryResults } from './list-components/SecondaryResults';
 
@@ -95,11 +94,7 @@ export const FilteredEventsList: React.FC<FilteredEventsListProps> = ({
     <div id="search-results" className="space-y-12">
       {/* No Results Message - Only show after initial load is complete */}
       {noResultsFound && primaryResults.length === 0 && initialLoadComplete && similarEvents.length === 0 && (
-        <NoResultsFound 
-          message="No events match your search"
-          searchQuery={searchQuery || ""}
-          resetFilters={resetFilters}
-        />
+        <NoResultsFound searchQuery={searchQuery} resetFilters={resetFilters} />
       )}
       
       {/* Related Results Message - Show when no exact matches but we have similar results */}
@@ -121,6 +116,7 @@ export const FilteredEventsList: React.FC<FilteredEventsListProps> = ({
       {/* Main Results */}
       <PrimaryResults 
         events={primaryResults}
+        searchQuery={searchQuery}
         isLoading={isLoading}
         onRsvp={isAuthenticated ? handleRsvpAction : undefined}
         showRsvpButtons={isAuthenticated}
@@ -184,5 +180,3 @@ export const FilteredEventsList: React.FC<FilteredEventsListProps> = ({
     </div>
   );
 };
-
-export default FilteredEventsList;

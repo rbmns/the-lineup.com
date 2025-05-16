@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { UserProfile } from '@/types';
 import { FriendSearchBar } from './FriendSearchBar';
-import FriendCard from '@/components/profile/FriendCard';
+import { FriendCard } from '@/components/profile/FriendCard';
 
 interface DiscoverTabContentProps {
   searchQuery: string;
@@ -10,7 +10,7 @@ interface DiscoverTabContentProps {
   searchResults: UserProfile[];
   onAddFriend: (id: string) => void;
   isSearching: boolean;
-  pendingRequestIds: string[]; // This is correct as an array
+  pendingRequestIds: string[];
   onSearch: () => void;
 }
 
@@ -70,13 +70,11 @@ export const DiscoverTabContent = ({
           {searchResults.map(profile => (
             <FriendCard
               key={profile.id}
-              id={profile.id}
-              name={profile.username || ''}
-              username={profile.username || ''}
-              avatarUrl={profile.avatar_url && profile.avatar_url.length > 0 ? profile.avatar_url[0] : null}
+              profile={profile}
+              relationship="none"
               onAddFriend={() => onAddFriend(profile.id)}
-              isPending={pendingRequestIds.includes(profile.id)}
-              pendingFriendIds={pendingRequestIds}
+              actionLabel="Send Request"
+              pendingRequestIds={pendingRequestIds}
             />
           ))}
         </div>
