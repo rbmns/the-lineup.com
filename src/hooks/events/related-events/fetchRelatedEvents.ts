@@ -1,111 +1,75 @@
 
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
-import { processEventsData } from '@/utils/eventProcessorUtils';
+import { fetchPrimaryRelatedEvents } from './fetchPrimaryRelatedEvents';
 
-export interface FetchRelatedEventsProps {
-  eventType: string;
-  currentEventId: string;
+interface FetchOptions {
+  eventType?: string;
+  currentEventId?: string;
+  limit?: number;
+  minResults?: number;
   userId?: string;
   tags?: string[];
   startDate?: string;
-  minResults?: number;
 }
 
-export async function fetchRelatedEvents({
+/**
+ * Fetches related events with proper error handling and fallbacks
+ */
+export const fetchRelatedEvents = async ({
   eventType,
   currentEventId,
+  limit = 4,
+  minResults = 2,
   userId,
   tags = [],
-  startDate,
-  minResults = 2
-}: FetchRelatedEventsProps): Promise<Event[]> {
+  startDate
+}: FetchOptions): Promise<Event[]> => {
   try {
-    // Get current date to filter out past events
-    const today = startDate || new Date().toISOString().split('T')[0];
+    // Try to get events with the same event type first
+    let events = await fetchPrimaryRelatedEvents({
+      eventType,
+      currentEventId,
+      limit,
+      userId,
+      tags,
+      startDate
+    });
     
-    // First strategy: Fetch events with the same event type
-    let query = supabase
-      .from('events')
-      .select(`
-        *,
-        creator:profiles(*),
-        venues:venue_id(*)
-      `)
-      .eq('event_type', eventType)
-      .neq('id', currentEventId)
-      .gte('start_date', today)
-      .order('start_date', { ascending: true })
-      .limit(8);
-    
-    const { data, error } = await query;
-    
-    if (error) {
-      console.error('Error fetching related events:', error);
-      return [];
+    // If we don't have enough events, try to get events with similar tags
+    if (events.length < minResults && tags && tags.length > 0) {
+      const tagEvents = await fetchPrimaryRelatedEvents({
+        currentEventId,
+        limit: limit - events.length,
+        userId,
+        tags,
+        startDate
+      });
+      
+      // Add the tag events to our results, avoiding duplicates
+      const eventIds = new Set(events.map(e => e.id));
+      const uniqueTagEvents = tagEvents.filter(e => !eventIds.has(e.id));
+      events = [...events, ...uniqueTagEvents];
     }
     
-    // Process the events data with user RSVP info
-    const processedEvents = data ? processEventsData(data, userId) : [];
-    
-    // If we don't have enough events from the first strategy, try more fallbacks
-    if (processedEvents.length < minResults) {
-      // Second strategy: Try to fetch events by tags
-      const fallbackQuery = supabase
-        .from('events')
-        .select(`
-          *,
-          creator:profiles(*),
-          venues:venue_id(*)
-        `)
-        .neq('id', currentEventId)
-        .gte('start_date', today)
-        .order('start_date', { ascending: true })
-        .limit(10);
+    // As a last resort, get any events if we still don't have enough
+    if (events.length < minResults) {
+      const fallbackEvents = await fetchPrimaryRelatedEvents({
+        currentEventId,
+        limit: limit - events.length,
+        userId,
+        startDate
+      });
       
-      const { data: fallbackData, error: fallbackError } = await fallbackQuery;
-      
-      if (fallbackError || !fallbackData) {
-        return processedEvents;
-      }
-      
-      // Process the fallback events with user RSVP info
-      const fallbackProcessed = processEventsData(fallbackData, userId);
-      
-      // If we have tags, sort the fallback events by tag relevance
-      const sortedFallbacks = tags.length > 0
-        ? sortByTagRelevance(fallbackProcessed, tags)
-        : fallbackProcessed;
-      
-      // Combine unique events from both queries
-      const combinedEvents = [...processedEvents];
-      for (const event of sortedFallbacks) {
-        if (!combinedEvents.some(e => e.id === event.id)) {
-          combinedEvents.push(event);
-          if (combinedEvents.length >= minResults) break;
-        }
-      }
-      
-      return combinedEvents;
+      // Add the fallback events to our results, avoiding duplicates
+      const eventIds = new Set(events.map(e => e.id));
+      const uniqueFallbackEvents = fallbackEvents.filter(e => !eventIds.has(e.id));
+      events = [...events, ...uniqueFallbackEvents];
     }
     
-    return processedEvents;
-    
+    return events;
   } catch (error) {
     console.error('Error in fetchRelatedEvents:', error);
     return [];
   }
-}
-
-// Helper function to sort events by tag relevance
-function sortByTagRelevance(events: Event[], tags: string[]): Event[] {
-  return [...events].sort((a, b) => {
-    const aTagsStr = String(a.tags || '');
-    const bTagsStr = String(b.tags || '');
-    
-    const aMatchCount = tags.filter(tag => aTagsStr.includes(tag)).length;
-    const bMatchCount = tags.filter(tag => bTagsStr.includes(tag)).length;
-    
-    return bMatchCount - aMatchCount;
-  });
-}
+};

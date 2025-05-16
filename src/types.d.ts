@@ -1,8 +1,7 @@
-
 export interface UserProfile {
   id: string;
   username: string | null;
-  avatar_url: string | null; // Changed from string[] to string
+  avatar_url: string[] | null; // Changed from string | null to string[] | null to match types/index.ts
   email: string | null;
   location: string | null;
   location_category: string | null;
