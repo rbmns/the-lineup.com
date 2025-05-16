@@ -31,7 +31,7 @@ export const EventsTeaser: React.FC<EventsTeaserProps> = ({ className }) => {
 
         <div className="flex-grow">
           <h3 className="font-medium text-gray-900">Connect with attendees</h3>
-          <p className="text-sm text-gray-600">Sign up to save events to your calendar and to see what friends are doing</p>
+          <p className="text-sm text-gray-600">Sign up to save your RSVPs, add to your calendar and see who's going</p>
         </div>
 
         <div className="flex items-center gap-2">

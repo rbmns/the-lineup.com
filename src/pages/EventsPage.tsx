@@ -7,7 +7,7 @@ import { LazyEventsList } from '@/components/events/LazyEventsList';
 import { useCanonical } from '@/hooks/useCanonical';
 import { EventsPageHeader } from '@/components/events/EventsPageHeader';
 import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp';
-import { useRsvpHandler } from '@/hooks/events/useRsvpHandler';
+import { useRsvpHandler } from '@/hooks/useRsvpHandler';
 import { useCategoryFilterSelection } from '@/hooks/events/useCategoryFilterSelection';
 import { EventFilterBar } from '@/components/events/filters/EventFilterBar';
 import { AdvancedFiltersButton } from '@/components/events/AdvancedFiltersButton';
@@ -119,13 +119,6 @@ const EventsPage = () => {
       <div className="max-w-7xl mx-auto">
         <EventsPageHeader title="What's Happening?" />
         
-        {/* Show teaser for non-authenticated users */}
-        {!user && (
-          <div className="mt-6 mb-4">
-            <EventsTeaser />
-          </div>
-        )}
-        
         {/* Filter section with fixed height */}
         <div className="mt-6 mb-8 relative">
           <div className="flex flex-col">
@@ -187,6 +180,8 @@ const EventsPage = () => {
             hasActiveFilters={hasActiveFilters}
             loadingEventId={loadingEventId}
             noCategoriesSelected={noCategoriesSelected}
+            renderTeaserAfterRow={!user && 2}
+            teaser={<EventsTeaser />}
           />
         </div>
       </div>

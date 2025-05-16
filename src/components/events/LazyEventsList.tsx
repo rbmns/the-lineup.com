@@ -1,9 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
-import { EventsList } from '@/components/events/list-components/EventsList';
-import { EventsLoadingState } from '@/components/events/list-components/EventsLoadingState';
-import { EventsEmptyState } from '@/components/events/EventsEmptyState';
 import { Event } from '@/types';
+import { EventGrid } from '@/components/events/EventGrid';
+import { EventsList } from '@/components/events/EventsList';
+import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
+import { EventsLoadingState } from '@/components/events/list-components/EventsLoadingState';
 
 interface LazyEventsListProps {
   mainEvents: Event[];
@@ -14,7 +15,8 @@ interface LazyEventsListProps {
   hasActiveFilters?: boolean;
   loadingEventId?: string | null;
   noCategoriesSelected?: boolean;
-  compact?: boolean;
+  renderTeaserAfterRow?: number | false;
+  teaser?: React.ReactNode;
 }
 
 export const LazyEventsList: React.FC<LazyEventsListProps> = ({
@@ -22,75 +24,111 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   relatedEvents = [],
   isLoading = false,
   onRsvp,
-  showRsvpButtons = false,
+  showRsvpButtons = true,
   hasActiveFilters = false,
   loadingEventId,
   noCategoriesSelected = false,
-  compact = false
+  renderTeaserAfterRow = false,
+  teaser
 }) => {
-  // State to track if we should show loading state
-  const [showLoading, setShowLoading] = useState(isLoading);
-  
-  // Update loading state with a slight delay to prevent flashing
-  useEffect(() => {
-    if (isLoading) {
-      setShowLoading(true);
-    } else {
-      const timer = setTimeout(() => {
-        setShowLoading(false);
-      }, 300); // Small delay to prevent UI flashing
-      return () => clearTimeout(timer);
-    }
-  }, [isLoading]);
+  const [visibleEvents, setVisibleEvents] = useState<Event[]>([]);
+  const eventsPerRow = 3; // Standard number of events per row for a 3-column grid
 
-  if (showLoading) {
-    // Pass the compact prop to the loading state component
-    return <EventsLoadingState 
-      compact={compact} 
-      numberOfSkeletons={6} 
-    />;
+  useEffect(() => {
+    // Reset visible events when main events change
+    setVisibleEvents(mainEvents.slice(0, 6));
+  }, [mainEvents]);
+
+  // Show loading state
+  if (isLoading) {
+    return <EventsLoadingState />;
   }
 
-  // Special case: No categories selected
+  // Show empty state for no selected categories
   if (noCategoriesSelected) {
     return (
-      <EventsEmptyState 
-        noCategoriesSelected={true}
-        hasActiveFilters={hasActiveFilters}
+      <NoResultsFound 
+        message="Please select at least one category to see events" 
+        showFiltersHint={false}
       />
     );
   }
 
-  // Check if we have no events to display and have filters applied
-  if (mainEvents.length === 0) {
+  // Show no results found when filters are active but no events match
+  if (mainEvents.length === 0 && hasActiveFilters) {
     return (
-      <EventsEmptyState 
-        hasActiveFilters={hasActiveFilters} 
+      <NoResultsFound 
+        message="No events match your filters" 
+        showFiltersHint={true}
       />
     );
+  }
+
+  // If no events at all, show generic no results
+  if (mainEvents.length === 0) {
+    return (
+      <NoResultsFound 
+        message="No events found" 
+        showFiltersHint={false}
+      />
+    );
+  }
+
+  // Calculate which events go before and after the teaser
+  let eventsBeforeTeaser: Event[] = [];
+  let eventsAfterTeaser: Event[] = [];
+  
+  if (renderTeaserAfterRow && typeof renderTeaserAfterRow === 'number') {
+    const splitIndex = renderTeaserAfterRow * eventsPerRow;
+    eventsBeforeTeaser = mainEvents.slice(0, splitIndex);
+    eventsAfterTeaser = mainEvents.slice(splitIndex);
+  } else {
+    eventsBeforeTeaser = mainEvents;
   }
 
   return (
-    <div className="space-y-8">
-      <EventsList 
-        events={mainEvents} 
-        onRsvp={onRsvp}
-        showRsvpButtons={showRsvpButtons}
-        loadingEventId={loadingEventId}
-        compact={compact}
-      />
-      
-      {/* If we have related events and they're different from main events, show them too */}
-      {relatedEvents && relatedEvents.length > 0 && 
-        !mainEvents.some(e => relatedEvents.some(r => r.id === e.id)) && (
-        <div className="mt-12 pt-6 border-t">
-          <h2 className="text-xl font-semibold mb-6">You may also like</h2>
-          <EventsList 
-            events={relatedEvents} 
+    <div className="space-y-12">
+      {/* First set of events */}
+      <div className="space-y-6">
+        {eventsBeforeTeaser.length > 0 && (
+          <EventsList
+            events={eventsBeforeTeaser}
             onRsvp={onRsvp}
             showRsvpButtons={showRsvpButtons}
             loadingEventId={loadingEventId}
-            compact={compact}
+          />
+        )}
+      </div>
+      
+      {/* Teaser after specified row */}
+      {renderTeaserAfterRow && teaser && (
+        <div className="my-8">
+          {teaser}
+        </div>
+      )}
+      
+      {/* Remaining events */}
+      {eventsAfterTeaser.length > 0 && (
+        <div className="space-y-6 mt-8">
+          <EventsList
+            events={eventsAfterTeaser}
+            onRsvp={onRsvp}
+            showRsvpButtons={showRsvpButtons}
+            loadingEventId={loadingEventId}
+          />
+        </div>
+      )}
+      
+      {/* Related events if any */}
+      {relatedEvents.length > 0 && (
+        <div className="mt-12 pt-8 border-t border-gray-200">
+          <h2 className="text-xl font-medium mb-6">You might also be interested in</h2>
+          <EventsList
+            events={relatedEvents}
+            onRsvp={onRsvp}
+            showRsvpButtons={showRsvpButtons}
+            compact={true}
+            loadingEventId={loadingEventId}
           />
         </div>
       )}

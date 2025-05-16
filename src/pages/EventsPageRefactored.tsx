@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -6,7 +5,7 @@ import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp';
 import { EventsPageHeader } from '@/components/events/EventsPageHeader';
 import { LazyEventsList } from '@/components/events/LazyEventsList';
 import { EventFilterBar } from '@/components/events/filters/EventFilterBar';
-import { useCategoryFilterSelection } from '@/hooks/events/useCategoryFilterSelection';
+import { useCategoryFilterSelection } from '@/hooks/useCategoryFilterSelection';
 import { useEventPageMeta } from '@/components/events/EventsPageMeta';
 import { useEventFilterState } from '@/hooks/events/useEventFilterState';
 import { AdvancedFiltersButton } from '@/components/events/filters/AdvancedFiltersButton';
@@ -138,13 +137,6 @@ const EventsPageRefactored = () => {
       <div className="max-w-7xl mx-auto">
         <EventsPageHeader title="What's Happening?" />
         
-        {/* Show teaser for non-authenticated users */}
-        {!user && (
-          <div className="mt-6 mb-4">
-            <EventsTeaser />
-          </div>
-        )}
-        
         <div className="mt-6 mb-2 flex flex-wrap justify-between items-center gap-4">
           {/* Category Pills in fixed height container */}
           <EventFilterBar
@@ -241,6 +233,8 @@ const EventsPageRefactored = () => {
             hasActiveFilters={hasActiveFilters}
             loadingEventId={loadingEventId}
             noCategoriesSelected={noCategoriesSelected}
+            renderTeaserAfterRow={!user && 2}
+            teaser={<EventsTeaser />}
           />
         </div>
       </div>
