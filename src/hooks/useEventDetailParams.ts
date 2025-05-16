@@ -37,6 +37,17 @@ export const useEventDetailParams = () => {
     [location.state]
   );
 
+  // Extract RSVP status from location state if available
+  const initialRsvpStatus = useMemo(() => 
+    location.state?.rsvpStatus || null,
+    [location.state]
+  );
+
+  const originalEvent = useMemo(() => 
+    location.state?.originalEvent || null,
+    [location.state]
+  );
+
   // Log the parameters for debugging
   useEffect(() => {
     console.log(`useEventDetailParams: eventId=${eventId}, eventSlug=${eventSlug}, destination=${destination}`);
@@ -94,6 +105,9 @@ export const useEventDetailParams = () => {
     forceKey,
     isSlugRoute,
     isDestinationRoute,
-    hasTransitionState
+    hasTransitionState,
+    // Export the initial RSVP status from navigation state
+    initialRsvpStatus,
+    originalEvent
   };
 };

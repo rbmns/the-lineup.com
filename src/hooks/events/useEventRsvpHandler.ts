@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useRsvpMutation } from '../event-rsvp/useRsvpMutation';
 import { useScrollPosition } from '../useScrollPosition';
@@ -44,9 +43,16 @@ export const useEventRsvpHandler = ({
         }
         
         // Invalidate relevant queries to refresh data
+        // This is crucial for keeping event list and detail views in sync
         queryClient.invalidateQueries({ queryKey: ['events'] });
         queryClient.invalidateQueries({ queryKey: ['event', eventId] });
         queryClient.invalidateQueries({ queryKey: ['user-events'] });
+        
+        // Also invalidate any filtered events queries that might include this event
+        queryClient.invalidateQueries({ queryKey: ['filtered-events'] });
+        
+        // Support both the event detail using old and new query key formats
+        queryClient.invalidateQueries({ queryKey: ['eventDetail', eventId] });
         
         // Refetch events if a refetch function was provided
         if (refetchEvents) {

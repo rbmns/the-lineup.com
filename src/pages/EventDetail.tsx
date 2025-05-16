@@ -21,7 +21,7 @@ import { RelatedEvents } from '@/components/events/related-events/RelatedEvents'
 
 const EventDetail = () => {
   // Use our comprehensive params hook to get all URL parameters
-  const { id, eventId, eventSlug, hasTransitionState } = useEventDetailParams();
+  const { id, eventId, eventSlug, hasTransitionState, initialRsvpStatus, originalEvent } = useEventDetailParams();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
   const { isMobile } = useDeviceDetection();
@@ -49,8 +49,28 @@ const EventDetail = () => {
     error, 
     attendees, 
     rsvpLoading,
-    handleRsvp 
+    handleRsvp,
+    refreshData
   } = useEventDetails(effectiveId);
+
+  // Apply initial RSVP status from navigation state to ensure consistency
+  useEffect(() => {
+    if (event && initialRsvpStatus && !event.rsvp_status) {
+      console.log(`Applying initial RSVP status from navigation: ${initialRsvpStatus}`);
+      // Update the local event state with the RSVP status from navigation
+      event.rsvp_status = initialRsvpStatus;
+    }
+    
+    // If we have original event data from navigation, use it to supplement our event data
+    if (originalEvent && event && originalEvent.id === event.id) {
+      console.log("Using original event data from navigation to supplement current event data");
+      
+      // Only supplement properties that might be missing
+      if (!event.rsvp_status && originalEvent.rsvp_status) {
+        event.rsvp_status = originalEvent.rsvp_status;
+      }
+    }
+  }, [event, initialRsvpStatus, originalEvent]);
 
   const { coverImage } = useEventImages(event);
   const metaTags = useEventMetaTags(event);
@@ -68,6 +88,8 @@ const EventDetail = () => {
   const handleRsvpEvent = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     try {
       await handleRsvp(status);
+      // After successful RSVP, refresh event data to ensure we have the latest
+      await refreshData();
       return true;
     } catch (error) {
       console.error('Error handling RSVP:', error);
