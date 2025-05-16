@@ -5,7 +5,7 @@ import { Users, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getInitials } from '@/utils/eventUtils';
+import { getInitials } from '@/utils/profileUtils';
 
 interface SidebarContentProps {
   event: Event;
@@ -48,11 +48,11 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({
                   {uniqueAttendees.map((attendee, i) => (
                     <Avatar key={attendee.id || i} className="w-8 h-8 border-2 border-white">
                       <AvatarImage 
-                        src={attendee.avatar_url} 
-                        alt={attendee.full_name || attendee.username || 'Attendee'} 
+                        src={attendee.avatar_url?.[0] || undefined} 
+                        alt={attendee.username || 'Attendee'} 
                       />
                       <AvatarFallback className="bg-primary/10 text-xs">
-                        {getInitials(attendee.full_name || attendee.username || 'A')}
+                        {getInitials(attendee.username || 'A')}
                       </AvatarFallback>
                     </Avatar>
                   ))}
@@ -93,15 +93,15 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({
           <div className="flex items-center gap-3">
             <Avatar className="w-10 h-10 border border-gray-200">
               <AvatarImage 
-                src={event.creator?.avatar_url} 
-                alt={event.creator?.full_name || event.organiser_name || 'Organizer'} 
+                src={event.creator?.avatar_url?.[0] || undefined} 
+                alt={event.creator?.username || event.organiser_name || 'Organizer'} 
               />
               <AvatarFallback className="bg-primary/10">
-                {getInitials(event.creator?.full_name || event.organiser_name || 'O')}
+                {getInitials(event.creator?.username || event.organiser_name || 'O')}
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-medium">{event.creator?.full_name || event.organiser_name}</p>
+              <p className="font-medium">{event.creator?.username || event.organiser_name}</p>
               {event.creator?.tagline && (
                 <p className="text-xs text-gray-500 mt-0.5">{event.creator.tagline}</p>
               )}
