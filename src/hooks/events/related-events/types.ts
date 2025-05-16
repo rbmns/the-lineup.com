@@ -15,3 +15,7 @@ export interface RelatedEventsState {
   relatedEvents: Event[];
   loading: boolean;
 }
+
+export interface EventRsvpMap {
+  [eventId: string]: 'Going' | 'Interested';
+}

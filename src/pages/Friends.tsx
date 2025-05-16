@@ -51,7 +51,7 @@ const Friends: React.FC = () => {
     if (!friends) return;
     
     if (!friendsSearchQuery) {
-      setFilteredFriends(friends);
+      setFilteredFriends(friends as any);
       return;
     }
     
@@ -62,7 +62,7 @@ const Friends: React.FC = () => {
       friend.status?.toLowerCase().includes(query)
     );
     
-    setFilteredFriends(filtered);
+    setFilteredFriends(filtered as any);
   }, [friendsSearchQuery, friends]);
 
   // Handle search for new people
@@ -168,7 +168,7 @@ const Friends: React.FC = () => {
           pendingRequestsCount={requests?.length || 0}
           friendsContent={
             <FriendsTabContent
-              friends={filteredFriends as UserProfile[]}
+              friends={filteredFriends}
               loading={friendsLoading}
               requests={requests || []}
               onAcceptRequest={onAcceptRequest}

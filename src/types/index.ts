@@ -10,7 +10,7 @@ export interface UserProfile {
   status_details?: string | null;
   created_at?: string;
   updated_at?: string;
-  location_category?: string | null;
+  location_category?: string | null; // Made optional with ? to match types.d.ts
   onboarded?: boolean | null;
   onboarding_data?: string | null;
   role?: string | null;

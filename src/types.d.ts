@@ -1,10 +1,11 @@
+
 export interface UserProfile {
   id: string;
   username: string | null;
   avatar_url: string[] | null; // Changed from string | null to string[] | null to match types/index.ts
   email: string | null;
   location: string | null;
-  location_category: string | null;
+  location_category?: string | null; // Made optional with ? to match types/index.ts
   status: string | null;
   status_details?: string | null;
   tagline: string | null;
