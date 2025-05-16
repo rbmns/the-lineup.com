@@ -34,25 +34,9 @@ export const EventFriendRsvps: React.FC<EventFriendRsvpsProps> = ({
   const [isGoingDialogOpen, setIsGoingDialogOpen] = useState(false);
   const [isInterestedDialogOpen, setIsInterestedDialogOpen] = useState(false);
   
-  // If not authenticated, show teaser
+  // If not authenticated, don't show anything
   if (!isAuthenticated) {
-    return (
-      <div className={`space-y-6 ${className}`}>
-        <div className="flex flex-col items-center text-center p-4 bg-gray-50 rounded-lg">
-          <Lock className="h-8 w-8 text-gray-400 mb-2" />
-          <h4 className="text-sm font-medium mb-1">See who's attending</h4>
-          <p className="text-xs text-gray-500 mb-3">Sign up to view attendees and connect with friends</p>
-          <Button 
-            onClick={() => navigate('/signup')} 
-            variant="default" 
-            size="sm" 
-            className="w-full sm:w-auto"
-          >
-            Sign up to see attendees
-          </Button>
-        </div>
-      </div>
-    );
+    return null;
   }
   
   // Return null if no attendees

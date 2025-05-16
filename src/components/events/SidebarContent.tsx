@@ -110,7 +110,7 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({
         </Card>
       )}
 
-      {/* Attendees / Friends Teaser Section */}
+      {/* Friends Attending Section */}
       <Card className="shadow-md border border-gray-200 animate-fade-in" style={{ animationDelay: '300ms' }}>
         <CardContent className="p-5">
           <h3 className="text-lg font-semibold mb-3">Friends Attending</h3>
@@ -128,21 +128,16 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({
               />
             </>
           ) : (
-            /* Non-authenticated Users: Show teaser */
-            <div className="flex flex-col items-center">
-              <div className="text-center mb-4 py-3">
-                <Lock className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-600 mb-1">Sign up to see who's attending this event</p>
-                <p className="text-sm text-gray-500">Join to connect with friends and discover events together</p>
-              </div>
-              <div className="flex justify-center w-full">
-                <Button 
-                  className="bg-black hover:bg-gray-800 text-white font-medium"
-                  onClick={handleSignUpClick}
-                >
-                  Sign up to see attendees
-                </Button>
-              </div>
+            /* Non-authenticated Users: Show teaser that matches the design */
+            <div className="flex flex-col items-center text-center">
+              <Lock className="h-10 w-10 text-gray-500 mb-3" />
+              <p className="text-sm text-gray-600 mb-4">Sign up to see who's attending and connect with friends</p>
+              <Button 
+                onClick={handleSignUpClick}
+                className="w-full bg-black hover:bg-gray-800 text-white font-medium"
+              >
+                Sign up to see attendees
+              </Button>
             </div>
           )}
         </CardContent>
