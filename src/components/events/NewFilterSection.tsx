@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { EventCategoryPills } from './EventCategoryPills';
+import { EventCategoryFilters } from './filters/EventCategoryFilters';
 import { AdvancedFiltersButton } from './AdvancedFiltersButton';
 import { DateRangeFilter } from './DateRangeFilter';
 import { VenueFilter } from './VenueFilter';
@@ -102,10 +102,10 @@ export const NewFilterSection: React.FC<NewFilterSectionProps> = ({
           </div>
         </div>
         
-        <EventCategoryPills
-          categories={allEventTypes}
-          selectedCategories={selectedEventTypes}
-          onToggleCategory={onToggleEventType}
+        <EventCategoryFilters
+          allEventTypes={allEventTypes}
+          selectedEventTypes={selectedEventTypes}
+          onToggleEventType={onToggleEventType}
           onSelectAll={onSelectAllEventTypes}
           onDeselectAll={onDeselectAllEventTypes}
           onReset={resetAllFilters}

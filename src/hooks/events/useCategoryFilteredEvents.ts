@@ -49,7 +49,8 @@ export const useCategoryFilteredEvents = (userId: string | undefined) => {
   const [similarEvents, setSimilarEvents] = useState<Event[]>([]); // Kept here for now
 
   const selectAllEventTypes = () => {
-    setSelectedEventTypes(availableEventTypes.map(et => et.value));
+    const allTypes = availableEventTypes.map(et => et.value);
+    setSelectedEventTypes(allTypes);
     toast({ title: "All categories selected" });
   };
 

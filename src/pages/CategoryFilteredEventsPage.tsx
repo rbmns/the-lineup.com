@@ -1,20 +1,19 @@
 
-import React from 'react';
-// import { useNavigate } from 'react-router-dom'; // No longer used
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCategoryFilteredEvents } from '@/hooks/events/useCategoryFilteredEvents';
 import { useCategoryPageSeo } from '@/hooks/events/useCategoryPageSeo';
 import { useScrollPositionManager } from '@/hooks/events/useScrollPositionManager';
 import { EventsPageHeader } from '@/components/events/EventsPageHeader';
-import { CategoryFilterControls } from '@/components/events/category-filters/CategoryFilterControls';
 import { CategoryFilteredEventsContent } from '@/components/events/category-filters/CategoryFilteredEventsContent';
+import { NewFilterSection } from '@/components/events/NewFilterSection';
+import { useCategoryFilterSelection } from '@/hooks/events/useCategoryFilterSelection';
 
 const CategoryFilteredEventsPage = () => {
   // Apply SEO settings
   useCategoryPageSeo();
   
   // Manage UI state, scroll position and filters
-  // const navigate = useNavigate(); // No longer used
   const { user } = useAuth();
   const { 
     showEventTypeFilter, setShowEventTypeFilter,
@@ -24,9 +23,12 @@ const CategoryFilteredEventsPage = () => {
   
   // Event filtering and state
   const {
-    // events, // Not directly used here, exactMatches is used for display
-    isLoading, // For initial data load
-    // error, // Not handled in UI, consider adding error display
+    // Available data and loading state
+    isLoading,
+    // Filter options
+    availableEventTypes: allEventTypes,
+    availableVenues,
+    // Filter state
     selectedEventTypes,
     setSelectedEventTypes,
     selectedVenues,
@@ -35,50 +37,61 @@ const CategoryFilteredEventsPage = () => {
     setDateRange,
     selectedDateFilter,
     setSelectedDateFilter,
-    isFilterLoading, // For loading indication when filters change
-    loadingEventId, // Updated from rsvpLoading
-    availableEventTypes,
-    availableVenues,
-    showNoExactMatchesMessage,
+    isFilterLoading,
+    // Event data
     exactMatches,
     similarEvents,
+    showNoExactMatchesMessage,
     hasActiveFilters,
+    // Actions
     resetFilters,
     handleRemoveEventType,
     handleRemoveVenue,
     handleClearDateFilter,
-    handleEventRsvp // The RSVP function from the hook
+    // RSVP handling
+    loadingEventId,
+    handleEventRsvp,
+    // Filter management
+    selectAllEventTypes,
+    deselectAllEventTypes,
   } = useCategoryFilteredEvents(user?.id);
   
+  // Enhanced category filtering
+  const eventTypeStrings = allEventTypes.map(item => item.value);
+  
+  const hasAdvancedFilters = hasActiveFilters || 
+    selectedVenues.length > 0 || 
+    !!dateRange || 
+    !!selectedDateFilter;
+
   return (
     <div className="w-full px-4 md:px-6 py-8">
       <div className="max-w-7xl mx-auto">
         <EventsPageHeader title="Explore Events" />
         
         <div className="space-y-12">
-          {/* Filter Controls Section */}
-          <CategoryFilterControls
-            showEventTypeFilter={showEventTypeFilter}
-            setShowEventTypeFilter={setShowEventTypeFilter}
-            showVenueFilter={showVenueFilter}
-            setShowVenueFilter={setShowVenueFilter}
-            showDateFilter={showDateFilter}
-            setShowDateFilter={setShowDateFilter}
+          {/* New Filter Section */}
+          <NewFilterSection
+            allEventTypes={eventTypeStrings}
             selectedEventTypes={selectedEventTypes}
-            setSelectedEventTypes={setSelectedEventTypes}
-            selectedVenues={selectedVenues}
-            setSelectedVenues={setSelectedVenues}
+            onToggleEventType={(type) => {
+              if (selectedEventTypes.includes(type)) {
+                setSelectedEventTypes(selectedEventTypes.filter(t => t !== type));
+              } else {
+                setSelectedEventTypes([...selectedEventTypes, type]);
+              }
+            }}
+            onSelectAllEventTypes={selectAllEventTypes}
+            onDeselectAllEventTypes={deselectAllEventTypes}
+            resetAllFilters={resetFilters}
             dateRange={dateRange}
             setDateRange={setDateRange}
             selectedDateFilter={selectedDateFilter}
             setSelectedDateFilter={setSelectedDateFilter}
-            availableEventTypes={availableEventTypes}
+            selectedVenues={selectedVenues}
+            setSelectedVenues={setSelectedVenues}
             availableVenues={availableVenues}
-            resetFilters={resetFilters}
-            hasActiveFilters={hasActiveFilters}
-            onRemoveEventType={handleRemoveEventType}
-            onRemoveVenue={handleRemoveVenue}
-            onClearDateFilter={handleClearDateFilter}
+            hasAdvancedFilters={hasAdvancedFilters}
           />
 
           {/* Events Content Section */}
