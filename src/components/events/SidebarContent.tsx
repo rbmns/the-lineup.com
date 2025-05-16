@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { EventFriendRsvps } from '@/components/events/EventFriendRsvps';
 import { EventLocationInfo } from '@/components/events/EventLocationInfo';
 import { EventAttendeesList } from '@/components/events/EventAttendeesList';
-import { MapPin, Ticket, Globe, CalendarClock, Lock } from 'lucide-react';
+import { MapPin, Ticket, Globe, CalendarClock, Lock, UserPlus } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -128,8 +128,8 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({
               />
             </>
           ) : (
-            /* Non-authenticated Users: Show teaser that matches the design */
-            <div className="flex flex-col items-center text-center">
+            /* Non-authenticated Users: Show teaser that matches the design from the first image */
+            <div className="flex flex-col items-center text-center py-4">
               <Lock className="h-10 w-10 text-gray-500 mb-3" />
               <p className="text-sm text-gray-600 mb-4">Sign up to see who's attending</p>
               <Button 
