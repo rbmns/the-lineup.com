@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Event } from '@/types';
 import { filterEventsByType, filterEventsByVenue } from '@/utils/eventUtils';

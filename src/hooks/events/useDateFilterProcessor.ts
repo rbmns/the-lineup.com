@@ -13,22 +13,10 @@ export const useDateFilterProcessor = (selectedDateFilter: string, dateRange?: D
     
     let filtered = events;
     
-    if (selectedDateFilter) {
-      console.log(`Applying date filter: ${selectedDateFilter} to ${events.length} events`);
-      filtered = filterEventsByDate(events, selectedDateFilter);
-      console.log(`After date filter: ${filtered.length} events remain`);
-    } else if (dateRange?.from) {
-      console.log(`Applying date range filter: from ${dateRange.from} to ${dateRange.to || 'unspecified'}`);
-      filtered = events.filter(event => {
-        if (!event.start_time) return false;
-        const eventDate = new Date(event.start_time);
-        if (dateRange.to) {
-          return eventDate >= dateRange.from && eventDate <= dateRange.to;
-        }
-        return eventDate >= dateRange.from;
-      });
-      console.log(`After date range filter: ${filtered.length} events remain`);
-    }
+    // Use the combined filter function that handles both date filters and date ranges
+    filtered = filterEventsByDate(events, selectedDateFilter, dateRange);
+    console.log(`After date filtering: ${filtered.length} events remain`);
+    
     return filtered;
   }, [selectedDateFilter, dateRange]);
 

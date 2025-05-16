@@ -18,6 +18,37 @@ export const filterUpcomingEvents = (events: Event[]): Event[] => {
 };
 
 /**
+ * Filter events that happened in the past
+ */
+export const filterPastEvents = (events: Event[]): Event[] => {
+  const today = startOfDay(new Date());
+  
+  return events.filter(event => {
+    // Try to get a valid date from the event
+    const eventDate = getEventDate(event);
+    if (!eventDate) return false;
+    
+    // Keep the event if it's in the past
+    return isAfter(today, eventDate) && !isSameDay(eventDate, today);
+  });
+};
+
+/**
+ * Sort events by date (ascending)
+ */
+export const sortEventsByDate = (events: Event[]): Event[] => {
+  return [...events].sort((a, b) => {
+    const dateA = getEventDate(a);
+    const dateB = getEventDate(b);
+    
+    if (!dateA) return 1;
+    if (!dateB) return -1;
+    
+    return dateA.getTime() - dateB.getTime();
+  });
+};
+
+/**
  * Helper to extract the date from an event object
  */
 export const getEventDate = (event: Event): Date | null => {
@@ -118,4 +149,39 @@ export const filterEventsByDateFilter = (events: Event[], filter: string): Event
     default:
       return events;
   }
+};
+
+/**
+ * Filter events by date range or date filter
+ * This function is used by components that need to filter events by date
+ */
+export const filterEventsByDate = (events: Event[], dateFilter?: string, dateRange?: any): Event[] => {
+  // If there's a specific filter string like 'today', 'this week', etc., use that first
+  if (dateFilter) {
+    return filterEventsByDateFilter(events, dateFilter);
+  }
+  
+  // If there's a date range, filter by that
+  if (dateRange?.from) {
+    const startDate = startOfDay(dateRange.from);
+    const endDate = dateRange.to ? startOfDay(dateRange.to) : null;
+    
+    return events.filter(event => {
+      const eventDate = getEventDate(event);
+      if (!eventDate) return false;
+      
+      const eventDay = startOfDay(eventDate);
+      
+      if (endDate) {
+        return isAfter(eventDay, startDate) && isBefore(eventDay, endDate) || 
+               isSameDay(eventDay, startDate) || 
+               isSameDay(eventDay, endDate);
+      } else {
+        return isSameDay(eventDay, startDate);
+      }
+    });
+  }
+  
+  // If no filters are provided, return all events
+  return events;
 };
