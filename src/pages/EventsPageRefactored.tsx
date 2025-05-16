@@ -8,7 +8,7 @@ import { EventFilterBar } from '@/components/events/filters/EventFilterBar';
 import { useCategoryFilterSelection } from '@/hooks/events/useCategoryFilterSelection';
 import { useEventPageMeta } from '@/components/events/EventsPageMeta';
 import { useEventFilterState } from '@/hooks/events/useEventFilterState';
-import { AdvancedFiltersButton } from '@/components/events/AdvancedFiltersButton';
+import { AdvancedFiltersButton } from '@/components/events/filters/AdvancedFiltersButton';
 import { AdvancedFiltersPanel } from '@/components/events/filters/AdvancedFiltersPanel';
 import { Button } from '@/components/ui/button';
 import { filterEventsByVenue } from '@/utils/eventUtils';
@@ -41,7 +41,7 @@ const EventsPageRefactored = () => {
     setSelectedDateFilter,
     isFilterLoading,
     showAdvancedFilters,
-    toggleAdvancedFilters,
+    setShowAdvancedFilters,
     hasActiveFilters,
     hasAdvancedFilters,
     resetFilters,
@@ -153,7 +153,7 @@ const EventsPageRefactored = () => {
             <AdvancedFiltersButton
               hasActiveFilters={hasAdvancedFilters}
               isOpen={showAdvancedFilters}
-              onOpen={toggleAdvancedFilters}
+              onOpen={setShowAdvancedFilters}
               className="ml-auto"
             >
               <AdvancedFiltersPanel

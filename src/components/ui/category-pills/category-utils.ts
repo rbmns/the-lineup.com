@@ -1,70 +1,48 @@
 
-import { 
-  Music, 
-  Waves, 
-  Umbrella, 
-  Utensils, 
-  Users, 
-  Calendar, 
-  MapPin, 
-  Heart, 
-  Leaf, 
-  Bike, 
-  Trophy, 
-  PartyPopper, 
-  Gamepad, 
-  Droplets, 
-  Tent 
-} from 'lucide-react';
+import { ReactElement } from 'react';
+import { Music, UtensilsCrossed, Tent, Dumbbell, WaterIcon, Users, Beach, MapIcon, Gamepad2, Yoga } from 'lucide-react';
 
-// Define the type for category icon mapping
-export type CategoryIconMapping = Record<string, React.ElementType>;
-
-// Get the correct icon component for each category
-export const getCategoryIcon = (category: string) => {
-  const normalizedCategory = category?.toLowerCase() || 'event';
-  
-  switch (normalizedCategory) {
-    case 'yoga':
-      return Leaf;
-    case 'surf':
-      return Waves;
-    case 'beach':
-      return Umbrella;
-    case 'music':
-      return Music;
-    case 'food':
-      return Utensils;
-    case 'community':
-      return Users;
-    case 'wellness':
-      return Heart;
-    case 'kite':
-      return Waves;
-    case 'sports':
-      return Bike;
-    case 'other':
-      return Trophy;
-    case 'party':
-      return PartyPopper;
-    case 'game':
-      return Gamepad;
-    case 'water':
-      return Droplets;
-    case 'festival':
-      return Tent;
-    case 'market':
-      return Users;
-    case 'location':
-      return MapPin;
-    case 'event':
-    default:
-      return Calendar;
-  }
+export type CategoryIconMapping = {
+  [key: string]: ReactElement;
 };
 
-// For backward compatibility - these will not be used in the new design
+// Function to map category names to icon components
+export const getCategoryIcon = (category: string) => {
+  const iconMap: Record<string, React.FC> = {
+    'Music': Music,
+    'Food': UtensilsCrossed,
+    'Festival': Tent,
+    'Sports': Dumbbell,
+    'Water': WaterIcon,
+    'Community': Users,
+    'Beach': Beach,
+    'Market': MapIcon,
+    'Game': Gamepad2,
+    'Yoga': Yoga,
+  };
+  
+  const Icon = iconMap[category] || MapIcon;
+  return <Icon className="h-4 w-4" />;
+};
+
+// Get category color based on name
 export const getCategoryColor = (category: string) => {
-  // We return a blank string as we're now handling colors directly in the CategoryPill component
-  return '';
+  const colorMap: Record<string, string> = {
+    'Music': 'bg-purple-500 hover:bg-purple-600',
+    'Food': 'bg-red-500 hover:bg-red-600',
+    'Festival': 'bg-yellow-500 hover:bg-yellow-600',
+    'Sports': 'bg-green-500 hover:bg-green-600',
+    'Water': 'bg-blue-500 hover:bg-blue-600',
+    'Community': 'bg-indigo-500 hover:bg-indigo-600',
+    'Beach': 'bg-amber-500 hover:bg-amber-600',
+    'Market': 'bg-orange-500 hover:bg-orange-600',
+    'Game': 'bg-violet-500 hover:bg-violet-600',
+    'Yoga': 'bg-pink-500 hover:bg-pink-600',
+    'Kite': 'bg-cyan-500 hover:bg-cyan-600',
+    'Wellness': 'bg-lime-500 hover:bg-lime-600',
+    'Surf': 'bg-sky-500 hover:bg-sky-600',
+    'Party': 'bg-rose-500 hover:bg-rose-600',
+  };
+  
+  return colorMap[category] || 'bg-gray-500 hover:bg-gray-600';
 };
