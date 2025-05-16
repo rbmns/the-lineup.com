@@ -52,8 +52,3 @@ export const EventsList: React.FC<EventsListProps> = ({
     </div>
   );
 };
-
-// Helper function to properly format classNames
-const cn = (...classes: (string | boolean | undefined)[]) => {
-  return classes.filter(Boolean).join(' ');
-};
