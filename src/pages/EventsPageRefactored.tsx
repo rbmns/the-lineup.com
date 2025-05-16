@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -9,11 +8,11 @@ import { EventFilterBar } from '@/components/events/filters/EventFilterBar';
 import { useCategoryFilterSelection } from '@/hooks/events/useCategoryFilterSelection';
 import { useEventPageMeta } from '@/components/events/EventsPageMeta';
 import { useEventFilterState } from '@/hooks/events/useEventFilterState';
+import { AdvancedFiltersButton } from '@/components/events/AdvancedFiltersButton';
 import { AdvancedFiltersPanel } from '@/components/events/filters/AdvancedFiltersPanel';
 import { Button } from '@/components/ui/button';
-import { ChevronDown } from 'lucide-react';
 import { filterEventsByVenue } from '@/utils/eventUtils';
-import { filterEventsByDate } from '@/utils/date-filtering';
+import { filterEventsByDate } from '@/utils/eventUtils';
 import { supabase } from '@/lib/supabase';
 
 const EventsPageRefactored = () => {
@@ -137,8 +136,8 @@ const EventsPageRefactored = () => {
       <div className="max-w-7xl mx-auto">
         <EventsPageHeader title="What's Happening?" />
         
-        {/* Add the filter bar */}
-        <div className="mt-6 mb-4">
+        <div className="mt-6 mb-2 flex flex-wrap justify-between items-center gap-4">
+          {/* Category Pills in fixed height container */}
           <EventFilterBar
             allEventTypes={allEventTypes}
             selectedEventTypes={selectedCategories}
@@ -146,43 +145,34 @@ const EventsPageRefactored = () => {
             onSelectAll={selectAll}
             onDeselectAll={deselectAll}
             onReset={reset}
-            hasActiveFilters={hasActiveFilters}
-            onClearAllFilters={resetFilters}
-            className="bg-white rounded-lg shadow-sm p-4"
+            className="flex-grow"
           />
+          
+          {/* Advanced Filters Button */}
+          <div className="flex-shrink-0">
+            <AdvancedFiltersButton
+              hasActiveFilters={hasAdvancedFilters}
+              isOpen={showAdvancedFilters}
+              onOpen={toggleAdvancedFilters}
+              className="ml-auto"
+            >
+              <AdvancedFiltersPanel
+                dateRange={dateRange}
+                onDateRangeChange={setDateRange}
+                selectedDateFilter={selectedDateFilter}
+                onDateFilterChange={setSelectedDateFilter}
+                venues={venues}
+                selectedVenues={selectedVenues}
+                onVenueChange={setSelectedVenues}
+              />
+            </AdvancedFiltersButton>
+          </div>
         </div>
-        
-        {/* Toggle for Advanced Filters */}
-        <div className="flex justify-end mb-4">
-          <Button
-            variant="outline"
-            onClick={toggleAdvancedFilters}
-            className="flex items-center gap-2"
-            size="sm"
-          >
-            {showAdvancedFilters ? "Hide Advanced Filters" : "Advanced Filters"}
-            <ChevronDown className={`h-4 w-4 transition-transform ${showAdvancedFilters ? 'rotate-180' : ''}`} />
-          </Button>
-        </div>
-        
-        {/* Advanced Filters Panel */}
-        <AdvancedFiltersPanel
-          isOpen={showAdvancedFilters}
-          onClose={toggleAdvancedFilters}
-          dateRange={dateRange}
-          onDateRangeChange={setDateRange}
-          selectedDateFilter={selectedDateFilter}
-          onDateFilterChange={setSelectedDateFilter}
-          venues={venues}
-          selectedVenues={selectedVenues}
-          onVenueChange={setSelectedVenues}
-          className="mb-6"
-        />
         
         {/* Active Filters Summary */}
         {hasAdvancedFilters && (
           <div className="mb-6">
-            <div className="flex flex-wrap gap-2 items-center">
+            <div className="flex flex-wrap gap-2 items-center mt-4">
               <span className="text-sm text-gray-500">Active filters:</span>
               
               {selectedVenues.map(venueId => {

@@ -21,7 +21,6 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
   onToggleEventType,
   onSelectAll,
   onDeselectAll,
-  onReset,
   className
 }) => {
   const allSelected = allEventTypes.length === selectedEventTypes.length;
@@ -34,9 +33,10 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
       onSelectAll();
     }
   };
-  
+
+  // Fixed height container with overflow for events
   return (
-    <div className={cn("w-full overflow-x-auto", className)}>
+    <div className={cn("w-full overflow-x-auto h-[42px]", className)}>
       <div className="flex items-center space-x-2 min-w-max">
         {/* All button first */}
         <AllCategoryPill
@@ -48,11 +48,11 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
         {/* Individual category pills */}
         {allEventTypes.map((category) => (
           <CategoryPill
-            key={category}
-            category={category}
+            key={category} 
+            category={category} 
             active={selectedEventTypes.includes(category)}
             onClick={() => onToggleEventType(category)}
-            showIcon={false} // Based on your design images, icons aren't shown
+            showIcon={false}
             size="default"
           />
         ))}
