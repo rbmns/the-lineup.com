@@ -26,16 +26,16 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
   className
 }) => {
   const allSelected = allEventTypes.length > 0 && allEventTypes.length === selectedEventTypes.length;
-  const noneSelected = selectedEventTypes.length === 0;
   
-  // If no filters are selected (empty array), treat as "all selected" for UX purposes
-  const effectiveSelectedTypes = noneSelected ? allEventTypes : selectedEventTypes;
+  // Update: We no longer treat empty selection as "all selected" for UX purposes
+  // Instead, we show no results when nothing is selected
+  const noneSelected = selectedEventTypes.length === 0;
   
   // Handle the "All" pill click
   const handleAllClick = () => {
     if (allSelected) {
       onDeselectAll();
-      toast({ title: "Showing specific categories only" });
+      toast({ title: "No categories selected" });
     } else {
       onSelectAll();
       toast({ title: "Showing all categories" });
@@ -83,7 +83,7 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
             <CategoryPill
               key={category}
               category={category}
-              active={effectiveSelectedTypes.includes(category)} 
+              active={selectedEventTypes.includes(category)} 
               onClick={() => handleCategoryClick(category)}
               showIcon={true}
               size="default"

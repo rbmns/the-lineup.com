@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -32,9 +31,17 @@ const EventsPageRefactored = () => {
   
   // Filter events based on selected categories
   const filteredEvents = React.useMemo(() => {
-    if (selectedCategories.length === 0 || selectedCategories.length === allEventTypes.length) {
-      return events; // Show all if none selected or all selected
+    // If no categories are selected, show no events (empty array)
+    if (selectedCategories.length === 0) {
+      return [];
     }
+    
+    // If all categories are selected, show all events
+    if (selectedCategories.length === allEventTypes.length) {
+      return events;
+    }
+    
+    // Otherwise, filter events by selected categories
     return events.filter(event => 
       event.event_type && selectedCategories.includes(event.event_type)
     );

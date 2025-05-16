@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Calendar, Music, Globe, Users, Film, Book, Dumbbell, Utensils, Tag, Waves, Tent, Leaf, Sun, Sailboat, PartyPopper, BadgeCheck, Gamepad } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -51,6 +52,7 @@ const getCategoryIcon = (category: string): React.ElementType => {
 };
 
 // Enhanced color mapping based on the design system color palette
+// Removed all opacity/transparency from colors
 const getCategoryColor = (category: string): string => {
   const lowerCategory = category.toLowerCase();
   
@@ -180,8 +182,6 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
     'default': 'h-4 w-4 mr-1.5',
     'lg': 'h-4.5 w-4.5 mr-2'
   };
-  
-  // Remove opacity classes - pills should not have transparency
   
   // Interactive classes
   const interactiveClasses = onClick 

@@ -37,6 +37,7 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
 }) => {
   const [showMobileFilters, setShowMobileFilters] = React.useState(false);
   const allSelected = allEventTypes.length === selectedEventTypes.length;
+  const partiallySelected = selectedEventTypes.length > 0 && !allSelected;
   
   return (
     <div className={cn("w-full", className)}>
@@ -69,7 +70,7 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
               >
                 <Filter className="h-4 w-4" />
                 <span>Filters</span>
-                {!allSelected && selectedEventTypes.length > 0 && (
+                {partiallySelected && (
                   <span className="bg-primary text-white rounded-full px-1.5 py-0.5 text-xs">
                     {selectedEventTypes.length}
                   </span>
@@ -109,7 +110,7 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
         </div>
         
         {/* Show selected filters in a scrollable row on mobile */}
-        {!allSelected && selectedEventTypes.length > 0 && (
+        {partiallySelected && (
           <div className="flex overflow-x-auto gap-2 pt-3 pb-1 -mx-2 px-2 snap-x scrollbar-hide">
             {selectedEventTypes.map(category => (
               <div 
