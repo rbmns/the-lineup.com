@@ -68,7 +68,7 @@ export const useEventDetailParams = () => {
     return null;
   }, [eventId, eventSlug, location.pathname, location.state]);
   
-  // Reset initialFetchDone when the route changes
+  // Reset initialFetchDone when the route changes and scroll to top
   useEffect(() => {
     const currentUrl = location.pathname;
     if (previousUrlRef.current !== currentUrl) {
@@ -76,8 +76,11 @@ export const useEventDetailParams = () => {
       initialFetchDone.current = false;
       previousUrlRef.current = currentUrl;
       
-      // Scroll to top on URL change
-      window.scrollTo(0, 0);
+      // Force scroll to top on URL change
+      window.scrollTo({
+        top: 0,
+        behavior: 'instant' // Use 'instant' instead of 'auto' for immediate scroll
+      });
     }
   }, [location.pathname]);
 

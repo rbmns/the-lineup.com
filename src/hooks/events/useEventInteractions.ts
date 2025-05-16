@@ -19,6 +19,9 @@ export const useEventInteractions = () => {
     // Always navigate using UUID for consistency
     const eventUrl = `/events/${event.id}`;
     
+    // Scroll to top before navigation
+    window.scrollTo(0, 0);
+    
     // Navigate to the event detail page
     navigate(eventUrl, {
       state: { 
@@ -34,6 +37,9 @@ export const useEventInteractions = () => {
       console.error("Cannot navigate: event is missing ID");
       return;
     }
+    
+    // Scroll to top before navigation
+    window.scrollTo(0, 0);
     
     // Always use ID-based URLs for internal navigation
     const eventUrl = `/events/${event.id}`;

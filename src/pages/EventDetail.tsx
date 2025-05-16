@@ -29,6 +29,11 @@ const EventDetail = () => {
   // Use proper ID for data fetching, prefer explicit ID over slug
   const effectiveId = id || eventId || '';
   
+  // Always scroll to the top when the event detail page loads
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [effectiveId]);
+  
   // Safety check - if no valid ID is available, redirect to events page
   useEffect(() => {
     if (!effectiveId) {
