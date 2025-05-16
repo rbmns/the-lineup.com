@@ -8,6 +8,8 @@ import { RelatedEvents } from '@/components/events/related-events/RelatedEvents'
 import { MobileRsvpFooter } from '@/components/events/MobileRsvpFooter';
 import { EventDetailHeader } from './EventDetailHeader';
 import { EventDetailFooter } from './EventDetailFooter';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface EventDetailLayoutProps {
   event: Event;
@@ -40,6 +42,8 @@ export const EventDetailLayout: React.FC<EventDetailLayoutProps> = ({
   shareDialogOpen,
   setShareDialogOpen,
 }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="container mx-auto px-4 pt-6 pb-24">
       {/* Back button header */}
@@ -94,12 +98,24 @@ export const EventDetailLayout: React.FC<EventDetailLayoutProps> = ({
       />
       
       {/* Mobile RSVP Footer */}
-      {isMobile && isAuthenticated && (
-        <MobileRsvpFooter 
-          currentStatus={event.rsvp_status} 
-          onRsvp={handleRsvp}
-          onShare={() => setShareDialogOpen(true)}
-        />
+      {isMobile && (
+        isAuthenticated ? (
+          <MobileRsvpFooter 
+            currentStatus={event.rsvp_status} 
+            onRsvp={handleRsvp}
+            onShare={() => setShareDialogOpen(true)}
+          />
+        ) : (
+          <div className="fixed bottom-0 left-0 right-0 p-3 bg-white border-t border-gray-200 shadow-lg z-30 flex justify-between items-center">
+            <Button 
+              onClick={() => navigate('/signup')} 
+              className="w-full bg-black hover:bg-gray-800 text-white"
+              size="lg"
+            >
+              Sign up to see attendees
+            </Button>
+          </div>
+        )
       )}
       
       {/* Share Dialog */}

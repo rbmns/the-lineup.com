@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
-import { UsersRound } from 'lucide-react';
+import { UsersRound, Lock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { navigateToUserProfile } from '@/utils/navigationUtils';
@@ -19,17 +20,40 @@ interface EventFriendRsvpsProps {
   going: User[];
   interested: User[];
   className?: string;
+  isAuthenticated?: boolean;
 }
 
 export const EventFriendRsvps: React.FC<EventFriendRsvpsProps> = ({ 
   going = [], 
   interested = [],
-  className = ''
+  className = '',
+  isAuthenticated = true
 }) => {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const [isGoingDialogOpen, setIsGoingDialogOpen] = useState(false);
   const [isInterestedDialogOpen, setIsInterestedDialogOpen] = useState(false);
+  
+  // If not authenticated, show teaser
+  if (!isAuthenticated) {
+    return (
+      <div className={`space-y-6 ${className}`}>
+        <div className="flex flex-col items-center text-center p-4 bg-gray-50 rounded-lg">
+          <Lock className="h-8 w-8 text-gray-400 mb-2" />
+          <h4 className="text-sm font-medium mb-1">See who's attending</h4>
+          <p className="text-xs text-gray-500 mb-3">Sign up to view attendees and connect with friends</p>
+          <Button 
+            onClick={() => navigate('/signup')} 
+            variant="default" 
+            size="sm" 
+            className="w-full sm:w-auto"
+          >
+            Sign up to see attendees
+          </Button>
+        </div>
+      </div>
+    );
+  }
   
   // Return null if no attendees
   if (going.length === 0 && interested.length === 0) {
