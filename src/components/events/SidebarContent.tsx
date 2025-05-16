@@ -1,18 +1,18 @@
 
 import React from 'react';
 import { Event } from '@/types';
-import { Card, CardContent } from '@/components/ui/card';
-import { EventFriendRsvps } from '@/components/events/EventFriendRsvps';
-import { EventLocationInfo } from '@/components/events/EventLocationInfo';
-import { EventAttendeesList } from '@/components/events/EventAttendeesList';
-import { MapPin, Ticket, Globe, CalendarClock, Lock, UserPlus } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
+import { Users, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getInitials } from '@/utils/eventUtils';
 
 interface SidebarContentProps {
   event: Event;
-  attendees: { going: any[]; interested: any[] };
+  attendees: { 
+    going: any[];
+    interested: any[];
+  };
   isAuthenticated: boolean;
 }
 
@@ -21,129 +21,94 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({
   attendees,
   isAuthenticated
 }) => {
-  const hasFee = typeof event.fee === 'number' && event.fee > 0;
-  const hasBookingLink = !!event.booking_link;
-  const hasExtraInfo = !!event.extra_info && event.extra_info.trim() !== '';
-  const hasOrganizerLink = !!event.organizer_link;
   const navigate = useNavigate();
   
-  // Check if we need to show booking info
-  const showBookingInfo = hasFee || hasBookingLink || hasExtraInfo || hasOrganizerLink;
-
-  // Handler for the sign up button
-  const handleSignUpClick = () => {
-    navigate('/login', { state: { initialMode: 'register' } });
-  };
-
+  // All attendees combined for display
+  const allAttendees = [...(attendees?.going || []), ...(attendees?.interested || [])];
+  
+  // Get unique attendees for display (in case someone is both going and interested)
+  const uniqueAttendees = allAttendees.filter((attendee, index, self) => 
+    index === self.findIndex(a => a.id === attendee.id)
+  ).slice(0, 5); // Show only the first 5
+  
   return (
-    <div className="space-y-4">
-      {/* Location Section */}
-      <Card className="shadow-md border border-gray-200 animate-fade-in" style={{ animationDelay: '150ms' }}>
-        <CardContent className="p-5">
-          <h3 className="text-lg font-semibold mb-3">Location</h3>
-          <EventLocationInfo venue={event.venues} />
-        </CardContent>
-      </Card>
-
-      {/* Booking Info Section */}
-      {showBookingInfo && (
-        <Card className="shadow-md border border-gray-200 animate-fade-in" style={{ animationDelay: '225ms' }}>
-          <CardContent className="p-5">
-            <h3 className="text-lg font-semibold mb-3">Booking Info</h3>
-            
-            <div className="space-y-4">
-              {hasFee && (
-                <div className="flex items-start gap-2">
-                  <Ticket className="h-4 w-4 text-gray-500 mt-1" />
-                  <div>
-                    <p className="text-sm font-medium">Entry fee</p>
-                    <p className="text-sm">{typeof event.fee === 'number' ? `€${event.fee.toFixed(2)}` : 'Free'}</p>
-                  </div>
+    <div className="space-y-6">
+      {/* Attendees preview */}
+      <div className="bg-gray-50 p-5 rounded-lg">
+        <h3 className="font-semibold flex items-center gap-2 mb-3">
+          <Users className="h-5 w-5" /> 
+          <span>Who's going</span>
+        </h3>
+        
+        {isAuthenticated ? (
+          <>
+            {uniqueAttendees.length > 0 ? (
+              <>
+                <div className="flex -space-x-2 mb-3">
+                  {uniqueAttendees.map((attendee, i) => (
+                    <Avatar key={attendee.id || i} className="w-8 h-8 border-2 border-white">
+                      <AvatarImage 
+                        src={attendee.avatar_url} 
+                        alt={attendee.full_name || attendee.username || 'Attendee'} 
+                      />
+                      <AvatarFallback className="bg-primary/10 text-xs">
+                        {getInitials(attendee.full_name || attendee.username || 'A')}
+                      </AvatarFallback>
+                    </Avatar>
+                  ))}
                 </div>
-              )}
-              
-              {hasBookingLink && (
-                <div className="flex items-start gap-2">
-                  <CalendarClock className="h-4 w-4 text-gray-500 mt-1" />
-                  <div>
-                    <p className="text-sm font-medium">Booking required</p>
-                    <a 
-                      href={event.booking_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-1 inline-block"
-                    >
-                      Book Now
-                    </a>
-                  </div>
-                </div>
-              )}
-              
-              {hasOrganizerLink && (
-                <div className="flex items-start gap-2">
-                  <Globe className="h-4 w-4 text-gray-500 mt-1" />
-                  <div>
-                    <p className="text-sm font-medium">Organizer website</p>
-                    <a 
-                      href={event.organizer_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-1 inline-block"
-                    >
-                      {new URL(event.organizer_link).hostname.replace('www.', '')}
-                    </a>
-                  </div>
-                </div>
-              )}
-              
-              {hasExtraInfo && (
-                <>
-                  {(hasFee || hasBookingLink || hasOrganizerLink) && <Separator className="my-2" />}
-                  <div>
-                    <p className="text-sm font-medium mb-1">Additional information</p>
-                    <p className="text-sm text-gray-600">{event.extra_info}</p>
-                  </div>
-                </>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Friends Attending Section */}
-      <Card className="shadow-md border border-gray-200 animate-fade-in" style={{ animationDelay: '300ms' }}>
-        <CardContent className="p-5">
-          <h3 className="text-lg font-semibold mb-3">Friends Attending</h3>
+                
+                <p className="text-sm text-gray-600">
+                  {event.attendees?.going || 0} going · {event.attendees?.interested || 0} interested
+                </p>
+              </>
+            ) : (
+              <p className="text-sm text-gray-500">Be the first to RSVP to this event!</p>
+            )}
+          </>
+        ) : (
+          <div className="text-center py-3">
+            <p className="text-sm text-gray-600 mb-3">
+              Sign up to see who's going
+            </p>
+            <Button 
+              variant="default" 
+              className="w-full"
+              onClick={() => navigate('/login')}
+            >
+              Sign up - it's free
+            </Button>
+          </div>
+        )}
+      </div>
+      
+      {/* Organizer information if available */}
+      {(event.creator || event.organiser_name) && (
+        <div className="border border-gray-200 rounded-lg p-5">
+          <h3 className="font-semibold flex items-center gap-2 mb-3">
+            <User className="h-5 w-5" />
+            <span>Organizer</span>
+          </h3>
           
-          {isAuthenticated ? (
-            /* Authenticated Users: Show attendees list */
-            <>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-sm font-medium">Going: {attendees?.going?.length || 0}</span>
-                <span className="text-sm font-medium">Interested: {attendees?.interested?.length || 0}</span>
-              </div>
-              <EventAttendeesList 
-                going={attendees?.going || []} 
-                interested={attendees?.interested || []} 
+          <div className="flex items-center gap-3">
+            <Avatar className="w-10 h-10 border border-gray-200">
+              <AvatarImage 
+                src={event.creator?.avatar_url} 
+                alt={event.creator?.full_name || event.organiser_name || 'Organizer'} 
               />
-            </>
-          ) : (
-            /* Non-authenticated Users: Show teaser that matches the design from the first image */
-            <div className="flex flex-col items-center text-center py-4">
-              <Lock className="h-10 w-10 text-gray-500 mb-3" />
-              <p className="text-sm text-gray-600 mb-4">Sign up to see who's attending</p>
-              <Button 
-                onClick={handleSignUpClick}
-                className="w-full bg-black hover:bg-gray-800 text-white font-medium"
-              >
-                Sign up to see attendees
-              </Button>
+              <AvatarFallback className="bg-primary/10">
+                {getInitials(event.creator?.full_name || event.organiser_name || 'O')}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-medium">{event.creator?.full_name || event.organiser_name}</p>
+              {event.creator?.tagline && (
+                <p className="text-xs text-gray-500 mt-0.5">{event.creator.tagline}</p>
+              )}
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-
-export default SidebarContent;
