@@ -18,11 +18,6 @@ export const useCategoryFilterSelection = (availableCategories: string[] = []) =
 
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev => {
-      // If we're deselecting the last category, don't allow it
-      if (prev.includes(category) && prev.length === 1) {
-        return prev;
-      }
-      
       // If clicking a category when all are selected, select ONLY this category
       if (prev.length === availableCategories.length) {
         return [category];
@@ -30,6 +25,7 @@ export const useCategoryFilterSelection = (availableCategories: string[] = []) =
       
       // Normal toggle behavior
       if (prev.includes(category)) {
+        // Allow deselecting even if it's the last category
         return prev.filter(c => c !== category);
       } else {
         return [...prev, category];
@@ -42,8 +38,8 @@ export const useCategoryFilterSelection = (availableCategories: string[] = []) =
   };
 
   const deselectAll = () => {
-    // When deselecting all, we need to maintain at least one filter to avoid the "no events" state
-    setSelectedCategories(availableCategories.length > 0 ? [availableCategories[0]] : []);
+    // Now we allow completely empty selection
+    setSelectedCategories([]);
   };
 
   const reset = () => {

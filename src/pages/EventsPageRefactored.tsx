@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -93,13 +94,21 @@ const EventsPageRefactored = () => {
     fetchVenues();
   }, []);
   
+  // Determine if we have no categories selected
+  const noCategoriesSelected = selectedCategories.length === 0;
+  
   // Filter events based on all filters
   const filteredEvents = React.useMemo(() => {
     // Start with all events
     let filtered = events;
     
+    // If no categories are selected, return empty array (no events)
+    if (noCategoriesSelected) {
+      return [];
+    }
+    
     // Apply event type filter only if not all categories are selected
-    if (selectedCategories.length > 0 && selectedCategories.length !== allEventTypes.length) {
+    if (selectedCategories.length !== allEventTypes.length) {
       filtered = events.filter(event => 
         event.event_type && selectedCategories.includes(event.event_type)
       );
@@ -116,7 +125,7 @@ const EventsPageRefactored = () => {
     }
     
     return filtered;
-  }, [events, selectedCategories, allEventTypes.length, selectedVenues, dateRange, selectedDateFilter]);
+  }, [events, selectedCategories, allEventTypes.length, selectedVenues, dateRange, selectedDateFilter, noCategoriesSelected]);
   
   const { 
     handleRsvp: enhancedHandleRsvp, 
@@ -232,6 +241,7 @@ const EventsPageRefactored = () => {
             showRsvpButtons={!!user}
             hasActiveFilters={hasActiveFilters}
             loadingEventId={loadingEventId}
+            noCategoriesSelected={noCategoriesSelected}
           />
         </div>
       </div>

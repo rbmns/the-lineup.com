@@ -26,8 +26,7 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
 }) => {
   const allSelected = allEventTypes.length > 0 && allEventTypes.length === selectedEventTypes.length;
   
-  // Update: We no longer treat empty selection as "all selected" for UX purposes
-  // Instead, we show no results when nothing is selected
+  // Note: We now treat empty selection as intended behavior
   const noneSelected = selectedEventTypes.length === 0;
   
   // Handle the "All" pill click
@@ -39,8 +38,8 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
     }
   };
   
-  // Show reset option only when some filters are selected but not all
-  const showResetOption = selectedEventTypes.length > 0 && !allSelected;
+  // Show reset option only when some filters are selected but not all or none
+  const showResetOption = selectedEventTypes.length > 0 && !allSelected && !noneSelected;
   
   return (
     <div className={cn("space-y-4", className)}>
