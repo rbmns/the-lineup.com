@@ -7,7 +7,7 @@ import { CategoryPill } from '@/components/ui/category-pill';
 import { useEventImages } from '@/hooks/useEventImages';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
-import { formatEventTime, formatDate, AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
+import { formatEventTime, formatDate, AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
 
 export interface EventCardProps {
   event: Event;

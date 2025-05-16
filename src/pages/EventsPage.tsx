@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
-import { filterUpcomingEvents } from '@/utils/dateUtils';
+import { filterUpcomingEvents } from '@/utils/date-filtering';
 import { pageSeoTags } from '@/utils/seoUtils';
 import { LazyEventsList } from '@/components/events/LazyEventsList';
 import { useCanonical } from '@/hooks/useCanonical';

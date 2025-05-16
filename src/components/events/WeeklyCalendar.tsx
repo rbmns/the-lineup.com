@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { format, addDays, isSameDay } from 'date-fns';
 import { ArrowLeft, ArrowRight, Calendar as CalendarIcon } from 'lucide-react';
 import { Event } from '@/types';
-import { getWeekRange } from '@/utils/dateUtils';
+import { getWeekRange } from '@/utils/event-date-utils';
 import { Button } from '@/components/ui/button';
 import { EventDayDetails } from './EventDayDetails';
 

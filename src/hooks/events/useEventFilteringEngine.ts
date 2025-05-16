@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Event } from '@/types'; 
-import { filterEventsByDate } from '@/utils/dateUtils'; 
+import { filterEventsByDate, filterEventsByDateRange } from '@/utils/date-filtering'; 
 
 interface UseEventFilteringEngineProps {
   events: Event[] | undefined;

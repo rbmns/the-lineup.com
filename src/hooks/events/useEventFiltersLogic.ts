@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Event } from '@/types';
 import { filterEventsByType, filterEventsByVenue } from '@/utils/eventUtils';
-import { filterEventsByDate } from '@/utils/dateUtils';
+import { filterEventsByDate } from '@/utils/date-filtering';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { DateRange } from 'react-day-picker';

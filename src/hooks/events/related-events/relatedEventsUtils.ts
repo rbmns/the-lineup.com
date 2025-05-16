@@ -1,8 +1,7 @@
-
 import { Event } from '@/types';
-import { supabase } from '@/integrations/supabase/client';
+import { compareAsc } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
-import { AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
+import { AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
 import { EventRsvpMap } from './types';
 
 /**

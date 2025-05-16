@@ -1,215 +1,210 @@
-
-import React, { useEffect } from 'react';
-import { useNavigate, useLocation as useRouterLocation } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { ProfileHeader } from '@/components/profile/ProfileHeader';
-import { AvatarUploadWrapper } from '@/components/profile/AvatarUploadWrapper';
-import { Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { Event } from '@/types';
-import { processEventData } from '@/utils/eventProcessorUtils';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { filterUpcomingEvents, filterPastEvents, sortEventsByDate } from '@/utils/dateUtils';
-import { UserEvents } from '@/components/profile/UserEvents';
-import { UserPastEvents } from '@/components/profile/UserPastEvents';
-
+import { useProfileData } from '@/hooks/useProfileData';
+import { useCanonical } from '@/hooks/useCanonical';
+import { UserProfileContent } from '@/components/profile/UserProfileContent';
+import { ProfileNotFound } from '@/components/profile/ProfileNotFound';
+import { ProfileHeader } from '@/components/profile/ProfileHeader';
+import { ProfileLoading } from '@/components/profile/ProfileLoading';
+import { FriendManagement } from '@/components/profile/FriendManagement';
+import { ProfileAccessControl } from '@/components/profile/ProfileAccessControl';
+import { BackButton } from '@/components/profile/BackButton';
+import { filterPastEvents, sortEventsByDate } from '@/utils/date-filtering';
+ 
 const Profile = () => {
-  const { user, profile, isAuthenticated, loading: authLoading, refreshProfile } = useAuth();
+  const { username } = useParams<{ username: string }>();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const location = useRouterLocation();
-  const [events, setEvents] = React.useState<Event[]>([]);
-  const [eventsLoading, setEventsLoading] = React.useState(true);
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
+  const [events, setEvents] = useState([]);
+  const [loadingEvents, setLoadingEvents] = useState(true);
+  const [isFriend, setIsFriend] = useState<boolean | null>(null);
+  const [friendRequestSent, setFriendRequestSent] = useState(false);
+  const [friendRequestReceived, setFriendRequestReceived] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [profileId, setProfileId] = useState<string | null>(null);
   
-  // Only refresh profile when navigating from edit page with refreshNeeded flag
+  const { 
+    profile, 
+    isLoading, 
+    error, 
+    isNotFound,
+    fetchProfileData 
+  } = useProfileData(username);
+  
+  // Add canonical URL for SEO - providing the username as required parameter
+  useCanonical(username ? `/profile/${username}` : '/profile', profile?.username);
+  
   useEffect(() => {
-    const shouldRefresh = location.state?.refreshNeeded === true;
-    
-    if (!authLoading && user?.id && shouldRefresh) {
-      console.log("Profile updated, refreshing profile data...");
-      refreshProfile();
-      
-      // Clear the state to prevent further refreshes
-      navigate('/profile', { 
-        replace: true,
-        state: {} 
-      });
+    if (profile?.id) {
+      setProfileId(profile.id);
+      setIsOwnProfile(user?.id === profile.id);
     }
-  }, [location.state, user?.id, refreshProfile, authLoading, navigate]);
-
+  }, [user?.id, profile?.id]);
+  
   useEffect(() => {
-    if (!authLoading && !isAuthenticated && !user) {
-      navigate('/login');
-    }
-  }, [isAuthenticated, user, navigate, authLoading]);
-
-  useEffect(() => {
-    const fetchUserEvents = async () => {
-      if (!user?.id) return;
-      
-      try {
-        setEventsLoading(true);
-        
-        const { data, error } = await supabase
-          .from('event_rsvps')
-          .select(`
-            status,
-            events (
-              id, title, description, event_type,
-              start_time, end_time, image_urls, creator, venue_id,
-              venues:venue_id (
-                id, name, street, city
-              ),
-              created_at, updated_at
-            )
-          `)
-          .eq('user_id', user.id);
-          
-        if (error) {
-          console.error('Error fetching events:', error);
-          setEventsLoading(false);
-          return;
-        }
-        
-        const userEvents = data
-          .filter(item => item.events)
-          .map(item => {
-            const eventData = item.events as any;
-            const processedEvent = processEventData(eventData, user.id);
-            return {
-              ...processedEvent,
-              rsvp_status: item.status as 'Going' | 'Interested'
-            };
-          });
-          
-        setEvents(userEvents);
-      } catch (err) {
-        console.error('Exception fetching events:', err);
-      } finally {
-        setEventsLoading(false);
+    if (profileId) {
+      fetchEvents(profileId);
+      if (user?.id && !isOwnProfile) {
+        checkFriendshipStatus(user.id, profileId);
+        checkIfBlocked(user.id, profileId);
       }
-    };
-    
-    if (user?.id) {
-      fetchUserEvents();
     }
-  }, [user?.id]);
-
-  if (authLoading) {
-    return (
-      <div className="container py-8 flex items-center justify-center min-h-[50vh]">
-        <div className="flex flex-col items-center space-y-4">
-          <Loader2 className="h-12 w-12 animate-spin text-purple" />
-          <p className="text-gray-600">Loading your profile...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated || !user) {
-    return (
-      <div className="container py-8">
-        <Card className="p-8 text-center">
-          <CardContent>
-            <h1 className="text-2xl font-bold mb-4">Please log in</h1>
-            <p className="text-gray-500 mb-4">You need to be logged in to view your profile.</p>
-            <Button onClick={() => navigate('/login')}>Go to Login</Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <div className="container py-8">
-        <Card className="p-8 text-center">
-          <CardContent>
-            <h1 className="text-2xl font-bold mb-4">Loading Profile</h1>
-            <p className="text-gray-500 mb-4">We're retrieving your profile information...</p>
-            <Loader2 className="h-8 w-8 animate-spin text-purple mx-auto mb-4" />
-            <Button onClick={() => refreshProfile()}>Reload Profile</Button>
-            <Button onClick={() => navigate('/')} className="ml-2" variant="outline">Go to Home</Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  const upcomingEvents = sortEventsByDate(filterUpcomingEvents(events));
-  const pastEvents = filterPastEvents(events);
-
-  const handleEditProfile = () => {
-    navigate('/profile/edit');
+  }, [profileId, user?.id, isOwnProfile]);
+  
+  useEffect(() => {
+    if (username) {
+      document.title = `@${username} | Events`;
+    }
+  }, [username]);
+  
+  const fetchEvents = async (profileId: string) => {
+    setLoadingEvents(true);
+    try {
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .eq('creator_id', profileId)
+        .order('start_date', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching events:', error);
+      } else {
+        setEvents(data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    } finally {
+      setLoadingEvents(false);
+    }
   };
-
+  
+  const checkFriendshipStatus = async (userId: string, profileId: string) => {
+    try {
+      // Check if a friend request has been sent by the current user
+      const { data: sentRequest, error: sentError } = await supabase
+        .from('friend_requests')
+        .select('*')
+        .eq('sender_id', userId)
+        .eq('receiver_id', profileId)
+        .single();
+      
+      if (sentError && sentError.code !== 'PGRST116') {
+        console.error('Error checking sent friend request:', sentError);
+      } else if (sentRequest) {
+        setFriendRequestSent(true);
+      }
+      
+      // Check if a friend request has been received by the current user
+      const { data: receivedRequest, error: receivedError } = await supabase
+        .from('friend_requests')
+        .select('*')
+        .eq('sender_id', profileId)
+        .eq('receiver_id', userId)
+        .single();
+      
+      if (receivedError && receivedError.code !== 'PGRST116') {
+        console.error('Error checking received friend request:', receivedError);
+      } else if (receivedRequest) {
+        setFriendRequestReceived(true);
+      }
+      
+      // Check if the users are already friends
+      const { data: friendship, error: friendshipError } = await supabase
+        .from('friends')
+        .select('*')
+        .or(`user_id.eq.${userId}, friend_id.eq.${userId}`)
+        .or(`user_id.eq.${profileId}, friend_id.eq.${profileId}`);
+      
+      if (friendshipError) {
+        console.error('Error checking friendship:', friendshipError);
+      } else {
+        const areFriends = friendship && friendship.some(record =>
+          (record.user_id === userId && record.friend_id === profileId) ||
+          (record.user_id === profileId && record.friend_id === userId)
+        );
+        setIsFriend(areFriends);
+      }
+    } catch (error) {
+      console.error('Error checking friendship status:', error);
+    }
+  };
+  
+  const checkIfBlocked = async (userId: string, profileId: string) => {
+    try {
+      const { data: block, error: blockError } = await supabase
+        .from('blocks')
+        .select('*')
+        .eq('blocker_id', userId)
+        .eq('blocked_id', profileId)
+        .single();
+      
+      if (blockError && blockError.code !== 'PGRST116') {
+        console.error('Error checking block status:', blockError);
+      } else if (block) {
+        setIsBlocked(true);
+      } else {
+        setIsBlocked(false);
+      }
+    } catch (error) {
+      console.error('Error checking block status:', error);
+    }
+  };
+  
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+  
+  if (isLoading) {
+    return <ProfileLoading />;
+  }
+  
+  if (isNotFound || !profile) {
+    return <ProfileNotFound />;
+  }
+  
+  const pastEvents = filterPastEvents(events);
+  const sortedPastEvents = sortEventsByDate(pastEvents);
+  
   return (
-    <div className="container max-w-4xl py-6 px-4 md:px-8">
-      <h1 className="text-2xl font-bold mb-4">My Profile</h1>
+    <div className="container mx-auto mt-8">
+      <BackButton onClick={handleGoBack} />
       
-      <div className="mb-6">
-        <Card className="border border-gray-200 shadow-sm">
-          <CardContent className="p-6 flex flex-col items-center">
-            <AvatarUploadWrapper size="xl" className="mb-4" />
-            <ProfileHeader 
-              profile={{
-                id: profile?.id || '',
-                username: profile?.username || '',
-                avatar_url: Array.isArray(profile?.avatar_url) && profile?.avatar_url && profile?.avatar_url.length > 0 
-                  ? profile.avatar_url[0] 
-                  : '',
-                tagline: profile?.tagline || '',
-                location: profile?.location || '',
-                status: profile?.status || null,
-              }}
-              viewingOwnProfile={true}
-              showAvatar={false}
-              onEditProfile={handleEditProfile}
-            />
-          </CardContent>
-        </Card>
-      </div>
+      <ProfileHeader
+        profile={profile}
+        isOwnProfile={isOwnProfile}
+      />
       
-      <div>
-        <Tabs defaultValue="upcoming" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-2">
-            <TabsTrigger value="upcoming">Upcoming Events</TabsTrigger>
-            <TabsTrigger value="past">Past Events</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="upcoming" className="pt-1">
-            {eventsLoading ? (
-              <div className="flex items-center justify-center py-6">
-                <Loader2 className="h-6 w-6 animate-spin text-purple mr-2" />
-                <span className="text-sm">Loading your upcoming events...</span>
-              </div>
-            ) : (
-              <UserEvents 
-                events={upcomingEvents}
-                loading={false}
-                isCurrentUser={true}
-                showRsvpStatus={true}
-              />
-            )}
-          </TabsContent>
-          
-          <TabsContent value="past" className="pt-1">
-            {eventsLoading ? (
-              <div className="flex items-center justify-center py-6">
-                <Loader2 className="h-6 w-6 animate-spin text-purple mr-2" />
-                <span className="text-sm">Loading your past events...</span>
-              </div>
-            ) : (
-              <UserPastEvents 
-                events={pastEvents}
-                loading={false}
-                isCurrentUser={true}
-              />
-            )}
-          </TabsContent>
-        </Tabs>
-      </div>
+      {!isOwnProfile && user && (
+        <FriendManagement
+          userId={user.id}
+          profileId={profileId || ''}
+          isFriend={isFriend}
+          friendRequestSent={friendRequestSent}
+          friendRequestReceived={friendRequestReceived}
+          isBlocked={isBlocked}
+          setIsFriend={setIsFriend}
+          setFriendRequestSent={setFriendRequestSent}
+          setFriendRequestReceived={setFriendRequestReceived}
+          setIsBlocked={setIsBlocked}
+          fetchProfileData={fetchProfileData}
+        />
+      )}
+      
+      {isOwnProfile && user && (
+        <ProfileAccessControl
+          profile={profile}
+          fetchProfileData={fetchProfileData}
+        />
+      )}
+      
+      <UserProfileContent
+        profile={profile}
+        events={sortedPastEvents}
+        loadingEvents={loadingEvents}
+      />
     </div>
   );
 };

@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Event } from '@/types';
 import { filterEventsByType, filterEventsByVenue } from '@/utils/eventUtils';
-import { filterEventsByDate } from '@/utils/dateUtils';
+import { filterEventsByDate } from '@/utils/date-filtering';
 import { useSearchParams } from 'react-router-dom';
 import { DateRange } from 'react-day-picker';
 

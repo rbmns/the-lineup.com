@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -12,7 +13,7 @@ import { AdvancedFiltersPanel } from '@/components/events/filters/AdvancedFilter
 import { Button } from '@/components/ui/button';
 import { ChevronDown } from 'lucide-react';
 import { filterEventsByVenue } from '@/utils/eventUtils';
-import { filterEventsByDate } from '@/utils/dateUtils';
+import { filterEventsByDate } from '@/utils/date-filtering';
 import { supabase } from '@/lib/supabase';
 
 const EventsPageRefactored = () => {

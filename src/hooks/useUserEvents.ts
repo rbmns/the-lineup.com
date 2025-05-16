@@ -1,57 +1,67 @@
-
-import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase';
+import { filterPastEvents, sortEventsByDate } from '@/utils/date-filtering';
+import { processEventsData } from '@/utils/eventProcessorUtils';
 import { Event } from '@/types';
-import { filterUpcomingEvents, filterPastEvents, sortEventsByDate } from '@/utils/dateUtils';
-import { useRsvpActions } from '@/hooks/useRsvpActions';
-import { useUserEventQueries } from './useUserEventQueries';
 
-export const useUserEvents = (
-  userId: string | undefined, 
-  currentUserId: string | undefined,
-  friendshipStatus: 'none' | 'pending' | 'requested' | 'accepted'
-) => {
-  const { handleRsvp: handleRsvpAction } = useRsvpActions();
-  
-  // Consider all non-accepted statuses as 'none' for event queries
-  const normalizedStatus = friendshipStatus === 'accepted' ? 'accepted' : 
-                           friendshipStatus === 'pending' ? 'pending' : 'none';
-                           
-  const { userEvents, isLoading, refetch } = useUserEventQueries(userId, currentUserId, normalizedStatus);
+interface UseUserEventsResult {
+  pastEvents: Event[];
+  upcomingEvents: Event[];
+  isLoading: boolean;
+  error: Error | null;
+  refetch: () => Promise<void>;
+}
 
-  React.useEffect(() => {
-    console.log('useUserEvents hook called with:', {
-      userId,
-      currentUserId,
-      friendshipStatus,
-      normalizedStatus
-    });
-  }, [userId, currentUserId, friendshipStatus, normalizedStatus]);
-
-  // Use simple memoization to avoid unnecessary recalculations
-  const upcomingEvents = React.useMemo(() => {
-    return userEvents ? sortEventsByDate(filterUpcomingEvents(userEvents)) : [];
-  }, [userEvents]);
-  
-  const pastEvents = React.useMemo(() => {
-    return userEvents ? filterPastEvents(userEvents) : [];
-  }, [userEvents]);
-
-  // Handle RSVP actions
-  const handleRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<void> => {
-    if (handleRsvpAction) {
-      await handleRsvpAction(eventId, status);
-      if (refetch) {
-        await refetch();
+export const useUserEvents = (userId: string | undefined): UseUserEventsResult => {
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['userEvents', userId],
+    queryFn: async () => {
+      if (!userId) {
+        return { pastEvents: [], upcomingEvents: [] };
       }
-    }
-  };
+
+      try {
+        const { data: eventsData, error: eventsError } = await supabase
+          .from('events')
+          .select(`
+            *,
+            creator:profiles(id, username, avatar_url, email, location, status, tagline),
+            venues:venue_id(*),
+            event_rsvps(id, user_id, status)
+          `)
+          .order('start_date', { ascending: true })
+          .order('start_time', { ascending: true });
+
+        if (eventsError) {
+          console.error('Error fetching events:', eventsError);
+          throw eventsError;
+        }
+
+        if (!eventsData) {
+          return { pastEvents: [], upcomingEvents: [] };
+        }
+
+        const allEvents = processEventsData(eventsData, userId);
+        const pastEvents = filterPastEvents(allEvents);
+        const sortedPastEvents = sortEventsByDate(pastEvents);
+        const upcomingEvents = allEvents.filter(event => !pastEvents.includes(event));
+
+        return { pastEvents: sortedPastEvents, upcomingEvents };
+      } catch (err) {
+        console.error('Error in useUserEvents:', err);
+        return { pastEvents: [], upcomingEvents: [] };
+      }
+    },
+    enabled: !!userId,
+    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 2, // 2 minutes
+  });
 
   return {
-    userEvents,
+    pastEvents: data?.pastEvents || [],
+    upcomingEvents: data?.upcomingEvents || [],
     isLoading,
-    upcomingEvents,
-    pastEvents,
-    handleRsvp,
-    refetch
+    error,
+    refetch,
   };
 };

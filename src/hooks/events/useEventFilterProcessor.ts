@@ -1,7 +1,7 @@
 
 import { useMemo } from 'react';
 import { Event } from '@/types';
-import { filterUpcomingEvents } from '@/utils/dateUtils';
+import { filterUpcomingEvents } from '@/utils/date-filtering';
 import { useDateFilterProcessor } from './useDateFilterProcessor';
 
 // Extend the Event type to include the optional isExactMatch property

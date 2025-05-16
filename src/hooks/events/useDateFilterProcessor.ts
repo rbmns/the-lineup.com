@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import { filterEventsByDate } from '@/utils/dateUtils';
+import { filterEventsByDate } from '@/utils/date-filtering';
 import { DateRange } from 'react-day-picker';
 import { Event } from '@/types';
 
