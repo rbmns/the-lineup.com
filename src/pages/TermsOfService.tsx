@@ -4,11 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
 export default function TermsOfService() {
+  const currentDate = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
   return (
     <div className="container max-w-3xl py-8 space-y-6">
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">Terms of Service</h1>
-        <p className="text-gray-500 dark:text-gray-400">Last updated: {new Date().toLocaleDateString()}</p>
+        <p className="text-gray-500 dark:text-gray-400">Last updated: {currentDate}</p>
       </div>
       
       <div className="space-y-6">
@@ -38,6 +44,22 @@ export default function TermsOfService() {
         </section>
 
         <section className="space-y-3">
+          <h2 className="text-xl font-semibold">Privacy and Data Collection</h2>
+          <p>
+            Our Privacy Policy explains how we handle your personal data and protect your privacy when you use our Service. 
+            By using our Service, you agree to the collection and use of information in accordance with our Privacy Policy.
+          </p>
+          <p>
+            We use tracking technologies including cookies to collect and store information about how you interact with our services. 
+            These technologies help us analyze site traffic, personalize content, and optimize your experience.
+          </p>
+          <p>
+            You can manage cookie preferences through our Cookie Consent banner or your browser settings. 
+            Please note that disabling certain cookies may impact functionality of our service.
+          </p>
+        </section>
+
+        <section className="space-y-3">
           <h2 className="text-xl font-semibold">Content in the Service</h2>
           <p>
             When you upload, submit, store, send or receive content to or through our Service, you give us a worldwide
@@ -56,7 +78,23 @@ export default function TermsOfService() {
             <li>Uploading or transmitting viruses or malicious code</li>
             <li>Attempting to access, tamper with, or use non-public areas of the platform</li>
             <li>Harassing, threatening, or intimidating other users</li>
+            <li>Circumventing, disabling, or interfering with security features</li>
+            <li>Using automated systems to access our Service without authorization</li>
           </ul>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-xl font-semibold">Third-Party Services</h2>
+          <p>
+            Our Service may contain links to third-party websites or services that are not owned or controlled by the lineup.
+            We have no control over, and assume no responsibility for, the content, privacy policies, or practices of any
+            third-party websites or services. You acknowledge that we will not be liable for any claims attributable
+            to any third-party websites or services.
+          </p>
+          <p>
+            We use third-party analytics services such as Google Analytics to help us understand how users interact with our platform. 
+            These services may collect information about your use of our service and may share this information with other services.
+          </p>
         </section>
 
         <section className="space-y-3">
