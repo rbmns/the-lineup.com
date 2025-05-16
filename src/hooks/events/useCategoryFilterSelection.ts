@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 
 /**
@@ -17,11 +18,18 @@ export const useCategoryFilterSelection = (availableCategories: string[] = []) =
 
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev => {
+      // If we're deselecting the last category, don't allow it
+      if (prev.includes(category) && prev.length === 1) {
+        return prev;
+      }
+      
+      // If clicking a category when all are selected, select ONLY this category
+      if (prev.length === availableCategories.length) {
+        return [category];
+      }
+      
+      // Normal toggle behavior
       if (prev.includes(category)) {
-        // If all categories would be deselected, keep at least this one selected
-        if (prev.length === 1) {
-          return prev;
-        }
         return prev.filter(c => c !== category);
       } else {
         return [...prev, category];

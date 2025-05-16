@@ -39,23 +39,6 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
     }
   };
   
-  // Handle individual category click
-  const handleCategoryClick = (category: string) => {
-    if (allSelected) {
-      // If all are selected and user clicks one, deselect all others and select only this one
-      const newSelection = [category];
-      // We can't directly call onToggleEventType here since we need to replace the entire selection
-      // Instead, deselect all first then add the clicked category
-      onDeselectAll();
-      setTimeout(() => {
-        onToggleEventType(category);
-      }, 0);
-    } else {
-      // Normal toggle behavior for subsequent clicks
-      onToggleEventType(category);
-    }
-  };
-  
   // Show reset option only when some filters are selected but not all
   const showResetOption = selectedEventTypes.length > 0 && !allSelected;
   
@@ -80,7 +63,7 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
               key={category}
               category={category}
               active={selectedEventTypes.includes(category)} 
-              onClick={() => handleCategoryClick(category)}
+              onClick={() => onToggleEventType(category)}
               showIcon={true}
               size="default"
             />
