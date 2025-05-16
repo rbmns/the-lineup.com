@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,6 +13,7 @@ import { FriendManagement } from '@/components/profile/FriendManagement';
 import { ProfileAccessControl } from '@/components/profile/ProfileAccessControl';
 import { BackButton } from '@/components/profile/BackButton';
 import { filterPastEvents, sortEventsByDate } from '@/utils/date-filtering';
+import { checkRealTimeFriendshipStatus } from '@/utils/friendshipUtils';
  
 const Profile = () => {
   const { username } = useParams<{ username: string }>();
@@ -25,6 +27,7 @@ const Profile = () => {
   const [friendRequestReceived, setFriendRequestReceived] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
   const [profileId, setProfileId] = useState<string | null>(null);
+  const [friendshipStatus, setFriendshipStatus] = useState<'none' | 'pending' | 'accepted'>('none');
   
   const { 
     profile, 
@@ -60,6 +63,18 @@ const Profile = () => {
       document.title = `@${username} | Events`;
     }
   }, [username]);
+  
+  // Update friendship status from the database
+  useEffect(() => {
+    const updateFriendshipStatus = async () => {
+      if (user?.id && profileId && !isOwnProfile) {
+        const status = await checkRealTimeFriendshipStatus(user.id, profileId);
+        setFriendshipStatus(status);
+      }
+    };
+    
+    updateFriendshipStatus();
+  }, [user?.id, profileId, isOwnProfile]);
   
   const fetchEvents = async (profileId: string) => {
     setLoadingEvents(true);
@@ -181,21 +196,30 @@ const Profile = () => {
         <FriendManagement
           profile={profile}
           currentUserId={user.id}
+          friendshipStatus={friendshipStatus}
+          setFriendshipStatus={setFriendshipStatus}
           onUpdateFriendship={(status) => {
             setIsFriend(status === 'accepted');
             setFriendRequestSent(status === 'requested');
             setFriendRequestReceived(status === 'pending');
           }}
           onBlock={(blocked) => setIsBlocked(blocked)}
-          refreshProfile={() => refreshProfile()}
+          refreshProfile={refreshProfile}
         />
       )}
       
       {isOwnProfile && user && (
         <ProfileAccessControl
           profile={profile}
-          onUpdate={() => refreshProfile()}
-        />
+          user={user}
+          userId={user.id}
+          loading={false}
+          profileLoading={loading}
+          isAuthenticated={!!user}
+          friendshipStatus={friendshipStatus}
+        >
+          <div>Profile content for authenticated user</div>
+        </ProfileAccessControl>
       )}
       
       <UserProfileContent
