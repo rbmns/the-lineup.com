@@ -7,13 +7,10 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  // DropdownMenuItem, // Not used, can be removed if not needed elsewhere
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-// Removed DateRange as it's not used in this component's props or logic
-// import { DateRange } from 'react-day-picker'; 
-import { CategoryPill } from '@/components/ui/category-pill'; // Added this import
+import { CategoryPill } from '@/components/ui/category-pill';
 
 interface EventFilterBarProps {
   allEventTypes: string[];
@@ -25,6 +22,7 @@ interface EventFilterBarProps {
   hasActiveFilters?: boolean;
   onClearAllFilters?: () => void;
   className?: string;
+  allSelected?: boolean;
 }
 
 export const EventFilterBar: React.FC<EventFilterBarProps> = ({
@@ -36,7 +34,8 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
   onReset,
   hasActiveFilters,
   onClearAllFilters,
-  className
+  className,
+  allSelected = false
 }) => {
   const [showMobileFilters, setShowMobileFilters] = React.useState(false);
   
@@ -79,29 +78,34 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[280px] p-4">
+              <div className="mb-2">
+                <CategoryPill
+                  key="all-categories-mobile"
+                  category="All"
+                  active={allSelected}
+                  onClick={() => allSelected ? onDeselectAll() : onSelectAll()}
+                  showIcon={true}
+                  isAll={true}
+                />
+              </div>
               <EventCategoryFilters
                 allEventTypes={allEventTypes}
                 selectedEventTypes={selectedEventTypes}
                 onToggleEventType={(type) => {
                   onToggleEventType(type);
-                  // Consider closing dropdown after selection if desired for UX
-                  // setShowMobileFilters(false); 
                 }}
                 onSelectAll={() => {
                   onSelectAll();
-                  // setShowMobileFilters(false); // Optional: close dropdown
                 }}
                 onDeselectAll={() => {
                   onDeselectAll();
-                  // setShowMobileFilters(false); // Optional: close dropdown
                 }}
                 onReset={() => {
                   onReset();
-                  // setShowMobileFilters(false); // Optional: close dropdown
                 }}
               />
               
-              {hasActiveFilters && onClearAllFilters && ( // Ensure onClearAllFilters is defined
+              {hasActiveFilters && onClearAllFilters && (
                 <>
                   <DropdownMenuSeparator className="my-2" />
                   <Button 
@@ -113,7 +117,7 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
                       setShowMobileFilters(false);
                     }}
                   >
-                    Clear All Filters
+                    Reset All Filters
                   </Button>
                 </>
               )}
@@ -130,9 +134,8 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
                 className="snap-start flex-shrink-0"
               >
                 <CategoryPill 
-                  key={category} // Inner key is fine, outer div already has a key
                   category={category}
-                  active={true} // These are selected, so always active in this context
+                  active={true}
                   onClick={() => onToggleEventType(category)}
                   showIcon={true}
                   size="sm"

@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -7,15 +8,20 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { toast } from "@/components/ui/use-toast"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "@/components/ui/use-toast";
+import { CategoryPillShowcase } from "@/components/ui/CategoryPillShowcase";
 
 export default function DesignSystem() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">Design System</h1>
+
+      <section className="mb-8">
+        <CategoryPillShowcase />
+      </section>
 
       <section className="mb-8">
         <h2 className="text-2xl font-semibold mb-2">Buttons</h2>
@@ -25,7 +31,7 @@ export default function DesignSystem() {
           <Button variant="secondary">Secondary Button</Button>
           <Button variant="ghost">Ghost Button</Button>
           <Button 
-            variant="default" // Changed from "success" to "default"
+            variant="default"
             onClick={() => toast({
               title: "Success",
               description: "Your action was successful!",
@@ -35,7 +41,7 @@ export default function DesignSystem() {
           </Button>
 
           <Button 
-            variant="destructive" // Changed from "primary" to "destructive"
+            variant="destructive"
             onClick={() => toast({
               title: "Error",
               description: "There was an error with your action!",

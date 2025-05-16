@@ -137,6 +137,93 @@ const getCategoryColor = (category: string): string => {
   return 'bg-gray-600 text-white hover:bg-gray-700';
 };
 
+// Get inactive color style for a category (much lighter version)
+const getInactiveColor = (category: string): string => {
+  const lowerCategory = category.toLowerCase();
+  
+  // Festival - Amber/Orange
+  if (lowerCategory.includes('festival')) {
+    return 'bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200';
+  }
+  
+  // Wellness - Lime Green
+  if (lowerCategory.includes('wellness')) {
+    return 'bg-lime-50 text-lime-700 border border-lime-200 hover:bg-lime-100';
+  }
+  
+  // Kite - Deep Teal
+  if (lowerCategory.includes('kite')) {
+    return 'bg-cyan-50 text-cyan-700 border border-cyan-200 hover:bg-cyan-100';
+  }
+  
+  // Beach - Soft Orange
+  if (lowerCategory.includes('beach')) {
+    return 'bg-amber-50 text-amber-600 border border-amber-200 hover:bg-amber-100';
+  }
+  
+  // Game - Purple
+  if (lowerCategory.includes('game')) {
+    return 'bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100';
+  }
+  
+  // Sports
+  if (lowerCategory.includes('sports') || lowerCategory.includes('fitness')) {
+    return 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-100';
+  }
+  
+  // Surf
+  if (lowerCategory.includes('surf')) {
+    return 'bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100';
+  }
+  
+  // Party - Coral
+  if (lowerCategory.includes('party')) {
+    return 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100';
+  }
+  
+  // Yoga - Bright Green
+  if (lowerCategory.includes('yoga')) {
+    return 'bg-lime-50 text-lime-700 border border-lime-200 hover:bg-lime-100';
+  }
+  
+  // Community - Purple
+  if (lowerCategory.includes('community') || 
+      lowerCategory.includes('networking') ||
+      lowerCategory.includes('meetup')) {
+    return 'bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100';
+  }
+  
+  // Water - Teal
+  if (lowerCategory.includes('water')) {
+    return 'bg-teal-50 text-teal-700 border border-teal-200 hover:bg-teal-100';
+  }
+  
+  // Music - Purple/Blue
+  if (lowerCategory.includes('music') || 
+      lowerCategory.includes('concert')) {
+    return 'bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100';
+  }
+  
+  // Food - Coral Red
+  if (lowerCategory.includes('food') || 
+      lowerCategory.includes('dining')) {
+    return 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100';
+  }
+  
+  // Market - Orange
+  if (lowerCategory.includes('market')) {
+    return 'bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100';
+  }
+  
+  // Other - Gray (default)
+  if (lowerCategory.includes('other') || lowerCategory === 'all') {
+    return 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200';
+  }
+  
+  // Default - if no match is found
+  return 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-200';
+};
+
 interface CategoryPillProps {
   category: string;
   onClick?: () => void;
@@ -144,6 +231,7 @@ interface CategoryPillProps {
   showIcon?: boolean;
   className?: string;
   size?: 'xs' | 'sm' | 'default' | 'lg';
+  isAll?: boolean;
 }
 
 export const CategoryPill: React.FC<CategoryPillProps> = ({
@@ -152,12 +240,15 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
   active = false,
   showIcon = false,
   className,
-  size = 'default'
+  size = 'default',
+  isAll = false
 }) => {
-  const Icon = getCategoryIcon(category);
+  const Icon = isAll ? Calendar : getCategoryIcon(category);
+  
+  // Use higher contrast between active and inactive states
   const colorClasses = active 
-    ? 'bg-purple-600 text-white hover:bg-purple-700' 
-    : getCategoryColor(category);
+    ? (isAll ? 'bg-gray-800 text-white hover:bg-gray-900' : getCategoryColor(category)) 
+    : getInactiveColor(isAll ? 'all' : category);
     
   const sizeClasses = {
     'xs': 'text-xs py-0.5 px-1.5',
@@ -172,7 +263,7 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
     'default': 'h-4 w-4 mr-1.5',
     'lg': 'h-4.5 w-4.5 mr-2'
   };
-  
+
   return (
     <div
       className={cn(
@@ -180,9 +271,12 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
         colorClasses,
         sizeClasses[size],
         onClick ? 'cursor-pointer' : 'cursor-default',
+        active ? 'ring-2 ring-offset-1' : '',
         className
       )}
       onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      aria-pressed={onClick ? active : undefined}
     >
       {showIcon && <Icon className={iconSize[size]} />}
       <span>{category}</span>

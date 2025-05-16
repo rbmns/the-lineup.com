@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
 
@@ -46,6 +47,12 @@ export const useCategoryFilterSelection = (availableCategories: string[] = []) =
     toast({ title: "Filters reset to default" });
   }, [availableCategories]);
 
+  // Add a new function to check if all categories are selected
+  const areAllSelected = useCallback(() => {
+    return availableCategories.length > 0 && 
+           selectedCategories.length === availableCategories.length;
+  }, [availableCategories, selectedCategories]);
+
   return {
     selectedCategories,
     setSelectedCategories,
@@ -53,5 +60,6 @@ export const useCategoryFilterSelection = (availableCategories: string[] = []) =
     selectAll,
     deselectAll,
     reset,
+    areAllSelected
   };
 };
