@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -24,6 +23,12 @@ const EventsPageRefactored = () => {
   const [venues, setVenues] = useState<Array<{ value: string, label: string }>>([]);
   const [isVenuesLoading, setIsVenuesLoading] = useState(true);
   
+  // Get all unique event types from events
+  const allEventTypes = React.useMemo(() => {
+    const types = events.map(event => event.event_type).filter(Boolean);
+    return [...new Set(types)];
+  }, [events]);
+  
   // Event filter state management
   const {
     selectedEventTypes,
@@ -45,11 +50,19 @@ const EventsPageRefactored = () => {
     handleClearDateFilter
   } = useEventFilterState();
   
-  // Get all unique event types from events
-  const allEventTypes = React.useMemo(() => {
-    const types = events.map(event => event.event_type).filter(Boolean);
-    return [...new Set(types)];
-  }, [events]);
+  // Filter events by selected event types - all selected by default
+  const {
+    selectedCategories,
+    toggleCategory,
+    selectAll,
+    deselectAll,
+    reset
+  } = useCategoryFilterSelection(allEventTypes);
+  
+  // Keep the category filter and event type filter in sync
+  useEffect(() => {
+    setSelectedEventTypes(selectedCategories);
+  }, [selectedCategories, setSelectedEventTypes]);
   
   // Fetch all venues for the filter
   useEffect(() => {
@@ -80,30 +93,13 @@ const EventsPageRefactored = () => {
     fetchVenues();
   }, []);
   
-  // Filter events by selected event types - all selected by default
-  const {
-    selectedCategories,
-    toggleCategory,
-    selectAll,
-    deselectAll,
-    reset
-  } = useCategoryFilterSelection(allEventTypes);
-  
-  // Keep the category filter and event type filter in sync
-  useEffect(() => {
-    setSelectedEventTypes(selectedCategories);
-  }, [selectedCategories, setSelectedEventTypes]);
-  
   // Filter events based on all filters
   const filteredEvents = React.useMemo(() => {
-    // If no categories are selected, show no events
-    if (selectedCategories.length === 0) {
-      return [];
-    }
-    
-    // Apply event type filter
+    // Start with all events
     let filtered = events;
-    if (selectedCategories.length !== allEventTypes.length) {
+    
+    // Apply event type filter only if not all categories are selected
+    if (selectedCategories.length > 0 && selectedCategories.length !== allEventTypes.length) {
       filtered = events.filter(event => 
         event.event_type && selectedCategories.includes(event.event_type)
       );
