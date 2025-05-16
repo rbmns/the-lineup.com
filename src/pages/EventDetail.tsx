@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEventDetailParams } from '@/hooks/useEventDetailParams';
@@ -8,15 +9,9 @@ import { useEventMetaTags } from '@/hooks/useEventMetaTags';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDeviceDetection } from '@/hooks/useDeviceDetection';
 import { useEventDetailHandlers } from '@/hooks/useEventDetailHandlers';
-import { ChevronLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { EventDetailErrorState } from '@/components/events/EventDetailErrorState';
 import { EventDetailLoadingState } from '@/components/events/EventDetailLoadingState';
-import { ShareDialog } from '@/components/events/share/ShareDialog';
-import { MainEventContent } from '@/components/events/MainEventContent';
-import { SidebarContent } from '@/components/events/SidebarContent';
-import { MobileRsvpFooter } from '@/components/events/MobileRsvpFooter';
-import { RelatedEvents } from '@/components/events/related-events/RelatedEvents';
+import { EventDetailLayout } from '@/components/events/detail/EventDetailLayout';
 
 const EventDetail = () => {
   // Use our comprehensive params hook to get all URL parameters
@@ -132,90 +127,21 @@ const EventDetail = () => {
   const shareUrl = `${window.location.origin}/events/${event.slug || event.id}`;
 
   return (
-    <div className="container mx-auto px-4 pt-6 pb-24">
-      {/* Back button for all screen sizes - Improved styling */}
-      <div className="mb-4">
-        <Button 
-          variant="outline" 
-          onClick={handleBackToEvents}
-          size={isMobile ? "default" : "lg"}
-          className="flex items-center gap-1.5 text-gray-700 border-gray-300 shadow-sm hover:bg-gray-50"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Back to Events
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Main event content - takes up 8/12 of the screen on desktop */}
-        <div className="lg:col-span-8 order-first">
-          <MainEventContent 
-            event={event}
-            attendees={attendees}
-            isAuthenticated={isAuthenticated}
-            rsvpLoading={rsvpLoading}
-            handleRsvp={handleRsvpEvent}
-            isMobile={isMobile}
-            imageUrl={coverImage}
-            formattedDate={formattedDate}
-            shareUrl={shareUrl}
-            handleEventTypeClick={handleEventTypeClick}
-            handleBackToEvents={handleBackToEvents}
-          />
-        </div>
-        
-        {/* Sidebar content - takes up 4/12 of the screen on desktop */}
-        <div className="lg:col-span-4 order-last">
-          <SidebarContent 
-            event={event}
-            attendees={attendees}
-            isAuthenticated={isAuthenticated}
-          />
-        </div>
-      </div>
-      
-      {/* Related Events Section - properly implemented */}
-      <div className="mt-12">
-        <RelatedEvents 
-          eventId={event.id} 
-          eventType={event.event_type || ''}
-          startDate={event.start_date || ''}
-          tags={event.tags}
-          vibe={event.vibe}
-        />
-      </div>
-          
-      {/* Bottom back to events button - desktop and mobile */}
-      <div className="mt-8 mb-4 flex justify-center">
-        <Button 
-          variant="outline" 
-          onClick={handleBackToEvents}
-          className="flex items-center gap-2 shadow-sm hover:shadow-md transition-all"
-          size={isMobile ? "default" : "lg"}
-        >
-          <ChevronLeft className="h-4 w-4" />
-          <span>Back to Events</span>
-        </Button>
-      </div>
-      
-      {/* Mobile RSVP Footer */}
-      {isMobile && isAuthenticated && (
-        <MobileRsvpFooter 
-          currentStatus={event.rsvp_status} 
-          onRsvp={handleRsvpEvent}
-          onShare={() => setShareDialogOpen(true)}
-        />
-      )}
-      
-      {/* Share Dialog */}
-      <ShareDialog 
-        title={event.title}
-        description={event.description || ""}
-        eventUrl={shareUrl}
-        open={shareDialogOpen}
-        onOpenChange={setShareDialogOpen}
-      />
-    </div>
+    <EventDetailLayout
+      event={event}
+      attendees={attendees}
+      isAuthenticated={isAuthenticated}
+      rsvpLoading={rsvpLoading}
+      handleRsvp={handleRsvpEvent}
+      isMobile={isMobile}
+      coverImage={coverImage}
+      formattedDate={formattedDate}
+      shareUrl={shareUrl}
+      handleEventTypeClick={handleEventTypeClick}
+      handleBackToEvents={handleBackToEvents}
+      shareDialogOpen={shareDialogOpen}
+      setShareDialogOpen={setShareDialogOpen}
+    />
   );
 };
 
