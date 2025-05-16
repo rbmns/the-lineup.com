@@ -131,7 +131,7 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({
             /* Non-authenticated Users: Show teaser that matches the design */
             <div className="flex flex-col items-center text-center">
               <Lock className="h-10 w-10 text-gray-500 mb-3" />
-              <p className="text-sm text-gray-600 mb-4">Sign up to see who's attending and connect with friends</p>
+              <p className="text-sm text-gray-600 mb-4">Sign up to see who's attending</p>
               <Button 
                 onClick={handleSignUpClick}
                 className="w-full bg-black hover:bg-gray-800 text-white font-medium"
