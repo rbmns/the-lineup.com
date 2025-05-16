@@ -1,10 +1,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Event } from '@/types';
-import { useSimilarEvents } from '../useSimilarEvents';
+import { fetchRelatedEvents } from './fetchRelatedEvents';
 import { UseFetchRelatedEventsProps, RelatedEventsState } from './types';
-import { fetchPrimaryRelatedEvents } from './fetchPrimaryRelatedEvents';
-import { fetchSecondaryRelatedEvents } from './fetchSecondaryRelatedEvents';
 
 export const useFetchRelatedEvents = ({ 
   eventType, 
@@ -17,7 +15,6 @@ export const useFetchRelatedEvents = ({
 }: UseFetchRelatedEventsProps): RelatedEventsState => {
   const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const { fetchSimilarEvents } = useSimilarEvents([], []);
   const loadingRef = useRef<boolean>(false);
   const dataFetchedRef = useRef<boolean>(false);
   
@@ -33,81 +30,17 @@ export const useFetchRelatedEvents = ({
         loadingRef.current = true;
         setLoading(true);
         
-        // First strategy: Fetch events with the same event type
-        const filteredEvents = await fetchPrimaryRelatedEvents(
+        // Use our new fetchRelatedEvents function
+        const events = await fetchRelatedEvents({
           eventType,
           currentEventId,
           userId,
-          startDate
-        );
+          tags: Array.isArray(tags) ? tags : [],
+          startDate,
+          minResults
+        });
         
-        // If we don't have enough events from the first strategy, try more aggressive fallbacks
-        if (filteredEvents.length < minResults) {
-          console.log(`Not enough primary events (${filteredEvents.length}), trying second strategy...`);
-          
-          // Second strategy: Fetch events regardless of type but try to filter by tags if available
-          const additionalEvents = await fetchSecondaryRelatedEvents(
-            currentEventId,
-            tags,
-            userId,
-            startDate
-          );
-          
-          if (additionalEvents.length > 0) {
-            // Combine the events, prioritizing the direct type matches
-            const combinedEvents = [...filteredEvents];
-            
-            // Add additional events until we reach the minimum
-            for (const event of additionalEvents) {
-              if (!combinedEvents.some(e => e.id === event.id)) {
-                combinedEvents.push(event);
-                if (combinedEvents.length >= minResults) break;
-              }
-            }
-            
-            setRelatedEvents(combinedEvents);
-          } else {
-            // Last resort - try similar events
-            console.log('Trying similar events as last resort...');
-            try {
-              const rawSimilarEvents = await fetchSimilarEvents([eventType]);
-              
-              // Filter out the current event and past events and add attendees
-              const now = new Date();
-              const similarEvents = rawSimilarEvents
-                .filter(event => {
-                  if (event.id === currentEventId) return false;
-                  if (!event.start_time) return false;
-                  return new Date(event.start_time) > now;
-                })
-                .map(event => ({
-                  ...event,
-                  attendees: {
-                    going: 0,
-                    interested: 0
-                  }
-                }));
-              
-              // Combine all events we've found
-              const combinedEvents = [...filteredEvents];
-              
-              // Add additional events until we reach the minimum
-              for (const event of similarEvents) {
-                if (!combinedEvents.some(e => e.id === event.id)) {
-                  combinedEvents.push(event);
-                  if (combinedEvents.length >= minResults) break;
-                }
-              }
-              
-              setRelatedEvents(combinedEvents);
-            } catch (error) {
-              console.error('Error fetching similar events:', error);
-              setRelatedEvents(filteredEvents);
-            }
-          }
-        } else {
-          setRelatedEvents(filteredEvents);
-        }
+        setRelatedEvents(events);
         
         // Mark as fetched
         dataFetchedRef.current = true;
@@ -125,7 +58,7 @@ export const useFetchRelatedEvents = ({
     } else {
       setLoading(false);
     }
-  }, [eventType, currentEventId, userId, minResults, tags, vibe, fetchSimilarEvents, startDate]); 
+  }, [eventType, currentEventId, userId, minResults, tags, vibe, startDate]); 
   
   return { relatedEvents, loading };
 };

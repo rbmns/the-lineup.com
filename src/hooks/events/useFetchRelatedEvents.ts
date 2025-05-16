@@ -1,8 +1,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Event } from '@/types';
-import { supabase } from '@/integrations/supabase/client';
-import { useSimilarEvents } from '../events/useSimilarEvents';
+import { supabase } from '@/lib/supabase';
+import { useSimilarEvents } from './useSimilarEvents';
 
 interface UseFetchRelatedEventsProps {
   eventType: string;
@@ -14,13 +14,18 @@ interface UseFetchRelatedEventsProps {
   startDate?: string;
 }
 
+interface RsvpData {
+  event_id: string;
+  status: string;
+}
+
 export const useFetchRelatedEvents = ({ 
   eventType, 
   currentEventId,
   userId,
   tags,
   vibe,
-  minResults = 2, // Default to minimum 2 results
+  minResults = 2,
   startDate
 }: UseFetchRelatedEventsProps) => {
   const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
@@ -79,7 +84,7 @@ export const useFetchRelatedEvents = ({
             // Fetch RSVP status for these events for the current user
             if (eventIds.length > 0) {
               const { data: rsvpData, error: rsvpError } = await supabase
-                .from('event_rsvps')
+                .from('rsvps')
                 .select('event_id, status')
                 .eq('user_id', userId)
                 .in('event_id', eventIds);
@@ -89,7 +94,7 @@ export const useFetchRelatedEvents = ({
               } else if (rsvpData) {
                 // Create a map of event ID to RSVP status for quick lookup
                 const rsvpMap = new Map();
-                rsvpData.forEach(rsvp => {
+                rsvpData.forEach((rsvp: RsvpData) => {
                   rsvpMap.set(rsvp.event_id, rsvp.status);
                 });
                 
@@ -169,7 +174,7 @@ export const useFetchRelatedEvents = ({
               const additionalIds = additionalEvents.map(event => event.id);
               
               const { data: additionalRsvpData, error: additionalRsvpError } = await supabase
-                .from('event_rsvps')
+                .from('rsvps')
                 .select('event_id, status')
                 .eq('user_id', userId)
                 .in('event_id', additionalIds);
@@ -178,7 +183,7 @@ export const useFetchRelatedEvents = ({
                 console.error('Error fetching RSVP status for additional events:', additionalRsvpError);
               } else if (additionalRsvpData) {
                 const rsvpMap = new Map();
-                additionalRsvpData.forEach(rsvp => {
+                additionalRsvpData.forEach((rsvp: RsvpData) => {
                   rsvpMap.set(rsvp.event_id, rsvp.status);
                 });
                 
@@ -206,61 +211,66 @@ export const useFetchRelatedEvents = ({
           } else {
             // Last resort - try similar events
             console.log('Trying similar events as last resort...');
-            const rawSimilarEvents = await fetchSimilarEvents([eventType]);
-          
-            // Filter out the current event and past events and add attendees
-            const now = new Date();
-            const additionalEvents = rawSimilarEvents
-              .filter(event => {
-                if (event.id === currentEventId) return false;
-                if (!event.start_time) return false;
-                return new Date(event.start_time) > now;
-              })
-              .map(event => ({
-                ...event,
-                attendees: {
-                  going: 0,
-                  interested: 0
-                }
-              }));
+            try {
+              const rawSimilarEvents = await fetchSimilarEvents([eventType]);
             
-            // Add RSVP status if available
-            if (userId && additionalEvents.length > 0) {
-              const additionalIds = additionalEvents.map(event => event.id);
+              // Filter out the current event and past events and add attendees
+              const now = new Date();
+              const additionalEvents = rawSimilarEvents
+                .filter(event => {
+                  if (event.id === currentEventId) return false;
+                  if (!event.start_time) return false;
+                  return new Date(event.start_time) > now;
+                })
+                .map(event => ({
+                  ...event,
+                  attendees: {
+                    going: 0,
+                    interested: 0
+                  }
+                }));
               
-              const { data: additionalRsvpData, error: additionalRsvpError } = await supabase
-                .from('event_rsvps')
-                .select('event_id, status')
-                .eq('user_id', userId)
-                .in('event_id', additionalIds);
+              // Add RSVP status if available
+              if (userId && additionalEvents.length > 0) {
+                const additionalIds = additionalEvents.map(event => event.id);
                 
-              if (additionalRsvpError) {
-                console.error('Error fetching RSVP status for similar events:', additionalRsvpError);
-              } else if (additionalRsvpData) {
-                const rsvpMap = new Map();
-                additionalRsvpData.forEach(rsvp => {
-                  rsvpMap.set(rsvp.event_id, rsvp.status);
-                });
-                
-                // Update the events with their RSVP status
-                for (let i = 0; i < additionalEvents.length; i++) {
-                  additionalEvents[i].rsvp_status = rsvpMap.get(additionalEvents[i].id) as 'Going' | 'Interested' | undefined;
+                const { data: additionalRsvpData, error: additionalRsvpError } = await supabase
+                  .from('rsvps')
+                  .select('event_id, status')
+                  .eq('user_id', userId)
+                  .in('event_id', additionalIds);
+                  
+                if (additionalRsvpError) {
+                  console.error('Error fetching RSVP status for similar events:', additionalRsvpError);
+                } else if (additionalRsvpData) {
+                  const rsvpMap = new Map();
+                  additionalRsvpData.forEach((rsvp: RsvpData) => {
+                    rsvpMap.set(rsvp.event_id, rsvp.status);
+                  });
+                  
+                  // Update the events with their RSVP status
+                  for (let i = 0; i < additionalEvents.length; i++) {
+                    additionalEvents[i].rsvp_status = rsvpMap.get(additionalEvents[i].id) as 'Going' | 'Interested' | undefined;
+                  }
                 }
               }
-            }
-            
-            // Combine all events we've found
-            const combinedEvents = [...filteredEvents];
-            
-            // Add additional events until we reach the minimum
-            for (const event of additionalEvents) {
-              if (!combinedEvents.some(e => e.id === event.id)) {
-                combinedEvents.push(event);
-                if (combinedEvents.length >= minResults) break;
+              
+              // Combine all events we've found
+              const combinedEvents = [...filteredEvents];
+              
+              // Add additional events until we reach the minimum
+              for (const event of additionalEvents) {
+                if (!combinedEvents.some(e => e.id === event.id)) {
+                  combinedEvents.push(event);
+                  if (combinedEvents.length >= minResults) break;
+                }
               }
+              
+              setRelatedEvents(combinedEvents);
+            } catch (error) {
+              console.error('Error with similar events fallback:', error);
+              setRelatedEvents(filteredEvents);
             }
-            
-            setRelatedEvents(combinedEvents);
           }
         } else {
           setRelatedEvents(filteredEvents);

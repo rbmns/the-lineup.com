@@ -44,6 +44,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   }, [isLoading]);
 
   if (showLoading) {
+    // Pass the compact prop to the loading state component
     return <EventsLoadingState compact={compact} />;
   }
 

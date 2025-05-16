@@ -1,13 +1,14 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { MapPin } from 'lucide-react';
 import { formatInTimeZone } from 'date-fns-tz';
 import { cn } from '@/lib/utils';
-import { CategoryPill } from '@/components/ui/category-pill';
+import { CategoryPill } from '@/components/ui/category-pills/CategoryPill';
 import { useEventImages } from '@/hooks/useEventImages';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
-import { formatEventTime, formatDate, AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
+import { formatEventTime, formatDate, AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
 
 export interface EventCardProps {
   event: Event;
@@ -16,7 +17,8 @@ export interface EventCardProps {
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   className?: string;
   onClick?: (event: Event) => void;
-  loadingEventId?: string | null; // Added to pass down to EventRsvpButtons
+  isRsvpLoading?: boolean;
+  loadingEventId?: string | null;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -26,12 +28,14 @@ const EventCard: React.FC<EventCardProps> = ({
   onRsvp,
   className,
   onClick,
-  loadingEventId // Added
+  isRsvpLoading = false,
+  loadingEventId
 }) => {
   const { getEventImageUrl } = useEventImages();
   const { navigateToEvent } = useEventNavigation();
   const imageUrl = getEventImageUrl(event);
 
+  // Format date for display - using European format
   const formatDateDisplay = (dateStr: string): string => {
     try {
       const date = new Date(dateStr);
@@ -42,12 +46,14 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
   
-  const getEventTimeDisplay = (currentEvent: Event): string => { // Renamed event to currentEvent to avoid conflict
+  // Get formatted event time
+  const getEventTimeDisplay = (currentEvent: Event): string => {
     if (!currentEvent.start_time) return '';
     return formatEventTime(currentEvent.start_time, currentEvent.end_time);
   };
 
   const handleClick = (e: React.MouseEvent) => {
+    // Don't navigate if clicking on RSVP buttons
     if ((e.target as HTMLElement).closest('[data-rsvp-container="true"]')) {
       return; 
     }
@@ -70,11 +76,13 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
 
+  // Handle RSVP and ensure we always return a Promise<boolean>
   const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp) return false;
     
     try {
       const result = await onRsvp(event.id, status);
+      // Convert any result (including void) to a boolean
       return result === undefined ? true : !!result;
     } catch (error) {
       console.error('Error in EventCard RSVP handler:', error);
@@ -82,7 +90,11 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
 
-  const cardHeightClass = compact ? "max-h-[280px]" : ""; // Ensure this is still relevant or adjust
+  // Determine if RSVP is loading for this specific event
+  const isThisEventRsvpLoading = isRsvpLoading || loadingEventId === event.id;
+
+  // Determine max height for compact vs standard view
+  const cardHeightClass = compact ? "max-h-[280px]" : "";
 
   return (
     <div
@@ -94,6 +106,7 @@ const EventCard: React.FC<EventCardProps> = ({
       onClick={handleClick}
       data-event-id={event.id}
     >
+      {/* Image container with event type label positioned on top */}
       <div className="aspect-[16/9] relative overflow-hidden">
         <img
           src={imageUrl}
@@ -145,8 +158,7 @@ const EventCard: React.FC<EventCardProps> = ({
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
               size="sm"
-              // Pass the loading state for *this specific event*
-              isLoading={loadingEventId === event.id} 
+              isLoading={isThisEventRsvpLoading}
             />
           </div>
         )}
