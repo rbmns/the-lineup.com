@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { UserProfile } from '@/types';
 import { FriendSearchBar } from './FriendSearchBar';
-import { FriendCard } from '@/components/profile/FriendCard';
+import FriendCard from '@/components/profile/FriendCard';
 
 interface DiscoverTabContentProps {
   searchQuery: string;
@@ -74,7 +74,6 @@ export const DiscoverTabContent = ({
               name={profile.username || ''}
               username={profile.username || ''}
               avatarUrl={profile.avatar_url}
-              bio={profile.bio}
               onAddFriend={() => onAddFriend(profile.id)}
               pendingRequestIds={pendingRequestIds}
             />

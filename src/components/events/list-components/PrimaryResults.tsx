@@ -1,80 +1,94 @@
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Event } from '@/types';
 import { EventsList } from './EventsList';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { Button } from '@/components/ui/button';
 
 export interface PrimaryResultsProps {
   events: Event[];
-  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
-  showRsvpButtons?: boolean;
+  isLoading: boolean;
+  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<void>;
+  showRsvpButtons: boolean;
   loadingEventId?: string | null;
+  visibleCount: number;
+  hasMore: boolean;
+  onLoadMore: () => void;
   renderTeaserAfterRow?: number | false;
-  teaser?: React.ReactNode;
   showTeaser?: boolean;
+  teaser?: React.ReactNode;
   searchQuery?: string;
-  isLoading?: boolean;
-  visibleCount?: number;
-  hasMore?: boolean;
-  onLoadMore?: () => void;
 }
 
-export const PrimaryResults: React.FC<PrimaryResultsProps> = ({ 
-  events, 
+export const PrimaryResults: React.FC<PrimaryResultsProps> = ({
+  events,
+  isLoading,
   onRsvp,
   showRsvpButtons,
   loadingEventId,
-  renderTeaserAfterRow = false,
-  teaser,
-  showTeaser = false,
-  searchQuery,
-  isLoading,
   visibleCount,
   hasMore,
-  onLoadMore
+  onLoadMore,
+  renderTeaserAfterRow,
+  showTeaser,
+  teaser,
+  searchQuery
 }) => {
-  const isMobile = useIsMobile();
-  
-  // Calculate events per row based on screen size
-  const eventsPerRow = isMobile ? 1 : 3;
-  
-  // Split events if we need to insert a teaser
-  const { eventsBeforeTeaser, eventsAfterTeaser } = useMemo(() => {
-    if (!renderTeaserAfterRow || !showTeaser) {
-      return { eventsBeforeTeaser: events, eventsAfterTeaser: [] };
-    }
-    
-    const splitIndex = renderTeaserAfterRow * eventsPerRow;
-    return {
-      eventsBeforeTeaser: events.slice(0, splitIndex),
-      eventsAfterTeaser: events.slice(splitIndex)
-    };
-  }, [events, renderTeaserAfterRow, showTeaser, eventsPerRow]);
-  
+  // If we have no events, don't render anything
+  if (events.length === 0) return null;
+
+  // Get the visible events
+  const visibleEvents = events.slice(0, visibleCount);
+
+  // If we have a teaser to render after a specific row
+  let firstBatch, secondBatch;
+  if (renderTeaserAfterRow && showTeaser && teaser && visibleEvents.length > 0) {
+    const rowSize = 3; // Assuming 3 items per row
+    const breakpoint = Math.min(renderTeaserAfterRow * rowSize, visibleEvents.length);
+    firstBatch = visibleEvents.slice(0, breakpoint);
+    secondBatch = visibleEvents.slice(breakpoint);
+  }
+
   return (
     <div className="space-y-8">
-      {eventsBeforeTeaser.length > 0 && (
-        <EventsList 
-          events={eventsBeforeTeaser}
-          onRsvp={onRsvp}
-          showRsvpButtons={showRsvpButtons}
-          loadingEventId={loadingEventId}
-        />
-      )}
-      
-      {showTeaser && teaser && (
-        <div className="my-8">
+      {renderTeaserAfterRow && showTeaser && teaser ? (
+        <>
+          <EventsList
+            events={firstBatch || []}
+            onRsvp={onRsvp}
+            showRsvpButtons={showRsvpButtons}
+            loadingEventId={loadingEventId}
+          />
+          
           {teaser}
-        </div>
-      )}
-      
-      {eventsAfterTeaser.length > 0 && (
-        <EventsList 
-          events={eventsAfterTeaser}
+          
+          {secondBatch && secondBatch.length > 0 && (
+            <EventsList
+              events={secondBatch}
+              onRsvp={onRsvp}
+              showRsvpButtons={showRsvpButtons}
+              loadingEventId={loadingEventId}
+            />
+          )}
+        </>
+      ) : (
+        <EventsList
+          events={visibleEvents}
           onRsvp={onRsvp}
           showRsvpButtons={showRsvpButtons}
           loadingEventId={loadingEventId}
         />
+      )}
+
+      {hasMore && (
+        <div className="text-center mt-6">
+          <Button
+            onClick={onLoadMore}
+            variant="outline"
+            className="mx-auto"
+          >
+            Load more events
+          </Button>
+        </div>
       )}
     </div>
   );

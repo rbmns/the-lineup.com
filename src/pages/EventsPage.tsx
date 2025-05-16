@@ -1,12 +1,13 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Event } from '@/types';
-import { CategoryFilter } from '@/components/events/category-filters/CategoryFilter';
-import { CategoryFilteredEventsContent } from '@/components/events/category-filters/CategoryFilteredEventsContent';
+import CategoryFilter from '@/components/events/category-filters/CategoryFilter';
+import CategoryFilteredEventsContent from '@/components/events/category-filters/CategoryFilteredEventsContent';
 import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { trackEvent } from '@/utils/analytics';
-import { SignUpTeaser } from '@/components/events/SignUpTeaser';
+import SignUpTeaser from '@/components/events/SignUpTeaser';
 import { LazyEventsList } from '@/components/events/LazyEventsList';
 
 const EventsPage: React.FC = () => {
@@ -81,23 +82,20 @@ const EventsPage: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('event_rsvps')
-        .upsert(
-          { 
-            event_id: eventId, 
-            user_id: user.id, 
-            status: status,
-            updated_at: new Date()
-          },
-          { onConflict: ['event_id', 'user_id'] }
-        )
-        .select()
+        .upsert({
+          event_id: eventId, 
+          user_id: user.id, 
+          status: status,
+          updated_at: new Date()
+        }, { onConflict: 'event_id,user_id' })
+        .select();
       
       if (error) {
         console.error("Error updating RSVP:", error);
         alert("Failed to update RSVP");
         return false;
       } else {
-        trackEvent('event_rsvp', { eventId: eventId, status: status });
+        trackEvent('event_rsvp', { eventId, status });
         return true;
       }
     } catch (error) {
@@ -116,6 +114,7 @@ const EventsPage: React.FC = () => {
         isLoading={isLoading}
         onRsvp={onRsvp}
         showRsvpButtons={true}
+        loadingEventId={loadingEventId}
         renderTeaserAfterRow={renderTeaserAfterRow}
         showTeaser={showTeaser}
         teaser={teaser}
@@ -142,6 +141,9 @@ const EventsPage: React.FC = () => {
           showRsvpButtons={true}
           hasActiveFilters={hasActiveFilters}
           loadingEventId={loadingEventId}
+          selectedCategories={selectedCategory ? [selectedCategory] : []}
+          onCategoryChange={() => setSelectedCategory(null)}
+          onClearFilters={() => setSelectedCategory(null)}
         />
       ) : (
         renderEventsList()

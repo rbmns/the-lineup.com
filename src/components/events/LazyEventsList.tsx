@@ -2,9 +2,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Event } from '@/types';
 import { EventsList } from './list-components/EventsList';
-import { PrimaryResults } from './list-components/PrimaryResults';
+import PrimaryResults from './list-components/PrimaryResults';
 import { EventsLoadingState } from './list-components/EventsLoadingState';
-import { NoResultsFound } from './list-components/NoResultsFound';
+import NoResultsFound from './list-components/NoResultsFound';
 
 interface LazyEventsListProps {
   events: Event[];

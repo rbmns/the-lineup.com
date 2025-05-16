@@ -1,14 +1,15 @@
+
 import React from 'react';
 import LazyEventsList from '../LazyEventsList';
 import { Event } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EventsLoadingState } from '../list-components/EventsLoadingState';
-import { NoResultsFound } from '../list-components/NoResultsFound';
-import { CategoryFilterBar } from './CategoryFilterBar';
+import NoResultsFound from '../list-components/NoResultsFound';
+import CategoryFilterBar from './CategoryFilterBar';
 import { EventsEmptyState } from '../list-components/EventsEmptyState';
-import { EventsHeader } from '../list-components/EventsHeader';
-import { EventsSignUpTeaser } from '../list-components/EventsSignUpTeaser';
+import EventsHeader from '../list-components/EventsHeader';
+import EventsSignUpTeaser from '../list-components/EventsSignUpTeaser';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface CategoryFilteredEventsContentProps {
@@ -96,6 +97,7 @@ const CategoryFilteredEventsContent: React.FC<CategoryFilteredEventsContentProps
                 <NoResultsFound 
                   message={`No events match your filters`}
                   searchQuery={searchQuery}
+                  resetFilters={onClearFilters}
                 />
               ) : (
                 <EventsEmptyState message={emptyStateMessage} />
@@ -148,6 +150,7 @@ const CategoryFilteredEventsContent: React.FC<CategoryFilteredEventsContentProps
               <NoResultsFound 
                 message={`No events match your filters`}
                 searchQuery={searchQuery}
+                resetFilters={onClearFilters}
               />
             ) : (
               <EventsEmptyState message={emptyStateMessage} />
