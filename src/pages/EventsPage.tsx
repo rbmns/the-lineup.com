@@ -50,12 +50,11 @@ const EventsPage = () => {
             mainEvents={displayEvents}
             relatedEvents={[]}
             isLoading={isLoading}
-            // isRsvpLoading={false} // Removed, loadingEventId is used instead
             onRsvp={user ? handleEventRsvp : undefined}
             showRsvpButtons={!!user}
             hasActiveFilters={false}
-            compact={false}
             loadingEventId={loadingEventId}
+            // Remove compact or set it properly
           />
         </div>
       </div>

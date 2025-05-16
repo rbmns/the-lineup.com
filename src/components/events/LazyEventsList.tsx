@@ -14,6 +14,7 @@ interface LazyEventsListProps {
   hasActiveFilters?: boolean;
   loadingEventId?: string | null;
   noCategoriesSelected?: boolean;
+  compact?: boolean; // Added compact prop to the interface
 }
 
 export const LazyEventsList: React.FC<LazyEventsListProps> = ({
@@ -24,7 +25,8 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   showRsvpButtons = false,
   hasActiveFilters = false,
   loadingEventId,
-  noCategoriesSelected = false
+  noCategoriesSelected = false,
+  compact = false // Added with default value of false
 }) => {
   // State to track if we should show loading state
   const [showLoading, setShowLoading] = useState(isLoading);
@@ -71,6 +73,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
         onRsvp={onRsvp}
         showRsvpButtons={showRsvpButtons}
         loadingEventId={loadingEventId}
+        compact={compact} // Pass the compact prop down to EventsList
       />
       
       {/* If we have related events and they're different from main events, show them too */}
@@ -83,6 +86,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
             onRsvp={onRsvp}
             showRsvpButtons={showRsvpButtons}
             loadingEventId={loadingEventId}
+            compact={compact} // Pass the compact prop down to related events too
           />
         </div>
       )}
