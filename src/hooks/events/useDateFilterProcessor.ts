@@ -1,6 +1,6 @@
 
 import { useCallback } from 'react';
-import { filterEventsByDateFilter } from '@/utils/dateUtils';
+import { filterEventsByDate } from '@/utils/dateUtils';
 import { DateRange } from 'react-day-picker';
 import { Event } from '@/types';
 
@@ -10,7 +10,7 @@ export const useDateFilterProcessor = (selectedDateFilter: string, dateRange?: D
     
     if (selectedDateFilter) {
       console.log(`Applying date filter: ${selectedDateFilter} to ${events.length} events`);
-      filtered = filterEventsByDateFilter(events, selectedDateFilter);
+      filtered = filterEventsByDate(events, selectedDateFilter);
       console.log(`After date filter: ${filtered.length} events remain`);
     } else if (dateRange?.from) {
       console.log(`Applying date range filter: from ${dateRange.from} to ${dateRange.to || 'unspecified'}`);

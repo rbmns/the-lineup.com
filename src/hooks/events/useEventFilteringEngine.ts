@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
-import { Event } from '@/types'; // Assuming Event type is available
-import { filterEventsByDateRange } from '@/utils/dateUtils'; // Ensure this utility is correct
+import { Event } from '@/types'; 
+import { filterEventsByDate } from '@/utils/dateUtils'; 
 
 interface UseEventFilteringEngineProps {
   events: Event[] | undefined;
@@ -42,12 +42,13 @@ export const useEventFilteringEngine = ({
       if (selectedVenues.length > 0 && event.venues?.name && !selectedVenues.includes(event.venues.name)) {
         return false;
       }
+      
+      // Use the filterEventsByDate function directly
       if (selectedDateFilter || dateRange) {
-        const isInRange = filterEventsByDateRange(event, selectedDateFilter, dateRange);
-        if (!isInRange) {
-          return false;
-        }
+        const dateFilteredEvents = filterEventsByDate([event], selectedDateFilter, dateRange);
+        return dateFilteredEvents.length > 0;
       }
+      
       return true;
     });
 
