@@ -1,58 +1,52 @@
 
-import { useCallback, MutableRefObject } from 'react';
+import { useCallback, useRef } from 'react';
+import { User } from '@supabase/supabase-js';
+import { useQueryClient } from '@tanstack/react-query';
 
+/**
+ * A hook to handle RSVP actions with proper caching to maintain RSVP state across pages
+ */
 export const useRsvpHandler = (
-  user: any,
-  handleRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>,
-  rsvpInProgressRef: MutableRefObject<boolean>
+  user: User | null | undefined,
+  handleRsvp: ((eventId: string, status: "Going" | "Interested") => Promise<boolean>) | undefined,
+  rsvpInProgressRef: React.MutableRefObject<boolean>
 ) => {
-  const handleEventRsvp = useCallback(async (eventId: string, status: 'Going' | 'Interested') => {
-    if (!user) {
-      console.log("User not logged in, cannot RSVP");
+  const queryClient = useQueryClient();
+  
+  const handleEventRsvp = useCallback(async (
+    eventId: string, 
+    status: "Going" | "Interested"
+  ): Promise<boolean> => {
+    if (!user || !handleRsvp) {
       return false;
     }
-    
+
+    if (rsvpInProgressRef.current) {
+      console.log('RSVP request in progress, please wait');
+      return false;
+    }
+
     try {
-      // Mark that we're in an RSVP action to prevent scroll changes
-      if (rsvpInProgressRef) {
-        rsvpInProgressRef.current = true;
+      rsvpInProgressRef.current = true;
+      const success = await handleRsvp(eventId, status);
+      
+      if (success) {
+        // Invalidate all relevant queries to ensure fresh data
+        queryClient.invalidateQueries({ queryKey: ['events'] });
+        queryClient.invalidateQueries({ queryKey: ['event', eventId] });
       }
       
-      // Store scroll position for restoration
-      const scrollPosition = window.scrollY;
-      
-      // Add visual feedback to the specific event card
-      const eventCard = document.querySelector(`[data-event-id="${eventId}"]`);
-      if (eventCard) {
-        const animationClass = status === 'Going' ? 'rsvp-going-animation' : 'rsvp-interested-animation';
-        eventCard.classList.add(animationClass);
-        setTimeout(() => eventCard.classList.remove(animationClass), 800);
-      }
-      
-      // Use our RSVP handler
-      const result = await handleRsvp(eventId, status);
-      
-      // Restore scroll position after the RSVP operation
-      setTimeout(() => {
-        window.scrollTo({
-          top: scrollPosition,
-          behavior: 'auto'
-        });
-      }, 100);
-      
-      return result;
+      return success;
     } catch (error) {
-      console.error("Error in EventsPage RSVP handler:", error);
+      console.error('Error in RSVP handler:', error);
       return false;
     } finally {
-      // Wait a moment before allowing scroll position saves again
+      // Small delay to prevent multiple rapid clicks
       setTimeout(() => {
-        if (rsvpInProgressRef) {
-          rsvpInProgressRef.current = false;
-        }
-      }, 500);
+        rsvpInProgressRef.current = false;
+      }, 300);
     }
-  }, [user, handleRsvp, rsvpInProgressRef]);
+  }, [user, handleRsvp, rsvpInProgressRef, queryClient]);
 
   return { handleEventRsvp };
 };

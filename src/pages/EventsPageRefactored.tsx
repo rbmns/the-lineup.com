@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
 import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp';
@@ -8,18 +7,77 @@ import { LazyEventsList } from '@/components/events/LazyEventsList';
 import { EventFilterBar } from '@/components/events/filters/EventFilterBar';
 import { useCategoryFilterSelection } from '@/hooks/events/useCategoryFilterSelection';
 import { useEventPageMeta } from '@/components/events/EventsPageMeta';
+import { useEventFilterState } from '@/hooks/events/useEventFilterState';
+import { AdvancedFiltersPanel } from '@/components/events/filters/AdvancedFiltersPanel';
+import { Button } from '@/components/ui/button';
+import { ChevronDown } from 'lucide-react';
+import { filterEventsByVenue } from '@/utils/eventUtils';
+import { filterEventsByDate } from '@/utils/dateUtils';
+import { supabase } from '@/lib/supabase';
 
 const EventsPageRefactored = () => {
   useEventPageMeta();
   
   const { user } = useAuth();
   const { data: events = [], isLoading: eventsLoading } = useEvents(user?.id);
+  const [venues, setVenues] = useState<Array<{ value: string, label: string }>>([]);
+  const [isVenuesLoading, setIsVenuesLoading] = useState(true);
+  
+  // Event filter state management
+  const {
+    selectedEventTypes,
+    setSelectedEventTypes,
+    selectedVenues,
+    setSelectedVenues,
+    dateRange,
+    setDateRange,
+    selectedDateFilter,
+    setSelectedDateFilter,
+    isFilterLoading,
+    showAdvancedFilters,
+    toggleAdvancedFilters,
+    hasActiveFilters,
+    hasAdvancedFilters,
+    resetFilters,
+    handleRemoveEventType,
+    handleRemoveVenue,
+    handleClearDateFilter
+  } = useEventFilterState();
   
   // Get all unique event types from events
   const allEventTypes = React.useMemo(() => {
     const types = events.map(event => event.event_type).filter(Boolean);
     return [...new Set(types)];
   }, [events]);
+  
+  // Fetch all venues for the filter
+  useEffect(() => {
+    const fetchVenues = async () => {
+      setIsVenuesLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('venues')
+          .select('id, name')
+          .order('name');
+          
+        if (error) throw error;
+        
+        if (data) {
+          const venueOptions = data.map(venue => ({
+            value: venue.id,
+            label: venue.name
+          }));
+          setVenues(venueOptions);
+        }
+      } catch (err) {
+        console.error('Error fetching venues:', err);
+      } finally {
+        setIsVenuesLoading(false);
+      }
+    };
+
+    fetchVenues();
+  }, []);
   
   // Filter events by selected event types - all selected by default
   const {
@@ -30,23 +88,38 @@ const EventsPageRefactored = () => {
     reset
   } = useCategoryFilterSelection(allEventTypes);
   
-  // Filter events based on selected categories
+  // Keep the category filter and event type filter in sync
+  useEffect(() => {
+    setSelectedEventTypes(selectedCategories);
+  }, [selectedCategories, setSelectedEventTypes]);
+  
+  // Filter events based on all filters
   const filteredEvents = React.useMemo(() => {
-    // If no categories are selected, show no events (empty array)
+    // If no categories are selected, show no events
     if (selectedCategories.length === 0) {
       return [];
     }
     
-    // If all categories are selected or selectedCategories matches allEventTypes length, show all events
-    if (selectedCategories.length === allEventTypes.length) {
-      return events;
+    // Apply event type filter
+    let filtered = events;
+    if (selectedCategories.length !== allEventTypes.length) {
+      filtered = events.filter(event => 
+        event.event_type && selectedCategories.includes(event.event_type)
+      );
     }
     
-    // Otherwise, filter events by selected categories
-    return events.filter(event => 
-      event.event_type && selectedCategories.includes(event.event_type)
-    );
-  }, [events, selectedCategories, allEventTypes.length]);
+    // Apply venue filter
+    if (selectedVenues.length > 0) {
+      filtered = filterEventsByVenue(filtered, selectedVenues);
+    }
+    
+    // Apply date filter
+    if (dateRange || selectedDateFilter) {
+      filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
+    }
+    
+    return filtered;
+  }, [events, selectedCategories, allEventTypes.length, selectedVenues, dateRange, selectedDateFilter]);
   
   const { 
     handleRsvp: enhancedHandleRsvp, 
@@ -59,7 +132,7 @@ const EventsPageRefactored = () => {
         <EventsPageHeader title="What's Happening?" />
         
         {/* Add the filter bar */}
-        <div className="mt-6 mb-8">
+        <div className="mt-6 mb-4">
           <EventFilterBar
             allEventTypes={allEventTypes}
             selectedEventTypes={selectedCategories}
@@ -67,20 +140,100 @@ const EventsPageRefactored = () => {
             onSelectAll={selectAll}
             onDeselectAll={deselectAll}
             onReset={reset}
-            hasActiveFilters={selectedCategories.length > 0 && selectedCategories.length < allEventTypes.length}
-            onClearAllFilters={reset}
+            hasActiveFilters={hasActiveFilters}
+            onClearAllFilters={resetFilters}
             className="bg-white rounded-lg shadow-sm p-4"
           />
         </div>
+        
+        {/* Toggle for Advanced Filters */}
+        <div className="flex justify-end mb-4">
+          <Button
+            variant="outline"
+            onClick={toggleAdvancedFilters}
+            className="flex items-center gap-2"
+            size="sm"
+          >
+            {showAdvancedFilters ? "Hide Advanced Filters" : "Advanced Filters"}
+            <ChevronDown className={`h-4 w-4 transition-transform ${showAdvancedFilters ? 'rotate-180' : ''}`} />
+          </Button>
+        </div>
+        
+        {/* Advanced Filters Panel */}
+        <AdvancedFiltersPanel
+          isOpen={showAdvancedFilters}
+          onClose={toggleAdvancedFilters}
+          dateRange={dateRange}
+          onDateRangeChange={setDateRange}
+          selectedDateFilter={selectedDateFilter}
+          onDateFilterChange={setSelectedDateFilter}
+          venues={venues}
+          selectedVenues={selectedVenues}
+          onVenueChange={setSelectedVenues}
+          className="mb-6"
+        />
+        
+        {/* Active Filters Summary */}
+        {hasAdvancedFilters && (
+          <div className="mb-6">
+            <div className="flex flex-wrap gap-2 items-center">
+              <span className="text-sm text-gray-500">Active filters:</span>
+              
+              {selectedVenues.map(venueId => {
+                const venue = venues.find(v => v.value === venueId);
+                return venue ? (
+                  <div key={venueId} className="bg-[#9b87f5] text-white rounded-full px-3 py-1 text-xs flex items-center">
+                    <span>Venue: {venue.label}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="ml-1 h-4 w-4 p-0 text-white hover:text-white hover:bg-transparent" 
+                      onClick={() => handleRemoveVenue(venueId)}
+                    >
+                      &times;
+                    </Button>
+                  </div>
+                ) : null;
+              })}
+              
+              {(dateRange || selectedDateFilter) && (
+                <div className="bg-[#9b87f5] text-white rounded-full px-3 py-1 text-xs flex items-center">
+                  <span>
+                    Date: {selectedDateFilter || (dateRange ? 'Custom range' : '')}
+                  </span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="ml-1 h-4 w-4 p-0 text-white hover:text-white hover:bg-transparent" 
+                    onClick={handleClearDateFilter}
+                  >
+                    &times;
+                  </Button>
+                </div>
+              )}
+              
+              {hasAdvancedFilters && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-xs text-gray-500"
+                  onClick={resetFilters}
+                >
+                  Clear all filters
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
         
         <div className="space-y-8 mt-8">
           <LazyEventsList 
             mainEvents={filteredEvents}
             relatedEvents={[]} 
-            isLoading={eventsLoading}
+            isLoading={eventsLoading || isVenuesLoading || isFilterLoading}
             onRsvp={user ? enhancedHandleRsvp : undefined}
             showRsvpButtons={!!user}
-            hasActiveFilters={selectedCategories.length > 0 && selectedCategories.length < allEventTypes.length}
+            hasActiveFilters={hasActiveFilters}
             loadingEventId={loadingEventId}
           />
         </div>

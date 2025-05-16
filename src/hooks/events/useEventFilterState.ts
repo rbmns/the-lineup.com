@@ -8,9 +8,15 @@ export const useEventFilterState = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [selectedDateFilter, setSelectedDateFilter] = useState('');
   const [isFilterLoading, setIsFilterLoading] = useState(false);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   const hasActiveFilters =
     selectedEventTypes.length > 0 ||
+    selectedVenues.length > 0 ||
+    dateRange !== undefined ||
+    selectedDateFilter !== '';
+
+  const hasAdvancedFilters =
     selectedVenues.length > 0 ||
     dateRange !== undefined ||
     selectedDateFilter !== '';
@@ -35,6 +41,10 @@ export const useEventFilterState = () => {
     setSelectedDateFilter('');
   };
 
+  const toggleAdvancedFilters = () => {
+    setShowAdvancedFilters(prev => !prev);
+  };
+
   return {
     selectedEventTypes,
     setSelectedEventTypes,
@@ -46,7 +56,11 @@ export const useEventFilterState = () => {
     setSelectedDateFilter,
     isFilterLoading,
     setIsFilterLoading,
+    showAdvancedFilters,
+    setShowAdvancedFilters,
+    toggleAdvancedFilters,
     hasActiveFilters,
+    hasAdvancedFilters,
     resetFilters,
     handleRemoveEventType,
     handleRemoveVenue,

@@ -2,10 +2,10 @@
 import { Event } from '@/types';
 
 /**
- * Filter events by event type
+ * Filters events by venue IDs
  */
 export const filterEventsByType = (events: Event[], eventTypes: string[]): Event[] => {
-  if (!eventTypes || eventTypes.length === 0) return events;
+  if (!eventTypes.length) return events;
   
   return events.filter(event => 
     event.event_type && eventTypes.includes(event.event_type)
@@ -13,13 +13,12 @@ export const filterEventsByType = (events: Event[], eventTypes: string[]): Event
 };
 
 /**
- * Filter events by venue
+ * Filters events by venue IDs
  */
 export const filterEventsByVenue = (events: Event[], venueIds: string[]): Event[] => {
-  if (!venueIds || venueIds.length === 0) return events;
+  if (!venueIds.length) return events;
   
-  return events.filter(event => {
-    // Check if venue exists and venue_id matches one in the filter
-    return event.venue_id && venueIds.includes(event.venue_id);
-  });
+  return events.filter(event => 
+    event.venue_id && venueIds.includes(event.venue_id)
+  );
 };

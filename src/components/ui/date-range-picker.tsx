@@ -13,7 +13,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { toast } from "sonner";
 
 interface DateRangePickerProps {
   value?: DateRange;
@@ -27,7 +26,7 @@ export function DateRangePicker({
   value,
   onChange,
   className,
-  placeholder = "Pick a date range",
+  placeholder = "Select date range",
   disabled = false,
 }: DateRangePickerProps) {
   const [date, setDate] = React.useState<DateRange | undefined>(value);
@@ -57,17 +56,15 @@ export function DateRangePicker({
     // Auto-apply single date selections
     if (newDate?.from && !newDate.to) {
       onChange(newDate);
-      toast.success("Date filter applied");
     }
   };
 
-  // Handle confirmation - now we trigger the actual onChange and close the popover
+  // Handle confirmation - now we trigger the actual onChange
   const handleConfirm = () => {
     if (date) {
       onChange(date);
       setOpen(false); // Close the popover after confirming
       console.log("DateRangePicker confirmed:", date);
-      toast.success("Date range applied");
     }
   };
 
@@ -115,7 +112,7 @@ export function DateRangePicker({
                 disabled={!date?.from}
                 className="bg-[#9b87f5] hover:bg-[#7E69AB]"
               >
-                {date?.to ? "Apply" : "Confirm"}
+                {date?.to ? "Apply Range" : "Confirm Date"}
               </Button>
             </div>
           </div>
