@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin } from 'lucide-react';
@@ -107,7 +108,8 @@ const EventCardList: React.FC<EventCardListProps> = ({
             <CategoryPill 
               category={event.event_type} 
               size="xs" 
-              showIcon={false} 
+              showIcon={false}
+              active={true}
             />
           </div>
         )}

@@ -3,7 +3,7 @@ import React from 'react';
 import { Event } from '@/types';
 import { MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { CategoryPill } from '@/components/ui/category-pills/CategoryPill';
+import { CategoryPill } from '@/components/ui/category-pills';
 import { useEventImages } from '@/hooks/useEventImages';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
@@ -127,7 +127,8 @@ const EventCard: React.FC<EventCardProps> = ({
             <CategoryPill 
               category={event.event_type} 
               size="default" 
-              showIcon={true}
+              showIcon={false}
+              active={true}
             />
           </div>
         )}

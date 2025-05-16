@@ -38,7 +38,7 @@ export const EventCategoryPills: React.FC<EventCategoryPillsProps> = ({
             category={category}
             active={selectedCategories.includes(category)}
             onClick={() => onToggleCategory(category)}
-            showIcon={true}
+            showIcon={false}
           />
         ))}
       </div>
