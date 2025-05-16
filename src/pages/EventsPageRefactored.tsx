@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,10 +7,10 @@ import EventsHeader from '@/components/events/list-components/EventsHeader';
 import EventsFilters from '@/components/events/list-components/EventsFilters';
 import { EventsEmptyState } from '@/components/events/EventsEmptyState';
 import EventsSignUpTeaser from '@/components/events/list-components/EventsSignUpTeaser';
-import useEventRsvp from '@/hooks/useEventRsvp';
+import { useEventRSVP } from '@/hooks/useEventRSVP'; // Updated import with correct casing
 import { useEvents } from '@/hooks/useEvents';
-import useCategories from '@/hooks/useCategories';
-import useFilters from '@/hooks/useFilters';
+import { useCategories } from '@/hooks/useCategories';
+import { useFilters } from '@/hooks/useFilters';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { filterEvents } from '@/utils/event-filters';
 import EventsSidebar from '@/components/events/EventsSidebar';
@@ -54,7 +53,7 @@ const EventsPageRefactored: React.FC = () => {
   const { categories, isLoading: categoriesLoading } = useCategories();
   
   // RSVP functionality
-  const { handleRsvp, loadingEventId } = useEventRsvp({
+  const { handleRsvp, loadingEventId } = useEventRSVP({
     onSuccess: () => {
       refreshEvents();
     }

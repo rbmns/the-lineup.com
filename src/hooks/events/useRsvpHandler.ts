@@ -50,3 +50,5 @@ export const useRsvpHandler = (
 
   return { handleEventRsvp };
 };
+
+export default useRsvpHandler;
