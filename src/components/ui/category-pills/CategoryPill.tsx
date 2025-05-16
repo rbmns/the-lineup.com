@@ -20,7 +20,7 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
   className,
   size = 'default'
 }) => {
-  const Icon = getCategoryIcon(category);
+  const IconComponent = getCategoryIcon(category);
   
   // Size classes
   const sizeClasses = {
@@ -76,7 +76,7 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
       )}
       onClick={onClick}
     >
-      {showIcon && <Icon className={iconSize[size]} />}
+      {showIcon && <IconComponent className={iconSize[size]} />}
       <span>{category}</span>
     </div>
   );

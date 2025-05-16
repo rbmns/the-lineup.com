@@ -1,5 +1,5 @@
 
-import { ReactElement } from 'react';
+import React, { ReactElement } from 'react';
 import { 
   Music, UtensilsCrossed, Tent, Dumbbell, WaterIcon, Users, 
   Beach, MapIcon, Gamepad2, Yoga, Palette, PartyPopper, 
@@ -12,7 +12,8 @@ export type CategoryIconMapping = {
 
 // Function to map category names to icon components
 export const getCategoryIcon = (category: string) => {
-  const iconMap: Record<string, React.FC> = {
+  // Get the appropriate icon component based on category name
+  const iconMap: Record<string, any> = {
     'Music': Music,
     'Food': UtensilsCrossed,
     'Festival': Tent,
@@ -31,8 +32,10 @@ export const getCategoryIcon = (category: string) => {
     'Coffee': Coffee
   };
   
+  // Return the icon component (not the JSX element)
+  // The actual JSX rendering will happen in the components that use this function
   const Icon = iconMap[category] || MapIcon;
-  return <Icon className="h-4 w-4" />;
+  return Icon;
 };
 
 // Get category color based on name
