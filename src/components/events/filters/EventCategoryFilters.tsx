@@ -42,42 +42,36 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
   const showResetOption = selectedEventTypes.length > 0 && !allSelected && !noneSelected;
   
   return (
-    <div className={cn("space-y-4", className)}>
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium">Event Categories</h3>
-      </div>
-      
-      <div className="space-y-4">
-        <div className="flex flex-wrap gap-2">
-          {/* Add an "All" filter option */}
-          <AllCategoryPill
-            active={allSelected}
-            onClick={handleAllClick}
+    <div className={cn("relative min-h-[44px]", className)}>
+      <div className="flex items-center space-x-2 overflow-x-auto">
+        <AllCategoryPill
+          active={allSelected}
+          onClick={handleAllClick}
+          size="default"
+        />
+
+        {/* Show the category pills */}
+        {allEventTypes.map((category) => (
+          <CategoryPill
+            key={category}
+            category={category}
+            active={selectedEventTypes.includes(category)} 
+            onClick={() => onToggleEventType(category)}
+            showIcon={false}
             size="default"
           />
-
-          {/* Show the category pills */}
-          {allEventTypes.map((category) => (
-            <CategoryPill
-              key={category}
-              category={category}
-              active={selectedEventTypes.includes(category)} 
-              onClick={() => onToggleEventType(category)}
-              showIcon={true}
-              size="default"
-            />
-          ))}
-        </div>
+        ))}
         
+        {/* Reset button that doesn't affect layout */}
         {showResetOption && (
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={onReset}
-            className="text-gray-600 hover:text-gray-900 flex items-center gap-1 px-2 py-1"
+            className="text-gray-600 hover:text-gray-900 flex items-center gap-1 px-2 py-1 ml-2 h-9"
           >
             <X className="h-3.5 w-3.5" />
-            Reset to all
+            <span>Reset to all</span>
           </Button>
         )}
       </div>
