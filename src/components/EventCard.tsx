@@ -2,13 +2,12 @@
 import React from 'react';
 import { Event } from '@/types';
 import { MapPin } from 'lucide-react';
-import { formatInTimeZone } from 'date-fns-tz';
 import { cn } from '@/lib/utils';
 import { CategoryPill } from '@/components/ui/category-pills/CategoryPill';
 import { useEventImages } from '@/hooks/useEventImages';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
-import { formatEventTime, formatDate, AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
+import { formatDate, formatEventTime } from '@/utils/date-formatting';
 
 export interface EventCardProps {
   event: Event;
@@ -35,21 +34,30 @@ const EventCard: React.FC<EventCardProps> = ({
   const { navigateToEvent } = useEventNavigation();
   const imageUrl = getEventImageUrl(event);
 
-  // Format date for display - using European format
-  const formatDateDisplay = (dateStr: string): string => {
-    try {
-      const date = new Date(dateStr);
-      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, d MMM yyyy");
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return dateStr;
+  // Format date and time display
+  const formatDateDisplay = (): string => {
+    if (event.formattedDate) return event.formattedDate;
+    
+    // First try to use start_date (preferred)
+    if (event.start_date) {
+      return formatDate(event.start_date);
     }
+    
+    // Fall back to start_time if available
+    if (event.start_time) {
+      return formatDate(event.start_time);
+    }
+    
+    return 'Date not specified';
   };
   
   // Get formatted event time
-  const getEventTimeDisplay = (currentEvent: Event): string => {
-    if (!currentEvent.start_time) return '';
-    return formatEventTime(currentEvent.start_time, currentEvent.end_time);
+  const getEventTimeDisplay = (): string => {
+    if (event.formattedTime) return event.formattedTime;
+    
+    if (!event.start_time) return '';
+    
+    return formatEventTime(event.start_time, event.end_time);
   };
 
   const handleClick = (e: React.MouseEvent) => {
@@ -134,11 +142,7 @@ const EventCard: React.FC<EventCardProps> = ({
         </h3>
         
         <div className="text-sm text-gray-600 font-medium">
-          {event.start_time && (
-            <>
-              {formatDateDisplay(event.start_time)} • {getEventTimeDisplay(event)}
-            </>
-          )}
+          {formatDateDisplay()} {getEventTimeDisplay() && `• ${getEventTimeDisplay()}`}
         </div>
         
         <div className="flex items-center text-sm text-gray-500">

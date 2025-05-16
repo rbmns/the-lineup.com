@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { DateRange } from 'react-day-picker';
 import { cn } from '@/lib/utils';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
-import { DATE_FILTER_OPTIONS } from '@/constants';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface DateRangeFilterProps {
   dateRange: DateRange | undefined;
@@ -22,12 +22,16 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
   selectedDateFilter,
   onDateFilterChange,
 }) => {
-  // Use constants for quick filters to ensure consistency
+  const isMobile = useIsMobile();
+  
+  // Quick filters for date selection
   const quickFilters = [
-    DATE_FILTER_OPTIONS.TODAY,
-    DATE_FILTER_OPTIONS.THIS_WEEK,
-    DATE_FILTER_OPTIONS.THIS_WEEKEND,
-    DATE_FILTER_OPTIONS.LATER
+    'today',
+    'tomorrow', 
+    'this week',
+    'this weekend',
+    'next week',
+    'later'
   ];
   
   const handleQuickFilterClick = (filter: string) => {
@@ -40,28 +44,15 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
       onDateFilterChange(filter);
       // Always clear any existing date range when selecting a quick filter
       onDateRangeChange(undefined);
-      
-      console.log(`Date filter applied: ${filter}`);
     }
-  };
-
-  const handleDateRangeChange = (newDateRange: DateRange | undefined) => {
-    // When setting a date range, always clear the quick filter
-    if (newDateRange) {
-      if (selectedDateFilter) {
-        onDateFilterChange('');
-      }
-      
-      console.log(`Date range applied:`, newDateRange);
-    }
-    
-    // Always set the new date range directly, replacing any existing range
-    onDateRangeChange(newDateRange);
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
+      <div className={cn(
+        "flex flex-wrap gap-2",
+        isMobile && "grid grid-cols-2 gap-2"
+      )}>
         {quickFilters.map((filter) => (
           <Button
             key={filter}
@@ -69,7 +60,7 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
             size="sm"
             onClick={() => handleQuickFilterClick(filter)}
             className={cn(
-              "capitalize",
+              "capitalize w-full",
               selectedDateFilter === filter ? "bg-[#9b87f5] hover:bg-[#7E69AB]" : "",
               selectedDateFilter === filter ? "border-[#9b87f5]" : ""
             )}
@@ -79,10 +70,10 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
         ))}
       </div>
       
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 mt-4">
         <DateRangePicker
           value={dateRange}
-          onChange={handleDateRangeChange}
+          onChange={onDateRangeChange}
           className="w-full"
         />
         
