@@ -109,7 +109,7 @@ export const EventDetailLayout: React.FC<EventDetailLayoutProps> = ({
           <div className="fixed bottom-0 left-0 right-0 p-3 bg-white border-t border-gray-200 shadow-lg z-30 flex justify-between items-center">
             <Button 
               onClick={() => navigate('/signup')} 
-              className="w-full bg-black hover:bg-gray-800 text-white"
+              className="bg-black hover:bg-gray-800 text-white"
               size="lg"
             >
               Sign up to see attendees
