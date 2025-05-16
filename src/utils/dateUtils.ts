@@ -224,6 +224,7 @@ export const filterEventsByDate = (
 
 // Alias for filterEventsByDate for backwards compatibility
 export const filterEventsByDateFilter = filterEventsByDate;
+
 export const filterEventsByDateRange = (event: Event, dateFilter: string, dateRange?: DateRange): boolean => {
   if (!dateFilter && !dateRange) return true;
   
@@ -340,11 +341,4 @@ export const combineDateAndTime = (dateStr: string, timeStr: string): string => 
     console.error('Error combining date and time:', error);
     return '';
   }
-};
-
-/**
- * Fix for useDateFilterProcessor hook
- */
-export const filterEventsByDateFilter = (events: Event[], dateFilter: string): Event[] => {
-  return filterEventsByDate(events, dateFilter);
 };
