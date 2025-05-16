@@ -27,8 +27,7 @@ const EventsPageRefactored = () => {
     toggleCategory,
     selectAll,
     deselectAll,
-    reset,
-    areAllSelected
+    reset
   } = useCategoryFilterSelection(allEventTypes);
   
   // Filter events based on selected categories
@@ -63,7 +62,6 @@ const EventsPageRefactored = () => {
             hasActiveFilters={selectedCategories.length > 0 && selectedCategories.length < allEventTypes.length}
             onClearAllFilters={reset}
             className="bg-white rounded-lg shadow-sm p-4"
-            allSelected={areAllSelected()}
           />
         </div>
         
