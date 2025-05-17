@@ -36,16 +36,21 @@ const UserProfilePage: React.FC = () => {
     isLoading: eventsLoading 
   } = useUserEvents(profileId);
   
+  // Convert friendshipStatus to compatible type for child components
+  // This ensures "requested" is properly handled as "pending"
+  const normalizedFriendStatus = friendshipStatus === 'requested' ? 'pending' : 
+    (friendshipStatus as 'none' | 'pending' | 'accepted');
+  
   // Track page view with friendship status
   useEffect(() => {
     if (profile && !isOwnProfile) {
       trackEvent('profile_view', {
         profile_id: profileId,
-        friendship_status: friendshipStatus,
+        friendship_status: normalizedFriendStatus, // Use normalized status here
         is_own_profile: isOwnProfile
       });
     }
-  }, [profile, profileId, friendshipStatus, isOwnProfile]);
+  }, [profile, profileId, normalizedFriendStatus, isOwnProfile]);
   
   // Redirect to login if trying to view own profile but not logged in
   useEffect(() => {
@@ -65,15 +70,12 @@ const UserProfilePage: React.FC = () => {
   };
 
   // Determine if user can view events based on friendship status
-  const canViewEvents = isOwnProfile || friendshipStatus === 'accepted';
+  // Use the normalized status here
+  const canViewEvents = isOwnProfile || normalizedFriendStatus === 'accepted';
   
   // Determine if the profile is clickable
-  const canNavigateToProfile = !isOwnProfile && isProfileClickable(friendshipStatus, false);
-
-  // Convert friendshipStatus to compatible type for child components
-  // This ensures "requested" is properly handled as "pending"
-  const normalizedFriendStatus = friendshipStatus === 'requested' ? 'pending' : 
-    (friendshipStatus as 'none' | 'pending' | 'accepted');
+  // Use the normalized status here
+  const canNavigateToProfile = !isOwnProfile && isProfileClickable(normalizedFriendStatus, false);
 
   if (isOwnProfile && !user) {
     return null; // Will redirect in effect
