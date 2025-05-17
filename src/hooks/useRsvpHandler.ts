@@ -1,5 +1,5 @@
 
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import { User } from '@supabase/supabase-js';
 import { useQueryClient } from '@tanstack/react-query';
 import { trackRsvp } from '@/utils/gtm';
@@ -44,8 +44,6 @@ export const useRsvpHandler = (
         queryClient.invalidateQueries({ queryKey: ['event', thisEventId] });
         
         // For event lists, be more targeted with invalidation
-        // Note: This is a compromise - we could be more granular but it would require
-        // more complex cache manipulation logic
         queryClient.invalidateQueries({ queryKey: ['events'] });
       }
       

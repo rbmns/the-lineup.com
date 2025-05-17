@@ -3,11 +3,6 @@
  * Google Tag Manager utilities
  */
 
-// Initialize the dataLayer array if it doesn't exist
-export const initializeDataLayer = (): void => {
-  window.dataLayer = window.dataLayer || [];
-};
-
 // Push an event to the dataLayer
 export const pushToDataLayer = (data: Record<string, any>): void => {
   if (typeof window !== 'undefined' && window.dataLayer) {

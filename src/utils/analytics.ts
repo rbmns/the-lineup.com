@@ -1,6 +1,6 @@
 
 import { supabase } from '@/lib/supabase';
-import { trackEvent as trackGtmEvent } from './gtm';
+import { pushToDataLayer } from './gtm';
 
 interface PageViewData {
   page: string;
@@ -52,9 +52,9 @@ export async function trackPageView(page: string) {
     console.log('Tracking page view:', pageViewData);
     
     // We'll use a custom tracking RPC function in Supabase
-    // This approach avoids creating additional tables if you don't have them yet
     await supabase.rpc('track_page_view', pageViewData);
     
+    // No need to call GTM here as it's handled in PageViewTracker component
   } catch (error) {
     // Silently fail - analytics should never break the app
     console.error('Error tracking page view:', error);
@@ -91,12 +91,13 @@ export async function trackEvent(eventName: string, eventData: Record<string, an
     await supabase.rpc('track_user_event', eventTrackingData);
     
     // Also track in GTM
-    trackGtmEvent(
-      eventName,                  // category
-      eventData.action || 'view', // action
-      eventData.label,            // label
-      eventData.value             // value
-    );
+    pushToDataLayer({
+      event: 'trackEvent',
+      eventCategory: eventName,
+      eventAction: eventData.action || 'interact',
+      eventLabel: eventData.label,
+      eventValue: eventData.value
+    });
     
   } catch (error) {
     // Silently fail - analytics should never break the app
