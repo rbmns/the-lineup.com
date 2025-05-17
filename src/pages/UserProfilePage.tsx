@@ -8,6 +8,8 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { ProfileEventsSection } from '@/components/profile/ProfileEventsSection';
 import { ProfileCard } from '@/components/profile/ProfileCard';
 import { Loader2 } from 'lucide-react';
+import { trackEvent } from '@/utils/gtm';
+import { isProfileClickable } from '@/utils/friendshipUtils';
 
 const UserProfilePage: React.FC = () => {
   const { user } = useAuth();
@@ -34,6 +36,17 @@ const UserProfilePage: React.FC = () => {
     isLoading: eventsLoading 
   } = useUserEvents(profileId);
   
+  // Track page view with friendship status
+  useEffect(() => {
+    if (profile && !isOwnProfile) {
+      trackEvent('profile_view', {
+        profile_id: profileId,
+        friendship_status: friendshipStatus,
+        is_own_profile: isOwnProfile
+      });
+    }
+  }, [profile, profileId, friendshipStatus, isOwnProfile]);
+  
   // Redirect to login if trying to view own profile but not logged in
   useEffect(() => {
     if (isOwnProfile && !user) {
@@ -44,12 +57,18 @@ const UserProfilePage: React.FC = () => {
   // Handle adding friend
   const handleAddFriend = async () => {
     if (userId && sendFriendRequest) {
+      trackEvent('friend_request_sent', {
+        recipient_id: userId
+      });
       await sendFriendRequest();
     }
   };
 
   // Determine if user can view events based on friendship status
   const canViewEvents = isOwnProfile || friendshipStatus === 'accepted';
+  
+  // Determine if the profile is clickable
+  const canNavigateToProfile = !isOwnProfile && isProfileClickable(friendshipStatus, false);
 
   if (isOwnProfile && !user) {
     return null; // Will redirect in effect
@@ -89,7 +108,7 @@ const UserProfilePage: React.FC = () => {
             friendStatus={friendshipStatus as 'none' | 'pending' | 'accepted'}
             onAddFriend={handleAddFriend}
             showActions={!isOwnProfile}
-            linkToProfile={false}
+            linkToProfile={canNavigateToProfile}
           />
           
           <ProfileEventsSection 
