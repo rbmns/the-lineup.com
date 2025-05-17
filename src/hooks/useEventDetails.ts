@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
@@ -125,7 +126,7 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
     }
   }, [initialRsvpStatus, event]);
 
-  // Handle RSVP for a specific event
+  // Legacy handler (for backward compatibility)
   const rsvpToEvent = async (status: 'Going' | 'Interested') => {
     if (!user) {
       navigate('/login');
@@ -156,7 +157,7 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
     }
   };
 
-  // Handle RSVP for any event (used for passing to components)
+  // Modern handler (takes eventId parameter directly)
   const handleRsvpAction = async (eventId: string, status: 'Going' | 'Interested') => {
     await hookHandleRsvp(eventId, status);
   };

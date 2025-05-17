@@ -21,8 +21,10 @@ export const useRsvpButtonLogic = ({
 
   // Update localStatus whenever currentStatus prop changes
   useEffect(() => {
-    console.log(`EventRsvpButtons (${eventId}): currentStatus changed to ${currentStatus} from ${localStatus}`);
-    setLocalStatus(currentStatus);
+    if (currentStatus !== localStatus) {
+      console.log(`EventRsvpButtons (${eventId}): currentStatus changed to ${currentStatus} from ${localStatus}`);
+      setLocalStatus(currentStatus);
+    }
   }, [currentStatus, eventId, localStatus]);
 
   const isGoing = localStatus === 'Going';
@@ -34,7 +36,7 @@ export const useRsvpButtonLogic = ({
   // Handle RSVP with optimistic UI updates
   const handleRsvpClick = async (status: 'Going' | 'Interested') => {
     // Disable if parent says it's loading, or if local action is in progress
-    if (isLoading || localLoading || false) return;
+    if (isLoading || localLoading) return;
     
     setLocalLoading(status);
     const prevLocalStatus = localStatus; // Store previous status for potential revert

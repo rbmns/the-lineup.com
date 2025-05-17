@@ -41,7 +41,6 @@ export const useRsvpActions = (userId?: string) => {
             return false;
           }
           
-          // Removed toast message
           setLoading(false);
           return true;
         } else {
@@ -57,7 +56,6 @@ export const useRsvpActions = (userId?: string) => {
             return false;
           }
           
-          // Removed toast message
           setLoading(false);
           return true;
         }
@@ -73,7 +71,6 @@ export const useRsvpActions = (userId?: string) => {
           return false;
         }
         
-        // Removed toast message
         setLoading(false);
         return true;
       }

@@ -4,10 +4,11 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Share2, CheckCircle2, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { RsvpStatus } from './EventRsvpButtons';
 
 export interface MobileRsvpFooterProps {
   eventId: string;
-  currentStatus?: 'Going' | 'Interested' | null;
+  currentStatus?: RsvpStatus;
   onRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
   onShare: () => void;
   loading?: boolean;
