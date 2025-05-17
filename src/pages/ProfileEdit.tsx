@@ -90,7 +90,7 @@ const ProfileEdit = () => {
             <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-md shadow-sm">
               <h2 className="text-xl font-bold text-blue-700">Complete your profile</h2>
               <p className="mt-2 text-blue-600">
-                Please set your location to discover nearby events and connect with friends in your area.
+                Add your location wherever you move, to see relevant events and so that your friends can find you.
               </p>
             </div>
           )}
