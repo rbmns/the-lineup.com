@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { MapPin } from 'lucide-react';
@@ -85,11 +84,11 @@ const EventCard: React.FC<EventCardProps> = ({
   };
 
   // Handle RSVP and ensure we always return a Promise<boolean>
-  const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+  const handleRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp) return false;
     
     try {
-      const result = await onRsvp(event.id, status);
+      const result = await onRsvp(eventId, status);
       // Convert any result (including void) to a boolean
       return result === undefined ? true : !!result;
     } catch (error) {
@@ -160,6 +159,7 @@ const EventCard: React.FC<EventCardProps> = ({
             onClick={(e) => e.stopPropagation()}
           >
             <EventRsvpButtons
+              eventId={event.id}
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
               size="sm"

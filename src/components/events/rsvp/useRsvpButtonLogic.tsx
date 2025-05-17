@@ -1,14 +1,17 @@
 
 import { useState, useEffect } from 'react';
 import { RsvpStatus } from '../EventRsvpButtons';
+import { trackEvent } from '@/utils/gtm';
 
 interface UseRsvpButtonLogicProps {
+  eventId: string; // Add eventId parameter to track which event is being acted on
   currentStatus?: RsvpStatus | null;
-  onRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
+  onRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
   isLoading?: boolean;
 }
 
 export const useRsvpButtonLogic = ({
+  eventId,
   currentStatus = null,
   onRsvp,
   isLoading = false
@@ -18,9 +21,9 @@ export const useRsvpButtonLogic = ({
 
   // Update localStatus whenever currentStatus prop changes
   useEffect(() => {
-    console.log(`EventRsvpButtons: currentStatus changed to ${currentStatus} from ${localStatus}`);
+    console.log(`EventRsvpButtons (${eventId}): currentStatus changed to ${currentStatus} from ${localStatus}`);
     setLocalStatus(currentStatus);
-  }, [currentStatus]);
+  }, [currentStatus, eventId]);
 
   const isGoing = localStatus === 'Going';
   const isInterested = localStatus === 'Interested';
@@ -41,9 +44,16 @@ export const useRsvpButtonLogic = ({
     
     // Important: Ensure we NEVER have two statuses active at once - always clear previous status first
     setLocalStatus(newOptimisticStatus);
+    
+    // Track RSVP interaction with GTM
+    trackEvent('rsvp_action', {
+      event_id: eventId,
+      status: status,
+      action: localStatus === status ? 'remove' : 'add'
+    });
       
     // Apply button click feedback animation and immediate color change
-    const button = document.getElementById(`rsvp-${status.toLowerCase()}`);
+    const button = document.getElementById(`rsvp-${status.toLowerCase()}-${eventId}`);
     if (button) {
       button.classList.add('button-click-animation');
       
@@ -55,7 +65,7 @@ export const useRsvpButtonLogic = ({
         
         // If we're activating this button, ensure the other button is deactivated
         const otherStatus = status === 'Going' ? 'interested' : 'going';
-        const otherButton = document.getElementById(`rsvp-${otherStatus}`);
+        const otherButton = document.getElementById(`rsvp-${otherStatus}-${eventId}`);
         if (otherButton) {
           otherButton.classList.remove('bg-green-500', 'bg-blue-500', 'text-white');
           otherButton.classList.add('bg-gray-100', 'text-gray-700');
@@ -70,7 +80,7 @@ export const useRsvpButtonLogic = ({
     }
       
     // Visual feedback on event card
-    const eventCard = button?.closest('[data-event-id]');
+    const eventCard = document.querySelector(`[data-event-id="${eventId}"]`);
     if (eventCard) {
       const animationClass = status === 'Going' ? 'rsvp-going-animation' : 'rsvp-interested-animation';
       eventCard.classList.add(animationClass);
@@ -78,7 +88,8 @@ export const useRsvpButtonLogic = ({
     }
       
     try {
-      const success = await onRsvp(status);
+      // Pass the eventId to the onRsvp function
+      const success = await onRsvp(eventId, status);
       if (!success) {
         // Revert optimistic update if the actual call failed
         setLocalStatus(prevLocalStatus);

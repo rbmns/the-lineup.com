@@ -6,8 +6,9 @@ import { useRsvpButtonLogic } from './useRsvpButtonLogic';
 import { RsvpStatus } from '../EventRsvpButtons';
 
 interface RsvpButtonGroupProps {
+  eventId: string; // Add eventId parameter
   currentStatus?: RsvpStatus | null;
-  onRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
+  onRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
   isLoading?: boolean;
   disabled?: boolean;
   className?: string;
@@ -16,6 +17,7 @@ interface RsvpButtonGroupProps {
 }
 
 export const RsvpButtonGroup: React.FC<RsvpButtonGroupProps> = ({
+  eventId,
   currentStatus = null,
   onRsvp,
   isLoading = false,
@@ -30,7 +32,7 @@ export const RsvpButtonGroup: React.FC<RsvpButtonGroupProps> = ({
     localLoading,
     combinedIsLoading,
     handleRsvpClick
-  } = useRsvpButtonLogic({ currentStatus, onRsvp, isLoading });
+  } = useRsvpButtonLogic({ eventId, currentStatus, onRsvp, isLoading });
 
   // Map size to appropriate button sizes
   const buttonSizeClasses = {
@@ -41,9 +43,10 @@ export const RsvpButtonGroup: React.FC<RsvpButtonGroupProps> = ({
   };
 
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div className={cn('flex items-center gap-2', className)} data-rsvp-group={eventId}>
       <RsvpButton
         id="rsvp-going"
+        eventId={eventId}
         status="Going"
         isActive={isGoing}
         isDisabled={disabled}
@@ -57,6 +60,7 @@ export const RsvpButtonGroup: React.FC<RsvpButtonGroupProps> = ({
       
       <RsvpButton
         id="rsvp-interested"
+        eventId={eventId}
         status="Interested"
         isActive={isInterested}
         isDisabled={disabled}

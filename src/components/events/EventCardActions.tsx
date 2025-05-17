@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { EventRsvpButtons } from './EventRsvpButtons';
 import { cn } from '@/lib/utils';
@@ -38,7 +37,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
     return null;
   }
 
-  const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+  const handleRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp) return false;
     
     try {
@@ -99,7 +98,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       )}
       data-no-navigation="true"
       data-rsvp-container="true"
-      data-event-id={eventId} // Add event ID to container for better scoping
+      data-event-id={eventId}
       onClick={(e) => e.stopPropagation()}
     >
       {/* RSVP Buttons */}
@@ -107,10 +106,11 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
         <div 
           className="event-rsvp-buttons animate-fade-in" 
           data-no-navigation="true"
-          style={{ animationDuration: '100ms' }} // Faster animation
+          style={{ animationDuration: '100ms' }}
           onClick={(e) => e.stopPropagation()}
         >
           <EventRsvpButtons
+            eventId={eventId}
             currentStatus={localRsvpStatus || null}
             onRsvp={handleRsvp}
             size={buttonSize}

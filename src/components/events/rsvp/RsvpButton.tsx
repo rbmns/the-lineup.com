@@ -6,6 +6,7 @@ import { RsvpButtonContent } from './RsvpButtonContent';
 
 interface RsvpButtonProps {
   id: string;
+  eventId: string; // Add eventId parameter
   status: 'Going' | 'Interested';
   isActive: boolean;
   isDisabled: boolean;
@@ -19,6 +20,7 @@ interface RsvpButtonProps {
 
 export const RsvpButton: React.FC<RsvpButtonProps> = ({
   id,
+  eventId,
   status,
   isActive,
   isDisabled,
@@ -43,11 +45,14 @@ export const RsvpButton: React.FC<RsvpButtonProps> = ({
     return 'bg-gray-100 border-gray-200 hover:bg-gray-200 text-gray-700';
   };
 
+  // Create event-specific button ID
+  const buttonId = `rsvp-${status.toLowerCase()}-${eventId}`;
+
   // Special handling for minimal variant with just icons
   if (variant === 'minimal') {
     return (
       <Button
-        id={`rsvp-${status.toLowerCase()}`}
+        id={buttonId}
         type="button"
         variant="outline"
         size="icon"
@@ -60,6 +65,8 @@ export const RsvpButton: React.FC<RsvpButtonProps> = ({
         onClick={onClick}
         title={status}
         data-rsvp-button="true"
+        data-event-id={eventId}
+        data-status={status}
       >
         <RsvpButtonContent 
           status={status}
@@ -75,7 +82,7 @@ export const RsvpButton: React.FC<RsvpButtonProps> = ({
   // Compact or default variants with text
   return (
     <Button
-      id={`rsvp-${status.toLowerCase()}`}
+      id={buttonId}
       type="button"
       variant="outline"
       className={cn(
@@ -87,6 +94,8 @@ export const RsvpButton: React.FC<RsvpButtonProps> = ({
       disabled={isDisabled || isLoading}
       onClick={onClick}
       data-rsvp-button="true"
+      data-event-id={eventId}
+      data-status={status}
     >
       <RsvpButtonContent 
         status={status}

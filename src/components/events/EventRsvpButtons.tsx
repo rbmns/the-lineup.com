@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { RsvpStatusBadge } from './rsvp/RsvpStatusBadge';
 import { RsvpButtonGroup } from './rsvp/RsvpButtonGroup';
@@ -5,8 +6,9 @@ import { RsvpButtonGroup } from './rsvp/RsvpButtonGroup';
 export type RsvpStatus = 'Going' | 'Interested' | null;
 
 interface EventRsvpButtonsProps {
+  eventId: string; // Add required eventId parameter
   currentStatus?: RsvpStatus | null;
-  onRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
+  onRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
   /** General loading state for the RSVP action (e.g., from a parent hook) */
   isLoading?: boolean; 
   disabled?: boolean;
@@ -17,6 +19,7 @@ interface EventRsvpButtonsProps {
 }
 
 export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
+  eventId,
   currentStatus = null,
   onRsvp,
   isLoading = false,
@@ -38,6 +41,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   // Otherwise show the interactive buttons
   return (
     <RsvpButtonGroup
+      eventId={eventId}
       currentStatus={currentStatus}
       onRsvp={onRsvp}
       isLoading={isLoading}
