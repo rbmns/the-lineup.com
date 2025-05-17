@@ -26,7 +26,7 @@ export const EventsTeaser: React.FC<EventsTeaserProps> = ({ className }) => {
 
   return (
     <div className={`bg-white rounded-lg border border-gray-200 shadow-sm p-4 ${className}`}>
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+      <div className={`flex ${isMobile ? 'flex-col items-center text-center' : 'flex-row sm:items-center'} gap-4`}>
         <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
           <Calendar className="h-6 w-6 text-purple-500" />
         </div>
@@ -36,7 +36,7 @@ export const EventsTeaser: React.FC<EventsTeaserProps> = ({ className }) => {
           <p className="text-sm text-gray-600">Sign up to save your liked events and see where your friends are going</p>
         </div>
 
-        <div className="flex items-center mt-3 sm:mt-0">
+        <div className={`flex items-center mt-3 ${isMobile ? 'w-full justify-center' : 'sm:mt-0'}`}>
           <Button 
             onClick={handleSignUpClick}
             className="w-full sm:w-auto bg-black hover:bg-gray-800 text-white font-medium text-sm"
