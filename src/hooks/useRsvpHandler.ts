@@ -2,6 +2,7 @@
 import { useCallback, useRef } from 'react';
 import { User } from '@supabase/supabase-js';
 import { useQueryClient } from '@tanstack/react-query';
+import { trackRsvp } from '@/utils/gtm';
 
 /**
  * A hook to handle RSVP actions with proper caching to maintain RSVP state across pages
@@ -31,6 +32,9 @@ export const useRsvpHandler = (
       const success = await handleRsvp(eventId, status);
       
       if (success) {
+        // Track the RSVP event in GTM
+        trackRsvp(eventId, status);
+        
         // Invalidate all relevant queries to ensure fresh data
         queryClient.invalidateQueries({ queryKey: ['events'] });
         queryClient.invalidateQueries({ queryKey: ['event', eventId] });

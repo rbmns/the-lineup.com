@@ -1,5 +1,6 @@
 
 import { supabase } from '@/lib/supabase';
+import { trackEvent as trackGtmEvent } from './gtm';
 
 interface PageViewData {
   page: string;
@@ -86,8 +87,16 @@ export async function trackEvent(eventName: string, eventData: Record<string, an
     // Log the event to the server
     console.log('Tracking event:', eventTrackingData);
     
-    // Use the event tracking RPC function
+    // Track in Supabase
     await supabase.rpc('track_user_event', eventTrackingData);
+    
+    // Also track in GTM
+    trackGtmEvent(
+      eventName,                  // category
+      eventData.action || 'view', // action
+      eventData.label,            // label
+      eventData.value             // value
+    );
     
   } catch (error) {
     // Silently fail - analytics should never break the app
