@@ -8,7 +8,7 @@ import Friends from "./pages/Friends";
 import UserProfilePage from "./pages/UserProfilePage"; 
 import ProfileEdit from "./pages/ProfileEdit";
 import Login from "./pages/Login";
-import { AuthProvider } from "./contexts/auth/AuthContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import { ToastProvider } from "./contexts/ToastContext";
 import DesignSystem from "./pages/DesignSystem";
 
