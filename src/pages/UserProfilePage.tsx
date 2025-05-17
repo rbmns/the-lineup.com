@@ -75,7 +75,7 @@ const UserProfilePage: React.FC = () => {
         {isOwnProfile && (
           <div className="mb-4">
             <Link 
-              to="/profile/settings" 
+              to="/profile/edit" 
               className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors"
             >
               Edit Profile Settings
