@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useRsvpMutation } from '../event-rsvp/useRsvpMutation';
 import { useScrollPosition } from '../useScrollPosition';
 import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 
 /**
  * A unified hook for handling event RSVPs with scroll preservation and optimistic updates
@@ -21,7 +20,7 @@ export const useEventRsvpHandler = ({
 
   const handleEventRsvp = async (eventId: string, status: 'Going' | 'Interested') => {
     if (!userId) {
-      toast.error("Please log in to RSVP");
+      console.log("Please log in to RSVP");
       return false;
     }
 
@@ -37,11 +36,6 @@ export const useEventRsvpHandler = ({
       const result = await mutateRsvp(userId, eventId, status);
       
       if (result.success) {
-        // Show success toast if configured
-        if (result.toastMessage) {
-          toast.success(result.toastMessage);
-        }
-        
         // Invalidate relevant queries to refresh data
         // This is crucial for keeping event list and detail views in sync
         queryClient.invalidateQueries({ queryKey: ['events'] });
@@ -61,12 +55,11 @@ export const useEventRsvpHandler = ({
         
         return true;
       } else {
-        toast.error("Failed to update RSVP status");
+        console.error("Failed to update RSVP status");
         return false;
       }
     } catch (error) {
       console.error('Error in RSVP handler:', error);
-      toast.error("An error occurred while updating your RSVP");
       return false;
     } finally {
       // Clear loading state

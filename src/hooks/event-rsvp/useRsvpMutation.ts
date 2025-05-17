@@ -35,7 +35,6 @@ export const useRsvpMutation = () => {
       }
 
       let success = false;
-      let toastMessage = "";
       
       // Update the database
       if (existingRsvp && newStatus === null) {
@@ -47,7 +46,6 @@ export const useRsvpMutation = () => {
           
         if (error) throw error;
         success = true;
-        toastMessage = `You are no longer ${status.toLowerCase()} to this event`;
         
       } else if (existingRsvp) {
         // Update existing RSVP
@@ -58,7 +56,6 @@ export const useRsvpMutation = () => {
           
         if (error) throw error;
         success = true;
-        toastMessage = `You are now ${newStatus?.toLowerCase()} to this event`;
         
       } else if (newStatus) {
         // Create new RSVP
@@ -72,12 +69,10 @@ export const useRsvpMutation = () => {
           
         if (error) throw error;
         success = true;
-        toastMessage = `You are now ${newStatus.toLowerCase()} to this event`;
       }
       
       // Try to restore the scroll position
       setTimeout(() => {
-        console.log(`useRsvpMutation - Trying to restore scroll to: ${scrollPosition}px`);
         window.scrollTo({
           top: scrollPosition,
           behavior: 'auto'
@@ -88,7 +83,7 @@ export const useRsvpMutation = () => {
         success,
         newStatus,
         oldStatus,
-        toastMessage
+        toastMessage: '' // Empty toast message
       };
       
     } catch (error) {
@@ -106,7 +101,7 @@ export const useRsvpMutation = () => {
         success: false,
         newStatus: null,
         oldStatus: null,
-        toastMessage: 'Failed to update RSVP status'
+        toastMessage: ''
       };
     }
   }, []);

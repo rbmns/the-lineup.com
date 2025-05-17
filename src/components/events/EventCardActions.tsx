@@ -45,22 +45,32 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       console.log('EventCardActions - Handling RSVP for event:', eventId, status);
       setIsLoading(true);
       
-      // Set optimistic status update
+      // Set optimistic status update immediately
       const newStatus = localRsvpStatus === status ? undefined : status;
-      setLocalRsvpStatus(newStatus);
+      
+      // If changing from one status to another, first clear the current status
+      if (localRsvpStatus && localRsvpStatus !== status) {
+        setLocalRsvpStatus(undefined);
+        // Small delay before setting the new status for visual feedback
+        setTimeout(() => {
+          setLocalRsvpStatus(newStatus);
+        }, 10);
+      } else {
+        setLocalRsvpStatus(newStatus);
+      }
       
       // Add improved visual feedback with animation
       const eventCard = document.querySelector(`[data-event-id="${eventId}"]`);
       if (eventCard) {
         // Apply faster animation with less flickering
-        eventCard.classList.add('transition-all', 'duration-200');
+        eventCard.classList.add('transition-all', 'duration-100');
         
         if (status === 'Going') {
           eventCard.classList.add('rsvp-going-animation');
-          setTimeout(() => eventCard.classList.remove('rsvp-going-animation'), 400);
+          setTimeout(() => eventCard.classList.remove('rsvp-going-animation'), 300);
         } else {
           eventCard.classList.add('rsvp-interested-animation');
-          setTimeout(() => eventCard.classList.remove('rsvp-interested-animation'), 400);
+          setTimeout(() => eventCard.classList.remove('rsvp-interested-animation'), 300);
         }
       }
       
@@ -70,7 +80,6 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       // Revert if the operation failed
       if (!success) {
         setLocalRsvpStatus(currentRsvpStatus);
-        // Removed toast
       }
       
       return success;
@@ -79,7 +88,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       setLocalRsvpStatus(currentRsvpStatus); // Revert on error
       return false;
     } finally {
-      setTimeout(() => setIsLoading(false), 300); // Small delay to prevent rapid clicks
+      setTimeout(() => setIsLoading(false), 200); // Reduced delay for faster feedback
     }
   };
 
@@ -91,7 +100,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       className={cn(
         "event-rsvp-container", 
         "mt-2",
-        "transition-all duration-200"
+        "transition-all duration-100" // Faster animation
       )}
       data-no-navigation="true"
       data-rsvp-container="true"
@@ -102,7 +111,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
         <div 
           className="event-rsvp-buttons animate-fade-in" 
           data-no-navigation="true"
-          style={{ animationDuration: '150ms' }}
+          style={{ animationDuration: '100ms' }} // Faster animation
           onClick={(e) => e.stopPropagation()}
         >
           <EventRsvpButtons
@@ -121,7 +130,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
           <Badge
             variant="outline"
             className={cn(
-              "py-1 px-3 text-xs font-medium transition-all duration-200",
+              "py-1 px-3 text-xs font-medium transition-all duration-100", // Faster animation
               localRsvpStatus === 'Going' 
                 ? "bg-green-50 text-green-700 border-green-200" 
                 : "bg-blue-50 text-blue-700 border-blue-200"

@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useRsvpActions } from '@/hooks/useRsvpActions';
 
@@ -62,11 +61,6 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
       if (error) {
         console.error('Error fetching event details:', error);
         setError('Failed to load event details.');
-        toast({
-          title: "Error loading event",
-          description: "We couldn't load the event details. Please try again.",
-          variant: "destructive"
-        });
       } else if (data) {
         console.log('Event data loaded:', data);
         
@@ -82,20 +76,10 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
         fetchAttendees(eventId);
       } else {
         setError('Event not found');
-        toast({
-          title: "Event not found",
-          description: "The event you're looking for doesn't exist or has been removed.",
-          variant: "destructive"
-        });
       }
     } catch (err) {
       console.error('Unexpected error fetching event details:', err);
       setError('An unexpected error occurred.');
-      toast({
-        title: "Error",
-        description: "Something went wrong while loading the event. Please try again.",
-        variant: "destructive"
-      });
     } finally {
       setIsLoading(false);
     }
@@ -145,11 +129,6 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
   // Handle RSVP for a specific event
   const rsvpToEvent = async (status: 'Going' | 'Interested') => {
     if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please log in to RSVP to events",
-        variant: "destructive",
-      });
       navigate('/login');
       return;
     }
@@ -172,19 +151,9 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
         
         // Refresh attendees data
         fetchAttendees(eventId);
-        
-        toast({
-          title: "RSVP Updated",
-          description: `You're now ${status.toLowerCase()} to this event.`
-        });
       }
     } catch (err) {
       console.error('Error during RSVP:', err);
-      toast({
-        title: "RSVP Failed",
-        description: "We couldn't update your RSVP. Please try again.",
-        variant: "destructive"
-      });
     }
   };
 

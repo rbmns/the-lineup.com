@@ -35,8 +35,21 @@ export const useRsvpButtonLogic = ({
     
     setLocalLoading(status);
     const prevLocalStatus = localStatus; // Store previous status for potential revert
+    
+    // Immediately update the button state
     const newOptimisticStatus = localStatus === status ? null : status;
-    setLocalStatus(newOptimisticStatus);
+    
+    // If changing from one status to another (e.g., Interested → Going), 
+    // first clear the current status
+    if (localStatus && localStatus !== status) {
+      setLocalStatus(null);
+      // Small delay before setting the new status for visual feedback
+      setTimeout(() => {
+        setLocalStatus(newOptimisticStatus);
+      }, 10);
+    } else {
+      setLocalStatus(newOptimisticStatus);
+    }
       
     // Apply button click feedback animation and immediate color change
     const button = document.getElementById(`rsvp-${status.toLowerCase()}`);
@@ -57,7 +70,7 @@ export const useRsvpButtonLogic = ({
     if (eventCard) {
       const animationClass = status === 'Going' ? 'rsvp-going-animation' : 'rsvp-interested-animation';
       eventCard.classList.add(animationClass);
-      setTimeout(() => eventCard.classList.remove(animationClass), 800);
+      setTimeout(() => eventCard.classList.remove(animationClass), 400);
     }
       
     try {
@@ -82,7 +95,7 @@ export const useRsvpButtonLogic = ({
     } finally {
       setTimeout(() => {
         setLocalLoading(null);
-      }, 300); // Delay to allow animations/transitions
+      }, 200); // Reduced delay for faster feedback
     }
   };
 
