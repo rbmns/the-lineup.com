@@ -80,7 +80,7 @@ const EventDetail = () => {
   } = useEventDetailHandlers();
   
   // Enhanced RSVP with scroll preservation
-  const handleRsvpEvent = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+  const handleRsvpEvent = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     try {
       await handleRsvp(status);
       // After successful RSVP, refresh event data to ensure we have the latest

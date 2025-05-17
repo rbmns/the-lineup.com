@@ -101,9 +101,11 @@ export const EventDetailLayout: React.FC<EventDetailLayoutProps> = ({
       {/* Mobile RSVP Footer - only for authenticated users */}
       {isMobile && isAuthenticated && (
         <MobileRsvpFooter 
+          eventId={event.id}
           currentStatus={event.rsvp_status} 
           onRsvp={handleRsvp}
           onShare={() => setShareDialogOpen(true)}
+          loading={rsvpLoading}
         />
       )}
       

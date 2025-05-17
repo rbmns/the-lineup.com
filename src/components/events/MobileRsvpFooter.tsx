@@ -6,13 +6,15 @@ import { Share2, CheckCircle2, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface MobileRsvpFooterProps {
+  eventId: string; // Add eventId parameter
   currentStatus?: 'Going' | 'Interested' | null;
-  onRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
+  onRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
   onShare: () => void;
   loading?: boolean;
 }
 
 export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({ 
+  eventId,
   currentStatus, 
   onRsvp, 
   onShare,
@@ -29,7 +31,7 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
     
     try {
       setLocalLoading(true);
-      await onRsvp(status);
+      await onRsvp(eventId, status); // Pass the eventId to onRsvp
     } finally {
       // Add a small delay to prevent rapid re-clicking
       setTimeout(() => setLocalLoading(false), 500);
