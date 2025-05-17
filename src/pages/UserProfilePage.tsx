@@ -8,7 +8,7 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { ProfileEventsSection } from '@/components/profile/ProfileEventsSection';
 import { ProfileCard } from '@/components/profile/ProfileCard';
 import { Loader2 } from 'lucide-react';
-import { trackEvent } from '@/utils/gtm';
+import { trackEvent } from '@/utils/analytics';
 import { isProfileClickable } from '@/utils/friendshipUtils';
 
 const UserProfilePage: React.FC = () => {
@@ -105,7 +105,7 @@ const UserProfilePage: React.FC = () => {
         <div className="space-y-6">
           <ProfileCard 
             profile={profile}
-            friendStatus={friendshipStatus as 'none' | 'pending' | 'accepted'}
+            friendStatus={friendshipStatus === 'requested' ? 'pending' : friendshipStatus as 'none' | 'pending' | 'accepted'}
             onAddFriend={handleAddFriend}
             showActions={!isOwnProfile}
             linkToProfile={canNavigateToProfile}
@@ -119,7 +119,7 @@ const UserProfilePage: React.FC = () => {
             isCurrentUser={isOwnProfile}
             username={profile?.username}
             handleAddFriend={handleAddFriend}
-            friendshipStatus={friendshipStatus as 'none' | 'pending' | 'accepted'}
+            friendshipStatus={friendshipStatus === 'requested' ? 'pending' : friendshipStatus as 'none' | 'pending' | 'accepted'}
           />
         </div>
       </div>

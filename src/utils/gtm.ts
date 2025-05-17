@@ -21,19 +21,15 @@ export const trackPageView = (path: string, title?: string): void => {
   });
 };
 
-// Track event with GTM
+// Track event with GTM - updated to accept category string and properties object
 export const trackEvent = (
-  category: string, 
-  action: string, 
-  label?: string, 
-  value?: number
+  eventCategory: string, 
+  eventProperties?: Record<string, any>
 ): void => {
   pushToDataLayer({
     event: 'trackEvent',
-    eventCategory: category,
-    eventAction: action,
-    eventLabel: label,
-    eventValue: value
+    eventCategory,
+    ...eventProperties
   });
 };
 
