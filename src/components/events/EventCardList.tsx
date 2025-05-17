@@ -152,6 +152,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
               onClick={(e) => e.stopPropagation()}
             >
               <EventRsvpButtons
+                eventId={event.id}
                 currentStatus={event.rsvp_status || null}
                 onRsvp={handleRsvp}
                 size="sm"

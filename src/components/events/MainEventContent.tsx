@@ -107,9 +107,10 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
           {isAuthenticated && !isMobile && (
             <div className="animate-fade-in" style={{ animationDelay: '150ms' }}>
               <EventRsvpButtons 
+                eventId={event.id}
                 currentStatus={event?.rsvp_status}
                 onRsvp={handleRsvpWrapped}
-                isLoading={rsvpLoading} /* Changed from loading to isLoading */
+                isLoading={rsvpLoading}
                 className="w-full"
                 size="lg"
               />

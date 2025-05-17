@@ -4,8 +4,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 
 export const EventRsvpButtonsShowcase = () => {
-  const handleDemoRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
-    console.log(`Demo RSVP: ${status}`);
+  const handleDemoRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
+    console.log(`Demo RSVP: ${status} for event ${eventId}`);
     return true;
   };
 
@@ -19,6 +19,7 @@ export const EventRsvpButtonsShowcase = () => {
           <div>
             <h3 className="text-lg font-medium mb-3">Default RSVP Button</h3>
             <EventRsvpButtons
+              eventId="demo-event-1"
               currentStatus={null}
               onRsvp={handleDemoRsvp}
             />
@@ -31,6 +32,7 @@ export const EventRsvpButtonsShowcase = () => {
               <div>
                 <p className="text-sm text-gray-500 mb-2">Going</p>
                 <EventRsvpButtons
+                  eventId="demo-event-2"
                   currentStatus="Going"
                   onRsvp={handleDemoRsvp}
                 />
@@ -38,6 +40,7 @@ export const EventRsvpButtonsShowcase = () => {
               <div>
                 <p className="text-sm text-gray-500 mb-2">Interested</p>
                 <EventRsvpButtons
+                  eventId="demo-event-3"
                   currentStatus="Interested"
                   onRsvp={handleDemoRsvp}
                 />
@@ -52,6 +55,7 @@ export const EventRsvpButtonsShowcase = () => {
               <div>
                 <p className="text-sm text-gray-500 mb-2">Small</p>
                 <EventRsvpButtons
+                  eventId="demo-event-4"
                   currentStatus={null}
                   onRsvp={handleDemoRsvp}
                   size="sm"
@@ -60,6 +64,7 @@ export const EventRsvpButtonsShowcase = () => {
               <div>
                 <p className="text-sm text-gray-500 mb-2">Default</p>
                 <EventRsvpButtons
+                  eventId="demo-event-5"
                   currentStatus={null}
                   onRsvp={handleDemoRsvp}
                 />
@@ -67,6 +72,7 @@ export const EventRsvpButtonsShowcase = () => {
               <div>
                 <p className="text-sm text-gray-500 mb-2">Large</p>
                 <EventRsvpButtons
+                  eventId="demo-event-6"
                   currentStatus={null}
                   onRsvp={handleDemoRsvp}
                   size="lg"
