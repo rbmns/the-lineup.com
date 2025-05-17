@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 
@@ -17,9 +16,9 @@ export const prepareEventsWithRsvp = async (
     // Get event IDs
     const eventIds = events.map(event => event.id);
 
-    // Fetch RSVP statuses
+    // Fetch RSVP statuses - FIX: use event_rsvps table instead of rsvps
     const { data: rsvpData, error } = await supabase
-      .from('rsvps')
+      .from('event_rsvps')
       .select('event_id, status')
       .eq('user_id', userId)
       .in('event_id', eventIds);
@@ -34,15 +33,15 @@ export const prepareEventsWithRsvp = async (
     
     if (rsvpData) {
       rsvpData.forEach(rsvp => {
-        rsvpMap[rsvp.event_id] = rsvp.status === 'going' ? 'Going' : 
-                                  rsvp.status === 'interested' ? 'Interested' : null;
+        // Keep the original case since the status is stored as 'Going' or 'Interested' in the database
+        rsvpMap[rsvp.event_id] = rsvp.status;
       });
     }
 
     // Add RSVP status to each event
     return events.map(event => ({
       ...event,
-      user_rsvp_status: rsvpMap[event.id] || null
+      rsvp_status: rsvpMap[event.id] || null
     }));
   } catch (error) {
     console.error('Error preparing events with RSVP:', error);

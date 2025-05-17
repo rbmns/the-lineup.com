@@ -1,113 +1,101 @@
 
-import { useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 
 /**
- * Hook for performing RSVP mutations with Supabase
+ * Hook for making RSVP mutations to the database
  */
 export const useRsvpMutation = () => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const mutateRsvp = useCallback(async (
-    userId: string, 
-    eventId: string, 
+    userId: string,
+    eventId: string,
     status: 'Going' | 'Interested'
   ) => {
-    // Store position before DB operations
-    const scrollPosition = window.scrollY;
-    console.log(`useRsvpMutation - Saving scroll position: ${scrollPosition}px`);
+    if (!userId || !eventId) {
+      return { success: false, newStatus: null, oldStatus: null };
+    }
+
+    setIsLoading(true);
     
     try {
-      // Get the current RSVP status
-      const { data: existingRsvp, error: checkError } = await supabase
+      console.log(`RSVP mutation: User ${userId}, Event ${eventId}, Status ${status}`);
+      
+      // Check for existing RSVP
+      const { data: existingRsvp, error: fetchError } = await supabase
         .from('event_rsvps')
         .select('id, status')
         .eq('user_id', userId)
         .eq('event_id', eventId)
         .maybeSingle();
-
-      if (checkError) throw checkError;
-
-      const oldStatus = existingRsvp?.status as 'Going' | 'Interested' | undefined;
-      let newStatus: 'Going' | 'Interested' | null = status;
       
-      // Toggle behavior: if clicking the same status, remove it
-      // If clicking a different status, switch to that one
-      if (oldStatus === status) {
-        // Toggle off if clicking the same status
-        newStatus = null;
+      if (fetchError) {
+        console.error("Error checking existing RSVP:", fetchError);
+        return { success: false, newStatus: null, oldStatus: null };
       }
-      // No else needed - if status is different, we use the new status (already set above)
-
-      let success = false;
       
-      // Update the database
-      if (existingRsvp && newStatus === null) {
-        // Delete the RSVP (toggle off)
+      const oldStatus = existingRsvp?.status;
+      let newStatus = status;
+      
+      // If clicking the same status button that's already active, toggle it off
+      if (existingRsvp && existingRsvp.status === status) {
+        console.log("Toggling off RSVP (same status clicked)");
         const { error } = await supabase
           .from('event_rsvps')
           .delete()
           .eq('id', existingRsvp.id);
           
-        if (error) throw error;
-        success = true;
+        if (error) {
+          console.error("Error deleting RSVP:", error);
+          return { success: false, newStatus: null, oldStatus };
+        }
         
+        newStatus = null;
       } else if (existingRsvp) {
-        // Update existing RSVP
+        // Update existing RSVP to new status
+        console.log("Updating RSVP status to:", status);
         const { error } = await supabase
           .from('event_rsvps')
-          .update({ status: newStatus })
+          .update({ status })
           .eq('id', existingRsvp.id);
           
-        if (error) throw error;
-        success = true;
-        
-      } else if (newStatus) {
+        if (error) {
+          console.error("Error updating RSVP:", error);
+          return { success: false, newStatus: null, oldStatus };
+        }
+      } else {
         // Create new RSVP
+        console.log("Creating new RSVP with status:", status);
         const { error } = await supabase
           .from('event_rsvps')
           .insert({
             user_id: userId,
             event_id: eventId,
-            status: newStatus
+            status,
           });
           
-        if (error) throw error;
-        success = true;
+        if (error) {
+          console.error("Error creating RSVP:", error);
+          return { success: false, newStatus: null, oldStatus };
+        }
       }
       
-      // Try to restore the scroll position
-      setTimeout(() => {
-        window.scrollTo({
-          top: scrollPosition,
-          behavior: 'auto'
-        });
-      }, 50);
-
-      return {
-        success,
+      return { 
+        success: true,
         newStatus,
-        oldStatus,
-        toastMessage: '' // Empty toast message since we removed toasts
+        oldStatus
       };
-      
     } catch (error) {
-      console.error('RSVP mutation failed:', error);
-      
-      // Even on error, try to restore scroll position
-      setTimeout(() => {
-        window.scrollTo({
-          top: scrollPosition,
-          behavior: 'auto'
-        });
-      }, 50);
-      
-      return {
-        success: false,
-        newStatus: null,
-        oldStatus: null,
-        toastMessage: ''
-      };
+      console.error("Error in RSVP mutation:", error);
+      return { success: false, newStatus: null, oldStatus: null };
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
-  return { mutateRsvp };
+  return {
+    mutateRsvp,
+    isLoading
+  };
 };
