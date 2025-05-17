@@ -6,7 +6,7 @@ import { RsvpButtonGroup } from './rsvp/RsvpButtonGroup';
 export type RsvpStatus = 'Going' | 'Interested' | null;
 
 interface EventRsvpButtonsProps {
-  eventId?: string; // Make eventId optional with ?
+  eventId: string;  // Changed from optional to required
   currentStatus?: RsvpStatus | null;
   onRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
   /** General loading state for the RSVP action (e.g., from a parent hook) */
@@ -19,7 +19,7 @@ interface EventRsvpButtonsProps {
 }
 
 export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
-  eventId = 'default-event', // Provide a default value for backward compatibility
+  eventId,
   currentStatus = null,
   onRsvp,
   isLoading = false,

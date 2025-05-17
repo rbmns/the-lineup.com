@@ -14,7 +14,7 @@ interface MainEventContentProps {
   attendees: { going: any[]; interested: any[] };
   isAuthenticated: boolean;
   rsvpLoading: boolean;
-  handleRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
+  handleRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
   isMobile: boolean;
   imageUrl: string | null;
   formattedDate: string | null;
@@ -58,10 +58,11 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
   handleEventTypeClick,
   handleBackToEvents
 }) => {
-  const handleRsvpWrapped = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+  // This wrapper ensures we properly pass the eventId to the handleRsvp function
+  const handleRsvpWrapped = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     try {
-      await handleRsvp(status);
-      return true;
+      const result = await handleRsvp(eventId, status);
+      return result;
     } catch (error) {
       console.error('Error handling RSVP:', error);
       return false;

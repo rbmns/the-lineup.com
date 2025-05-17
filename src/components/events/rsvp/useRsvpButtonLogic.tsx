@@ -4,7 +4,7 @@ import { RsvpStatus } from '../EventRsvpButtons';
 import { trackEvent } from '@/utils/gtm';
 
 interface UseRsvpButtonLogicProps {
-  eventId: string; // Add eventId parameter to track which event is being acted on
+  eventId: string; 
   currentStatus?: RsvpStatus | null;
   onRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
   isLoading?: boolean;
@@ -23,7 +23,7 @@ export const useRsvpButtonLogic = ({
   useEffect(() => {
     console.log(`EventRsvpButtons (${eventId}): currentStatus changed to ${currentStatus} from ${localStatus}`);
     setLocalStatus(currentStatus);
-  }, [currentStatus, eventId]);
+  }, [currentStatus, eventId, localStatus]);
 
   const isGoing = localStatus === 'Going';
   const isInterested = localStatus === 'Interested';

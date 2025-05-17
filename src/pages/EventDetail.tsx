@@ -82,6 +82,8 @@ const EventDetail = () => {
   // Enhanced RSVP with scroll preservation
   const handleRsvpEvent = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     try {
+      // handleRsvp from useEventDetails only takes status as an argument, but we're receiving eventId too
+      // We'll ignore the eventId parameter since we already have effectiveId
       await handleRsvp(status);
       // After successful RSVP, refresh event data to ensure we have the latest
       await refreshData();

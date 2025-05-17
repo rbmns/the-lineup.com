@@ -17,7 +17,7 @@ interface EventDetailLayoutProps {
   attendees: { going: any[]; interested: any[] };
   isAuthenticated: boolean;
   rsvpLoading: boolean;
-  handleRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
+  handleRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
   isMobile: boolean;
   coverImage: string | null;
   formattedDate: string | null;
