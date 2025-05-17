@@ -169,10 +169,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         
         setIsNewUser(true);
-        toast({
-          title: "Account created!",
-          description: "You have successfully signed up.",
-        });
         return { error: null };
       }
       
@@ -207,11 +203,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       console.log("Sign in successful:", data.user?.id);
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully logged in.",
-      });
-
       return { error: null, data };
     } catch (error) {
       console.error("Unexpected error during sign in:", error);
@@ -469,7 +460,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setProfile(createDefaultUserProfile(
           currentUser.id,
           currentUser.email || '',
-          currentUser.user_metadata?.username || currentUser.email?.split('@')[0] || 'User'
+          currentUser.email?.split('@')[0] || 'User'
         ));
       }
     } catch (error) {
