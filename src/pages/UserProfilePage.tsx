@@ -70,6 +70,11 @@ const UserProfilePage: React.FC = () => {
   // Determine if the profile is clickable
   const canNavigateToProfile = !isOwnProfile && isProfileClickable(friendshipStatus, false);
 
+  // Convert friendshipStatus to compatible type for child components
+  // This ensures "requested" is properly handled as "pending"
+  const normalizedFriendStatus = friendshipStatus === 'requested' ? 'pending' : 
+    (friendshipStatus as 'none' | 'pending' | 'accepted');
+
   if (isOwnProfile && !user) {
     return null; // Will redirect in effect
   }
@@ -105,7 +110,7 @@ const UserProfilePage: React.FC = () => {
         <div className="space-y-6">
           <ProfileCard 
             profile={profile}
-            friendStatus={friendshipStatus === 'requested' ? 'pending' : friendshipStatus as 'none' | 'pending' | 'accepted'}
+            friendStatus={normalizedFriendStatus}
             onAddFriend={handleAddFriend}
             showActions={!isOwnProfile}
             linkToProfile={canNavigateToProfile}
@@ -119,7 +124,7 @@ const UserProfilePage: React.FC = () => {
             isCurrentUser={isOwnProfile}
             username={profile?.username}
             handleAddFriend={handleAddFriend}
-            friendshipStatus={friendshipStatus === 'requested' ? 'pending' : friendshipStatus as 'none' | 'pending' | 'accepted'}
+            friendshipStatus={normalizedFriendStatus}
           />
         </div>
       </div>
