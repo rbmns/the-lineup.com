@@ -1,11 +1,10 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ... keep existing code */
 
-/* Enhanced RSVP Button Animations */
+/* Enhanced RSVP Button Animations - Faster for better feedback */
 @keyframes buttonClickPulse {
   0% { transform: scale(1); }
   50% { transform: scale(0.95); }
@@ -13,7 +12,7 @@
 }
 
 .button-click-animation {
-  animation: buttonClickPulse 0.15s ease-out; /* Faster animation */
+  animation: buttonClickPulse 0.1s ease-out; /* Even faster animation */
 }
 
 @keyframes rsvpGoingPulse {
@@ -22,7 +21,7 @@
 }
 
 .rsvp-going-animation {
-  animation: rsvpGoingPulse 0.3s ease-out; /* Faster animation */
+  animation: rsvpGoingPulse 0.2s ease-out; /* Faster animation */
 }
 
 @keyframes rsvpInterestedPulse {
@@ -31,7 +30,7 @@
 }
 
 .rsvp-interested-animation {
-  animation: rsvpInterestedPulse 0.3s ease-out; /* Faster animation */
+  animation: rsvpInterestedPulse 0.2s ease-out; /* Faster animation */
 }
 
 /* Loading indicator during RSVP operations */
@@ -54,7 +53,7 @@
   bottom: 0;
   background-image: linear-gradient(to right, #10b981, #3b82f6);
   width: 100%;
-  animation: rsvpLoading 1.2s infinite linear; /* Faster animation */
+  animation: rsvpLoading 0.8s infinite linear; /* Faster animation */
 }
 
 @keyframes rsvpLoading {

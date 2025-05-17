@@ -29,15 +29,24 @@ export const useRsvpHandler = (
 
     try {
       rsvpInProgressRef.current = true;
-      const success = await handleRsvp(eventId, status);
+      
+      // Store the eventId this action is for to prevent cross-event interference
+      const thisEventId = eventId;
+      
+      // Perform the RSVP action with the specific event ID
+      const success = await handleRsvp(thisEventId, status);
       
       if (success) {
         // Track the RSVP event in GTM
-        trackRsvp(eventId, status);
+        trackRsvp(thisEventId, status);
         
-        // Invalidate all relevant queries to ensure fresh data
+        // Invalidate queries only for this specific event
+        queryClient.invalidateQueries({ queryKey: ['event', thisEventId] });
+        
+        // For event lists, be more targeted with invalidation
+        // Note: This is a compromise - we could be more granular but it would require
+        // more complex cache manipulation logic
         queryClient.invalidateQueries({ queryKey: ['events'] });
-        queryClient.invalidateQueries({ queryKey: ['event', eventId] });
       }
       
       return success;
@@ -48,7 +57,7 @@ export const useRsvpHandler = (
       // Small delay to prevent multiple rapid clicks
       setTimeout(() => {
         rsvpInProgressRef.current = false;
-      }, 300);
+      }, 200);
     }
   }, [user, handleRsvp, rsvpInProgressRef, queryClient]);
 

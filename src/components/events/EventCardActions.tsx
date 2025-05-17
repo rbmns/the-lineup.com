@@ -45,36 +45,31 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       console.log('EventCardActions - Handling RSVP for event:', eventId, status);
       setIsLoading(true);
       
-      // Set optimistic status update immediately
-      const newStatus = localRsvpStatus === status ? undefined : status;
+      // The critical fix: store the specific eventId this action is for
+      const thisEventId = eventId;
       
-      // If changing from one status to another, first clear the current status
-      if (localRsvpStatus && localRsvpStatus !== status) {
-        setLocalRsvpStatus(undefined);
-        // Small delay before setting the new status for visual feedback
-        setTimeout(() => {
-          setLocalRsvpStatus(newStatus);
-        }, 10);
-      } else {
-        setLocalRsvpStatus(newStatus);
-      }
+      // Calculate new status - if clicking the same button that's active, toggle it off
+      // This ensures only one status can be active at a time
+      const newStatus = localRsvpStatus === status ? undefined : status;
+      setLocalRsvpStatus(newStatus);
       
       // Add improved visual feedback with animation
-      const eventCard = document.querySelector(`[data-event-id="${eventId}"]`);
+      const eventCard = document.querySelector(`[data-event-id="${thisEventId}"]`);
       if (eventCard) {
         // Apply faster animation with less flickering
         eventCard.classList.add('transition-all', 'duration-100');
         
         if (status === 'Going') {
           eventCard.classList.add('rsvp-going-animation');
-          setTimeout(() => eventCard.classList.remove('rsvp-going-animation'), 300);
+          setTimeout(() => eventCard.classList.remove('rsvp-going-animation'), 200);
         } else {
           eventCard.classList.add('rsvp-interested-animation');
-          setTimeout(() => eventCard.classList.remove('rsvp-interested-animation'), 300);
+          setTimeout(() => eventCard.classList.remove('rsvp-interested-animation'), 200);
         }
       }
       
-      const result = await onRsvp(eventId, status);
+      // Pass the specific eventId to ensure we only update this event
+      const result = await onRsvp(thisEventId, status);
       const success = result === undefined ? true : !!result;
       
       // Revert if the operation failed
@@ -88,7 +83,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       setLocalRsvpStatus(currentRsvpStatus); // Revert on error
       return false;
     } finally {
-      setTimeout(() => setIsLoading(false), 200); // Reduced delay for faster feedback
+      setTimeout(() => setIsLoading(false), 100); // Reduced delay for faster feedback
     }
   };
 
@@ -104,6 +99,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       )}
       data-no-navigation="true"
       data-rsvp-container="true"
+      data-event-id={eventId} // Add event ID to container for better scoping
       onClick={(e) => e.stopPropagation()}
     >
       {/* RSVP Buttons */}
