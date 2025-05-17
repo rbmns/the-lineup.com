@@ -41,17 +41,18 @@ export const useRsvpButtonLogic = ({
     setLocalLoading(status);
     const prevLocalStatus = localStatus; // Store previous status for potential revert
     
-    // Calculate new status - if same as current, set null (toggle off), otherwise use new status
-    const newOptimisticStatus = localStatus === status ? null : status;
+    // Calculate new status - toggle off if clicking the same button, otherwise use new status
+    const isTogglingOff = localStatus === status;
+    const newOptimisticStatus = isTogglingOff ? null : status;
     
-    // Important: Ensure we NEVER have two statuses active at once - always clear previous status first
+    // Update local state immediately for responsiveness
     setLocalStatus(newOptimisticStatus);
     
     // Track RSVP interaction with GTM
     trackEvent('rsvp_action', {
       event_id: eventId,
       status: status,
-      action: localStatus === status ? 'remove' : 'add'
+      action: isTogglingOff ? 'remove' : 'add'
     });
       
     // Apply button click feedback animation and immediate color change

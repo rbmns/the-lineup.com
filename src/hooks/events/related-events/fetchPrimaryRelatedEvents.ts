@@ -40,13 +40,15 @@ export const fetchPrimaryRelatedEvents = async ({
       query = query.eq('event_type', eventType);
     }
     
-    // Filter by tags if provided - FIX: don't use overlaps (&&) operator
+    // Filter by tags if provided - using ilike for text columns
     if (tags && tags.length > 0 && tags[0]) {
-      // Use ilike filter for text columns instead of array operators
-      const tagConditions = tags.map(tag => `tags.ilike.%${tag}%`);
-      
-      // Apply the first tag filter directly
-      query = query.or(tagConditions.join(','));
+      // For each tag, add an "ilike" filter
+      tags.forEach(tag => {
+        if (tag && tag.trim()) {
+          // Use contains operator for text fields with tag values
+          query = query.ilike('tags', `%${tag}%`);
+        }
+      });
     }
     
     // Filter by date if provided

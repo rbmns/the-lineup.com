@@ -28,8 +28,25 @@ export const useRsvpActions = (userId?: string) => {
         .single();
 
       if (existingRsvp) {
-        // Update the existing RSVP if the status is different
-        if (existingRsvp.status !== status) {
+        // If it's the same status, remove the RSVP (toggle off)
+        if (existingRsvp.status === status) {
+          const { error } = await supabase
+            .from('event_rsvps')
+            .delete()
+            .eq('id', existingRsvp.id);
+
+          if (error) {
+            console.error('Error removing RSVP:', error);
+            toast.error('Failed to remove RSVP status');
+            setLoading(false);
+            return false;
+          }
+          
+          toast.success('RSVP removed');
+          setLoading(false);
+          return true;
+        } else {
+          // Update the existing RSVP if the status is different
           const { error } = await supabase
             .from('event_rsvps')
             .update({ status })
@@ -43,23 +60,6 @@ export const useRsvpActions = (userId?: string) => {
           }
           
           toast.success(`RSVP updated to ${status}`);
-          setLoading(false);
-          return true;
-        } else {
-          // If clicking the same status, remove the RSVP
-          const { error } = await supabase
-            .from('event_rsvps')
-            .delete()
-            .eq('id', existingRsvp.id);
-
-          if (error) {
-            console.error('Error removing RSVP:', error);
-            toast.error('Failed to remove RSVP');
-            setLoading(false);
-            return false;
-          }
-          
-          toast.success('RSVP removed');
           setLoading(false);
           return true;
         }
