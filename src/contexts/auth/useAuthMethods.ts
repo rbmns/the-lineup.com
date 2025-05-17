@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
@@ -10,7 +9,7 @@ import {
   createDefaultUserProfile 
 } from '@/utils/supabaseUtils';
 import { asTypedParam, asUpdateParam } from '@/utils/supabaseTypeUtils';
-import { useLocationHook } from '@/hooks/useLocation';
+import { useLocation } from '@/hooks/useLocation';
 
 export const useAuthMethods = (
   user: User | null,
@@ -20,7 +19,7 @@ export const useAuthMethods = (
   setIsNewUser: React.Dispatch<React.SetStateAction<boolean>>,
   setSession: React.Dispatch<React.SetStateAction<any>>,
 ) => {
-  const { getCurrentLocation } = useLocationHook();
+  const { getCurrentLocation } = useLocation();
 
   const signUp = async (email: string, password: string, username: string) => {
     try {

@@ -1,4 +1,3 @@
-
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { UserProfile } from '@/types';
@@ -9,13 +8,13 @@ import {
   createDefaultUserProfile 
 } from '@/utils/supabaseUtils';
 import { asTypedParam, asUpdateParam } from '@/utils/supabaseTypeUtils';
-import { useLocationHook } from '@/hooks/useLocation';
+import { useLocation } from '@/hooks/useLocation';
 
 export const useProfileManagement = (
   user: User | null,
   setProfile: React.Dispatch<React.SetStateAction<UserProfile | null>>,
 ) => {
-  const { getCurrentLocation } = useLocationHook();
+  const { getCurrentLocation } = useLocation();
 
   const updateProfile = async (updates: {
     username: string;
