@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
@@ -58,17 +57,6 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
   handleEventTypeClick,
   handleBackToEvents
 }) => {
-  // This wrapper ensures we properly pass the eventId to the handleRsvp function
-  const handleRsvpWrapped = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
-    try {
-      const result = await handleRsvp(eventId, status);
-      return result;
-    } catch (error) {
-      console.error('Error handling RSVP:', error);
-      return false;
-    }
-  };
-
   const dateTimeInfo = formatDateTime(event.start_date, event.start_time, event.end_time);
 
   return (
@@ -110,7 +98,7 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
               <EventRsvpButtons 
                 eventId={event.id}
                 currentStatus={event?.rsvp_status}
-                onRsvp={handleRsvpWrapped}
+                onRsvp={handleRsvp}
                 isLoading={rsvpLoading}
                 className="w-full"
                 size="lg"

@@ -43,7 +43,8 @@ const EventDetail = () => {
     error, 
     attendees, 
     rsvpLoading,
-    handleRsvp,
+    handleRsvp: handleRsvpFromHook,
+    handleRsvpAction,
     refreshData
   } = useEventDetails(effectiveId);
 
@@ -82,9 +83,14 @@ const EventDetail = () => {
   // Enhanced RSVP with scroll preservation
   const handleRsvpEvent = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     try {
-      // handleRsvp from useEventDetails only takes status as an argument, but we're receiving eventId too
-      // We'll ignore the eventId parameter since we already have effectiveId
-      await handleRsvp(status);
+      // Fix the handling by explicitly passing both parameters
+      if (handleRsvpAction) {
+        await handleRsvpAction(eventId, status);
+      } else {
+        // Fallback to direct method if action method isn't available
+        await handleRsvpFromHook(status);
+      }
+      
       // After successful RSVP, refresh event data to ensure we have the latest
       await refreshData();
       return true;

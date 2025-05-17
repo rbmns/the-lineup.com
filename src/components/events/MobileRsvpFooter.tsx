@@ -77,4 +77,4 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
       </div>
     </Card>
   );
-}
+};

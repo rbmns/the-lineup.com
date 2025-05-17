@@ -6,7 +6,7 @@ import { RsvpButtonGroup } from './rsvp/RsvpButtonGroup';
 export type RsvpStatus = 'Going' | 'Interested' | null;
 
 interface EventRsvpButtonsProps {
-  eventId: string;  // Changed from optional to required
+  eventId: string;  // Required parameter
   currentStatus?: RsvpStatus | null;
   onRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
   /** General loading state for the RSVP action (e.g., from a parent hook) */
