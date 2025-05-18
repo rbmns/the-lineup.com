@@ -2,7 +2,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { getCategoryIcon } from './category/category-icon-mapping';
-import { getCategoryColor } from './category/category-color-mapping';
+import { getCategoryColor, getCategoryColorState } from './category/category-color-mapping';
 import { CategoryPillProps } from './category/category-pill-types';
 export { AllCategoryPill } from './category/all-category-pill';
 
@@ -17,7 +17,8 @@ export const CategoryPill: React.FC<CategoryPillProps & { noBorder?: boolean }> 
   noBorder = false
 }) => {
   const Icon = getCategoryIcon(category);
-  const colorClasses = getCategoryColor(category);
+  const colorState = getCategoryColorState(category);
+  const colorClasses = active ? colorState.active : colorState.inactive;
   
   // Base styles for all pills
   const baseClasses = 'rounded-full font-medium transition-colors flex items-center';
