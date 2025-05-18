@@ -96,14 +96,27 @@ const EventsPageRefactored = () => {
   
   // Filter events based on all filters
   const filteredEvents = React.useMemo(() => {
-    // If no categories are selected, show no events
-    if (selectedCategories.length === 0) {
-      return [];
+    // Show all events by default, even if no categories are selected
+    if (selectedCategories.length === 0 && allEventTypes.length > 0) {
+      // Return all events if no event types are selected
+      let filtered = events;
+      
+      // Apply venue filter if selected
+      if (selectedVenues.length > 0) {
+        filtered = filterEventsByVenue(filtered, selectedVenues);
+      }
+      
+      // Apply date filter if selected
+      if (dateRange || selectedDateFilter) {
+        filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
+      }
+      
+      return filtered;
     }
     
-    // Apply event type filter
+    // Apply event type filter if some event types are selected
     let filtered = events;
-    if (selectedCategories.length !== allEventTypes.length) {
+    if (selectedCategories.length > 0 && selectedCategories.length !== allEventTypes.length) {
       filtered = events.filter(event => 
         event.event_type && selectedCategories.includes(event.event_type)
       );

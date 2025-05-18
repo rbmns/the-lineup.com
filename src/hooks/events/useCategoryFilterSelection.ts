@@ -1,32 +1,31 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 export const useCategoryFilterSelection = (allCategories: string[] = []) => {
   // Initialize with all categories selected by default
   const [selectedCategories, setSelectedCategories] = useState<string[]>(allCategories);
 
-  const toggleCategory = (category: string) => {
-    setSelectedCategories((prev) => {
+  const toggleCategory = useCallback((category: string) => {
+    setSelectedCategories(prev => {
       if (prev.includes(category)) {
         return prev.filter(c => c !== category);
       } else {
         return [...prev, category];
       }
     });
-  };
+  }, []);
 
-  const selectAll = () => {
+  const selectAll = useCallback(() => {
     setSelectedCategories([...allCategories]);
-  };
+  }, [allCategories]);
 
-  const deselectAll = () => {
+  const deselectAll = useCallback(() => {
     setSelectedCategories([]);
-  };
+  }, []);
 
-  // Reset function - goes back to all categories selected
-  const reset = () => {
-    selectAll();
-  };
+  const reset = useCallback(() => {
+    setSelectedCategories([...allCategories]);
+  }, [allCategories]);
 
   return {
     selectedCategories,
