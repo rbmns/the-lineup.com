@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -9,12 +8,14 @@ import { EventFilterBar } from '@/components/events/filters/EventFilterBar';
 import { useCategoryFilterSelection } from '@/hooks/events/useCategoryFilterSelection';
 import { useEventPageMeta } from '@/components/events/EventsPageMeta';
 import { useEventFilterState } from '@/hooks/events/useEventFilterState';
-import { AdvancedFiltersButton } from '@/components/events/AdvancedFiltersButton';
 import { AdvancedFiltersPanel } from '@/components/events/filters/AdvancedFiltersPanel';
 import { filterEventsByVenue } from '@/utils/eventUtils';
 import { filterEventsByDate } from '@/utils/date-filtering';
 import { supabase } from '@/lib/supabase';
-import { ChevronDown, Filter } from 'lucide-react';
+import { EventSearch } from '@/components/events/search/EventSearch';
+import { AdvancedFiltersToggle } from '@/components/events/filters/AdvancedFiltersToggle';
+import { ActiveFiltersSummary } from '@/components/events/filters/ActiveFiltersSummary';
+import { EventCountDisplay } from '@/components/events/EventCountDisplay';
 
 const EventsPageRefactored = () => {
   useEventPageMeta();
@@ -159,17 +160,8 @@ const EventsPageRefactored = () => {
       <div className="max-w-7xl mx-auto">
         <EventsPageHeader title="Upcoming Events" />
         
-        {/* Search placeholder - not functional */}
-        <div className="relative mb-4 mt-4">
-          <input
-            type="text"
-            placeholder="Search events..."
-            className="w-full p-2 pl-8 border border-gray-200 rounded-lg"
-          />
-          <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-          </div>
-        </div>
+        {/* Search input */}
+        <EventSearch className="mb-4 mt-4" />
         
         {/* Events category filter bar */}
         <div className="mt-2 mb-4 overflow-x-auto">
@@ -186,16 +178,12 @@ const EventsPageRefactored = () => {
           />
         </div>
         
-        {/* Advanced Filters Button - collapsible panel style */}
+        {/* Advanced Filters Toggle */}
         <div className="mb-4">
-          <button 
-            onClick={toggleAdvancedFilters}
-            className="flex items-center gap-2 py-1.5 px-3 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700"
-          >
-            <Filter className="h-4 w-4" />
-            Advanced Filters
-            <ChevronDown className={`h-4 w-4 transition-transform ${showAdvancedFilters ? 'rotate-180' : ''}`} />
-          </button>
+          <AdvancedFiltersToggle 
+            showAdvancedFilters={showAdvancedFilters}
+            toggleAdvancedFilters={toggleAdvancedFilters}
+          />
         </div>
         
         {/* Advanced Filters Panel */}
@@ -216,54 +204,19 @@ const EventsPageRefactored = () => {
         )}
         
         {/* Active Filters Summary */}
-        {hasAdvancedFilters && (
-          <div className="mb-4">
-            <div className="flex flex-wrap gap-2 items-center">
-              {selectedVenues.map(venueId => {
-                const venue = venues.find(v => v.value === venueId);
-                return venue ? (
-                  <div key={venueId} className="bg-purple-100 text-purple-900 rounded-full px-3 py-1 text-xs flex items-center">
-                    <span>Venue: {venue.label}</span>
-                    <button 
-                      className="ml-1 h-4 w-4 p-0" 
-                      onClick={() => handleRemoveVenue(venueId)}
-                    >
-                      &times;
-                    </button>
-                  </div>
-                ) : null;
-              })}
-              
-              {(dateRange || selectedDateFilter) && (
-                <div className="bg-purple-100 text-purple-900 rounded-full px-3 py-1 text-xs flex items-center">
-                  <span>
-                    Date: {selectedDateFilter || (dateRange ? 'Custom range' : '')}
-                  </span>
-                  <button 
-                    className="ml-1 h-4 w-4 p-0" 
-                    onClick={handleClearDateFilter}
-                  >
-                    &times;
-                  </button>
-                </div>
-              )}
-              
-              {hasAdvancedFilters && (
-                <button 
-                  className="text-xs text-purple-700 hover:text-purple-900"
-                  onClick={resetFilters}
-                >
-                  Clear all filters
-                </button>
-              )}
-            </div>
-          </div>
-        )}
+        <ActiveFiltersSummary 
+          selectedVenues={selectedVenues}
+          venues={venues}
+          dateRange={dateRange}
+          selectedDateFilter={selectedDateFilter}
+          hasAdvancedFilters={hasAdvancedFilters}
+          handleRemoveVenue={handleRemoveVenue}
+          handleClearDateFilter={handleClearDateFilter}
+          resetFilters={resetFilters}
+        />
         
         {/* Events count display */}
-        <div className="mb-4 text-sm text-gray-600">
-          {eventsFound} {eventsFound === 1 ? 'event' : 'events'} found
-        </div>
+        <EventCountDisplay count={eventsFound} />
         
         <div className="space-y-8">
           <LazyEventsList 
