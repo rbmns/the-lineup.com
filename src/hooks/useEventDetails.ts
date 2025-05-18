@@ -24,7 +24,7 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
   const navigate = useNavigate();
   const { handleRsvp: hookHandleRsvp, loading: rsvpLoadingState } = useRsvpActions();
   
-  // Use our new extracted hooks
+  // Use our extracted hooks
   const { event, isLoading, error, refreshData } = useEventDetailsFetcher(eventId);
   const { attendees, fetchAttendees } = useEventAttendees(eventId);
   const { handleRsvp: directRsvpHandler, rsvpLoading: localRsvpLoading } = useEventRsvpHandler(eventId);
