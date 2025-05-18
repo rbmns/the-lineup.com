@@ -1,5 +1,5 @@
 
-import { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Event } from '@/types';
 import { Separator } from '@/components/ui/separator';
 import '@/styles/rsvp-animations.css';
