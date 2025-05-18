@@ -42,7 +42,7 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
         return;
       }
 
-      console.log(`Fetching event details for eventId=${eventId}`);
+      console.log(`Fetching event details for eventId=${eventId}, userId=${user?.id}`);
       
       const { data, error } = await supabase
         .from('events')
@@ -50,24 +50,69 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
           *,
           creator:profiles(*),
           venues:venue_id(*),
-          event_rsvps(id, user_id, status)
+          event_rsvps!inner(id, user_id, status)
         `)
         .eq('id', eventId)
         .single();
 
       if (error) {
-        console.error('Error fetching event details:', error);
-        setError('Failed to load event details.');
-        toast({
-          title: "Error loading event",
-          description: "We couldn't load the event details. Please try again.",
-          variant: "destructive"
-        });
+        // Maybe the event exists but user hasn't RSVP'd - try without inner join
+        const { data: dataNoRsvp, error: errorNoRsvp } = await supabase
+          .from('events')
+          .select(`
+            *,
+            creator:profiles(*),
+            venues:venue_id(*)
+          `)
+          .eq('id', eventId)
+          .single();
+          
+        if (errorNoRsvp) {
+          console.error('Error fetching event details:', errorNoRsvp);
+          setError('Failed to load event details.');
+          toast({
+            title: "Error loading event",
+            description: "We couldn't load the event details. Please try again.",
+            variant: "destructive"
+          });
+          setIsLoading(false);
+          return;
+        } else {
+          // Successfully got event, but no RSVP
+          console.log('Event data loaded (no RSVP):', dataNoRsvp);
+          
+          // If user is logged in, check for RSVP separately
+          if (user) {
+            const { data: rsvpData } = await supabase
+              .from('event_rsvps')
+              .select('status')
+              .eq('event_id', eventId)
+              .eq('user_id', user.id)
+              .maybeSingle();
+              
+            if (rsvpData) {
+              // Add RSVP status to event data
+              dataNoRsvp.rsvp_status = rsvpData.status;
+              console.log(`Found RSVP status for event ${eventId}:`, rsvpData.status);
+            }
+          }
+          
+          setEvent(dataNoRsvp);
+          fetchAttendees(eventId);
+        }
       } else if (data) {
-        console.log('Event data loaded:', data);
-        setEvent(data);
+        console.log('Event data loaded with RSVP:', data);
         
-        // Fetch attendees
+        // Extract RSVP status for the current user
+        if (user && data.event_rsvps && data.event_rsvps.length > 0) {
+          const userRsvp = data.event_rsvps.find((rsvp: any) => rsvp.user_id === user.id);
+          if (userRsvp) {
+            data.rsvp_status = userRsvp.status;
+            console.log(`Set RSVP status for event ${eventId}:`, data.rsvp_status);
+          }
+        }
+        
+        setEvent(data);
         fetchAttendees(eventId);
       } else {
         setError('Event not found');

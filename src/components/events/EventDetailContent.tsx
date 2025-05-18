@@ -136,6 +136,9 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
     if (!onRsvp) return false;
     
     try {
+      // Log the current RSVP status before handling
+      console.log(`EventDetailContent: Current RSVP status before handling: ${event.rsvp_status}, handling: ${status}`);
+      
       const result = await onRsvp(event.id, status);
       if (result) {
         toast({
@@ -245,6 +248,7 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
                 <EventRsvpButtons 
                   currentStatus={event.rsvp_status || null}
                   onRsvp={handleRsvp}
+                  isLoading={isRsvpLoading}
                   size="lg"
                   className="w-full"
                 />

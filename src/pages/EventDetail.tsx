@@ -1,5 +1,4 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEventDetailParams } from '@/hooks/useEventDetailParams';
 import { useEventDetails } from '@/hooks/useEventDetails';
@@ -62,6 +61,9 @@ const EventDetail = () => {
   // Enhanced RSVP with scroll preservation
   const handleRsvpEvent = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     try {
+      console.log("EventDetail: Handling RSVP with status:", status);
+      console.log("EventDetail: Current event RSVP status:", event?.rsvp_status);
+      
       await handleRsvp(status);
       return true;
     } catch (error) {
@@ -103,6 +105,8 @@ const EventDetail = () => {
   }
 
   const shareUrl = `${window.location.origin}/events/${event.slug || event.id}`;
+
+  console.log("EventDetail: Rendering with event RSVP status:", event.rsvp_status);
 
   return (
     <div className="container mx-auto px-4 pt-6 pb-24">

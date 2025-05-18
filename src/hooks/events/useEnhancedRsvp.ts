@@ -1,72 +1,92 @@
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const useEnhancedRsvp = (userId: string | undefined) => {
   const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
-  
-  const handleRsvp = useCallback(async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
+  const queryClient = useQueryClient();
+
+  const handleRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!userId) {
       return false;
     }
-    
+
+    console.log(`Handling RSVP for user=${userId}, eventId=${eventId}, status=${status}`);
     setLoadingEventId(eventId);
     
     try {
-      // Get current status
-      const { data: existingRsvp, error: checkError } = await supabase
+      // First check if the user already has an RSVP for this event
+      const { data: existingRsvp } = await supabase
         .from('event_rsvps')
-        .select('id, status')
-        .eq('user_id', userId)
+        .select('*')
         .eq('event_id', eventId)
-        .maybeSingle();
-        
-      if (checkError) throw checkError;
+        .eq('user_id', userId)
+        .single();
+
+      let success = false;
       
-      // Whether to add, update, or delete based on current status
-      if (existingRsvp && existingRsvp.status === status) {
-        // If clicking the same status, remove the RSVP
-        const { error } = await supabase
-          .from('event_rsvps')
-          .delete()
-          .eq('id', existingRsvp.id);
-          
-        if (error) throw error;
-      } else if (existingRsvp) {
-        // Update existing RSVP to new status
-        const { error } = await supabase
-          .from('event_rsvps')
-          .update({ status })
-          .eq('id', existingRsvp.id);
-          
-        if (error) throw error;
+      if (existingRsvp) {
+        console.log('Found existing RSVP:', existingRsvp);
+        // Toggle behavior: if same status, remove it; if different, update it
+        if (existingRsvp.status === status) {
+          // Remove RSVP
+          const { error } = await supabase
+            .from('event_rsvps')
+            .delete()
+            .eq('id', existingRsvp.id);
+            
+          if (error) {
+            throw error;
+          }
+          success = true;
+        } else {
+          // Update to new status
+          const { error } = await supabase
+            .from('event_rsvps')
+            .update({ status })
+            .eq('id', existingRsvp.id);
+            
+          if (error) {
+            throw error;
+          }
+          success = true;
+        }
       } else {
         // Create new RSVP
         const { error } = await supabase
           .from('event_rsvps')
-          .insert({
-            user_id: userId,
-            event_id: eventId,
-            status
-          });
+          .insert([{ event_id: eventId, user_id: userId, status }]);
           
-        if (error) throw error;
+        if (error) {
+          throw error;
+        }
+        success = true;
       }
       
-      return true;
+      // Invalidate all relevant caches to ensure consistency across the app
+      if (success) {
+        console.log('RSVP update successful, invalidating queries');
+        queryClient.invalidateQueries({ queryKey: ['events'] });
+        queryClient.invalidateQueries({ queryKey: ['event', eventId] });
+        queryClient.invalidateQueries({ queryKey: ['filtered-events'] });
+        queryClient.invalidateQueries({ queryKey: ['userEvents'] });
+        queryClient.invalidateQueries({ queryKey: ['user-events'] });
+      }
+      
+      return success;
     } catch (error) {
-      console.error('Error in enhanced RSVP handler:', error);
+      console.error('Error in RSVP handler:', error);
       return false;
     } finally {
-      // Small delay to allow animations to complete
       setTimeout(() => {
         setLoadingEventId(null);
-      }, 300);
+      }, 500);
     }
-  }, [userId]);
+  };
 
   return {
     handleRsvp,
-    loadingEventId
+    loadingEventId,
   };
 };
