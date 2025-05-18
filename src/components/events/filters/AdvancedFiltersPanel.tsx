@@ -17,6 +17,9 @@ interface AdvancedFiltersPanelProps {
   venues: Array<{ value: string, label: string }>;
   selectedVenues: string[];
   onVenueChange: (venues: string[]) => void;
+  locations?: Array<{ value: string, label: string }>;
+  selectedLocations?: string[];
+  onLocationChange?: (locations: string[]) => void;
   className?: string;
 }
 
@@ -30,6 +33,9 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
   venues,
   selectedVenues,
   onVenueChange,
+  locations = [],
+  selectedLocations = [],
+  onLocationChange = () => {},
   className
 }) => {
   if (!isOpen) return null;
@@ -43,9 +49,18 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
       onVenueChange([...selectedVenues, venueId]);
     }
   };
+  
+  // Handle location selection
+  const handleLocationSelect = (locationId: string) => {
+    if (selectedLocations.includes(locationId)) {
+      onLocationChange(selectedLocations.filter(l => l !== locationId));
+    } else {
+      onLocationChange([...selectedLocations, locationId]);
+    }
+  };
 
   return (
-    <div className={cn("bg-white border rounded-lg p-4 space-y-6", className)}>
+    <div className={cn("bg-white border rounded-lg p-6 space-y-8", className)}>
       <div className="flex justify-between items-center">
         <h3 className="font-semibold text-lg">Advanced Filters</h3>
         <Button variant="ghost" size="icon" onClick={onClose}>
@@ -53,8 +68,8 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
+      <div className="space-y-8">
+        <div className="space-y-4">
           <h4 className="font-medium text-sm">Date Range</h4>
           <DateRangeFilter
             dateRange={dateRange}
@@ -65,13 +80,13 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
           />
         </div>
 
-        <div className="space-y-2">
-          <h4 className="font-medium text-sm">Venue</h4>
+        <div className="space-y-4">
+          <h4 className="font-medium text-sm">Venue Filter</h4>
           <Select 
             value={selectedVenues[0] || ""} 
             onValueChange={handleVenueSelect}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full bg-white">
               <SelectValue placeholder="Select venue" />
             </SelectTrigger>
             <SelectContent>
@@ -104,6 +119,48 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
             </div>
           )}
         </div>
+        
+        {locations.length > 0 && (
+          <div className="space-y-4">
+            <h4 className="font-medium text-sm">Location Filter</h4>
+            <Select 
+              value={selectedLocations[0] || ""} 
+              onValueChange={handleLocationSelect}
+            >
+              <SelectTrigger className="w-full bg-white">
+                <SelectValue placeholder="Select location" />
+              </SelectTrigger>
+              <SelectContent>
+                {locations.map((location) => (
+                  <SelectItem key={location.value} value={location.value}>
+                    {location.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            {selectedLocations.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {selectedLocations.map(locationId => {
+                  const location = locations.find(l => l.value === locationId);
+                  return location ? (
+                    <div key={locationId} className="bg-gray-100 rounded-full px-3 py-1 text-sm flex items-center">
+                      <span>{location.label}</span>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="ml-1 h-5 w-5 p-0" 
+                        onClick={() => onLocationChange(selectedLocations.filter(l => l !== locationId))}
+                      >
+                        &times;
+                      </Button>
+                    </div>
+                  ) : null;
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

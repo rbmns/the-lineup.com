@@ -1,16 +1,9 @@
 
 import React from 'react';
-import { Filter, X } from 'lucide-react';
 import { EventCategoryFilters } from './EventCategoryFilters';
 import { Button } from '@/components/ui/button';
-import { 
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
+import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { CategoryPill } from '@/components/ui/category-pill';
 
 interface EventFilterBarProps {
   allEventTypes: string[];
@@ -18,9 +11,9 @@ interface EventFilterBarProps {
   onToggleEventType: (type: string) => void;
   onSelectAll: () => void;
   onDeselectAll: () => void;
-  onReset: () => void;
-  hasActiveFilters?: boolean;
-  onClearAllFilters?: () => void;
+  onReset?: () => void;
+  hasActiveFilters: boolean;
+  onClearAllFilters: () => void;
   className?: string;
 }
 
@@ -35,100 +28,32 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
   onClearAllFilters,
   className
 }) => {
-  const [showMobileFilters, setShowMobileFilters] = React.useState(false);
-  const allSelected = allEventTypes.length === selectedEventTypes.length;
-  const partiallySelected = selectedEventTypes.length > 0 && !allSelected;
-  
   return (
-    <div className={cn("w-full", className)}>
-      {/* Desktop View */}
-      <div className="hidden md:block">
-        <EventCategoryFilters
-          allEventTypes={allEventTypes}
-          selectedEventTypes={selectedEventTypes}
-          onToggleEventType={onToggleEventType}
-          onSelectAll={onSelectAll}
-          onDeselectAll={onDeselectAll}
-          onReset={onReset}
-        />
-      </div>
-      
-      {/* Mobile View with Dropdown */}
-      <div className="md:hidden">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-medium">Event Categories</h3>
-          
-          <DropdownMenu 
-            open={showMobileFilters} 
-            onOpenChange={setShowMobileFilters}
-          >
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <Filter className="h-4 w-4" />
-                <span>Filters</span>
-                {partiallySelected && (
-                  <span className="bg-primary text-white rounded-full px-1.5 py-0.5 text-xs">
-                    {selectedEventTypes.length}
-                  </span>
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[280px] p-4 bg-white">
-              <EventCategoryFilters
-                allEventTypes={allEventTypes}
-                selectedEventTypes={selectedEventTypes}
-                onToggleEventType={(type) => {
-                  onToggleEventType(type);
-                }}
-                onSelectAll={onSelectAll}
-                onDeselectAll={onDeselectAll}
-                onReset={onReset}
-              />
-              
-              {hasActiveFilters && onClearAllFilters && (
-                <>
-                  <DropdownMenuSeparator className="my-2" />
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full"
-                    onClick={() => {
-                      if (onClearAllFilters) onClearAllFilters();
-                      setShowMobileFilters(false);
-                    }}
-                  >
-                    Clear All Filters
-                  </Button>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+    <div className={cn("space-y-4", className)}>
+      <div className="flex flex-wrap justify-between items-center gap-3">
+        <h3 className="font-medium">Filter by category</h3>
         
-        {/* Show selected filters in a scrollable row on mobile */}
-        {partiallySelected && (
-          <div className="flex overflow-x-auto gap-2 pt-3 pb-1 -mx-2 px-2 snap-x scrollbar-hide">
-            {selectedEventTypes.map(category => (
-              <div 
-                key={category} 
-                className="snap-start flex-shrink-0"
-              >
-                <CategoryPill 
-                  category={category}
-                  active={true}
-                  onClick={() => onToggleEventType(category)}
-                  showIcon={true}
-                  size="sm"
-                />
-              </div>
-            ))}
-          </div>
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClearAllFilters}
+            className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
+          >
+            <X className="h-3.5 w-3.5" />
+            Reset all
+          </Button>
         )}
       </div>
+
+      <EventCategoryFilters
+        allEventTypes={allEventTypes}
+        selectedEventTypes={selectedEventTypes}
+        onToggleEventType={onToggleEventType}
+        onSelectAll={onSelectAll}
+        onDeselectAll={onDeselectAll}
+        onReset={onReset}
+      />
     </div>
   );
 };

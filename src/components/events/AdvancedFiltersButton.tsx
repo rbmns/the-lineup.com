@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Filter } from 'lucide-react';
+import { Filter, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Popover,
@@ -15,6 +15,7 @@ interface AdvancedFiltersButtonProps {
   isOpen?: boolean;
   children: React.ReactNode;
   className?: string;
+  variant?: 'popover' | 'dropdown';
 }
 
 export const AdvancedFiltersButton: React.FC<AdvancedFiltersButtonProps> = ({
@@ -22,8 +23,34 @@ export const AdvancedFiltersButton: React.FC<AdvancedFiltersButtonProps> = ({
   onOpen,
   isOpen,
   children,
-  className
+  className,
+  variant = 'popover'
 }) => {
+  if (variant === 'dropdown') {
+    return (
+      <div className={className}>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => onOpen && onOpen(!isOpen)}
+          className={cn(
+            "flex items-center gap-2", 
+            hasActiveFilters ? "border-black/50" : ""
+          )}
+        >
+          <Filter className="h-4 w-4" />
+          Advanced Filters
+          {isOpen ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
+        </Button>
+        {isOpen && children}
+      </div>
+    );
+  }
+
   return (
     <Popover open={isOpen} onOpenChange={onOpen}>
       <PopoverTrigger asChild>

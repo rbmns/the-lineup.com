@@ -1,69 +1,69 @@
 
-// Updated color mapping based on the brand style guide nature palette
-export const getCategoryColor = (category: string): string => {
+import { cn } from '@/lib/utils';
+
+export const getCategoryColor = (category: string) => {
   const lowerCategory = category.toLowerCase();
   
-  // Nature-inspired color palette
   if (lowerCategory.includes('festival')) {
-    return 'bg-sunset text-white'; // Sunset: #FF9933
-  }
+    return cn('bg-orange-300 text-black');
+  } 
   
   if (lowerCategory.includes('wellness')) {
-    return 'bg-leaf text-white'; // Leaf: #66CC66
+    return cn('bg-green-300 text-black');
   }
   
   if (lowerCategory.includes('kite')) {
-    return 'bg-ocean-deep text-white'; // Ocean Deep: #005F73
+    return cn('bg-green-200 text-black');
   }
   
   if (lowerCategory.includes('beach')) {
-    return 'bg-sand text-sandstone'; // Sand: #FFCC99, text Sandstone: #CA6702
+    return cn('bg-yellow-200 text-black');
   }
   
   if (lowerCategory.includes('game')) {
-    return 'bg-dusk text-white'; // Dusk: #9966FF
+    return cn('bg-purple-300 text-black');
   }
   
   if (lowerCategory.includes('other')) {
-    return 'bg-secondary text-primary'; // Using secondary/primary from theme
+    return cn('bg-gray-200 text-black');
   }
   
   if (lowerCategory.includes('sports')) {
-    return 'bg-jungle-palm text-white'; // Palm: #40916C
+    return cn('bg-green-400 text-black');
   }
   
   if (lowerCategory.includes('surf')) {
-    return 'bg-ocean-medium text-white'; // Ocean Medium: #0099CC
+    return cn('bg-cyan-400 text-black');
   }
   
   if (lowerCategory.includes('party')) {
-    return 'bg-coral text-white'; // Coral: #FF6666
-  }
-  
-  if (lowerCategory.includes('community')) {
-    return 'bg-twilight text-white'; // Twilight: #5E60CE
-  }
-  
-  if (lowerCategory.includes('water')) {
-    return 'bg-teal text-white'; // Teal: #00CCCC
-  }
-  
-  if (lowerCategory.includes('music')) {
-    return 'bg-night text-white'; // Night: #3a0CA3
-  }
-  
-  if (lowerCategory.includes('food')) {
-    return 'bg-coral text-white'; // Coral: #FF6666
-  }
-  
-  if (lowerCategory.includes('market')) {
-    return 'bg-amber text-white'; // Amber: #EE9B00
+    return cn('bg-pink-300 text-black');
   }
   
   if (lowerCategory.includes('yoga')) {
-    return 'bg-lime text-white'; // Lime: #99CC33
+    return cn('bg-lime-200 text-black');
   }
   
-  // Default - if no match is found
-  return 'bg-ocean-light text-jungle'; // Ocean Light: #94D2BD, text Jungle: #2D6A4F
+  if (lowerCategory.includes('community')) {
+    return cn('bg-purple-400 text-white');
+  }
+  
+  if (lowerCategory.includes('water')) {
+    return cn('bg-cyan-300 text-black');
+  }
+  
+  if (lowerCategory.includes('music')) {
+    return cn('bg-fuchsia-300 text-black');
+  }
+  
+  if (lowerCategory.includes('food')) {
+    return cn('bg-red-400 text-white');
+  }
+  
+  if (lowerCategory.includes('market')) {
+    return cn('bg-orange-400 text-black');
+  }
+  
+  // Default
+  return cn('bg-gray-100 text-gray-800');
 };
