@@ -5,10 +5,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { EventFriendRsvps } from '@/components/events/EventFriendRsvps';
 import { EventLocationInfo } from '@/components/events/EventLocationInfo';
 import { EventAttendeesList } from '@/components/events/EventAttendeesList';
-import { MapPin, Ticket, Globe, CalendarClock, Lock, UserPlus } from 'lucide-react';
+import { MapPin, Ticket, Globe, CalendarClock } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
-import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
 
 interface SidebarContentProps {
   event: Event;
@@ -25,15 +23,9 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({
   const hasBookingLink = !!event.booking_link;
   const hasExtraInfo = !!event.extra_info && event.extra_info.trim() !== '';
   const hasOrganizerLink = !!event.organizer_link;
-  const navigate = useNavigate();
   
   // Check if we need to show booking info
   const showBookingInfo = hasFee || hasBookingLink || hasExtraInfo || hasOrganizerLink;
-
-  // Handler for the sign up button
-  const handleSignUpClick = () => {
-    navigate('/login', { state: { initialMode: 'register' } });
-  };
 
   return (
     <div className="space-y-4">
@@ -111,37 +103,21 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({
       )}
 
       {/* Friends Attending Section */}
-      <Card className="shadow-md border border-gray-200 animate-fade-in" style={{ animationDelay: '300ms' }}>
-        <CardContent className="p-5">
-          <h3 className="text-lg font-semibold mb-3">Friends Attending</h3>
-          
-          {isAuthenticated ? (
-            /* Authenticated Users: Show attendees list */
-            <>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-sm font-medium">Going: {attendees?.going?.length || 0}</span>
-                <span className="text-sm font-medium">Interested: {attendees?.interested?.length || 0}</span>
-              </div>
-              <EventAttendeesList 
-                going={attendees?.going || []} 
-                interested={attendees?.interested || []} 
-              />
-            </>
-          ) : (
-            /* Non-authenticated Users: Show teaser that matches the design from the first image */
-            <div className="flex flex-col items-center text-center py-4">
-              <Lock className="h-10 w-10 text-gray-500 mb-3" />
-              <p className="text-sm text-gray-600 mb-4">Sign up to see who's attending</p>
-              <Button 
-                onClick={handleSignUpClick}
-                className="w-full bg-black hover:bg-gray-800 text-white font-medium"
-              >
-                Sign up - it's free
-              </Button>
+      {isAuthenticated && (
+        <Card className="shadow-md border border-gray-200 animate-fade-in" style={{ animationDelay: '300ms' }}>
+          <CardContent className="p-5">
+            <h3 className="text-lg font-semibold mb-3">Friends Attending</h3>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-sm font-medium">Going: {attendees?.going?.length || 0}</span>
+              <span className="text-sm font-medium">Interested: {attendees?.interested?.length || 0}</span>
             </div>
-          )}
-        </CardContent>
-      </Card>
+            <EventAttendeesList 
+              going={attendees?.going || []} 
+              interested={attendees?.interested || []} 
+            />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

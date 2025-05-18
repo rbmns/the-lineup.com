@@ -1,59 +1,35 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Share2, CheckCircle2, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { RsvpStatus } from './EventRsvpButtons';
 
 export interface MobileRsvpFooterProps {
-  eventId: string;
-  currentStatus?: RsvpStatus;
-  onRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
+  currentStatus?: 'Going' | 'Interested' | null;
+  onRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
   onShare: () => void;
   loading?: boolean;
 }
 
 export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({ 
-  eventId,
   currentStatus, 
   onRsvp, 
   onShare,
   loading = false
 }) => {
   const [localLoading, setLocalLoading] = useState(false);
-  const [localStatus, setLocalStatus] = useState<RsvpStatus>(currentStatus);
   const isLoading = loading || localLoading;
   
-  // Update local status when prop changes
-  useEffect(() => {
-    if (currentStatus !== localStatus) {
-      setLocalStatus(currentStatus);
-    }
-  }, [currentStatus, localStatus]);
-
-  const isGoing = localStatus === 'Going';
-  const isInterested = localStatus === 'Interested';
+  const isGoing = currentStatus === 'Going';
+  const isInterested = currentStatus === 'Interested';
 
   const handleRsvp = async (status: 'Going' | 'Interested') => {
     if (isLoading) return;
     
-    // Calculate new status - toggle off if clicking the same button
-    const isTogglingOff = localStatus === status;
-    const newStatus = isTogglingOff ? null : status;
-    
     try {
       setLocalLoading(true);
-      // Update UI optimistically
-      setLocalStatus(isTogglingOff ? null : status);
-      
-      // Make the API call
-      const success = await onRsvp(eventId, status);
-      
-      // If API call failed, revert the optimistic update
-      if (!success) {
-        setLocalStatus(localStatus);
-      }
+      await onRsvp(status);
     } finally {
       // Add a small delay to prevent rapid re-clicking
       setTimeout(() => setLocalLoading(false), 500);
@@ -99,4 +75,4 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
       </div>
     </Card>
   );
-};
+}

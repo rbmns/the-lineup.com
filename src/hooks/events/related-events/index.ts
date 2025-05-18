@@ -1,4 +1,6 @@
 
 export * from './useFetchRelatedEvents';
 export * from './types';
-export * from './fetchRelatedEvents';
+export * from './relatedEventsUtils';
+export * from './fetchPrimaryRelatedEvents';
+export * from './fetchSecondaryRelatedEvents';

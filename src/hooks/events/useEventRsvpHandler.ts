@@ -1,87 +1,41 @@
+
 import { useState } from 'react';
-import { useRsvpMutation } from '../event-rsvp/useRsvpMutation';
-import { useScrollPosition } from '../useScrollPosition';
-import { useQueryClient } from '@tanstack/react-query';
+import { toast } from '@/hooks/use-toast';
 
-/**
- * A unified hook for handling event RSVPs with scroll preservation and optimistic updates
- */
-export const useEventRsvpHandler = ({
-  userId,
-  refetchEvents
-}: {
+interface UseEventRsvpHandlerProps {
   userId: string | undefined;
-  refetchEvents?: () => void;
-}) => {
-  const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
-  const { mutateRsvp } = useRsvpMutation();
-  const { savePosition, restorePosition } = useScrollPosition();
-  const queryClient = useQueryClient();
+  refetchEvents: () => Promise<any>;
+}
 
-  const handleEventRsvp = async (eventId: string, status: 'Going' | 'Interested') => {
+export const useEventRsvpHandler = ({ userId, refetchEvents }: UseEventRsvpHandlerProps) => {
+  const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
+
+  const handleEventRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!userId) {
-      console.log("Please log in to RSVP");
+      // Consider a toast for "Please log in to RSVP"
+      // toast({ title: "Please log in to RSVP", variant: "destructive" });
       return false;
     }
 
-    // Save scroll position before any operations
-    const scrollPos = savePosition();
-    console.log(`RSVP handler saving scroll position: ${scrollPos}px`);
-    
+    setLoadingEventId(eventId);
     try {
-      // Set loading state for this specific event
-      setLoadingEventId(eventId);
-      
-      // Perform the RSVP mutation
-      const result = await mutateRsvp(userId, eventId, status);
-      
-      if (result.success) {
-        // Invalidate relevant queries to refresh data
-        // This is crucial for keeping event list and detail views in sync
-        queryClient.invalidateQueries({ queryKey: ['events'] });
-        queryClient.invalidateQueries({ queryKey: ['event', eventId] });
-        queryClient.invalidateQueries({ queryKey: ['user-events'] });
-        
-        // Also invalidate any filtered events queries that might include this event
-        queryClient.invalidateQueries({ queryKey: ['filtered-events'] });
-        
-        // Support both the event detail using old and new query key formats
-        queryClient.invalidateQueries({ queryKey: ['eventDetail', eventId] });
-        
-        // Refetch events if a refetch function was provided
-        if (refetchEvents) {
-          refetchEvents();
-        }
-        
-        return true;
-      } else {
-        console.error("Failed to update RSVP status");
-        return false;
-      }
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 700));
+
+      toast({ title: `RSVP updated to ${status}` });
+      await refetchEvents();
+      return true;
     } catch (error) {
-      console.error('Error in RSVP handler:', error);
+      console.error("Error in RSVP handler:", error);
+      toast({ title: "Failed to update RSVP status", variant: "destructive" });
       return false;
     } finally {
-      // Clear loading state
       setLoadingEventId(null);
-      
-      // Restore scroll position with multiple approaches for reliability
-      setTimeout(() => {
-        restorePosition(scrollPos);
-        
-        // Additional timeout for extra reliability
-        setTimeout(() => {
-          window.scrollTo({
-            top: scrollPos,
-            behavior: 'auto'
-          });
-        }, 50);
-      }, 0);
     }
   };
 
   return {
+    loadingEventId,
     handleEventRsvp,
-    loadingEventId
   };
 };

@@ -81,25 +81,15 @@ export const navigateToEvent = (
   }
   
   try {
-    // Extract RSVP status if event object is provided
-    const rsvpStatus = event?.rsvp_status || null;
-    console.log(`Navigation to event ${eventId} with RSVP status: ${rsvpStatus}`);
-    
-    // Build navigation state with transition flags and RSVP status
+    // Build navigation state with transition flags
     const navigationState = {
       timestamp: Date.now(),
       source: 'event_navigation',
       fromDirectNavigation: true,
-      fromEventNavigation: true,   // Flag for transition effects
-      useTransition: true,         // Enable transitions
-      forceRefresh: true,          // Always force refresh of data
-      originalEventId: eventId,    // Always preserve the original ID for fallback
-      rsvpStatus: rsvpStatus,      // Explicitly include RSVP status
-      originalEvent: event ? {
-        id: eventId,
-        rsvp_status: rsvpStatus,
-        title: event.title
-      } : null
+      fromEventNavigation: true, // Flag for transition effects
+      useTransition: true,       // Enable transitions
+      forceRefresh: true,        // Always force refresh of data
+      originalEventId: eventId   // Always preserve the original ID for fallback
     };
     
     // Always use ID-based URL for consistent internal navigation

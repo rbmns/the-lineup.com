@@ -31,7 +31,7 @@ export const UserService = {
       const userProfile: UserProfile = {
         id: data.id,
         username: data.username,
-        avatar_url: data.avatar_url ? [data.avatar_url] : null, // Convert string to array
+        avatar_url: data.avatar_url ? [data.avatar_url] : null,
         email: null, // We don't have this in the profiles table
         location: null, // We don't have this in the profiles table
         location_category: null, // We don't have this in the profiles table
@@ -78,7 +78,7 @@ export const UserService = {
       const userProfile: UserProfile = {
         id: data.id,
         username: data.username,
-        avatar_url: data.avatar_url ? [data.avatar_url] : null, // Convert string to array
+        avatar_url: data.avatar_url ? [data.avatar_url] : null,
         email: null,
         location: null,
         location_category: null,

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { 
@@ -22,9 +21,6 @@ interface FriendManagementProps {
   friendshipStatus: 'none' | 'pending' | 'accepted';
   setFriendshipStatus: (status: 'none' | 'pending' | 'accepted') => void;
   onFriendRemoved?: () => void;
-  onUpdateFriendship?: (status: 'none' | 'pending' | 'accepted' | 'requested') => void;
-  onBlock?: (blocked: boolean) => void;
-  refreshProfile?: () => Promise<void>;
 }
 
 export const FriendManagement: React.FC<FriendManagementProps> = ({
@@ -32,10 +28,7 @@ export const FriendManagement: React.FC<FriendManagementProps> = ({
   currentUserId,
   friendshipStatus,
   setFriendshipStatus,
-  onFriendRemoved,
-  onUpdateFriendship,
-  onBlock,
-  refreshProfile
+  onFriendRemoved
 }) => {
   const [showUnfriendDialog, setShowUnfriendDialog] = React.useState(false);
   const [isProcessing, setIsProcessing] = React.useState(false);
@@ -51,9 +44,7 @@ export const FriendManagement: React.FC<FriendManagementProps> = ({
       const result = await initiateFriendRequest(profile.id);
       if (result) {
         setFriendshipStatus('pending');
-        if (onUpdateFriendship) {
-          onUpdateFriendship('pending');
-        }
+        // No toast message
       }
     } catch (err) {
       console.error('Error sending friend request:', err);
@@ -75,18 +66,12 @@ export const FriendManagement: React.FC<FriendManagementProps> = ({
     try {
       const result = await removeFriendship(currentUserId, profile.id);
       if (result) {
-        setFriendshipStatus('none');
+        // No toast for friend removal
         
-        if (onUpdateFriendship) {
-          onUpdateFriendship('none');
-        }
+        setFriendshipStatus('none');
         
         if (onFriendRemoved) {
           onFriendRemoved();
-        }
-        
-        if (refreshProfile) {
-          await refreshProfile();
         }
       }
     } catch (error) {
@@ -136,11 +121,6 @@ export const FriendManagement: React.FC<FriendManagementProps> = ({
       }
       
       console.log("Friendship successfully marked as Removed");
-      
-      if (onBlock) {
-        onBlock(false);
-      }
-      
       return true;
     } catch (error) {
       console.error('Error removing friend:', error);
@@ -179,9 +159,7 @@ export const FriendManagement: React.FC<FriendManagementProps> = ({
       
       setFriendshipStatus('accepted');
       
-      if (onUpdateFriendship) {
-        onUpdateFriendship('accepted');
-      }
+      // No toast message when accepting request
       
     } catch (err) {
       console.error('Error accepting friend request:', err);
@@ -220,10 +198,7 @@ export const FriendManagement: React.FC<FriendManagementProps> = ({
       if (updateError) throw updateError;
       
       setFriendshipStatus('none');
-      
-      if (onUpdateFriendship) {
-        onUpdateFriendship('none');
-      }
+      // No toast for declined request
     } catch (err) {
       console.error('Error declining friend request:', err);
     } finally {

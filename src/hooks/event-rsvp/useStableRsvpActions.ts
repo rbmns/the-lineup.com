@@ -84,16 +84,10 @@ export const useStableRsvpActions = (userId: string | undefined) => {
         newRsvpStatus = status;
       }
 
-      // Invalidate queries to refresh data across both list and detail views
+      // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['events'] });
       queryClient.invalidateQueries({ queryKey: ['event', eventId] });
       queryClient.invalidateQueries({ queryKey: ['user-events'] });
-      
-      // Also invalidate any filtered events queries
-      queryClient.invalidateQueries({ queryKey: ['filtered-events'] });
-      
-      // Support event detail page with multiple query key formats
-      queryClient.invalidateQueries({ queryKey: ['eventDetail', eventId] });
       
       console.log(`StableRsvp: Successfully ${newRsvpStatus ? 'updated' : 'removed'} RSVP`);
       

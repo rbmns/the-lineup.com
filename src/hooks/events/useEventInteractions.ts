@@ -19,22 +19,12 @@ export const useEventInteractions = () => {
     // Always navigate using UUID for consistency
     const eventUrl = `/events/${event.id}`;
     
-    // Scroll to top before navigation
-    window.scrollTo(0, 0);
-    
-    // Ensure we're passing the complete RSVP information in state
+    // Navigate to the event detail page
     navigate(eventUrl, {
       state: { 
         fromDirectNavigation: true,
         forceRefresh: true,
-        timestamp: Date.now(),
-        // Explicitly include the RSVP status with higher specificity
-        rsvpStatus: event.rsvp_status || null,
-        originalEvent: {
-          id: event.id,
-          rsvp_status: event.rsvp_status || null,
-          title: event.title
-        }
+        timestamp: Date.now()
       }
     });
   }, [navigate]);
@@ -45,21 +35,9 @@ export const useEventInteractions = () => {
       return;
     }
     
-    // Scroll to top before navigation
-    window.scrollTo(0, 0);
-    
-    // Enhance the navigation state with explicit RSVP status
+    // Always use ID-based URLs for internal navigation
     const eventUrl = `/events/${event.id}`;
-    navigate(eventUrl, {
-      state: {
-        fromEventNavigation: true,
-        useTransition: true,
-        originalEventId: event.id,
-        // Include RSVP status in navigation state with higher specificity
-        rsvpStatus: event.rsvp_status || null,
-        timestamp: Date.now()
-      }
-    });
+    navigate(eventUrl);
   }, [navigate]);
   
   const handleEventDetailOpen = useCallback((event: Event) => {

@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { FriendsData, FriendRequest } from '@/types/friends';
 import { UserProfile } from '@/types';
-import { normalizeUserProfile } from '@/utils/profileUtils';
 
 export const useFriendData = (userId: string | undefined) => {
   const [data, setData] = useState<FriendsData>({
@@ -92,42 +91,32 @@ export const useFriendData = (userId: string | undefined) => {
           throw profilesError;
         }
         
-        // Normalize all profiles to ensure avatar_url is in array format
-        const normalizedProfiles = (profiles || []).map(profile => normalizeUserProfile(profile));
-        
         // Process the data - ensure we only show accepted friends on friends page
-        const friendProfiles = normalizedProfiles.filter(profile => 
+        const friendProfiles = profiles?.filter(profile => 
           friendIds.includes(profile.id)
-        );
+        ) || [];
         
-        // Use type assertion to handle the conversion safely
-        const requestsWithProfiles = receivedRequests?.map(req => {
-          const profile = normalizedProfiles.find(p => p.id === req.user_id);
-          return {
-            id: req.id,
-            status: req.status.toLowerCase(),
-            created_at: req.created_at,
-            user_id: req.user_id,
-            friend_id: req.friend_id,
-            sender_id: req.user_id,
-            receiver_id: req.friend_id,
-            profile
-          } as unknown as FriendRequest;
-        }).filter(req => req.profile) || [];
+        const requestsWithProfiles = receivedRequests?.map(req => ({
+          id: req.id,
+          status: req.status.toLowerCase(),
+          created_at: req.created_at,
+          user_id: req.user_id,
+          friend_id: req.friend_id,
+          sender_id: req.user_id,
+          receiver_id: req.friend_id,
+          profile: profiles?.find(p => p.id === req.user_id) as UserProfile
+        })) as FriendRequest[];
         
-        const sentRequestsWithProfiles = sentRequests?.map(req => {
-          const profile = normalizedProfiles.find(p => p.id === req.friend_id);
-          return {
-            id: req.id,
-            status: req.status.toLowerCase(),
-            created_at: req.created_at,
-            user_id: req.user_id,
-            friend_id: req.friend_id,
-            sender_id: req.user_id,
-            receiver_id: req.friend_id,
-            profile
-          } as unknown as FriendRequest;
-        }).filter(req => req.profile) || [];
+        const sentRequestsWithProfiles = sentRequests?.map(req => ({
+          id: req.id,
+          status: req.status.toLowerCase(),
+          created_at: req.created_at,
+          user_id: req.user_id,
+          friend_id: req.friend_id,
+          sender_id: req.user_id,
+          receiver_id: req.friend_id,
+          profile: profiles?.find(p => p.id === req.friend_id) as UserProfile
+        })) as FriendRequest[];
         
         setPendingRequests(sentRequestsWithProfiles);
         
@@ -135,10 +124,10 @@ export const useFriendData = (userId: string | undefined) => {
         console.log('Requests with profiles:', requestsWithProfiles);
         
         setData({
-          friends: friendProfiles,
+          friends: friendProfiles as UserProfile[],
           requests: requestsWithProfiles,
           suggestions: [],
-          allProfiles: normalizedProfiles
+          allProfiles: profiles as UserProfile[]
         });
       } else {
         setData({

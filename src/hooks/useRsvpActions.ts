@@ -3,7 +3,6 @@ import { supabase } from '@/lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
-import { toast } from 'sonner';
 
 export const useRsvpActions = (userId?: string) => {
   const navigate = useNavigate();
@@ -14,6 +13,7 @@ export const useRsvpActions = (userId?: string) => {
     setLoading(true);
     
     if (!isAuthenticated || !user) {
+      // Removed toast message
       navigate('/login');
       return false;
     }
@@ -28,25 +28,8 @@ export const useRsvpActions = (userId?: string) => {
         .single();
 
       if (existingRsvp) {
-        // If it's the same status, remove the RSVP (toggle off)
-        if (existingRsvp.status === status) {
-          const { error } = await supabase
-            .from('event_rsvps')
-            .delete()
-            .eq('id', existingRsvp.id);
-
-          if (error) {
-            console.error('Error removing RSVP:', error);
-            toast.error('Failed to remove RSVP status');
-            setLoading(false);
-            return false;
-          }
-          
-          toast.success('RSVP removed');
-          setLoading(false);
-          return true;
-        } else {
-          // Update the existing RSVP if the status is different
+        // Update the existing RSVP if the status is different
+        if (existingRsvp.status !== status) {
           const { error } = await supabase
             .from('event_rsvps')
             .update({ status })
@@ -54,12 +37,27 @@ export const useRsvpActions = (userId?: string) => {
 
           if (error) {
             console.error('Error updating RSVP:', error);
-            toast.error('Failed to update RSVP status');
             setLoading(false);
             return false;
           }
           
-          toast.success(`RSVP updated to ${status}`);
+          // Removed toast message
+          setLoading(false);
+          return true;
+        } else {
+          // If clicking the same status, remove the RSVP
+          const { error } = await supabase
+            .from('event_rsvps')
+            .delete()
+            .eq('id', existingRsvp.id);
+
+          if (error) {
+            console.error('Error removing RSVP:', error);
+            setLoading(false);
+            return false;
+          }
+          
+          // Removed toast message
           setLoading(false);
           return true;
         }
@@ -71,18 +69,16 @@ export const useRsvpActions = (userId?: string) => {
 
         if (error) {
           console.error('Error creating RSVP:', error);
-          toast.error('Failed to create RSVP');
           setLoading(false);
           return false;
         }
         
-        toast.success(`RSVP status set to ${status}`);
+        // Removed toast message
         setLoading(false);
         return true;
       }
     } catch (error) {
       console.error('Error in RSVP process:', error);
-      toast.error('Error updating RSVP status');
       setLoading(false);
       return false;
     }

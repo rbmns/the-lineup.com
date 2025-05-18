@@ -1,10 +1,11 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ... keep existing code */
 
-/* Enhanced RSVP Button Animations - Faster for better feedback */
+/* Enhanced RSVP Button Animations */
 @keyframes buttonClickPulse {
   0% { transform: scale(1); }
   50% { transform: scale(0.95); }
@@ -12,25 +13,25 @@
 }
 
 .button-click-animation {
-  animation: buttonClickPulse 0.1s ease-out; /* Even faster animation */
+  animation: buttonClickPulse 0.2s ease-out;
 }
 
 @keyframes rsvpGoingPulse {
-  0% { box-shadow: 0 0 0 0px rgba(34, 197, 94, 0.3); }
-  100% { box-shadow: 0 0 0 4px rgba(34, 197, 94, 0); }
+  0% { box-shadow: 0 0 0 0px rgba(34, 197, 94, 0.2); }
+  100% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
 }
 
 .rsvp-going-animation {
-  animation: rsvpGoingPulse 0.2s ease-out; /* Faster animation */
+  animation: rsvpGoingPulse 0.4s ease-out;
 }
 
 @keyframes rsvpInterestedPulse {
-  0% { box-shadow: 0 0 0 0px rgba(59, 130, 246, 0.3); }
-  100% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0); }
+  0% { box-shadow: 0 0 0 0px rgba(59, 130, 246, 0.2); }
+  100% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0); }
 }
 
 .rsvp-interested-animation {
-  animation: rsvpInterestedPulse 0.2s ease-out; /* Faster animation */
+  animation: rsvpInterestedPulse 0.4s ease-out;
 }
 
 /* Loading indicator during RSVP operations */
@@ -53,7 +54,7 @@
   bottom: 0;
   background-image: linear-gradient(to right, #10b981, #3b82f6);
   width: 100%;
-  animation: rsvpLoading 0.8s infinite linear; /* Faster animation */
+  animation: rsvpLoading 1.5s infinite linear;
 }
 
 @keyframes rsvpLoading {
@@ -75,7 +76,7 @@
 .event-detail-card {
   border-radius: 1rem;
   overflow: hidden;
-  transition: all 0.2s ease; /* Faster animation */
+  transition: all 0.3s ease;
   border: 1px solid rgba(0, 0, 0, 0.05);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }

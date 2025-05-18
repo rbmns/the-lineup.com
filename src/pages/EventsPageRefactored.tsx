@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -5,16 +6,15 @@ import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp';
 import { EventsPageHeader } from '@/components/events/EventsPageHeader';
 import { LazyEventsList } from '@/components/events/LazyEventsList';
 import { EventFilterBar } from '@/components/events/filters/EventFilterBar';
-import { useCategoryFilterSelection } from '@/hooks/useCategoryFilterSelection';
+import { useCategoryFilterSelection } from '@/hooks/events/useCategoryFilterSelection';
 import { useEventPageMeta } from '@/components/events/EventsPageMeta';
 import { useEventFilterState } from '@/hooks/events/useEventFilterState';
-import { AdvancedFiltersButton } from '@/components/events/filters/AdvancedFiltersButton';
 import { AdvancedFiltersPanel } from '@/components/events/filters/AdvancedFiltersPanel';
 import { Button } from '@/components/ui/button';
+import { ChevronDown } from 'lucide-react';
 import { filterEventsByVenue } from '@/utils/eventUtils';
-import { filterEventsByDate } from '@/utils/eventUtils';
+import { filterEventsByDate } from '@/utils/date-filtering';
 import { supabase } from '@/lib/supabase';
-import { EventsTeaser } from '@/components/events/EventsTeaser';
 
 const EventsPageRefactored = () => {
   useEventPageMeta();
@@ -23,12 +23,6 @@ const EventsPageRefactored = () => {
   const { data: events = [], isLoading: eventsLoading } = useEvents(user?.id);
   const [venues, setVenues] = useState<Array<{ value: string, label: string }>>([]);
   const [isVenuesLoading, setIsVenuesLoading] = useState(true);
-  
-  // Get all unique event types from events
-  const allEventTypes = React.useMemo(() => {
-    const types = events.map(event => event.event_type).filter(Boolean);
-    return [...new Set(types)];
-  }, [events]);
   
   // Event filter state management
   const {
@@ -42,7 +36,7 @@ const EventsPageRefactored = () => {
     setSelectedDateFilter,
     isFilterLoading,
     showAdvancedFilters,
-    setShowAdvancedFilters,
+    toggleAdvancedFilters,
     hasActiveFilters,
     hasAdvancedFilters,
     resetFilters,
@@ -51,19 +45,11 @@ const EventsPageRefactored = () => {
     handleClearDateFilter
   } = useEventFilterState();
   
-  // Filter events by selected event types - all selected by default
-  const {
-    selectedCategories,
-    toggleCategory,
-    selectAll,
-    deselectAll,
-    reset
-  } = useCategoryFilterSelection(allEventTypes);
-  
-  // Keep the category filter and event type filter in sync
-  useEffect(() => {
-    setSelectedEventTypes(selectedCategories);
-  }, [selectedCategories, setSelectedEventTypes]);
+  // Get all unique event types from events
+  const allEventTypes = React.useMemo(() => {
+    const types = events.map(event => event.event_type).filter(Boolean);
+    return [...new Set(types)];
+  }, [events]);
   
   // Fetch all venues for the filter
   useEffect(() => {
@@ -94,20 +80,29 @@ const EventsPageRefactored = () => {
     fetchVenues();
   }, []);
   
-  // Determine if we have no categories selected
-  const noCategoriesSelected = selectedCategories.length === 0;
+  // Filter events by selected event types - all selected by default
+  const {
+    selectedCategories,
+    toggleCategory,
+    selectAll,
+    deselectAll,
+    reset
+  } = useCategoryFilterSelection(allEventTypes);
+  
+  // Keep the category filter and event type filter in sync
+  useEffect(() => {
+    setSelectedEventTypes(selectedCategories);
+  }, [selectedCategories, setSelectedEventTypes]);
   
   // Filter events based on all filters
   const filteredEvents = React.useMemo(() => {
-    // Start with all events
-    let filtered = events;
-    
-    // If no categories are selected, return empty array (no events)
-    if (noCategoriesSelected) {
+    // If no categories are selected, show no events
+    if (selectedCategories.length === 0) {
       return [];
     }
     
-    // Apply event type filter only if not all categories are selected
+    // Apply event type filter
+    let filtered = events;
     if (selectedCategories.length !== allEventTypes.length) {
       filtered = events.filter(event => 
         event.event_type && selectedCategories.includes(event.event_type)
@@ -125,7 +120,7 @@ const EventsPageRefactored = () => {
     }
     
     return filtered;
-  }, [events, selectedCategories, allEventTypes.length, selectedVenues, dateRange, selectedDateFilter, noCategoriesSelected]);
+  }, [events, selectedCategories, allEventTypes.length, selectedVenues, dateRange, selectedDateFilter]);
   
   const { 
     handleRsvp: enhancedHandleRsvp, 
@@ -137,8 +132,8 @@ const EventsPageRefactored = () => {
       <div className="max-w-7xl mx-auto">
         <EventsPageHeader title="What's Happening?" />
         
-        <div className="mt-6 mb-2 flex flex-wrap justify-between items-center gap-4">
-          {/* Category Pills in fixed height container */}
+        {/* Add the filter bar */}
+        <div className="mt-6 mb-4">
           <EventFilterBar
             allEventTypes={allEventTypes}
             selectedEventTypes={selectedCategories}
@@ -146,34 +141,43 @@ const EventsPageRefactored = () => {
             onSelectAll={selectAll}
             onDeselectAll={deselectAll}
             onReset={reset}
-            className="flex-grow"
+            hasActiveFilters={hasActiveFilters}
+            onClearAllFilters={resetFilters}
+            className="bg-white rounded-lg shadow-sm p-4"
           />
-          
-          {/* Advanced Filters Button */}
-          <div className="flex-shrink-0">
-            <AdvancedFiltersButton
-              hasActiveFilters={hasAdvancedFilters}
-              isOpen={showAdvancedFilters}
-              onOpen={setShowAdvancedFilters}
-              className="ml-auto"
-            >
-              <AdvancedFiltersPanel
-                dateRange={dateRange}
-                onDateRangeChange={setDateRange}
-                selectedDateFilter={selectedDateFilter}
-                onDateFilterChange={setSelectedDateFilter}
-                venues={venues}
-                selectedVenues={selectedVenues}
-                onVenueChange={setSelectedVenues}
-              />
-            </AdvancedFiltersButton>
-          </div>
         </div>
+        
+        {/* Toggle for Advanced Filters */}
+        <div className="flex justify-end mb-4">
+          <Button
+            variant="outline"
+            onClick={toggleAdvancedFilters}
+            className="flex items-center gap-2"
+            size="sm"
+          >
+            {showAdvancedFilters ? "Hide Advanced Filters" : "Advanced Filters"}
+            <ChevronDown className={`h-4 w-4 transition-transform ${showAdvancedFilters ? 'rotate-180' : ''}`} />
+          </Button>
+        </div>
+        
+        {/* Advanced Filters Panel */}
+        <AdvancedFiltersPanel
+          isOpen={showAdvancedFilters}
+          onClose={toggleAdvancedFilters}
+          dateRange={dateRange}
+          onDateRangeChange={setDateRange}
+          selectedDateFilter={selectedDateFilter}
+          onDateFilterChange={setSelectedDateFilter}
+          venues={venues}
+          selectedVenues={selectedVenues}
+          onVenueChange={setSelectedVenues}
+          className="mb-6"
+        />
         
         {/* Active Filters Summary */}
         {hasAdvancedFilters && (
           <div className="mb-6">
-            <div className="flex flex-wrap gap-2 items-center mt-4">
+            <div className="flex flex-wrap gap-2 items-center">
               <span className="text-sm text-gray-500">Active filters:</span>
               
               {selectedVenues.map(venueId => {
@@ -232,9 +236,6 @@ const EventsPageRefactored = () => {
             showRsvpButtons={!!user}
             hasActiveFilters={hasActiveFilters}
             loadingEventId={loadingEventId}
-            noCategoriesSelected={noCategoriesSelected}
-            renderTeaserAfterRow={!user && 2}
-            teaser={<EventsTeaser />}
           />
         </div>
       </div>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin } from 'lucide-react';
@@ -108,8 +107,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
             <CategoryPill 
               category={event.event_type} 
               size="xs" 
-              showIcon={false}
-              active={true}
+              showIcon={false} 
             />
           </div>
         )}
@@ -152,7 +150,6 @@ const EventCardList: React.FC<EventCardListProps> = ({
               onClick={(e) => e.stopPropagation()}
             >
               <EventRsvpButtons
-                eventId={event.id}
                 currentStatus={event.rsvp_status || null}
                 onRsvp={handleRsvp}
                 size="sm"

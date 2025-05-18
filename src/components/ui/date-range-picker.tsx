@@ -13,14 +13,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useIsMobile } from "@/hooks/use-mobile";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
 
 interface DateRangePickerProps {
   value?: DateRange;
@@ -50,14 +42,15 @@ export function DateRangePicker({
   const formatDateRange = (range: DateRange | undefined) => {
     if (!range?.from) return placeholder;
     if (range.to) {
-      return `${format(range.from, "LLL dd, yyyy")} - ${format(range.to, "LLL dd, yyyy")}`;
+      return `${format(range.from, "LLL dd, y")} - ${format(range.to, "LLL dd, y")}`;
     }
-    return format(range.from, "LLL dd, yyyy");
+    return format(range.from, "LLL dd, y");
   };
 
   // Handle internal changes - store temporarily without triggering onChange
   const handleSelect = (newDate: DateRange | undefined) => {
     // Always replace the existing range with the new selection
+    // instead of trying to extend an existing range
     setDate(newDate);
     
     // Auto-apply single date selections
@@ -70,75 +63,11 @@ export function DateRangePicker({
   const handleConfirm = () => {
     if (date) {
       onChange(date);
-      setOpen(false); // Close the popover/dialog after confirming
+      setOpen(false); // Close the popover after confirming
+      console.log("DateRangePicker confirmed:", date);
     }
   };
 
-  // When on mobile, use a dialog instead of a popover
-  if (isMobile) {
-    return (
-      <div className={cn("grid gap-2", className)}>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button
-              id="date"
-              variant={"outline"}
-              className={cn(
-                "w-full justify-start text-left font-normal",
-                !date && "text-muted-foreground",
-                disabled && "opacity-50 cursor-not-allowed"
-              )}
-              disabled={disabled}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {formatDateRange(date)}
-            </Button>
-          </DialogTrigger>
-          
-          <DialogContent className="sm:max-w-[425px] p-0">
-            <DialogHeader className="px-4 pt-4">
-              <DialogTitle>Select date range</DialogTitle>
-            </DialogHeader>
-            
-            <div className="p-4">
-              <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={date?.from}
-                selected={date}
-                onSelect={handleSelect}
-                numberOfMonths={1}
-                className="pointer-events-auto"
-                disabled={disabled}
-              />
-              
-              <DialogFooter className="flex justify-end px-4 pb-4 pt-2">
-                <Button
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setOpen(false)}
-                  className="mr-2"
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  onClick={handleConfirm}
-                  disabled={!date?.from}
-                  className="bg-[#9b87f5] hover:bg-[#7E69AB]"
-                >
-                  {date?.to ? "Apply Range" : "Confirm Date"}
-                </Button>
-              </DialogFooter>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-    );
-  }
-
-  // Desktop experience with popover
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover open={open} onOpenChange={(isOpen) => {
@@ -171,7 +100,7 @@ export function DateRangePicker({
               defaultMonth={date?.from}
               selected={date}
               onSelect={handleSelect}
-              numberOfMonths={2}
+              numberOfMonths={isMobile ? 1 : 2}
               className="pointer-events-auto"
               disabled={disabled}
             />

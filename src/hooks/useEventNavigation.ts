@@ -21,7 +21,6 @@ export const useEventNavigation = () => {
     destination?: string;
     title?: string; 
     start_time?: string | Date;
-    rsvp_status?: 'Going' | 'Interested' | null;
   }) => {
     if (!event?.id) {
       console.error("Cannot navigate: missing event ID");
@@ -38,14 +37,7 @@ export const useEventNavigation = () => {
       const url = `/events/${event.id}`;
       console.log(`Navigation to event URL: ${url}`, event);
       
-      // Preserve essential information including RSVP status with higher specificity
-      const originalEvent = {
-        id: event.id,
-        title: event.title,
-        rsvp_status: event.rsvp_status || null
-      };
-      
-      // Force navigation to the ID-based URL with enhanced RSVP status handling
+      // Force navigation to the ID-based URL
       navigate(url, { 
         replace: false,
         state: { 
@@ -54,9 +46,6 @@ export const useEventNavigation = () => {
           fromEventNavigation: true,
           useTransition: true,
           originalEventId: event.id,
-          // Ensure RSVP status is explicitly included and prioritized
-          rsvpStatus: event.rsvp_status || null,
-          originalEvent,
           timestamp: Date.now()
         }
       });

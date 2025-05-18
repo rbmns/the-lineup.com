@@ -1,78 +1,46 @@
 
-import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
-import { prepareEventsWithRsvp } from '../helpers/prepareEventsWithRsvp';
-
-interface FetchOptions {
-  eventType?: string;
-  currentEventId?: string;
-  limit?: number;
-  minResults?: number;
-  startDate?: string;
-  userId?: string;
-  tags?: string[];
-}
+import { supabase } from '@/integrations/supabase/client';
+import { applyRsvpStatus } from './relatedEventsUtils';
 
 /**
- * Fetches related events based on event type
+ * Fetches primary related events that match the same event type
  */
-export const fetchPrimaryRelatedEvents = async ({
-  eventType,
-  currentEventId,
-  limit = 3,
-  minResults = 2,
-  startDate,
-  userId,
-  tags = []
-}: FetchOptions): Promise<Event[]> => {
-  
+export const fetchPrimaryRelatedEvents = async (
+  eventType: string,
+  currentEventId: string,
+  userId?: string,
+  startDate?: string
+): Promise<Event[]> => {
   try {
-    // Base query
-    let query = supabase
-      .from('events')
-      .select('*, creator:profiles(*), venues(*)')
-      .neq('id', currentEventId || '')
-      .order('created_at', { ascending: false })
-      .limit(limit);
+    // Get current date to filter out past events if no startDate is provided
+    const filterDate = startDate || new Date().toISOString().split('T')[0];
     
-    // Filter by event type if provided
-    if (eventType) {
-      query = query.eq('event_type', eventType);
-    }
+    // Fetch events with the same event type
+    const query = supabase.from('events').select(`
+      *,
+      creator:profiles(id, username, avatar_url, email, location, status),
+      venues:venue_id(*)
+    `)
+    .eq('event_type', eventType)
+    .neq('id', currentEventId)
+    .gte('start_date', filterDate) // Only future events
+    .order('start_time', { ascending: true })
+    .limit(8);
     
-    // Filter by tags if provided - using ilike for text columns
-    if (tags && tags.length > 0 && tags[0]) {
-      // For each tag, add an "ilike" filter
-      tags.forEach(tag => {
-        if (tag && tag.trim()) {
-          // Use contains operator for text fields with tag values
-          query = query.ilike('tags', `%${tag}%`);
-        }
-      });
-    }
-    
-    // Filter by date if provided
-    if (startDate) {
-      query = query.gte('start_date', startDate);
-    }
-    
-    const { data: events, error } = await query;
+    const { data, error } = await query;
     
     if (error) {
       console.error('Error fetching primary related events:', error);
       return [];
     }
     
-    if (!events?.length) {
+    if (!data || data.length === 0) {
       return [];
     }
     
-    // If we have a user ID, get the RSVP status for each event
-    if (userId) {
-      return await prepareEventsWithRsvp(events, userId);
-    }
-    
-    return events;
+    // Apply RSVP status and correct attendees structure
+    return await applyRsvpStatus(data, userId);
   } catch (error) {
     console.error('Error in fetchPrimaryRelatedEvents:', error);
     return [];

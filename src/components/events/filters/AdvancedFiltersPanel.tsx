@@ -1,29 +1,28 @@
 
 import React from 'react';
-import { DateRange } from 'react-day-picker';
+import { ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Calendar as CalendarIcon } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+import { DateRangeFilter } from '@/components/events/DateRangeFilter';
+import { DateRange } from 'react-day-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface AdvancedFiltersPanelProps {
+  isOpen: boolean;
+  onClose: () => void;
   dateRange: DateRange | undefined;
   onDateRangeChange: (range: DateRange | undefined) => void;
-  selectedDateFilter?: string;
-  onDateFilterChange?: (filter: string) => void;
+  selectedDateFilter: string;
+  onDateFilterChange: (filter: string) => void;
   venues: Array<{ value: string, label: string }>;
   selectedVenues: string[];
   onVenueChange: (venues: string[]) => void;
-  locations?: Array<{ value: string, label: string }>;
-  selectedLocation?: string;
-  onLocationChange?: (location: string) => void;
   className?: string;
 }
 
 export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
+  isOpen,
+  onClose,
   dateRange,
   onDateRangeChange,
   selectedDateFilter,
@@ -31,11 +30,10 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
   venues,
   selectedVenues,
   onVenueChange,
-  locations = [],
-  selectedLocation,
-  onLocationChange,
   className
 }) => {
+  if (!isOpen) return null;
+
   // Handle venue selection
   const handleVenueSelect = (venueId: string) => {
     // Toggle the venue selection
@@ -47,81 +45,65 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
   };
 
   return (
-    <div className={cn("grid grid-cols-1 md:grid-cols-3 gap-6", className)}>
-      <div>
-        <h4 className="font-medium mb-2">Date Range</h4>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-full justify-start text-left font-normal border-gray-300",
-                !dateRange && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {dateRange?.from ? (
-                dateRange.to ? (
-                  <>
-                    {format(dateRange.from, "LLL dd, y")} -{" "}
-                    {format(dateRange.to, "LLL dd, y")}
-                  </>
-                ) : (
-                  format(dateRange.from, "LLL dd, y")
-                )
-              ) : (
-                <span>Select date range</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="range"
-              selected={dateRange}
-              onSelect={onDateRangeChange}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
+    <div className={cn("bg-white border rounded-lg p-4 space-y-6", className)}>
+      <div className="flex justify-between items-center">
+        <h3 className="font-semibold text-lg">Advanced Filters</h3>
+        <Button variant="ghost" size="icon" onClick={onClose}>
+          <ChevronUp className="h-5 w-5" />
+        </Button>
       </div>
 
-      <div>
-        <h4 className="font-medium mb-2">Venue</h4>
-        <Select 
-          value={selectedVenues[0] || ""} 
-          onValueChange={handleVenueSelect}
-        >
-          <SelectTrigger className="w-full border-gray-300">
-            <SelectValue placeholder="Select venue" />
-          </SelectTrigger>
-          <SelectContent>
-            {venues.map((venue) => (
-              <SelectItem key={venue.value} value={venue.value}>
-                {venue.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-2">
+          <h4 className="font-medium text-sm">Date Range</h4>
+          <DateRangeFilter
+            dateRange={dateRange}
+            onDateRangeChange={onDateRangeChange}
+            onReset={() => onDateRangeChange(undefined)}
+            selectedDateFilter={selectedDateFilter}
+            onDateFilterChange={onDateFilterChange}
+          />
+        </div>
 
-      <div>
-        <h4 className="font-medium mb-2">Location</h4>
-        <Select 
-          value={selectedLocation || ""} 
-          onValueChange={(value) => onLocationChange?.(value)}
-          disabled={!onLocationChange || locations.length === 0}
-        >
-          <SelectTrigger className="w-full border-gray-300">
-            <SelectValue placeholder="Select location" />
-          </SelectTrigger>
-          <SelectContent>
-            {locations.map((location) => (
-              <SelectItem key={location.value} value={location.value}>
-                {location.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="space-y-2">
+          <h4 className="font-medium text-sm">Venue</h4>
+          <Select 
+            value={selectedVenues[0] || ""} 
+            onValueChange={handleVenueSelect}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select venue" />
+            </SelectTrigger>
+            <SelectContent>
+              {venues.map((venue) => (
+                <SelectItem key={venue.value} value={venue.value}>
+                  {venue.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          {selectedVenues.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {selectedVenues.map(venueId => {
+                const venue = venues.find(v => v.value === venueId);
+                return venue ? (
+                  <div key={venueId} className="bg-gray-100 rounded-full px-3 py-1 text-sm flex items-center">
+                    <span>{venue.label}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="ml-1 h-5 w-5 p-0" 
+                      onClick={() => onVenueChange(selectedVenues.filter(v => v !== venueId))}
+                    >
+                      &times;
+                    </Button>
+                  </div>
+                ) : null;
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

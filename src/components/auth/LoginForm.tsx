@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -119,6 +120,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode, onForgotPass
       setDebugInfo(prevDebug => `${prevDebug || ''}\nLogin successful.`);
       resetRateLimit();
       setRetryCount(0);
+      
+      // Removed successful login toast - no confirmation needed
       
       // Auth context will handle redirects
     } catch (error: any) {

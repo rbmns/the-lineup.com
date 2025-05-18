@@ -10,7 +10,7 @@ export const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
 export const formatDate = (dateString: string): string => {
   try {
     const date = new Date(dateString);
-    return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEEE, d MMMM yyyy");
+    return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, d MMM yyyy");
   } catch (error) {
     console.error('Error formatting date:', error);
     return dateString;
@@ -54,4 +54,3 @@ export const formatEventTime = (startTime: string, endTime?: string | null): str
   const formattedEndTime = formatTime(endTime);
   return `${formattedStartTime} - ${formattedEndTime}`;
 };
-

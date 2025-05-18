@@ -9,7 +9,6 @@ import { FriendsTabs } from '@/components/friends/FriendsTabs';
 import { UserProfile } from '@/types';
 import { DiscoverTabContent } from '@/components/friends/DiscoverTabContent';
 import { supabase } from '@/lib/supabase';
-import { normalizeUserProfile } from '@/utils/profileUtils';
 
 const Friends: React.FC = () => {
   const { user } = useAuth();
@@ -51,7 +50,7 @@ const Friends: React.FC = () => {
     if (!friends) return;
     
     if (!friendsSearchQuery) {
-      setFilteredFriends(friends as any);
+      setFilteredFriends(friends as UserProfile[]);
       return;
     }
     
@@ -62,7 +61,7 @@ const Friends: React.FC = () => {
       friend.status?.toLowerCase().includes(query)
     );
     
-    setFilteredFriends(filtered as any);
+    setFilteredFriends(filtered as UserProfile[]);
   }, [friendsSearchQuery, friends]);
 
   // Handle search for new people
@@ -82,14 +81,11 @@ const Friends: React.FC = () => {
         
       if (error) throw error;
       
-      // Normalize profiles to ensure avatar_url is in array format
-      const normalizedResults = (data || []).map(profile => normalizeUserProfile(profile));
-      
       // Filter out users who are already friends
       const friendIds = friends?.map(f => f.id) || [];
-      const filteredResults = normalizedResults.filter(profile => !friendIds.includes(profile.id));
+      const filteredResults = (data || []).filter(profile => !friendIds.includes(profile.id));
       
-      setSearchResults(filteredResults);
+      setSearchResults(filteredResults as UserProfile[]);
     } catch (error) {
       console.error('Error searching for users:', error);
     } finally {
@@ -168,7 +164,7 @@ const Friends: React.FC = () => {
           pendingRequestsCount={requests?.length || 0}
           friendsContent={
             <FriendsTabContent
-              friends={filteredFriends}
+              friends={filteredFriends as UserProfile[]}
               loading={friendsLoading}
               requests={requests || []}
               onAcceptRequest={onAcceptRequest}

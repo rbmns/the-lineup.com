@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { MapPin } from 'lucide-react';
@@ -159,7 +158,6 @@ const EventCard: React.FC<EventCardProps> = ({
             onClick={(e) => e.stopPropagation()}
           >
             <EventRsvpButtons
-              eventId={event.id}
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
               size="sm"

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
@@ -13,7 +14,7 @@ interface MainEventContentProps {
   attendees: { going: any[]; interested: any[] };
   isAuthenticated: boolean;
   rsvpLoading: boolean;
-  handleRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
+  handleRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
   isMobile: boolean;
   imageUrl: string | null;
   formattedDate: string | null;
@@ -57,6 +58,16 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
   handleEventTypeClick,
   handleBackToEvents
 }) => {
+  const handleRsvpWrapped = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    try {
+      await handleRsvp(status);
+      return true;
+    } catch (error) {
+      console.error('Error handling RSVP:', error);
+      return false;
+    }
+  };
+
   const dateTimeInfo = formatDateTime(event.start_date, event.start_time, event.end_time);
 
   return (
@@ -96,10 +107,9 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
           {isAuthenticated && !isMobile && (
             <div className="animate-fade-in" style={{ animationDelay: '150ms' }}>
               <EventRsvpButtons 
-                eventId={event.id}
                 currentStatus={event?.rsvp_status}
-                onRsvp={handleRsvp}
-                isLoading={rsvpLoading}
+                onRsvp={handleRsvpWrapped}
+                isLoading={rsvpLoading} /* Changed from loading to isLoading */
                 className="w-full"
                 size="lg"
               />

@@ -80,9 +80,9 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
       });
 
       if (error) {
-        // Handle existing account error
+        // Check for existing account error
         if (error.message.includes("User already registered")) {
-          setErrorMessage("This email is already registered. Please use a different email or try logging in instead.");
+          setErrorMessage("This email is already registered. Please use a different email or try logging in.");
           toast({
             title: "Account already exists",
             description: "This email address is already registered. Please try logging in instead.",
@@ -95,18 +95,6 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
       }
       
       console.log('Signup response:', data);
-
-      // Check if the user needs to confirm their email
-      if (data?.user?.identities?.length === 0) {
-        // This means the user already exists
-        setErrorMessage("This email is already registered. Please use a different email or try logging in.");
-        toast({
-          title: "Account already exists",
-          description: "This email address is already registered. Please try logging in instead.",
-          variant: "destructive"
-        });
-        return;
-      }
 
       // Show success message
       setRegistrationComplete(true);
@@ -301,4 +289,3 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
     </div>
   );
 }
-

@@ -37,17 +37,6 @@ export const useEventDetailParams = () => {
     [location.state]
   );
 
-  // Extract RSVP status from location state if available
-  const initialRsvpStatus = useMemo(() => 
-    location.state?.rsvpStatus || null,
-    [location.state]
-  );
-
-  const originalEvent = useMemo(() => 
-    location.state?.originalEvent || null,
-    [location.state]
-  );
-
   // Log the parameters for debugging
   useEffect(() => {
     console.log(`useEventDetailParams: eventId=${eventId}, eventSlug=${eventSlug}, destination=${destination}`);
@@ -79,7 +68,7 @@ export const useEventDetailParams = () => {
     return null;
   }, [eventId, eventSlug, location.pathname, location.state]);
   
-  // Reset initialFetchDone when the route changes and scroll to top
+  // Reset initialFetchDone when the route changes
   useEffect(() => {
     const currentUrl = location.pathname;
     if (previousUrlRef.current !== currentUrl) {
@@ -87,11 +76,8 @@ export const useEventDetailParams = () => {
       initialFetchDone.current = false;
       previousUrlRef.current = currentUrl;
       
-      // Force scroll to top on URL change
-      window.scrollTo({
-        top: 0,
-        behavior: 'instant' // Use 'instant' instead of 'auto' for immediate scroll
-      });
+      // Scroll to top on URL change
+      window.scrollTo(0, 0);
     }
   }, [location.pathname]);
 
@@ -105,9 +91,6 @@ export const useEventDetailParams = () => {
     forceKey,
     isSlugRoute,
     isDestinationRoute,
-    hasTransitionState,
-    // Export the initial RSVP status from navigation state
-    initialRsvpStatus,
-    originalEvent
+    hasTransitionState
   };
 };

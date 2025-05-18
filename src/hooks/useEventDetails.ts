@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 import { useRsvpActions } from '@/hooks/useRsvpActions';
 
 interface UseEventDetailsResult {
@@ -25,11 +26,7 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
   const [rsvpLoading, setRsvpLoading] = useState<boolean>(false);
   const { user } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const { handleRsvp: hookHandleRsvp, loading: rsvpLoadingState } = useRsvpActions();
-  
-  // Get RSVP status from location state if available
-  const initialRsvpStatus = location.state?.rsvpStatus || null;
 
   // Fetch event data
   const fetchEventDetails = async () => {
@@ -61,25 +58,33 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
       if (error) {
         console.error('Error fetching event details:', error);
         setError('Failed to load event details.');
+        toast({
+          title: "Error loading event",
+          description: "We couldn't load the event details. Please try again.",
+          variant: "destructive"
+        });
       } else if (data) {
         console.log('Event data loaded:', data);
-        
-        // Apply RSVP status from navigation state if available
-        if (initialRsvpStatus && !data.rsvp_status) {
-          console.log(`Applying initial RSVP status from navigation to loaded event: ${initialRsvpStatus}`);
-          data.rsvp_status = initialRsvpStatus;
-        }
-        
         setEvent(data);
         
         // Fetch attendees
         fetchAttendees(eventId);
       } else {
         setError('Event not found');
+        toast({
+          title: "Event not found",
+          description: "The event you're looking for doesn't exist or has been removed.",
+          variant: "destructive"
+        });
       }
     } catch (err) {
       console.error('Unexpected error fetching event details:', err);
       setError('An unexpected error occurred.');
+      toast({
+        title: "Error",
+        description: "Something went wrong while loading the event. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -117,18 +122,15 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
       fetchEventDetails();
     }
   }, [eventId]);
-  
-  // Apply RSVP status from location state when it changes
-  useEffect(() => {
-    if (initialRsvpStatus && event && !event.rsvp_status) {
-      console.log(`Applying RSVP status from location state: ${initialRsvpStatus}`);
-      setEvent(prev => prev ? {...prev, rsvp_status: initialRsvpStatus} : null);
-    }
-  }, [initialRsvpStatus, event]);
 
-  // Legacy handler (for backward compatibility)
+  // Handle RSVP for a specific event
   const rsvpToEvent = async (status: 'Going' | 'Interested') => {
     if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to RSVP to events",
+        variant: "destructive",
+      });
       navigate('/login');
       return;
     }
@@ -151,13 +153,23 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
         
         // Refresh attendees data
         fetchAttendees(eventId);
+        
+        toast({
+          title: "RSVP Updated",
+          description: `You're now ${status.toLowerCase()} to this event.`
+        });
       }
     } catch (err) {
       console.error('Error during RSVP:', err);
+      toast({
+        title: "RSVP Failed",
+        description: "We couldn't update your RSVP. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
-  // Modern handler (takes eventId parameter directly)
+  // Handle RSVP for any event (used for passing to components)
   const handleRsvpAction = async (eventId: string, status: 'Going' | 'Interested') => {
     await hookHandleRsvp(eventId, status);
   };

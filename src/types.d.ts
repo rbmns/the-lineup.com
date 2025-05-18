@@ -2,15 +2,15 @@
 export interface UserProfile {
   id: string;
   username: string | null;
-  avatar_url: string[] | null; // Changed from string | null to string[] | null to match types/index.ts
+  avatar_url: string[] | null; // Changed to string[] to be consistent with types/index.ts
   email: string | null;
   location: string | null;
-  location_category?: string | null; // Made optional with ? to match types/index.ts
+  location_category: string | null;
   status: string | null;
-  status_details?: string | null;
+  status_details?: string | null; // Added to match other UserProfile
   tagline: string | null;
-  created_at?: string;
-  updated_at?: string;
+  created_at?: string; // Added to match other UserProfile
+  updated_at?: string; // Added to match other UserProfile
   onboarded?: boolean | null;
   onboarding_data?: string | null;
   role?: string | null;
@@ -29,6 +29,7 @@ export interface Venue {
   slug?: string | null;
 }
 
+// Update the Event type definition to include all required fields
 export interface Event {
   id: string;
   title: string;
@@ -66,9 +67,8 @@ export interface Event {
   created_by?: string;
   going_count?: number;
   interested_count?: number;
-  formattedDate?: string;
-  formattedTime?: string;
-  user_rsvp_status?: 'Interested' | 'Going' | null;
+  formattedDate?: string; // Add the missing property
+  formattedTime?: string; // Add the missing property
 }
 
 export interface EventsResponse {

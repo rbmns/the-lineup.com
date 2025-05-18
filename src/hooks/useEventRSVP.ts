@@ -228,7 +228,6 @@ export const useEventRSVP = () => {
     if (!userId) return [];
     
     try {
-      // FIX: Use event_rsvps table instead of rsvps
       const { data, error } = await supabase
         .from('event_rsvps')
         .select(`

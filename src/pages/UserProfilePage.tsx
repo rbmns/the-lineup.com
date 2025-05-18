@@ -8,8 +8,6 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { ProfileEventsSection } from '@/components/profile/ProfileEventsSection';
 import { ProfileCard } from '@/components/profile/ProfileCard';
 import { Loader2 } from 'lucide-react';
-import { trackEvent } from '@/utils/analytics';
-import { isProfileClickable } from '@/utils/friendshipUtils';
 
 const UserProfilePage: React.FC = () => {
   const { user } = useAuth();
@@ -36,22 +34,6 @@ const UserProfilePage: React.FC = () => {
     isLoading: eventsLoading 
   } = useUserEvents(profileId);
   
-  // Convert friendshipStatus to compatible type for child components
-  // This ensures "requested" is properly handled as "pending"
-  const normalizedFriendStatus = friendshipStatus === 'requested' ? 'pending' : 
-    (friendshipStatus as 'none' | 'pending' | 'accepted');
-  
-  // Track page view with friendship status
-  useEffect(() => {
-    if (profile && !isOwnProfile) {
-      trackEvent('profile_view', {
-        profile_id: profileId,
-        friendship_status: normalizedFriendStatus, // Use normalized status here
-        is_own_profile: isOwnProfile
-      });
-    }
-  }, [profile, profileId, normalizedFriendStatus, isOwnProfile]);
-  
   // Redirect to login if trying to view own profile but not logged in
   useEffect(() => {
     if (isOwnProfile && !user) {
@@ -62,20 +44,12 @@ const UserProfilePage: React.FC = () => {
   // Handle adding friend
   const handleAddFriend = async () => {
     if (userId && sendFriendRequest) {
-      trackEvent('friend_request_sent', {
-        recipient_id: userId
-      });
       await sendFriendRequest();
     }
   };
 
   // Determine if user can view events based on friendship status
-  // Use the normalized status here
-  const canViewEvents = isOwnProfile || normalizedFriendStatus === 'accepted';
-  
-  // Determine if the profile is clickable
-  // Use the normalized status here
-  const canNavigateToProfile = !isOwnProfile && isProfileClickable(normalizedFriendStatus, false);
+  const canViewEvents = isOwnProfile || friendshipStatus === 'accepted';
 
   if (isOwnProfile && !user) {
     return null; // Will redirect in effect
@@ -101,7 +75,7 @@ const UserProfilePage: React.FC = () => {
         {isOwnProfile && (
           <div className="mb-4">
             <Link 
-              to="/profile/edit" 
+              to="/profile/settings" 
               className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors"
             >
               Edit Profile Settings
@@ -112,10 +86,10 @@ const UserProfilePage: React.FC = () => {
         <div className="space-y-6">
           <ProfileCard 
             profile={profile}
-            friendStatus={normalizedFriendStatus}
+            friendStatus={friendshipStatus as 'none' | 'pending' | 'accepted'}
             onAddFriend={handleAddFriend}
             showActions={!isOwnProfile}
-            linkToProfile={canNavigateToProfile}
+            linkToProfile={false}
           />
           
           <ProfileEventsSection 
@@ -126,7 +100,7 @@ const UserProfilePage: React.FC = () => {
             isCurrentUser={isOwnProfile}
             username={profile?.username}
             handleAddFriend={handleAddFriend}
-            friendshipStatus={normalizedFriendStatus}
+            friendshipStatus={friendshipStatus as 'none' | 'pending' | 'accepted'}
           />
         </div>
       </div>

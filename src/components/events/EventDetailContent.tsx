@@ -243,7 +243,6 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
               <>
                 <h3 className="font-medium">Are you going?</h3>
                 <EventRsvpButtons 
-                  eventId={event.id}
                   currentStatus={event.rsvp_status || null}
                   onRsvp={handleRsvp}
                   size="lg"

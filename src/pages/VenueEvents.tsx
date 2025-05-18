@@ -10,14 +10,12 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { setCanonicalLink } from '@/utils/canonicalUtils';
 import { useRsvpActions } from '@/hooks/useRsvpActions';
-import { EventsLoadingState } from '@/components/events/list-components/EventsLoadingState';
 
 const VenueEvents = () => {
   const { venueSlug } = useParams<{ venueSlug: string }>();
   const [events, setEvents] = useState<Event[]>([]);
   const [venue, setVenue] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
   const { handleRsvp: rsvpToEvent } = useRsvpActions();
@@ -84,25 +82,20 @@ const VenueEvents = () => {
   
   const handleLocalRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<void> => {
     if (rsvpToEvent) {
-      setLoadingEventId(eventId);
-      try {
-        await rsvpToEvent(eventId, status);
-        
-        // Update the local events state to reflect the new RSVP status
-        const updatedEvents = events.map(event => {
-          if (event.id === eventId) {
-            return {
-              ...event,
-              user_rsvp_status: status
-            };
-          }
-          return event;
-        });
-        
-        setEvents(updatedEvents);
-      } finally {
-        setLoadingEventId(null);
-      }
+      await rsvpToEvent(eventId, status);
+      
+      // Update the local events state to reflect the new RSVP status
+      const updatedEvents = events.map(event => {
+        if (event.id === eventId) {
+          return {
+            ...event,
+            user_rsvp_status: status
+          };
+        }
+        return event;
+      });
+      
+      setEvents(updatedEvents);
     }
   };
   
@@ -149,20 +142,17 @@ const VenueEvents = () => {
         )}
       </div>
       
-      {isLoading ? (
-        <EventsLoadingState />
-      ) : events.length > 0 ? (
-        <EventsList
-          events={events}
-          onRsvp={handleLocalRsvp}
-          showRsvpButtons={!!user}
-          loadingEventId={loadingEventId}
-        />
-      ) : (
-        <div className="text-center py-8">
-          <p className="text-gray-500">No events found for this venue.</p>
-        </div>
-      )}
+      <EventsList
+        isLoading={isLoading}
+        isSearching={false}
+        displayEvents={events}
+        searchQuery=""
+        noResultsFound={!isLoading && events.length === 0}
+        similarEvents={[]}
+        resetFilters={() => {}}
+        handleRsvpAction={handleLocalRsvp}
+        isAuthenticated={!!user}
+      />
     </div>
   );
 };

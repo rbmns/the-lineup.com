@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
@@ -166,6 +167,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         
         setIsNewUser(true);
+        toast({
+          title: "Account created!",
+          description: "Check your email to confirm your account.",
+        });
         
         if (authData.session) {
           setSession(authData.session);
@@ -213,6 +218,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       console.log("Sign in successful:", data.user?.id);
+      toast({
+        title: "Welcome back!",
+        description: "You have successfully logged in.",
+      });
       
       if (data.session) {
         setSession(data.session);

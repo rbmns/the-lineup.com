@@ -1,9 +1,7 @@
-
 import { supabase } from '@/lib/supabase';
 import { FriendRequest } from '@/types/friends';
 import { UserProfile } from '@/types';
 import { toast } from '@/components/ui/use-toast';
-import { normalizeUserProfile } from '@/utils/profileUtils';
 
 // Function to fetch friend requests for a specific user
 export async function fetchPendingRequests(userId: string): Promise<FriendRequest[]> {
@@ -38,21 +36,17 @@ export async function fetchPendingRequests(userId: string): Promise<FriendReques
     }
     
     // Map to the correct type
-    const requests: FriendRequest[] = data.map(item => {
-      // Normalize the profile to ensure avatar_url is in array format
-      const normalizedProfile = normalizeUserProfile(item.profiles);
-      
-      return {
-        id: item.id,
-        status: item.status.toLowerCase() as 'pending' | 'accepted' | 'declined',
-        created_at: item.created_at,
-        user_id: item.user_id,
-        friend_id: item.friend_id,
-        sender_id: item.user_id,
-        receiver_id: item.friend_id,
-        profile: normalizedProfile
-      } as FriendRequest;
-    });
+    const requests: FriendRequest[] = data.map(item => ({
+      id: item.id,
+      status: item.status.toLowerCase() as 'pending' | 'accepted' | 'declined',
+      created_at: item.created_at,
+      user_id: item.user_id,
+      friend_id: item.friend_id,
+      sender_id: item.user_id,
+      receiver_id: item.friend_id,
+      // Fix: Cast the single profile object correctly instead of treating it as an array
+      profile: item.profiles as unknown as UserProfile
+    }));
     
     return requests;
   } catch (error) {

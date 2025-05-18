@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { EventRsvpButtons } from './EventRsvpButtons';
 import { cn } from '@/lib/utils';
@@ -37,43 +38,39 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
     return null;
   }
 
-  const handleRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
+  const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp) return false;
     
     try {
       console.log('EventCardActions - Handling RSVP for event:', eventId, status);
       setIsLoading(true);
       
-      // The critical fix: store the specific eventId this action is for
-      const thisEventId = eventId;
-      
-      // Calculate new status - if clicking the same button that's active, toggle it off
-      // This ensures only one status can be active at a time
+      // Set optimistic status update
       const newStatus = localRsvpStatus === status ? undefined : status;
       setLocalRsvpStatus(newStatus);
       
       // Add improved visual feedback with animation
-      const eventCard = document.querySelector(`[data-event-id="${thisEventId}"]`);
+      const eventCard = document.querySelector(`[data-event-id="${eventId}"]`);
       if (eventCard) {
         // Apply faster animation with less flickering
-        eventCard.classList.add('transition-all', 'duration-100');
+        eventCard.classList.add('transition-all', 'duration-200');
         
         if (status === 'Going') {
           eventCard.classList.add('rsvp-going-animation');
-          setTimeout(() => eventCard.classList.remove('rsvp-going-animation'), 200);
+          setTimeout(() => eventCard.classList.remove('rsvp-going-animation'), 400);
         } else {
           eventCard.classList.add('rsvp-interested-animation');
-          setTimeout(() => eventCard.classList.remove('rsvp-interested-animation'), 200);
+          setTimeout(() => eventCard.classList.remove('rsvp-interested-animation'), 400);
         }
       }
       
-      // Pass the specific eventId to ensure we only update this event
-      const result = await onRsvp(thisEventId, status);
+      const result = await onRsvp(eventId, status);
       const success = result === undefined ? true : !!result;
       
       // Revert if the operation failed
       if (!success) {
         setLocalRsvpStatus(currentRsvpStatus);
+        // Removed toast
       }
       
       return success;
@@ -82,7 +79,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       setLocalRsvpStatus(currentRsvpStatus); // Revert on error
       return false;
     } finally {
-      setTimeout(() => setIsLoading(false), 100); // Reduced delay for faster feedback
+      setTimeout(() => setIsLoading(false), 300); // Small delay to prevent rapid clicks
     }
   };
 
@@ -94,11 +91,10 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       className={cn(
         "event-rsvp-container", 
         "mt-2",
-        "transition-all duration-100" // Faster animation
+        "transition-all duration-200"
       )}
       data-no-navigation="true"
       data-rsvp-container="true"
-      data-event-id={eventId}
       onClick={(e) => e.stopPropagation()}
     >
       {/* RSVP Buttons */}
@@ -106,11 +102,10 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
         <div 
           className="event-rsvp-buttons animate-fade-in" 
           data-no-navigation="true"
-          style={{ animationDuration: '100ms' }}
+          style={{ animationDuration: '150ms' }}
           onClick={(e) => e.stopPropagation()}
         >
           <EventRsvpButtons
-            eventId={eventId}
             currentStatus={localRsvpStatus || null}
             onRsvp={handleRsvp}
             size={buttonSize}
@@ -126,7 +121,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
           <Badge
             variant="outline"
             className={cn(
-              "py-1 px-3 text-xs font-medium transition-all duration-100", // Faster animation
+              "py-1 px-3 text-xs font-medium transition-all duration-200",
               localRsvpStatus === 'Going' 
                 ? "bg-green-50 text-green-700 border-green-200" 
                 : "bg-blue-50 text-blue-700 border-blue-200"

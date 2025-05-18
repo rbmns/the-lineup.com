@@ -2,7 +2,7 @@
 import React from 'react';
 import { X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { CategoryPill } from '@/components/ui/category-pills';
+import { CategoryPill } from '@/components/ui/category-pill';
 import { cn } from '@/lib/utils';
 
 interface EventCategoryPillsProps {
@@ -38,7 +38,7 @@ export const EventCategoryPills: React.FC<EventCategoryPillsProps> = ({
             category={category}
             active={selectedCategories.includes(category)}
             onClick={() => onToggleCategory(category)}
-            showIcon={false}
+            showIcon={true}
           />
         ))}
       </div>
