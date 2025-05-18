@@ -25,6 +25,9 @@ export const useEventRsvpHandler = (eventId: string) => {
       setRsvpLoading(true);
       console.log(`useEventRsvpHandler: RSVP to event ${eventId} with status ${status}`);
       
+      // Show transition indicator
+      document.body.classList.add('rsvp-transition');
+      
       // First check if the user already has an RSVP for this event
       const { data: existingRsvp } = await supabase
         .from('event_rsvps')
@@ -67,7 +70,11 @@ export const useEventRsvpHandler = (eventId: string) => {
       console.error('Error in RSVP process:', err);
       return false;
     } finally {
-      setRsvpLoading(false);
+      // Add a small delay to make transitions smoother
+      setTimeout(() => {
+        setRsvpLoading(false);
+        document.body.classList.remove('rsvp-transition');
+      }, 300);
     }
   };
 

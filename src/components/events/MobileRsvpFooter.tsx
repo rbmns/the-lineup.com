@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Share2, Check, Star, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -20,9 +20,10 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
   const isInterested = currentStatus === 'Interested';
   const [loadingStatus, setLoadingStatus] = useState<'Going' | 'Interested' | null>(null);
   const [localStatus, setLocalStatus] = useState<'Going' | 'Interested' | null>(currentStatus || null);
+  const [animating, setAnimating] = useState(false);
 
   // Update local state when props change
-  React.useEffect(() => {
+  useEffect(() => {
     if (currentStatus !== localStatus) {
       setLocalStatus(currentStatus || null);
     }
@@ -31,6 +32,7 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
   const handleRsvp = async (status: 'Going' | 'Interested') => {
     console.log(`MobileRsvpFooter: Handling RSVP for event ${eventId}, status ${status}, currentStatus: ${currentStatus}`);
     setLoadingStatus(status);
+    setAnimating(true);
     
     try {
       // Apply optimistic update
@@ -51,22 +53,26 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
       // Revert on error
       setLocalStatus(currentStatus || null);
     } finally {
-      setLoadingStatus(null);
+      // Add a slight delay to make transitions smoother
+      setTimeout(() => {
+        setLoadingStatus(null);
+        setAnimating(false);
+      }, 300);
     }
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+    <div className={`fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 transition-all duration-300 ${animating ? 'mobile-footer-animating' : ''}`}>
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex gap-2 flex-1">
           <Button
             variant={localStatus === 'Going' ? "default" : "outline"}
-            className={`flex-1 gap-2 ${localStatus === 'Going' ? "bg-green-600 hover:bg-green-700" : "border-gray-300"}`}
+            className={`flex-1 gap-2 transition-all duration-300 ${localStatus === 'Going' ? "bg-green-600 hover:bg-green-700" : "border-gray-300"} ${animating ? 'rsvp-button-animating' : ''}`}
             onClick={() => handleRsvp('Going')}
             data-rsvp-button="true"
             data-status="Going"
             data-event-id={eventId}
-            disabled={loadingStatus !== null}
+            disabled={loadingStatus !== null || animating}
           >
             {loadingStatus === 'Going' ? (
               <>
@@ -83,12 +89,12 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
           
           <Button
             variant={localStatus === 'Interested' ? "default" : "outline"}
-            className={`flex-1 gap-2 ${localStatus === 'Interested' ? "bg-blue-600 hover:bg-blue-700" : "border-gray-300"}`}
+            className={`flex-1 gap-2 transition-all duration-300 ${localStatus === 'Interested' ? "bg-blue-600 hover:bg-blue-700" : "border-gray-300"} ${animating ? 'rsvp-button-animating' : ''}`}
             onClick={() => handleRsvp('Interested')}
             data-rsvp-button="true"
             data-status="Interested"
             data-event-id={eventId}
-            disabled={loadingStatus !== null}
+            disabled={loadingStatus !== null || animating}
           >
             {loadingStatus === 'Interested' ? (
               <>
@@ -110,11 +116,12 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
           className="ml-2"
           onClick={onShare}
           data-share-button="true"
-          disabled={loadingStatus !== null}
+          disabled={loadingStatus !== null || animating}
         >
           <Share2 className="h-5 w-5 text-gray-600" />
         </Button>
       </div>
+      <div className={`rsvp-transition-indicator ${animating ? 'active' : ''}`}></div>
     </div>
   );
 };

@@ -1,8 +1,9 @@
-
 import { Button } from '@/components/ui/button';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { Share2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { useState } from 'react';
+import '@/styles/rsvp-animations.css';
 
 interface EventRsvpSectionProps {
   isOwner: boolean;
@@ -17,6 +18,8 @@ export const EventRsvpSection = ({
   isRsvpLoading,
   currentStatus
 }: EventRsvpSectionProps) => {
+  const [animating, setAnimating] = useState(false);
+
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
@@ -39,19 +42,42 @@ export const EventRsvpSection = ({
     });
   };
 
+  const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    if (!onRsvp) return false;
+    
+    // Start animation
+    setAnimating(true);
+    
+    try {
+      const success = await onRsvp(status);
+      
+      // Keep animation going briefly to make transition smoother
+      setTimeout(() => {
+        setAnimating(false);
+      }, 300);
+      
+      return success;
+    } catch (error) {
+      setAnimating(false);
+      return false;
+    }
+  };
+
   return (
-    <div className="bg-gray-50 p-6 rounded-lg">
+    <div className={`bg-gray-50 p-6 rounded-lg transition-opacity duration-300 ${animating ? 'rsvp-section-animating' : ''}`}>
       <div className="space-y-4">
         {onRsvp && !isOwner && (
           <>
             <h3 className="font-medium">Are you going?</h3>
-            <EventRsvpButtons 
-              currentStatus={currentStatus}
-              onRsvp={onRsvp}
-              isLoading={isRsvpLoading}
-              size="lg"
-              className="w-full"
-            />
+            <div className={`rsvp-buttons-container ${animating ? 'rsvp-buttons-animating' : ''}`}>
+              <EventRsvpButtons 
+                currentStatus={currentStatus}
+                onRsvp={handleRsvp}
+                isLoading={isRsvpLoading || animating}
+                size="lg"
+                className="w-full"
+              />
+            </div>
           </>
         )}
         
