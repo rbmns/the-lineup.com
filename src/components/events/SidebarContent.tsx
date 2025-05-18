@@ -7,6 +7,7 @@ import { EventLocationInfo } from '@/components/events/EventLocationInfo';
 import { EventAttendeesList } from '@/components/events/EventAttendeesList';
 import { MapPin, Ticket, Globe, CalendarClock } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import TeaseLoginSignup from './detail-sections/TeaseLoginSignup';
 
 interface SidebarContentProps {
   event: Event;
@@ -102,8 +103,8 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({
         </Card>
       )}
 
-      {/* Friends Attending Section */}
-      {isAuthenticated && (
+      {/* For authenticated users: Friends Attending Section */}
+      {isAuthenticated ? (
         <Card className="shadow-md border border-gray-200 animate-fade-in" style={{ animationDelay: '300ms' }}>
           <CardContent className="p-5">
             <h3 className="text-lg font-semibold mb-3">Friends Attending</h3>
@@ -117,6 +118,9 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({
             />
           </CardContent>
         </Card>
+      ) : (
+        /* For non-authenticated users: Login/Signup teaser */
+        <TeaseLoginSignup />
       )}
     </div>
   );
