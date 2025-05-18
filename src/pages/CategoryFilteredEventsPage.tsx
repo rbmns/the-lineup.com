@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCategoryFilteredEvents } from '@/hooks/events/useCategoryFilteredEvents';
 import { useCategoryPageSeo } from '@/hooks/events/useCategoryPageSeo';
@@ -7,7 +7,6 @@ import { useScrollPositionManager } from '@/hooks/events/useScrollPositionManage
 import { EventsPageHeader } from '@/components/events/EventsPageHeader';
 import { CategoryFilteredEventsContent } from '@/components/events/category-filters/CategoryFilteredEventsContent';
 import { NewFilterSection } from '@/components/events/NewFilterSection';
-import { useCategoryFilterSelection } from '@/hooks/events/useCategoryFilterSelection';
 
 const CategoryFilteredEventsPage = () => {
   // Apply SEO settings
@@ -21,12 +20,10 @@ const CategoryFilteredEventsPage = () => {
     showDateFilter, setShowDateFilter
   } = useScrollPositionManager();
   
-  // Event filtering and state
+  // Get all the event filtering logic from our hook
   const {
-    // Available data and loading state
-    isLoading,
-    // Filter options
-    availableEventTypes: allEventTypes,
+    // Available data and filter options
+    availableEventTypes,
     availableVenues,
     // Filter state
     selectedEventTypes,
@@ -51,13 +48,14 @@ const CategoryFilteredEventsPage = () => {
     // RSVP handling
     loadingEventId,
     handleEventRsvp,
+    isLoading,
     // Filter management
     selectAllEventTypes,
     deselectAllEventTypes,
   } = useCategoryFilteredEvents(user?.id);
   
   // Enhanced category filtering
-  const eventTypeStrings = allEventTypes.map(item => item.value);
+  const eventTypeStrings = availableEventTypes.map(item => item.value);
   
   const hasAdvancedFilters = hasActiveFilters || 
     selectedVenues.length > 0 || 
@@ -100,11 +98,11 @@ const CategoryFilteredEventsPage = () => {
             resetFilters={resetFilters}
             exactMatches={exactMatches}
             similarEvents={similarEvents}
-            isLoading={isLoading} // For skeleton loading of the list
-            isFilterLoading={isFilterLoading} // Also contributes to list loading state
+            isLoading={isLoading} 
+            isFilterLoading={isFilterLoading}
             hasActiveFilters={hasActiveFilters}
             onRsvp={user ? handleEventRsvp : undefined}
-            loadingEventId={loadingEventId} // Pass loadingEventId down
+            loadingEventId={loadingEventId}
           />
         </div>
       </div>
