@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { EventRsvpButtons } from './EventRsvpButtons';
 import { cn } from '@/lib/utils';
@@ -70,7 +69,6 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       // Revert if the operation failed
       if (!success) {
         setLocalRsvpStatus(currentRsvpStatus);
-        // Removed toast
       }
       
       return success;

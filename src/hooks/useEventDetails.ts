@@ -170,11 +170,7 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
   // Handle RSVP for a specific event - FIXED: Modified to return boolean
   const rsvpToEvent = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please log in to RSVP to events",
-        variant: "destructive",
-      });
+      // Redirect to login without toast message
       navigate('/login');
       return false;
     }
@@ -202,21 +198,11 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
         
         // Refresh attendees data
         fetchAttendees(eventId);
-        
-        toast({
-          title: "RSVP Updated",
-          description: `You're now ${status.toLowerCase()} to this event.`
-        });
       }
       
       return result;
     } catch (err) {
       console.error('Error during RSVP:', err);
-      toast({
-        title: "RSVP Failed",
-        description: "We couldn't update your RSVP. Please try again.",
-        variant: "destructive"
-      });
       return false;
     }
   };
