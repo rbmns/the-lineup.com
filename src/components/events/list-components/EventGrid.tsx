@@ -3,6 +3,7 @@ import React, { useRef, useEffect } from 'react';
 import { Event } from '@/types';
 import EventCard from '@/components/EventCard';
 import { Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface EventGridProps {
   events: Event[];
@@ -12,6 +13,9 @@ interface EventGridProps {
   onLoadMore: () => void;
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   showRsvpButtons?: boolean;
+  className?: string;
+  style?: React.CSSProperties;
+  loadingEventId?: string | null;
 }
 
 export const EventGrid: React.FC<EventGridProps> = ({
@@ -22,6 +26,9 @@ export const EventGrid: React.FC<EventGridProps> = ({
   onLoadMore,
   onRsvp,
   showRsvpButtons = true,
+  className,
+  style,
+  loadingEventId
 }) => {
   const observerTarget = useRef<HTMLDivElement>(null);
   const visibleEvents = events.slice(0, visibleCount);
@@ -70,20 +77,19 @@ export const EventGrid: React.FC<EventGridProps> = ({
   };
 
   return (
-    <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {visibleEvents.map((event) => (
-          <div key={event.id} className="h-full">
-            <EventCard 
-              key={event.id} 
-              event={event}
-              onRsvp={handleRsvp}
-              showRsvpButtons={showRsvpButtons}
-              className="h-full"
-            />
-          </div>
-        ))}
-      </div>
+    <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8", className)} style={style}>
+      {visibleEvents.map((event) => (
+        <div key={event.id} className="h-full">
+          <EventCard 
+            key={event.id} 
+            event={event}
+            onRsvp={handleRsvp}
+            showRsvpButtons={showRsvpButtons}
+            className="h-full"
+            loadingEventId={loadingEventId}
+          />
+        </div>
+      ))}
       
       {/* Loading indicator */}
       {hasMore && visibleEvents.length < events.length && (
@@ -94,6 +100,6 @@ export const EventGrid: React.FC<EventGridProps> = ({
           <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
         </div>
       )}
-    </>
+    </div>
   );
 };
