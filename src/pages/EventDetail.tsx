@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEventDetailParams } from '@/hooks/useEventDetailParams';
@@ -19,6 +18,7 @@ import { SidebarContent } from '@/components/events/SidebarContent';
 import { MobileRsvpFooter } from '@/components/events/MobileRsvpFooter';
 import { RelatedEvents } from '@/components/events/related-events/RelatedEvents';
 import { useQueryClient } from '@tanstack/react-query';
+import '@/styles/rsvp-animations.css';
 
 const EventDetail = () => {
   // Use our comprehensive params hook to get all URL parameters
@@ -27,6 +27,7 @@ const EventDetail = () => {
   const { isAuthenticated, user } = useAuth();
   const { isMobile } = useDeviceDetection();
   const queryClient = useQueryClient();
+  const [isRsvpTransitioning, setIsRsvpTransitioning] = useState(false);
   
   // Use proper ID for data fetching, prefer explicit ID over slug
   const effectiveId = id || eventId || '';
@@ -61,6 +62,31 @@ const EventDetail = () => {
     wrapRsvpWithScrollPreservation
   } = useEventDetailHandlers();
   
+  // Set up RSVP transition states
+  useEffect(() => {
+    // Watch for changes in rsvpLoading to manage transition state
+    if (rsvpLoading) {
+      setIsRsvpTransitioning(true);
+      // Add transition class to body
+      document.body.classList.add('rsvp-transition');
+    } else {
+      // Delay removing transition state for smoother visuals
+      setTimeout(() => {
+        setIsRsvpTransitioning(false);
+        document.body.classList.remove('rsvp-transition');
+      }, 600);
+    }
+  }, [rsvpLoading]);
+
+  // Cleanup transitions when unmounting
+  useEffect(() => {
+    return () => {
+      document.body.classList.remove('rsvp-transition');
+      document.body.classList.remove('rsvp-transition-active');
+      document.querySelector('.rsvp-transition-indicator')?.classList.remove('active');
+    };
+  }, []);
+  
   // When navigating away, make sure to invalidate events to ensure fresh data
   useEffect(() => {
     return () => {
@@ -81,6 +107,14 @@ const EventDetail = () => {
         return false;
       }
       
+      setIsRsvpTransitioning(true);
+      
+      // Apply transition indicator
+      const transitionIndicator = document.querySelector('.rsvp-transition-indicator');
+      if (transitionIndicator) {
+        transitionIndicator.classList.add('active');
+      }
+      
       // Always pass the event ID when handling RSVPs
       // Make sure to await and return the boolean result
       const success = await handleRsvp(status);
@@ -88,10 +122,22 @@ const EventDetail = () => {
       // Force invalidate all events queries to ensure consistency
       queryClient.invalidateQueries({ queryKey: ['events'] });
       
+      // Keep the transition state active briefly for visual polish
+      setTimeout(() => {
+        if (transitionIndicator) {
+          transitionIndicator.classList.remove('active');
+        }
+      }, 600);
+      
       return success || false; // Ensure we always return a boolean
     } catch (error) {
       console.error('Error handling RSVP:', error);
       return false;
+    } finally {
+      // Add delay for smoother transition out
+      setTimeout(() => {
+        setIsRsvpTransitioning(false);
+      }, 800);
     }
   };
   
@@ -132,91 +178,97 @@ const EventDetail = () => {
   console.log("EventDetail: Rendering with event RSVP status:", event.rsvp_status);
 
   return (
-    <div className="container mx-auto px-4 pt-6 pb-24">
-      {/* Back button for all screen sizes - Improved styling */}
-      <div className="mb-4">
-        <Button 
-          variant="outline" 
-          onClick={handleBackToEvents}
-          size={isMobile ? "default" : "lg"}
-          className="flex items-center gap-1.5 text-gray-700 border-gray-300 shadow-sm hover:bg-gray-50"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Back to Events
-        </Button>
-      </div>
+    <>
+      <div className={`container mx-auto px-4 pt-6 pb-24 transition-opacity duration-300 ${isRsvpTransitioning ? 'opacity-95' : 'opacity-100'}`}>
+        {/* Back button for all screen sizes - Improved styling */}
+        <div className="mb-4">
+          <Button 
+            variant="outline" 
+            onClick={handleBackToEvents}
+            size={isMobile ? "default" : "lg"}
+            className="flex items-center gap-1.5 text-gray-700 border-gray-300 shadow-sm hover:bg-gray-50"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back to Events
+          </Button>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Main event content - takes up 8/12 of the screen on desktop */}
-        <div className="lg:col-span-8 order-first">
-          <MainEventContent 
-            event={event}
-            attendees={attendees}
-            isAuthenticated={isAuthenticated}
-            rsvpLoading={rsvpLoading}
-            handleRsvp={handleRsvpEvent}
-            isMobile={isMobile}
-            imageUrl={coverImage}
-            formattedDate={formattedDate}
-            shareUrl={shareUrl}
-            handleEventTypeClick={handleEventTypeClick}
-            handleBackToEvents={handleBackToEvents}
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Main event content - takes up 8/12 of the screen on desktop */}
+          <div className="lg:col-span-8 order-first">
+            <MainEventContent 
+              event={event}
+              attendees={attendees}
+              isAuthenticated={isAuthenticated}
+              rsvpLoading={rsvpLoading || isRsvpTransitioning}
+              handleRsvp={handleRsvpEvent}
+              isMobile={isMobile}
+              imageUrl={coverImage}
+              formattedDate={formattedDate}
+              shareUrl={shareUrl}
+              handleEventTypeClick={handleEventTypeClick}
+              handleBackToEvents={handleBackToEvents}
+            />
+          </div>
+          
+          {/* Sidebar content - takes up 4/12 of the screen on desktop */}
+          <div className="lg:col-span-4 order-last">
+            <SidebarContent 
+              event={event}
+              attendees={attendees}
+              isAuthenticated={isAuthenticated}
+            />
+          </div>
         </div>
         
-        {/* Sidebar content - takes up 4/12 of the screen on desktop */}
-        <div className="lg:col-span-4 order-last">
-          <SidebarContent 
-            event={event}
-            attendees={attendees}
-            isAuthenticated={isAuthenticated}
+        {/* Related Events Section - properly implemented */}
+        <div className="mt-12">
+          <RelatedEvents 
+            eventId={event.id} 
+            eventType={event.event_type || ''}
+            startDate={event.start_date || ''}
+            tags={event.tags}
+            vibe={event.vibe}
           />
         </div>
-      </div>
-      
-      {/* Related Events Section - properly implemented */}
-      <div className="mt-12">
-        <RelatedEvents 
-          eventId={event.id} 
-          eventType={event.event_type || ''}
-          startDate={event.start_date || ''}
-          tags={event.tags}
-          vibe={event.vibe}
+            
+        {/* Bottom back to events button - desktop and mobile */}
+        <div className="mt-8 mb-4 flex justify-center">
+          <Button 
+            variant="outline" 
+            onClick={handleBackToEvents}
+            className="flex items-center gap-2 shadow-sm hover:shadow-md transition-all"
+            size={isMobile ? "default" : "lg"}
+          >
+            <ChevronLeft className="h-4 w-4" />
+            <span>Back to Events</span>
+          </Button>
+        </div>
+        
+        {/* Mobile RSVP Footer */}
+        {isMobile && isAuthenticated && (
+          <MobileRsvpFooter 
+            eventId={event.id}
+            currentStatus={event.rsvp_status} 
+            onRsvp={handleRsvpEvent}
+            onShare={() => setShareDialogOpen(true)}
+          />
+        )}
+        
+        {/* Share Dialog */}
+        <ShareDialog 
+          title={event.title}
+          description={event.description || ""}
+          eventUrl={shareUrl}
+          open={shareDialogOpen}
+          onOpenChange={setShareDialogOpen}
         />
       </div>
-          
-      {/* Bottom back to events button - desktop and mobile */}
-      <div className="mt-8 mb-4 flex justify-center">
-        <Button 
-          variant="outline" 
-          onClick={handleBackToEvents}
-          className="flex items-center gap-2 shadow-sm hover:shadow-md transition-all"
-          size={isMobile ? "default" : "lg"}
-        >
-          <ChevronLeft className="h-4 w-4" />
-          <span>Back to Events</span>
-        </Button>
-      </div>
       
-      {/* Mobile RSVP Footer */}
-      {isMobile && isAuthenticated && (
-        <MobileRsvpFooter 
-          eventId={event.id}
-          currentStatus={event.rsvp_status} 
-          onRsvp={handleRsvpEvent}
-          onShare={() => setShareDialogOpen(true)}
-        />
-      )}
-      
-      {/* Share Dialog */}
-      <ShareDialog 
-        title={event.title}
-        description={event.description || ""}
-        eventUrl={shareUrl}
-        open={shareDialogOpen}
-        onOpenChange={setShareDialogOpen}
-      />
-    </div>
+      {/* Global transition indicator */}
+      <div className="rsvp-transition-indicator"></div>
+      {isRsvpTransitioning && <div className="rsvp-overlay"></div>}
+    </>
   );
 };
 
