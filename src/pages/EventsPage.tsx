@@ -45,12 +45,10 @@ const EventsPage = () => {
         <EventsPageHeader title="Upcoming Events" />
         
         <div className="space-y-8 mt-8">
-          {/* Events List Section - grid view only now */}
           <LazyEventsList 
             mainEvents={displayEvents}
             relatedEvents={[]}
             isLoading={isLoading}
-            // isRsvpLoading={false} // Removed, loadingEventId is used instead
             onRsvp={user ? handleEventRsvp : undefined}
             showRsvpButtons={!!user}
             hasActiveFilters={false}

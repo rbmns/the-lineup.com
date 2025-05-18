@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { MapPin } from 'lucide-react';
@@ -16,7 +17,7 @@ export interface EventCardProps {
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   className?: string;
   onClick?: (event: Event) => void;
-  loadingEventId?: string | null; // Added to pass down to EventRsvpButtons
+  loadingEventId?: string | null; // Used to track which event is being processed
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -26,7 +27,7 @@ const EventCard: React.FC<EventCardProps> = ({
   onRsvp,
   className,
   onClick,
-  loadingEventId // Added
+  loadingEventId
 }) => {
   const { getEventImageUrl } = useEventImages();
   const { navigateToEvent } = useEventNavigation();
@@ -42,7 +43,7 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
   
-  const getEventTimeDisplay = (currentEvent: Event): string => { // Renamed event to currentEvent to avoid conflict
+  const getEventTimeDisplay = (currentEvent: Event): string => {
     if (!currentEvent.start_time) return '';
     return formatEventTime(currentEvent.start_time, currentEvent.end_time);
   };
@@ -82,7 +83,7 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
 
-  const cardHeightClass = compact ? "max-h-[280px]" : ""; // Ensure this is still relevant or adjust
+  const cardHeightClass = compact ? "max-h-[280px]" : "";
 
   return (
     <div
@@ -145,8 +146,7 @@ const EventCard: React.FC<EventCardProps> = ({
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
               size="sm"
-              // Pass the loading state for *this specific event*
-              isLoading={loadingEventId === event.id} 
+              isLoading={loadingEventId === event.id}
             />
           </div>
         )}

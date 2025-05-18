@@ -1,5 +1,5 @@
 
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import { User } from '@supabase/supabase-js';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -21,17 +21,22 @@ export const useRsvpHandler = (
       return false;
     }
 
-    if (rsvpInProgressRef.current) {
-      console.log('RSVP request in progress, please wait');
+    // Use event ID specific check to prevent cross-event interference
+    const eventRsvpKey = `rsvp-${eventId}`;
+    if ((window as any)[eventRsvpKey]) {
+      console.log(`RSVP request in progress for event: ${eventId}, please wait`);
       return false;
     }
 
     try {
+      // Set event-specific lock
+      (window as any)[eventRsvpKey] = true;
       rsvpInProgressRef.current = true;
+      
       const success = await handleRsvp(eventId, status);
       
       if (success) {
-        // Invalidate all relevant queries to ensure fresh data
+        // Invalidate event-specific queries to ensure fresh data
         queryClient.invalidateQueries({ queryKey: ['events'] });
         queryClient.invalidateQueries({ queryKey: ['event', eventId] });
       }
@@ -43,6 +48,7 @@ export const useRsvpHandler = (
     } finally {
       // Small delay to prevent multiple rapid clicks
       setTimeout(() => {
+        (window as any)[eventRsvpKey] = false;
         rsvpInProgressRef.current = false;
       }, 300);
     }

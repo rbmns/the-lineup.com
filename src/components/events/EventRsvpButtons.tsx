@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,8 +10,7 @@ export type RsvpStatus = 'Going' | 'Interested' | null;
 interface EventRsvpButtonsProps {
   currentStatus?: RsvpStatus | null;
   onRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
-  /** General loading state for the RSVP action (e.g., from a parent hook) */
-  isLoading?: boolean; 
+  isLoading?: boolean;
   disabled?: boolean;
   className?: string;
   size?: 'sm' | 'default' | 'lg' | 'xl';
@@ -21,26 +21,27 @@ interface EventRsvpButtonsProps {
 export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   currentStatus = null,
   onRsvp,
-  isLoading = false, // This prop indicates if the parent considers this event's RSVP action as loading
+  isLoading = false,
   disabled = false,
   className = '',
   size = 'default',
   variant = 'default',
   showStatusOnly = false,
 }) => {
+  // Use controlled component pattern with local state that syncs with props
   const [localStatus, setLocalStatus] = useState<RsvpStatus>(currentStatus);
-  // localLoading is for the button's own optimistic click feedback
-  const [localLoading, setLocalLoading] = useState<'Going' | 'Interested' | null>(null); 
-
+  const [activeButton, setActiveButton] = useState<'Going' | 'Interested' | null>(null);
+  
+  // Sync with parent component's state
   useEffect(() => {
-    // Sync localStatus if currentStatus prop changes from parent (e.g., after successful RSVP)
     setLocalStatus(currentStatus);
   }, [currentStatus]);
   
+  // Compute derived state
   const isGoing = localStatus === 'Going';
   const isInterested = localStatus === 'Interested';
 
-  // Map size to appropriate button sizes
+  // Map size to button classes
   const buttonSizeClasses = {
     sm: 'h-7 text-xs py-1 px-2.5',
     default: 'h-8 text-sm py-1.5 px-3',
@@ -82,75 +83,48 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     return 'bg-gray-100 border-gray-200 hover:bg-gray-200 text-gray-700';
   };
 
-  // Handle RSVP with optimistic UI updates
+  // Handle RSVP click with proper state management
   const handleRsvpClick = async (status: 'Going' | 'Interested') => {
-    // Disable if parent says it's loading, or if local action is in progress, or general disabled
-    if (isLoading || localLoading || disabled) return; 
+    if (isLoading || disabled) return;
     
-    setLocalLoading(status);
-    const prevLocalStatus = localStatus; // Store previous status for potential revert
-    const newOptimisticStatus = localStatus === status ? null : status;
-    setLocalStatus(newOptimisticStatus);
-      
-    // Apply button click feedback animation and immediate color change (already in original code)
-    const button = document.getElementById(`rsvp-${status.toLowerCase()}`);
-    if (button) {
-      button.classList.add('button-click-animation');
-      if (newOptimisticStatus) {
-        button.classList.add(status === 'Going' ? 'bg-green-500' : 'bg-blue-500', 'text-white');
-        button.classList.remove('bg-gray-100', 'text-gray-700');
-      } else {
-        button.classList.remove('bg-green-500', 'bg-blue-500', 'text-white');
-        button.classList.add('bg-gray-100', 'text-gray-700');
-      }
-      setTimeout(() => button.classList.remove('button-click-animation'), 200);
-    }
-      
-    // Visual feedback on event card (already in original code)
-    const eventCard = button?.closest('[data-event-id]');
-    if (eventCard) {
-      const animationClass = status === 'Going' ? 'rsvp-going-animation' : 'rsvp-interested-animation';
-      eventCard.classList.add(animationClass);
-      setTimeout(() => eventCard.classList.remove(animationClass), 800);
-    }
-      
     try {
+      // Track which button is being clicked for UI feedback
+      setActiveButton(status);
+      
+      // Optimistic update
+      const prevStatus = localStatus;
+      const newStatus = localStatus === status ? null : status;
+      
+      // Update local state immediately for responsive UI
+      setLocalStatus(newStatus);
+      
+      // Call the parent's onRsvp handler
       const success = await onRsvp(status);
+      
       if (!success) {
-        // Revert optimistic update if the actual call failed
-        setLocalStatus(prevLocalStatus); 
-        // Revert button appearance (already in original code, check if still needed or handled by localStatus change)
-        if (button) {
-          if (prevLocalStatus === status) { // If it was active and failed to deactivate
-            button.classList.add(status === 'Going' ? 'bg-green-500' : 'bg-blue-500', 'text-white');
-            button.classList.remove('bg-gray-100', 'text-gray-700');
-          } else { // If it was inactive and failed to activate
-            button.classList.remove('bg-green-500', 'bg-blue-500', 'text-white');
-            button.classList.add('bg-gray-100', 'text-gray-700');
-          }
-        }
+        // Revert if the operation failed
+        setLocalStatus(prevStatus);
       }
-      // If successful, localStatus is already optimistically set. Parent's `currentStatus` prop change will confirm via useEffect.
     } catch (error) {
-      console.error('RSVP error:', error);
-      setLocalStatus(prevLocalStatus); // Revert on exception
-      // Revert button appearance (similar to !success case)
+      console.error('Error in RSVP button handler:', error);
     } finally {
+      // Clear loading state
       setTimeout(() => {
-        setLocalLoading(null);
-      }, 300); // Delay to allow animations/transitions
+        setActiveButton(null);
+      }, 200);
     }
   };
 
-  // isLoading combines parent loading state and local click loading state
-  const combinedIsLoading = (buttonType: 'Going' | 'Interested') => isLoading || localLoading === buttonType;
+  // Determine if this particular button type is loading
+  const isButtonLoading = (buttonType: 'Going' | 'Interested') => {
+    return isLoading && activeButton === buttonType;
+  };
 
-  // Determine what to render inside buttons
+  // Render button content (icon + text)
   const renderButtonContent = (status: 'Going' | 'Interested', isActive: boolean) => {
-    // Use combinedIsLoading to determine if this specific button type should show a loader
-    const isButtonActuallyLoading = combinedIsLoading(status) && (isActive || localLoading === status);
+    const isButtonLoading = activeButton === status && isLoading;
     
-    if (isButtonActuallyLoading) {
+    if (isButtonLoading) {
       return (
         <span className="flex items-center gap-1.5">
           <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -181,21 +155,22 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     return (
       <div className={cn('flex items-center gap-2', className)}>
         <Button
-          id="rsvp-going"
           type="button"
           variant="outline"
           size="icon"
           className={cn(
             'rounded-md w-8 h-8',
             getButtonStyle(isGoing, 'Going'),
-            (disabled || combinedIsLoading('Going')) ? 'opacity-50 cursor-not-allowed' : ''
+            (disabled || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
           )}
-          disabled={disabled || combinedIsLoading('Going')}
+          disabled={disabled || isLoading}
           onClick={() => handleRsvpClick('Going')}
           title="Going"
           data-rsvp-button="true"
+          data-status="Going"
+          data-event-button="true"
         >
-          {combinedIsLoading('Going') && localLoading === 'Going' ? (
+          {isButtonLoading('Going') ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             <Check className="h-4 w-4" />
@@ -203,21 +178,22 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         </Button>
         
         <Button
-          id="rsvp-interested"
           type="button"
           variant="outline"
           size="icon"
           className={cn(
             'rounded-md w-8 h-8',
             getButtonStyle(isInterested, 'Interested'),
-            (disabled || combinedIsLoading('Interested')) ? 'opacity-50 cursor-not-allowed' : ''
+            (disabled || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
           )}
-          disabled={disabled || combinedIsLoading('Interested')}
+          disabled={disabled || isLoading}
           onClick={() => handleRsvpClick('Interested')}
           title="Interested"
           data-rsvp-button="true"
+          data-status="Interested"
+          data-event-button="true"
         >
-          {combinedIsLoading('Interested') && localLoading === 'Interested' ? (
+          {isButtonLoading('Interested') ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
             <Star className="h-4 w-4" />
@@ -232,35 +208,37 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     return (
       <div className={cn('flex items-center gap-2', className)}>
         <Button
-          id="rsvp-going"
           type="button"
           variant="outline"
           size="sm"
           className={cn(
             'rounded-md text-sm py-1 px-3',
             getButtonStyle(isGoing, 'Going'),
-            (disabled || combinedIsLoading('Going')) ? 'opacity-50 cursor-not-allowed' : ''
+            (disabled || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
           )}
-          disabled={disabled || combinedIsLoading('Going')}
+          disabled={disabled || isLoading}
           onClick={() => handleRsvpClick('Going')}
           data-rsvp-button="true"
+          data-status="Going"
+          data-event-button="true"
         >
           {renderButtonContent('Going', isGoing)}
         </Button>
         
         <Button
-          id="rsvp-interested"
           type="button"
           variant="outline"
           size="sm"
           className={cn(
             'rounded-md text-sm py-1 px-3',
             getButtonStyle(isInterested, 'Interested'),
-            (disabled || combinedIsLoading('Interested')) ? 'opacity-50 cursor-not-allowed' : ''
+            (disabled || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
           )}
-          disabled={disabled || combinedIsLoading('Interested')}
+          disabled={disabled || isLoading}
           onClick={() => handleRsvpClick('Interested')}
           data-rsvp-button="true"
+          data-status="Interested"
+          data-event-button="true"
         >
           {renderButtonContent('Interested', isInterested)}
         </Button>
@@ -272,35 +250,37 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   return (
     <div className={cn('flex items-center gap-2', className)}>
       <Button
-        id="rsvp-going"
         type="button"
         variant="outline"
         className={cn(
           buttonSizeClasses[size],
-          'font-medium rounded-md transition-all',
+          'font-medium rounded-md transition-all duration-200',
           getButtonStyle(isGoing, 'Going'),
-          (disabled || combinedIsLoading('Going')) ? 'opacity-50 cursor-not-allowed' : ''
+          (disabled || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
         )}
-        disabled={disabled || combinedIsLoading('Going')}
+        disabled={disabled || isLoading}
         onClick={() => handleRsvpClick('Going')}
         data-rsvp-button="true"
+        data-status="Going"
+        data-event-button="true"
       >
         {renderButtonContent('Going', isGoing)}
       </Button>
       
       <Button
-        id="rsvp-interested"
         type="button"
         variant="outline"
         className={cn(
           buttonSizeClasses[size],
-          'font-medium rounded-md transition-all',
+          'font-medium rounded-md transition-all duration-200',
           getButtonStyle(isInterested, 'Interested'),
-          (disabled || combinedIsLoading('Interested')) ? 'opacity-50 cursor-not-allowed' : ''
+          (disabled || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
         )}
-        disabled={disabled || combinedIsLoading('Interested')}
+        disabled={disabled || isLoading}
         onClick={() => handleRsvpClick('Interested')}
         data-rsvp-button="true"
+        data-status="Interested"
+        data-event-button="true"
       >
         {renderButtonContent('Interested', isInterested)}
       </Button>

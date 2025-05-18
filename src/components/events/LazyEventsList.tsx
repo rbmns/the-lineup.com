@@ -1,35 +1,32 @@
 
 import React from 'react';
 import { Event } from '@/types';
-// import { EventsList } from '@/components/events/EventsList'; // This was for the old list view, EventGrid is used
-import { EventGrid } from '@/components/events/EventGrid'; // Ensure this is the correct EventGrid path
+import { EventGrid } from '@/components/events/list-components/EventGrid';
 import { RelatedEventsSection } from '@/components/events/RelatedEventsSection';
 import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
 import { SkeletonEventCard } from '@/components/events/SkeletonEventCard';
 import { cn } from '@/lib/utils';
+import { EventsLoadingState } from '@/components/events/list-components/EventsLoadingState';
 
 interface LazyEventsListProps {
   mainEvents: Event[];
   relatedEvents?: Event[];
   isLoading: boolean;
-  // isRsvpLoading?: boolean; // Replaced by loadingEventId
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   showRsvpButtons?: boolean;
   hasActiveFilters?: boolean;
   compact?: boolean;
-  // defaultView?: 'list' | 'grid'; // Not currently used, EventGrid is hardcoded
-  loadingEventId?: string | null; // Added
+  loadingEventId?: string | null;
 }
 
 export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   mainEvents,
   relatedEvents = [],
   isLoading,
-  // isRsvpLoading = false, // Removed
   onRsvp,
   showRsvpButtons = true,
   hasActiveFilters = false,
-  compact = false, // This prop seems to not be used by EventGrid directly, but kept for consistency
+  compact = false,
   loadingEventId = null
 }) => {
   const skeletonCards = Array.from({ length: 6 }, (_, i) => <SkeletonEventCard key={`skeleton-${i}`} />);
@@ -41,11 +38,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
 
   return (
     <div className={cn('space-y-6', compact ? 'compact-view' : '')}>
-      {isLoading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {skeletonCards}
-        </div>
-      )}
+      {isLoading && <EventsLoadingState />}
 
       {showNoResults && (
         <NoResultsFound resetFilters={resetFilters} />
@@ -63,11 +56,10 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
         <EventGrid
           events={mainEvents}
           onRsvp={onRsvp}
-          // isRsvpLoading={isRsvpLoading} // Removed, use loadingEventId
           showRsvpButtons={showRsvpButtons}
-          className="animate-fade-in" // Keep UI nice-to-haves
-          style={{ animationDuration: '100ms' }} // Keep UI nice-to-haves
-          loadingEventId={loadingEventId} // Pass down
+          className="animate-fade-in"
+          style={{ animationDuration: '150ms' }}
+          loadingEventId={loadingEventId}
         />
       )}
 

@@ -1,4 +1,3 @@
-
 import { Event } from '@/types';
 import { compareAsc } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
@@ -118,3 +117,55 @@ export const sortEventsByTagMatch = (events: Event[], tags: string[]): Event[] =
     return bMatchCount - aMatchCount;
   });
 };
+
+/**
+ * Update local state of a specific event with fresh RSVP status
+ */
+export function updateEventRsvpStatus(
+  events: Event[],
+  eventId: string,
+  newStatus: 'Going' | 'Interested' | null
+): Event[] {
+  return events.map(event => {
+    if (event.id === eventId) {
+      return {
+        ...event,
+        rsvp_status: newStatus as any // Update the specific event's RSVP status
+      };
+    }
+    return event;
+  });
+}
+
+/**
+ * Helper to ensure only one status can be active at a time
+ */
+export function ensureSingleActiveStatus(
+  events: Event[],
+  eventId: string,
+  newStatus: 'Going' | 'Interested' | null
+): Event[] {
+  // First pass: update the target event
+  const updatedEvents = updateEventRsvpStatus(events, eventId, newStatus);
+  
+  // Sanity check to prevent multiple statuses
+  return updatedEvents.map(event => {
+    // Skip further processing for non-target events
+    if (event.id !== eventId) {
+      return event;
+    }
+    
+    // For the target event, ensure only one status is active
+    if (
+      (newStatus === 'Going' && event.rsvp_status === 'Interested') ||
+      (newStatus === 'Interested' && event.rsvp_status === 'Going')
+    ) {
+      return {
+        ...event,
+        rsvp_status: newStatus as any // Ensure only the new status is active
+      };
+    }
+    
+    return event;
+  });
+}
