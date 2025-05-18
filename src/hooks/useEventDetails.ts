@@ -202,21 +202,11 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
         
         // Refresh attendees data
         fetchAttendees(eventId);
-        
-        toast({
-          title: "RSVP Updated",
-          description: `You're now ${status.toLowerCase()} to this event.`
-        });
       }
       
       return result;
     } catch (err) {
       console.error('Error during RSVP:', err);
-      toast({
-        title: "RSVP Failed",
-        description: "We couldn't update your RSVP. Please try again.",
-        variant: "destructive"
-      });
       return false;
     }
   };

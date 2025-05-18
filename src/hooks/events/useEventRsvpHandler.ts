@@ -12,8 +12,7 @@ export const useEventRsvpHandler = ({ userId, refetchEvents }: UseEventRsvpHandl
 
   const handleEventRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!userId) {
-      // Consider a toast for "Please log in to RSVP"
-      // toast({ title: "Please log in to RSVP", variant: "destructive" });
+      // Removed toast notification
       return false;
     }
 
@@ -22,12 +21,12 @@ export const useEventRsvpHandler = ({ userId, refetchEvents }: UseEventRsvpHandl
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 700));
 
-      toast({ title: `RSVP updated to ${status}` });
+      // Removed toast notification
       await refetchEvents();
       return true;
     } catch (error) {
       console.error("Error in RSVP handler:", error);
-      toast({ title: "Failed to update RSVP status", variant: "destructive" });
+      // Removed toast notification
       return false;
     } finally {
       setLoadingEventId(null);
