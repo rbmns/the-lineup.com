@@ -1,41 +1,78 @@
 
 import { useState } from 'react';
-import { toast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 
-interface UseEventRsvpHandlerProps {
-  userId: string | undefined;
-  refetchEvents: () => Promise<any>;
-}
+export const useEventRsvpHandler = (eventId: string) => {
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
+  const [rsvpLoading, setRsvpLoading] = useState<boolean>(false);
 
-export const useEventRsvpHandler = ({ userId, refetchEvents }: UseEventRsvpHandlerProps) => {
-  const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
-
-  const handleEventRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
-    if (!userId) {
-      // Consider a toast for "Please log in to RSVP"
-      // toast({ title: "Please log in to RSVP", variant: "destructive" });
+  const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    if (!user || !isAuthenticated) {
+      // Redirect to login without toast message
+      navigate('/login');
       return false;
     }
 
-    setLoadingEventId(eventId);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 700));
+      if (!eventId) {
+        console.error("Error: Event ID is missing.");
+        return false;
+      }
 
-      toast({ title: `RSVP updated to ${status}` });
-      await refetchEvents();
-      return true;
-    } catch (error) {
-      console.error("Error in RSVP handler:", error);
-      toast({ title: "Failed to update RSVP status", variant: "destructive" });
+      setRsvpLoading(true);
+      console.log(`useEventRsvpHandler: RSVP to event ${eventId} with status ${status}`);
+      
+      // First check if the user already has an RSVP for this event
+      const { data: existingRsvp } = await supabase
+        .from('event_rsvps')
+        .select('*')
+        .eq('event_id', eventId)
+        .eq('user_id', user.id)
+        .single();
+
+      let result = false;
+
+      if (existingRsvp) {
+        // Update the existing RSVP if the status is different
+        if (existingRsvp.status !== status) {
+          const { error } = await supabase
+            .from('event_rsvps')
+            .update({ status })
+            .eq('id', existingRsvp.id);
+
+          result = !error;
+        } else {
+          // If clicking the same status, remove the RSVP
+          const { error } = await supabase
+            .from('event_rsvps')
+            .delete()
+            .eq('id', existingRsvp.id);
+
+          result = !error;
+        }
+      } else {
+        // Create a new RSVP
+        const { error } = await supabase
+          .from('event_rsvps')
+          .insert([{ event_id: eventId, user_id: user.id, status }]);
+
+        result = !error;
+      }
+      
+      return result;
+    } catch (err) {
+      console.error('Error in RSVP process:', err);
       return false;
     } finally {
-      setLoadingEventId(null);
+      setRsvpLoading(false);
     }
   };
 
   return {
-    loadingEventId,
-    handleEventRsvp,
+    handleRsvp,
+    rsvpLoading
   };
 };
