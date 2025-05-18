@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Calendar, Music, Globe, Users, Film, Book, Dumbbell, Utensils, Tag, Waves, Tent, Leaf, Sun, Sailboat, PartyPopper, BadgeCheck, Gamepad } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -51,92 +50,91 @@ const getCategoryIcon = (category: string): React.ElementType => {
   return Tag;
 };
 
-// Enhanced color mapping based on the design system color palette
-// Removed all opacity/transparency from colors
+// Updated color mapping based on the brand style guide nature palette
 const getCategoryColor = (category: string): string => {
   const lowerCategory = category.toLowerCase();
   
-  // Festival - Amber/Orange
+  // Festival - Amber tone
   if (lowerCategory.includes('festival')) {
-    return 'bg-amber-500 text-white';
+    return 'bg-amber text-white';
   }
   
-  // Wellness - Lime Green
+  // Wellness - Leaf green
   if (lowerCategory.includes('wellness')) {
-    return 'bg-lime-500 text-white';
+    return 'bg-leaf text-white';
   }
   
-  // Kite - Deep Teal
+  // Kite - Ocean Deep
   if (lowerCategory.includes('kite')) {
-    return 'bg-[#005F73] text-white';
+    return 'bg-ocean-deep text-white';
   }
   
-  // Beach - Soft Orange
+  // Beach - Sand
   if (lowerCategory.includes('beach')) {
-    return 'bg-[#FFCC99] text-[#CA6702]';
+    return 'bg-sand text-sandstone';
   }
   
-  // Game - Purple
+  // Game - Dusk (purple)
   if (lowerCategory.includes('game')) {
-    return 'bg-purple-600 text-white';
+    return 'bg-dusk text-white';
   }
   
-  // Sports
+  // Sports - Leaf
   if (lowerCategory.includes('sports') || lowerCategory.includes('fitness')) {
-    return 'bg-[#66CC66] text-white';
+    return 'bg-leaf text-white';
   }
   
-  // Surf
+  // Surf - Ocean Medium
   if (lowerCategory.includes('surf')) {
-    return 'bg-[#0099CC] text-white';
+    return 'bg-ocean-medium text-white';
   }
   
   // Party - Coral
   if (lowerCategory.includes('party')) {
-    return 'bg-[#FF6666] text-white';
+    return 'bg-coral text-white';
   }
   
-  // Yoga - Bright Green
+  // Yoga - Lime
   if (lowerCategory.includes('yoga')) {
-    return 'bg-[#99CC33] text-white';
+    return 'bg-lime text-white';
   }
   
-  // Community - Purple
+  // Community - Dusk (purple)
   if (lowerCategory.includes('community') || 
       lowerCategory.includes('networking') ||
       lowerCategory.includes('meetup')) {
-    return 'bg-[#9966FF] text-white';
+    return 'bg-dusk text-white';
   }
   
   // Water - Teal
   if (lowerCategory.includes('water')) {
-    return 'bg-[#00CCCC] text-white';
+    return 'bg-teal text-white';
   }
   
-  // Music - Purple/Blue
+  // Music - Twilight
   if (lowerCategory.includes('music') || 
       lowerCategory.includes('concert')) {
-    return 'bg-[#5E60CE] text-white';
+    return 'bg-twilight text-white';
   }
   
-  // Food - Coral Red
+  // Food - Coral
   if (lowerCategory.includes('food') || 
       lowerCategory.includes('dining')) {
-    return 'bg-[#FF6666] text-white';
+    return 'bg-coral text-white';
   }
   
-  // Market - Orange
+  // Market - Sunset
   if (lowerCategory.includes('market')) {
-    return 'bg-[#FF9933] text-white';
+    return 'bg-sunset text-white';
   }
   
-  // Other - Gray (default)
+  // Other - Night (dark purple)
   if (lowerCategory.includes('other')) {
-    return 'bg-gray-600 text-white';
+    return 'bg-night text-white';
   }
   
   // Default - if no match is found
-  return 'bg-gray-600 text-white';
+  return 'bg-ocean-light text-jungle';
 };
 
 interface CategoryPillProps {
@@ -225,7 +223,7 @@ export const AllCategoryPill: React.FC<Omit<CategoryPillProps, 'category'>> = ({
   
   // Use different styling for the "All" pill
   const allPillClasses = active
-    ? 'bg-black text-white border-2 border-black shadow-sm'
+    ? 'bg-night text-white border-2 border-black shadow-sm'
     : 'bg-white text-black border border-gray-300 hover:bg-gray-50';
   
   return (
