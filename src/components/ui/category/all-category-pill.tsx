@@ -1,14 +1,28 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { CategoryPillProps } from './category-pill-types';
 
-export const AllCategoryPill: React.FC<Omit<CategoryPillProps, 'category'>> = ({
-  onClick,
+interface AllCategoryPillProps {
+  active?: boolean;
+  onClick: () => void;
+  size?: 'xs' | 'sm' | 'default' | 'lg';
+  className?: string;
+}
+
+export const AllCategoryPill: React.FC<AllCategoryPillProps> = ({
   active = false,
-  className,
-  size = 'default'
+  onClick,
+  size = 'default',
+  className
 }) => {
+  // Base styles
+  const baseClasses = 'rounded-full font-medium transition-colors flex items-center cursor-pointer';
+  
+  // Active/inactive state colors
+  const stateClasses = active 
+    ? 'bg-slate-800 text-white hover:bg-slate-900'
+    : 'bg-slate-100 text-slate-700 hover:bg-slate-200';
+  
   // Size classes
   const sizeClasses = {
     'xs': 'text-xs py-0.5 px-1.5',
@@ -17,20 +31,13 @@ export const AllCategoryPill: React.FC<Omit<CategoryPillProps, 'category'>> = ({
     'lg': 'text-sm py-2 px-4 font-medium'
   };
   
-  const baseClasses = 'rounded-full font-medium transition-colors flex items-center';
-  
-  // Use different styling for the "All" pill
-  const allPillClasses = active
-    ? 'bg-black text-white shadow-sm'
-    : 'bg-gray-100 text-black hover:bg-gray-200';
-  
   return (
     <div
       className={cn(
         baseClasses,
-        allPillClasses,
+        stateClasses,
         sizeClasses[size],
-        'cursor-pointer hover:shadow-sm',
+        'hover:shadow-sm',
         className
       )}
       onClick={onClick}

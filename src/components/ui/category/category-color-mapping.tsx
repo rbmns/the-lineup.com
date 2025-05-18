@@ -10,6 +10,7 @@ export const getCategoryColorState = (category: string): CategoryColorState => {
   const lowerCategory = category.toLowerCase();
   
   // Color mapping based on category with both active and inactive states
+  // Making active states darker versions of inactive states
   const categoryColors: Record<string, CategoryColorState> = {
     'festival': {
       active: 'bg-orange-600 text-white hover:bg-orange-700',
@@ -24,12 +25,12 @@ export const getCategoryColorState = (category: string): CategoryColorState => {
       inactive: 'bg-teal-100 text-teal-700 hover:bg-teal-200'
     },
     'beach': {
-      active: 'bg-yellow-500 text-white hover:bg-yellow-600',
-      inactive: 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100'
+      active: 'bg-yellow-600 text-white hover:bg-yellow-700',
+      inactive: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
     },
     'game': {
-      active: 'bg-indigo-600 text-white hover:bg-indigo-700',
-      inactive: 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200'
+      active: 'bg-purple-700 text-white hover:bg-purple-800',
+      inactive: 'bg-purple-100 text-purple-700 hover:bg-purple-200'
     },
     'other': {
       active: 'bg-gray-600 text-white hover:bg-gray-700',

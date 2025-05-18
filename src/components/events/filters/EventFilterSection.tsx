@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Filter, X } from 'lucide-react';
+import { Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -69,6 +69,9 @@ export const EventFilterSection: React.FC<EventFilterSectionProps> = ({
   const safeSelectedEventTypes = Array.isArray(selectedEventTypes) ? selectedEventTypes : [];
   const safeSelectedVenues = Array.isArray(selectedVenues) ? selectedVenues : [];
   
+  // Advanced filters dropdown state
+  const [showAdvancedFilters, setShowAdvancedFilters] = React.useState(false);
+  
   return (
     <div className="flex flex-col space-y-3 mb-6">
       <div className="flex flex-wrap items-center gap-3">
@@ -85,7 +88,7 @@ export const EventFilterSection: React.FC<EventFilterSectionProps> = ({
               />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-[240px] p-3 bg-white" align="start">
+          <DropdownMenuContent className="w-[240px] p-3 bg-white shadow-lg border border-gray-200 rounded-lg" align="start">
             <DropdownMenuLabel>Event Types</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <EventTypesFilter
@@ -105,7 +108,7 @@ export const EventFilterSection: React.FC<EventFilterSectionProps> = ({
               </span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-[240px] p-3 bg-white" align="start">
+          <DropdownMenuContent className="w-[240px] p-3 bg-white shadow-lg border border-gray-200 rounded-lg" align="start">
             <DropdownMenuLabel>Venues</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <VenueFilter
@@ -126,7 +129,7 @@ export const EventFilterSection: React.FC<EventFilterSectionProps> = ({
               </span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className={cn("p-3 bg-white", isMobile ? "w-[280px]" : "w-auto")} align="start">
+          <DropdownMenuContent className={cn("p-3 bg-white shadow-lg border border-gray-200 rounded-lg", isMobile ? "w-[280px]" : "w-auto")} align="start">
             <DropdownMenuLabel>Date Range</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <div className="py-2">
@@ -140,6 +143,55 @@ export const EventFilterSection: React.FC<EventFilterSectionProps> = ({
             </div>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <div className="relative">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+            className="h-9 bg-black text-white hover:bg-gray-800 flex items-center gap-2"
+          >
+            <Filter className="h-4 w-4" />
+            Advanced Filters
+            {showAdvancedFilters ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </Button>
+          
+          {showAdvancedFilters && (
+            <div className="absolute left-0 mt-2 w-[calc(100vw-40px)] max-w-3xl bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-50">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <h3 className="font-medium mb-2">Date Range</h3>
+                  <DateRangeFilter
+                    dateRange={dateRange}
+                    onDateRangeChange={setDateRange}
+                    onReset={() => setDateRange(undefined)}
+                    selectedDateFilter={selectedDateFilter}
+                    onDateFilterChange={setSelectedDateFilter}
+                  />
+                </div>
+                <div>
+                  <h3 className="font-medium mb-2">Venue</h3>
+                  <VenueFilter
+                    venues={safeVenues}
+                    selectedVenues={safeSelectedVenues}
+                    onVenueChange={setSelectedVenues}
+                    onReset={() => setSelectedVenues([])}
+                  />
+                </div>
+                <div>
+                  <h3 className="font-medium mb-2">Location</h3>
+                  <div className="text-sm text-gray-500">
+                    Select a venue to filter by location
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
 
         {hasActiveFilters && (
           <Button 

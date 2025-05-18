@@ -24,10 +24,7 @@ export const useEventTypeFilter = (events: Event[] | undefined = []) => {
       
       // Set all event types as selected by default
       const allEventTypes = eventTypeOptions.map(option => option.value);
-      setSelectedEventTypes(prevSelected => {
-        // Only set all as selected if we don't have any selection yet
-        return prevSelected.length === 0 ? allEventTypes : prevSelected;
-      });
+      setSelectedEventTypes(allEventTypes);
     } else {
       setAvailableEventTypes([]);
     }
