@@ -140,9 +140,20 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
       console.log(`EventDetailContent: Current RSVP status before handling: ${event.rsvp_status}, handling: ${status}`);
       
       const result = await onRsvp(event.id, status);
+      if (result) {
+        toast({
+          title: `You're ${status.toLowerCase()} to this event`,
+          description: `Your RSVP for "${event.title}" has been updated.`
+        });
+      }
       return result;
     } catch (error) {
       console.error('RSVP error:', error);
+      toast({
+        title: "RSVP failed",
+        description: "There was an error updating your RSVP status.",
+        variant: "destructive"
+      });
       return false;
     }
   };
