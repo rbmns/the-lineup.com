@@ -1,5 +1,5 @@
 
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { Event } from '@/types';
 import { Separator } from '@/components/ui/separator';
 import '@/styles/rsvp-animations.css';
@@ -19,20 +19,26 @@ interface EventDetailContentProps {
   isOwner?: boolean;
 }
 
-export const EventDetailContent: React.FC<EventDetailContentProps> = ({
+const EventDetailContent = ({
   event,
   onRsvp,
   isRsvpLoading = false,
   isOwner = false,
-}) => {
-  // Get coordinates in a standardized format
-  const coordinates = useMemo(() => extractEventCoordinates(event.coordinates), [event.coordinates]);
+}: EventDetailContentProps) => {
+  // Get coordinates in a standardized format - memoized
+  const coordinates = useMemo(() => 
+    extractEventCoordinates(event.coordinates), 
+    [event.coordinates]
+  );
   
-  // Check if we have a booking link
-  const bookingLink = event.booking_link || event.organizer_link || null;
+  // Check if we have a booking link - memoized
+  const bookingLink = useMemo(() => 
+    event.booking_link || event.organizer_link || null, 
+    [event.booking_link, event.organizer_link]
+  );
   
-  // Handle RSVP
-  const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+  // Handle RSVP - memoized callback
+  const handleRsvp = useCallback(async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp) return false;
     
     try {
@@ -44,7 +50,7 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
       console.error('RSVP error:', error);
       return false;
     }
-  };
+  }, [onRsvp, event.id, event.rsvp_status]);
   
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-12">
@@ -98,3 +104,9 @@ export const EventDetailContent: React.FC<EventDetailContentProps> = ({
     </div>
   );
 };
+
+// Export memoized component to prevent unnecessary re-renders
+export const MemoizedEventDetailContent = React.memo(EventDetailContent);
+
+// For backward compatibility, export the component as before
+export { MemoizedEventDetailContent as EventDetailContent };
