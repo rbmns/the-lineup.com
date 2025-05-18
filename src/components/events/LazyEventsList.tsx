@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Event } from '@/types';
-import { EventGrid } from '@/components/events/list-components/EventGrid';
+import { EventGrid } from '@/components/events/EventGrid';
 import { RelatedEventsSection } from '@/components/events/RelatedEventsSection';
 import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
 import { SkeletonEventCard } from '@/components/events/SkeletonEventCard';

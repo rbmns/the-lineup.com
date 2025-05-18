@@ -16,6 +16,7 @@ export const useEvents = (userId: string | undefined = undefined): UseEventsResu
     queryKey: ['events', userId],
     queryFn: async () => {
       try {
+        console.log('Fetching events for user:', userId);
         // Get the current date as YYYY-MM-DD for filtering
         const currentDate = new Date().toISOString().split('T')[0];
         
@@ -48,7 +49,7 @@ export const useEvents = (userId: string | undefined = undefined): UseEventsResu
       }
     },
     refetchOnWindowFocus: true,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 30, // Reduced stale time to 30 seconds for more frequent updates
   });
 
   return {

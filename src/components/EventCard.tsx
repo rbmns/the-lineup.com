@@ -32,7 +32,11 @@ const EventCard: React.FC<EventCardProps> = ({
   const { getEventImageUrl } = useEventImages();
   const { navigateToEvent } = useEventNavigation();
   const imageUrl = getEventImageUrl(event);
+  
+  // For debugging
+  console.log(`EventCard rendering for ${event.id} with rsvp_status:`, event.rsvp_status);
 
+  // Format date for display
   const formatDateDisplay = (dateStr: string): string => {
     try {
       const date = new Date(dateStr);
@@ -43,12 +47,14 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
   
+  // Format time using the 24-hour time format
   const getEventTimeDisplay = (currentEvent: Event): string => {
     if (!currentEvent.start_time) return '';
     return formatEventTime(currentEvent.start_time, currentEvent.end_time);
   };
 
   const handleClick = (e: React.MouseEvent) => {
+    // Check if click originated from RSVP buttons
     if ((e.target as HTMLElement).closest('[data-rsvp-container="true"]')) {
       return; 
     }
@@ -71,11 +77,14 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
 
+  // Enhanced RSVP handler that ensures the return value is always a Promise<boolean>
   const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp) return false;
     
     try {
+      console.log(`EventCard: Handling RSVP for event ${event.id}, status: ${status}`);
       const result = await onRsvp(event.id, status);
+      // Convert any result (including void) to a boolean
       return result === undefined ? true : !!result;
     } catch (error) {
       console.error('Error in EventCard RSVP handler:', error);
@@ -83,6 +92,10 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
 
+  // Determine if this specific event is loading
+  const isLoading = loadingEventId === event.id;
+  
+  // Determine card height
   const cardHeightClass = compact ? "max-h-[280px]" : "";
 
   return (
@@ -146,7 +159,7 @@ const EventCard: React.FC<EventCardProps> = ({
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
               size="sm"
-              isLoading={loadingEventId === event.id}
+              isLoading={isLoading}
             />
           </div>
         )}

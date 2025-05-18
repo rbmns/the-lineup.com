@@ -32,9 +32,12 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   const [localStatus, setLocalStatus] = useState<RsvpStatus>(currentStatus);
   const [activeButton, setActiveButton] = useState<'Going' | 'Interested' | null>(null);
   
-  // Sync with parent component's state
+  // Sync with parent component's state whenever it changes
   useEffect(() => {
-    setLocalStatus(currentStatus);
+    if (currentStatus !== localStatus) {
+      console.log('EventRsvpButtons: Syncing status from prop', currentStatus);
+      setLocalStatus(currentStatus);
+    }
   }, [currentStatus]);
   
   // Compute derived state

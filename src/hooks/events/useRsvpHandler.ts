@@ -36,9 +36,13 @@ export const useRsvpHandler = (
       const success = await handleRsvp(eventId, status);
       
       if (success) {
-        // Invalidate event-specific queries to ensure fresh data
+        // Invalidate all event-related queries to ensure fresh data across pages
+        console.log('Invalidating queries after successful RSVP');
         queryClient.invalidateQueries({ queryKey: ['events'] });
         queryClient.invalidateQueries({ queryKey: ['event', eventId] });
+        queryClient.invalidateQueries({ queryKey: ['filtered-events'] });
+        queryClient.invalidateQueries({ queryKey: ['userEvents'] });
+        queryClient.invalidateQueries({ queryKey: ['user-events'] });
       }
       
       return success;
