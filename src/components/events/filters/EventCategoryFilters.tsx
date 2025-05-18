@@ -22,32 +22,13 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
   onReset,
   className
 }) => {
-  const isAllSelected = selectedEventTypes.length === allEventTypes.length || selectedEventTypes.length === 0;
+  const isAllSelected = selectedEventTypes.length === allEventTypes.length;
   
   const handleAllClick = () => {
     if (isAllSelected) {
       onDeselectAll();
     } else {
       onSelectAll();
-    }
-  };
-
-  const handleCategoryClick = (eventType: string) => {
-    // If All is currently selected, then clicking a specific category should deselect all others
-    if (isAllSelected) {
-      // Select only this category
-      const newSelection = [eventType];
-      const selectedTypes = allEventTypes.filter(type => 
-        newSelection.includes(type)
-      );
-      
-      // Update the selected event types with only the clicked category
-      onDeselectAll(); // First clear all
-      // Then manually select just the one that was clicked
-      setTimeout(() => onToggleEventType(eventType), 0);
-    } else {
-      // Normal toggle behavior when not starting from "All" selected
-      onToggleEventType(eventType);
     }
   };
 
@@ -64,7 +45,7 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
           key={eventType}
           category={eventType}
           active={selectedEventTypes.includes(eventType)}
-          onClick={() => handleCategoryClick(eventType)}
+          onClick={() => onToggleEventType(eventType)}
           showIcon={false}
           size="default"
           noBorder={true}
