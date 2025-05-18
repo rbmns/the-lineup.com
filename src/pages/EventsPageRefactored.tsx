@@ -165,11 +165,11 @@ const EventsPageRefactored = () => {
           <Button
             variant="outline"
             onClick={toggleAdvancedFilters}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 text-sm"
             size="sm"
           >
             <Filter className="h-4 w-4" />
-            {showAdvancedFilters ? "Hide Advanced Filters" : "Advanced Filters"}
+            Advanced Filters
             {showAdvancedFilters ? (
               <ChevronUp className="h-4 w-4" />
             ) : (
@@ -178,7 +178,7 @@ const EventsPageRefactored = () => {
           </Button>
         </div>
         
-        {/* Advanced Filters Panel */}
+        {/* Advanced Filters Panel - Matching the exact design */}
         {showAdvancedFilters && (
           <div className="mb-6 border rounded-md p-4 bg-white shadow-sm">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -195,32 +195,22 @@ const EventsPageRefactored = () => {
 
               <div className="space-y-2">
                 <h4 className="font-medium text-sm">Venue</h4>
-                <div className="relative">
-                  <Select 
-                    value={selectedVenues[0] || ""} 
-                    onValueChange={handleVenueSelect}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select venue" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {venues.map((venue) => (
-                        <SelectItem key={venue.value} value={venue.value}>
-                          {venue.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <Select 
+                  value={selectedVenues[0] || ""} 
+                  onValueChange={handleVenueSelect}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select venue" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {venues.map((venue) => (
+                      <SelectItem key={venue.value} value={venue.value}>
+                        {venue.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-            </div>
-
-            <div className="mt-4 space-y-2">
-              <h4 className="font-medium text-sm">Location</h4>
-              <div className="w-full p-2 bg-gray-100 border rounded text-sm">
-                Zandvoort Area
-              </div>
-              <p className="text-xs text-gray-500">Location filtering is currently fixed to Zandvoort Area</p>
             </div>
           </div>
         )}

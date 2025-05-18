@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useEventRsvp } from '../event-rsvp/useEventRsvp'; // Updated import path with correct casing
+import { useEventRsvp } from '../event-rsvp/useEventRsvp';
 
 export const useEnhancedRsvp = (userId: string | undefined) => {
   const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
