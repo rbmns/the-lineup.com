@@ -8,7 +8,7 @@ export const useRsvpActions = (userId: string | undefined) => {
   const { updateAllCaches } = useCacheUpdater();
   const { mutateRsvp } = useRsvpMutation();
 
-  const handleRsvp = async (eventId: string, status: 'Interested' | 'Going') => {
+  const handleRsvp = async (eventId: string, status: 'Interested' | 'Going'): Promise<boolean> => {
     if (!userId) {
       // Don't show toast, just return false
       console.log('User not logged in, cannot RSVP');

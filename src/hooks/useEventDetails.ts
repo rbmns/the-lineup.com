@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
@@ -13,7 +12,7 @@ interface UseEventDetailsResult {
   error: Error | string | null;
   attendees: { going: any[]; interested: any[] };
   rsvpLoading: boolean;
-  handleRsvp: (status: 'Going' | 'Interested') => Promise<void>;
+  handleRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
   handleRsvpAction: (eventId: string, status: 'Going' | 'Interested') => Promise<void>;
   refreshData: () => Promise<void>;
 }
@@ -168,8 +167,8 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
     }
   }, [eventId]);
 
-  // Handle RSVP for a specific event
-  const rsvpToEvent = async (status: 'Going' | 'Interested') => {
+  // Handle RSVP for a specific event - FIXED: Modified to return boolean
+  const rsvpToEvent = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!user) {
       toast({
         title: "Authentication required",
@@ -177,17 +176,18 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
         variant: "destructive",
       });
       navigate('/login');
-      return;
+      return false;
     }
 
     try {
       if (!eventId) {
         console.error("Error: Event ID is missing.");
-        return;
+        return false;
       }
 
       console.log(`useEventDetails: RSVP to event ${eventId} with status ${status}`);
       const result = await hookHandleRsvp(eventId, status);
+      
       if (result) {
         // Optimistically update the event state
         setEvent((prevEvent) => {
@@ -208,6 +208,8 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
           description: `You're now ${status.toLowerCase()} to this event.`
         });
       }
+      
+      return result;
     } catch (err) {
       console.error('Error during RSVP:', err);
       toast({
@@ -215,6 +217,7 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
         description: "We couldn't update your RSVP. Please try again.",
         variant: "destructive"
       });
+      return false;
     }
   };
 

@@ -82,12 +82,13 @@ const EventDetail = () => {
       }
       
       // Always pass the event ID when handling RSVPs
+      // Make sure to await and return the boolean result
       const success = await handleRsvp(status);
       
       // Force invalidate all events queries to ensure consistency
       queryClient.invalidateQueries({ queryKey: ['events'] });
       
-      return success;
+      return success || false; // Ensure we always return a boolean
     } catch (error) {
       console.error('Error handling RSVP:', error);
       return false;
