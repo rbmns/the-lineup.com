@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -37,7 +36,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   // Sync with parent component's state whenever it changes
   useEffect(() => {
     if (currentStatus !== localStatus) {
-      console.log(`EventRsvpButtons (${eventId}): Syncing status from prop`, currentStatus);
+      console.log(`EventRsvpButtons (${eventId}): Syncing status from prop:`, currentStatus);
       setLocalStatus(currentStatus);
     }
   }, [currentStatus, eventId, localStatus]);
@@ -109,6 +108,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       
       if (!success) {
         // Revert if the operation failed
+        console.log(`EventRsvpButtons (${eventId}): RSVP failed, reverting to ${prevStatus}`);
         setLocalStatus(prevStatus);
       }
     } catch (error) {

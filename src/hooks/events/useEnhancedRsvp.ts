@@ -69,20 +69,13 @@ export const useEnhancedRsvp = (userId: string | undefined) => {
       
       // Invalidate all relevant caches to ensure consistency across the app
       if (success) {
-        console.log('RSVP update successful, invalidating queries');
+        console.log(`RSVP update successful for event ${eventId}, invalidating queries`);
         
-        // Perform more aggressive cache invalidation
-        // First invalidate all events-related queries
-        queryClient.invalidateQueries({ queryKey: ['events'] });
-        queryClient.invalidateQueries({ queryKey: ['event', eventId] });
-        queryClient.invalidateQueries({ queryKey: ['filtered-events'] });
-        queryClient.invalidateQueries({ queryKey: ['userEvents'] });
-        queryClient.invalidateQueries({ queryKey: ['user-events'] });
+        // Use a more aggressive invalidation approach to ensure sync
+        // Invalidate all events-related queries including filtered events
+        queryClient.invalidateQueries();
         
-        // Also invalidate the entire user-events-related cache
-        queryClient.invalidateQueries({ queryKey: ['user-events'] });
-        
-        // Also update the cache directly for immediate UI feedback
+        // Direct cache updates for immediate UI feedback
         updateEventsCache(eventId, newStatus, oldStatus);
         updateEventCache(eventId, newStatus, oldStatus);
       }
@@ -92,6 +85,7 @@ export const useEnhancedRsvp = (userId: string | undefined) => {
       console.error('Error in RSVP handler:', error);
       return false;
     } finally {
+      // Add a slight delay before removing the loading state for better UX
       setTimeout(() => {
         setLoadingEventId(null);
       }, 500);
@@ -103,45 +97,53 @@ export const useEnhancedRsvp = (userId: string | undefined) => {
     // Update specific event in event detail cache
     queryClient.setQueryData(['event', eventId], (oldData: any) => {
       if (!oldData) return oldData;
+      console.log(`Directly updating event cache for event ${eventId}, setting status to ${newStatus}`);
       return { ...oldData, rsvp_status: newStatus };
     });
   };
   
   // Helper function to update events list cache
   const updateEventsCache = (eventId: string, newStatus: string | null, oldStatus: string | null) => {
+    console.log(`Directly updating events cache for event ${eventId}, setting status to ${newStatus}`);
+    
     // Update all events caches that might contain this event
     const updateEventInList = (events: any[]) => {
       if (!events || !Array.isArray(events)) return events;
       
       return events.map((event: any) => {
         if (event.id === eventId) {
+          console.log(`Found event ${eventId} in cached list, updating status to ${newStatus}`);
           return { ...event, rsvp_status: newStatus };
         }
         return event;
       });
     };
     
-    // Update events in main events list cache
+    // Update every possible events cache
+    // Main events list
     queryClient.setQueriesData({ queryKey: ['events'] }, (oldData: any) => {
       if (!oldData) return oldData;
       return updateEventInList(oldData);
     });
     
-    // Also update filtered events cache
+    // Filtered events cache
     queryClient.setQueriesData({ queryKey: ['filtered-events'] }, (oldData: any) => {
       if (!oldData) return oldData;
       return updateEventInList(oldData);
     });
     
-    // Update events in user events cache
+    // User events cache
     queryClient.setQueriesData({ queryKey: ['userEvents'] }, (oldData: any) => {
-      if (!oldData || !oldData.upcomingEvents) return oldData;
+      if (!oldData) return oldData;
       
-      return {
-        ...oldData,
-        upcomingEvents: updateEventInList(oldData.upcomingEvents),
-        pastEvents: updateEventInList(oldData.pastEvents)
-      };
+      if (oldData.upcomingEvents) {
+        return {
+          ...oldData,
+          upcomingEvents: updateEventInList(oldData.upcomingEvents),
+          pastEvents: oldData.pastEvents ? updateEventInList(oldData.pastEvents) : []
+        };
+      }
+      return oldData;
     });
   };
 
