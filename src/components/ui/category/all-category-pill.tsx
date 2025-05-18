@@ -18,9 +18,9 @@ export const AllCategoryPill: React.FC<AllCategoryPillProps> = ({
   // Base styles
   const baseClasses = 'rounded-full font-medium transition-colors flex items-center cursor-pointer';
   
-  // Active/inactive state colors
+  // Active/inactive state colors - using vibrant purple for active state
   const stateClasses = active 
-    ? 'bg-slate-800 text-white hover:bg-slate-900'
+    ? 'bg-[#9b87f5] text-white hover:bg-[#8B5CF6]'
     : 'bg-slate-100 text-slate-700 hover:bg-slate-200';
   
   // Size classes

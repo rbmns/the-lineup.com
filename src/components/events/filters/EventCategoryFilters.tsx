@@ -26,8 +26,10 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
   
   const handleAllClick = () => {
     if (isAllSelected) {
-      onDeselectAll();
+      // If all are already selected, do nothing (we always want to show results)
+      return;
     } else {
+      // If not all are selected, select all
       onSelectAll();
     }
   };
