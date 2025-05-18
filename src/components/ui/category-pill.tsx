@@ -126,6 +126,7 @@ interface CategoryPillProps {
   showIcon?: boolean;
   className?: string;
   size?: 'xs' | 'sm' | 'default' | 'lg';
+  children?: React.ReactNode; // Added children prop to accept React nodes
 }
 
 export const CategoryPill: React.FC<CategoryPillProps> = ({
@@ -134,7 +135,8 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
   active = false,
   showIcon = false,
   className,
-  size = 'default'
+  size = 'default',
+  children // Added children to the props
 }) => {
   const Icon = getCategoryIcon(category);
   const colorClasses = getCategoryColor(category);
@@ -182,6 +184,7 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
     >
       {showIcon && <Icon className={iconSize[size]} />}
       <span>{category}</span>
+      {children} {/* Render any children passed to the component */}
     </div>
   );
 };
