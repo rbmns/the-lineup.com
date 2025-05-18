@@ -19,19 +19,37 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
   const isGoing = currentStatus === 'Going';
   const isInterested = currentStatus === 'Interested';
   const [loadingStatus, setLoadingStatus] = useState<'Going' | 'Interested' | null>(null);
+  const [localStatus, setLocalStatus] = useState<'Going' | 'Interested' | null>(currentStatus || null);
+
+  // Update local state when props change
+  React.useEffect(() => {
+    if (currentStatus !== localStatus) {
+      setLocalStatus(currentStatus || null);
+    }
+  }, [currentStatus]);
 
   const handleRsvp = async (status: 'Going' | 'Interested') => {
-    console.log(`MobileRsvpFooter: Handling RSVP for event ${eventId}, status ${status}`);
+    console.log(`MobileRsvpFooter: Handling RSVP for event ${eventId}, status ${status}, currentStatus: ${currentStatus}`);
     setLoadingStatus(status);
+    
     try {
+      // Apply optimistic update
+      const newStatus = localStatus === status ? null : status;
+      setLocalStatus(newStatus);
+      
       const success = await onRsvp(status);
+      
       if (success) {
         console.log(`MobileRsvpFooter: RSVP successful for ${status}`);
       } else {
         console.log(`MobileRsvpFooter: RSVP failed for ${status}`);
+        // Revert on failure
+        setLocalStatus(currentStatus || null);
       }
     } catch (error) {
       console.error(`MobileRsvpFooter: Error in RSVP handler:`, error);
+      // Revert on error
+      setLocalStatus(currentStatus || null);
     } finally {
       setLoadingStatus(null);
     }
@@ -42,8 +60,8 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex gap-2 flex-1">
           <Button
-            variant={isGoing ? "default" : "outline"}
-            className={`flex-1 gap-2 ${isGoing ? "bg-green-600 hover:bg-green-700" : "border-gray-300"}`}
+            variant={localStatus === 'Going' ? "default" : "outline"}
+            className={`flex-1 gap-2 ${localStatus === 'Going' ? "bg-green-600 hover:bg-green-700" : "border-gray-300"}`}
             onClick={() => handleRsvp('Going')}
             data-rsvp-button="true"
             data-status="Going"
@@ -64,8 +82,8 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
           </Button>
           
           <Button
-            variant={isInterested ? "default" : "outline"}
-            className={`flex-1 gap-2 ${isInterested ? "bg-blue-600 hover:bg-blue-700" : "border-gray-300"}`}
+            variant={localStatus === 'Interested' ? "default" : "outline"}
+            className={`flex-1 gap-2 ${localStatus === 'Interested' ? "bg-blue-600 hover:bg-blue-700" : "border-gray-300"}`}
             onClick={() => handleRsvp('Interested')}
             data-rsvp-button="true"
             data-status="Interested"

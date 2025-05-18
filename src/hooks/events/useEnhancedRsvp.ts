@@ -9,6 +9,7 @@ export const useEnhancedRsvp = (userId: string | undefined) => {
 
   const handleRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!userId) {
+      console.log('Cannot RSVP: No user ID provided');
       return false;
     }
 
@@ -71,11 +72,13 @@ export const useEnhancedRsvp = (userId: string | undefined) => {
       if (success) {
         console.log(`RSVP update successful for event ${eventId}, invalidating queries`);
         
-        // Use a more aggressive invalidation approach to ensure sync
-        // Invalidate all events-related queries including filtered events
+        // IMPROVED: Use a more aggressive invalidation approach
+        // Invalidate ALL queries to force a complete refresh
         queryClient.invalidateQueries();
         
-        // Direct cache updates for immediate UI feedback
+        console.log("RSVP Cache invalidation complete - invalidated ALL queries");
+        
+        // Direct cache updates for immediate UI feedback while queries refetch
         updateEventsCache(eventId, newStatus, oldStatus);
         updateEventCache(eventId, newStatus, oldStatus);
       }
@@ -106,7 +109,7 @@ export const useEnhancedRsvp = (userId: string | undefined) => {
   const updateEventsCache = (eventId: string, newStatus: string | null, oldStatus: string | null) => {
     console.log(`Directly updating events cache for event ${eventId}, setting status to ${newStatus}`);
     
-    // Update all events caches that might contain this event
+    // IMPROVED: Update all events caches that might contain this event using a more thorough approach
     const updateEventInList = (events: any[]) => {
       if (!events || !Array.isArray(events)) return events;
       
@@ -119,31 +122,38 @@ export const useEnhancedRsvp = (userId: string | undefined) => {
       });
     };
     
-    // Update every possible events cache
-    // Main events list
-    queryClient.setQueriesData({ queryKey: ['events'] }, (oldData: any) => {
-      if (!oldData) return oldData;
-      return updateEventInList(oldData);
-    });
+    // Update EVERY POSSIBLE events cache using queryClient.getQueriesData() to find all queries
+    // This ensures we don't miss any cache that might contain this event
+    const queries = queryClient.getQueriesData({});
     
-    // Filtered events cache
-    queryClient.setQueriesData({ queryKey: ['filtered-events'] }, (oldData: any) => {
-      if (!oldData) return oldData;
-      return updateEventInList(oldData);
-    });
-    
-    // User events cache
-    queryClient.setQueriesData({ queryKey: ['userEvents'] }, (oldData: any) => {
-      if (!oldData) return oldData;
-      
-      if (oldData.upcomingEvents) {
-        return {
-          ...oldData,
-          upcomingEvents: updateEventInList(oldData.upcomingEvents),
-          pastEvents: oldData.pastEvents ? updateEventInList(oldData.pastEvents) : []
-        };
+    queries.forEach(([queryKey, data]: [any, any]) => {
+      // Check if this is an events-related query
+      const keyString = JSON.stringify(queryKey);
+      if (keyString.includes('events') || keyString.includes('event') || keyString.includes('Events')) {
+        console.log(`Found events cache to update: ${keyString}`);
+        
+        // Handle different data shapes based on query type
+        if (Array.isArray(data)) {
+          // Direct array of events
+          queryClient.setQueryData(queryKey, updateEventInList(data));
+        } else if (data && typeof data === 'object') {
+          // Handle nested data structures
+          if (data.upcomingEvents || data.pastEvents) {
+            // User events format
+            queryClient.setQueryData(queryKey, {
+              ...data,
+              upcomingEvents: updateEventInList(data.upcomingEvents || []),
+              pastEvents: updateEventInList(data.pastEvents || [])
+            });
+          } else if (data.data && Array.isArray(data.data)) {
+            // Paginated data format
+            queryClient.setQueryData(queryKey, {
+              ...data,
+              data: updateEventInList(data.data)
+            });
+          }
+        }
       }
-      return oldData;
     });
   };
 

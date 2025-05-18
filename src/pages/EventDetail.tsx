@@ -18,6 +18,7 @@ import { MainEventContent } from '@/components/events/MainEventContent';
 import { SidebarContent } from '@/components/events/SidebarContent';
 import { MobileRsvpFooter } from '@/components/events/MobileRsvpFooter';
 import { RelatedEvents } from '@/components/events/related-events/RelatedEvents';
+import { useQueryClient } from '@tanstack/react-query';
 
 const EventDetail = () => {
   // Use our comprehensive params hook to get all URL parameters
@@ -25,6 +26,7 @@ const EventDetail = () => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
   const { isMobile } = useDeviceDetection();
+  const queryClient = useQueryClient();
   
   // Use proper ID for data fetching, prefer explicit ID over slug
   const effectiveId = id || eventId || '';
@@ -59,6 +61,14 @@ const EventDetail = () => {
     wrapRsvpWithScrollPreservation
   } = useEventDetailHandlers();
   
+  // When navigating away, make sure to invalidate events to ensure fresh data
+  useEffect(() => {
+    return () => {
+      console.log("EventDetail: Unmounting, invalidating events queries");
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+    };
+  }, [queryClient]);
+  
   // Enhanced RSVP with scroll preservation
   const handleRsvpEvent = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     try {
@@ -72,8 +82,12 @@ const EventDetail = () => {
       }
       
       // Always pass the event ID when handling RSVPs
-      await handleRsvp(status);
-      return true;
+      const success = await handleRsvp(status);
+      
+      // Force invalidate all events queries to ensure consistency
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      
+      return success;
     } catch (error) {
       console.error('Error handling RSVP:', error);
       return false;

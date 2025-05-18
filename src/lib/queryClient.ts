@@ -5,8 +5,12 @@ import { QueryClient } from '@tanstack/react-query';
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 2, // 2 minutes - reduced from 5 minutes to catch 30-minute cutoffs more frequently
+      staleTime: 1000 * 30, // 30 seconds - reduced to ensure fresh data
       retry: 1,
+      // Important for consistent state between routes
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+      refetchOnReconnect: true,
     },
   },
 });

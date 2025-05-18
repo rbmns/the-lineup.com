@@ -15,7 +15,7 @@ interface EventRsvpButtonsProps {
   size?: 'sm' | 'default' | 'lg' | 'xl';
   variant?: 'default' | 'compact' | 'minimal';
   showStatusOnly?: boolean;
-  eventId?: string; // Make eventId optional to maintain backward compatibility
+  eventId?: string;
 }
 
 export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
@@ -27,11 +27,16 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   size = 'default',
   variant = 'default',
   showStatusOnly = false,
-  eventId = 'default-event', // Provide a default value
+  eventId = 'default-event',
 }) => {
   // Use controlled component pattern with local state that syncs with props
   const [localStatus, setLocalStatus] = useState<RsvpStatus>(currentStatus);
   const [activeButton, setActiveButton] = useState<'Going' | 'Interested' | null>(null);
+  
+  // For debugging - log props changes
+  useEffect(() => {
+    console.log(`EventRsvpButtons (${eventId}): props.currentStatus updated to:`, currentStatus);
+  }, [currentStatus, eventId]);
   
   // Sync with parent component's state whenever it changes
   useEffect(() => {
@@ -65,6 +70,8 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
               ? "bg-green-50 text-green-700 border-green-200" 
               : "bg-blue-50 text-blue-700 border-blue-200"
           )}
+          data-rsvp-status={localStatus}
+          data-event-id={eventId}
         >
           {localStatus}
         </Badge>
@@ -102,8 +109,9 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       // Update local state immediately for responsive UI
       setLocalStatus(newStatus);
       
+      console.log(`EventRsvpButtons (${eventId}): Handling RSVP click for status ${status}, current: ${localStatus}, new: ${newStatus}`);
+      
       // Call the parent's onRsvp handler
-      console.log(`EventRsvpButtons (${eventId}): Handling RSVP click for status ${status}`);
       const success = await onRsvp(status);
       
       if (!success) {

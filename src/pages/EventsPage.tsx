@@ -9,18 +9,25 @@ import { useCanonical } from '@/hooks/useCanonical';
 import { EventsPageHeader } from '@/components/events/EventsPageHeader';
 import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp';
 import { useRsvpHandler } from '@/hooks/events/useRsvpHandler';
+import { useQueryClient } from '@tanstack/react-query';
 
 const EventsPage = () => {
   // Add canonical URL for SEO - providing the path as required parameter
   useCanonical('/events', pageSeoTags.events.title);
   
   const { user } = useAuth();
-  const { data: events = [], isLoading } = useEvents(user?.id);
+  const queryClient = useQueryClient();
+  const { data: events = [], isLoading, refetch } = useEvents(user?.id);
   const { handleRsvp, loadingEventId } = useEnhancedRsvp(user?.id);
   const rsvpInProgressRef = useRef(false);
   
   // Use the optimized RSVP handler with proper event handling
   const { handleEventRsvp } = useRsvpHandler(user, handleRsvp, rsvpInProgressRef);
+  
+  // Force refetch when component mounts to ensure fresh data
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
   
   // Set page metadata
   useEffect(() => {
