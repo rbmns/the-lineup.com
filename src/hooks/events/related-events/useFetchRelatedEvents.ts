@@ -33,7 +33,8 @@ export const useFetchRelatedEvents = ({
         loadingRef.current = true;
         setLoading(true);
         
-        // First strategy: Fetch events with the same event type
+        // First strategy: Fetch events with the same event type and around the same time
+        // This is our primary focus - same type, similar time frame
         const filteredEvents = await fetchPrimaryRelatedEvents(
           eventType,
           currentEventId,
@@ -67,7 +68,7 @@ export const useFetchRelatedEvents = ({
             
             setRelatedEvents(combinedEvents);
           } else {
-            // Last resort - try similar events
+            // Last resort - try similar events by event type only
             console.log('Trying similar events as last resort...');
             try {
               const rawSimilarEvents = await fetchSimilarEvents([eventType]);

@@ -9,7 +9,7 @@ const TeaseLoginSignup = () => {
   const navigate = useNavigate();
 
   const handleSignUp = () => {
-    navigate('/signup');
+    navigate('/login', { state: { initialMode: 'register' } });
   };
 
   return (

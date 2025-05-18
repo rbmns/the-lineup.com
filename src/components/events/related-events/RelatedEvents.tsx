@@ -69,10 +69,15 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
     userId: user?.id
   });
 
+  // Generate a section title based on event type
+  const sectionTitle = eventType 
+    ? `More ${eventType} events around the same time`
+    : "Similar Events";
+
   // Always render the loader or results section since we want to show it even if empty
   return (
     <div id="related-events-section" className="w-full">
-      <h2 className="text-2xl font-bold mb-6">Similar Events</h2>
+      <h2 className="text-2xl font-bold mb-6">{sectionTitle}</h2>
       
       {loading ? (
         <RelatedEventsLoader />
