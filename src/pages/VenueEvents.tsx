@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
@@ -88,10 +89,10 @@ const VenueEvents = () => {
         const updatedEvents = events.map(event => {
           if (event.id === eventId) {
             // If the status is the same as current, remove it (toggle behavior)
-            const newStatus = event.user_rsvp_status === status ? undefined : status;
+            const newStatus = event.rsvp_status === status ? undefined : status;
             return {
               ...event,
-              user_rsvp_status: newStatus
+              rsvp_status: newStatus
             };
           }
           return event;
