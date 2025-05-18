@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { RsvpStatus } from '@/components/events/rsvp/types';
+import { RsvpStatus, RsvpHandler } from '@/components/events/rsvp/types';
 import { RsvpStatusBadge } from '@/components/events/rsvp/RsvpStatusBadge';
 import { MinimalRsvpButtons } from '@/components/events/rsvp/MinimalRsvpButtons';
 import { CompactRsvpButtons } from '@/components/events/rsvp/CompactRsvpButtons';
@@ -11,7 +11,7 @@ export type { RsvpStatus };
 
 interface EventRsvpButtonsProps {
   currentStatus?: RsvpStatus | null;
-  onRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
+  onRsvp: RsvpHandler;
   isLoading?: boolean;
   disabled?: boolean;
   className?: string;
@@ -62,8 +62,8 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   }
 
   // Handle RSVP click with proper state management
-  const handleRsvpClick = async (status: 'Going' | 'Interested') => {
-    if (isLoading || disabled) return;
+  const handleRsvpClick = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    if (isLoading || disabled) return false;
     
     try {
       // Track which button is being clicked for UI feedback
@@ -86,8 +86,11 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         console.log(`EventRsvpButtons (${eventId}): RSVP failed, reverting to ${prevStatus}`);
         setLocalStatus(prevStatus);
       }
+      
+      return success;
     } catch (error) {
       console.error('Error in RSVP button handler:', error);
+      return false;
     } finally {
       // Clear loading state
       setTimeout(() => {

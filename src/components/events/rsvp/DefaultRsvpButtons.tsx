@@ -3,11 +3,11 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { RsvpButtonContent } from './RsvpButtonContent';
-import { RsvpStatus } from '@/components/events/rsvp/types';
+import { RsvpStatus, RsvpHandler } from '@/components/events/rsvp/types';
 
 interface DefaultRsvpButtonsProps {
   currentStatus: RsvpStatus;
-  onRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
+  onRsvp: RsvpHandler;
   isLoading?: boolean;
   disabled?: boolean;
   className?: string;

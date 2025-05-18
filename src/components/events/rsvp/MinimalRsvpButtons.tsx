@@ -3,11 +3,11 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Check, Star, Loader2 } from 'lucide-react';
-import { RsvpStatus } from '@/components/events/rsvp/types';
+import { RsvpStatus, RsvpHandler } from '@/components/events/rsvp/types';
 
 interface MinimalRsvpButtonsProps {
   currentStatus: RsvpStatus;
-  onRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
+  onRsvp: RsvpHandler;
   isLoading?: boolean;
   disabled?: boolean;
   className?: string;
