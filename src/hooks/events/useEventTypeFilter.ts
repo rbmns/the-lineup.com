@@ -3,11 +3,11 @@ import { useState, useEffect } from 'react';
 import { Event } from '@/types';
 
 export const useEventTypeFilter = (events: Event[] | undefined = []) => {
-  const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
   const [availableEventTypes, setAvailableEventTypes] = useState<Array<{value: string, label: string}>>([]);
   const [showEventTypeFilter, setShowEventTypeFilter] = useState(false);
+  const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
 
-  // Set up available event types
+  // Set up available event types and select all by default
   useEffect(() => {
     if (events && events.length > 0) {
       const eventTypeSet = new Set<string>();
@@ -21,6 +21,13 @@ export const useEventTypeFilter = (events: Event[] | undefined = []) => {
       })).sort((a, b) => a.label.localeCompare(b.label));
       
       setAvailableEventTypes(eventTypeOptions);
+      
+      // Set all event types as selected by default
+      const allEventTypes = eventTypeOptions.map(option => option.value);
+      setSelectedEventTypes(prevSelected => {
+        // Only set all as selected if we don't have any selection yet
+        return prevSelected.length === 0 ? allEventTypes : prevSelected;
+      });
     } else {
       setAvailableEventTypes([]);
     }

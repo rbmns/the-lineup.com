@@ -1,38 +1,30 @@
 
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 
-export const useCategoryFilterSelection = (allCategories: string[] = []) => {
-  // Initialize with all categories selected by default
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(allCategories);
+export const useCategoryFilterSelection = (categories: string[]) => {
+  // Initialize with all categories selected
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([...categories]);
 
-  const toggleCategory = useCallback((category: string) => {
-    setSelectedCategories(prev => {
-      // If category is already selected and is the only one selected, deselect it (showing no events)
-      if (prev.includes(category) && prev.length === 1) {
-        return [];
-      }
-      
-      // If the category is already selected and multiple categories are selected, remove it
+  const toggleCategory = (category: string) => {
+    setSelectedCategories((prev) => {
       if (prev.includes(category)) {
-        return prev.filter(c => c !== category);
-      } 
-      
-      // If the category is not selected, add it
+        return prev.filter((c) => c !== category);
+      }
       return [...prev, category];
     });
-  }, []);
+  };
 
-  const selectAll = useCallback(() => {
-    setSelectedCategories([...allCategories]);
-  }, [allCategories]);
+  const selectAll = () => {
+    setSelectedCategories([...categories]);
+  };
 
-  const deselectAll = useCallback(() => {
+  const deselectAll = () => {
     setSelectedCategories([]);
-  }, []);
+  };
 
-  const reset = useCallback(() => {
-    setSelectedCategories([...allCategories]);
-  }, [allCategories]);
+  const reset = () => {
+    setSelectedCategories([...categories]);
+  };
 
   return {
     selectedCategories,

@@ -58,11 +58,11 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
   };
 
   return (
-    <div className={cn("bg-white border border-gray-200 rounded-lg shadow-sm", className)}>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
-        <div className="space-y-2">
-          <h4 className="font-medium text-sm">Date Range</h4>
-          <div className="border border-gray-200 rounded-md p-2">
+    <div className={cn("bg-white border border-gray-200 rounded-lg shadow-md max-w-4xl mx-auto animate-fade-in", className)}>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6">
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm text-gray-700">Date Range</h4>
+          <div className="border border-gray-200 rounded-md p-3 bg-white shadow-sm hover:border-gray-300 transition-colors">
             <DateRangeFilter
               dateRange={dateRange}
               onDateRangeChange={onDateRangeChange}
@@ -73,16 +73,16 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
           </div>
         </div>
 
-        <div className="space-y-2">
-          <h4 className="font-medium text-sm">Venue</h4>
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm text-gray-700">Venue</h4>
           <Select 
             value={selectedVenues[0] || ""} 
             onValueChange={handleVenueSelect}
           >
-            <SelectTrigger className="w-full bg-white border-gray-200">
+            <SelectTrigger className="w-full bg-white border-gray-200 hover:border-gray-300 transition-colors shadow-sm">
               <SelectValue placeholder="Select venue" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white border border-gray-200 shadow-md">
               {venues.map((venue) => (
                 <SelectItem key={venue.value} value={venue.value}>
                   {venue.label}
@@ -92,16 +92,16 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
           </Select>
         </div>
         
-        <div className="space-y-2">
-          <h4 className="font-medium text-sm">Location</h4>
+        <div className="space-y-3">
+          <h4 className="font-medium text-sm text-gray-700">Location</h4>
           <Select 
             value={selectedLocations[0] || ""} 
             onValueChange={handleLocationSelect}
           >
-            <SelectTrigger className="w-full bg-white border-gray-200">
+            <SelectTrigger className="w-full bg-white border-gray-200 hover:border-gray-300 transition-colors shadow-sm">
               <SelectValue placeholder="Select location" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white border border-gray-200 shadow-md">
               {locations.map((location) => (
                 <SelectItem key={location.value} value={location.value}>
                   {location.label}

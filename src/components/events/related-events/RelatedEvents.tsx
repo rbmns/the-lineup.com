@@ -66,7 +66,8 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
     vibe: vibe ? String(vibe) : undefined,
     minResults: 2, // Ensure we get at least 2 events
     startDate,
-    userId: user?.id
+    userId: user?.id,
+    dateDifference: 21 // Show events within 21 days of the current event
   });
 
   // Generate a section title based on event type
