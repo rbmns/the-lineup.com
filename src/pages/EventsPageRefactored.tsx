@@ -214,14 +214,6 @@ const EventsPageRefactored = () => {
                 </div>
               </div>
             </div>
-
-            <div className="mt-4 space-y-2">
-              <h4 className="font-medium text-sm">Location</h4>
-              <div className="w-full p-2 bg-gray-100 border rounded text-sm">
-                Zandvoort Area
-              </div>
-              <p className="text-xs text-gray-500">Location filtering is currently fixed to Zandvoort Area</p>
-            </div>
           </div>
         )}
         

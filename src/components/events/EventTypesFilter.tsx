@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { CategoryPill } from '@/components/ui/category-pill';
 
 interface EventTypeOption {
   value: string;
@@ -78,17 +79,22 @@ export const EventTypesFilter: React.FC<EventTypesFilterProps> = ({
           {safeSelectedEventTypes.map(eventType => {
             const eventTypeLabel = safeEventTypes.find(e => e.value === eventType)?.label || eventType;
             return (
-              <Badge 
+              <CategoryPill 
                 key={eventType} 
-                variant="secondary"
-                className="text-xs py-0.5 flex items-center"
+                category={eventTypeLabel}
+                active={true}
+                showIcon={false}
+                size="xs"
+                className="pr-1.5"
               >
-                {eventTypeLabel}
                 <X 
                   className="ml-1 h-3 w-3 cursor-pointer" 
-                  onClick={() => toggleEventType(eventType)} 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleEventType(eventType);
+                  }} 
                 />
-              </Badge>
+              </CategoryPill>
             );
           })}
         </div>

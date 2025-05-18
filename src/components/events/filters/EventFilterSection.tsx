@@ -15,6 +15,7 @@ import { DateRangeFilter } from '../DateRangeFilter';
 import { DateRange } from 'react-day-picker';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { CategoryPill } from '@/components/ui/category-pill';
 
 interface EventFilterSectionProps {
   showEventTypeFilter: boolean;
@@ -75,19 +76,13 @@ export const EventFilterSection: React.FC<EventFilterSectionProps> = ({
         
         <DropdownMenu open={showEventTypeFilter} onOpenChange={setShowEventTypeFilter}>
           <DropdownMenuTrigger asChild>
-            <Button 
-              variant={hasEventTypeFilters ? "default" : "outline"} 
-              size="sm" 
-              className={cn(
-                "h-9", 
-                hasEventTypeFilters ? "bg-[#9b87f5] hover:bg-[#7E69AB]" : ""
-              )}
-            >
-              {hasEventTypeFilters ? (
-                <span className="flex items-center gap-1">
-                  Event Type <span className="bg-white text-[#9b87f5] text-xs px-1.5 py-0.5 rounded-full">{safeSelectedEventTypes.length}</span>
-                </span>
-              ) : "Event Type"}
+            <Button variant="outline" size="sm" className="h-9">
+              <CategoryPill 
+                category={hasEventTypeFilters ? `${safeSelectedEventTypes.length} Selected` : "Event Type"} 
+                active={hasEventTypeFilters}
+                size="xs"
+                className="px-2"
+              />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[240px] p-3 bg-white" align="start">
@@ -104,19 +99,10 @@ export const EventFilterSection: React.FC<EventFilterSectionProps> = ({
         
         <DropdownMenu open={showVenueFilter} onOpenChange={setShowVenueFilter}>
           <DropdownMenuTrigger asChild>
-            <Button 
-              variant={hasVenueFilters ? "default" : "outline"} 
-              size="sm" 
-              className={cn(
-                "h-9", 
-                hasVenueFilters ? "bg-[#9b87f5] hover:bg-[#7E69AB]" : ""
-              )}
-            >
-              {hasVenueFilters ? (
-                <span className="flex items-center gap-1">
-                  Venue <span className="bg-white text-[#9b87f5] text-xs px-1.5 py-0.5 rounded-full">{safeSelectedVenues.length}</span>
-                </span>
-              ) : "Venue"}
+            <Button variant="outline" size="sm" className="h-9">
+              <span className={cn(hasVenueFilters ? "font-medium" : "")}>
+                {hasVenueFilters ? `Venue (${safeSelectedVenues.length})` : "Venue"}
+              </span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[240px] p-3 bg-white" align="start">
@@ -133,16 +119,11 @@ export const EventFilterSection: React.FC<EventFilterSectionProps> = ({
         
         <DropdownMenu open={showDateFilter} onOpenChange={setShowDateFilter}>
           <DropdownMenuTrigger asChild>
-            <Button 
-              variant={hasDateFilter ? "default" : "outline"} 
-              size="sm" 
-              className={cn(
-                "h-9", 
-                hasDateFilter ? "bg-[#9b87f5] hover:bg-[#7E69AB]" : ""
-              )}
-            >
-              {dateRange ? "Date Range" : 
-               selectedDateFilter ? selectedDateFilter : "Date"}
+            <Button variant="outline" size="sm" className="h-9">
+              <span className={cn(hasDateFilter ? "font-medium" : "")}>
+                {dateRange ? "Date Range" : 
+                 selectedDateFilter ? selectedDateFilter : "Date"}
+              </span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className={cn("p-3 bg-white", isMobile ? "w-[280px]" : "w-auto")} align="start">
@@ -172,7 +153,6 @@ export const EventFilterSection: React.FC<EventFilterSectionProps> = ({
           </Button>
         )}
       </div>
-      {/* Removed the duplicate FilterSummary component from here */}
     </div>
   );
 };

@@ -7,6 +7,7 @@ import { DateRangeFilter } from './DateRangeFilter';
 import { EventTypesFilter } from './EventTypesFilter';
 import { VenueFilter } from './VenueFilter';
 import { cn } from '@/lib/utils';
+import { CategoryPill } from '@/components/ui/category-pill';
 
 interface EventTypeOption {
   value: string;
@@ -90,9 +91,12 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
           <p className="text-sm font-medium">
             Event Type
             {eventTypeCount > 0 && (
-              <span className="ml-2 px-1.5 py-0.5 bg-[#9b87f5] text-white rounded-full text-xs">
-                {eventTypeCount}
-              </span>
+              <CategoryPill 
+                category={`${eventTypeCount}`} 
+                size="xs" 
+                active={true}
+                className="ml-2 px-2 py-0.5"
+              />
             )}
           </p>
           <EventTypesFilter
