@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 
 interface AllCategoryPillProps {
   active?: boolean;
-  onClick: () => void;
+  onClick?: () => void;
   size?: 'xs' | 'sm' | 'default' | 'lg';
   className?: string;
 }
@@ -40,7 +40,7 @@ export const AllCategoryPill: React.FC<AllCategoryPillProps> = ({
         'hover:shadow-sm',
         className
       )}
-      onClick={onClick}
+      onClick={onClick || (() => {})}
     >
       <span>All</span>
     </div>

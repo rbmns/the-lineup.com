@@ -9,6 +9,10 @@ export const CategoryPillShowcase = () => {
     'Water', 'Music', 'Food', 'Market', 'Yoga'
   ];
 
+  const handleDemoClick = (category: string) => {
+    alert(`Clicked on ${category}`);
+  };
+
   return (
     <section className="space-y-8">
       <div>
@@ -22,7 +26,7 @@ export const CategoryPillShowcase = () => {
       <div className="space-y-4">
         <h3 className="text-2xl font-semibold mb-2">Active Category Pills</h3>
         <div className="flex flex-wrap gap-2">
-          <AllCategoryPill active={true} />
+          <AllCategoryPill active={true} onClick={() => handleDemoClick('All')} />
           {eventTypes.map(category => (
             <CategoryPill key={category} category={category} active={true} />
           ))}
@@ -32,7 +36,7 @@ export const CategoryPillShowcase = () => {
       <div className="space-y-4">
         <h3 className="text-2xl font-semibold mb-2">Inactive Category Pills</h3>
         <div className="flex flex-wrap gap-2">
-          <AllCategoryPill active={false} />
+          <AllCategoryPill active={false} onClick={() => handleDemoClick('All')} />
           {eventTypes.map(category => (
             <CategoryPill key={category} category={category} active={false} />
           ))}
@@ -53,7 +57,7 @@ export const CategoryPillShowcase = () => {
       <div className="space-y-4">
         <h3 className="text-2xl font-semibold mb-2">Small Category Pills</h3>
         <div className="flex flex-wrap gap-2">
-          <AllCategoryPill size="sm" active={true} />
+          <AllCategoryPill size="sm" active={true} onClick={() => handleDemoClick('All')} />
           {eventTypes.slice(0, 8).map(category => (
             <CategoryPill key={category} category={category} size="sm" active={true} />
           ))}
@@ -64,7 +68,7 @@ export const CategoryPillShowcase = () => {
       <div className="space-y-4">
         <h3 className="text-2xl font-semibold mb-2">Large Category Pills</h3>
         <div className="flex flex-wrap gap-2">
-          <AllCategoryPill size="lg" active={true} />
+          <AllCategoryPill size="lg" active={true} onClick={() => handleDemoClick('All')} />
           {eventTypes.slice(0, 6).map(category => (
             <CategoryPill key={category} category={category} size="lg" active={true} />
           ))}
