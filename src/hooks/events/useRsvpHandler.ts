@@ -16,7 +16,7 @@ export const useRsvpHandler = (
   const handleEventRsvp = useCallback(async (
     eventId: string, 
     status: "Going" | "Interested"
-  ): Promise<boolean> => {
+  ): Promise<boolean | void> => {
     if (!user || !handleRsvp) {
       return false;
     }
