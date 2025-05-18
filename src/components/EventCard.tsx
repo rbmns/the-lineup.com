@@ -2,13 +2,12 @@
 import React from 'react';
 import { Event } from '@/types';
 import { MapPin } from 'lucide-react';
-import { formatInTimeZone } from 'date-fns-tz';
 import { cn } from '@/lib/utils';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { useEventImages } from '@/hooks/useEventImages';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
-import { formatEventTime, formatDate, AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
+import { formatDate, formatEventTime } from '@/utils/date-formatting';
 
 export interface EventCardProps {
   event: Event;
@@ -17,7 +16,7 @@ export interface EventCardProps {
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   className?: string;
   onClick?: (event: Event) => void;
-  loadingEventId?: string | null; // Used to track which event is being processed
+  loadingEventId?: string | null;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -37,21 +36,12 @@ const EventCard: React.FC<EventCardProps> = ({
   console.log(`EventCard rendering for ${event.id} with rsvp_status:`, event.rsvp_status);
 
   // Format date for display
-  const formatDateDisplay = (dateStr: string): string => {
-    try {
-      const date = new Date(dateStr);
-      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, d MMM yyyy");
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return dateStr;
-    }
-  };
+  const formattedDate = event.start_date ? formatDate(event.start_date) : 
+                        (event.start_time ? formatDate(event.start_time) : '');
   
   // Format time using the 24-hour time format
-  const getEventTimeDisplay = (currentEvent: Event): string => {
-    if (!currentEvent.start_time) return '';
-    return formatEventTime(currentEvent.start_time, currentEvent.end_time);
-  };
+  const timeDisplay = event.start_time ? 
+    formatEventTime(event.start_time, event.end_time) : '';
 
   const handleClick = (e: React.MouseEvent) => {
     // Check if click originated from RSVP buttons
@@ -135,10 +125,12 @@ const EventCard: React.FC<EventCardProps> = ({
         </h3>
         
         <div className="text-sm text-gray-600 font-medium">
-          {event.start_time && (
+          {formattedDate && timeDisplay ? (
             <>
-              {formatDateDisplay(event.start_time)} • {getEventTimeDisplay(event)}
+              {formattedDate} • {timeDisplay}
             </>
+          ) : (
+            formattedDate || 'Date not set'
           )}
         </div>
         

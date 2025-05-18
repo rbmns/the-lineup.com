@@ -1,14 +1,14 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin } from 'lucide-react';
-import { formatInTimeZone } from 'date-fns-tz';
 import { cn } from '@/lib/utils';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { useEventImages } from '@/hooks/useEventImages';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { toast } from '@/hooks/use-toast';
-import { formatEventTime, AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
+import { formatDate, formatEventTime } from '@/utils/date-formatting';
 
 interface EventCardListProps {
   event: Event;
@@ -60,16 +60,10 @@ const EventCardList: React.FC<EventCardListProps> = ({
     }
   };
 
-  // Format date for display - European format
-  const formatDate = (dateStr: string): string => {
-    try {
-      const date = new Date(dateStr);
-      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, d MMM");
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return dateStr;
-    }
-  };
+  // Format date and time for display
+  const formattedDate = event.start_date ? formatDate(event.start_date) : '';
+  const timeDisplay = event.start_time ? 
+    formatEventTime(event.start_time, event.end_time) : '';
 
   // Handle RSVP and ensure we always return a Promise<boolean>
   const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
@@ -124,11 +118,13 @@ const EventCardList: React.FC<EventCardListProps> = ({
         <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
           <Calendar className="h-3 w-3" />
           <span>
-            {event.start_time ? (
+            {formattedDate && timeDisplay ? (
               <>
-                {formatDate(event.start_time)} • {formatEventTime(event.start_time, event.end_time)}
+                {formattedDate} • {timeDisplay}
               </>
-            ) : 'Date not set'}
+            ) : (
+              formattedDate || 'Date not set'
+            )}
           </span>
         </div>
         

@@ -18,7 +18,7 @@ export const formatDate = (dateString: string): string => {
 };
 
 /**
- * Helper to format event time in a consistent way
+ * Helper to format event time in a consistent way - 24h format
  */
 export const formatTime = (timeString: string): string => {
   try {

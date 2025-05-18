@@ -1,13 +1,13 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { MapPin } from 'lucide-react';
-import { formatInTimeZone } from 'date-fns-tz';
 import { cn } from '@/lib/utils';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { useEventImages } from '@/hooks/useEventImages';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
-import { formatEventTime, formatDate, AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
+import { formatDate, formatEventTime, AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
 
 export interface EventCardProps {
   event: Event;
@@ -16,6 +16,7 @@ export interface EventCardProps {
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   className?: string;
   onClick?: (event: Event) => void;
+  loadingEventId?: string | null;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
@@ -24,29 +25,19 @@ const EventCard: React.FC<EventCardProps> = ({
   showRsvpButtons = false,
   onRsvp,
   className,
-  onClick
+  onClick,
+  loadingEventId
 }) => {
   const { getEventImageUrl } = useEventImages();
   const { navigateToEvent } = useEventNavigation();
   const imageUrl = getEventImageUrl(event);
-
-  // Format date for display - now using European format (DD-MM-YYYY)
-  const formatDateDisplay = (dateStr: string): string => {
-    try {
-      const date = new Date(dateStr);
-      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, d MMM yyyy");
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return dateStr;
-    }
-  };
   
-  // Format time using the 24-hour time format
-  const getEventTimeDisplay = (event: Event): string => {
-    if (!event.start_time) return '';
-    
-    return formatEventTime(event.start_time, event.end_time);
-  };
+  // Format date for display - European format (DD-MM-YYYY)
+  const formattedDate = event.start_date ? formatDate(event.start_date) : '';
+  
+  // Format time range using the 24-hour time format
+  const timeDisplay = event.start_time ? 
+    formatEventTime(event.start_time, event.end_time) : '';
 
   const handleClick = (e: React.MouseEvent) => {
     // Check if click originated from RSVP buttons
@@ -55,11 +46,8 @@ const EventCard: React.FC<EventCardProps> = ({
     }
     
     if (onClick) {
-      // Use the provided onClick handler if available
       onClick(event);
     } else {
-      // Otherwise use the default navigation
-      // Make sure we have all required properties for proper navigation
       if (event && event.id) {
         navigateToEvent({
           ...event,
@@ -89,7 +77,10 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
 
-  // Determine max height for compact vs standard view
+  // Determine if this specific event is loading
+  const isLoading = loadingEventId === event.id;
+  
+  // Determine card height
   const cardHeightClass = compact ? "max-h-[280px]" : "";
 
   return (
@@ -134,10 +125,12 @@ const EventCard: React.FC<EventCardProps> = ({
         
         {/* Date & Time */}
         <div className="text-sm text-gray-600 font-medium">
-          {event.start_time && (
+          {formattedDate && timeDisplay ? (
             <>
-              {formatDateDisplay(event.start_time)} • {getEventTimeDisplay(event)}
+              {formattedDate} • {timeDisplay}
             </>
+          ) : (
+            formattedDate || 'Date not set'
           )}
         </div>
         
@@ -161,6 +154,7 @@ const EventCard: React.FC<EventCardProps> = ({
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
               size="sm"
+              isLoading={isLoading}
             />
           </div>
         )}
