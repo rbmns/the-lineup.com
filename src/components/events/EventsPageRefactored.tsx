@@ -166,14 +166,17 @@ const EventsPageRefactored = () => {
           />
         </div>
         
-        {/* Advanced Filters Button */}
+        {/* Advanced Filters Button - Fixed by adding children */}
         <div className="flex justify-start mb-4">
           <AdvancedFiltersButton
             hasActiveFilters={hasAdvancedFilters}
             isOpen={showAdvancedFilters}
             onOpen={toggleAdvancedFilters}
             variant="dropdown"
-          />
+          >
+            {/* This empty fragment serves as the children prop */}
+            <></>
+          </AdvancedFiltersButton>
         </div>
         
         {/* Advanced Filters Panel */}
