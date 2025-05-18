@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -13,6 +14,7 @@ import { AdvancedFiltersPanel } from '@/components/events/filters/AdvancedFilter
 import { filterEventsByVenue } from '@/utils/eventUtils';
 import { filterEventsByDate } from '@/utils/date-filtering';
 import { supabase } from '@/lib/supabase';
+import { ChevronDown, Filter } from 'lucide-react';
 
 const EventsPageRefactored = () => {
   useEventPageMeta();
@@ -22,6 +24,7 @@ const EventsPageRefactored = () => {
   const [venues, setVenues] = useState<Array<{ value: string, label: string }>>([]);
   const [locations, setLocations] = useState<Array<{ value: string, label: string }>>([]);
   const [isVenuesLoading, setIsVenuesLoading] = useState(true);
+  const [eventsFound, setEventsFound] = useState(0);
   
   // Event filter state management
   const {
@@ -140,6 +143,11 @@ const EventsPageRefactored = () => {
     
     return filtered;
   }, [events, selectedCategories, allEventTypes.length, selectedVenues, dateRange, selectedDateFilter]);
+
+  // Update events found count
+  useEffect(() => {
+    setEventsFound(filteredEvents.length);
+  }, [filteredEvents]);
   
   const { 
     handleRsvp: enhancedHandleRsvp, 
@@ -147,12 +155,24 @@ const EventsPageRefactored = () => {
   } = useEnhancedRsvp(user?.id);
   
   return (
-    <div className="w-full px-4 md:px-6 py-8">
+    <div className="w-full px-4 md:px-6 py-4 md:py-8">
       <div className="max-w-7xl mx-auto">
-        <EventsPageHeader title="What's Happening?" />
+        <EventsPageHeader title="Upcoming Events" />
+        
+        {/* Search placeholder - not functional */}
+        <div className="relative mb-4 mt-4">
+          <input
+            type="text"
+            placeholder="Search events..."
+            className="w-full p-2 pl-8 border border-gray-200 rounded-lg"
+          />
+          <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </div>
+        </div>
         
         {/* Events category filter bar */}
-        <div className="mt-6 mb-4">
+        <div className="mt-2 mb-4 overflow-x-auto">
           <EventFilterBar
             allEventTypes={allEventTypes}
             selectedEventTypes={selectedCategories}
@@ -162,21 +182,20 @@ const EventsPageRefactored = () => {
             onReset={reset}
             hasActiveFilters={hasActiveFilters}
             onClearAllFilters={resetFilters}
-            className="bg-white rounded-lg shadow-sm p-4"
+            className="py-2"
           />
         </div>
         
-        {/* Advanced Filters Button - Fixed by adding children */}
-        <div className="flex justify-start mb-4">
-          <AdvancedFiltersButton
-            hasActiveFilters={hasAdvancedFilters}
-            isOpen={showAdvancedFilters}
-            onOpen={toggleAdvancedFilters}
-            variant="dropdown"
+        {/* Advanced Filters Button - collapsible panel style */}
+        <div className="mb-4">
+          <button 
+            onClick={toggleAdvancedFilters}
+            className="flex items-center gap-2 py-1.5 px-3 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700"
           >
-            {/* This empty fragment serves as the children prop */}
-            <></>
-          </AdvancedFiltersButton>
+            <Filter className="h-4 w-4" />
+            Advanced Filters
+            <ChevronDown className={`h-4 w-4 transition-transform ${showAdvancedFilters ? 'rotate-180' : ''}`} />
+          </button>
         </div>
         
         {/* Advanced Filters Panel */}
@@ -198,17 +217,15 @@ const EventsPageRefactored = () => {
         
         {/* Active Filters Summary */}
         {hasAdvancedFilters && (
-          <div className="mb-6">
+          <div className="mb-4">
             <div className="flex flex-wrap gap-2 items-center">
-              <span className="text-sm text-gray-500">Active filters:</span>
-              
               {selectedVenues.map(venueId => {
                 const venue = venues.find(v => v.value === venueId);
                 return venue ? (
-                  <div key={venueId} className="bg-[#9b87f5] text-white rounded-full px-3 py-1 text-xs flex items-center">
+                  <div key={venueId} className="bg-purple-100 text-purple-900 rounded-full px-3 py-1 text-xs flex items-center">
                     <span>Venue: {venue.label}</span>
                     <button 
-                      className="ml-1 h-4 w-4 p-0 text-white hover:text-white hover:bg-transparent" 
+                      className="ml-1 h-4 w-4 p-0" 
                       onClick={() => handleRemoveVenue(venueId)}
                     >
                       &times;
@@ -218,12 +235,12 @@ const EventsPageRefactored = () => {
               })}
               
               {(dateRange || selectedDateFilter) && (
-                <div className="bg-[#9b87f5] text-white rounded-full px-3 py-1 text-xs flex items-center">
+                <div className="bg-purple-100 text-purple-900 rounded-full px-3 py-1 text-xs flex items-center">
                   <span>
                     Date: {selectedDateFilter || (dateRange ? 'Custom range' : '')}
                   </span>
                   <button 
-                    className="ml-1 h-4 w-4 p-0 text-white hover:text-white hover:bg-transparent" 
+                    className="ml-1 h-4 w-4 p-0" 
                     onClick={handleClearDateFilter}
                   >
                     &times;
@@ -233,7 +250,7 @@ const EventsPageRefactored = () => {
               
               {hasAdvancedFilters && (
                 <button 
-                  className="text-xs text-gray-500 hover:text-gray-700"
+                  className="text-xs text-purple-700 hover:text-purple-900"
                   onClick={resetFilters}
                 >
                   Clear all filters
@@ -243,7 +260,12 @@ const EventsPageRefactored = () => {
           </div>
         )}
         
-        <div className="space-y-8 mt-8">
+        {/* Events count display */}
+        <div className="mb-4 text-sm text-gray-600">
+          {eventsFound} {eventsFound === 1 ? 'event' : 'events'} found
+        </div>
+        
+        <div className="space-y-8">
           <LazyEventsList 
             mainEvents={filteredEvents}
             relatedEvents={[]} 

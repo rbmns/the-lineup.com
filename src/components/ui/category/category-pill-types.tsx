@@ -1,6 +1,4 @@
 
-import React from 'react';
-
 export interface CategoryPillProps {
   category: string;
   onClick?: () => void;
@@ -9,4 +7,5 @@ export interface CategoryPillProps {
   className?: string;
   size?: 'xs' | 'sm' | 'default' | 'lg';
   children?: React.ReactNode;
+  noBorder?: boolean;
 }

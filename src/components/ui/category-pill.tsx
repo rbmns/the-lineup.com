@@ -6,14 +6,15 @@ import { getCategoryColor } from './category/category-color-mapping';
 import { CategoryPillProps } from './category/category-pill-types';
 export { AllCategoryPill } from './category/all-category-pill';
 
-export const CategoryPill: React.FC<CategoryPillProps> = ({
+export const CategoryPill: React.FC<CategoryPillProps & { noBorder?: boolean }> = ({
   category,
   onClick,
   active = false,
   showIcon = false,
   className,
   size = 'default',
-  children
+  children,
+  noBorder = false
 }) => {
   const Icon = getCategoryIcon(category);
   const colorClasses = getCategoryColor(category);
@@ -21,10 +22,9 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
   // Base styles for all pills
   const baseClasses = 'rounded-full font-medium transition-colors flex items-center';
   
-  // Border styles - darker border when active, lighter when inactive
-  const borderClasses = active 
-    ? 'border-2 border-black shadow-sm' 
-    : 'border border-gray-300';
+  // Border styles - only apply if noBorder is false
+  const borderClasses = !noBorder ? 
+    (active ? 'border-2 border-black shadow-sm' : 'border border-gray-300') : '';
   
   // Size classes
   const sizeClasses = {
@@ -44,7 +44,7 @@ export const CategoryPill: React.FC<CategoryPillProps> = ({
   
   // Interactive classes
   const interactiveClasses = onClick 
-    ? 'cursor-pointer hover:shadow-md' 
+    ? 'cursor-pointer hover:shadow-sm' 
     : 'cursor-default';
   
   return (

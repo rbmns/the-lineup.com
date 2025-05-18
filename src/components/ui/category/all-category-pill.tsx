@@ -21,8 +21,8 @@ export const AllCategoryPill: React.FC<Omit<CategoryPillProps, 'category'>> = ({
   
   // Use different styling for the "All" pill
   const allPillClasses = active
-    ? 'bg-night text-white border-2 border-black shadow-sm'
-    : 'bg-white text-black border border-gray-300 hover:bg-gray-50';
+    ? 'bg-black text-white shadow-sm'
+    : 'bg-gray-100 text-black hover:bg-gray-200';
   
   return (
     <div
@@ -30,7 +30,7 @@ export const AllCategoryPill: React.FC<Omit<CategoryPillProps, 'category'>> = ({
         baseClasses,
         allPillClasses,
         sizeClasses[size],
-        'cursor-pointer hover:shadow-md',
+        'cursor-pointer hover:shadow-sm',
         className
       )}
       onClick={onClick}
