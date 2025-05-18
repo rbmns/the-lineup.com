@@ -1,78 +1,63 @@
 
-import React, { useState } from 'react';
-import { Card } from '@/components/ui/card';
+import React from 'react';
+import { Share2, Check, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Share2, CheckCircle2, Star } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
-export interface MobileRsvpFooterProps {
+interface MobileRsvpFooterProps {
   currentStatus?: 'Going' | 'Interested' | null;
   onRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
   onShare: () => void;
-  loading?: boolean;
+  eventId: string;
 }
 
-export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({ 
-  currentStatus, 
-  onRsvp, 
+export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
+  currentStatus,
+  onRsvp,
   onShare,
-  loading = false
+  eventId
 }) => {
-  const [localLoading, setLocalLoading] = useState(false);
-  const isLoading = loading || localLoading;
-  
   const isGoing = currentStatus === 'Going';
   const isInterested = currentStatus === 'Interested';
 
-  const handleRsvp = async (status: 'Going' | 'Interested') => {
-    if (isLoading) return;
-    
-    try {
-      setLocalLoading(true);
-      await onRsvp(status);
-    } finally {
-      // Add a small delay to prevent rapid re-clicking
-      setTimeout(() => setLocalLoading(false), 500);
-    }
-  };
-
   return (
-    <Card className="fixed bottom-0 left-0 w-full border-t z-50 bg-white shadow-lg">
-      <div className="flex items-center justify-between p-4">
-        <div className="flex space-x-2 flex-1">
-          <Button 
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="flex gap-2 flex-1">
+          <Button
             variant={isGoing ? "default" : "outline"}
-            className={cn(
-              "flex items-center gap-1.5 flex-1",
-              isGoing 
-                ? "bg-green-600 hover:bg-green-700 text-white" 
-                : "hover:border-green-600 hover:text-green-600"
-            )}
-            disabled={isLoading}
-            onClick={() => handleRsvp('Going')}
+            className={`flex-1 gap-2 ${isGoing ? "bg-green-600 hover:bg-green-700" : "border-gray-300"}`}
+            onClick={() => onRsvp('Going')}
+            data-rsvp-button="true"
+            data-status="Going"
+            data-event-id={eventId}
           >
-            <CheckCircle2 className="h-4 w-4" />
-            <span>Going</span>
+            <Check className="h-4 w-4" />
+            Going
           </Button>
+          
           <Button
             variant={isInterested ? "default" : "outline"}
-            className={cn(
-              "flex items-center gap-1.5 flex-1",
-              isInterested 
-                ? "bg-blue-600 hover:bg-blue-700 text-white"
-                : "hover:border-blue-600 hover:text-blue-600"
-            )}
-            disabled={isLoading}
-            onClick={() => handleRsvp('Interested')}
+            className={`flex-1 gap-2 ${isInterested ? "bg-blue-600 hover:bg-blue-700" : "border-gray-300"}`}
+            onClick={() => onRsvp('Interested')}
+            data-rsvp-button="true"
+            data-status="Interested"
+            data-event-id={eventId}
           >
             <Star className="h-4 w-4" />
-            <span>Interested</span>
+            Interested
           </Button>
         </div>
-        <Button variant="outline" onClick={onShare} className="ml-2" disabled={isLoading}>
-          <Share2 size={16} />
+        
+        <Button
+          variant="ghost"
+          size="icon"
+          className="ml-2"
+          onClick={onShare}
+          data-share-button="true"
+        >
+          <Share2 className="h-5 w-5 text-gray-600" />
         </Button>
       </div>
-    </Card>
+    </div>
   );
-}
+};

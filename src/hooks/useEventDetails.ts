@@ -186,12 +186,16 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
         return;
       }
 
+      console.log(`useEventDetails: RSVP to event ${eventId} with status ${status}`);
       const result = await hookHandleRsvp(eventId, status);
       if (result) {
         // Optimistically update the event state
         setEvent((prevEvent) => {
           if (prevEvent) {
-            return { ...prevEvent, rsvp_status: status };
+            return { 
+              ...prevEvent, 
+              rsvp_status: prevEvent.rsvp_status === status ? null : status 
+            };
           }
           return prevEvent;
         });

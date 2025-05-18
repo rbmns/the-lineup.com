@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEventDetailParams } from '@/hooks/useEventDetailParams';
@@ -63,7 +64,14 @@ const EventDetail = () => {
     try {
       console.log("EventDetail: Handling RSVP with status:", status);
       console.log("EventDetail: Current event RSVP status:", event?.rsvp_status);
+      console.log("EventDetail: Using effectiveId:", effectiveId);
       
+      if (!event || !effectiveId) {
+        console.error("Missing event ID for RSVP");
+        return false;
+      }
+      
+      // Always pass the event ID when handling RSVPs
       await handleRsvp(status);
       return true;
     } catch (error) {
@@ -178,6 +186,7 @@ const EventDetail = () => {
       {/* Mobile RSVP Footer */}
       {isMobile && isAuthenticated && (
         <MobileRsvpFooter 
+          eventId={event.id}
           currentStatus={event.rsvp_status} 
           onRsvp={handleRsvpEvent}
           onShare={() => setShareDialogOpen(true)}

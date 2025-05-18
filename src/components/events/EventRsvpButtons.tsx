@@ -16,6 +16,7 @@ interface EventRsvpButtonsProps {
   size?: 'sm' | 'default' | 'lg' | 'xl';
   variant?: 'default' | 'compact' | 'minimal';
   showStatusOnly?: boolean;
+  eventId?: string; // Make eventId optional to maintain backward compatibility
 }
 
 export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
@@ -27,6 +28,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   size = 'default',
   variant = 'default',
   showStatusOnly = false,
+  eventId = 'default-event', // Provide a default value
 }) => {
   // Use controlled component pattern with local state that syncs with props
   const [localStatus, setLocalStatus] = useState<RsvpStatus>(currentStatus);
@@ -35,10 +37,10 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   // Sync with parent component's state whenever it changes
   useEffect(() => {
     if (currentStatus !== localStatus) {
-      console.log('EventRsvpButtons: Syncing status from prop', currentStatus);
+      console.log(`EventRsvpButtons (${eventId}): Syncing status from prop`, currentStatus);
       setLocalStatus(currentStatus);
     }
-  }, [currentStatus]);
+  }, [currentStatus, eventId]);
   
   // Compute derived state
   const isGoing = localStatus === 'Going';
@@ -102,6 +104,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       setLocalStatus(newStatus);
       
       // Call the parent's onRsvp handler
+      console.log(`EventRsvpButtons (${eventId}): Handling RSVP click for status ${status}`);
       const success = await onRsvp(status);
       
       if (!success) {
@@ -172,6 +175,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
           data-rsvp-button="true"
           data-status="Going"
           data-event-button="true"
+          data-event-id={eventId}
         >
           {isButtonLoading('Going') ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -195,6 +199,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
           data-rsvp-button="true"
           data-status="Interested"
           data-event-button="true"
+          data-event-id={eventId}
         >
           {isButtonLoading('Interested') ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -224,6 +229,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
           data-rsvp-button="true"
           data-status="Going"
           data-event-button="true"
+          data-event-id={eventId}
         >
           {renderButtonContent('Going', isGoing)}
         </Button>
@@ -242,6 +248,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
           data-rsvp-button="true"
           data-status="Interested"
           data-event-button="true"
+          data-event-id={eventId}
         >
           {renderButtonContent('Interested', isInterested)}
         </Button>
@@ -266,6 +273,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         data-rsvp-button="true"
         data-status="Going"
         data-event-button="true"
+        data-event-id={eventId}
       >
         {renderButtonContent('Going', isGoing)}
       </Button>
@@ -284,6 +292,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         data-rsvp-button="true"
         data-status="Interested"
         data-event-button="true"
+        data-event-id={eventId}
       >
         {renderButtonContent('Interested', isInterested)}
       </Button>
