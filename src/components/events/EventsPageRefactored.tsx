@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -16,6 +17,7 @@ import { EventSearch } from '@/components/events/search/EventSearch';
 import { AdvancedFiltersToggle } from '@/components/events/filters/AdvancedFiltersToggle';
 import { ActiveFiltersSummary } from '@/components/events/filters/ActiveFiltersSummary';
 import { EventCountDisplay } from '@/components/events/EventCountDisplay';
+import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
 
 const EventsPageRefactored = () => {
   useEventPageMeta();
@@ -106,9 +108,13 @@ const EventsPageRefactored = () => {
   
   // Filter events based on all filters
   const filteredEvents = React.useMemo(() => {
-    // Show all events by default, even if no categories are selected
-    if (selectedCategories.length === 0 && allEventTypes.length > 0) {
-      // Return all events if no event types are selected
+    // If no categories selected, show no events
+    if (selectedCategories.length === 0) {
+      return [];
+    }
+    
+    // Show all events if all categories are selected
+    if (selectedCategories.length === allEventTypes.length) {
       let filtered = events;
       
       // Apply venue filter if selected
@@ -125,12 +131,9 @@ const EventsPageRefactored = () => {
     }
     
     // Apply event type filter if some event types are selected
-    let filtered = events;
-    if (selectedCategories.length > 0 && selectedCategories.length !== allEventTypes.length) {
-      filtered = events.filter(event => 
-        event.event_type && selectedCategories.includes(event.event_type)
-      );
-    }
+    let filtered = events.filter(event => 
+      event.event_type && selectedCategories.includes(event.event_type)
+    );
     
     // Apply venue filter
     if (selectedVenues.length > 0) {
@@ -219,15 +222,23 @@ const EventsPageRefactored = () => {
         <EventCountDisplay count={eventsFound} />
         
         <div className="space-y-8">
-          <LazyEventsList 
-            mainEvents={filteredEvents}
-            relatedEvents={[]} 
-            isLoading={eventsLoading || isVenuesLoading || isFilterLoading}
-            onRsvp={user ? enhancedHandleRsvp : undefined}
-            showRsvpButtons={!!user}
-            hasActiveFilters={hasActiveFilters}
-            loadingEventId={loadingEventId}
-          />
+          {/* Show NoResultsFound when there are no event types selected */}
+          {selectedCategories.length === 0 ? (
+            <NoResultsFound 
+              resetFilters={reset}
+              message="No event types selected. Select at least one event type to see events."
+            />
+          ) : (
+            <LazyEventsList 
+              mainEvents={filteredEvents}
+              relatedEvents={[]} 
+              isLoading={eventsLoading || isVenuesLoading || isFilterLoading}
+              onRsvp={user ? enhancedHandleRsvp : undefined}
+              showRsvpButtons={!!user}
+              hasActiveFilters={hasActiveFilters}
+              loadingEventId={loadingEventId}
+            />
+          )}
         </div>
       </div>
     </div>

@@ -7,27 +7,20 @@ export const useCategoryFilterSelection = (allCategories: string[] = []) => {
 
   const toggleCategory = useCallback((category: string) => {
     setSelectedCategories(prev => {
-      // If all categories are currently selected and user clicks one category
-      // Only select that category (deselect all others)
-      if (prev.length === allCategories.length) {
-        return [category];
-      }
-      
-      // If the category is already selected and it's the only one selected,
-      // select all categories (reset to default state)
+      // If category is already selected and is the only one selected, deselect it (showing no events)
       if (prev.includes(category) && prev.length === 1) {
-        return [...allCategories];
+        return [];
       }
       
-      // If the category is already in the selection but there are others selected too,
-      // just remove this category from the selection
+      // If the category is already selected and multiple categories are selected, remove it
       if (prev.includes(category)) {
         return prev.filter(c => c !== category);
-      } else {
-        return [...prev, category];
-      }
+      } 
+      
+      // If the category is not selected, add it
+      return [...prev, category];
     });
-  }, [allCategories]);
+  }, []);
 
   const selectAll = useCallback(() => {
     setSelectedCategories([...allCategories]);
