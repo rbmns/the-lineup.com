@@ -1,3 +1,4 @@
+
 import { Event } from '@/types';
 
 export interface UseFetchRelatedEventsProps {
@@ -8,6 +9,7 @@ export interface UseFetchRelatedEventsProps {
   vibe?: string;
   minResults?: number;
   startDate?: string;
+  dateDifference?: number;
 }
 
 export interface RelatedEventsState {

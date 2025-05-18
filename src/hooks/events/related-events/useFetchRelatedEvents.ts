@@ -13,7 +13,8 @@ export const useFetchRelatedEvents = ({
   tags = [],
   vibe,
   minResults = 2,
-  startDate
+  startDate,
+  dateDifference = 21
 }: UseFetchRelatedEventsProps): RelatedEventsState => {
   const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -126,7 +127,7 @@ export const useFetchRelatedEvents = ({
     } else {
       setLoading(false);
     }
-  }, [eventType, currentEventId, userId, minResults, tags, vibe, fetchSimilarEvents, startDate]); 
+  }, [eventType, currentEventId, userId, minResults, tags, vibe, fetchSimilarEvents, startDate, dateDifference]); 
   
   return { relatedEvents, loading };
 };
