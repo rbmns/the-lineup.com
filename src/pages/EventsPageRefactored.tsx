@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -9,12 +8,13 @@ import { EventFilterBar } from '@/components/events/filters/EventFilterBar';
 import { useCategoryFilterSelection } from '@/hooks/events/useCategoryFilterSelection';
 import { useEventPageMeta } from '@/components/events/EventsPageMeta';
 import { useEventFilterState } from '@/hooks/events/useEventFilterState';
-import { AdvancedFiltersPanel } from '@/components/events/filters/AdvancedFiltersPanel';
 import { Button } from '@/components/ui/button';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { filterEventsByVenue } from '@/utils/eventUtils';
 import { filterEventsByDate } from '@/utils/date-filtering';
 import { supabase } from '@/lib/supabase';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DateRangeFilter } from '@/components/events/DateRangeFilter';
 
 const EventsPageRefactored = () => {
   useEventPageMeta();
@@ -160,32 +160,70 @@ const EventsPageRefactored = () => {
           />
         </div>
         
-        {/* Toggle for Advanced Filters */}
-        <div className="flex justify-end mb-4">
+        {/* Toggle for Advanced Filters - Now aligned left */}
+        <div className="flex justify-start mb-4">
           <Button
             variant="outline"
             onClick={toggleAdvancedFilters}
             className="flex items-center gap-2"
             size="sm"
           >
+            <Filter className="h-4 w-4" />
             {showAdvancedFilters ? "Hide Advanced Filters" : "Advanced Filters"}
-            <ChevronDown className={`h-4 w-4 transition-transform ${showAdvancedFilters ? 'rotate-180' : ''}`} />
+            {showAdvancedFilters ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
           </Button>
         </div>
         
         {/* Advanced Filters Panel */}
-        <AdvancedFiltersPanel
-          isOpen={showAdvancedFilters}
-          onClose={toggleAdvancedFilters}
-          dateRange={dateRange}
-          onDateRangeChange={setDateRange}
-          selectedDateFilter={selectedDateFilter}
-          onDateFilterChange={setSelectedDateFilter}
-          venues={venues}
-          selectedVenues={selectedVenues}
-          onVenueChange={setSelectedVenues}
-          className="mb-6"
-        />
+        {showAdvancedFilters && (
+          <div className="mb-6 border rounded-md p-4 bg-white shadow-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm">Date Range</h4>
+                <DateRangeFilter
+                  dateRange={dateRange}
+                  onDateRangeChange={setDateRange}
+                  onReset={() => setDateRange(undefined)}
+                  selectedDateFilter={selectedDateFilter}
+                  onDateFilterChange={setSelectedDateFilter}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm">Venue</h4>
+                <div className="relative">
+                  <Select 
+                    value={selectedVenues[0] || ""} 
+                    onValueChange={handleVenueSelect}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select venue" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {venues.map((venue) => (
+                        <SelectItem key={venue.value} value={venue.value}>
+                          {venue.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 space-y-2">
+              <h4 className="font-medium text-sm">Location</h4>
+              <div className="w-full p-2 bg-gray-100 border rounded text-sm">
+                Zandvoort Area
+              </div>
+              <p className="text-xs text-gray-500">Location filtering is currently fixed to Zandvoort Area</p>
+            </div>
+          </div>
+        )}
         
         {/* Active Filters Summary */}
         {hasAdvancedFilters && (
@@ -254,6 +292,16 @@ const EventsPageRefactored = () => {
       </div>
     </div>
   );
+
+  // Helper function for handling venue selection
+  function handleVenueSelect(venueId: string) {
+    // Toggle the venue selection
+    if (selectedVenues.includes(venueId)) {
+      setSelectedVenues(selectedVenues.filter(v => v !== venueId));
+    } else {
+      setSelectedVenues([...selectedVenues, venueId]);
+    }
+  }
 };
 
 export default EventsPageRefactored;
