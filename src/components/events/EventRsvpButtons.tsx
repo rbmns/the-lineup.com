@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
-import { Check, Star, Loader2 } from 'lucide-react';
 
-export type RsvpStatus = 'Going' | 'Interested' | null;
+import React, { useState, useEffect } from 'react';
+import { cn } from '@/lib/utils';
+import { RsvpStatus } from '@/components/events/rsvp/types';
+import { RsvpStatusBadge } from '@/components/events/rsvp/RsvpStatusBadge';
+import { MinimalRsvpButtons } from '@/components/events/rsvp/MinimalRsvpButtons';
+import { CompactRsvpButtons } from '@/components/events/rsvp/CompactRsvpButtons';
+import { DefaultRsvpButtons } from '@/components/events/rsvp/DefaultRsvpButtons';
+
+export type { RsvpStatus };
 
 interface EventRsvpButtonsProps {
   currentStatus?: RsvpStatus | null;
@@ -46,53 +49,17 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     }
   }, [currentStatus, eventId, localStatus]);
   
-  // Compute derived state
-  const isGoing = localStatus === 'Going';
-  const isInterested = localStatus === 'Interested';
-
-  // Map size to button classes
-  const buttonSizeClasses = {
-    sm: 'h-7 text-xs py-1 px-2.5',
-    default: 'h-8 text-sm py-1.5 px-3',
-    lg: 'h-9 text-sm py-2 px-3.5',
-    xl: 'h-10 text-base py-2 px-4'
-  };
-
   // If showStatusOnly is true and there's a current status, only show a badge
   if (showStatusOnly && localStatus) {
     return (
       <div className={cn("flex items-center", className)}>
-        <Badge
-          variant="outline"
-          className={cn(
-            "py-1 px-2 text-xs font-medium transition-all duration-200",
-            localStatus === 'Going' 
-              ? "bg-green-50 text-green-700 border-green-200" 
-              : "bg-blue-50 text-blue-700 border-blue-200"
-          )}
-          data-rsvp-status={localStatus}
-          data-event-id={eventId}
-        >
-          {localStatus}
-        </Badge>
+        <RsvpStatusBadge 
+          status={localStatus} 
+          eventId={eventId} 
+        />
       </div>
     );
   }
-
-  // Get button styles based on variant and active state
-  const getButtonStyle = (active: boolean, status: 'Going' | 'Interested') => {
-    if (active) {
-      return status === 'Going' ? 
-        'bg-green-500 text-white border-green-600 hover:bg-green-600' : 
-        'bg-blue-500 text-white border-blue-600 hover:bg-blue-600';
-    }
-    
-    if (variant === 'minimal') {
-      return 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700';
-    }
-    
-    return 'bg-gray-100 border-gray-200 hover:bg-gray-200 text-gray-700';
-  };
 
   // Handle RSVP click with proper state management
   const handleRsvpClick = async (status: 'Going' | 'Interested') => {
@@ -129,182 +96,48 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     }
   };
 
-  // Determine if this particular button type is loading
-  const isButtonLoading = (buttonType: 'Going' | 'Interested') => {
-    return isLoading && activeButton === buttonType;
-  };
-
-  // Render button content (icon + text)
-  const renderButtonContent = (status: 'Going' | 'Interested', isActive: boolean) => {
-    const isButtonLoading = activeButton === status && isLoading;
-    
-    if (isButtonLoading) {
-      return (
-        <span className="flex items-center gap-1.5">
-          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          <span className="font-medium">{status}</span>
-        </span>
-      );
-    }
-    
-    if (status === 'Going') {
-      return (
-        <span className="flex items-center gap-1.5">
-          <Check className="h-3.5 w-3.5" />
-          <span className="font-medium">Going</span>
-        </span>
-      );
-    } else {
-      return (
-        <span className="flex items-center gap-1.5">
-          <Star className="h-3.5 w-3.5" />
-          <span className="font-medium">Interested</span>
-        </span>
-      );
-    }
-  };
-
   // Minimal variant - just icons
   if (variant === 'minimal') {
     return (
-      <div className={cn('flex items-center gap-2', className)}>
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className={cn(
-            'rounded-md w-8 h-8',
-            getButtonStyle(isGoing, 'Going'),
-            (disabled || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
-          )}
-          disabled={disabled || isLoading}
-          onClick={() => handleRsvpClick('Going')}
-          title="Going"
-          data-rsvp-button="true"
-          data-status="Going"
-          data-event-button="true"
-          data-event-id={eventId}
-        >
-          {isButtonLoading('Going') ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Check className="h-4 w-4" />
-          )}
-        </Button>
-        
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className={cn(
-            'rounded-md w-8 h-8',
-            getButtonStyle(isInterested, 'Interested'),
-            (disabled || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
-          )}
-          disabled={disabled || isLoading}
-          onClick={() => handleRsvpClick('Interested')}
-          title="Interested"
-          data-rsvp-button="true"
-          data-status="Interested"
-          data-event-button="true"
-          data-event-id={eventId}
-        >
-          {isButtonLoading('Interested') ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Star className="h-4 w-4" />
-          )}
-        </Button>
-      </div>
+      <MinimalRsvpButtons
+        currentStatus={localStatus}
+        onRsvp={handleRsvpClick}
+        isLoading={isLoading}
+        disabled={disabled}
+        className={className}
+        activeButton={activeButton}
+        eventId={eventId}
+      />
     );
   }
 
   // Compact variant - smaller buttons with text
   if (variant === 'compact') {
     return (
-      <div className={cn('flex items-center gap-2', className)}>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className={cn(
-            'rounded-md text-sm py-1 px-3',
-            getButtonStyle(isGoing, 'Going'),
-            (disabled || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
-          )}
-          disabled={disabled || isLoading}
-          onClick={() => handleRsvpClick('Going')}
-          data-rsvp-button="true"
-          data-status="Going"
-          data-event-button="true"
-          data-event-id={eventId}
-        >
-          {renderButtonContent('Going', isGoing)}
-        </Button>
-        
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className={cn(
-            'rounded-md text-sm py-1 px-3',
-            getButtonStyle(isInterested, 'Interested'),
-            (disabled || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
-          )}
-          disabled={disabled || isLoading}
-          onClick={() => handleRsvpClick('Interested')}
-          data-rsvp-button="true"
-          data-status="Interested"
-          data-event-button="true"
-          data-event-id={eventId}
-        >
-          {renderButtonContent('Interested', isInterested)}
-        </Button>
-      </div>
+      <CompactRsvpButtons
+        currentStatus={localStatus}
+        onRsvp={handleRsvpClick}
+        isLoading={isLoading}
+        disabled={disabled}
+        className={className}
+        activeButton={activeButton}
+        eventId={eventId}
+      />
     );
   }
 
   // Default variant - full size buttons
   return (
-    <div className={cn('flex items-center gap-2', className)}>
-      <Button
-        type="button"
-        variant="outline"
-        className={cn(
-          buttonSizeClasses[size],
-          'font-medium rounded-md transition-all duration-200',
-          getButtonStyle(isGoing, 'Going'),
-          (disabled || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
-        )}
-        disabled={disabled || isLoading}
-        onClick={() => handleRsvpClick('Going')}
-        data-rsvp-button="true"
-        data-status="Going"
-        data-event-button="true"
-        data-event-id={eventId}
-      >
-        {renderButtonContent('Going', isGoing)}
-      </Button>
-      
-      <Button
-        type="button"
-        variant="outline"
-        className={cn(
-          buttonSizeClasses[size],
-          'font-medium rounded-md transition-all duration-200',
-          getButtonStyle(isInterested, 'Interested'),
-          (disabled || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
-        )}
-        disabled={disabled || isLoading}
-        onClick={() => handleRsvpClick('Interested')}
-        data-rsvp-button="true"
-        data-status="Interested"
-        data-event-button="true"
-        data-event-id={eventId}
-      >
-        {renderButtonContent('Interested', isInterested)}
-      </Button>
-    </div>
+    <DefaultRsvpButtons
+      currentStatus={localStatus}
+      onRsvp={handleRsvpClick}
+      isLoading={isLoading}
+      disabled={disabled}
+      className={className}
+      size={size}
+      activeButton={activeButton}
+      eventId={eventId}
+    />
   );
 };
 
