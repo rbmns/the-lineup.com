@@ -40,7 +40,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       console.log(`EventRsvpButtons (${eventId}): Syncing status from prop`, currentStatus);
       setLocalStatus(currentStatus);
     }
-  }, [currentStatus, eventId]);
+  }, [currentStatus, eventId, localStatus]);
   
   // Compute derived state
   const isGoing = localStatus === 'Going';

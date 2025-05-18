@@ -26,6 +26,7 @@ export const useEnhancedRsvp = (userId: string | undefined) => {
 
       let success = false;
       let oldStatus = existingRsvp?.status;
+      let newStatus = status;
       
       if (existingRsvp) {
         console.log('Found existing RSVP:', existingRsvp);
@@ -41,6 +42,7 @@ export const useEnhancedRsvp = (userId: string | undefined) => {
             throw error;
           }
           success = true;
+          newStatus = null; // Set to null when removing
         } else {
           // Update to new status
           const { error } = await supabase
@@ -69,15 +71,20 @@ export const useEnhancedRsvp = (userId: string | undefined) => {
       if (success) {
         console.log('RSVP update successful, invalidating queries');
         
-        // Use more aggressive cache invalidation to ensure all event-related queries are updated
+        // Perform more aggressive cache invalidation
+        // First invalidate all events-related queries
         queryClient.invalidateQueries({ queryKey: ['events'] });
         queryClient.invalidateQueries({ queryKey: ['event', eventId] });
         queryClient.invalidateQueries({ queryKey: ['filtered-events'] });
         queryClient.invalidateQueries({ queryKey: ['userEvents'] });
         queryClient.invalidateQueries({ queryKey: ['user-events'] });
         
-        // Also update the cache directly for the specific event
-        updateEventCache(eventId, status, oldStatus);
+        // Also invalidate the entire user-events-related cache
+        queryClient.invalidateQueries({ queryKey: ['user-events'] });
+        
+        // Also update the cache directly for immediate UI feedback
+        updateEventsCache(eventId, newStatus, oldStatus);
+        updateEventCache(eventId, newStatus, oldStatus);
       }
       
       return success;
@@ -91,24 +98,50 @@ export const useEnhancedRsvp = (userId: string | undefined) => {
     }
   };
 
-  // Helper function to directly update the cache for immediate UI feedback
+  // Helper function to directly update the single event cache
   const updateEventCache = (eventId: string, newStatus: string | null, oldStatus: string | null) => {
-    // Update event in events list cache
-    queryClient.setQueriesData({ queryKey: ['events'] }, (oldData: any) => {
+    // Update specific event in event detail cache
+    queryClient.setQueryData(['event', eventId], (oldData: any) => {
       if (!oldData) return oldData;
+      return { ...oldData, rsvp_status: newStatus };
+    });
+  };
+  
+  // Helper function to update events list cache
+  const updateEventsCache = (eventId: string, newStatus: string | null, oldStatus: string | null) => {
+    // Update all events caches that might contain this event
+    const updateEventInList = (events: any[]) => {
+      if (!events || !Array.isArray(events)) return events;
       
-      return oldData.map((event: any) => {
+      return events.map((event: any) => {
         if (event.id === eventId) {
           return { ...event, rsvp_status: newStatus };
         }
         return event;
       });
+    };
+    
+    // Update events in main events list cache
+    queryClient.setQueriesData({ queryKey: ['events'] }, (oldData: any) => {
+      if (!oldData) return oldData;
+      return updateEventInList(oldData);
     });
     
-    // Update specific event in event detail cache
-    queryClient.setQueryData(['event', eventId], (oldData: any) => {
+    // Also update filtered events cache
+    queryClient.setQueriesData({ queryKey: ['filtered-events'] }, (oldData: any) => {
       if (!oldData) return oldData;
-      return { ...oldData, rsvp_status: newStatus };
+      return updateEventInList(oldData);
+    });
+    
+    // Update events in user events cache
+    queryClient.setQueriesData({ queryKey: ['userEvents'] }, (oldData: any) => {
+      if (!oldData || !oldData.upcomingEvents) return oldData;
+      
+      return {
+        ...oldData,
+        upcomingEvents: updateEventInList(oldData.upcomingEvents),
+        pastEvents: updateEventInList(oldData.pastEvents)
+      };
     });
   };
 
