@@ -1,55 +1,32 @@
 
-import React from 'react';
 import { 
-  Calendar, Music, Globe, Users, Film, Book, Dumbbell, 
-  Utensils, Tag, Waves, Tent, Leaf, Sun, Sailboat, 
-  PartyPopper, BadgeCheck, Gamepad 
+  Music, Award, Heart, Wind, Waves, Gamepad, MoreHorizontal, 
+  Trophy, Pizza, ShoppingCart, UsersRound, Droplet 
 } from 'lucide-react';
+import React from 'react';
 
-type CategoryIconMapping = {
-  [key: string]: React.ElementType;
-};
-
-export const categoryIconMapping: CategoryIconMapping = {
-  'music': Music,
-  'concert': Music,
-  'festival': Music,
-  'conference': Users,
-  'networking': Users,
-  'meetup': Users,
-  'community': Users,
-  'fitness': Dumbbell,
-  'sports': Dumbbell,
-  'food': Utensils,
-  'dining': Utensils,
-  'film': Film, 
-  'movie': Film,
-  'literature': Book,
-  'reading': Book,
-  'culture': Globe,
-  'travel': Globe,
-  'water': Waves,
-  'surf': Waves,
-  'wellness': Leaf,
-  'yoga': Leaf,
-  'beach': Sun,
-  'kite': Sailboat,
-  'party': PartyPopper,
-  'market': BadgeCheck,
-  'game': Gamepad,
-  'other': Calendar
-};
-
-export const getCategoryIcon = (category: string): React.ElementType => {
+export const getCategoryIcon = (category: string): React.FC<React.SVGProps<SVGSVGElement>> => {
   const lowerCategory = category.toLowerCase();
   
-  // Check if there's a direct match
-  for (const [key, Icon] of Object.entries(categoryIconMapping)) {
-    if (lowerCategory === key || lowerCategory.includes(key)) {
-      return Icon;
-    }
-  }
+  // Icon mapping based on category
+  const categoryIcons: Record<string, React.FC<React.SVGProps<SVGSVGElement>>> = {
+    'festival': Award,
+    'wellness': Heart,
+    'kite': Wind,
+    'beach': Waves,
+    'game': Gamepad,
+    'other': MoreHorizontal,
+    'sports': Trophy,
+    'surf': Waves,
+    'party': Award,
+    'yoga': Heart,
+    'community': UsersRound,
+    'water': Droplet,
+    'music': Music,
+    'food': Pizza,
+    'market': ShoppingCart
+  };
   
-  // Default icon if no match
-  return Tag;
+  // Return the icon component for the category, or a default if not found
+  return categoryIcons[lowerCategory] || MoreHorizontal;
 };
