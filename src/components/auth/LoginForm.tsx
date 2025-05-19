@@ -12,9 +12,10 @@ import { completeLogout, checkEmailRateLimit, markAuthAttempt, resetRateLimit } 
 interface LoginFormProps {
   onToggleMode: () => void;
   onForgotPassword: () => void;
+  suppressSuccessToast?: boolean; // Add the missing prop with optional flag
 }
 
-export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode, onForgotPassword }) => {
+export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode, onForgotPassword, suppressSuccessToast = false }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -121,7 +122,13 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode, onForgotPass
       resetRateLimit();
       setRetryCount(0);
       
-      // Removed successful login toast - no confirmation needed
+      // Only show success toast if not suppressed
+      if (!suppressSuccessToast) {
+        toast({
+          title: "Login successful",
+          description: "You are now logged in.",
+        });
+      }
       
       // Auth context will handle redirects
     } catch (error: any) {
@@ -243,3 +250,4 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode, onForgotPass
     </>
   );
 };
+
