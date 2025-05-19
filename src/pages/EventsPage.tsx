@@ -52,7 +52,7 @@ const EventsPage = () => {
   const hasActiveFilters = false;
   
   // Get similar events if no main events are found
-  const { similarEvents } = useSimilarEventsHandler({
+  const { similarEvents = [] } = useSimilarEventsHandler({
     mainEvents: displayEvents,
     hasActiveFilters: displayEvents.length === 0, // Treat as "has filters" if no events to show related ones
     selectedEventTypes: [], // No selected event types on basic page

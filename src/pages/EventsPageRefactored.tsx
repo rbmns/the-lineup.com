@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -144,9 +145,9 @@ const EventsPageRefactored = () => {
     
     return filtered;
   }, [events, selectedCategories, allEventTypes.length, selectedVenues, dateRange, selectedDateFilter]);
-  
+
   // Get similar events if no results match our filters but filters are active
-  const { similarEvents } = useSimilarEventsHandler({
+  const { similarEvents = [] } = useSimilarEventsHandler({
     mainEvents: filteredEvents,
     hasActiveFilters,
     selectedEventTypes: selectedCategories,
