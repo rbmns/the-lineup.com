@@ -12,7 +12,6 @@ import { AdvancedFiltersPanel } from '@/components/events/filters/AdvancedFilter
 import { filterEventsByVenue } from '@/utils/eventUtils';
 import { filterEventsByDate } from '@/utils/date-filtering';
 import { supabase } from '@/lib/supabase';
-import { EventSearch } from '@/components/events/search/EventSearch';
 import { AdvancedFiltersToggle } from '@/components/events/filters/AdvancedFiltersToggle';
 import { ActiveFiltersSummary } from '@/components/events/filters/ActiveFiltersSummary';
 import { EventCountDisplay } from '@/components/events/EventCountDisplay';
@@ -180,11 +179,8 @@ const EventsPageRefactored = () => {
       <div className="max-w-7xl mx-auto">
         <EventsPageHeader title="Upcoming Events" />
         
-        {/* Search input */}
-        <EventSearch className="mb-4 mt-4" />
-        
         {/* Events category filter bar */}
-        <div className="mt-2 mb-4 overflow-x-auto">
+        <div className="mt-6 mb-4 overflow-x-auto">
           <EventFilterBar
             allEventTypes={allEventTypes}
             selectedEventTypes={selectedCategories}
