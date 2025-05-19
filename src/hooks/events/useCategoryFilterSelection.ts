@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 
 // Storage key for persisting filter state
@@ -82,6 +83,12 @@ export const useCategoryFilterSelection = (categories: string[]) => {
 
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev => {
+      // If all categories are currently selected and user clicks one,
+      // show only that one category (first filter click behavior)
+      if (prev.length === categories.length) {
+        return [category];
+      }
+      
       // If the category is already in the selection, remove it
       if (prev.includes(category)) {
         // Don't allow removing the last category (always keep at least one)
