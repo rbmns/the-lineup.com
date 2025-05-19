@@ -41,23 +41,49 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   const isGoing = currentStatus === 'Going';
   const isInterested = currentStatus === 'Interested';
 
-  // Enhanced RSVP handler with better event isolation
+  // Enhanced RSVP handler with complete event isolation
   const handleRsvp = async (status: 'Going' | 'Interested', e?: React.MouseEvent) => {
-    // Stop propagation and prevent default to ensure no parent elements receive the event
+    // Comprehensive event isolation
     if (e) {
       e.stopPropagation();
       e.preventDefault();
+      e.nativeEvent.stopImmediatePropagation();
+      
+      // Mark this event as explicitly handled
+      const target = e.currentTarget as HTMLElement;
+      if (target) {
+        target.setAttribute('data-event-handled', 'true');
+        target.setAttribute('data-rsvp-action', status);
+      }
     }
     
-    if (isLoading || internalLoading) return;
+    if (isLoading || internalLoading) return false;
 
     try {
       setActiveButton(status);
       setInternalLoading(true);
       
-      // Call the provided onRsvp handler
-      await onRsvp(status);
+      // Store current filter state from URL and scroll position
+      const urlParams = window.location.search;
+      const scrollPos = window.scrollY;
       
+      // Call the provided onRsvp handler
+      const result = await onRsvp(status);
+      
+      // Attempt to restore state if needed
+      setTimeout(() => {
+        // Check if URL params changed during the RSVP operation
+        const currentParams = window.location.search;
+        if (window.location.pathname.includes('/events') && urlParams !== currentParams) {
+          console.log('Filter state changed during RSVP, attempting to restore');
+          window.history.replaceState({}, '', `${window.location.pathname}${urlParams}`);
+        }
+        
+        // Restore scroll position
+        window.scrollTo({ top: scrollPos, behavior: 'auto' });
+      }, 50);
+      
+      return result;
     } catch (error) {
       console.error('Error in RSVP handler:', error);
     } finally {
@@ -109,9 +135,11 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     <div 
       className={cn('flex items-center space-x-2', className)} 
       data-rsvp-container="true"
+      data-no-navigation="true"
       onClick={(e) => {
         e.stopPropagation();
         e.preventDefault();
+        e.nativeEvent.stopImmediatePropagation();
       }}
     >
       <Button
@@ -127,6 +155,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         onClick={(e) => handleRsvp('Going', e)}
         data-rsvp-button="true"
         data-status="Going"
+        data-no-navigation="true"
       >
         {isLoading && activeButton === 'Going' ? (
           <Loader2 className="h-3 w-3 animate-spin" />
@@ -148,6 +177,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         onClick={(e) => handleRsvp('Interested', e)}
         data-rsvp-button="true"
         data-status="Interested"
+        data-no-navigation="true"
       >
         {isLoading && activeButton === 'Interested' ? (
           <Loader2 className="h-3 w-3 animate-spin" />

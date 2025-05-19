@@ -43,11 +43,20 @@ export const MinimalRsvpButtons: React.FC<MinimalRsvpButtonsProps> = ({
     return isLoading && activeButton === buttonType;
   };
 
-  // Enhanced click handler with improved event stopping
+  // Enhanced click handler with improved event isolation
   const handleClick = (status: 'Going' | 'Interested', e: React.MouseEvent) => {
-    // Ensure the event doesn't propagate up or trigger defaults
-    e.stopPropagation();
-    e.preventDefault();
+    // Completely isolate the event to prevent any possible propagation
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      e.nativeEvent.stopImmediatePropagation();
+    }
+    
+    // Apply a data attribute to the event target to mark it as handled
+    const target = e.currentTarget as HTMLElement;
+    if (target) {
+      target.setAttribute('data-event-handled', 'true');
+    }
     
     // Call the provided onRsvp handler
     onRsvp(status, e);
@@ -60,9 +69,11 @@ export const MinimalRsvpButtons: React.FC<MinimalRsvpButtonsProps> = ({
     <div 
       className={cn('flex items-center gap-2', className)}
       data-rsvp-container="true" 
+      data-no-navigation="true"
       onClick={(e) => {
         e.stopPropagation();
         e.preventDefault();
+        e.nativeEvent.stopImmediatePropagation();
       }}
     >
       <Button
@@ -81,6 +92,7 @@ export const MinimalRsvpButtons: React.FC<MinimalRsvpButtonsProps> = ({
         data-status="Going"
         data-event-button="true"
         data-event-id={eventId}
+        data-no-navigation="true"
       >
         {isButtonLoading('Going') ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -105,6 +117,7 @@ export const MinimalRsvpButtons: React.FC<MinimalRsvpButtonsProps> = ({
         data-status="Interested"
         data-event-button="true"
         data-event-id={eventId}
+        data-no-navigation="true"
       >
         {isButtonLoading('Interested') ? (
           <Loader2 className="h-4 w-4 animate-spin" />

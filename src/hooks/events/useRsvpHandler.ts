@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 /**
  * A hook to handle RSVP actions with proper caching to maintain RSVP state across pages
+ * while preserving filter state
  */
 export const useRsvpHandler = (
   user: User | null | undefined,
@@ -21,6 +22,10 @@ export const useRsvpHandler = (
       return false;
     }
 
+    // Store current filter state and scroll position
+    const scrollPosition = window.scrollY;
+    const urlSearchParams = window.location.search;
+    
     // Use event ID specific check to prevent cross-event interference
     const eventRsvpKey = `rsvp-${eventId}`;
     if ((window as any)[eventRsvpKey]) {
@@ -33,16 +38,47 @@ export const useRsvpHandler = (
       (window as any)[eventRsvpKey] = true;
       rsvpInProgressRef.current = true;
       
+      // Track start time for performance measurement
+      const startTime = performance.now();
       const success = await handleRsvp(eventId, status);
+      const endTime = performance.now();
+      
+      console.log(`RSVP operation completed in ${endTime - startTime}ms`);
       
       if (success) {
-        // Invalidate all event-related queries to ensure fresh data across pages
-        console.log('Invalidating queries after successful RSVP');
-        queryClient.invalidateQueries({ queryKey: ['events'] });
+        // Instead of invalidating all queries, only invalidate the specific event
+        // This helps preserve filter state
+        console.log('Performing selective cache invalidation after successful RSVP');
         queryClient.invalidateQueries({ queryKey: ['event', eventId] });
-        queryClient.invalidateQueries({ queryKey: ['filtered-events'] });
-        queryClient.invalidateQueries({ queryKey: ['userEvents'] });
-        queryClient.invalidateQueries({ queryKey: ['user-events'] });
+        
+        // Don't invalidate these queries to preserve filter state
+        // queryClient.invalidateQueries({ queryKey: ['events'] });
+        // queryClient.invalidateQueries({ queryKey: ['filtered-events'] });
+        
+        // Give time for any React state updates to stabilize
+        setTimeout(() => {
+          // Restore scroll position
+          window.scrollTo({
+            top: scrollPosition,
+            behavior: 'auto'
+          });
+          
+          // If we're on the events page with filters, ensure the filters are preserved
+          if (window.location.pathname.includes('/events') && urlSearchParams) {
+            const currentParams = new URLSearchParams(window.location.search).toString();
+            const originalParams = new URLSearchParams(urlSearchParams).toString();
+            
+            if (currentParams !== originalParams) {
+              console.log("Restoring URL parameters:", originalParams);
+              // Use history.replaceState to avoid triggering navigation
+              window.history.replaceState(
+                {}, 
+                '', 
+                `${window.location.pathname}?${originalParams}`
+              );
+            }
+          }
+        }, 100);
       }
       
       return success;
