@@ -1,34 +1,32 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { AlertCircle } from 'lucide-react';
 
 interface NoResultsFoundProps {
-  message?: string;
-  searchQuery?: string;
   resetFilters: () => void;
+  message?: string;
 }
 
 export const NoResultsFound: React.FC<NoResultsFoundProps> = ({ 
-  message,
-  searchQuery, 
-  resetFilters 
+  resetFilters, 
+  message = "No events found matching your filters."
 }) => {
-  // Customize message based on whether there's a search query
-  const displayMessage = message || (searchQuery 
-    ? `We couldn't find exact matches for "${searchQuery}".`
-    : 'No matches found for your current filters.');
-
   return (
-    <div className="text-center py-8 max-w-xl mx-auto animate-fade-in" style={{ animationDelay: '300ms' }}>
-      <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-        <h3 className="text-xl font-medium text-gray-900 mb-3">No matches found</h3>
-        <p className="text-gray-600 mb-4">{displayMessage}</p>
+    <div className="py-16 flex flex-col items-center justify-center text-center">
+      <div className="bg-gray-50 p-6 rounded-lg shadow-sm max-w-md">
+        <div className="flex justify-center mb-4">
+          <AlertCircle className="h-10 w-10 text-yellow-500" />
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 mb-3">
+          {message}
+        </h3>
         <Button 
-          variant="outline" 
-          onClick={resetFilters}
-          className="bg-white hover:bg-gray-100"
+          onClick={resetFilters} 
+          className="mt-4"
+          variant="default"
         >
-          Clear all filters
+          Show All Events
         </Button>
       </div>
     </div>
