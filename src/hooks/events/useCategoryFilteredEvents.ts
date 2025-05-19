@@ -124,14 +124,20 @@ export const useCategoryFilteredEvents = (categorySlug: string | undefined) => {
     }
   };
   
-  // Handle fetching similar events when filters are applied but no exact matches
-  useSimilarEventsHandler(
-    exactMatches,
+  // Use the useSimilarEventsHandler hook correctly with a single object parameter
+  const { similarEvents: fetchedSimilarEvents = [] } = useSimilarEventsHandler({
+    mainEvents: exactMatches,
     hasActiveFilters,
     selectedEventTypes,
-    fetchSimilarEvents,
-    setSimilarEvents
-  );
+    dateRange,
+    selectedDateFilter,
+    userId: user?.id
+  });
+  
+  // Update similarEvents state when fetchedSimilarEvents changes
+  useEffect(() => {
+    setSimilarEvents(fetchedSimilarEvents);
+  }, [fetchedSimilarEvents]);
   
   // Handle RSVP actions with loading state
   const handleEventRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<void> => {
@@ -192,7 +198,7 @@ export const useCategoryFilteredEvents = (categorySlug: string | undefined) => {
     
     // Filtered event data
     exactMatches,
-    similarEvents,
+    similarEvents: fetchedSimilarEvents, // Use the fetched similar events here
     showNoExactMatchesMessage,
     hasActiveFilters,
     
