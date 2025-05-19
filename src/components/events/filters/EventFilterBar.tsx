@@ -43,6 +43,7 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
             onClick={handleAllToggle}
             size="default"
             isSelectAll={!isAllSelected}
+            label={isAllSelected ? "Deselect all" : "Select all"}
           />
           
           {allEventTypes.map((eventType) => (

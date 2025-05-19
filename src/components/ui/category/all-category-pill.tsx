@@ -23,9 +23,9 @@ export const AllCategoryPill: React.FC<AllCategoryPillProps> = ({
   // Base styles with more distinct button appearance
   const baseClasses = 'rounded-md font-medium transition-colors flex items-center gap-1.5 cursor-pointer border';
   
-  // Active/inactive state colors - using more distinct styling
+  // More distinct styling for the All/None button
   const stateClasses = active 
-    ? 'bg-gray-900 text-white hover:bg-gray-800 border-gray-900'
+    ? 'bg-black text-white hover:bg-gray-800 border-black'
     : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300';
   
   // Size classes

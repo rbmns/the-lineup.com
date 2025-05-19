@@ -1,9 +1,13 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export const useCategoryFilterSelection = (categories: string[]) => {
   // Initialize with all categories selected (default state)
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([...categories]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+  // Set all categories as selected when the component mounts or categories change
+  useEffect(() => {
+    setSelectedCategories([...categories]);
+  }, [categories]);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev => {
@@ -15,6 +19,10 @@ export const useCategoryFilterSelection = (categories: string[]) => {
       
       // If the category is already in the selection, remove it
       if (prev.includes(category)) {
+        // Don't allow removing the last category (always keep at least one)
+        if (prev.length === 1) {
+          return prev;
+        }
         return prev.filter(c => c !== category);
       }
       

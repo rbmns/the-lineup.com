@@ -175,17 +175,25 @@ export const EventFilterSection: React.FC<EventFilterSectionProps> = ({
                 </div>
                 <div>
                   <h3 className="font-medium mb-2">Venue</h3>
-                  <VenueFilter
-                    venues={safeVenues}
-                    selectedVenues={safeSelectedVenues}
-                    onVenueChange={setSelectedVenues}
-                    onReset={() => setSelectedVenues([])}
-                  />
+                  <div className="max-h-64 overflow-y-auto pr-2">
+                    <VenueFilter
+                      venues={safeVenues}
+                      selectedVenues={safeSelectedVenues}
+                      onVenueChange={setSelectedVenues}
+                      onReset={() => setSelectedVenues([])}
+                    />
+                    {safeVenues.length > 5 && (
+                      <div className="flex justify-center mt-1">
+                        <ChevronDown className="h-4 w-4 text-gray-400" />
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <h3 className="font-medium mb-2">Location</h3>
-                  <div className="text-sm text-gray-500">
-                    Select a venue to filter by location
+                  <div className="flex items-center space-x-2 p-2 border border-gray-200 rounded-md bg-gray-50">
+                    <span className="text-sm">Zandvoort Area</span>
+                    <span className="text-xs text-gray-500">(coming soon)</span>
                   </div>
                 </div>
               </div>
