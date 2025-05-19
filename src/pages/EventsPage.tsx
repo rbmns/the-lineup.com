@@ -69,7 +69,8 @@ const EventsPage = () => {
       <div className="max-w-7xl mx-auto">
         <EventsPageHeader title="Upcoming Events" />
         
-        <EventCountDisplay count={eventsCount} />
+        {/* Hide the EventCountDisplay */}
+        <EventCountDisplay count={eventsCount} hidden={true} />
         
         <div className="space-y-8 mt-8">
           <LazyEventsList 
@@ -81,7 +82,7 @@ const EventsPage = () => {
             hasActiveFilters={displayEvents.length === 0} // Show related events message if no events
             compact={false}
             loadingEventId={loadingEventId}
-            hideCount={true} // Add this prop to hide the count in LazyEventsList
+            hideCount={true} // Keep this true to hide the count in LazyEventsList
           />
         </div>
       </div>

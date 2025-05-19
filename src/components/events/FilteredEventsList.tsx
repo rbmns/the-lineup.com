@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Event } from '@/types';
@@ -142,10 +143,9 @@ export const FilteredEventsList: React.FC<FilteredEventsListProps> = ({
         </div>
       )}
       
-      {/* Divider between exact and similar results */}
+      {/* Divider between exact and similar results - remove the Separator */}
       {showDivider && (
         <div className="mt-12 mb-8">
-          <Separator className="my-4" />
           <div className="text-center text-gray-600 text-sm bg-gray-50 p-3 rounded-lg">
             End of exact matches. Showing similar results below.
           </div>

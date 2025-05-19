@@ -70,13 +70,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
         <NoResultsFound resetFilters={resetFilters} />
       )}
       
-      {!isLoading && mainEvents.length > 0 && !hideCount && (
-        <div className="flex justify-between items-center border-b pb-2">
-          <span className="text-sm text-gray-500">
-            {mainEvents.length} {mainEvents.length === 1 ? 'event' : 'events'} found
-          </span>
-        </div>
-      )}
+      {/* Remove the events count display here */}
 
       {!isLoading && mainEvents.length > 0 && (
         <EventGrid

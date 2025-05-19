@@ -35,8 +35,8 @@ export const EventsResultsSection: React.FC<EventsResultsSectionProps> = ({
 
   return (
     <div className="space-y-8">
-      {/* Events count display */}
-      <EventCountDisplay count={eventsCount} />
+      {/* Hide the EventCountDisplay */}
+      <EventCountDisplay count={eventsCount} hidden={true} />
       
       {/* Show NoResultsFound when there are no event types selected */}
       {isNoneSelected ? (
@@ -53,6 +53,7 @@ export const EventsResultsSection: React.FC<EventsResultsSectionProps> = ({
           showRsvpButtons={showRsvpButtons}
           hasActiveFilters={hasActiveFilters}
           loadingEventId={loadingEventId}
+          hideCount={true} // Ensure count is hidden in LazyEventsList
         />
       )}
     </div>

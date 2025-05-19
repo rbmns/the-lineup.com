@@ -37,8 +37,8 @@ export const EventsResultsDisplay: React.FC<EventsResultsDisplayProps> = ({
 
   return (
     <div className="space-y-8">
-      {/* Events count display */}
-      <EventCountDisplay count={eventsCount} />
+      {/* Hide the EventCountDisplay */}
+      <EventCountDisplay count={eventsCount} hidden={true} />
 
       {/* Show LazyEventsList in all cases */}
       <LazyEventsList 
