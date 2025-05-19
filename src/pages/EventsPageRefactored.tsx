@@ -15,6 +15,7 @@ import { supabase } from '@/lib/supabase';
 import { EventSearch } from '@/components/events/search/EventSearch';
 import { AdvancedFiltersToggle } from '@/components/events/filters/AdvancedFiltersToggle';
 import { ActiveFiltersSummary } from '@/components/events/filters/ActiveFiltersSummary';
+import { EventCountDisplay } from '@/components/events/EventCountDisplay';
 import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
 
 const EventsPageRefactored = () => {
@@ -98,21 +99,7 @@ const EventsPageRefactored = () => {
   
   const filteredEvents = React.useMemo(() => {
     if (selectedCategories.length === 0) {
-      return [];
-    }
-    
-    if (selectedCategories.length === allEventTypes.length) {
-      let filtered = events;
-      
-      if (selectedVenues.length > 0) {
-        filtered = filterEventsByVenue(filtered, selectedVenues);
-      }
-      
-      if (dateRange || selectedDateFilter) {
-        filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
-      }
-      
-      return filtered;
+      return events;
     }
     
     let filtered = events.filter(event => 
@@ -128,7 +115,7 @@ const EventsPageRefactored = () => {
     }
     
     return filtered;
-  }, [events, selectedCategories, allEventTypes.length, selectedVenues, dateRange, selectedDateFilter]);
+  }, [events, selectedCategories, selectedVenues, dateRange, selectedDateFilter]);
   
   const eventsCount = filteredEvents.length;
   
@@ -190,29 +177,18 @@ const EventsPageRefactored = () => {
           resetFilters={resetFilters}
         />
         
-        {!isNoneSelected && (
-          <div className="mb-4 text-sm text-gray-600">
-            {eventsCount} {eventsCount === 1 ? 'event' : 'events'} found
-          </div>
-        )}
+        <EventCountDisplay count={eventsCount} />
         
         <div className="space-y-8">
-          {isNoneSelected ? (
-            <NoResultsFound 
-              resetFilters={selectAll}
-              message="No event types selected. Select at least one event type to see events."
-            />
-          ) : (
-            <LazyEventsList 
-              mainEvents={filteredEvents}
-              relatedEvents={[]} 
-              isLoading={eventsLoading || isVenuesLoading || isFilterLoading}
-              onRsvp={user ? enhancedHandleRsvp : undefined}
-              showRsvpButtons={!!user}
-              hasActiveFilters={hasActiveFilters}
-              loadingEventId={loadingEventId}
-            />
-          )}
+          <LazyEventsList 
+            mainEvents={filteredEvents}
+            relatedEvents={[]} 
+            isLoading={eventsLoading || isVenuesLoading || isFilterLoading}
+            onRsvp={user ? enhancedHandleRsvp : undefined}
+            showRsvpButtons={!!user}
+            hasActiveFilters={hasActiveFilters}
+            loadingEventId={loadingEventId}
+          />
         </div>
       </div>
     </div>

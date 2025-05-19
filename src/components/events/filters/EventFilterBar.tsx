@@ -30,9 +30,9 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
   const isNoneSelected = selectedEventTypes.length === 0;
   
   const handleAllToggle = () => {
-    // If all are already selected, deselect all
-    // If some or none are selected, select all
-    isAllSelected ? onDeselectAll() : onSelectAll();
+    // If some or all are selected, deselect all
+    // If none are selected, select all
+    selectedEventTypes.length > 0 ? onDeselectAll() : onSelectAll();
   };
 
   return (
@@ -40,11 +40,11 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
       <div className="overflow-x-auto pb-2 no-scrollbar">
         <div className="flex gap-2 min-w-max">
           <AllCategoryPill
-            active={true}
+            active={isNoneSelected ? false : true}
             onClick={handleAllToggle}
             size="default"
-            isSelectAll={!isAllSelected}
-            label={isAllSelected ? "Deselect all" : "Select all"}
+            isSelectAll={isNoneSelected}
+            label={isNoneSelected ? "Select all" : "Deselect all"}
             className="min-w-[115px] justify-center"
           />
           

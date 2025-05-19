@@ -1,11 +1,10 @@
-
 import { useState, useEffect, useRef } from 'react';
 
 // Storage key for persisting filter state
 const FILTER_STORAGE_KEY = 'event-category-filters';
 
 export const useCategoryFilterSelection = (categories: string[]) => {
-  // Initialize with stored categories if available, otherwise use all categories
+  // Initialize with stored categories if available
   const initialCategories = () => {
     try {
       const storedCategories = sessionStorage.getItem(FILTER_STORAGE_KEY);
@@ -20,8 +19,8 @@ export const useCategoryFilterSelection = (categories: string[]) => {
     } catch (e) {
       console.error("Error reading stored categories:", e);
     }
-    // Default behavior: select all categories
-    return [...categories];
+    // Default behavior: select no categories initially
+    return [];
   };
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>(initialCategories);
@@ -35,12 +34,10 @@ export const useCategoryFilterSelection = (categories: string[]) => {
     if (urlCategories && isInitialRender.current) {
       try {
         const parsedCategories = JSON.parse(decodeURIComponent(urlCategories));
-        if (Array.isArray(parsedCategories) && parsedCategories.length > 0) {
+        if (Array.isArray(parsedCategories)) {
           // Ensure all categories from URL exist in the current categories list
           const validCategories = parsedCategories.filter(cat => categories.includes(cat));
-          if (validCategories.length > 0) {
-            setSelectedCategories(validCategories);
-          }
+          setSelectedCategories(validCategories);
         }
       } catch (e) {
         console.error("Error parsing URL categories:", e);
@@ -62,15 +59,12 @@ export const useCategoryFilterSelection = (categories: string[]) => {
       if (window.location.pathname.includes('/events')) {
         const urlParams = new URLSearchParams(window.location.search);
         
-        if (selectedCategories.length === categories.length) {
-          // If all are selected, don't include in URL (default state)
+        if (selectedCategories.length === 0) {
+          // If none are selected, don't include in URL (default state)
           urlParams.delete('eventTypes');
-        } else if (selectedCategories.length > 0) {
+        } else {
           // If some are selected, include them in URL
           urlParams.set('eventTypes', encodeURIComponent(JSON.stringify(selectedCategories)));
-        } else {
-          // If none are selected, clear this parameter
-          urlParams.delete('eventTypes');
         }
         
         const newUrl = `${window.location.pathname}${urlParams.toString() ? '?' + urlParams.toString() : ''}`;
@@ -79,27 +73,17 @@ export const useCategoryFilterSelection = (categories: string[]) => {
     } catch (e) {
       console.error("Error saving category filters:", e);
     }
-  }, [selectedCategories, categories]);
+  }, [selectedCategories]);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev => {
-      // If all categories are currently selected and user clicks one,
-      // show only that one category (first filter click behavior)
-      if (prev.length === categories.length) {
-        return [category];
-      }
-      
-      // If the category is already in the selection, remove it
       if (prev.includes(category)) {
-        // Don't allow removing the last category (always keep at least one)
-        if (prev.length === 1) {
-          return prev;
-        }
+        // If the category is already selected, remove it
         return prev.filter(c => c !== category);
+      } else {
+        // Otherwise, add the category to the selection
+        return [...prev, category];
       }
-      
-      // Otherwise, add the category to the selection
-      return [...prev, category];
     });
   };
 
@@ -108,12 +92,11 @@ export const useCategoryFilterSelection = (categories: string[]) => {
   };
 
   const deselectAll = () => {
-    // Allow deselecting all categories (showing no results)
     setSelectedCategories([]);
   };
 
   const reset = () => {
-    setSelectedCategories([...categories]);
+    setSelectedCategories([]);
   };
 
   const isAllSelected = selectedCategories.length === categories.length;
