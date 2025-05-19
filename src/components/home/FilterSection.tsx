@@ -32,6 +32,10 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
     'next week',
     'later'
   ];
+  
+  const handleToggleEventType = (eventType: string) => {
+    toggleEventType(eventType);
+  };
 
   return (
     <div className="space-y-8">
@@ -46,7 +50,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
               key={category} 
               category={category} 
               active={selectedEventTypes.includes(category)}
-              onClick={() => toggleEventType(category)}
+              onClick={() => handleToggleEventType(category)}
               showIcon={true}
               size="default"
             />

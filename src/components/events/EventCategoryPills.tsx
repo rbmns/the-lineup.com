@@ -29,6 +29,17 @@ export const EventCategoryPills: React.FC<EventCategoryPillsProps> = ({
   const allSelected = categories.length === selectedCategories.length;
   const someSelected = selectedCategories.length > 0 && !allSelected;
   
+  const handleToggleCategory = (category: string) => {
+    // If all categories are selected, clicking one should isolate it
+    if (allSelected) {
+      // We'll handle this in the hook directly
+      onToggleCategory(category);
+    } else {
+      // Normal toggle behavior
+      onToggleCategory(category);
+    }
+  };
+  
   return (
     <div className={cn("space-y-4", className)}>
       <div className="flex flex-wrap gap-2">
@@ -37,7 +48,7 @@ export const EventCategoryPills: React.FC<EventCategoryPillsProps> = ({
             key={category}
             category={category}
             active={selectedCategories.includes(category)}
-            onClick={() => onToggleCategory(category)}
+            onClick={() => handleToggleCategory(category)}
             showIcon={true}
           />
         ))}
