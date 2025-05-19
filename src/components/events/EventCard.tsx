@@ -100,13 +100,13 @@ const EventCard: React.FC<EventCardProps> = ({
           className="h-full w-full object-cover transition-transform group-hover:scale-105 duration-300"
         />
         
-        {/* Event type pill positioned at top of image */}
+        {/* Event type pill - UPDATED to not show icons */}
         {event.event_type && (
           <div className="absolute top-3 left-3 z-10">
             <CategoryPill 
               category={event.event_type} 
               size="default" 
-              showIcon={true}
+              showIcon={false}
             />
           </div>
         )}
@@ -142,7 +142,7 @@ const EventCard: React.FC<EventCardProps> = ({
         {/* Spacer to push RSVP buttons to bottom */}
         <div className="flex-grow min-h-[8px]"></div>
         
-        {/* RSVP Buttons - with improved event handling */}
+        {/* RSVP Buttons - UPDATED to use default size instead of small */}
         {showRsvpButtons && (
           <div 
             className="mt-2" 
@@ -155,7 +155,7 @@ const EventCard: React.FC<EventCardProps> = ({
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
-              size="sm"
+              size="default"
               isLoading={isLoading}
             />
           </div>

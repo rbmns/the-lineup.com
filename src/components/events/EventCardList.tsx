@@ -101,7 +101,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
           alt={event.title}
           className="h-full w-full object-cover"
         />
-        {/* Event type pill */}
+        {/* Event type pill - UPDATED to not show icons */}
         {event.event_type && (
           <div className="absolute top-2 left-2">
             <CategoryPill 
@@ -154,7 +154,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
               <EventRsvpButtons
                 currentStatus={event.rsvp_status || null}
                 onRsvp={handleRsvp}
-                size="sm"
+                size="default"
                 showStatusOnly={!showRsvpButtons && showRsvpStatus}
               />
             </div>
