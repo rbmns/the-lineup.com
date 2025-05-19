@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -110,8 +109,8 @@ const EventsPageRefactored = () => {
       return [];
     }
     
-    // Show all events if all categories are selected OR if none are specifically selected
-    if (selectedCategories.length === allEventTypes.length || selectedCategories.length === 0) {
+    // Show all events if all categories are selected
+    if (selectedCategories.length === allEventTypes.length) {
       let filtered = events;
       
       // Apply venue filter if selected

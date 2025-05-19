@@ -35,7 +35,7 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
   return (
     <div className={cn("flex gap-2 flex-wrap", className)}>
       <AllCategoryPill
-        active={isAllSelected}
+        active={isAllSelected || isNoneSelected}
         onClick={handleAllClick}
         size="default"
       />
@@ -44,7 +44,8 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
         <CategoryPill
           key={eventType}
           category={eventType}
-          active={selectedEventTypes.includes(eventType)}
+          // Show as active if specifically selected OR if none are selected (meaning all are active by default)
+          active={selectedEventTypes.includes(eventType) || isNoneSelected}
           onClick={() => onToggleEventType(eventType)}
           showIcon={false}
           size="default"

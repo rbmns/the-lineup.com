@@ -30,8 +30,8 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
   const isNoneSelected = selectedEventTypes.length === 0;
   
   const handleAllToggle = () => {
-    // If all are already selected, deselect all
-    // If some or none are selected, select all
+    // If all are already selected or none are selected, select all
+    // If some are selected, select all
     isAllSelected ? onDeselectAll() : onSelectAll();
   };
 
@@ -52,7 +52,7 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
             <CategoryPill
               key={eventType}
               category={eventType}
-              active={selectedEventTypes.includes(eventType)}
+              active={selectedEventTypes.includes(eventType) || isNoneSelected}
               onClick={() => onToggleEventType(eventType)}
               showIcon={false}
               size="default"
