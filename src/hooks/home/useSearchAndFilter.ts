@@ -1,4 +1,3 @@
-
 import { useCallback } from 'react';
 import { Event, UserProfile, Venue } from '@/types';
 import { supabase } from '@/lib/supabase';
@@ -418,7 +417,7 @@ export const useSearchAndFilter = (
     }
   };
 
-  // Submit search form
+  // Submit search form - fixed to accept a query parameter
   const handleSearch = useCallback(async (e?: React.FormEvent, query?: string) => {
     if (e) e.preventDefault();
     
