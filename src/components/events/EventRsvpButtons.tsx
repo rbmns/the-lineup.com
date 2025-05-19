@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Check, Star, Loader2 } from 'lucide-react';
 import { MinimalRsvpButtons } from './rsvp/MinimalRsvpButtons';
+import { DefaultRsvpButtons } from './rsvp/DefaultRsvpButtons';
 
 export type RsvpStatus = 'Going' | 'Interested' | null;
 export type RsvpHandler = (status: 'Going' | 'Interested') => Promise<boolean>;
@@ -27,9 +28,6 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
 }) => {
   const [activeButton, setActiveButton] = useState<'Going' | 'Interested' | null>(null);
   const [internalLoading, setInternalLoading] = useState(false);
-  
-  // For debugging
-  console.log(`EventRsvpButtons (default-event): props.currentStatus updated to:`, currentStatus);
 
   // Reset active button when external loading state changes or current status changes
   useEffect(() => {
@@ -97,12 +95,13 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   // If minimal UI is requested, use the compact button version
   if (size === 'sm') {
     return (
-      <MinimalRsvpButtons
+      <DefaultRsvpButtons
         currentStatus={currentStatus}
         onRsvp={handleRsvp}
         isLoading={isLoading || internalLoading}
         className={className}
         activeButton={activeButton}
+        size="sm"
       />
     );
   }
@@ -128,12 +127,10 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     );
   }
 
-  // Size classes for the buttons - use only valid size values
-  const buttonSize = size === 'lg' ? 'sm' : 'sm';
-
+  // Use DefaultRsvpButtons for default and larger sizes
   return (
     <div 
-      className={cn('flex items-center space-x-2', className)} 
+      className={cn('', className)} 
       data-rsvp-container="true"
       data-no-navigation="true"
       onClick={(e) => {
@@ -142,50 +139,14 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         e.nativeEvent.stopImmediatePropagation();
       }}
     >
-      <Button
-        variant="outline"
-        size={buttonSize}
-        className={cn(
-          'rounded-full flex items-center gap-1',
-          isGoing
-            ? 'bg-green-500 hover:bg-green-600 text-white border-green-600'
-            : 'bg-white hover:bg-gray-50'
-        )}
-        disabled={isLoading || internalLoading}
-        onClick={(e) => handleRsvp('Going', e)}
-        data-rsvp-button="true"
-        data-status="Going"
-        data-no-navigation="true"
-      >
-        {isLoading && activeButton === 'Going' ? (
-          <Loader2 className="h-3 w-3 animate-spin" />
-        ) : (
-          <Check className="h-3 w-3" />
-        )}
-        <span>Going</span>
-      </Button>
-      <Button
-        variant="outline"
-        size={buttonSize}
-        className={cn(
-          'rounded-full flex items-center gap-1',
-          isInterested
-            ? 'bg-blue-500 hover:bg-blue-600 text-white border-blue-600'
-            : 'bg-white hover:bg-gray-50'
-        )}
-        disabled={isLoading || internalLoading}
-        onClick={(e) => handleRsvp('Interested', e)}
-        data-rsvp-button="true"
-        data-status="Interested"
-        data-no-navigation="true"
-      >
-        {isLoading && activeButton === 'Interested' ? (
-          <Loader2 className="h-3 w-3 animate-spin" />
-        ) : (
-          <Star className="h-3 w-3" />
-        )}
-        <span>Interested</span>
-      </Button>
+      <DefaultRsvpButtons
+        currentStatus={currentStatus}
+        onRsvp={handleRsvp}
+        isLoading={isLoading || internalLoading}
+        className={className}
+        activeButton={activeButton}
+        size={size === 'lg' ? 'lg' : 'default'}
+      />
     </div>
   );
 };

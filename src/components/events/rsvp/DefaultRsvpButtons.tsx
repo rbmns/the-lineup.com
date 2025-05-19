@@ -37,7 +37,7 @@ export const DefaultRsvpButtons: React.FC<DefaultRsvpButtonsProps> = ({
     xl: 'h-10 text-base py-2 px-4'
   };
 
-  // Get button styles based on active state
+  // Get button styles based on active state - updated to match the reference image
   const getButtonStyle = (active: boolean, status: 'Going' | 'Interested') => {
     if (active) {
       return status === 'Going' ? 
