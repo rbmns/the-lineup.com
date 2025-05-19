@@ -27,6 +27,12 @@ const EventsPageRefactored = () => {
   const [locations, setLocations] = useState<Array<{ value: string, label: string }>>([]);
   const [isVenuesLoading, setIsVenuesLoading] = useState(true);
   
+  // Get all unique event types from events
+  const allEventTypes = React.useMemo(() => {
+    const types = events.map(event => event.event_type).filter(Boolean);
+    return [...new Set(types)];
+  }, [events]);
+  
   // Event filter state management
   const {
     selectedEventTypes,
@@ -48,11 +54,25 @@ const EventsPageRefactored = () => {
     handleClearDateFilter
   } = useEventFilterState();
   
-  // Get all unique event types from events
-  const allEventTypes = React.useMemo(() => {
-    const types = events.map(event => event.event_type).filter(Boolean);
-    return [...new Set(types)];
-  }, [events]);
+  // Filter events by selected event types - all selected by default
+  const {
+    selectedCategories,
+    toggleCategory,
+    selectAll,
+    deselectAll,
+    isNoneSelected
+  } = useCategoryFilterSelection(allEventTypes);
+  
+  // Keep the category filter and event type filter in sync
+  useEffect(() => {
+    if (selectedCategories.length === 0 && allEventTypes.length > 0) {
+      // If no categories are selected but we have event types, select all by default
+      selectAll();
+    } else {
+      // Otherwise, sync the selected event types with the categories
+      setSelectedEventTypes(selectedCategories);
+    }
+  }, [selectedCategories, allEventTypes, selectAll, setSelectedEventTypes]);
   
   // Fetch all venues for the filter
   useEffect(() => {
@@ -88,24 +108,27 @@ const EventsPageRefactored = () => {
     fetchVenues();
   }, []);
   
-  // Filter events by selected event types - all selected by default
-  const {
-    selectedCategories,
-    toggleCategory,
-    selectAll,
-    deselectAll,
-    isNoneSelected
-  } = useCategoryFilterSelection(allEventTypes);
-  
-  // Keep the category filter and event type filter in sync
-  useEffect(() => {
-    setSelectedEventTypes(selectedCategories);
-  }, [selectedCategories, setSelectedEventTypes]);
-  
   // Filter events based on all filters
   const filteredEvents = React.useMemo(() => {
-    // If no categories selected, show no events
+    // If no categories selected but we have event types, show all events
+    // This ensures we always show events when first loading the page
     if (selectedCategories.length === 0) {
+      if (allEventTypes.length > 0) {
+        // We have event types but none selected, use all of them
+        let filtered = events;
+        
+        // Apply venue filter if selected
+        if (selectedVenues.length > 0) {
+          filtered = filterEventsByVenue(filtered, selectedVenues);
+        }
+        
+        // Apply date filter if selected
+        if (dateRange || selectedDateFilter) {
+          filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
+        }
+        
+        return filtered;
+      }
       return [];
     }
     

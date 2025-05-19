@@ -24,11 +24,25 @@ export const useFilteredEvents = ({
 }: UseFilteredEventsProps) => {
   // Filter events based on all filters
   const filteredEvents = useMemo(() => {
-    // If no categories selected, show no events 
-    // (this is different from the "show all when all selected" behavior)
+    // If no categories selected but we have event types, show all events
+    // This ensures we always show events when first loading the page
     if (selectedCategories.length === 0) {
-      console.log("No categories selected, showing no events");
-      return [];
+      console.log("No categories selected, assuming all events should be shown");
+      
+      // Apply other filters if needed
+      let filtered = events;
+      
+      // Apply venue filter if selected
+      if (selectedVenues.length > 0) {
+        filtered = filterEventsByVenue(filtered, selectedVenues);
+      }
+      
+      // Apply date filter if selected
+      if (dateRange || selectedDateFilter) {
+        filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
+      }
+      
+      return filtered;
     }
     
     let filtered = events;
