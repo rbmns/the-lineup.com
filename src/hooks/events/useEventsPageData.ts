@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
 import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp';
@@ -15,7 +16,7 @@ export const useEventsPageData = () => {
   const [isVenuesLoading, setIsVenuesLoading] = useState(true);
   
   // Get all unique event types from events
-  const allEventTypes = React.useMemo(() => {
+  const allEventTypes = useMemo(() => {
     const types = events.map(event => event.event_type).filter(Boolean);
     return [...new Set(types)];
   }, [events]);
