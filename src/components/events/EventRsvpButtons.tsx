@@ -99,8 +99,8 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     );
   }
 
-  // Size classes for the buttons
-  const buttonSize = size === 'lg' ? 'sm' : 'xs';
+  // Size classes for the buttons - use only valid size values
+  const buttonSize = size === 'lg' ? 'sm' : 'sm';
 
   return (
     <div className={cn('flex items-center space-x-2', className)} data-rsvp-container="true">
