@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { ChevronDown, Filter } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Filter, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface AdvancedFiltersToggleProps {
   showAdvancedFilters: boolean;
@@ -12,13 +13,19 @@ export const AdvancedFiltersToggle: React.FC<AdvancedFiltersToggleProps> = ({
   toggleAdvancedFilters
 }) => {
   return (
-    <button 
+    <Button
+      variant="outline"
+      size="sm"
       onClick={toggleAdvancedFilters}
-      className="flex items-center gap-2 py-1.5 px-3 bg-white border border-gray-300 rounded-full text-sm font-medium text-gray-700"
+      className="flex items-center gap-2 text-sm"
     >
       <Filter className="h-4 w-4" />
       Advanced Filters
-      <ChevronDown className={`h-4 w-4 transition-transform ${showAdvancedFilters ? 'rotate-180' : ''}`} />
-    </button>
+      {showAdvancedFilters ? (
+        <ChevronUp className="h-4 w-4" />
+      ) : (
+        <ChevronDown className="h-4 w-4" />
+      )}
+    </Button>
   );
 };

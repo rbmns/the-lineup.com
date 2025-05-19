@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 
 export const useCategoryFilterSelection = (categories: string[]) => {
@@ -7,21 +6,16 @@ export const useCategoryFilterSelection = (categories: string[]) => {
 
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev => {
-      // If clicking on a category that's already selected and it's the only one selected
-      // Don't deselect it (we always need at least one selected category)
-      if (prev.includes(category) && prev.length === 1) {
-        return prev;
-      }
-      
       // If clicking on a category that's not already selected,
-      // make it the only selected category
+      // toggle just this one
       if (!prev.includes(category)) {
-        return [category];
+        return [...prev, category];
       }
       
-      // If clicking on an already selected category and there are others selected,
-      // deselect just this one
-      return prev.filter(c => c !== category);
+      // If clicking on an already selected category,
+      // deselect just this one, but ensure at least one remains selected
+      const filtered = prev.filter(c => c !== category);
+      return filtered.length > 0 ? filtered : prev;
     });
   };
 
