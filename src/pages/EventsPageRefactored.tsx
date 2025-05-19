@@ -1,33 +1,31 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
 import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp';
 import { EventsPageHeader } from '@/components/events/EventsPageHeader';
-import { LazyEventsList } from '@/components/events/LazyEventsList';
-import { EventFilterBar } from '@/components/events/filters/EventFilterBar';
 import { useCategoryFilterSelection } from '@/hooks/events/useCategoryFilterSelection';
 import { useEventPageMeta } from '@/components/events/EventsPageMeta';
 import { useEventFilterState } from '@/hooks/events/useEventFilterState';
-import { AdvancedFiltersPanel } from '@/components/events/filters/AdvancedFiltersPanel';
-import { filterEventsByVenue } from '@/utils/eventUtils';
-import { filterEventsByDate } from '@/utils/date-filtering';
-import { supabase } from '@/lib/supabase';
 import { EventSearch } from '@/components/events/search/EventSearch';
-import { AdvancedFiltersToggle } from '@/components/events/filters/AdvancedFiltersToggle';
-import { ActiveFiltersSummary } from '@/components/events/filters/ActiveFiltersSummary';
-import { EventCountDisplay } from '@/components/events/EventCountDisplay';
-import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
 import { useSimilarEventsHandler } from '@/hooks/events/useSimilarEventsHandler';
+import { useVenueData } from '@/hooks/events/useVenueData';
+import { useEventTypeData } from '@/hooks/events/useEventTypeData';
+import { useFilteredEvents } from '@/hooks/events/useFilteredEvents';
+import { EventsFilterBar } from '@/components/events/page-components/EventsFilterBar';
+import { EventsFilterPanel } from '@/components/events/page-components/EventsFilterPanel';
+import { EventsResultsDisplay } from '@/components/events/page-components/EventsResultsDisplay';
 
 const EventsPageRefactored = () => {
   useEventPageMeta();
   
   const { user } = useAuth();
   const { data: events = [], isLoading: eventsLoading } = useEvents(user?.id);
-  const [venues, setVenues] = useState<Array<{ value: string, label: string }>>([]);
-  const [locations, setLocations] = useState<Array<{ value: string, label: string }>>([]);
-  const [isVenuesLoading, setIsVenuesLoading] = useState(true);
+  
+  // Get venue data
+  const { venues, locations, isVenuesLoading } = useVenueData();
+  
+  // Get event type data
+  const { allEventTypes } = useEventTypeData(events);
   
   // Event filter state management
   const {
@@ -50,46 +48,6 @@ const EventsPageRefactored = () => {
     handleClearDateFilter
   } = useEventFilterState();
   
-  // Get all unique event types from events
-  const allEventTypes = React.useMemo(() => {
-    const types = events.map(event => event.event_type).filter(Boolean);
-    return [...new Set(types)];
-  }, [events]);
-  
-  // Fetch all venues for the filter
-  useEffect(() => {
-    const fetchVenues = async () => {
-      setIsVenuesLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('venues')
-          .select('id, name')
-          .order('name');
-          
-        if (error) throw error;
-        
-        if (data) {
-          const venueOptions = data.map(venue => ({
-            value: venue.id,
-            label: venue.name
-          }));
-          setVenues(venueOptions);
-        }
-        
-        // Create sample locations for the design (now just fixed to "Zandvoort Area")
-        setLocations([
-          { value: 'zandvoort-area', label: 'Zandvoort Area' }
-        ]);
-      } catch (err) {
-        console.error('Error fetching venues:', err);
-      } finally {
-        setIsVenuesLoading(false);
-      }
-    };
-
-    fetchVenues();
-  }, []);
-  
   // Filter events by selected event types - all selected by default
   const {
     selectedCategories,
@@ -104,47 +62,15 @@ const EventsPageRefactored = () => {
     setSelectedEventTypes(selectedCategories);
   }, [selectedCategories, setSelectedEventTypes]);
   
-  // Filter events based on all filters
-  const filteredEvents = React.useMemo(() => {
-    // If no categories selected, show no events
-    if (selectedCategories.length === 0) {
-      return [];
-    }
-    
-    // Show all events if all categories are selected
-    if (selectedCategories.length === allEventTypes.length) {
-      let filtered = events;
-      
-      // Apply venue filter if selected
-      if (selectedVenues.length > 0) {
-        filtered = filterEventsByVenue(filtered, selectedVenues);
-      }
-      
-      // Apply date filter if selected
-      if (dateRange || selectedDateFilter) {
-        filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
-      }
-      
-      return filtered;
-    }
-    
-    // Apply event type filter if some event types are selected
-    let filtered = events.filter(event => 
-      event.event_type && selectedCategories.includes(event.event_type)
-    );
-    
-    // Apply venue filter
-    if (selectedVenues.length > 0) {
-      filtered = filterEventsByVenue(filtered, selectedVenues);
-    }
-    
-    // Apply date filter
-    if (dateRange || selectedDateFilter) {
-      filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
-    }
-    
-    return filtered;
-  }, [events, selectedCategories, allEventTypes.length, selectedVenues, dateRange, selectedDateFilter]);
+  // Filter events based on selected criteria
+  const filteredEvents = useFilteredEvents({
+    events,
+    selectedCategories,
+    allEventTypes,
+    selectedVenues,
+    dateRange,
+    selectedDateFilter
+  });
 
   // Get similar events if no results match our filters but filters are active
   const { similarEvents = [] } = useSimilarEventsHandler({
@@ -155,10 +81,8 @@ const EventsPageRefactored = () => {
     selectedDateFilter,
     userId: user?.id
   });
-
-  // Update events count for display
-  const eventsCount = filteredEvents.length;
   
+  // RSVP handling
   const { 
     handleRsvp: enhancedHandleRsvp, 
     loadingEventId
@@ -173,78 +97,47 @@ const EventsPageRefactored = () => {
         <EventSearch className="mb-4 mt-4" />
         
         {/* Events category filter bar */}
-        <div className="mt-2 mb-4 overflow-x-auto">
-          <EventFilterBar
-            allEventTypes={allEventTypes}
-            selectedEventTypes={selectedCategories}
-            onToggleEventType={toggleCategory}
-            onSelectAll={selectAll}
-            onDeselectAll={deselectAll}
-            hasActiveFilters={hasActiveFilters}
-            className="py-2"
-          />
-        </div>
+        <EventsFilterBar
+          allEventTypes={allEventTypes}
+          selectedCategories={selectedCategories}
+          toggleCategory={toggleCategory}
+          selectAll={selectAll}
+          deselectAll={deselectAll}
+          hasActiveFilters={hasActiveFilters}
+        />
         
-        {/* Advanced Filters Toggle */}
-        <div className="mb-4">
-          <AdvancedFiltersToggle 
-            showAdvancedFilters={showAdvancedFilters}
-            toggleAdvancedFilters={toggleAdvancedFilters}
-          />
-        </div>
-        
-        {/* Advanced Filters Panel */}
-        {showAdvancedFilters && (
-          <AdvancedFiltersPanel
-            isOpen={showAdvancedFilters}
-            onClose={() => toggleAdvancedFilters()}
-            dateRange={dateRange}
-            onDateRangeChange={setDateRange}
-            selectedDateFilter={selectedDateFilter}
-            onDateFilterChange={setSelectedDateFilter}
-            venues={venues}
-            selectedVenues={selectedVenues}
-            onVenueChange={setSelectedVenues}
-            locations={locations}
-            className="mb-6"
-          />
-        )}
-        
-        {/* Active Filters Summary */}
-        <ActiveFiltersSummary 
-          selectedVenues={selectedVenues}
-          venues={venues}
+        {/* Advanced Filters Panel & Filter Summary */}
+        <EventsFilterPanel
+          showAdvancedFilters={showAdvancedFilters}
+          toggleAdvancedFilters={toggleAdvancedFilters}
           dateRange={dateRange}
+          setDateRange={setDateRange}
           selectedDateFilter={selectedDateFilter}
+          setSelectedDateFilter={setSelectedDateFilter}
+          venues={venues}
+          selectedVenues={selectedVenues}
+          setSelectedVenues={setSelectedVenues}
+          locations={locations}
           hasAdvancedFilters={hasAdvancedFilters}
           handleRemoveVenue={handleRemoveVenue}
           handleClearDateFilter={handleClearDateFilter}
           resetFilters={resetFilters}
         />
         
-        {/* Events count display */}
-        <EventCountDisplay count={eventsCount} />
-        
-        <div className="space-y-8">
-          {/* Show NoResultsFound when there are no event types selected */}
-          {isNoneSelected ? (
-            <NoResultsFound 
-              resetFilters={selectAll}
-              message="No event types selected. Select at least one event type to see events."
-            />
-          ) : (
-            <LazyEventsList 
-              mainEvents={filteredEvents}
-              relatedEvents={similarEvents} 
-              isLoading={eventsLoading || isVenuesLoading || isFilterLoading}
-              onRsvp={user ? enhancedHandleRsvp : undefined}
-              showRsvpButtons={!!user}
-              hasActiveFilters={hasActiveFilters}
-              loadingEventId={loadingEventId}
-              hideCount={true}
-            />
-          )}
-        </div>
+        {/* Events List with Results */}
+        <EventsResultsDisplay
+          filteredEvents={filteredEvents}
+          similarEvents={similarEvents}
+          isLoading={eventsLoading}
+          isVenuesLoading={isVenuesLoading} 
+          isFilterLoading={isFilterLoading}
+          hasActiveFilters={hasActiveFilters}
+          handleRsvp={user ? enhancedHandleRsvp : undefined}
+          showRsvpButtons={!!user}
+          loadingEventId={loadingEventId}
+          isNoneSelected={isNoneSelected}
+          selectAll={selectAll}
+        />
       </div>
     </div>
   );
