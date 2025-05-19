@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Event } from '@/types';
 import { EventGrid } from '@/components/events/EventGrid';
@@ -10,6 +9,7 @@ import { EventsLoadingState } from '@/components/events/list-components/EventsLo
 import { EventsSignupTeaser } from '@/components/events/list-components/EventsSignupTeaser';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Button } from '@/components/ui/button';
 
 // Number of events to load initially
 const INITIAL_VISIBLE_COUNT = 9;
