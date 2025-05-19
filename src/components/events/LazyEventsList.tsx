@@ -22,6 +22,7 @@ interface LazyEventsListProps {
   hasActiveFilters?: boolean;
   compact?: boolean;
   loadingEventId?: string | null;
+  hideCount?: boolean;
 }
 
 export const LazyEventsList: React.FC<LazyEventsListProps> = ({
@@ -32,7 +33,8 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   showRsvpButtons = true,
   hasActiveFilters = false,
   compact = false,
-  loadingEventId = null
+  loadingEventId = null,
+  hideCount = false
 }) => {
   // State for handling lazy loading
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
@@ -65,7 +67,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
         <NoResultsFound resetFilters={resetFilters} />
       )}
       
-      {!isLoading && mainEvents.length > 0 && (
+      {!isLoading && mainEvents.length > 0 && !hideCount && (
         <div className="flex justify-between items-center border-b pb-2">
           <span className="text-sm text-gray-500">
             {mainEvents.length} {mainEvents.length === 1 ? 'event' : 'events'} found

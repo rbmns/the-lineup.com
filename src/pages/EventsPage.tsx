@@ -10,6 +10,7 @@ import { EventsPageHeader } from '@/components/events/EventsPageHeader';
 import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp';
 import { useRsvpHandler } from '@/hooks/events/useRsvpHandler';
 import { useQueryClient } from '@tanstack/react-query';
+import { EventCountDisplay } from '@/components/events/EventCountDisplay';
 
 const EventsPage = () => {
   // Add canonical URL for SEO - providing the path as required parameter
@@ -45,11 +46,16 @@ const EventsPage = () => {
 
   // Process events - just filter for upcoming events, no category filters
   const displayEvents = filterUpcomingEvents(events || []);
+  
+  // Get count for the EventCountDisplay component
+  const eventsCount = displayEvents.length;
 
   return (
     <div className="w-full px-4 md:px-6 py-8">
       <div className="max-w-7xl mx-auto">
         <EventsPageHeader title="Upcoming Events" />
+        
+        <EventCountDisplay count={eventsCount} />
         
         <div className="space-y-8 mt-8">
           <LazyEventsList 
@@ -61,6 +67,7 @@ const EventsPage = () => {
             hasActiveFilters={false}
             compact={false}
             loadingEventId={loadingEventId}
+            hideCount={true} // Add this prop to hide the count in LazyEventsList
           />
         </div>
       </div>

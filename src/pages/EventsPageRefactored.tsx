@@ -188,6 +188,7 @@ const EventsPageRefactored = () => {
             showRsvpButtons={!!user}
             hasActiveFilters={hasActiveFilters}
             loadingEventId={loadingEventId}
+            hideCount={true} // Add this prop to hide the count in LazyEventsList
           />
         </div>
       </div>
