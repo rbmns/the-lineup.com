@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { CategoryPill, AllCategoryPill } from '@/components/ui/category-pill';
+import { CategoryPill } from '@/components/ui/category-pill';
 import { Button } from '@/components/ui/button';
 import { X, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AllCategoryPill } from '@/components/ui/category-pill';
 
 interface EventFilterBarProps {
   allEventTypes: string[];

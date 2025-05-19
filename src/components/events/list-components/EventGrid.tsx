@@ -69,6 +69,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
       const result = await onRsvp(eventId, status);
       console.log('EventGrid - RSVP result:', result);
       
+      // Make sure the event doesn't propagate further
       return result;
     } catch (error) {
       console.error('Error in EventGrid RSVP handler:', error);

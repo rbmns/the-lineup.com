@@ -44,8 +44,11 @@ const EventCard: React.FC<EventCardProps> = ({
     formatEventTime(event.start_time, event.end_time) : '';
 
   const handleClick = (e: React.MouseEvent) => {
-    // Check if click originated from RSVP buttons
-    if ((e.target as HTMLElement).closest('[data-rsvp-container="true"]')) {
+    // Check if click originated from RSVP buttons or container
+    if ((e.target as HTMLElement).closest('[data-rsvp-container="true"]') || 
+        (e.target as HTMLElement).closest('[data-rsvp-button="true"]')) {
+      e.stopPropagation();
+      e.preventDefault();
       return; 
     }
     
@@ -68,6 +71,7 @@ const EventCard: React.FC<EventCardProps> = ({
   };
 
   // Enhanced RSVP handler that ensures the return value is always a Promise<boolean>
+  // and properly stops event propagation
   const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp) return false;
     

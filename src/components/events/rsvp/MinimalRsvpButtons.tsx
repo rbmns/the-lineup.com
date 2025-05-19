@@ -3,11 +3,11 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Check, Star, Loader2 } from 'lucide-react';
-import { RsvpStatus, RsvpHandler } from '@/components/events/rsvp/types';
+import { RsvpStatus, RsvpHandler } from '@/components/events/EventRsvpButtons';
 
 interface MinimalRsvpButtonsProps {
   currentStatus: RsvpStatus;
-  onRsvp: RsvpHandler;
+  onRsvp: (status: 'Going' | 'Interested', e?: React.MouseEvent) => Promise<boolean | void>;
   isLoading?: boolean;
   disabled?: boolean;
   className?: string;
@@ -43,8 +43,19 @@ export const MinimalRsvpButtons: React.FC<MinimalRsvpButtonsProps> = ({
     return isLoading && activeButton === buttonType;
   };
 
+  // Handle click with proper event stopping
+  const handleClick = (status: 'Going' | 'Interested', e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onRsvp(status, e);
+  };
+
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div 
+      className={cn('flex items-center gap-2', className)}
+      data-rsvp-container="true" 
+      onClick={(e) => e.stopPropagation()}
+    >
       <Button
         type="button"
         variant="outline"
@@ -55,7 +66,7 @@ export const MinimalRsvpButtons: React.FC<MinimalRsvpButtonsProps> = ({
           (disabled || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
         )}
         disabled={disabled || isLoading}
-        onClick={() => onRsvp('Going')}
+        onClick={(e) => handleClick('Going', e)}
         title="Going"
         data-rsvp-button="true"
         data-status="Going"
@@ -79,7 +90,7 @@ export const MinimalRsvpButtons: React.FC<MinimalRsvpButtonsProps> = ({
           (disabled || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
         )}
         disabled={disabled || isLoading}
-        onClick={() => onRsvp('Interested')}
+        onClick={(e) => handleClick('Interested', e)}
         title="Interested"
         data-rsvp-button="true"
         data-status="Interested"

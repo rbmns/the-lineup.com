@@ -1,147 +1,151 @@
 
 import React, { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { RsvpStatus, RsvpHandler } from '@/components/events/rsvp/types';
-import { RsvpStatusBadge } from '@/components/events/rsvp/RsvpStatusBadge';
-import { MinimalRsvpButtons } from '@/components/events/rsvp/MinimalRsvpButtons';
-import { CompactRsvpButtons } from '@/components/events/rsvp/CompactRsvpButtons';
-import { DefaultRsvpButtons } from '@/components/events/rsvp/DefaultRsvpButtons';
+import { Check, Star, Loader2 } from 'lucide-react';
+import { MinimalRsvpButtons } from './rsvp/MinimalRsvpButtons';
 
-export type { RsvpStatus };
+export type RsvpStatus = 'Going' | 'Interested' | null;
+export type RsvpHandler = (status: 'Going' | 'Interested') => Promise<boolean>;
 
 interface EventRsvpButtonsProps {
-  currentStatus?: RsvpStatus | null;
+  currentStatus: RsvpStatus;
   onRsvp: RsvpHandler;
   isLoading?: boolean;
-  disabled?: boolean;
-  className?: string;
-  size?: 'sm' | 'default' | 'lg' | 'xl';
-  variant?: 'default' | 'compact' | 'minimal';
   showStatusOnly?: boolean;
-  eventId?: string;
+  size?: 'sm' | 'default' | 'lg';
+  className?: string;
 }
 
 export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
-  currentStatus = null,
+  currentStatus,
   onRsvp,
   isLoading = false,
-  disabled = false,
-  className = '',
-  size = 'default',
-  variant = 'default',
   showStatusOnly = false,
-  eventId = 'default-event',
+  size = 'default',
+  className
 }) => {
-  // Use controlled component pattern with local state that syncs with props
-  const [localStatus, setLocalStatus] = useState<RsvpStatus>(currentStatus);
   const [activeButton, setActiveButton] = useState<'Going' | 'Interested' | null>(null);
+  const [internalLoading, setInternalLoading] = useState(false);
   
-  // For debugging - log props changes
+  // For debugging
+  console.log(`EventRsvpButtons (default-event): props.currentStatus updated to:`, currentStatus);
+
+  // Reset active button when external loading state changes or current status changes
   useEffect(() => {
-    console.log(`EventRsvpButtons (${eventId}): props.currentStatus updated to:`, currentStatus);
-  }, [currentStatus, eventId]);
-  
-  // Sync with parent component's state whenever it changes
-  useEffect(() => {
-    if (currentStatus !== localStatus) {
-      console.log(`EventRsvpButtons (${eventId}): Syncing status from prop:`, currentStatus);
-      setLocalStatus(currentStatus);
+    if (!isLoading) {
+      setActiveButton(null);
     }
-  }, [currentStatus, eventId, localStatus]);
-  
-  // If showStatusOnly is true and there's a current status, only show a badge
-  if (showStatusOnly && localStatus) {
+  }, [isLoading, currentStatus]);
+
+  const isGoing = currentStatus === 'Going';
+  const isInterested = currentStatus === 'Interested';
+
+  // Handle RSVP action with event propagation prevention
+  const handleRsvp = async (status: 'Going' | 'Interested', e?: React.MouseEvent) => {
+    // Stop propagation to prevent parent elements from handling the event
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    
+    if (isLoading || internalLoading) return;
+
+    try {
+      setActiveButton(status);
+      setInternalLoading(true);
+      
+      // Call the provided onRsvp handler
+      await onRsvp(status);
+      
+    } catch (error) {
+      console.error('Error in RSVP handler:', error);
+    } finally {
+      setInternalLoading(false);
+    }
+  };
+
+  // If minimal UI is requested, use the compact button version
+  if (size === 'sm') {
     return (
-      <div className={cn("flex items-center", className)}>
-        <RsvpStatusBadge 
-          status={localStatus} 
-          eventId={eventId} 
-        />
+      <MinimalRsvpButtons
+        currentStatus={currentStatus}
+        onRsvp={handleRsvp}
+        isLoading={isLoading || internalLoading}
+        className={className}
+        activeButton={activeButton}
+      />
+    );
+  }
+
+  // If only showing status
+  if (showStatusOnly) {
+    if (!currentStatus) return null;
+    return (
+      <div className="text-sm font-medium">
+        {isGoing && (
+          <span className="flex items-center text-green-600">
+            <Check className="h-3 w-3 mr-1" />
+            Going
+          </span>
+        )}
+        {isInterested && (
+          <span className="flex items-center text-blue-600">
+            <Star className="h-3 w-3 mr-1" />
+            Interested
+          </span>
+        )}
       </div>
     );
   }
 
-  // Handle RSVP click with proper state management
-  const handleRsvpClick = async (status: 'Going' | 'Interested'): Promise<boolean> => {
-    if (isLoading || disabled) return false;
-    
-    try {
-      // Track which button is being clicked for UI feedback
-      setActiveButton(status);
-      
-      // Optimistic update
-      const prevStatus = localStatus;
-      const newStatus = localStatus === status ? null : status;
-      
-      // Update local state immediately for responsive UI
-      setLocalStatus(newStatus);
-      
-      console.log(`EventRsvpButtons (${eventId}): Handling RSVP click for status ${status}, current: ${localStatus}, new: ${newStatus}`);
-      
-      // Call the parent's onRsvp handler
-      const success = await onRsvp(status);
-      
-      if (!success) {
-        // Revert if the operation failed
-        console.log(`EventRsvpButtons (${eventId}): RSVP failed, reverting to ${prevStatus}`);
-        setLocalStatus(prevStatus);
-      }
-      
-      return success;
-    } catch (error) {
-      console.error('Error in RSVP button handler:', error);
-      return false;
-    } finally {
-      // Clear loading state
-      setTimeout(() => {
-        setActiveButton(null);
-      }, 200);
-    }
-  };
+  // Size classes for the buttons
+  const buttonSize = size === 'lg' ? 'sm' : 'xs';
 
-  // Minimal variant - just icons
-  if (variant === 'minimal') {
-    return (
-      <MinimalRsvpButtons
-        currentStatus={localStatus}
-        onRsvp={handleRsvpClick}
-        isLoading={isLoading}
-        disabled={disabled}
-        className={className}
-        activeButton={activeButton}
-        eventId={eventId}
-      />
-    );
-  }
-
-  // Compact variant - smaller buttons with text
-  if (variant === 'compact') {
-    return (
-      <CompactRsvpButtons
-        currentStatus={localStatus}
-        onRsvp={handleRsvpClick}
-        isLoading={isLoading}
-        disabled={disabled}
-        className={className}
-        activeButton={activeButton}
-        eventId={eventId}
-      />
-    );
-  }
-
-  // Default variant - full size buttons
   return (
-    <DefaultRsvpButtons
-      currentStatus={localStatus}
-      onRsvp={handleRsvpClick}
-      isLoading={isLoading}
-      disabled={disabled}
-      className={className}
-      size={size}
-      activeButton={activeButton}
-      eventId={eventId}
-    />
+    <div className={cn('flex items-center space-x-2', className)} data-rsvp-container="true">
+      <Button
+        variant="outline"
+        size={buttonSize}
+        className={cn(
+          'rounded-full flex items-center gap-1',
+          isGoing
+            ? 'bg-green-500 hover:bg-green-600 text-white border-green-600'
+            : 'bg-white hover:bg-gray-50'
+        )}
+        disabled={isLoading || internalLoading}
+        onClick={(e) => handleRsvp('Going', e)}
+        data-rsvp-button="true"
+        data-status="Going"
+      >
+        {isLoading && activeButton === 'Going' ? (
+          <Loader2 className="h-3 w-3 animate-spin" />
+        ) : (
+          <Check className="h-3 w-3" />
+        )}
+        <span>Going</span>
+      </Button>
+      <Button
+        variant="outline"
+        size={buttonSize}
+        className={cn(
+          'rounded-full flex items-center gap-1',
+          isInterested
+            ? 'bg-blue-500 hover:bg-blue-600 text-white border-blue-600'
+            : 'bg-white hover:bg-gray-50'
+        )}
+        disabled={isLoading || internalLoading}
+        onClick={(e) => handleRsvp('Interested', e)}
+        data-rsvp-button="true"
+        data-status="Interested"
+      >
+        {isLoading && activeButton === 'Interested' ? (
+          <Loader2 className="h-3 w-3 animate-spin" />
+        ) : (
+          <Star className="h-3 w-3" />
+        )}
+        <span>Interested</span>
+      </Button>
+    </div>
   );
 };
-
-export default EventRsvpButtons;
