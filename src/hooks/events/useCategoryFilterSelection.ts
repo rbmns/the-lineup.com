@@ -1,10 +1,11 @@
+
 import { useState, useEffect, useRef } from 'react';
 
 // Storage key for persisting filter state
 const FILTER_STORAGE_KEY = 'event-category-filters';
 
 export const useCategoryFilterSelection = (categories: string[]) => {
-  // Initialize with stored categories if available
+  // Initialize with all categories if available, otherwise empty array
   const initialCategories = () => {
     try {
       const storedCategories = sessionStorage.getItem(FILTER_STORAGE_KEY);
@@ -19,8 +20,8 @@ export const useCategoryFilterSelection = (categories: string[]) => {
     } catch (e) {
       console.error("Error reading stored categories:", e);
     }
-    // Default behavior: select no categories initially
-    return [];
+    // Default behavior: select ALL categories initially
+    return [...categories];
   };
 
   const [selectedCategories, setSelectedCategories] = useState<string[]>(initialCategories);
@@ -42,6 +43,9 @@ export const useCategoryFilterSelection = (categories: string[]) => {
       } catch (e) {
         console.error("Error parsing URL categories:", e);
       }
+    } else if (isInitialRender.current && !urlCategories) {
+      // If no URL categories and first render, select all categories
+      setSelectedCategories([...categories]);
     }
     
     isInitialRender.current = false;
@@ -96,7 +100,7 @@ export const useCategoryFilterSelection = (categories: string[]) => {
   };
 
   const reset = () => {
-    setSelectedCategories([]);
+    setSelectedCategories([...categories]);  // Reset to all categories
   };
 
   const isAllSelected = selectedCategories.length === categories.length;

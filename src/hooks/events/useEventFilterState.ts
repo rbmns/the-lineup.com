@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { DateRange } from 'react-day-picker';
 
 export const useEventFilterState = () => {
+  // Initialize with empty arrays instead of specific event types
+  // This allows the parent component to populate with all event types if needed
   const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
   const [selectedVenues, setSelectedVenues] = useState<string[]>([]);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
@@ -10,6 +12,8 @@ export const useEventFilterState = () => {
   const [isFilterLoading, setIsFilterLoading] = useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
+  // Consider having active filters based on venues, date range or date filter
+  // For event types, only consider it an active filter if not all types are selected
   const hasActiveFilters =
     selectedEventTypes.length > 0 ||
     selectedVenues.length > 0 ||
