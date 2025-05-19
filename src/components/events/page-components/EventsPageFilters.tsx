@@ -1,8 +1,10 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { EventSearch } from '@/components/events/search/EventSearch';
 import { EventsFilterBar } from '@/components/events/page-components/EventsFilterBar';
 import { EventsFilterPanel } from '@/components/events/page-components/EventsFilterPanel';
+import { useNavigationHistory } from '@/hooks/useNavigationHistory';
 
 interface EventsPageFiltersProps {
   allEventTypes: string[];
@@ -49,6 +51,31 @@ export const EventsPageFilters: React.FC<EventsPageFiltersProps> = ({
   handleClearDateFilter,
   resetFilters
 }) => {
+  const location = useLocation();
+  const { saveFilterState } = useNavigationHistory();
+  
+  // Save filter state whenever it changes
+  useEffect(() => {
+    if (location.pathname === '/events') {
+      const filterState = {
+        eventTypes: selectedCategories,
+        venues: selectedVenues,
+        dateRange: dateRange,
+        dateFilter: selectedDateFilter
+      };
+      
+      saveFilterState(filterState);
+      console.log("Filter state saved in EventsPageFilters", filterState);
+    }
+  }, [
+    location.pathname,
+    selectedCategories,
+    selectedVenues,
+    dateRange,
+    selectedDateFilter,
+    saveFilterState
+  ]);
+
   return (
     <>
       {/* Search input */}

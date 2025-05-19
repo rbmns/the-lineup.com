@@ -1,4 +1,6 @@
+
 import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
 import { useVenueData } from '@/hooks/events/useVenueData';
@@ -8,6 +10,7 @@ import { useEventFilterState } from '@/hooks/events/useEventFilterState';
 import { useFilteredEvents } from '@/hooks/events/useFilteredEvents';
 import { useSimilarEventsHandler } from '@/hooks/events/useSimilarEventsHandler';
 import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp';
+import { useNavigationHistory } from '@/hooks/useNavigationHistory';
 import { Event } from '@/types';
 
 interface EventsDataProviderProps {
@@ -47,6 +50,7 @@ interface EventsDataProviderProps {
 
 export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children }) => {
   const { user } = useAuth();
+  const location = useLocation();
   const { data: events = [], isLoading: eventsLoading } = useEvents(user?.id);
   
   // Get venue data
@@ -54,6 +58,9 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
   
   // Get event type data
   const { allEventTypes } = useEventTypeData(events);
+  
+  // Navigation history for filter state persistence
+  const { saveFilterState, getLastFilterState } = useNavigationHistory();
   
   // Event filter state management
   const {
@@ -89,6 +96,61 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
   useEffect(() => {
     setSelectedEventTypes(selectedCategories);
   }, [selectedCategories, setSelectedEventTypes]);
+  
+  // Restore filter state when navigating back from event detail
+  useEffect(() => {
+    if (location.state?.fromEventDetail && location.state?.restoreFilters) {
+      console.log("Restoring filter state from navigation:", location.state?.filterState);
+      
+      // Restore from location state if available
+      const filterState = location.state?.filterState || getLastFilterState();
+      
+      if (filterState) {
+        // Restore event type filters
+        if (filterState.eventTypes && Array.isArray(filterState.eventTypes)) {
+          setSelectedEventTypes(filterState.eventTypes);
+        }
+        
+        // Restore venue filters
+        if (filterState.venues && Array.isArray(filterState.venues)) {
+          setSelectedVenues(filterState.venues);
+        }
+        
+        // Restore date filters
+        if (filterState.dateRange) {
+          setDateRange(filterState.dateRange);
+        }
+        
+        if (filterState.dateFilter) {
+          setSelectedDateFilter(filterState.dateFilter);
+        }
+        
+        console.log("Filter state restored successfully");
+      }
+    }
+  }, [location.state, setSelectedEventTypes, setSelectedVenues, setDateRange, setSelectedDateFilter, getLastFilterState]);
+  
+  // Save filter state whenever it changes
+  useEffect(() => {
+    // Only save when on the events page and filters have been initialized
+    if (location.pathname === '/events') {
+      const filterState = {
+        eventTypes: selectedCategories,
+        venues: selectedVenues,
+        dateRange: dateRange,
+        dateFilter: selectedDateFilter
+      };
+      
+      saveFilterState(filterState);
+    }
+  }, [
+    location.pathname, 
+    selectedCategories, 
+    selectedVenues, 
+    dateRange, 
+    selectedDateFilter, 
+    saveFilterState
+  ]);
   
   // Filter events based on selected criteria
   const filteredEvents = useFilteredEvents({

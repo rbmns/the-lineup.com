@@ -24,24 +24,34 @@ export const useFilteredEvents = ({
 }: UseFilteredEventsProps) => {
   // Filter events based on all filters
   const filteredEvents = useMemo(() => {
-    // Update: Changed behavior to show all events when no categories are selected
-    // (instead of showing no events)
+    // If no categories selected, show no events 
+    // (this is different from the "show all when all selected" behavior)
+    if (selectedCategories.length === 0) {
+      console.log("No categories selected, showing no events");
+      return [];
+    }
+    
     let filtered = events;
     
-    // Apply event type filter if some event types are selected
-    if (selectedCategories.length > 0 && selectedCategories.length < allEventTypes.length) {
+    // Apply event type filter if not all event types are selected
+    if (selectedCategories.length < allEventTypes.length) {
+      console.log("Some categories selected, filtering by:", selectedCategories);
       filtered = events.filter(event => 
         event.event_type && selectedCategories.includes(event.event_type)
       );
+    } else {
+      console.log("All categories selected, showing all events");
     }
     
     // Apply venue filter if selected
     if (selectedVenues.length > 0) {
+      console.log("Filtering by venues:", selectedVenues);
       filtered = filterEventsByVenue(filtered, selectedVenues);
     }
     
     // Apply date filter if selected
     if (dateRange || selectedDateFilter) {
+      console.log("Filtering by date:", { dateRange, selectedDateFilter });
       filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
     }
     

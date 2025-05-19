@@ -11,28 +11,57 @@ export const useEventDetailHandlers = () => {
   const { 
     getPreviousPath, 
     hasFilteredEventsHistory, 
-    getFilteredEventsPath 
+    getFilteredEventsPath,
+    getLastFilterState
   } = useNavigationHistory();
   
   // Determine back button behavior based on navigation history
   const handleBackToEvents = () => {
     if (hasFilteredEventsHistory()) {
       // Go back to filtered results if we came from there
-      navigate(getFilteredEventsPath());
+      const filterState = getLastFilterState();
+      
+      navigate(getFilteredEventsPath(), {
+        state: { 
+          restoreFilters: true,
+          filterState: filterState,
+          fromEventDetail: true,
+          timestamp: Date.now()
+        }
+      });
+      
+      console.log("Navigating back to filtered events with state:", filterState);
     } else {
       // Otherwise go to the generic events page
-      navigate('/events');
+      navigate('/events', {
+        state: {
+          fromEventDetail: true,
+          timestamp: Date.now()
+        }
+      });
     }
   };
 
   const handleBackToPrevious = () => {
     const previousPath = getPreviousPath();
-    navigate(previousPath.fullPath);
+    navigate(previousPath.fullPath, {
+      state: {
+        restoreFilters: previousPath.path === '/events',
+        filterState: previousPath.filterState,
+        fromEventDetail: true,
+        timestamp: Date.now()
+      }
+    });
   };
 
   const handleEventTypeClick = (eventType?: string) => {
     if (eventType) {
-      navigate(`/events?type=${encodeURIComponent(eventType)}`);
+      navigate(`/events?type=${encodeURIComponent(eventType)}`, {
+        state: {
+          filterByType: eventType,
+          timestamp: Date.now()
+        }
+      });
     }
   };
   
