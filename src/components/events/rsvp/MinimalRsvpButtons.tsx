@@ -43,18 +43,27 @@ export const MinimalRsvpButtons: React.FC<MinimalRsvpButtonsProps> = ({
     return isLoading && activeButton === buttonType;
   };
 
-  // Handle click with proper event stopping
+  // Enhanced click handler with improved event stopping
   const handleClick = (status: 'Going' | 'Interested', e: React.MouseEvent) => {
+    // Ensure the event doesn't propagate up or trigger defaults
     e.stopPropagation();
     e.preventDefault();
+    
+    // Call the provided onRsvp handler
     onRsvp(status, e);
+    
+    // Return false to prevent any default behavior
+    return false;
   };
 
   return (
     <div 
       className={cn('flex items-center gap-2', className)}
       data-rsvp-container="true" 
-      onClick={(e) => e.stopPropagation()}
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
     >
       <Button
         type="button"

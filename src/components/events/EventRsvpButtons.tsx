@@ -41,9 +41,9 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   const isGoing = currentStatus === 'Going';
   const isInterested = currentStatus === 'Interested';
 
-  // Handle RSVP action with event propagation prevention
+  // Enhanced RSVP handler with better event isolation
   const handleRsvp = async (status: 'Going' | 'Interested', e?: React.MouseEvent) => {
-    // Stop propagation to prevent parent elements from handling the event
+    // Stop propagation and prevent default to ensure no parent elements receive the event
     if (e) {
       e.stopPropagation();
       e.preventDefault();
@@ -63,6 +63,9 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     } finally {
       setInternalLoading(false);
     }
+    
+    // Return false to prevent any default behavior
+    return false;
   };
 
   // If minimal UI is requested, use the compact button version
@@ -103,7 +106,14 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   const buttonSize = size === 'lg' ? 'sm' : 'sm';
 
   return (
-    <div className={cn('flex items-center space-x-2', className)} data-rsvp-container="true">
+    <div 
+      className={cn('flex items-center space-x-2', className)} 
+      data-rsvp-container="true"
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+    >
       <Button
         variant="outline"
         size={buttonSize}

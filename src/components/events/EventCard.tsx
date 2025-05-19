@@ -39,10 +39,20 @@ const EventCard: React.FC<EventCardProps> = ({
   const timeDisplay = event.start_time ? 
     formatEventTime(event.start_time, event.end_time) : '';
 
+  // Enhanced click handler with better event target checking
   const handleClick = (e: React.MouseEvent) => {
-    // Check if click originated from RSVP buttons
-    if ((e.target as HTMLElement).closest('[data-rsvp-container="true"]')) {
-      return; // Don't navigate if clicked on RSVP buttons
+    // More thorough check for RSVP-related elements
+    const target = e.target as HTMLElement;
+    const isRsvpElement = 
+      target.closest('[data-rsvp-container="true"]') || 
+      target.closest('[data-rsvp-button="true"]') ||
+      target.hasAttribute('data-rsvp-button') ||
+      target.closest('button[data-status]');
+    
+    if (isRsvpElement) {
+      e.stopPropagation();
+      e.preventDefault();
+      return false; // Don't navigate if clicked on RSVP buttons
     }
     
     if (onClick) {
@@ -63,11 +73,12 @@ const EventCard: React.FC<EventCardProps> = ({
     }
   };
 
-  // Handle RSVP and ensure we always return a Promise<boolean>
+  // Enhanced RSVP handler with better isolation from card click events
   const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp) return false;
     
     try {
+      console.log(`EventCard: Handling RSVP for event ${event.id}, status: ${status}`);
       const result = await onRsvp(event.id, status);
       // Convert any result (including void) to a boolean
       return result === undefined ? true : !!result;
@@ -143,12 +154,16 @@ const EventCard: React.FC<EventCardProps> = ({
         {/* Spacer to push RSVP buttons to bottom */}
         <div className="flex-grow min-h-[8px]"></div>
         
-        {/* RSVP Buttons - only if needed */}
+        {/* RSVP Buttons - with improved event handling */}
         {showRsvpButtons && (
           <div 
             className="mt-2" 
             data-rsvp-container="true"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              return false;
+            }}
           >
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
