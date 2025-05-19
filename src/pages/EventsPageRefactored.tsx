@@ -17,6 +17,7 @@ import { AdvancedFiltersToggle } from '@/components/events/filters/AdvancedFilte
 import { ActiveFiltersSummary } from '@/components/events/filters/ActiveFiltersSummary';
 import { EventCountDisplay } from '@/components/events/EventCountDisplay';
 import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
+import { useSimilarEventsHandler } from '@/hooks/events/useSimilarEventsHandler';
 
 const EventsPageRefactored = () => {
   useEventPageMeta();
@@ -99,7 +100,21 @@ const EventsPageRefactored = () => {
   
   const filteredEvents = React.useMemo(() => {
     if (selectedCategories.length === 0) {
-      return events;
+      return [];
+    }
+    
+    if (selectedCategories.length === allEventTypes.length) {
+      let filtered = events;
+      
+      if (selectedVenues.length > 0) {
+        filtered = filterEventsByVenue(filtered, selectedVenues);
+      }
+      
+      if (dateRange || selectedDateFilter) {
+        filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
+      }
+      
+      return filtered;
     }
     
     let filtered = events.filter(event => 
@@ -115,8 +130,17 @@ const EventsPageRefactored = () => {
     }
     
     return filtered;
-  }, [events, selectedCategories, selectedVenues, dateRange, selectedDateFilter]);
+  }, [events, selectedCategories, allEventTypes.length, selectedVenues, dateRange, selectedDateFilter]);
   
+  const { similarEvents } = useSimilarEventsHandler({
+    mainEvents: filteredEvents,
+    hasActiveFilters,
+    selectedEventTypes: selectedCategories,
+    dateRange,
+    selectedDateFilter,
+    userId: user?.id
+  });
+
   const eventsCount = filteredEvents.length;
   
   const { 
@@ -129,8 +153,10 @@ const EventsPageRefactored = () => {
       <div className="max-w-7xl mx-auto">
         <EventsPageHeader title="Upcoming Events" />
         
+        {/* Search input */}
         <EventSearch className="mb-4 mt-4" />
         
+        {/* Events category filter bar */}
         <div className="mt-2 mb-4 overflow-x-auto">
           <EventFilterBar
             allEventTypes={allEventTypes}
@@ -143,6 +169,7 @@ const EventsPageRefactored = () => {
           />
         </div>
         
+        {/* Advanced Filters Toggle */}
         <div className="mb-4">
           <AdvancedFiltersToggle 
             showAdvancedFilters={showAdvancedFilters}
@@ -150,6 +177,7 @@ const EventsPageRefactored = () => {
           />
         </div>
         
+        {/* Advanced Filters Panel */}
         {showAdvancedFilters && (
           <AdvancedFiltersPanel
             isOpen={showAdvancedFilters}
@@ -166,6 +194,7 @@ const EventsPageRefactored = () => {
           />
         )}
         
+        {/* Active Filters Summary */}
         <ActiveFiltersSummary 
           selectedVenues={selectedVenues}
           venues={venues}
@@ -177,19 +206,28 @@ const EventsPageRefactored = () => {
           resetFilters={resetFilters}
         />
         
+        {/* Events count display */}
         <EventCountDisplay count={eventsCount} />
         
         <div className="space-y-8">
-          <LazyEventsList 
-            mainEvents={filteredEvents}
-            relatedEvents={[]} 
-            isLoading={eventsLoading || isVenuesLoading || isFilterLoading}
-            onRsvp={user ? enhancedHandleRsvp : undefined}
-            showRsvpButtons={!!user}
-            hasActiveFilters={hasActiveFilters}
-            loadingEventId={loadingEventId}
-            hideCount={true} // Add this prop to hide the count in LazyEventsList
-          />
+          {/* Show NoResultsFound when there are no event types selected */}
+          {isNoneSelected ? (
+            <NoResultsFound 
+              resetFilters={selectAll}
+              message="No event types selected. Select at least one event type to see events."
+            />
+          ) : (
+            <LazyEventsList 
+              mainEvents={filteredEvents}
+              relatedEvents={similarEvents} 
+              isLoading={eventsLoading || isVenuesLoading || isFilterLoading}
+              onRsvp={user ? enhancedHandleRsvp : undefined}
+              showRsvpButtons={!!user}
+              hasActiveFilters={hasActiveFilters}
+              loadingEventId={loadingEventId}
+              hideCount={true}
+            />
+          )}
         </div>
       </div>
     </div>

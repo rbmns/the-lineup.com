@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
 import { filterUpcomingEvents } from '@/utils/date-filtering';
@@ -11,6 +11,7 @@ import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp';
 import { useRsvpHandler } from '@/hooks/events/useRsvpHandler';
 import { useQueryClient } from '@tanstack/react-query';
 import { EventCountDisplay } from '@/components/events/EventCountDisplay';
+import { useSimilarEventsHandler } from '@/hooks/events/useSimilarEventsHandler';
 
 const EventsPage = () => {
   // Add canonical URL for SEO - providing the path as required parameter
@@ -47,6 +48,19 @@ const EventsPage = () => {
   // Process events - just filter for upcoming events, no category filters
   const displayEvents = filterUpcomingEvents(events || []);
   
+  // For basic events page, we'll simulate "no filter matches" if there are no events
+  const hasActiveFilters = false;
+  
+  // Get similar events if no main events are found
+  const { similarEvents } = useSimilarEventsHandler({
+    mainEvents: displayEvents,
+    hasActiveFilters: displayEvents.length === 0, // Treat as "has filters" if no events to show related ones
+    selectedEventTypes: [], // No selected event types on basic page
+    dateRange: null,
+    selectedDateFilter: '',
+    userId: user?.id
+  });
+  
   // Get count for the EventCountDisplay component
   const eventsCount = displayEvents.length;
 
@@ -60,11 +74,11 @@ const EventsPage = () => {
         <div className="space-y-8 mt-8">
           <LazyEventsList 
             mainEvents={displayEvents}
-            relatedEvents={[]}
+            relatedEvents={similarEvents}
             isLoading={isLoading}
             onRsvp={user ? handleEventRsvp : undefined}
             showRsvpButtons={!!user}
-            hasActiveFilters={false}
+            hasActiveFilters={displayEvents.length === 0} // Show related events message if no events
             compact={false}
             loadingEventId={loadingEventId}
             hideCount={true} // Add this prop to hide the count in LazyEventsList

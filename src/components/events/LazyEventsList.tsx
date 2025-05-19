@@ -59,6 +59,9 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
     setVisibleCount(prev => Math.min(prev + LOAD_MORE_INCREMENT, mainEvents.length));
   };
 
+  // Check if we have no main events but have related/similar events to show
+  const showRelatedEventsMessage = !isLoading && mainEvents.length === 0 && hasActiveFilters && relatedEvents.length > 0;
+
   return (
     <div className={cn('space-y-6', compact ? 'compact-view' : '')}>
       {isLoading && <EventsLoadingState />}
@@ -90,11 +93,22 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
         />
       )}
 
+      {showRelatedEventsMessage && (
+        <div className="my-8 text-center">
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">
+            Related events which you might also like
+          </h2>
+          <p className="text-gray-600 mb-6">
+            We found some similar events around the same time that might interest you
+          </p>
+        </div>
+      )}
+
       {relatedEvents && relatedEvents.length > 0 && (
         <RelatedEventsSection events={relatedEvents} />
       )}
 
-      {!isLoading && mainEvents.length === 0 && hasActiveFilters && (
+      {!isLoading && mainEvents.length === 0 && hasActiveFilters && relatedEvents.length === 0 && (
         <NoResultsFound 
           message="No events found with the current filters."
           resetFilters={resetFilters}
