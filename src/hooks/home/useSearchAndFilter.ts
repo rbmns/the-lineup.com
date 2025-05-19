@@ -419,11 +419,14 @@ export const useSearchAndFilter = (
   };
 
   // Submit search form
-  const handleSearch = useCallback(async (e?: React.FormEvent) => {
+  const handleSearch = useCallback(async (e?: React.FormEvent, query?: string) => {
     if (e) e.preventDefault();
     
-    await handleAiSearch(searchQuery);
-  }, [searchQuery]);
+    // Use the passed query parameter or rely on closure to access searchQuery from parent component
+    if (query) {
+      await handleAiSearch(query);
+    }
+  }, []);
 
   return {
     handleAiSearch,

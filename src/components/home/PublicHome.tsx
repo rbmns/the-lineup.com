@@ -95,9 +95,9 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
   };
 
   // Handle form submission for search
-  const handleSearchSubmit = (e?: React.FormEvent) => {
+  const handleSearchSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    searchAndFilter.handleSearch(e);
+    await searchAndFilter.handleAiSearch(searchQuery);
   };
 
   // Combine reset filters function with date filter reset
