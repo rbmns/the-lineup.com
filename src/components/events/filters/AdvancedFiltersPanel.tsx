@@ -5,6 +5,7 @@ import { VenueFilter } from '@/components/events/VenueFilter';
 import { DateRange } from 'react-day-picker';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface AdvancedFiltersPanelProps {
   isOpen: boolean;
@@ -52,6 +53,13 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
         <div className="space-y-2">
           <h3 className="text-sm font-medium">Venue</h3>
           <div className="border rounded-md p-1 relative">
+            <div className="flex items-center justify-between mb-1 px-1">
+              <span className="text-xs text-gray-500">Scroll for options</span>
+              <div className="flex flex-col">
+                <ChevronUp className="h-3 w-3 text-gray-400" />
+                <ChevronDown className="h-3 w-3 text-gray-400" />
+              </div>
+            </div>
             <ScrollArea className="h-[180px] pr-3">
               <VenueFilter
                 venues={venues}
@@ -60,19 +68,14 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
                 onReset={() => onVenueChange([])}
               />
             </ScrollArea>
-            <div className="absolute right-2 bottom-2 text-xs text-gray-400 bg-white px-1 rounded-sm">
-              Scroll for more
-            </div>
           </div>
         </div>
 
         <div className="space-y-2">
           <h3 className="text-sm font-medium">Location</h3>
-          <div className="text-sm p-2 bg-gray-50 rounded-md border">
-            <div className="flex items-center justify-between">
-              <span className="font-medium text-gray-700">Zandvoort Area</span>
-              <span className="text-xs text-gray-500">(fixed)</span>
-            </div>
+          <div className="flex items-center border rounded-md p-2">
+            <span className="text-gray-700">Zandvoort Area</span>
+            <ChevronDown className="ml-auto h-4 w-4 text-gray-400" />
           </div>
         </div>
       </div>

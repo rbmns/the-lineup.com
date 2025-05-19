@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 
 export const useCategoryFilterSelection = (categories: string[]) => {
@@ -13,7 +14,6 @@ export const useCategoryFilterSelection = (categories: string[]) => {
       }
       
       // If the category is already in the selection, remove it
-      // but ensure at least one category remains selected unless explicitly clearing all
       if (prev.includes(category)) {
         return prev.filter(c => c !== category);
       }

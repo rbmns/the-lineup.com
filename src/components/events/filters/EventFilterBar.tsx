@@ -39,10 +39,10 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
       <div className="overflow-x-auto pb-2 no-scrollbar">
         <div className="flex gap-2 min-w-max">
           <AllCategoryPill
-            active={isAllSelected}
+            active={true}
             onClick={handleAllToggle}
             size="default"
-            label={isAllSelected ? "None" : "All"}
+            isSelectAll={!isAllSelected}
           />
           
           {allEventTypes.map((eventType) => (
