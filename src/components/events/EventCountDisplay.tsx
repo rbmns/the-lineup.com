@@ -3,17 +3,11 @@ import React from 'react';
 
 interface EventCountDisplayProps {
   count: number;
-  showMessage?: boolean;
 }
 
-export const EventCountDisplay: React.FC<EventCountDisplayProps> = ({ 
-  count,
-  showMessage = true
-}) => {
-  if (!showMessage) return null;
-  
+export const EventCountDisplay: React.FC<EventCountDisplayProps> = ({ count }) => {
   return (
-    <div className="mb-4 text-sm text-gray-600">
+    <div className="text-sm text-gray-500 mb-4">
       {count} {count === 1 ? 'event' : 'events'} found
     </div>
   );
