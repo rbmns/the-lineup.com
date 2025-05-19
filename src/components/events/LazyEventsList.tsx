@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Event } from '@/types';
 import { EventGrid } from '@/components/events/EventGrid';
@@ -87,14 +88,12 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
         <NoResultsFound resetFilters={resetFilters} />
       )}
       
-      {/* Remove the events count display here */}
-
       {!isLoading && mainEvents.length > 0 && (
         <>
           {/* Display events before the teaser */}
           <EventGrid
             events={eventsBeforeTeaser}
-            visibleCount={eventsBeforeTeaser.length}
+            visibleCount={Math.min(eventsBeforeTeaser.length, EVENTS_BEFORE_TEASER)}
             hasMore={false}
             isLoading={isLoading}
             onLoadMore={() => {}}
