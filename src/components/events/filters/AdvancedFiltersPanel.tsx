@@ -51,7 +51,7 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
 
         <div className="space-y-2">
           <h3 className="text-sm font-medium">Venue</h3>
-          <div className="border rounded-md p-1">
+          <div className="border rounded-md p-1 relative">
             <ScrollArea className="h-[180px] pr-3">
               <VenueFilter
                 venues={venues}
@@ -60,6 +60,9 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
                 onReset={() => onVenueChange([])}
               />
             </ScrollArea>
+            <div className="absolute right-2 bottom-2 text-xs text-gray-400 bg-white px-1 rounded-sm">
+              Scroll for more
+            </div>
           </div>
         </div>
 

@@ -32,13 +32,12 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
   const someSelected = selectedEventTypes.length > 0 && !isAllSelected;
   
   const handleAllClick = () => {
-    if (isAllSelected) {
-      // If all are already selected, do nothing (we always want to show results)
-      return;
-    } else {
-      // If not all are selected, select all
+    // If not all are selected, select all
+    if (!isAllSelected) {
       onSelectAll();
     }
+    // If all are already selected, we don't do anything when clicking "All"
+    // (per the requirements, if all are selected we don't want to deselect anything)
   };
 
   return (
@@ -94,17 +93,6 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
               className="text-gray-600 hover:text-gray-900"
             >
               Reset
-            </Button>
-          )}
-          
-          {hasActiveFilters && onClearAllFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClearAllFilters}
-              className="text-red-500 hover:text-red-700"
-            >
-              Clear all filters
             </Button>
           )}
         </div>
