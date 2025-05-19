@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -29,6 +28,7 @@ const EventsPageRefactored = () => {
   const [locations, setLocations] = useState<Array<{ value: string, label: string }>>([]);
   const [isVenuesLoading, setIsVenuesLoading] = useState(true);
   
+  // Event filter state management
   const {
     selectedEventTypes,
     setSelectedEventTypes,
@@ -49,11 +49,13 @@ const EventsPageRefactored = () => {
     handleClearDateFilter
   } = useEventFilterState();
   
+  // Get all unique event types from events
   const allEventTypes = React.useMemo(() => {
     const types = events.map(event => event.event_type).filter(Boolean);
     return [...new Set(types)];
   }, [events]);
   
+  // Fetch all venues for the filter
   useEffect(() => {
     const fetchVenues = async () => {
       setIsVenuesLoading(true);
@@ -87,6 +89,7 @@ const EventsPageRefactored = () => {
     fetchVenues();
   }, []);
   
+  // Filter events by selected event types - all selected by default
   const {
     selectedCategories,
     toggleCategory,
@@ -95,22 +98,28 @@ const EventsPageRefactored = () => {
     isNoneSelected
   } = useCategoryFilterSelection(allEventTypes);
   
+  // Keep the category filter and event type filter in sync
   useEffect(() => {
     setSelectedEventTypes(selectedCategories);
   }, [selectedCategories, setSelectedEventTypes]);
   
+  // Filter events based on all filters
   const filteredEvents = React.useMemo(() => {
+    // If no categories selected, show no events
     if (selectedCategories.length === 0) {
       return [];
     }
     
+    // Show all events if all categories are selected
     if (selectedCategories.length === allEventTypes.length) {
       let filtered = events;
       
+      // Apply venue filter if selected
       if (selectedVenues.length > 0) {
         filtered = filterEventsByVenue(filtered, selectedVenues);
       }
       
+      // Apply date filter if selected
       if (dateRange || selectedDateFilter) {
         filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
       }
@@ -118,14 +127,17 @@ const EventsPageRefactored = () => {
       return filtered;
     }
     
+    // Apply event type filter if some event types are selected
     let filtered = events.filter(event => 
       event.event_type && selectedCategories.includes(event.event_type)
     );
     
+    // Apply venue filter
     if (selectedVenues.length > 0) {
       filtered = filterEventsByVenue(filtered, selectedVenues);
     }
     
+    // Apply date filter
     if (dateRange || selectedDateFilter) {
       filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
     }
@@ -133,6 +145,7 @@ const EventsPageRefactored = () => {
     return filtered;
   }, [events, selectedCategories, allEventTypes.length, selectedVenues, dateRange, selectedDateFilter]);
   
+  // Get similar events if no results match our filters but filters are active
   const { similarEvents } = useSimilarEventsHandler({
     mainEvents: filteredEvents,
     hasActiveFilters,
@@ -142,6 +155,7 @@ const EventsPageRefactored = () => {
     userId: user?.id
   });
 
+  // Update events count for display
   const eventsCount = filteredEvents.length;
   
   const { 
