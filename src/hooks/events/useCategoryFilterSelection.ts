@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 
 // Storage key for persisting filter state
@@ -20,6 +19,7 @@ export const useCategoryFilterSelection = (categories: string[]) => {
     } catch (e) {
       console.error("Error reading stored categories:", e);
     }
+    // Default behavior: select all categories
     return [...categories];
   };
 
@@ -62,7 +62,7 @@ export const useCategoryFilterSelection = (categories: string[]) => {
         const urlParams = new URLSearchParams(window.location.search);
         
         if (selectedCategories.length === categories.length) {
-          // If all are selected, don't include in URL
+          // If all are selected, don't include in URL (default state)
           urlParams.delete('eventTypes');
         } else if (selectedCategories.length > 0) {
           // If some are selected, include them in URL
@@ -82,12 +82,6 @@ export const useCategoryFilterSelection = (categories: string[]) => {
 
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev => {
-      // If all categories are currently selected and user clicks one,
-      // show only that one category
-      if (prev.length === categories.length) {
-        return [category];
-      }
-      
       // If the category is already in the selection, remove it
       if (prev.includes(category)) {
         // Don't allow removing the last category (always keep at least one)

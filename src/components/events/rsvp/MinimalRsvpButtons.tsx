@@ -56,6 +56,7 @@ export const MinimalRsvpButtons: React.FC<MinimalRsvpButtonsProps> = ({
     const target = e.currentTarget as HTMLElement;
     if (target) {
       target.setAttribute('data-event-handled', 'true');
+      target.setAttribute('data-rsvp-handled', status);
     }
     
     // Call the provided onRsvp handler
@@ -74,6 +75,22 @@ export const MinimalRsvpButtons: React.FC<MinimalRsvpButtonsProps> = ({
         e.stopPropagation();
         e.preventDefault();
         e.nativeEvent.stopImmediatePropagation();
+      }}
+      onMouseUp={(e) => {
+        // Prevent any mouse events from bubbling up
+        e.stopPropagation();
+      }}
+      onMouseDown={(e) => {
+        // Prevent any mouse events from bubbling up
+        e.stopPropagation();
+      }}
+      onTouchStart={(e) => {
+        // Prevent any touch events from bubbling up
+        e.stopPropagation();
+      }}
+      onTouchEnd={(e) => {
+        // Prevent any touch events from bubbling up
+        e.stopPropagation();
       }}
     >
       <Button

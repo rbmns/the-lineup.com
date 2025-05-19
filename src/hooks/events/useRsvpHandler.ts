@@ -26,6 +26,17 @@ export const useRsvpHandler = (
     const scrollPosition = window.scrollY;
     const urlSearchParams = window.location.search;
     
+    // Get filter states from session storage if available
+    let storedCategoryFilters = null;
+    try {
+      const categoryFiltersRaw = sessionStorage.getItem('event-category-filters');
+      if (categoryFiltersRaw) {
+        storedCategoryFilters = JSON.parse(categoryFiltersRaw);
+      }
+    } catch (e) {
+      console.error("Error reading stored category filters:", e);
+    }
+    
     // Use event ID specific check to prevent cross-event interference
     const eventRsvpKey = `rsvp-${eventId}`;
     if ((window as any)[eventRsvpKey]) {
@@ -76,6 +87,15 @@ export const useRsvpHandler = (
                 '', 
                 `${window.location.pathname}?${originalParams}`
               );
+            }
+          }
+          
+          // If we had stored category filters, restore them
+          if (storedCategoryFilters && Array.isArray(storedCategoryFilters)) {
+            try {
+              sessionStorage.setItem('event-category-filters', JSON.stringify(storedCategoryFilters));
+            } catch (e) {
+              console.error("Error restoring category filters:", e);
             }
           }
         }, 100);
