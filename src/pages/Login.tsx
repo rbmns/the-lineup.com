@@ -11,6 +11,7 @@ import { completeLogout, clearAllRateLimits } from '@/integrations/supabase/clie
 
 interface LocationState {
   initialMode?: 'login' | 'register';
+  suppressToast?: boolean; // Add flag to suppress toast messages
 }
 
 const Login = () => {
@@ -21,6 +22,9 @@ const Login = () => {
   const location = useLocation();
   const state = location.state as LocationState | null;
   const [isNewUser, setIsNewUser] = useState(false);
+  
+  // Determine whether to show success toast (default to false)
+  const suppressSuccessToast = state?.suppressToast || true;
 
   useEffect(() => {
     // Clear any stale session when mounting the login page
@@ -120,7 +124,7 @@ const Login = () => {
           {isForgotPassword ? (
             <ForgotPasswordForm onBackToLogin={handleBackToLogin} />
           ) : isLogin ? (
-            <LoginForm onToggleMode={handleToggleMode} onForgotPassword={handleForgotPassword} />
+            <LoginForm onToggleMode={handleToggleMode} onForgotPassword={handleForgotPassword} suppressSuccessToast={suppressSuccessToast} />
           ) : (
             <SignupForm onToggleMode={handleToggleMode} />
           )}

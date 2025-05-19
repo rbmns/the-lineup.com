@@ -34,11 +34,17 @@ const EventCardList: React.FC<EventCardListProps> = ({
   const imageUrl = getEventImageUrl(event);
 
   const handleClick = (e: React.MouseEvent) => {
-    // Don't navigate if clicking on RSVP buttons
-    if ((e.target as HTMLElement).closest('[data-rsvp-button]') || 
-        (e.target as HTMLElement).closest('[data-rsvp-container]')) {
-      e.preventDefault();
+    // More thorough check for RSVP-related elements
+    const target = e.target as HTMLElement;
+    const isRsvpElement = 
+      target.closest('[data-rsvp-container="true"]') || 
+      target.closest('[data-rsvp-button="true"]') ||
+      target.hasAttribute('data-rsvp-button') ||
+      target.closest('button[data-status]');
+    
+    if (isRsvpElement) {
       e.stopPropagation();
+      e.preventDefault();
       return;
     }
     

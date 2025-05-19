@@ -52,24 +52,13 @@ const EventCard: React.FC<EventCardProps> = ({
     if (isRsvpElement) {
       e.stopPropagation();
       e.preventDefault();
-      return false; // Don't navigate if clicked on RSVP buttons
+      return;
     }
     
     if (onClick) {
       onClick(event);
     } else {
-      if (event && event.id) {
-        navigateToEvent({
-          ...event,
-          id: event.id,
-          destination: event.destination,
-          slug: event.slug,
-          start_time: event.start_time,
-          title: event.title
-        });
-      } else {
-        console.error("Cannot navigate: Missing event ID", event);
-      }
+      navigateToEvent(event);
     }
   };
 
@@ -78,7 +67,6 @@ const EventCard: React.FC<EventCardProps> = ({
     if (!onRsvp) return false;
     
     try {
-      console.log(`EventCard: Handling RSVP for event ${event.id}, status: ${status}`);
       const result = await onRsvp(event.id, status);
       // Convert any result (including void) to a boolean
       return result === undefined ? true : !!result;
@@ -162,7 +150,6 @@ const EventCard: React.FC<EventCardProps> = ({
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              return false;
             }}
           >
             <EventRsvpButtons
