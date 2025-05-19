@@ -40,24 +40,17 @@ export const EventsResultsDisplay: React.FC<EventsResultsDisplayProps> = ({
       {/* Events count display */}
       <EventCountDisplay count={eventsCount} />
 
-      {/* Show NoResultsFound when there are no event types selected */}
-      {isNoneSelected ? (
-        <NoResultsFound 
-          resetFilters={selectAll}
-          message="No event types selected. Select at least one event type to see events."
-        />
-      ) : (
-        <LazyEventsList 
-          mainEvents={filteredEvents}
-          relatedEvents={similarEvents} 
-          isLoading={isLoading || isVenuesLoading || isFilterLoading}
-          onRsvp={handleRsvp}
-          showRsvpButtons={showRsvpButtons}
-          hasActiveFilters={hasActiveFilters}
-          loadingEventId={loadingEventId}
-          hideCount={true}
-        />
-      )}
+      {/* Show LazyEventsList in all cases */}
+      <LazyEventsList 
+        mainEvents={filteredEvents}
+        relatedEvents={similarEvents} 
+        isLoading={isLoading || isVenuesLoading || isFilterLoading}
+        onRsvp={handleRsvp}
+        showRsvpButtons={showRsvpButtons}
+        hasActiveFilters={hasActiveFilters}
+        loadingEventId={loadingEventId}
+        hideCount={true}
+      />
     </div>
   );
 };

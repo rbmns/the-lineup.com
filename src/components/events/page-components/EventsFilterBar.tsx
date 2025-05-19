@@ -9,6 +9,7 @@ interface EventsFilterBarProps {
   selectAll: () => void;
   deselectAll: () => void;
   hasActiveFilters: boolean;
+  isAllSelected?: boolean;
 }
 
 export const EventsFilterBar: React.FC<EventsFilterBarProps> = ({
@@ -17,7 +18,8 @@ export const EventsFilterBar: React.FC<EventsFilterBarProps> = ({
   toggleCategory,
   selectAll,
   deselectAll,
-  hasActiveFilters
+  hasActiveFilters,
+  isAllSelected = false
 }) => {
   return (
     <div className="mt-2 mb-4 overflow-x-auto">

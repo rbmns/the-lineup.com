@@ -63,8 +63,8 @@ export const useCategoryFilterSelection = (categories: string[]) => {
       if (window.location.pathname.includes('/events')) {
         const urlParams = new URLSearchParams(window.location.search);
         
-        if (selectedCategories.length === 0) {
-          // If none are selected, don't include in URL (default state)
+        if (selectedCategories.length === 0 || selectedCategories.length === categories.length) {
+          // If none are selected or all are selected, don't include in URL (default state)
           urlParams.delete('eventTypes');
         } else {
           // If some are selected, include them in URL
@@ -77,7 +77,7 @@ export const useCategoryFilterSelection = (categories: string[]) => {
     } catch (e) {
       console.error("Error saving category filters:", e);
     }
-  }, [selectedCategories]);
+  }, [selectedCategories, categories]);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev => {
