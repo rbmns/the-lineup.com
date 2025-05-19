@@ -23,20 +23,13 @@ export const EventsSignupTeaser: React.FC = () => {
             <p className="text-gray-600 mt-1 text-sm">See who's going and make new friends at events near you</p>
           </div>
         </div>
-        <div className="flex gap-3 mt-2 sm:mt-0">
+        <div className="flex mt-2 sm:mt-0">
           <Button 
             variant="default" 
             className="bg-black hover:bg-gray-800 px-5"
             onClick={handleSignUp}
           >
             Sign up
-          </Button>
-          <Button 
-            variant="outline" 
-            className="border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
-            onClick={() => navigate('/login')}
-          >
-            Log in
           </Button>
         </div>
       </div>

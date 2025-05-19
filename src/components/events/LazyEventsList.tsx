@@ -16,8 +16,8 @@ import { Button } from '@/components/ui/button';
 const INITIAL_VISIBLE_COUNT = 9;
 // Number of additional events to load on each load more action
 const LOAD_MORE_INCREMENT = 6;
-// Number of events to show before the teaser (3 rows of 3 events = 9 events)
-const EVENTS_BEFORE_TEASER = 9;
+// Number of events to show before the teaser (2 rows of 3 events = 6 events)
+const EVENTS_BEFORE_TEASER = 6;
 
 interface LazyEventsListProps {
   mainEvents: Event[];
