@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 import { Event, UserProfile, Venue } from '@/types';
 import { supabase } from '@/lib/supabase';
@@ -361,7 +362,7 @@ export const useSearchAndFilter = (
   };
 
   // Filter by selected categories
-  const handleCategoryFilter = async () => {
+  const handleCategoryFilter = async (currentSearchQuery?: string) => {
     if (selectedEventTypes.length === 0) {
       setSearchResults(null);
       setQueryOnlyResults(null);
@@ -390,8 +391,8 @@ export const useSearchAndFilter = (
         const upcomingEvents = filterUpcomingEvents(formattedEvents);
         setSearchResults(upcomingEvents);
         
-        if (searchQuery) {
-          await fetchQueryOnlyResults(searchQuery);
+        if (currentSearchQuery) {
+          await fetchQueryOnlyResults(currentSearchQuery);
         }
         
         setNoResultsFound(upcomingEvents.length === 0);

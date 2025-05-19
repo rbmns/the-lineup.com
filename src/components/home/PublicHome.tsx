@@ -79,14 +79,14 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
   // Run category filter when selectedEventTypes changes
   useEffect(() => {
     if (selectedEventTypes.length > 0) {
-      searchAndFilter.handleCategoryFilter();
+      searchAndFilter.handleCategoryFilter(searchQuery);
     } else if (selectedEventTypes.length === 0 && !searchQuery) {
       searchState.setSearchResults(null);
       searchState.setCombinedResults(null);
       searchState.setAiFeedback(undefined);
       searchState.setSimilarEvents([]);
     }
-  }, [selectedEventTypes]);
+  }, [selectedEventTypes, searchQuery]);
 
   // Handle RSVP actions
   const handleRsvpAction = async (eventId: string, status: 'Going' | 'Interested') => {
