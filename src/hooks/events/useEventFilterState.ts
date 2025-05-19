@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { DateRange } from 'react-day-picker';
 import { useLocation } from 'react-router-dom';
@@ -61,7 +60,7 @@ export const useEventFilterState = () => {
           location.state?.restoreFilters && 
           location.state?.filterState?.dateRange) {
         const stateDateRange = location.state.filterState.dateRange;
-        if (stateDateRange) {
+        if (stateDateRange && (stateDateRange.from || stateDateRange.to)) {
           // Ensure dates are proper Date objects
           if (stateDateRange.from) {
             stateDateRange.from = new Date(stateDateRange.from);
@@ -80,9 +79,10 @@ export const useEventFilterState = () => {
         const parsed = JSON.parse(stored);
         if (parsed && (parsed.from || parsed.to)) {
           // Convert date strings back to Date objects
-          if (parsed.from) parsed.from = new Date(parsed.from);
-          if (parsed.to) parsed.to = new Date(parsed.to);
-          return parsed;
+          const range: DateRange = {};
+          if (parsed.from) range.from = new Date(parsed.from);
+          if (parsed.to) range.to = new Date(parsed.to);
+          return range;
         }
       }
       

@@ -10,7 +10,7 @@ interface UseFilteredEventsProps {
   selectedCategories: string[];
   allEventTypes: string[];
   selectedVenues: string[];
-  dateRange?: DateRange;
+  dateRange?: DateRange | undefined;
   selectedDateFilter: string;
 }
 
