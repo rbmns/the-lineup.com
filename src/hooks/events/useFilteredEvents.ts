@@ -24,51 +24,23 @@ export const useFilteredEvents = ({
 }: UseFilteredEventsProps) => {
   // Filter events based on all filters
   const filteredEvents = useMemo(() => {
-    // If no categories selected, show all events (changed behavior)
-    if (selectedCategories.length === 0) {
-      let filtered = events;
-      
-      // Apply venue filter if selected
-      if (selectedVenues.length > 0) {
-        filtered = filterEventsByVenue(filtered, selectedVenues);
-      }
-      
-      // Apply date filter if selected
-      if (dateRange || selectedDateFilter) {
-        filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
-      }
-      
-      return filtered;
-    }
-    
-    // Show all events if all categories are selected
-    if (selectedCategories.length === allEventTypes.length) {
-      let filtered = events;
-      
-      // Apply venue filter if selected
-      if (selectedVenues.length > 0) {
-        filtered = filterEventsByVenue(filtered, selectedVenues);
-      }
-      
-      // Apply date filter if selected
-      if (dateRange || selectedDateFilter) {
-        filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
-      }
-      
-      return filtered;
-    }
+    // Update: Changed behavior to show all events when no categories are selected
+    // (instead of showing no events)
+    let filtered = events;
     
     // Apply event type filter if some event types are selected
-    let filtered = events.filter(event => 
-      event.event_type && selectedCategories.includes(event.event_type)
-    );
+    if (selectedCategories.length > 0 && selectedCategories.length < allEventTypes.length) {
+      filtered = events.filter(event => 
+        event.event_type && selectedCategories.includes(event.event_type)
+      );
+    }
     
-    // Apply venue filter
+    // Apply venue filter if selected
     if (selectedVenues.length > 0) {
       filtered = filterEventsByVenue(filtered, selectedVenues);
     }
     
-    // Apply date filter
+    // Apply date filter if selected
     if (dateRange || selectedDateFilter) {
       filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
     }
