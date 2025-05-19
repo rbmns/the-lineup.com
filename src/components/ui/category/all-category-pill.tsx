@@ -7,13 +7,15 @@ interface AllCategoryPillProps {
   onClick?: () => void;
   size?: 'xs' | 'sm' | 'default' | 'lg';
   className?: string;
+  label?: string;
 }
 
 export const AllCategoryPill: React.FC<AllCategoryPillProps> = ({
   active = false,
   onClick,
   size = 'default',
-  className
+  className,
+  label = "All"
 }) => {
   // Base styles
   const baseClasses = 'rounded-full font-medium transition-colors flex items-center cursor-pointer';
@@ -42,7 +44,7 @@ export const AllCategoryPill: React.FC<AllCategoryPillProps> = ({
       )}
       onClick={onClick || (() => {})}
     >
-      <span>All</span>
+      <span>{label}</span>
     </div>
   );
 };

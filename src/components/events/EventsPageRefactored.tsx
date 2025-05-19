@@ -26,7 +26,6 @@ const EventsPageRefactored = () => {
   const [venues, setVenues] = useState<Array<{ value: string, label: string }>>([]);
   const [locations, setLocations] = useState<Array<{ value: string, label: string }>>([]);
   const [isVenuesLoading, setIsVenuesLoading] = useState(true);
-  const [eventsFound, setEventsFound] = useState(0);
   
   // Event filter state management
   const {
@@ -95,7 +94,7 @@ const EventsPageRefactored = () => {
     toggleCategory,
     selectAll,
     deselectAll,
-    reset
+    isNoneSelected
   } = useCategoryFilterSelection(allEventTypes);
   
   // Keep the category filter and event type filter in sync
@@ -145,10 +144,8 @@ const EventsPageRefactored = () => {
     return filtered;
   }, [events, selectedCategories, allEventTypes.length, selectedVenues, dateRange, selectedDateFilter]);
 
-  // Update events found count
-  useEffect(() => {
-    setEventsFound(filteredEvents.length);
-  }, [filteredEvents]);
+  // Update events count for display
+  const eventsCount = filteredEvents.length;
   
   const { 
     handleRsvp: enhancedHandleRsvp, 
@@ -171,9 +168,7 @@ const EventsPageRefactored = () => {
             onToggleEventType={toggleCategory}
             onSelectAll={selectAll}
             onDeselectAll={deselectAll}
-            onReset={reset}
             hasActiveFilters={hasActiveFilters}
-            onClearAllFilters={resetFilters}
             className="py-2"
           />
         </div>
@@ -216,13 +211,13 @@ const EventsPageRefactored = () => {
         />
         
         {/* Events count display */}
-        <EventCountDisplay count={eventsFound} />
+        <EventCountDisplay count={eventsCount} />
         
         <div className="space-y-8">
           {/* Show NoResultsFound when there are no event types selected */}
-          {selectedCategories.length === 0 ? (
+          {isNoneSelected ? (
             <NoResultsFound 
-              resetFilters={reset}
+              resetFilters={selectAll}
               message="No event types selected. Select at least one event type to see events."
             />
           ) : (

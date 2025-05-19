@@ -23,21 +23,15 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
   onToggleEventType,
   onSelectAll,
   onDeselectAll,
-  onReset,
-  hasActiveFilters,
-  onClearAllFilters,
   className
 }) => {
   const isAllSelected = selectedEventTypes.length === allEventTypes.length;
-  const someSelected = selectedEventTypes.length > 0 && !isAllSelected;
+  const isNoneSelected = selectedEventTypes.length === 0;
   
-  const handleAllClick = () => {
-    // If not all are selected, select all
-    if (!isAllSelected) {
-      onSelectAll();
-    }
-    // If all are already selected, we don't do anything when clicking "All"
-    // (per the requirements, if all are selected we don't want to deselect anything)
+  const handleAllToggle = () => {
+    // If all are already selected, deselect all
+    // If some or none are selected, select all
+    isAllSelected ? onDeselectAll() : onSelectAll();
   };
 
   return (
@@ -46,8 +40,9 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
         <div className="flex gap-2 min-w-max">
           <AllCategoryPill
             active={isAllSelected}
-            onClick={handleAllClick}
+            onClick={handleAllToggle}
             size="default"
+            label={isAllSelected ? "None" : "All"}
           />
           
           {allEventTypes.map((eventType) => (
@@ -63,40 +58,6 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
           ))}
         </div>
       </div>
-      
-      {selectedEventTypes.length > 0 && (
-        <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={isAllSelected ? onDeselectAll : onSelectAll}
-            className="text-gray-600 hover:text-gray-900 flex items-center gap-1"
-          >
-            {isAllSelected ? (
-              <>
-                <X className="h-3.5 w-3.5" />
-                <span>Deselect all</span>
-              </>
-            ) : (
-              <>
-                <Check className="h-3.5 w-3.5" />
-                <span>Select all</span>
-              </>
-            )}
-          </Button>
-          
-          {someSelected && onReset && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onReset}
-              className="text-gray-600 hover:text-gray-900"
-            >
-              Reset
-            </Button>
-          )}
-        </div>
-      )}
     </div>
   );
 };

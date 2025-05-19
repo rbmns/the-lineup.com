@@ -13,12 +13,9 @@ export const useCategoryFilterSelection = (categories: string[]) => {
       }
       
       // If the category is already in the selection, remove it
-      // but ensure at least one category remains selected
+      // but ensure at least one category remains selected unless explicitly clearing all
       if (prev.includes(category)) {
-        const filtered = prev.filter(c => c !== category);
-        // If user is trying to deselect the last selected category,
-        // don't allow it - keep the current selection
-        return filtered.length > 0 ? filtered : prev;
+        return prev.filter(c => c !== category);
       }
       
       // Otherwise, add the category to the selection
@@ -31,23 +28,24 @@ export const useCategoryFilterSelection = (categories: string[]) => {
   };
 
   const deselectAll = () => {
-    // Keep at least one category selected
-    if (categories.length > 0) {
-      setSelectedCategories([categories[0]]);
-    } else {
-      setSelectedCategories([]);
-    }
+    // Allow deselecting all categories (showing no results)
+    setSelectedCategories([]);
   };
 
   const reset = () => {
     setSelectedCategories([...categories]);
   };
 
+  const isAllSelected = selectedCategories.length === categories.length;
+  const isNoneSelected = selectedCategories.length === 0;
+
   return {
     selectedCategories,
     toggleCategory,
     selectAll,
     deselectAll,
-    reset
+    reset,
+    isAllSelected,
+    isNoneSelected
   };
 };
