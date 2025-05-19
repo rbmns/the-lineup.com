@@ -1,7 +1,8 @@
+
 import { useState } from 'react';
 
 export const useCategoryFilterSelection = (categories: string[]) => {
-  // Initialize with all categories selected
+  // Initialize with all categories selected (default state)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([...categories]);
 
   const toggleCategory = (category: string) => {

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -76,11 +75,9 @@ const EventsPageRefactored = () => {
           setVenues(venueOptions);
         }
         
-        // Create sample locations for the design
+        // Create sample locations for the design (now just fixed to "Zandvoort Area")
         setLocations([
-          { value: 'den-haag', label: 'Den Haag' },
-          { value: 'amsterdam', label: 'Amsterdam' },
-          { value: 'rotterdam', label: 'Rotterdam' }
+          { value: 'zandvoort-area', label: 'Zandvoort Area' }
         ]);
       } catch (err) {
         console.error('Error fetching venues:', err);

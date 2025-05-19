@@ -4,13 +4,7 @@ import { DateRangeFilter } from '@/components/events/DateRangeFilter';
 import { VenueFilter } from '@/components/events/VenueFilter';
 import { DateRange } from 'react-day-picker';
 import { cn } from '@/lib/utils';
-import { 
-  Select,
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from '@/components/ui/select';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface AdvancedFiltersPanelProps {
   isOpen: boolean;
@@ -40,19 +34,6 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
   className
 }) => {
   if (!isOpen) return null;
-  
-  const handleVenueSelect = (value: string) => {
-    if (selectedVenues.includes(value)) {
-      onVenueChange(selectedVenues.filter(v => v !== value));
-    } else {
-      onVenueChange([...selectedVenues, value]);
-    }
-  };
-
-  const handleLocationSelect = (value: string) => {
-    // This is a placeholder for location filtering functionality
-    console.log("Location selected:", value);
-  };
 
   return (
     <div className={cn("border rounded-lg p-4 bg-white shadow-sm", className)}>
@@ -70,34 +51,26 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
 
         <div className="space-y-2">
           <h3 className="text-sm font-medium">Venue</h3>
-          <VenueFilter
-            venues={venues}
-            selectedVenues={selectedVenues}
-            onVenueChange={onVenueChange}
-            onReset={() => onVenueChange([])}
-          />
+          <div className="border rounded-md p-1">
+            <ScrollArea className="h-[180px] pr-3">
+              <VenueFilter
+                venues={venues}
+                selectedVenues={selectedVenues}
+                onVenueChange={onVenueChange}
+                onReset={() => onVenueChange([])}
+              />
+            </ScrollArea>
+          </div>
         </div>
 
         <div className="space-y-2">
           <h3 className="text-sm font-medium">Location</h3>
-          {locations.length > 0 ? (
-            <Select onValueChange={handleLocationSelect}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select location" />
-              </SelectTrigger>
-              <SelectContent>
-                {locations.map(location => (
-                  <SelectItem key={location.value} value={location.value}>
-                    {location.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          ) : (
-            <div className="text-sm text-gray-500">
-              Select a venue to filter by location
+          <div className="text-sm p-2 bg-gray-50 rounded-md border">
+            <div className="flex items-center justify-between">
+              <span className="font-medium text-gray-700">Zandvoort Area</span>
+              <span className="text-xs text-gray-500">(fixed)</span>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

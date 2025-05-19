@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/command';
 import { VenueFilterItem } from './venue-filter/VenueFilterItem';
 import { VenueFilterBadges } from './venue-filter/VenueFilterBadges';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface VenueOption {
   value: string;
@@ -56,22 +57,30 @@ export const VenueFilter: React.FC<VenueFilterProps> = ({
 
   return (
     <div className="space-y-2">
-      <Command className="rounded-md border shadow-none bg-white">
-        <CommandList className="max-h-64">
-          <CommandEmpty>No venue found.</CommandEmpty>
-          <CommandGroup className="max-h-64 overflow-y-auto">
-            {sortedVenues.map((venue) => (
-              <VenueFilterItem
-                key={venue.value}
-                value={venue.value}
-                label={venue.label}
-                isSelected={safeSelectedVenues.includes(venue.value)}
-                onSelect={toggleVenue}
-              />
-            ))}
-          </CommandGroup>
-        </CommandList>
-      </Command>
+      <div className="relative">
+        <Command className="rounded-md border shadow-none bg-white">
+          <CommandList>
+            <CommandEmpty>No venue found.</CommandEmpty>
+            <CommandGroup className="max-h-64 overflow-y-auto">
+              {sortedVenues.map((venue) => (
+                <VenueFilterItem
+                  key={venue.value}
+                  value={venue.value}
+                  label={venue.label}
+                  isSelected={safeSelectedVenues.includes(venue.value)}
+                  onSelect={toggleVenue}
+                />
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+        
+        {venues.length > 5 && (
+          <div className="absolute right-2 bottom-2 text-xs text-gray-400 bg-white px-1 rounded-sm">
+            Scroll for more
+          </div>
+        )}
+      </div>
       
       <VenueFilterBadges
         selectedVenues={safeSelectedVenues}
