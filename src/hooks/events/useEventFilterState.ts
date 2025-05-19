@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { DateRange } from 'react-day-picker';
 import { useLocation } from 'react-router-dom';
@@ -69,7 +70,10 @@ export const useEventFilterState = () => {
             stateDateRange.to = new Date(stateDateRange.to);
           }
           console.log("Restored date range from navigation state:", stateDateRange);
-          return stateDateRange;
+          // Only return if it has a from property
+          if (stateDateRange.from) {
+            return stateDateRange as DateRange;
+          }
         }
       }
       
@@ -77,11 +81,15 @@ export const useEventFilterState = () => {
       const stored = sessionStorage.getItem(DATE_RANGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (parsed && (parsed.from || parsed.to)) {
+        if (parsed && parsed.from) {
           // Convert date strings back to Date objects
-          const range: DateRange = {};
-          if (parsed.from) range.from = new Date(parsed.from);
-          if (parsed.to) range.to = new Date(parsed.to);
+          const range = {
+            from: new Date(parsed.from)
+          } as DateRange;
+          
+          if (parsed.to) {
+            range.to = new Date(parsed.to);
+          }
           return range;
         }
       }
@@ -90,10 +98,14 @@ export const useEventFilterState = () => {
       const urlParams = new URLSearchParams(location.search);
       const fromParam = urlParams.get('dateFrom');
       const toParam = urlParams.get('dateTo');
-      if (fromParam || toParam) {
-        const range: DateRange = {};
-        if (fromParam) range.from = new Date(fromParam);
-        if (toParam) range.to = new Date(toParam);
+      if (fromParam) {
+        const range = {
+          from: new Date(fromParam)
+        } as DateRange;
+        
+        if (toParam) {
+          range.to = new Date(toParam);
+        }
         return range;
       }
     } catch (e) {
