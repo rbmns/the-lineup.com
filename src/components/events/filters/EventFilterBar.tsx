@@ -44,6 +44,7 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
             size="default"
             isSelectAll={!isAllSelected}
             label={isAllSelected ? "Deselect all" : "Select all"}
+            className="min-w-[115px] justify-center"
           />
           
           {allEventTypes.map((eventType) => (

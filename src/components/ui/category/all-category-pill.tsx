@@ -20,12 +20,12 @@ export const AllCategoryPill: React.FC<AllCategoryPillProps> = ({
   label,
   isSelectAll = true
 }) => {
-  // Base styles with more distinct button appearance
+  // Base styles with more distinctive button appearance
   const baseClasses = 'rounded-md font-medium transition-colors flex items-center gap-1.5 cursor-pointer border';
   
-  // More distinct styling for the All/None button
+  // More distinctive styling for the Select/Deselect All button
   const stateClasses = active 
-    ? 'bg-black text-white hover:bg-gray-800 border-black'
+    ? 'bg-black text-white hover:bg-gray-800 border-black shadow-sm'
     : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300';
   
   // Size classes
