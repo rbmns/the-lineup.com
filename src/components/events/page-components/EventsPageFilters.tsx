@@ -1,7 +1,6 @@
 
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { EventSearch } from '@/components/events/search/EventSearch';
 import { EventsFilterBar } from '@/components/events/page-components/EventsFilterBar';
 import { EventsFilterPanel } from '@/components/events/page-components/EventsFilterPanel';
 import { useNavigationHistory } from '@/hooks/useNavigationHistory';
@@ -78,9 +77,6 @@ export const EventsPageFilters: React.FC<EventsPageFiltersProps> = ({
 
   return (
     <>
-      {/* Search input */}
-      <EventSearch className="mb-4 mt-4" />
-      
       {/* Events category filter bar */}
       <EventsFilterBar
         allEventTypes={allEventTypes}

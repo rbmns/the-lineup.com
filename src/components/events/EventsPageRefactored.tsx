@@ -16,6 +16,7 @@ import { AdvancedFiltersToggle } from '@/components/events/filters/AdvancedFilte
 import { ActiveFiltersSummary } from '@/components/events/filters/ActiveFiltersSummary';
 import { EventCountDisplay } from '@/components/events/EventCountDisplay';
 import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
+import { useFilteredEvents } from '@/hooks/events/useFilteredEvents';
 
 const EventsPageRefactored = () => {
   useEventPageMeta();
@@ -107,64 +108,15 @@ const EventsPageRefactored = () => {
     fetchVenues();
   }, []);
   
-  // Filter events based on all filters
-  const filteredEvents = React.useMemo(() => {
-    // If no categories selected but we have event types, show all events
-    // This ensures we always show events when first loading the page
-    if (selectedCategories.length === 0) {
-      if (allEventTypes.length > 0) {
-        // We have event types but none selected, use all of them
-        let filtered = events;
-        
-        // Apply venue filter if selected
-        if (selectedVenues.length > 0) {
-          filtered = filterEventsByVenue(filtered, selectedVenues);
-        }
-        
-        // Apply date filter if selected
-        if (dateRange || selectedDateFilter) {
-          filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
-        }
-        
-        return filtered;
-      }
-      return [];
-    }
-    
-    // Show all events if all categories are selected
-    if (selectedCategories.length === allEventTypes.length) {
-      let filtered = events;
-      
-      // Apply venue filter if selected
-      if (selectedVenues.length > 0) {
-        filtered = filterEventsByVenue(filtered, selectedVenues);
-      }
-      
-      // Apply date filter if selected
-      if (dateRange || selectedDateFilter) {
-        filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
-      }
-      
-      return filtered;
-    }
-    
-    // Apply event type filter if some event types are selected
-    let filtered = events.filter(event => 
-      event.event_type && selectedCategories.includes(event.event_type)
-    );
-    
-    // Apply venue filter
-    if (selectedVenues.length > 0) {
-      filtered = filterEventsByVenue(filtered, selectedVenues);
-    }
-    
-    // Apply date filter
-    if (dateRange || selectedDateFilter) {
-      filtered = filterEventsByDate(filtered, selectedDateFilter, dateRange);
-    }
-    
-    return filtered;
-  }, [events, selectedCategories, allEventTypes.length, selectedVenues, dateRange, selectedDateFilter]);
+  // Use the filtered events hook
+  const filteredEvents = useFilteredEvents({
+    events,
+    selectedCategories,
+    allEventTypes,
+    selectedVenues,
+    dateRange,
+    selectedDateFilter
+  });
 
   // Update events count for display
   const eventsCount = filteredEvents.length;
