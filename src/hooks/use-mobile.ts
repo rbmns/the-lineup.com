@@ -1,6 +1,8 @@
 
 import { useState, useEffect } from 'react';
 
+const MOBILE_BREAKPOINT = 768;
+
 export const useIsMobile = () => {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -8,7 +10,7 @@ export const useIsMobile = () => {
     // Check if window is available (client-side)
     if (typeof window !== 'undefined') {
       const checkIsMobile = () => {
-        const mobileCheck = window.innerWidth < 768;
+        const mobileCheck = window.innerWidth < MOBILE_BREAKPOINT;
         setIsMobile(mobileCheck);
       };
 
