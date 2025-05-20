@@ -27,7 +27,7 @@ export const useRsvpHandler = (
         // Using the mutable local ref
         localRsvpInProgressRef.current = true;
         
-        // Set the global ref if available (using setter pattern instead of directly)
+        // Set the global ref if available
         if (typeof window !== 'undefined') {
           window.rsvpInProgress = true;
         }

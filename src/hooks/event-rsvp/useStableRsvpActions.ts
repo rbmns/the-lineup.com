@@ -2,6 +2,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useQueryClient } from '@tanstack/react-query';
+import { useCacheUpdater } from './useCacheUpdater';
 
 /**
  * Hook that provides stable RSVP actions with optimistic UI updates
@@ -9,11 +10,22 @@ import { useQueryClient } from '@tanstack/react-query';
 export const useStableRsvpActions = (userId: string | undefined) => {
   const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
+  const { updateAllCaches } = useCacheUpdater();
 
   const handleRsvp = useCallback(async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!userId) {
       console.log("User not logged in");
       return false;
+    }
+
+    // Store current state before RSVP operation
+    const scrollPosition = window.scrollY;
+    const currentUrl = window.location.href;
+    const urlParams = window.location.search;
+    
+    // Set global flag to prevent unwanted state resets
+    if (typeof window !== 'undefined') {
+      window.rsvpInProgress = true;
     }
 
     console.log(`StableRsvp: User ${userId}, Event ${eventId}, Status ${status}`);
@@ -35,6 +47,7 @@ export const useStableRsvpActions = (userId: string | undefined) => {
         
       const existingRsvp = checkResult.data;
       let newRsvpStatus: 'Going' | 'Interested' | null = null;
+      const oldRsvpStatus = existingRsvp?.status as 'Going' | 'Interested' | null;
       
       // If clicking the same status button that's already active, toggle it off
       if (existingRsvp && existingRsvp.status === status) {
@@ -84,10 +97,25 @@ export const useStableRsvpActions = (userId: string | undefined) => {
         newRsvpStatus = status;
       }
 
-      // Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ['events'] });
-      queryClient.invalidateQueries({ queryKey: ['event', eventId] });
-      queryClient.invalidateQueries({ queryKey: ['user-events'] });
+      // Use surgical cache updates instead of invalidating queries
+      updateAllCaches(eventId, userId, newRsvpStatus, oldRsvpStatus);
+      
+      // Add a small delay before checking if we need to restore state
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
+      // Check if URL parameters changed during the RSVP operation
+      const currentParams = window.location.search;
+      if (window.location.pathname.includes('/events') && urlParams !== currentParams) {
+        console.log('Filter state changed during RSVP, restoring URL params:', urlParams);
+        window.history.replaceState({}, '', `${window.location.pathname}${urlParams}`);
+      }
+      
+      // Check if scroll position needs restoration
+      const scrollDiff = Math.abs(window.scrollY - scrollPosition);
+      if (scrollDiff > 50) {
+        console.log(`Scroll position changed (diff: ${scrollDiff}px), restoring to ${scrollPosition}px`);
+        window.scrollTo({ top: scrollPosition, behavior: 'auto' });
+      }
       
       console.log(`StableRsvp: Successfully ${newRsvpStatus ? 'updated' : 'removed'} RSVP`);
       
@@ -97,8 +125,13 @@ export const useStableRsvpActions = (userId: string | undefined) => {
       return false;
     } finally {
       setLoading(false);
+      
+      // Reset global flag
+      if (typeof window !== 'undefined') {
+        window.rsvpInProgress = false;
+      }
     }
-  }, [userId, queryClient]);
+  }, [userId, updateAllCaches]);
 
   return {
     handleRsvp,
