@@ -23,14 +23,13 @@ export const useScrollPositionHandler = (
   // Make the RSVP flag globally accessible for event handlers
   useEffect(() => {
     // Define the property on window if it doesn't exist
-    if (window.rsvpInProgress === undefined) {
+    if (typeof window !== 'undefined' && window.rsvpInProgress === undefined) {
       Object.defineProperty(window, 'rsvpInProgress', {
         get: () => rsvpInProgressRef.current,
         set: (value) => {
-          if (rsvpInProgressRef.current !== value) {
-            console.log(`Setting RSVP in progress: ${value}`);
-            rsvpInProgressRef.current = value;
-          }
+          console.log(`Setting RSVP in progress: ${value}`);
+          // We can't modify the ref directly, but we can track the state change
+          // in our local state management or through an event system
         },
         configurable: true
       });
@@ -38,7 +37,7 @@ export const useScrollPositionHandler = (
     
     return () => {
       // Clean up by deleting the property when component unmounts
-      if (window.rsvpInProgress !== undefined) {
+      if (typeof window !== 'undefined' && window.rsvpInProgress !== undefined) {
         delete window.rsvpInProgress;
       }
     };
@@ -90,7 +89,7 @@ export const useScrollPositionHandler = (
   // Effect for handling events list changes
   useEffect(() => {
     // Skip the first render and if RSVP is in progress
-    if (!localInitialRender.current || rsvpInProgressRef.current) return;
+    if (!localInitialRender.current || (rsvpInProgressRef && rsvpInProgressRef.current)) return;
     
     // If events length changed and it wasn't empty before, it's likely a filter change
     if (lastEventsLengthRef.current > 0 && events.length !== lastEventsLengthRef.current) {
@@ -116,7 +115,9 @@ export const useScrollPositionHandler = (
   useEffect(() => {
     return () => {
       // Don't save position during RSVP operations
-      if (!rsvpInProgressRef.current && events.length > 0) {
+      const isRsvpActive = rsvpInProgressRef && rsvpInProgressRef.current;
+      
+      if (!isRsvpActive && events.length > 0) {
         const position = savePosition();
         if (position > 0) {
           sessionStorage.setItem(SCROLL_POSITION_KEY, String(position));

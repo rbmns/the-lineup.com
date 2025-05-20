@@ -17,8 +17,8 @@ export const useEventListState = () => {
       rsvpInProgressRef.current = inProgress;
       console.log(`RSVP in progress: ${inProgress}`);
       
-      // Also set global flag if available
-      if (window.rsvpInProgress !== undefined) {
+      // Type-safe global flag setting
+      if (typeof window !== 'undefined') {
         window.rsvpInProgress = inProgress;
       }
     }

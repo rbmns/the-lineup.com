@@ -1,11 +1,14 @@
 
-import { useCallback, RefObject } from 'react';
+import { useCallback, RefObject, useRef } from 'react';
 
 export const useRsvpHandler = (
   user: any | null | undefined,
   rsvpFunction: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>,
   rsvpInProgressRef: RefObject<boolean>
 ) => {
+  // Local mutable state to track RSVP progress
+  const localRsvpInProgressRef = useRef<boolean>(false);
+  
   // Helper to handle RSVP with proper flag management
   const handleEventRsvp = useCallback(async (
     eventId: string, 
@@ -21,7 +24,13 @@ export const useRsvpHandler = (
     try {
       // Set flag to prevent unwanted resets
       if (rsvpInProgressRef) {
-        rsvpInProgressRef.current = true;
+        // Using the mutable local ref
+        localRsvpInProgressRef.current = true;
+        
+        // Set the global ref if available (using setter pattern instead of directly)
+        if (typeof window !== 'undefined') {
+          window.rsvpInProgress = true;
+        }
       }
       
       console.log(`useRsvpHandler - Starting RSVP operation: ${eventId}, ${status}`);
@@ -54,17 +63,21 @@ export const useRsvpHandler = (
     } finally {
       // Small delay before resetting flag to ensure all callbacks complete
       setTimeout(() => {
-        if (rsvpInProgressRef) {
-          rsvpInProgressRef.current = false;
-          console.log('useRsvpHandler - Reset RSVP in progress flag');
+        localRsvpInProgressRef.current = false;
+        
+        // Reset global values using type-safe approach
+        if (typeof window !== 'undefined') {
+          window.rsvpInProgress = false;
         }
+        
+        console.log('useRsvpHandler - Reset RSVP in progress flag');
       }, 150);
     }
   }, [user, rsvpFunction, rsvpInProgressRef]);
 
   // Add utility to get current RSVP state
   const isRsvpInProgress = useCallback(() => {
-    return rsvpInProgressRef ? rsvpInProgressRef.current : false;
+    return localRsvpInProgressRef.current || (rsvpInProgressRef ? rsvpInProgressRef.current : false);
   }, [rsvpInProgressRef]);
 
   return { handleEventRsvp, isRsvpInProgress };

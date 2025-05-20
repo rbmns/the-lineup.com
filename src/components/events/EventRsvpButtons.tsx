@@ -66,7 +66,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       const scrollPos = window.scrollY;
       
       // Set global RSVP in progress flag if available
-      if (window.rsvpInProgress !== undefined) {
+      if (typeof window !== 'undefined') {
         window.rsvpInProgress = true;
       }
       
@@ -86,7 +86,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         window.scrollTo({ top: scrollPos, behavior: 'auto' });
         
         // Reset RSVP in progress flag
-        if (window.rsvpInProgress !== undefined) {
+        if (typeof window !== 'undefined') {
           window.rsvpInProgress = false;
         }
       }, 50);
