@@ -21,17 +21,30 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
     const scrollPosition = window.scrollY;
     const currentUrl = window.location.href;
     const urlParams = window.location.search;
+    const eventTypesParam = new URLSearchParams(urlParams).getAll('eventType');
     
     // Check if we're on the events page
     const isEventsPage = window.location.pathname.includes('/events');
     
-    // Save active filters to sessionStorage as a backup
+    // Save active filters to sessionStorage as a comprehensive backup
     if (isEventsPage) {
       try {
+        const filterState = {
+          scrollPosition,
+          urlParams,
+          eventTypes: eventTypesParam,
+          timestamp: Date.now(),
+          url: currentUrl,
+          pathname: window.location.pathname
+        };
+        
+        // Store complete filter state as JSON
+        sessionStorage.setItem('rsvpFilterState', JSON.stringify(filterState));
         sessionStorage.setItem('lastRsvpScrollPosition', scrollPosition.toString());
         sessionStorage.setItem('lastRsvpUrlParams', urlParams);
+        sessionStorage.setItem('lastRsvpEventTypes', JSON.stringify(eventTypesParam));
         sessionStorage.setItem('lastRsvpTimestamp', Date.now().toString());
-        console.log(`Saved filter state to session storage: ${urlParams}`);
+        console.log(`Saved filter state to session storage:`, filterState);
       } catch (e) {
         console.error("Failed to save filter state to sessionStorage", e);
       }
@@ -42,6 +55,23 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
       window.rsvpInProgress = true;
       // Add a data attribute to the body to mark RSVP in progress - useful for debugging
       document.body.setAttribute('data-rsvp-in-progress', 'true');
+      
+      // Add a block event listener that will prevent URL changes during RSVP
+      const blockUrlChangeListener = (e: Event) => {
+        if (window.rsvpInProgress && (e.type === 'popstate' || e.type === 'pushstate')) {
+          console.log('Blocking URL change during RSVP operation');
+          e.stopImmediatePropagation();
+          e.preventDefault();
+          return false;
+        }
+      };
+      
+      // Add listeners to prevent URL changes
+      window.addEventListener('popstate', blockUrlChangeListener, true);
+      window.addEventListener('pushstate', blockUrlChangeListener, true);
+      
+      // Store the listener for cleanup
+      window._rsvpBlockUrlChangeListener = blockUrlChangeListener;
     }
     
     console.log(`OptimisticRsvp: Starting RSVP for event ${eventId}, status ${status}`);
@@ -58,8 +88,8 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
         updateAllCaches(eventId, userId, newStatus, oldStatus);
         
         // Add a small delay before checking if we need to restore state
-        // Increased to 150ms for better reliability
-        await new Promise(resolve => setTimeout(resolve, 150));
+        // Increased to 250ms for better reliability
+        await new Promise(resolve => setTimeout(resolve, 250));
         
         // Check if URL parameters changed during the RSVP operation
         const currentParams = window.location.search;
@@ -71,8 +101,36 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
             const baseUrl = window.location.pathname;
             window.history.replaceState({}, '', `${baseUrl}${urlParams}`);
             console.log(`Restored URL to: ${baseUrl}${urlParams}`);
+            
+            // Get event types from URLs
+            const oldEventTypes = new URLSearchParams(urlParams).getAll('eventType');
+            const newEventTypes = new URLSearchParams(currentParams).getAll('eventType');
+            
+            if (JSON.stringify(oldEventTypes) !== JSON.stringify(newEventTypes)) {
+              console.log('Event type parameters changed, checking UI state for updates...');
+              
+              // Emit a custom event to notify components about the filter restoration
+              const filterRestoredEvent = new CustomEvent('filtersRestored', { 
+                detail: { eventTypes: oldEventTypes, urlParams } 
+              });
+              document.dispatchEvent(filterRestoredEvent);
+            }
           } catch (e) {
             console.error("Failed to restore URL parameters:", e);
+            
+            // Fallback: Try to force reload the state from sessionStorage
+            try {
+              const savedState = sessionStorage.getItem('rsvpFilterState');
+              if (savedState) {
+                const parsedState = JSON.parse(savedState);
+                if (parsedState.urlParams && Date.now() - parsedState.timestamp < 60000) {
+                  console.log('Using fallback filter state restoration from session storage');
+                  window.history.replaceState({}, '', `${parsedState.pathname}${parsedState.urlParams}`);
+                }
+              }
+            } catch (fallbackError) {
+              console.error("Fallback restoration also failed:", fallbackError);
+            }
           }
         }
         
@@ -91,19 +149,26 @@ export const useOptimisticRsvp = (userId: string | undefined) => {
       console.error("Error in optimistic RSVP:", error);
       return false;
     } finally {
-      // Add a small delay before clearing state
+      // Add a larger delay before clearing state
       // This ensures any React updates have time to complete
       setTimeout(() => {
         setLoadingEventId(null);
         
-        // Reset global flag
+        // Reset global flag and remove event listeners
         if (typeof window !== 'undefined') {
           window.rsvpInProgress = false;
           document.body.removeAttribute('data-rsvp-in-progress');
+          
+          // Remove the block URL change listener if it exists
+          if (window._rsvpBlockUrlChangeListener) {
+            window.removeEventListener('popstate', window._rsvpBlockUrlChangeListener, true);
+            window.removeEventListener('pushstate', window._rsvpBlockUrlChangeListener, true);
+            delete window._rsvpBlockUrlChangeListener;
+          }
         }
         
         console.log(`OptimisticRsvp: Completed RSVP operation for ${eventId}`);
-      }, 200); // Increased to 200ms for better reliability
+      }, 300); // Increased to 300ms for better reliability
     }
   }, [userId, mutateRsvp, updateAllCaches]);
 

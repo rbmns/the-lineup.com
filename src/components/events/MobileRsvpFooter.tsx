@@ -44,12 +44,27 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
 
   const handleRsvp = async (status: 'Going' | 'Interested') => {
     console.log(`MobileRsvpFooter: Handling RSVP for event ${eventId}, status ${status}, currentStatus: ${currentStatus}`);
+    
+    if (loadingStatus) {
+      console.log('RSVP already in progress, ignoring request');
+      return false;
+    }
+    
     setLoadingStatus(status);
     setAnimating(true);
     
     // Store current filter state and scroll position
     const currentUrlParams = window.location.search;
     const currentScrollPosition = window.scrollY;
+    
+    // Save filter state to window for restoration
+    if (typeof window !== 'undefined') {
+      window._filterStateBeforeRsvp = {
+        urlParams: currentUrlParams,
+        scrollPosition: currentScrollPosition,
+        timestamp: Date.now()
+      };
+    }
     
     // Set global flag to prevent unwanted state resets
     if (typeof window !== 'undefined') {
@@ -83,6 +98,12 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
       if (urlParamsChanged && window.location.pathname.includes('/events')) {
         console.log('Filter state changed during RSVP, restoring URL params:', currentUrlParams);
         window.history.replaceState({}, '', `${window.location.pathname}${currentUrlParams}`);
+        
+        // Dispatch event to notify components of filter restoration
+        const filterRestoredEvent = new CustomEvent('filtersRestored', { 
+          detail: { urlParams: currentUrlParams } 
+        });
+        document.dispatchEvent(filterRestoredEvent);
       }
       
       // Check if scroll position changed significantly
@@ -106,7 +127,7 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
           window.rsvpInProgress = false;
           document.body.removeAttribute('data-rsvp-in-progress');
         }
-      }, 200);
+      }, 300);
       
       // Cleanup will happen through the useEffect
       setTimeout(() => {
