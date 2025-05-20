@@ -7,7 +7,6 @@ import { useOptimisticRsvp } from '@/hooks/event-rsvp/useOptimisticRsvp';
 import { useEventInteractions } from '@/hooks/events/useEventInteractions';
 import { formatInTimeZone } from 'date-fns-tz';
 import { AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
-import { Badge } from '@/components/ui/badge';
 
 interface RelatedEventCardProps {
   event: Event;
@@ -120,15 +119,6 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({
       data-testid={`related-event-${event.id}`}
       data-event-id={event.id}
     >
-      {/* Recommendation badge */}
-      {isSameType && (
-        <div className="absolute top-2 right-2 z-10">
-          <Badge variant="secondary" className="bg-green-50 text-green-700 hover:bg-green-100 border border-green-200">
-            Same Type
-          </Badge>
-        </div>
-      )}
-      
       <EventCard
         event={eventWithFormattedDateTime}
         showRsvpButtons={isAuthenticated}

@@ -26,7 +26,6 @@ export const RelatedEventsGrid: React.FC<RelatedEventsGridProps> = ({
         <RelatedEventCard 
           key={event.id} 
           event={event}
-          isSameType={event.event_type === referenceEventType}
         />
       ))}
     </div>
