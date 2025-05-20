@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom';
 // Keys for storing filter state
 const FILTER_STATE_KEY = 'navigation_filter_state';
 const LAST_URL_KEY = 'last_url_path';
+const FILTERED_EVENTS_KEY = 'filtered_events_path';
 
 export const useNavigationHistory = () => {
   const location = useLocation();
@@ -22,6 +23,16 @@ export const useNavigationHistory = () => {
         path: location.pathname,
         search: location.search
       }));
+      
+      // If we're on the events page, store this as a filtered events path
+      if (location.pathname === '/events' && location.search) {
+        sessionStorage.setItem(FILTERED_EVENTS_KEY, JSON.stringify({
+          path: location.pathname,
+          search: location.search,
+          timestamp: Date.now(),
+          filterState
+        }));
+      }
       
       console.log('Navigation filter state saved:', filterState);
     } catch (e) {
@@ -79,10 +90,82 @@ export const useNavigationHistory = () => {
     }
   }, []);
 
+  /**
+   * Checks if there's a history of filtered events
+   */
+  const hasFilteredEventsHistory = useCallback(() => {
+    try {
+      const storedPath = sessionStorage.getItem(FILTERED_EVENTS_KEY);
+      return storedPath !== null;
+    } catch (e) {
+      console.error('Error checking filtered events history:', e);
+    }
+    return false;
+  }, []);
+
+  /**
+   * Gets the path to the last filtered events view
+   */
+  const getFilteredEventsPath = useCallback(() => {
+    try {
+      const storedPath = sessionStorage.getItem(FILTERED_EVENTS_KEY);
+      if (storedPath) {
+        const data = JSON.parse(storedPath);
+        return data.path + data.search;
+      }
+    } catch (e) {
+      console.error('Error getting filtered events path:', e);
+    }
+    return '/events';
+  }, []);
+
+  /**
+   * Gets the last saved filter state
+   */
+  const getLastFilterState = useCallback(() => {
+    try {
+      const storedPath = sessionStorage.getItem(FILTERED_EVENTS_KEY);
+      if (storedPath) {
+        const data = JSON.parse(storedPath);
+        return data.filterState || {};
+      }
+    } catch (e) {
+      console.error('Error getting last filter state:', e);
+    }
+    return {};
+  }, []);
+
+  /**
+   * Gets the previous path information
+   */
+  const getPreviousPath = useCallback(() => {
+    try {
+      const lastPath = sessionStorage.getItem(LAST_URL_KEY);
+      const filterState = getSavedFilterState();
+      
+      return {
+        path: lastPath ? lastPath.split('?')[0] : '/events',
+        fullPath: lastPath || '/events',
+        filterState: filterState || {}
+      };
+    } catch (e) {
+      console.error('Error getting previous path:', e);
+      return {
+        path: '/events',
+        fullPath: '/events',
+        filterState: {}
+      };
+    }
+  }, [getSavedFilterState]);
+
   return {
     saveFilterState,
     getSavedFilterState,
     shouldRestoreFilters,
-    clearFilterState
+    clearFilterState,
+    getPreviousPath,
+    hasFilteredEventsHistory,
+    getFilteredEventsPath,
+    getLastFilterState
   };
 };
