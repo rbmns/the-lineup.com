@@ -1,8 +1,8 @@
 
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from '@/components/providers/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
+import { ThemeProvider } from '@/components/providers/theme-provider';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { FilterStateProvider } from '@/contexts/FilterStateContext';
 import { queryClient } from '@/lib/queryClient';
@@ -28,8 +28,8 @@ function App() {
           <FilterStateProvider>
             <Router>
               <div className="flex flex-col min-h-screen bg-background">
-                <Layout>
-                  <Routes>
+                <Routes>
+                  <Route element={<Layout />}>
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
@@ -39,8 +39,8 @@ function App() {
                     <Route path="/users/:userId" element={<UserProfile />} />
                     <Route path="/admin" element={<Admin />} />
                     <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Layout>
+                  </Route>
+                </Routes>
               </div>
             </Router>
           </FilterStateProvider>

@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { DateRange } from 'react-day-picker';
 
@@ -11,6 +10,8 @@ interface FilterState {
   timestamp: number;
   urlParams?: string;
   scrollPosition?: number;
+  eventId?: string; // Added to support RSVP operations
+  status?: string; // Added to support RSVP operations
 }
 
 // Props for the context
