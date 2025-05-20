@@ -44,14 +44,6 @@ export const CategoryPill: React.FC<CategoryPillProps & {
     'lg': 'text-sm py-2 px-4 font-medium'
   };
   
-  // Icon sizes based on pill size
-  const iconSize = {
-    'xs': 'h-3 w-3 mr-0.5',
-    'sm': 'h-3.5 w-3.5 mr-1',
-    'default': 'h-4 w-4 mr-1.5',
-    'lg': 'h-4.5 w-4.5 mr-2'
-  };
-  
   // Interactive classes
   const interactiveClasses = onClick 
     ? 'cursor-pointer hover:shadow-sm' 
@@ -69,7 +61,6 @@ export const CategoryPill: React.FC<CategoryPillProps & {
       )}
       onClick={onClick}
     >
-      {showIcon && <Icon className={iconSize[size]} />}
       <span>{category}</span>
       {children}
     </div>

@@ -1,8 +1,6 @@
 
 import React from 'react';
 import { CategoryPill } from '@/components/ui/category-pill';
-import { Button } from '@/components/ui/button';
-import { X, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { AllCategoryPill } from '@/components/ui/category-pill';
 
@@ -45,7 +43,7 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
             size="default"
             isSelectAll={isNoneSelected}
             label={isNoneSelected ? "Select all" : "Deselect all"}
-            className="min-w-[115px] justify-center"
+            className="min-w-[90px] justify-center text-sm"
           />
           
           {allEventTypes.map((eventType) => (

@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Check, X } from 'lucide-react';
 
 interface AllCategoryPillProps {
   active?: boolean;
@@ -20,13 +19,13 @@ export const AllCategoryPill: React.FC<AllCategoryPillProps> = ({
   label,
   isSelectAll = true
 }) => {
-  // Base styles with more distinctive button appearance
-  const baseClasses = 'rounded-md font-medium transition-colors flex items-center gap-1.5 cursor-pointer border';
+  // Base styles with more subtle text-only appearance
+  const baseClasses = 'rounded-md font-medium transition-colors cursor-pointer border';
   
-  // More distinctive styling for the Select/Deselect All button
+  // More subtle styling for the Select/Deselect All button
   const stateClasses = active 
-    ? 'bg-black text-white hover:bg-gray-800 border-black shadow-sm'
-    : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300';
+    ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-gray-300'
+    : 'bg-white text-gray-600 hover:bg-gray-50 border-gray-200';
   
   // Size classes
   const sizeClasses = {
@@ -36,21 +35,16 @@ export const AllCategoryPill: React.FC<AllCategoryPillProps> = ({
     'lg': 'text-sm py-2 px-4 font-medium'
   };
 
-  // Determine which icon to show based on the select all state
-  const IconComponent = isSelectAll ? Check : X;
-  
   return (
     <div
       className={cn(
         baseClasses,
         stateClasses,
         sizeClasses[size],
-        'hover:shadow-sm',
         className
       )}
       onClick={onClick || (() => {})}
     >
-      <IconComponent className="h-3.5 w-3.5" />
       <span>{label || (isSelectAll ? "Select all" : "Deselect all")}</span>
     </div>
   );

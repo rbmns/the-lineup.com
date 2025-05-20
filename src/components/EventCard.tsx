@@ -113,8 +113,8 @@ const EventCard: React.FC<EventCardProps> = ({
           <div className="absolute top-3 left-3 z-10">
             <CategoryPill 
               category={event.event_type} 
-              size="default" 
-              showIcon={true}
+              size="default"
+              showIcon={false}
             />
           </div>
         )}
