@@ -22,6 +22,7 @@ import Admin from './pages/Admin';
 import Profile from './pages/Profile';
 import ProfileEdit from './pages/ProfileEdit';
 import ProfileSettings from './pages/ProfileSettings';
+import Friends from './pages/Friends';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/profile/edit" element={<ProfileEdit />} />
                     <Route path="/profile/settings" element={<ProfileSettings />} />
+                    <Route path="/friends" element={<Friends />} />
                     <Route path="/admin" element={<Admin />} />
                     <Route path="*" element={<NotFound />} />
                   </Route>
