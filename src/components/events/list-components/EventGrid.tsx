@@ -103,7 +103,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
   );
 
   return (
-    <>
+    <React.Fragment>
       {/* Grid with proper layout */}
       <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6", className)} style={style}>
         {/* If using teaser, render events before teaser */}
@@ -137,10 +137,10 @@ export const EventGrid: React.FC<EventGridProps> = ({
           {isLoading ? (
             <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
           ) : (
-            <div className="h-8 w-full" /> {/* Invisible element for intersection observer */}
+            <div className="h-8 w-full" /> 
           )}
         </div>
       )}
-    </>
+    </React.Fragment>
   );
 };
