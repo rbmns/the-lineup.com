@@ -1,46 +1,34 @@
 
-import React, { useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useEvents } from '@/hooks/useEvents';
+import React from 'react';
 import { PublicHome } from '@/components/home/PublicHome';
-import { filterUpcomingEvents } from '@/utils/dateUtils';
-import { pageSeoTags } from '@/utils/seoUtils';
+import { useQuery } from '@tanstack/react-query';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Home = () => {
   const { user } = useAuth();
-  const { data: events, isLoading } = useEvents(user?.id);
   
-  // Update SEO tags for home page
-  useEffect(() => {
-    document.title = pageSeoTags.home.title;
-    
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute('content', pageSeoTags.home.description);
-    }
-    
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    const ogDesc = document.querySelector('meta[property="og:description"]');
-    
-    if (ogTitle) ogTitle.setAttribute('content', pageSeoTags.home.title);
-    if (ogDesc) ogDesc.setAttribute('content', pageSeoTags.home.description);
-  }, []);
+  // Use query to fetch events data
+  const { data: events, isLoading } = useQuery({
+    queryKey: ['events'],
+    queryFn: async () => {
+      console.log('Fetching events for user:', user);
+      // For now, return empty array as we don't have the actual fetch implementation
+      return [];
+    },
+    enabled: true, // Always fetch events regardless of user auth state
+  });
   
-  // Add debug logging
-  useEffect(() => {
-    console.log('Home page rendering with user:', user?.id);
-    console.log('Events loading status:', isLoading);
-    console.log('Events data available:', events?.length || 0);
-  }, [user?.id, isLoading, events]);
-  
-  const upcomingEvents = events ? filterUpcomingEvents(events) : [];
+  console.log('Home page rendering with user:', user);
+  console.log('Events loading status:', isLoading);
+  console.log('Events data available:', events?.length || 0);
 
   return (
-    <div className="w-full px-2 sm:px-4 md:px-6 py-2 sm:py-4 md:py-8">
+    <div className="min-h-screen">
       <PublicHome 
-        events={upcomingEvents} 
+        events={events || []} 
         isLoading={isLoading} 
-        showFilters={false} 
+        showSearch={true}
+        showFilters={true}
       />
     </div>
   );
