@@ -18,6 +18,7 @@ interface EventGridProps {
   onLoadMore?: () => void;
   showSignupTeaser?: boolean;
   eventsBeforeTeaserCount?: number;
+  compact?: boolean;
 }
 
 export const EventGrid: React.FC<EventGridProps> = ({
@@ -32,7 +33,8 @@ export const EventGrid: React.FC<EventGridProps> = ({
   isLoading,
   onLoadMore,
   showSignupTeaser = false,
-  eventsBeforeTeaserCount = 6
+  eventsBeforeTeaserCount = 6,
+  compact
 }) => {
   // If we have the lazy loading props, use the InfiniteEventGrid component
   if (visibleCount !== undefined && hasMore !== undefined && 
@@ -51,6 +53,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
         loadingEventId={loadingEventId}
         showSignupTeaser={showSignupTeaser}
         eventsBeforeTeaserCount={eventsBeforeTeaserCount}
+        compact={compact}
       />
     );
   }
@@ -67,7 +70,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
             event={event}
             onRsvp={onRsvp}
             showRsvpButtons={showRsvpButtons}
-            compact={true}
+            compact={compact}
             className="h-full"
             loadingEventId={loadingEventId}
           />

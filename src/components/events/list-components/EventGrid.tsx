@@ -19,6 +19,7 @@ interface EventGridProps {
   loadingEventId?: string | null;
   showSignupTeaser?: boolean;
   eventsBeforeTeaserCount?: number;
+  compact?: boolean;
 }
 
 export const EventGrid: React.FC<EventGridProps> = ({
@@ -33,7 +34,8 @@ export const EventGrid: React.FC<EventGridProps> = ({
   style,
   loadingEventId,
   showSignupTeaser = false,
-  eventsBeforeTeaserCount = 6
+  eventsBeforeTeaserCount = 6,
+  compact
 }) => {
   const observerTarget = useRef<HTMLDivElement>(null);
   
@@ -98,6 +100,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
         showRsvpButtons={showRsvpButtons}
         className="h-full"
         loadingEventId={loadingEventId}
+        compact={compact}
       />
     </div>
   );
