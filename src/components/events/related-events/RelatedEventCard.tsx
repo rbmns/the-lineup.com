@@ -14,7 +14,7 @@ interface RelatedEventCardProps {
 
 export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({ event }) => {
   const { user, isAuthenticated } = useAuth();
-  const { handleRsvp, loading: rsvpLoading } = useOptimisticRsvp(user?.id); 
+  const { handleRsvp, loadingEventId } = useOptimisticRsvp(user?.id); // Changed 'loading' to 'loadingEventId'
   const { handleEventClick } = useEventInteractions();
   const [localRsvpStatus, setLocalRsvpStatus] = useState<'Going' | 'Interested' | undefined>(event.rsvp_status);
   
@@ -59,7 +59,7 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({ event }) => 
   
   // RSVP handler with optimistic UI updates
   const handleRsvpAction = async (eventId: string, status: 'Going' | 'Interested') => {
-    if (!user?.id || rsvpLoading) return false;
+    if (!user?.id || loadingEventId) return false; // Changed 'rsvpLoading' to 'loadingEventId'
     
     console.log('RelatedEventCard - Handling RSVP:', { 
       eventId, 
@@ -122,6 +122,7 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({ event }) => 
         className="h-full border hover:shadow-md transition-all duration-300"
         onClick={() => handleEventClick(event)}
         onRsvp={isAuthenticated ? handleRsvpAction : undefined}
+        loadingEventId={loadingEventId} // Pass the loadingEventId to EventCard
       />
     </div>
   );
