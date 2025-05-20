@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Share2, Check, Star, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -46,6 +47,16 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
     setLoadingStatus(status);
     setAnimating(true);
     
+    // Store current filter state and scroll position
+    const currentUrlParams = window.location.search;
+    const currentScrollPosition = window.scrollY;
+    
+    // Set global flag to prevent unwanted state resets
+    if (typeof window !== 'undefined') {
+      window.rsvpInProgress = true;
+      document.body.setAttribute('data-rsvp-in-progress', 'true');
+    }
+    
     // Add transition indicator
     document.querySelector('.rsvp-transition-indicator')?.classList.add('active');
     
@@ -67,6 +78,20 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
         setLocalStatus(currentStatus || null);
       }
       
+      // Check if URL parameters changed during the RSVP operation
+      const urlParamsChanged = currentUrlParams !== window.location.search;
+      if (urlParamsChanged && window.location.pathname.includes('/events')) {
+        console.log('Filter state changed during RSVP, restoring URL params:', currentUrlParams);
+        window.history.replaceState({}, '', `${window.location.pathname}${currentUrlParams}`);
+      }
+      
+      // Check if scroll position changed significantly
+      const scrollDiff = Math.abs(window.scrollY - currentScrollPosition);
+      if (scrollDiff > 50) {
+        console.log(`Scroll position changed (diff: ${scrollDiff}px), restoring to ${currentScrollPosition}px`);
+        window.scrollTo({ top: currentScrollPosition, behavior: 'auto' });
+      }
+      
       // Keep animation going briefly for visual consistency
       return success;
     } catch (error) {
@@ -75,6 +100,14 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
       setLocalStatus(currentStatus || null);
       return false;
     } finally {
+      // Reset global RSVP flag after a short delay
+      setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          window.rsvpInProgress = false;
+          document.body.removeAttribute('data-rsvp-in-progress');
+        }
+      }, 200);
+      
       // Cleanup will happen through the useEffect
       setTimeout(() => {
         document.querySelector('.rsvp-transition-indicator')?.classList.remove('active');

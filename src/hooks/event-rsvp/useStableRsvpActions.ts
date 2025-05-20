@@ -23,6 +23,17 @@ export const useStableRsvpActions = (userId: string | undefined) => {
     const currentUrl = window.location.href;
     const urlParams = window.location.search;
     
+    // Save filter state to sessionStorage as backup
+    if (window.location.pathname.includes('/events')) {
+      try {
+        sessionStorage.setItem('lastRsvpScrollPosition', scrollPosition.toString());
+        sessionStorage.setItem('lastRsvpUrlParams', urlParams);
+        sessionStorage.setItem('lastRsvpTimestamp', Date.now().toString());
+      } catch (e) {
+        console.error("Failed to save state to sessionStorage:", e);
+      }
+    }
+    
     // Set global flag to prevent unwanted state resets
     if (typeof window !== 'undefined') {
       window.rsvpInProgress = true;
@@ -101,7 +112,7 @@ export const useStableRsvpActions = (userId: string | undefined) => {
       updateAllCaches(eventId, userId, newRsvpStatus, oldRsvpStatus);
       
       // Add a small delay before checking if we need to restore state
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 150));
       
       // Check if URL parameters changed during the RSVP operation
       const currentParams = window.location.search;
