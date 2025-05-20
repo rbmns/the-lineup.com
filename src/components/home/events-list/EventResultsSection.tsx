@@ -33,7 +33,9 @@ export const EventResultsSection: React.FC<EventResultsSectionProps> = ({
           <div key={event.id}>
             <EventCard
               event={event}
-              onRsvp={isAuthenticated ? (status) => handleRsvp(event.id, status) : undefined}
+              onRsvp={isAuthenticated ? 
+                (status: 'Going' | 'Interested') => handleRsvp(event.id, status) 
+                : undefined}
               showRsvpButtons={isAuthenticated}
             />
           </div>
