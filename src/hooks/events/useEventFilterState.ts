@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { DateRange } from 'react-day-picker';
 import { useLocation } from 'react-router-dom';
@@ -195,9 +194,9 @@ export const useEventFilterState = () => {
   
   const getInitialEventTypes = () => {
     try {
-      // Check URL parameters first for event types
+      // Check URL parameters first for event types with standardized name 'type'
       const urlParams = new URLSearchParams(location.search);
-      const eventTypes = urlParams.getAll('eventType');
+      const eventTypes = urlParams.getAll('type');
       if (eventTypes && eventTypes.length > 0) {
         return eventTypes;
       }
@@ -300,11 +299,14 @@ export const useEventFilterState = () => {
         
         // Update URL with venues
         const urlParams = new URLSearchParams(location.search);
-        if (selectedVenues.length > 0) {
-          urlParams.set('venues', encodeURIComponent(JSON.stringify(selectedVenues)));
-        } else {
-          urlParams.delete('venues');
-        }
+        
+        // Remove all existing venue parameters
+        urlParams.delete('venue');
+        
+        // Add each venue as a separate parameter
+        selectedVenues.forEach(venue => {
+          urlParams.append('venue', venue);
+        });
         
         // Store snapshot whenever filter state changes
         saveFilterStateSnapshot();
@@ -331,12 +333,12 @@ export const useEventFilterState = () => {
         // Update URL with event types
         const urlParams = new URLSearchParams(location.search);
         
-        // Remove all existing eventType parameters
-        urlParams.delete('eventType');
+        // Remove all existing type parameters
+        urlParams.delete('type');
         
         // Add each event type as a separate parameter
         selectedEventTypes.forEach(type => {
-          urlParams.append('eventType', type);
+          urlParams.append('type', type);
         });
         
         // Store snapshot whenever filter state changes
@@ -433,7 +435,7 @@ export const useEventFilterState = () => {
     }
   }, [selectedDateFilter, location.pathname, location.search, saveFilterStateSnapshot]);
   
-  // Listen for filter restoration events
+  // Listen for filter restoration events with standardized parameter names
   useEffect(() => {
     const handleFilterRestoration = (event: Event) => {
       const customEvent = event as CustomEvent;
@@ -451,8 +453,8 @@ export const useEventFilterState = () => {
           try {
             const params = new URLSearchParams(customEvent.detail.urlParams);
             
-            // Extract event types
-            const eventTypes = params.getAll('eventType');
+            // Extract event types with standardized name 'type'
+            const eventTypes = params.getAll('type');
             if (eventTypes && eventTypes.length > 0) {
               console.log('Setting event types from URL params:', eventTypes);
               setSelectedEventTypes(eventTypes);
@@ -515,13 +517,13 @@ export const useEventFilterState = () => {
       sessionStorage.removeItem(EVENT_TYPES_KEY);
       sessionStorage.removeItem(FILTER_STATE_SNAPSHOT_KEY);
       
-      // Update URL to remove filter parameters
+      // Update URL to remove filter parameters with standardized names
       const urlParams = new URLSearchParams(location.search);
-      urlParams.delete('venues');
+      urlParams.delete('venue');
       urlParams.delete('dateFrom');
       urlParams.delete('dateTo');
       urlParams.delete('dateFilter');
-      urlParams.delete('eventType');
+      urlParams.delete('type');
       
       const newUrl = `${window.location.pathname}${urlParams.toString() ? '?' + urlParams.toString() : ''}`;
       window.history.replaceState({}, '', newUrl);

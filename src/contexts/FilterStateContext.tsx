@@ -248,23 +248,14 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
           newState = parsed;
         }
       }
-      // Priority 3: Restore from URL (direct navigation)
+      // Priority 3: Restore from URL (direct navigation) with standardized parameter names
       else if (source === 'url' && typeof window !== 'undefined') {
         const urlParams = new URLSearchParams(window.location.search);
-        const eventTypes = urlParams.getAll('eventType');
+        const eventTypes = urlParams.getAll('type');
         const dateFrom = urlParams.get('dateFrom');
         const dateTo = urlParams.get('dateTo');
         const dateFilter = urlParams.get('dateFilter');
-        const venuesParam = urlParams.get('venues');
-        
-        let venues: string[] = [];
-        if (venuesParam) {
-          try {
-            venues = JSON.parse(decodeURIComponent(venuesParam));
-          } catch (e) {
-            console.error('Error parsing venues from URL:', e);
-          }
-        }
+        const venues = urlParams.getAll('venue');
         
         // Prepare date range if parameters exist
         let dateRange: DateRange | undefined;
@@ -400,17 +391,19 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
         try {
           const urlParams = new URLSearchParams();
           
-          // Add event types
+          // Add event types with standardized name 'type'
           filterState.eventTypes.forEach(type => {
-            urlParams.append('eventType', type);
+            urlParams.append('type', type);
           });
           
-          // Add venues
+          // Add venues with standardized name 'venue'
           if (filterState.venues.length > 0) {
-            urlParams.set('venues', encodeURIComponent(JSON.stringify(filterState.venues)));
+            filterState.venues.forEach(venue => {
+              urlParams.append('venue', venue);
+            });
           }
           
-          // Add date range
+          // Add date range with standardized names
           if (filterState.dateRange?.from) {
             urlParams.set('dateFrom', filterState.dateRange.from.toISOString());
             

@@ -1,125 +1,115 @@
 
 import { NavigateFunction } from 'react-router-dom';
-import { isProfileClickable } from './friendshipUtils';
+import { Event } from '@/types';
 
 /**
- * Utility function to navigate to a user profile page with improved reliability
- * Always uses ID-based URLs
- * @param userId The ID of the user to navigate to
- * @param navigate React Router's navigate function
- * @param friendshipStatus Optional friendship status to check before navigation
- * @param isCurrentUser Optional flag indicating if this is the current user's profile
- */
-export const navigateToUserProfile = (
-  userId: string, 
-  navigate: NavigateFunction,
-  friendshipStatus?: 'none' | 'pending' | 'accepted',
-  isCurrentUser?: boolean
-) => {
-  if (!userId) {
-    console.error("Cannot navigate: missing user ID");
-    return;
-  }
-  
-  // When looking at our own profile or if status isn't provided, just navigate
-  if (isCurrentUser === true || friendshipStatus === undefined) {
-    console.log(`Navigating to user profile (own profile or undefined status): ${userId}`);
-  } else {
-    // Check if navigation should be allowed based on friendship status
-    const canNavigate = isProfileClickable(friendshipStatus, !!isCurrentUser);
-    if (!canNavigate) {
-      console.log(`Navigation blocked: User ${userId} profile is not accessible with status ${friendshipStatus}`);
-      return;
-    }
-    console.log(`Navigating to friend profile with status: ${friendshipStatus}`);
-  }
-  
-  try {
-    // Clear any existing navigation state to prevent issues
-    sessionStorage.removeItem('lastProfileNavigation');
-    
-    // Use ID-based URL for navigation
-    navigate(`/users/${userId}`, { 
-      state: { 
-        fromDirectNavigation: true,
-        timestamp: Date.now(),
-        source: 'profile_navigation'
-      },
-      replace: false // Don't replace the current history entry
-    });
-    
-    // Set a flag in sessionStorage to track navigation
-    sessionStorage.setItem('lastProfileNavigation', JSON.stringify({
-      userId,
-      timestamp: Date.now(),
-      fromDirectNavigation: true
-    }));
-    
-    // Debug log the navigation
-    console.log(`Profile navigation completed to: /users/${userId}`);
-  } catch (error) {
-    console.error(`Navigation error:`, error);
-  }
-};
-
-/**
- * Utility function to navigate to an event detail page using ID-based URLs
- * @param eventId The ID of the event to navigate to
- * @param navigate React Router's navigate function
- * @param event Optional event object (not used for URL generation, only for state)
- * @param preserveSource Whether to preserve source information in navigation state
+ * Navigates to an event detail page with standardized URL parameters
+ * to track the source of navigation and maintain filter state
  */
 export const navigateToEvent = (
   eventId: string, 
   navigate: NavigateFunction, 
-  event?: any,
-  preserveSource: boolean = false
+  event?: Event, 
+  fromRelated: boolean = false
 ) => {
   if (!eventId) {
-    console.error("Cannot navigate: missing event ID");
+    console.error('Cannot navigate to event: missing event ID');
     return;
   }
   
   try {
-    // Build navigation state with transition flags
-    const navigationState = {
-      timestamp: Date.now(),
-      source: 'event_navigation',
-      fromDirectNavigation: true,
-      fromEventNavigation: true, // Flag for transition effects
-      useTransition: true,       // Enable transitions
-      forceRefresh: true,        // Always force refresh of data
-      originalEventId: eventId   // Always preserve the original ID for fallback
-    };
+    // Build the URL with standardized parameters
+    let url = `/events/${eventId}`;
     
-    // Always use ID-based URL for consistent internal navigation
-    navigate(`/events/${eventId}`, { 
-      state: navigationState,
-      replace: false
+    // Add source parameter to track where the user came from
+    const params = new URLSearchParams();
+    
+    // Add source parameter
+    if (fromRelated) {
+      params.append('source', 'related');
+    }
+    
+    // Add event type if available for potential filtering when returning to list
+    if (event?.event_type) {
+      params.append('type', event.event_type);
+    }
+    
+    // Add current URL search params to maintain filter state
+    const currentParams = new URLSearchParams(window.location.search);
+    currentParams.forEach((value, key) => {
+      // Only add parameters we want to preserve (standardized naming)
+      if (['type', 'venue', 'dateFrom', 'dateTo', 'dateFilter'].includes(key)) {
+        params.append(key, value);
+      }
     });
     
-    console.log(`Navigating to event with ID: ${eventId}`);
+    // Append parameters to URL if we have any
+    const paramString = params.toString();
+    if (paramString) {
+      url = `${url}?${paramString}`;
+    }
+    
+    console.log(`Navigating to: ${url}`);
+    
+    navigate(url, {
+      state: {
+        fromEventList: true,
+        eventData: event,
+        timestamp: Date.now()
+      }
+    });
   } catch (error) {
-    console.error("Navigation error:", error);
+    console.error('Navigation error:', error);
   }
 };
 
 /**
- * Helper function to safely go back in navigation history
- * @param navigate NavigateFunction from React Router
- * @param fallbackPath Fallback path if history navigation fails
+ * Updates URL search parameters without navigation
+ * to reflect the current filter state
  */
-export const safeGoBack = (navigate: NavigateFunction, fallbackPath: string = '/events') => {
-  try {
-    window.history.back();
-    
-    // Set a timeout to check if navigation was successful
-    setTimeout(() => {
-      // If we're still on the same page after a short delay, use the fallback
-      navigate(fallbackPath);
-    }, 300);
-  } catch (err) {
-    console.error("Navigation error going back:", err);
-    navigate(fallbackPath);
+export const updateUrlParameters = (
+  filterState: {
+    eventTypes?: string[];
+    venues?: string[];
+    dateRange?: any;
+    dateFilter?: string;
+  },
+  navigate: NavigateFunction,
+  pathname: string = window.location.pathname
+) => {
+  const params = new URLSearchParams();
+  
+  // Add event types with standardized name 'type'
+  if (filterState.eventTypes && filterState.eventTypes.length > 0) {
+    filterState.eventTypes.forEach(type => {
+      params.append('type', type);
+    });
   }
+  
+  // Add venues with standardized name 'venue'
+  if (filterState.venues && filterState.venues.length > 0) {
+    filterState.venues.forEach(venue => {
+      params.append('venue', venue);
+    });
+  }
+  
+  // Add date range with standardized names 'dateFrom' and 'dateTo'
+  if (filterState.dateRange?.from) {
+    params.set('dateFrom', filterState.dateRange.from.toISOString());
+    
+    if (filterState.dateRange.to) {
+      params.set('dateTo', filterState.dateRange.to.toISOString());
+    }
+  }
+  
+  // Add date filter with standardized name 'dateFilter'
+  if (filterState.dateFilter) {
+    params.set('dateFilter', filterState.dateFilter);
+  }
+  
+  // Update URL without navigation
+  const newUrl = `${pathname}${params.toString() ? `?${params.toString()}` : ''}`;
+  window.history.replaceState({}, '', newUrl);
+  
+  return params.toString();
 };
