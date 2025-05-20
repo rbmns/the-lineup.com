@@ -53,7 +53,7 @@ export const EventsResultsSection: React.FC<EventsResultsSectionProps> = ({
           showRsvpButtons={showRsvpButtons}
           hasActiveFilters={hasActiveFilters}
           loadingEventId={loadingEventId}
-          hideCount={true} // Ensure count is hidden in LazyEventsList
+          hideCount={true}
         />
       )}
     </div>

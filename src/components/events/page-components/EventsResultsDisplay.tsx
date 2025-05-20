@@ -2,7 +2,6 @@
 import React from 'react';
 import { Event } from '@/types';
 import { EventCountDisplay } from '@/components/events/EventCountDisplay';
-import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
 import { LazyEventsList } from '@/components/events/LazyEventsList';
 
 interface EventsResultsDisplayProps {

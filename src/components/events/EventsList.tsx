@@ -39,6 +39,7 @@ export const EventsList = React.memo(({
       hasActiveFilters={hasActiveFilters}
       compact={compact}
       loadingEventId={loadingEventId}
+      hideCount={false}
     />
   );
 });

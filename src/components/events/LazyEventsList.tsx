@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Event } from '@/types';
-import { EventCard } from '@/components/events/EventCard';
+import EventCard from '@/components/events/EventCard'; // Fixed import
 import { EventSkeleton } from '@/components/events/EventSkeleton';
+import { Event } from '@/types';
 
 interface LazyEventsListProps {
   mainEvents: Event[];
@@ -13,6 +13,7 @@ interface LazyEventsListProps {
   compact?: boolean;
   loadingEventId?: string | null;
   hasActiveFilters?: boolean;
+  hideCount?: boolean; // Added missing prop
 }
 
 export const LazyEventsList: React.FC<LazyEventsListProps> = ({
@@ -23,7 +24,8 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   showRsvpButtons = true,
   compact = false,
   loadingEventId,
-  hasActiveFilters = false
+  hasActiveFilters = false,
+  hideCount = false // Added with default value
 }) => {
   const [visibleMainCount, setVisibleMainCount] = useState(12);
   const [visibleRelatedCount, setVisibleRelatedCount] = useState(6);
