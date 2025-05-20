@@ -15,17 +15,22 @@ export const useScrollPositionHandler = (
   const isRestoringRef = useRef(false);
   const lastEventsLengthRef = useRef(0);
   const scrollTimeoutRef = useRef<number | null>(null);
+  
+  // Local refs to track state since we can't modify the passed refs directly
+  const localInitialRender = useRef(initialRenderRef.current);
+  const localScrollRestored = useRef(scrollRestoredRef.current);
 
   // Effect for handling initial page load and scroll restoration
   useEffect(() => {
-    if (!initialRenderRef.current) {
-      initialRenderRef.current = true;
+    if (!localInitialRender.current) {
+      // Update local ref instead of the passed ref
+      localInitialRender.current = true;
       console.log("Initial render of events list");
       
       // Get position from sessionStorage
       const storedPosition = sessionStorage.getItem(SCROLL_POSITION_KEY);
       
-      if (storedPosition && !scrollRestoredRef.current && !isRestoringRef.current) {
+      if (storedPosition && !localScrollRestored.current && !isRestoringRef.current) {
         isRestoringRef.current = true;
         
         // Restore position after data is loaded and components are rendered
@@ -37,7 +42,8 @@ export const useScrollPositionHandler = (
               console.log('Scroll position restored:', position);
             }
             
-            scrollRestoredRef.current = true;
+            // Update local ref instead of the passed ref
+            localScrollRestored.current = true;
             isRestoringRef.current = false;
             
             // Clear the stored position
@@ -60,7 +66,7 @@ export const useScrollPositionHandler = (
   // Effect for handling events list changes
   useEffect(() => {
     // Skip the first render and if RSVP is in progress
-    if (!initialRenderRef.current || rsvpInProgressRef.current) return;
+    if (!localInitialRender.current || rsvpInProgressRef.current) return;
     
     // If events length changed and it wasn't empty before, it's likely a filter change
     if (lastEventsLengthRef.current > 0 && events.length !== lastEventsLengthRef.current) {
