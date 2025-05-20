@@ -1,16 +1,8 @@
 
-import React from 'react';
-import { useParams } from 'react-router-dom';
+import UserProfilePage from './UserProfilePage';
 
 const UserProfile = () => {
-  const { userId } = useParams();
-  
-  return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-4">User Profile</h1>
-      <p>User ID: {userId}</p>
-    </div>
-  );
+  return <UserProfilePage />;
 };
 
 export default UserProfile;

@@ -14,11 +14,14 @@ import Signup from './pages/Signup';
 import Events from './pages/Events';
 import EventDetail from './pages/EventDetail';
 import Users from './pages/Users';
-import UserProfile from './pages/UserProfile';
+import UserProfilePage from './pages/UserProfilePage';
 import NotFound from './pages/NotFound';
 import Layout from './components/Layout';
 import EventsPageRefactored from './pages/EventsPageRefactored';
 import Admin from './pages/Admin';
+import Profile from './pages/Profile';
+import ProfileEdit from './pages/ProfileEdit';
+import ProfileSettings from './pages/ProfileSettings';
 
 function App() {
   return (
@@ -36,7 +39,10 @@ function App() {
                     <Route path="/events" element={<EventsPageRefactored />} />
                     <Route path="/events/:eventId" element={<EventDetail />} />
                     <Route path="/users" element={<Users />} />
-                    <Route path="/users/:userId" element={<UserProfile />} />
+                    <Route path="/users/:userId" element={<UserProfilePage />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/profile/edit" element={<ProfileEdit />} />
+                    <Route path="/profile/settings" element={<ProfileSettings />} />
                     <Route path="/admin" element={<Admin />} />
                     <Route path="*" element={<NotFound />} />
                   </Route>
