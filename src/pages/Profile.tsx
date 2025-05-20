@@ -17,7 +17,7 @@ const Profile = () => {
   const { username } = useParams<{ username: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [isOwnProfile, setIsOwnProfile] = useState(false);
+  const [isOwnProfile, setIsOwnProfile] = useState(true); // Default to true for /profile route
   const [events, setEvents] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [isFriend, setIsFriend] = useState<boolean | null>(null);
@@ -26,6 +26,9 @@ const Profile = () => {
   const [isBlocked, setIsBlocked] = useState(false);
   const [profileId, setProfileId] = useState<string | null>(null);
   
+  // Use the user's ID directly when on the /profile route (no username param)
+  const profileIdentifier = username || (user?.id || null);
+  
   const { 
     profile, 
     loading, 
@@ -33,17 +36,24 @@ const Profile = () => {
     isNotFound,
     fetchProfileData,
     refreshProfile
-  } = useProfileData(username);
+  } = useProfileData(profileIdentifier);
   
   // Add canonical URL for SEO - providing the username as required parameter
   useCanonical(username ? `/profile/${username}` : '/profile', profile?.username);
   
   useEffect(() => {
+    // If no user is logged in, redirect to login page
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    
     if (profile?.id) {
       setProfileId(profile.id);
-      setIsOwnProfile(user?.id === profile.id);
+      // When on /profile route or when username param matches current user
+      setIsOwnProfile(username ? user.id === profile.id : true);
     }
-  }, [user?.id, profile?.id]);
+  }, [user, profile?.id, username, navigate]);
   
   useEffect(() => {
     if (profileId) {
@@ -58,8 +68,10 @@ const Profile = () => {
   useEffect(() => {
     if (username) {
       document.title = `@${username} | Events`;
+    } else if (user) {
+      document.title = 'My Profile | Events';
     }
-  }, [username]);
+  }, [username, user]);
   
   const fetchEvents = async (profileId: string) => {
     setLoadingEvents(true);
@@ -160,6 +172,11 @@ const Profile = () => {
   
   if (loading) {
     return <ProfileLoading />;
+  }
+  
+  // If we're on /profile route and not logged in, we'll redirect in useEffect
+  if (!user) {
+    return null;
   }
   
   if (isNotFound || !profile) {
