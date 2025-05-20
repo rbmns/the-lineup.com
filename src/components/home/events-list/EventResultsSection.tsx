@@ -1,11 +1,9 @@
 
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { Event } from '@/types';
-import EventCard from '@/components/EventCard';
-import { Loader2 } from 'lucide-react';
+import { EventCard } from '@/components/events/EventCard';
 
 interface EventResultsSectionProps {
-  title?: string;
   events: Event[];
   visibleEvents: Event[];
   hasMore: boolean;
@@ -16,7 +14,6 @@ interface EventResultsSectionProps {
 }
 
 export const EventResultsSection: React.FC<EventResultsSectionProps> = ({
-  title,
   events,
   visibleEvents,
   hasMore,
@@ -25,32 +22,31 @@ export const EventResultsSection: React.FC<EventResultsSectionProps> = ({
   handleRsvp,
   isAuthenticated
 }) => {
+  if (events.length === 0) {
+    return null;
+  }
+
   return (
-    <div>
-      {title && (
-        <h3 className="text-lg font-medium text-gray-900 mb-6">
-          {title}
-        </h3>
-      )}
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {visibleEvents.map((event) => (
-          <EventCard 
-            key={event.id} 
-            event={event}
-            onRsvp={isAuthenticated ? handleRsvp : undefined}
-            showRsvpButtons={isAuthenticated}
-          />
+          <div key={event.id}>
+            <EventCard
+              event={event}
+              onRsvp={isAuthenticated ? (status) => handleRsvp(event.id, status) : undefined}
+              showRsvpButtons={isAuthenticated}
+            />
+          </div>
         ))}
       </div>
       
-      {/* Loading indicator for infinite scroll */}
-      {hasMore && visibleEvents.length < events.length && (
+      {/* Observer target for infinite scrolling */}
+      {hasMore && !isLoading && (
         <div 
           ref={observerTargetRef}
-          className="flex justify-center py-8"
+          className="h-10 w-full flex items-center justify-center"
         >
-          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          <div className="w-8 h-8 border-t-2 border-b-2 border-gray-300 rounded-full animate-spin"></div>
         </div>
       )}
     </div>
