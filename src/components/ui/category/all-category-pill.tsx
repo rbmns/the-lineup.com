@@ -35,6 +35,9 @@ export const AllCategoryPill: React.FC<AllCategoryPillProps> = ({
     'lg': 'text-sm py-2 px-4 font-medium'
   };
 
+  // Dynamic label based on active state and isSelectAll prop
+  const displayLabel = label || (isSelectAll ? "Select all" : "Deselect all");
+
   return (
     <div
       className={cn(
@@ -45,7 +48,7 @@ export const AllCategoryPill: React.FC<AllCategoryPillProps> = ({
       )}
       onClick={onClick || (() => {})}
     >
-      <span>{label || (isSelectAll ? "Select all" : "Deselect all")}</span>
+      <span>{displayLabel}</span>
     </div>
   );
 };

@@ -28,9 +28,7 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
   const isNoneSelected = selectedEventTypes.length === 0;
   
   const handleAllToggle = () => {
-    // If some or all are selected, deselect all
-    // If none are selected, select all
-    selectedEventTypes.length > 0 ? onDeselectAll() : onSelectAll();
+    isAllSelected ? onDeselectAll() : onSelectAll();
   };
 
   return (
@@ -41,8 +39,8 @@ export const EventFilterBar: React.FC<EventFilterBarProps> = ({
             active={isAllSelected}
             onClick={handleAllToggle}
             size="default"
-            isSelectAll={isNoneSelected}
-            label={isNoneSelected ? "Select all" : "Deselect all"}
+            isSelectAll={!isAllSelected}
+            label={isNoneSelected ? "Select all" : isAllSelected ? "Deselect all" : "All"}
             className="min-w-[90px] justify-center text-sm"
           />
           

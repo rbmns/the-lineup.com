@@ -23,14 +23,12 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = memo(({
   className
 }) => {
   const isAllSelected = selectedEventTypes.length === allEventTypes.length;
-  const isAnySelected = selectedEventTypes.length > 0;
+  const isNoneSelected = selectedEventTypes.length === 0;
   
   const handleAllClick = () => {
     if (isAllSelected) {
-      // If all are already selected, do nothing (we always want to show results)
-      return;
+      onDeselectAll();
     } else {
-      // If not all are selected, select all
       onSelectAll();
     }
   };
@@ -46,7 +44,7 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = memo(({
         active={isAllSelected}
         onClick={handleAllClick}
         size="default"
-        label="All"
+        label={isNoneSelected ? "Select all" : isAllSelected ? "Deselect all" : "All"}
         className="text-sm"
       />
       
