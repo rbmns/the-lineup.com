@@ -6,7 +6,10 @@ import { getCategoryColor, getCategoryColorState } from './category/category-col
 import { CategoryPillProps } from './category/category-pill-types';
 export { AllCategoryPill } from './category/all-category-pill';
 
-export const CategoryPill: React.FC<CategoryPillProps & { noBorder?: boolean }> = ({
+export const CategoryPill: React.FC<CategoryPillProps & { 
+  noBorder?: boolean,
+  visuallyInactive?: boolean 
+}> = ({
   category,
   onClick,
   active = false,
@@ -14,11 +17,17 @@ export const CategoryPill: React.FC<CategoryPillProps & { noBorder?: boolean }> 
   className,
   size = 'default',
   children,
-  noBorder = false
+  noBorder = false,
+  visuallyInactive = false
 }) => {
   const Icon = getCategoryIcon(category);
   const colorState = getCategoryColorState(category);
-  const colorClasses = active ? colorState.active : colorState.inactive;
+  
+  // For event cards, always use active colors for category labels
+  // For filter pills, use appropriate colors based on selection state
+  const colorClasses = showIcon || (!visuallyInactive && active)
+    ? colorState.active
+    : colorState.inactive;
   
   // Base styles for all pills
   const baseClasses = 'rounded-full font-medium transition-colors flex items-center';

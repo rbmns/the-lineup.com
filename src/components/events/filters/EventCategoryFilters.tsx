@@ -51,6 +51,8 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
           showIcon={false}
           size="default"
           noBorder={true}
+          // When all are selected, visually show as inactive
+          visuallyInactive={isAllSelected}
         />
       ))}
     </div>

@@ -16,10 +16,10 @@ export const useCategoryFilterSelection = (allEventTypes: string[]) => {
     const allSelected = selectedCategories.length === allEventTypes.length;
     
     if (allSelected) {
-      // If all are selected, deselect all except the clicked one
+      // If all are selected, clicking one filter should select only that one
       setSelectedCategories([category]);
     } else {
-      // Normal toggle behavior
+      // For subsequent clicks, add or remove the category
       if (selectedCategories.includes(category)) {
         // Remove this category if it's already selected
         setSelectedCategories(prev => prev.filter(c => c !== category));
@@ -39,12 +39,14 @@ export const useCategoryFilterSelection = (allEventTypes: string[]) => {
   };
   
   const isNoneSelected = selectedCategories.length === 0;
+  const isAllSelected = selectedCategories.length === allEventTypes.length;
   
   return {
     selectedCategories,
     toggleCategory,
     selectAll,
     deselectAll,
-    isNoneSelected
+    isNoneSelected,
+    isAllSelected
   };
 };
