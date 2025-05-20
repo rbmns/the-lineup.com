@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { CategoryPill, AllCategoryPill } from '@/components/ui/category-pill';
 import { cn } from '@/lib/utils';
 
@@ -13,7 +13,7 @@ interface EventCategoryFiltersProps {
   className?: string;
 }
 
-export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
+export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = memo(({
   allEventTypes,
   selectedEventTypes,
   onToggleEventType,
@@ -35,6 +35,10 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
     }
   };
 
+  const handleToggleEventType = React.useCallback((eventType: string) => {
+    onToggleEventType(eventType);
+  }, [onToggleEventType]);
+
   return (
     <div className={cn("flex gap-2 flex-wrap", className)}>
       <AllCategoryPill
@@ -50,7 +54,7 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
           key={eventType}
           category={eventType}
           active={selectedEventTypes.includes(eventType)}
-          onClick={() => onToggleEventType(eventType)}
+          onClick={() => handleToggleEventType(eventType)}
           showIcon={false}
           size="default"
           noBorder={true}
@@ -59,4 +63,7 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
       ))}
     </div>
   );
-};
+});
+
+// Add display name for better debugging
+EventCategoryFilters.displayName = 'EventCategoryFilters';

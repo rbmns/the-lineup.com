@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Event } from '@/types';
 import { LoadingIndicator } from '@/components/home/events-list/LoadingIndicator';
 import { NoResultsMessage } from '@/components/home/events-list/NoResultsMessage';
@@ -36,7 +36,7 @@ export const FilteredEventsList: React.FC<FilteredEventsListProps> = ({
   isAuthenticated
 }) => {
   // Always show events - either the matched ones, similar ones, or a combination
-  let eventsToDisplay = displayEvents.length > 0 ? displayEvents : similarEvents;
+  const eventsToDisplay = displayEvents.length > 0 ? displayEvents : similarEvents;
   
   // Split events into filtered results and query-only results
   const primaryResults = eventsToDisplay.filter(event => !(event as any).isQueryOnly);
@@ -69,15 +69,15 @@ export const FilteredEventsList: React.FC<FilteredEventsListProps> = ({
   const visiblePrimaryEvents = primaryResults.slice(0, primaryScroll.visibleCount);
   const visibleSecondaryEvents = secondaryResults.slice(0, secondaryScroll.visibleCount);
   
-  // Wrapper for handling RSVP actions
-  const handleRsvp = async (eventId: string, status: 'Going' | 'Interested') => {
+  // Wrapper for handling RSVP actions - use useCallback to prevent recreating the function
+  const handleRsvp = useCallback(async (eventId: string, status: 'Going' | 'Interested') => {
     try {
       console.log('FilteredEventsList - RSVP triggered:', { eventId, status });
       await handleRsvpAction(eventId, status);
     } catch (error) {
       console.error('Error in FilteredEventsList RSVP handler:', error);
     }
-  };
+  }, [handleRsvpAction]);
   
   // Loading state
   if (isLoading || isSearching) {

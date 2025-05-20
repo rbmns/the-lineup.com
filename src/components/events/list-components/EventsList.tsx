@@ -17,6 +17,6 @@ interface EventsListProps {
 }
 
 export const EventsList: React.FC<EventsListProps> = (props) => {
-  // Pass all props directly to the new FilteredEventsList component
-  return <FilteredEventsList {...props} />;
+  // Use React.memo to prevent unnecessary rerenders
+  return React.memo(FilteredEventsList)(props);
 };

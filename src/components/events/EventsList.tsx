@@ -16,7 +16,7 @@ interface EventsListProps {
   similarEvents?: Event[];
 }
 
-export const EventsList: React.FC<EventsListProps> = ({
+export const EventsList = React.memo(({
   events,
   onRsvp,
   showRsvpButtons = true,
@@ -27,7 +27,7 @@ export const EventsList: React.FC<EventsListProps> = ({
   isLoading = false,
   hasActiveFilters = false,
   similarEvents = []
-}) => {
+}: EventsListProps) => {
   // Use the enhanced LazyEventsList for a unified approach to event listing
   return (
     <LazyEventsList
@@ -41,4 +41,9 @@ export const EventsList: React.FC<EventsListProps> = ({
       loadingEventId={loadingEventId}
     />
   );
-};
+});
+
+// Add display name for better debugging
+EventsList.displayName = 'EventsList';
+
+export default EventsList;
