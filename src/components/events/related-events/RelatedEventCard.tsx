@@ -7,14 +7,19 @@ import { useOptimisticRsvp } from '@/hooks/event-rsvp/useOptimisticRsvp';
 import { useEventInteractions } from '@/hooks/events/useEventInteractions';
 import { formatInTimeZone } from 'date-fns-tz';
 import { AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
+import { Badge } from '@/components/ui/badge';
 
 interface RelatedEventCardProps {
   event: Event;
+  isSameType?: boolean;
 }
 
-export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({ event }) => {
+export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({ 
+  event,
+  isSameType = false
+}) => {
   const { user, isAuthenticated } = useAuth();
-  const { handleRsvp, loadingEventId } = useOptimisticRsvp(user?.id); // Changed 'loading' to 'loadingEventId'
+  const { handleRsvp, loadingEventId } = useOptimisticRsvp(user?.id);
   const { handleEventClick } = useEventInteractions();
   const [localRsvpStatus, setLocalRsvpStatus] = useState<'Going' | 'Interested' | undefined>(event.rsvp_status);
   
@@ -59,7 +64,7 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({ event }) => 
   
   // RSVP handler with optimistic UI updates
   const handleRsvpAction = async (eventId: string, status: 'Going' | 'Interested') => {
-    if (!user?.id || loadingEventId) return false; // Changed 'rsvpLoading' to 'loadingEventId'
+    if (!user?.id || loadingEventId) return false;
     
     console.log('RelatedEventCard - Handling RSVP:', { 
       eventId, 
@@ -111,10 +116,19 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({ event }) => 
 
   return (
     <div 
-      className="h-full transition-all duration-300 hover:scale-[1.01]" 
+      className="h-full transition-all duration-300 hover:scale-[1.01] relative" 
       data-testid={`related-event-${event.id}`}
       data-event-id={event.id}
     >
+      {/* Recommendation badge */}
+      {isSameType && (
+        <div className="absolute top-2 right-2 z-10">
+          <Badge variant="secondary" className="bg-green-50 text-green-700 hover:bg-green-100 border border-green-200">
+            Same Type
+          </Badge>
+        </div>
+      )}
+      
       <EventCard
         event={eventWithFormattedDateTime}
         showRsvpButtons={isAuthenticated}
@@ -122,7 +136,7 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({ event }) => 
         className="h-full border hover:shadow-md transition-all duration-300"
         onClick={() => handleEventClick(event)}
         onRsvp={isAuthenticated ? handleRsvpAction : undefined}
-        loadingEventId={loadingEventId} // Pass the loadingEventId to EventCard
+        loadingEventId={loadingEventId}
       />
     </div>
   );

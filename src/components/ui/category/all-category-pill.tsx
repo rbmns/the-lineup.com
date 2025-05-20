@@ -47,6 +47,9 @@ export const AllCategoryPill: React.FC<AllCategoryPillProps> = ({
         className
       )}
       onClick={onClick || (() => {})}
+      role="button"
+      tabIndex={0}
+      aria-pressed={active}
     >
       <span>{displayLabel}</span>
     </div>

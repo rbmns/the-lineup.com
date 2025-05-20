@@ -58,32 +58,51 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
   // Get the event tags as an array
   const eventTags = parseTags(tags);
 
-  // Use our custom hook to fetch related events
+  // Use our custom hook to fetch related events with improved relevance scoring
   const { relatedEvents, loading } = useFetchRelatedEvents({
     eventType,
     currentEventId: eventId,
     tags: eventTags,
     vibe: vibe ? String(vibe) : undefined,
-    minResults: 2, // Ensure we get at least 2 events
+    minResults: 4, // Increased minimum results for better selection
     startDate,
     userId: user?.id,
     dateDifference: 21 // Show events within 21 days of the current event
   });
 
-  // Generate a section title based on event type
-  const sectionTitle = eventType 
-    ? `More ${eventType} events around the same time`
-    : "Similar Events";
+  // Generate a section title based on event type and result count
+  const getSectionTitle = () => {
+    if (!relatedEvents || relatedEvents.length === 0) {
+      return "Related Events";
+    }
+    
+    // If all events are the same type, use a type-based headline
+    const allSameType = relatedEvents.every(event => event.event_type === eventType);
+    
+    if (allSameType && eventType) {
+      return `More ${eventType} events around the same time`;
+    }
+    
+    // If events have mixed types, use a more general headline
+    return "Events you might be interested in";
+  };
 
-  // Always render the loader or results section since we want to show it even if empty
+  // Only render when the section becomes visible
+  if (!isVisible) {
+    return <div id="related-events-section" className="w-full"></div>;
+  }
+
   return (
     <div id="related-events-section" className="w-full">
-      <h2 className="text-2xl font-bold mb-6">{sectionTitle}</h2>
+      <h2 className="text-2xl font-bold mb-6">{getSectionTitle()}</h2>
       
       {loading ? (
         <RelatedEventsLoader />
       ) : (
-        <RelatedEventsGrid events={relatedEvents || []} />
+        <RelatedEventsGrid 
+          events={relatedEvents || []} 
+          referenceEventType={eventType}
+        />
       )}
     </div>
   );

@@ -1,9 +1,74 @@
+
 import { Event } from '@/types';
-import { compareAsc } from 'date-fns';
+import { compareAsc, differenceInDays } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
 import { AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
 import { EventRsvpMap } from './types';
 import { supabase } from '@/lib/supabase';
+
+/**
+ * Calculate a relevance score between two events
+ * Higher score means more relevant
+ */
+export const calculateRelevanceScore = (
+  eventA: Event,
+  eventB: Event,
+  weights = {
+    eventType: 10,     // Highest weight - same type is very relevant
+    dateDifference: 5, // Date proximity is important
+    venue: 3,          // Same venue is somewhat important
+    tags: 2,           // Tag matches add relevance
+    creator: 1         // Same creator adds a bit of relevance
+  }
+): number => {
+  let score = 0;
+  
+  // Event type match (highest weight)
+  if (eventA.event_type === eventB.event_type) {
+    score += weights.eventType;
+  }
+  
+  // Date proximity (closer dates = higher score)
+  if (eventA.start_date && eventB.start_date) {
+    const dateA = new Date(eventA.start_date);
+    const dateB = new Date(eventB.start_date);
+    
+    // Calculate days between events (absolute value)
+    const daysDifference = Math.abs(differenceInDays(dateA, dateB));
+    
+    // Score inversely proportional to day difference
+    // Max 10 points if same day, down to 0 if 14+ days apart
+    const dateProximityScore = Math.max(0, weights.dateDifference - (daysDifference / 3));
+    score += dateProximityScore;
+  }
+  
+  // Venue match
+  if (eventA.venue_id && eventB.venue_id && eventA.venue_id === eventB.venue_id) {
+    score += weights.venue;
+  }
+  
+  // Tag matches
+  if (eventA.tags && eventB.tags) {
+    const tagsA = Array.isArray(eventA.tags) 
+      ? eventA.tags 
+      : String(eventA.tags || '').split(',').map(t => t.trim());
+      
+    const tagsB = Array.isArray(eventB.tags) 
+      ? eventB.tags 
+      : String(eventB.tags || '').split(',').map(t => t.trim());
+    
+    // Count matching tags
+    const matchingTags = tagsA.filter(tag => tagsB.includes(tag));
+    score += matchingTags.length * weights.tags;
+  }
+  
+  // Creator match
+  if (eventA.creator_id && eventB.creator_id && eventA.creator_id === eventB.creator_id) {
+    score += weights.creator;
+  }
+  
+  return score;
+};
 
 /**
  * Apply RSVP status to events and format them correctly
@@ -97,6 +162,21 @@ export const applyRsvpStatus = async (
       }
     })) as Event[];
   }
+};
+
+/**
+ * Sort events by relevance score compared to a reference event
+ */
+export const sortEventsByRelevance = (events: Event[], referenceEvent: Event): Event[] => {
+  if (!referenceEvent || events.length === 0) return events;
+  
+  return [...events].sort((a, b) => {
+    const scoreA = calculateRelevanceScore(referenceEvent, a);
+    const scoreB = calculateRelevanceScore(referenceEvent, b);
+    
+    // Sort by score (descending)
+    return scoreB - scoreA;
+  });
 };
 
 /**

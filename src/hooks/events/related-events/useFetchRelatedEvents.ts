@@ -1,10 +1,10 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Event } from '@/types';
 import { useSimilarEvents } from '../useSimilarEvents';
 import { UseFetchRelatedEventsProps, RelatedEventsState } from './types';
 import { fetchPrimaryRelatedEvents } from './fetchPrimaryRelatedEvents';
 import { fetchSecondaryRelatedEvents } from './fetchSecondaryRelatedEvents';
+import { sortEventsByRelevance, sortEventsByTagMatch } from './relatedEventsUtils';
 
 export const useFetchRelatedEvents = ({ 
   eventType, 
@@ -21,6 +21,33 @@ export const useFetchRelatedEvents = ({
   const { fetchSimilarEvents } = useSimilarEvents([], []);
   const loadingRef = useRef<boolean>(false);
   const dataFetchedRef = useRef<boolean>(false);
+  const [referenceEvent, setReferenceEvent] = useState<Event | null>(null);
+  
+  // First, fetch the reference event to use for comparison
+  useEffect(() => {
+    const fetchReferenceEvent = async () => {
+      if (!currentEventId) return;
+      
+      try {
+        const { data, error } = await fetch(`/api/events/${currentEventId}`).then(res => res.json());
+        
+        if (error) {
+          console.error('Error fetching reference event:', error);
+          return;
+        }
+        
+        if (data) {
+          setReferenceEvent(data);
+        }
+      } catch (err) {
+        console.error('Error in reference event fetch:', err);
+      }
+    };
+    
+    if (currentEventId && !referenceEvent) {
+      fetchReferenceEvent();
+    }
+  }, [currentEventId, referenceEvent]);
   
   useEffect(() => {
     const loadRelatedEvents = async () => {
@@ -67,7 +94,17 @@ export const useFetchRelatedEvents = ({
               }
             }
             
-            setRelatedEvents(combinedEvents);
+            // If we have a reference event, sort by relevance
+            if (referenceEvent) {
+              const sortedEvents = sortEventsByRelevance(combinedEvents, referenceEvent);
+              setRelatedEvents(sortedEvents);
+            } else if (tags && tags.length > 0) {
+              // Otherwise, sort by tag matches
+              const sortedByTags = sortEventsByTagMatch(combinedEvents, tags);
+              setRelatedEvents(sortedByTags);
+            } else {
+              setRelatedEvents(combinedEvents);
+            }
           } else {
             // Last resort - try similar events by event type only
             console.log('Trying similar events as last resort...');
@@ -101,14 +138,33 @@ export const useFetchRelatedEvents = ({
                 }
               }
               
-              setRelatedEvents(combinedEvents);
+              // Sort by relevance if we have reference event
+              if (referenceEvent) {
+                const sortedEvents = sortEventsByRelevance(combinedEvents, referenceEvent);
+                setRelatedEvents(sortedEvents);
+              } else {
+                setRelatedEvents(combinedEvents);
+              }
             } catch (error) {
               console.error('Error fetching similar events:', error);
-              setRelatedEvents(filteredEvents);
+              
+              // If we have a reference event, sort primary events by relevance
+              if (referenceEvent && filteredEvents.length > 0) {
+                const sortedEvents = sortEventsByRelevance(filteredEvents, referenceEvent);
+                setRelatedEvents(sortedEvents);
+              } else {
+                setRelatedEvents(filteredEvents);
+              }
             }
           }
         } else {
-          setRelatedEvents(filteredEvents);
+          // We have enough primary events, sort them by relevance if possible
+          if (referenceEvent) {
+            const sortedEvents = sortEventsByRelevance(filteredEvents, referenceEvent);
+            setRelatedEvents(sortedEvents);
+          } else {
+            setRelatedEvents(filteredEvents);
+          }
         }
         
         // Mark as fetched
@@ -127,7 +183,7 @@ export const useFetchRelatedEvents = ({
     } else {
       setLoading(false);
     }
-  }, [eventType, currentEventId, userId, minResults, tags, vibe, fetchSimilarEvents, startDate, dateDifference]); 
+  }, [eventType, currentEventId, userId, minResults, tags, vibe, fetchSimilarEvents, startDate, dateDifference, referenceEvent]); 
   
   return { relatedEvents, loading };
 };

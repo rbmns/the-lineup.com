@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import EventCard from '@/components/events/EventCard'; // Fixed import
+import EventCard from '@/components/events/EventCard'; 
 import { EventSkeleton } from '@/components/events/EventSkeleton';
 import { Event } from '@/types';
 
@@ -13,7 +13,7 @@ interface LazyEventsListProps {
   compact?: boolean;
   loadingEventId?: string | null;
   hasActiveFilters?: boolean;
-  hideCount?: boolean; // Added missing prop
+  hideCount?: boolean;
 }
 
 export const LazyEventsList: React.FC<LazyEventsListProps> = ({
@@ -25,7 +25,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   compact = false,
   loadingEventId,
   hasActiveFilters = false,
-  hideCount = false // Added with default value
+  hideCount = false
 }) => {
   const [visibleMainCount, setVisibleMainCount] = useState(12);
   const [visibleRelatedCount, setVisibleRelatedCount] = useState(6);
@@ -45,15 +45,18 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
 
   // Set up infinite scrolling for main events
   useEffect(() => {
-    if (!mainObserverRef.current) return;
+    if (!mainObserverRef.current || mainEvents.length <= visibleMainCount) return;
     
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting && visibleMainCount < mainEvents.length) {
-          setVisibleMainCount(prev => Math.min(prev + 12, mainEvents.length));
+          // Add a small delay to prevent too rapid loading
+          setTimeout(() => {
+            setVisibleMainCount(prev => Math.min(prev + 12, mainEvents.length));
+          }, 100);
         }
       },
-      { rootMargin: '200px' }
+      { rootMargin: '200px', threshold: 0.1 }
     );
     
     observer.observe(mainObserverRef.current);
@@ -65,15 +68,18 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   
   // Set up infinite scrolling for related events
   useEffect(() => {
-    if (!relatedObserverRef.current || relatedEvents.length === 0) return;
+    if (!relatedObserverRef.current || relatedEvents.length === 0 || relatedEvents.length <= visibleRelatedCount) return;
     
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting && visibleRelatedCount < relatedEvents.length) {
-          setVisibleRelatedCount(prev => Math.min(prev + 6, relatedEvents.length));
+          // Add a small delay to prevent too rapid loading
+          setTimeout(() => {
+            setVisibleRelatedCount(prev => Math.min(prev + 6, relatedEvents.length));
+          }, 100);
         }
       },
-      { rootMargin: '200px' }
+      { rootMargin: '200px', threshold: 0.1 }
     );
     
     observer.observe(relatedObserverRef.current);
@@ -110,6 +116,14 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
       {/* Main Events Section */}
       {renderedEvents.length > 0 && (
         <div className="space-y-6">
+          {!hideCount && (
+            <div className="flex justify-between items-center">
+              <h3 className="text-xl font-semibold">
+                {mainEvents.length} {mainEvents.length === 1 ? 'Event' : 'Events'}
+              </h3>
+            </div>
+          )}
+          
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {renderedEvents.map(event => (
               <EventCard
@@ -122,8 +136,17 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
               />
             ))}
           </div>
+          
           {visibleMainCount < mainEvents.length && (
-            <div ref={mainObserverRef} className="h-4" />
+            <div 
+              ref={mainObserverRef} 
+              className="h-8 flex justify-center items-center py-4"
+              aria-hidden="true"
+            >
+              {visibleMainCount < mainEvents.length && (
+                <div className="w-8 h-8 rounded-full border-2 border-gray-300 border-t-twilight animate-spin"></div>
+              )}
+            </div>
           )}
         </div>
       )}
@@ -144,8 +167,17 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
               />
             ))}
           </div>
+          
           {visibleRelatedCount < relatedEvents.length && (
-            <div ref={relatedObserverRef} className="h-4" />
+            <div 
+              ref={relatedObserverRef} 
+              className="h-8 flex justify-center items-center py-4"
+              aria-hidden="true"
+            >
+              {visibleRelatedCount < relatedEvents.length && (
+                <div className="w-8 h-8 rounded-full border-2 border-gray-300 border-t-twilight animate-spin"></div>
+              )}
+            </div>
           )}
         </div>
       )}
