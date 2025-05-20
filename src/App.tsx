@@ -1,39 +1,54 @@
 
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import EventsPageRefactored from "./pages/EventsPageRefactored";
-import EventDetail from "./pages/EventDetail";
-import Index from "./pages/Index";
-import Layout from "./components/Layout";
-import Friends from "./pages/Friends";
-import UserProfilePage from "./pages/UserProfilePage"; 
-import ProfileEdit from "./pages/ProfileEdit";
-import Login from "./pages/Login";
-import { AuthProvider } from "./contexts/AuthContext";
-import { ToastProvider } from "./contexts/ToastContext";
-import DesignSystem from "./pages/DesignSystem";
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { ThemeProvider } from '@/components/providers/theme-provider';
+import { Toaster } from '@/components/ui/toaster';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { FilterStateProvider } from '@/contexts/FilterStateContext';
+import { queryClient } from '@/lib/queryClient';
 
-const App: React.FC = () => {
+// Import routes
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Events from './pages/Events';
+import EventDetail from './pages/EventDetail';
+import Users from './pages/Users';
+import UserProfile from './pages/UserProfile';
+import NotFound from './pages/NotFound';
+import Layout from './components/Layout';
+import EventsPageRefactored from './pages/EventsPageRefactored';
+import Admin from './pages/Admin';
+
+function App() {
   return (
-    <AuthProvider>
-      <ToastProvider>
-        <Routes>
-          <Route index element={<Navigate to="/events" replace />} />
-          <Route path="/" element={<Layout />}>
-            <Route path="/events" element={<EventsPageRefactored />} />
-            <Route path="/events/:id" element={<EventDetail />} />
-            <Route path="/friends" element={<Friends />} />
-            <Route path="/users/:userId" element={<UserProfilePage />} />
-            <Route path="/profile" element={<UserProfilePage />} />
-            <Route path="/profile/edit" element={<ProfileEdit />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/design-system" element={<DesignSystem />} />
-            <Route path="*" element={<Navigate to="/events" replace />} />
-          </Route>
-        </Routes>
-      </ToastProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+        <AuthProvider>
+          <FilterStateProvider>
+            <Router>
+              <div className="flex flex-col min-h-screen bg-background">
+                <Layout>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/events" element={<EventsPageRefactored />} />
+                    <Route path="/events/:eventId" element={<EventDetail />} />
+                    <Route path="/users" element={<Users />} />
+                    <Route path="/users/:userId" element={<UserProfile />} />
+                    <Route path="/admin" element={<Admin />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Layout>
+              </div>
+            </Router>
+          </FilterStateProvider>
+        </AuthProvider>
+        <Toaster />
+      </ThemeProvider>
+    </QueryClientProvider>
   );
-};
+}
 
 export default App;

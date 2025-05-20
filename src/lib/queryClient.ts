@@ -70,7 +70,6 @@ if (typeof window !== 'undefined') {
       // Block state changes during RSVP operations on the events page
       if (window.location.pathname.includes('/events')) {
         // Check if this is coming from React Query's automatic URL updates
-        const newUrl = args[2] as string;
         const currentTime = Date.now();
         const rsvpStartTime = window._filterStateBeforeRsvp?.timestamp || 0;
         const timeSinceRsvpStart = currentTime - rsvpStartTime;
@@ -98,40 +97,4 @@ if (typeof window !== 'undefined') {
     // Call original implementation
     return originalReplaceState.apply(this, args);
   };
-  
-  // Enhanced event listeners for filter restoration
-  document.addEventListener('filtersRestored', (event: Event) => {
-    const customEvent = event as CustomEvent;
-    console.log('Filters restored event received:', customEvent.detail);
-    
-    // Re-apply URL parameters immediately after filters are restored
-    if (customEvent.detail?.urlParams) {
-      setTimeout(() => {
-        const currentParams = window.location.search;
-        if (customEvent.detail.urlParams !== currentParams) {
-          console.log('Re-applying URL params after filter restoration');
-          window.history.replaceState({}, '', `${window.location.pathname}${customEvent.detail.urlParams}`);
-        }
-      }, 50);
-    }
-  });
-  
-  // Enhanced popstate listener
-  window.addEventListener('popstate', () => {
-    // Always clear RSVP in-progress state when navigation happens
-    if (window.rsvpInProgress) {
-      console.log('Navigation detected during RSVP, resetting state');
-      window.rsvpInProgress = false;
-      document.body.removeAttribute('data-rsvp-in-progress');
-      
-      // Dispatch event to notify components about the interrupted RSVP
-      const interruptedEvent = new CustomEvent('rsvpInterrupted', {
-        detail: { 
-          timestamp: Date.now(),
-          previousState: window._filterStateBeforeRsvp
-        }
-      });
-      document.dispatchEvent(interruptedEvent);
-    }
-  });
 }

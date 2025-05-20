@@ -1,37 +1,59 @@
 
 import { useState, useEffect } from 'react';
 
-export const useCategoryFilterSelection = (allEventTypes: string[]) => {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  
-  // Initialize with all categories selected
-  useEffect(() => {
+export const useCategoryFilterSelection = (
+  allEventTypes: string[], 
+  externalSelectedTypes?: string[]
+) => {
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(() => {
+    // Use external types if provided
+    if (externalSelectedTypes && externalSelectedTypes.length > 0) {
+      console.log('Using external selected types:', externalSelectedTypes);
+      return externalSelectedTypes;
+    }
+    
+    // Default to all event types if available
     if (allEventTypes.length > 0) {
+      console.log('Selecting all event types by default:', allEventTypes);
+      return [...allEventTypes];
+    }
+    
+    return [];
+  });
+  
+  // Update selectedCategories when externalSelectedTypes changes
+  useEffect(() => {
+    if (externalSelectedTypes && externalSelectedTypes.length > 0) {
+      // Only update if there's an actual difference to prevent loops
+      const sameSelection = 
+        externalSelectedTypes.length === selectedCategories.length && 
+        externalSelectedTypes.every(type => selectedCategories.includes(type));
+      
+      if (!sameSelection) {
+        console.log('Updating selected categories from external types:', externalSelectedTypes);
+        setSelectedCategories(externalSelectedTypes);
+      }
+    } else if (allEventTypes.length > 0 && selectedCategories.length === 0) {
+      // If we have event types but none selected, select all by default
+      console.log('No categories selected, selecting all event types');
       setSelectedCategories([...allEventTypes]);
     }
-  }, [allEventTypes]);
+  }, [externalSelectedTypes, allEventTypes, selectedCategories]);
   
-  const toggleCategory = (category: string) => {
-    // Check if all categories are currently selected
-    const allSelected = selectedCategories.length === allEventTypes.length;
-    
-    if (allSelected) {
-      // If all are selected, clicking one filter should select only that one
-      setSelectedCategories([category]);
-    } else {
-      // For subsequent clicks, add or remove the category
-      if (selectedCategories.includes(category)) {
-        // Remove this category if it's already selected
-        setSelectedCategories(prev => prev.filter(c => c !== category));
+  const toggleCategory = (type: string) => {
+    setSelectedCategories(prev => {
+      if (prev.includes(type)) {
+        return prev.filter(t => t !== type);
       } else {
-        // Add this category if it's not selected
-        setSelectedCategories(prev => [...prev, category]);
+        return [...prev, type];
       }
-    }
+    });
   };
   
   const selectAll = () => {
-    setSelectedCategories([...allEventTypes]);
+    if (allEventTypes.length > 0) {
+      setSelectedCategories([...allEventTypes]);
+    }
   };
   
   const deselectAll = () => {
@@ -39,14 +61,12 @@ export const useCategoryFilterSelection = (allEventTypes: string[]) => {
   };
   
   const isNoneSelected = selectedCategories.length === 0;
-  const isAllSelected = selectedCategories.length === allEventTypes.length;
   
   return {
     selectedCategories,
     toggleCategory,
     selectAll,
     deselectAll,
-    isNoneSelected,
-    isAllSelected
+    isNoneSelected
   };
 };

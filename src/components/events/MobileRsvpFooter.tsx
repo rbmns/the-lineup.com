@@ -76,18 +76,15 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
     setLoadingStatus(status);
     setAnimating(true);
     
-    // Store current filter state and scroll position
-    const currentUrlParams = window.location.search;
-    const currentScrollPosition = window.scrollY;
-    
-    // Save filter state to window for restoration
-    if (typeof window !== 'undefined') {
-      window._filterStateBeforeRsvp = {
-        urlParams: currentUrlParams,
-        scrollPosition: currentScrollPosition,
+    // Dispatch a custom event to notify that RSVP is starting
+    const rsvpEvent = new CustomEvent('rsvpStarted', {
+      detail: {
+        eventId,
+        status,
         timestamp: Date.now()
-      };
-    }
+      }
+    });
+    document.dispatchEvent(rsvpEvent);
     
     // Set global flag to prevent unwanted state resets
     if (typeof window !== 'undefined') {
@@ -116,30 +113,6 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
         setLocalStatus(currentStatus || null);
       }
       
-      // Check if URL parameters changed during the RSVP operation
-      const urlParamsChanged = currentUrlParams !== window.location.search;
-      if (urlParamsChanged && window.location.pathname.includes('/events')) {
-        console.log('Filter state changed during RSVP, restoring URL params:', currentUrlParams);
-        window.history.replaceState({}, '', `${window.location.pathname}${currentUrlParams}`);
-        
-        // Dispatch event to notify components of filter restoration
-        const filterRestoredEvent = new CustomEvent('filtersRestored', { 
-          detail: { 
-            urlParams: currentUrlParams,
-            source: 'mobile-footer'
-          } 
-        });
-        document.dispatchEvent(filterRestoredEvent);
-      }
-      
-      // Check if scroll position changed significantly
-      const scrollDiff = Math.abs(window.scrollY - currentScrollPosition);
-      if (scrollDiff > 50) {
-        console.log(`Scroll position changed (diff: ${scrollDiff}px), restoring to ${currentScrollPosition}px`);
-        window.scrollTo({ top: currentScrollPosition, behavior: 'auto' });
-      }
-      
-      // Keep animation going briefly for visual consistency
       return success;
     } catch (error) {
       console.error(`MobileRsvpFooter: Error in RSVP handler:`, error);

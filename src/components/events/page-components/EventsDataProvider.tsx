@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
 import { useRsvpStateManager } from '@/hooks/events/useRsvpStateManager';
 import { useCategoryFilterSelection } from '@/hooks/events/useCategoryFilterSelection';
-import { useEventFilterState } from '@/hooks/events/useEventFilterState';
+import { useGlobalFilterState } from '@/hooks/events/useGlobalFilterState';
 import { useFilteredEvents } from '@/hooks/events/useFilteredEvents';
 import { useSimilarEventsHandler } from '@/hooks/events/useSimilarEventsHandler';
 import { supabase } from '@/lib/supabase';
@@ -54,17 +54,12 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
   const [venues, setVenues] = useState<Array<{ value: string, label: string }>>([]);
   const [locations, setLocations] = useState<Array<{ value: string, label: string }>>([]);
   const [isVenuesLoading, setIsVenuesLoading] = useState(true);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   
   // Use our new RSVP state manager
   const { handleRsvp: stateManagerHandleRsvp, loadingEventId, isProcessing } = useRsvpStateManager(user?.id);
   
-  // Get all unique event types from events
-  const allEventTypes = React.useMemo(() => {
-    const types = events.map(event => event.event_type).filter(Boolean);
-    return [...new Set(types)];
-  }, [events]);
-  
-  // Event filter state management
+  // Use our new global filter state
   const {
     selectedEventTypes,
     setSelectedEventTypes,
@@ -74,16 +69,19 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     setDateRange,
     selectedDateFilter,
     setSelectedDateFilter,
-    isFilterLoading,
-    showAdvancedFilters,
-    toggleAdvancedFilters,
-    hasActiveFilters,
-    hasAdvancedFilters,
     resetFilters,
-    handleRemoveEventType,
     handleRemoveVenue,
     handleClearDateFilter,
-  } = useEventFilterState();
+    hasActiveFilters,
+    hasAdvancedFilters,
+    isFilterLoading
+  } = useGlobalFilterState();
+  
+  // Get all unique event types from events
+  const allEventTypes = React.useMemo(() => {
+    const types = events.map(event => event.event_type).filter(Boolean);
+    return [...new Set(types)];
+  }, [events]);
   
   // Filter events by selected event types
   const {
@@ -92,18 +90,21 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     selectAll,
     deselectAll,
     isNoneSelected
-  } = useCategoryFilterSelection(allEventTypes);
+  } = useCategoryFilterSelection(allEventTypes, selectedEventTypes);
   
   // Keep the category filter and event type filter in sync
   useEffect(() => {
-    if (selectedCategories.length === 0 && allEventTypes.length > 0) {
-      // If no categories are selected but we have event types, select all by default
-      selectAll();
-    } else {
-      // Otherwise, sync the selected event types with the categories
+    // When selectedCategories change, update the global filter state
+    if (selectedCategories.length > 0) {
       setSelectedEventTypes(selectedCategories);
     }
-  }, [selectedCategories, allEventTypes, selectAll, setSelectedEventTypes]);
+  }, [selectedCategories, setSelectedEventTypes]);
+  
+  // When selectedEventTypes change from global state, update categories
+  useEffect(() => {
+    // This effect needs special handling to prevent infinite loops
+    // We're handling this in the useCategoryFilterSelection hook
+  }, [selectedEventTypes]);
   
   // Fetch all venues for the filter
   useEffect(() => {
@@ -139,41 +140,29 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     fetchVenues();
   }, []);
   
-  // Listen for filter restoration events
+  // Toggle advanced filters visibility
+  const toggleAdvancedFilters = () => {
+    setShowAdvancedFilters(prev => !prev);
+    
+    // Store the preference in sessionStorage
+    try {
+      sessionStorage.setItem('event-advanced-filters', String(!showAdvancedFilters));
+    } catch (e) {
+      console.error("Error saving advanced filters state:", e);
+    }
+  };
+  
+  // Initialize advanced filters state from storage
   useEffect(() => {
-    const handleFilterRestoration = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      console.log('Filter restoration event detected in EventsDataProvider:', customEvent.detail);
-      
-      // Update filter state if event types are provided
-      if (customEvent.detail?.eventTypes && Array.isArray(customEvent.detail.eventTypes)) {
-        setSelectedEventTypes(customEvent.detail.eventTypes);
-        
-        // If categories selection exists, update it too
-        if (customEvent.detail.eventTypes.length > 0) {
-          // Find any matching categories
-          const matchingEventTypes = customEvent.detail.eventTypes.filter(
-            (type: string) => allEventTypes.includes(type)
-          );
-          
-          if (matchingEventTypes.length > 0) {
-            // This will trigger the useEffect that syncs categories with event types
-            matchingEventTypes.forEach(type => {
-              if (!selectedCategories.includes(type)) {
-                toggleCategory(type);
-              }
-            });
-          }
-        }
+    try {
+      const stored = sessionStorage.getItem('event-advanced-filters');
+      if (stored) {
+        setShowAdvancedFilters(stored === 'true');
       }
-    };
-    
-    document.addEventListener('filtersRestored', handleFilterRestoration);
-    
-    return () => {
-      document.removeEventListener('filtersRestored', handleFilterRestoration);
-    };
-  }, [setSelectedEventTypes, allEventTypes, selectedCategories, toggleCategory]);
+    } catch (e) {
+      console.error("Error reading advanced filters state:", e);
+    }
+  }, []);
   
   // Use the filtered events hook
   const filteredEvents = useFilteredEvents({
@@ -201,6 +190,16 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
       navigate('/login');
       return false;
     }
+    
+    // Dispatch a custom event to notify that RSVP is starting
+    const rsvpEvent = new CustomEvent('rsvpStarted', {
+      detail: {
+        eventId,
+        status,
+        timestamp: Date.now()
+      }
+    });
+    document.dispatchEvent(rsvpEvent);
     
     return stateManagerHandleRsvp(eventId, status);
   }, [user, navigate, stateManagerHandleRsvp]);

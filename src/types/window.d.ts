@@ -22,4 +22,17 @@ interface Window {
     eventId?: string;
     status?: string;
   };
+  
+  // For global filter state management
+  _globalFilterState?: {
+    eventTypes: string[];
+    venues: string[];
+    dateRange?: {
+      from?: string;
+      to?: string;
+    };
+    dateFilter: string;
+    timestamp: number;
+    source: string;
+  };
 }
