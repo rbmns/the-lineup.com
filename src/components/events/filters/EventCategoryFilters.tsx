@@ -59,7 +59,6 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = memo(({
           showIcon={false}
           size="default"
           noBorder={true}
-          visuallyInactive={isAllSelected}
         />
       ))}
     </div>

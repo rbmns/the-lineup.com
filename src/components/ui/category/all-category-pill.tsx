@@ -22,9 +22,9 @@ export const AllCategoryPill: React.FC<AllCategoryPillProps> = ({
   // Base styles with more subtle text-only appearance
   const baseClasses = 'rounded-md font-medium transition-colors cursor-pointer border';
   
-  // More subtle styling for the Select/Deselect All button
+  // Use colors from design-system.css for active state
   const stateClasses = active 
-    ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-gray-300'
+    ? 'bg-twilight text-white hover:bg-night shadow-sm border-transparent'
     : 'bg-white text-gray-600 hover:bg-gray-50 border-gray-200';
   
   // Size classes
