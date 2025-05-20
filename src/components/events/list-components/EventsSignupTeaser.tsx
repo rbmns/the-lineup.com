@@ -8,7 +8,7 @@ export const EventsSignupTeaser: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSignUp = () => {
-    navigate('/login', { state: { initialMode: 'register' } });
+    navigate('/signup', { state: { initialMode: 'register' } });
   };
 
   return (
