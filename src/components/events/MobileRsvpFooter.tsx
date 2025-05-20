@@ -41,6 +41,29 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
       return () => clearTimeout(timer);
     }
   }, [animating]);
+  
+  // Listen for filter restoration events
+  useEffect(() => {
+    const handleFilterRestoration = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      console.log('Filter restoration detected in MobileRsvpFooter:', customEvent.detail);
+      
+      // Reset loading state to ensure UI is responsive
+      setLoadingStatus(null);
+      setAnimating(false);
+    };
+    
+    document.addEventListener('filtersRestored', handleFilterRestoration);
+    document.addEventListener('rsvpInterrupted', () => {
+      setLoadingStatus(null);
+      setAnimating(false);
+    });
+    
+    return () => {
+      document.removeEventListener('filtersRestored', handleFilterRestoration);
+      document.removeEventListener('rsvpInterrupted', () => {});
+    };
+  }, []);
 
   const handleRsvp = async (status: 'Going' | 'Interested') => {
     console.log(`MobileRsvpFooter: Handling RSVP for event ${eventId}, status ${status}, currentStatus: ${currentStatus}`);
@@ -101,7 +124,10 @@ export const MobileRsvpFooter: React.FC<MobileRsvpFooterProps> = ({
         
         // Dispatch event to notify components of filter restoration
         const filterRestoredEvent = new CustomEvent('filtersRestored', { 
-          detail: { urlParams: currentUrlParams } 
+          detail: { 
+            urlParams: currentUrlParams,
+            source: 'mobile-footer'
+          } 
         });
         document.dispatchEvent(filterRestoredEvent);
       }

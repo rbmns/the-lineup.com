@@ -1,7 +1,7 @@
-
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { useLocation } from 'react-router-dom';
 
 // Interface for filter state that needs to be preserved
 interface FilterState {
@@ -17,6 +17,43 @@ export const useRsvpStateManager = (userId: string | undefined) => {
   const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
   const filterStateRef = useRef<FilterState | null>(null);
   const queryClient = useQueryClient();
+  const location = useLocation();
+  
+  // Add listener for URL changes that might happen during RSVP
+  useEffect(() => {
+    const handleRsvpStateBackup = () => {
+      // When navigation occurs during RSVP, check if we have a state backup
+      if (window._rsvpStateBackup && 
+          Date.now() - window._rsvpStateBackup.timestamp < 5000) {
+        console.log('Detected navigation during RSVP, restoring state from backup');
+        
+        // Restore URL if we're on events page
+        if (window.location.pathname.includes('/events')) {
+          const storedUrl = window._rsvpStateBackup.urlParams;
+          if (storedUrl && window.location.search !== storedUrl) {
+            console.log('Restoring URL from backup:', storedUrl);
+            window.history.replaceState({}, '', `${window.location.pathname}${storedUrl}`);
+          }
+          
+          // Dispatch event to notify components
+          const event = new CustomEvent('filtersRestored', {
+            detail: {
+              urlParams: storedUrl,
+              timestamp: Date.now(),
+              source: 'navigation-handler'
+            }
+          });
+          document.dispatchEvent(event);
+        }
+      }
+    };
+    
+    window.addEventListener('popstate', handleRsvpStateBackup);
+    
+    return () => {
+      window.removeEventListener('popstate', handleRsvpStateBackup);
+    };
+  }, []);
   
   /**
    * Captures and stores the current filter state before RSVP operation
@@ -50,6 +87,16 @@ export const useRsvpStateManager = (userId: string | undefined) => {
       window._filterStateBeforeRsvp = {
         urlParams,
         scrollPosition,
+        timestamp,
+        eventTypes,
+        pathname
+      };
+      
+      // Add comprehensive backup
+      window._rsvpStateBackup = {
+        filterState,
+        urlParams,
+        scrollPosition,
         timestamp
       };
     }
@@ -57,6 +104,17 @@ export const useRsvpStateManager = (userId: string | undefined) => {
     // Store in sessionStorage as backup
     try {
       sessionStorage.setItem('rsvpFilterState', JSON.stringify(filterState));
+      
+      // Also store as a filter state snapshot for recovery
+      sessionStorage.setItem('event-filter-state-snapshot', JSON.stringify({
+        eventTypes,
+        venues: [],
+        dateRange: null,
+        dateFilter: '',
+        urlParams,
+        timestamp
+      }));
+      
       console.log('Filter state captured:', filterState);
     } catch (e) {
       console.error('Failed to save filter state to session storage:', e);
@@ -80,10 +138,10 @@ export const useRsvpStateManager = (userId: string | undefined) => {
       if (!filterState && window._filterStateBeforeRsvp) {
         filterState = {
           urlParams: window._filterStateBeforeRsvp.urlParams,
-          eventTypes: [], // Can't recover from window object
+          eventTypes: window._filterStateBeforeRsvp.eventTypes || [],
           scrollPosition: window._filterStateBeforeRsvp.scrollPosition,
           timestamp: window._filterStateBeforeRsvp.timestamp,
-          pathname: window.location.pathname
+          pathname: window._filterStateBeforeRsvp.pathname || window.location.pathname
         };
       }
       
@@ -110,19 +168,28 @@ export const useRsvpStateManager = (userId: string | undefined) => {
             console.log('URL params changed, restoring:', filterState.urlParams);
             window.history.replaceState({}, '', `${window.location.pathname}${filterState.urlParams}`);
             
+            // Store as last restored state
+            window._lastRestoredFilterState = {
+              urlParams: filterState.urlParams,
+              eventTypes: filterState.eventTypes,
+              timestamp: Date.now()
+            };
+            
             // Emit custom event to notify components about the filter restoration
             const filterRestoredEvent = new CustomEvent('filtersRestored', { 
               detail: { 
                 urlParams: filterState.urlParams,
                 eventTypes: filterState.eventTypes,
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                source: 'rsvp-state-manager'
               } 
             });
             document.dispatchEvent(filterRestoredEvent);
           }
           
           // Restore scroll position if it changed significantly
-          if (Math.abs(window.scrollY - filterState.scrollPosition) > 50) {
+          const scrollDiff = Math.abs(window.scrollY - filterState.scrollPosition);
+          if (scrollDiff > 50) {
             console.log(`Scroll changed, restoring to ${filterState.scrollPosition}px`);
             window.scrollTo({ top: filterState.scrollPosition, behavior: 'auto' });
           }
@@ -135,7 +202,12 @@ export const useRsvpStateManager = (userId: string | undefined) => {
       // Reset global flags
       if (typeof window !== 'undefined') {
         window.rsvpInProgress = false;
-        delete window._filterStateBeforeRsvp;
+        window._filterStateBeforeRsvp = undefined;
+        
+        // Keep the backup for a bit longer in case of navigation
+        setTimeout(() => {
+          window._rsvpStateBackup = undefined;
+        }, 5000);
       }
       
       // Remove body attribute
@@ -224,6 +296,12 @@ export const useRsvpStateManager = (userId: string | undefined) => {
       // Step 1: Capture current state
       const capturedState = captureFilterState();
       console.log('Starting RSVP with captured state:', capturedState);
+      
+      // Update backup with event details
+      if (window._rsvpStateBackup) {
+        window._rsvpStateBackup.eventId = eventId;
+        window._rsvpStateBackup.status = status;
+      }
       
       // Step 2: Check existing RSVP
       const { data: existingRsvp, error: checkError } = await supabase

@@ -37,8 +37,8 @@ if (typeof window !== 'undefined') {
         const rsvpStartTime = window._filterStateBeforeRsvp?.timestamp || 0;
         const timeSinceRsvpStart = currentTime - rsvpStartTime;
         
-        // Block state changes during active RSVP operations (within last 3 seconds)
-        if (timeSinceRsvpStart < 3000) {
+        // Block state changes during active RSVP operations (within last 5 seconds)
+        if (timeSinceRsvpStart < 5000) {
           console.log('Blocking pushState during active RSVP');
           
           // Create a custom event to notify about blocked navigation
@@ -75,8 +75,8 @@ if (typeof window !== 'undefined') {
         const rsvpStartTime = window._filterStateBeforeRsvp?.timestamp || 0;
         const timeSinceRsvpStart = currentTime - rsvpStartTime;
         
-        // Block ALL replaceState calls during active RSVP (within last 3 seconds)
-        if (timeSinceRsvpStart < 3000) {
+        // Block ALL replaceState calls during active RSVP (within last 5 seconds)
+        if (timeSinceRsvpStart < 5000) {
           console.log('Blocking replaceState during active RSVP');
           
           // Create a custom event to notify about blocked navigation
@@ -115,15 +115,23 @@ if (typeof window !== 'undefined') {
       }, 50);
     }
   });
-}
-
-// Add listener to reset RSVP state if user navigates away
-if (typeof window !== 'undefined') {
+  
+  // Enhanced popstate listener
   window.addEventListener('popstate', () => {
+    // Always clear RSVP in-progress state when navigation happens
     if (window.rsvpInProgress) {
       console.log('Navigation detected during RSVP, resetting state');
       window.rsvpInProgress = false;
       document.body.removeAttribute('data-rsvp-in-progress');
+      
+      // Dispatch event to notify components about the interrupted RSVP
+      const interruptedEvent = new CustomEvent('rsvpInterrupted', {
+        detail: { 
+          timestamp: Date.now(),
+          previousState: window._filterStateBeforeRsvp
+        }
+      });
+      document.dispatchEvent(interruptedEvent);
     }
   });
 }

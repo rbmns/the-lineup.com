@@ -148,6 +148,23 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
       // Update filter state if event types are provided
       if (customEvent.detail?.eventTypes && Array.isArray(customEvent.detail.eventTypes)) {
         setSelectedEventTypes(customEvent.detail.eventTypes);
+        
+        // If categories selection exists, update it too
+        if (customEvent.detail.eventTypes.length > 0) {
+          // Find any matching categories
+          const matchingEventTypes = customEvent.detail.eventTypes.filter(
+            (type: string) => allEventTypes.includes(type)
+          );
+          
+          if (matchingEventTypes.length > 0) {
+            // This will trigger the useEffect that syncs categories with event types
+            matchingEventTypes.forEach(type => {
+              if (!selectedCategories.includes(type)) {
+                toggleCategory(type);
+              }
+            });
+          }
+        }
       }
     };
     
@@ -156,7 +173,7 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     return () => {
       document.removeEventListener('filtersRestored', handleFilterRestoration);
     };
-  }, [setSelectedEventTypes]);
+  }, [setSelectedEventTypes, allEventTypes, selectedCategories, toggleCategory]);
   
   // Use the filtered events hook
   const filteredEvents = useFilteredEvents({

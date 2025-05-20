@@ -6,10 +6,20 @@ interface Window {
     urlParams: string;
     scrollPosition: number;
     timestamp: number;
+    eventTypes?: string[];
+    pathname?: string;
   };
   _lastRestoredFilterState?: {
     urlParams: string;
     eventTypes: string[];
     timestamp: number;
+  };
+  _rsvpStateBackup?: {
+    filterState: any;
+    urlParams: string;
+    scrollPosition: number;
+    timestamp: number;
+    eventId?: string;
+    status?: string;
   };
 }
