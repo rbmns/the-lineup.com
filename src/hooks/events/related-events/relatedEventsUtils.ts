@@ -1,4 +1,3 @@
-
 import { Event } from '@/types';
 import { compareAsc, differenceInDays } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
@@ -62,8 +61,8 @@ export const calculateRelevanceScore = (
     score += matchingTags.length * weights.tags;
   }
   
-  // Creator match
-  if (eventA.creator_id && eventB.creator_id && eventA.creator_id === eventB.creator_id) {
+  // Creator match - Fix: using creator instead of creator_id
+  if (eventA.creator && eventB.creator && eventA.creator.id === eventB.creator.id) {
     score += weights.creator;
   }
   
