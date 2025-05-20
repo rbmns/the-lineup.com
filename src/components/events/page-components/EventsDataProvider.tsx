@@ -1,66 +1,68 @@
-
-import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
-import { useVenueData } from '@/hooks/events/useVenueData';
-import { useEventTypeData } from '@/hooks/events/useEventTypeData';
+import { useRsvpStateManager } from '@/hooks/events/useRsvpStateManager';
 import { useCategoryFilterSelection } from '@/hooks/events/useCategoryFilterSelection';
 import { useEventFilterState } from '@/hooks/events/useEventFilterState';
 import { useFilteredEvents } from '@/hooks/events/useFilteredEvents';
 import { useSimilarEventsHandler } from '@/hooks/events/useSimilarEventsHandler';
-import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp';
-import { useNavigationHistory } from '@/hooks/useNavigationHistory';
-import { Event } from '@/types';
+import { supabase } from '@/lib/supabase';
+import { useNavigate } from 'react-router-dom';
 
+// Props type for children as render prop function
 interface EventsDataProviderProps {
-  children: (props: {
-    events: Event[];
-    filteredEvents: Event[];
-    similarEvents: Event[];
-    eventsLoading: boolean;
-    isVenuesLoading: boolean;
-    isFilterLoading: boolean;
-    allEventTypes: string[];
-    selectedCategories: string[];
-    toggleCategory: (type: string) => void;
-    selectAll: () => void;
-    deselectAll: () => void;
-    isNoneSelected: boolean;
-    hasActiveFilters: boolean;
-    showAdvancedFilters: boolean;
-    toggleAdvancedFilters: () => void;
-    dateRange: any;
-    setDateRange: (range: any) => void;
-    selectedDateFilter: string;
-    setSelectedDateFilter: (filter: string) => void;
-    venues: Array<{ value: string, label: string }>;
-    selectedVenues: string[];
-    setSelectedVenues: (venues: string[]) => void;
-    locations: Array<{ value: string, label: string }>;
-    hasAdvancedFilters: boolean;
-    handleRemoveVenue: (venue: string) => void;
-    handleClearDateFilter: () => void;
-    resetFilters: () => void;
-    handleRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
-    showRsvpButtons: boolean;
-    loadingEventId?: string | null;
-  }) => React.ReactNode;
+  children: (props: EventsDataContextProps) => React.ReactNode;
+}
+
+// Context props that will be passed to children
+interface EventsDataContextProps {
+  filteredEvents: any[];
+  similarEvents: any[];
+  eventsLoading: boolean;
+  isVenuesLoading: boolean;
+  isFilterLoading: boolean;
+  allEventTypes: string[];
+  selectedCategories: string[];
+  toggleCategory: (type: string) => void;
+  selectAll: () => void;
+  deselectAll: () => void;
+  isNoneSelected: boolean;
+  hasActiveFilters: boolean;
+  showAdvancedFilters: boolean;
+  toggleAdvancedFilters: () => void;
+  dateRange: any;
+  setDateRange: (range: any) => void;
+  selectedDateFilter: string;
+  setSelectedDateFilter: (filter: string) => void;
+  venues: Array<{ value: string, label: string }>;
+  selectedVenues: string[];
+  setSelectedVenues: (venues: string[]) => void;
+  locations: Array<{ value: string, label: string }>;
+  hasAdvancedFilters: boolean;
+  handleRemoveVenue: (venue: string) => void;
+  handleClearDateFilter: () => void;
+  resetFilters: () => void;
+  handleRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
+  showRsvpButtons: boolean;
+  loadingEventId: string | null;
 }
 
 export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children }) => {
   const { user } = useAuth();
-  const location = useLocation();
+  const navigate = useNavigate();
   const { data: events = [], isLoading: eventsLoading } = useEvents(user?.id);
+  const [venues, setVenues] = useState<Array<{ value: string, label: string }>>([]);
+  const [locations, setLocations] = useState<Array<{ value: string, label: string }>>([]);
+  const [isVenuesLoading, setIsVenuesLoading] = useState(true);
   
-  // Get venue data
-  const { venues, locations, isVenuesLoading } = useVenueData();
+  // Use our new RSVP state manager
+  const { handleRsvp: stateManagerHandleRsvp, loadingEventId, isProcessing } = useRsvpStateManager(user?.id);
   
-  // Get event type data
-  const { allEventTypes } = useEventTypeData(events);
-  
-  // Navigation history for filter state persistence
-  const { saveFilterState, getLastFilterState } = useNavigationHistory();
+  // Get all unique event types from events
+  const allEventTypes = React.useMemo(() => {
+    const types = events.map(event => event.event_type).filter(Boolean);
+    return [...new Set(types)];
+  }, [events]);
   
   // Event filter state management
   const {
@@ -80,10 +82,10 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     resetFilters,
     handleRemoveEventType,
     handleRemoveVenue,
-    handleClearDateFilter
+    handleClearDateFilter,
   } = useEventFilterState();
   
-  // Filter events by selected event types - all selected by default
+  // Filter events by selected event types
   const {
     selectedCategories,
     toggleCategory,
@@ -94,65 +96,69 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
   
   // Keep the category filter and event type filter in sync
   useEffect(() => {
-    setSelectedEventTypes(selectedCategories);
-  }, [selectedCategories, setSelectedEventTypes]);
+    if (selectedCategories.length === 0 && allEventTypes.length > 0) {
+      // If no categories are selected but we have event types, select all by default
+      selectAll();
+    } else {
+      // Otherwise, sync the selected event types with the categories
+      setSelectedEventTypes(selectedCategories);
+    }
+  }, [selectedCategories, allEventTypes, selectAll, setSelectedEventTypes]);
   
-  // Restore filter state when navigating back from event detail
+  // Fetch all venues for the filter
   useEffect(() => {
-    if (location.state?.fromEventDetail && location.state?.restoreFilters) {
-      console.log("Restoring filter state from navigation:", location.state?.filterState);
-      
-      // Restore from location state if available
-      const filterState = location.state?.filterState || getLastFilterState();
-      
-      if (filterState) {
-        // Restore event type filters
-        if (filterState.eventTypes && Array.isArray(filterState.eventTypes)) {
-          setSelectedEventTypes(filterState.eventTypes);
+    const fetchVenues = async () => {
+      setIsVenuesLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('venues')
+          .select('id, name')
+          .order('name');
+          
+        if (error) throw error;
+        
+        if (data) {
+          const venueOptions = data.map(venue => ({
+            value: venue.id,
+            label: venue.name
+          }));
+          setVenues(venueOptions);
         }
         
-        // Restore venue filters
-        if (filterState.venues && Array.isArray(filterState.venues)) {
-          setSelectedVenues(filterState.venues);
-        }
-        
-        // Restore date filters
-        if (filterState.dateRange) {
-          setDateRange(filterState.dateRange);
-        }
-        
-        if (filterState.dateFilter) {
-          setSelectedDateFilter(filterState.dateFilter);
-        }
-        
-        console.log("Filter state restored successfully");
+        // Create sample locations
+        setLocations([
+          { value: 'zandvoort-area', label: 'Zandvoort Area' }
+        ]);
+      } catch (err) {
+        console.error('Error fetching venues:', err);
+      } finally {
+        setIsVenuesLoading(false);
       }
-    }
-  }, [location.state, setSelectedEventTypes, setSelectedVenues, setDateRange, setSelectedDateFilter, getLastFilterState]);
+    };
+
+    fetchVenues();
+  }, []);
   
-  // Save filter state whenever it changes
+  // Listen for filter restoration events
   useEffect(() => {
-    // Only save when on the events page and filters have been initialized
-    if (location.pathname === '/events') {
-      const filterState = {
-        eventTypes: selectedCategories,
-        venues: selectedVenues,
-        dateRange: dateRange,
-        dateFilter: selectedDateFilter
-      };
+    const handleFilterRestoration = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      console.log('Filter restoration event detected in EventsDataProvider:', customEvent.detail);
       
-      saveFilterState(filterState);
-    }
-  }, [
-    location.pathname, 
-    selectedCategories, 
-    selectedVenues, 
-    dateRange, 
-    selectedDateFilter, 
-    saveFilterState
-  ]);
+      // Update filter state if event types are provided
+      if (customEvent.detail?.eventTypes && Array.isArray(customEvent.detail.eventTypes)) {
+        setSelectedEventTypes(customEvent.detail.eventTypes);
+      }
+    };
+    
+    document.addEventListener('filtersRestored', handleFilterRestoration);
+    
+    return () => {
+      document.removeEventListener('filtersRestored', handleFilterRestoration);
+    };
+  }, [setSelectedEventTypes]);
   
-  // Filter events based on selected criteria
+  // Use the filtered events hook
   const filteredEvents = useFilteredEvents({
     events,
     selectedCategories,
@@ -161,9 +167,9 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     dateRange,
     selectedDateFilter
   });
-
-  // Get similar events if no results match our filters but filters are active
-  const { similarEvents = [] } = useSimilarEventsHandler({
+  
+  // Use similar events handler
+  const { similarEvents } = useSimilarEventsHandler({
     mainEvents: filteredEvents,
     hasActiveFilters,
     selectedEventTypes: selectedCategories,
@@ -171,15 +177,19 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     selectedDateFilter,
     userId: user?.id
   });
-  
-  // RSVP handling
-  const { 
-    handleRsvp: enhancedHandleRsvp, 
-    loadingEventId
-  } = useEnhancedRsvp(user?.id);
 
-  return children({
-    events,
+  // Handle RSVP with navigation to login if needed
+  const handleRsvpWithAuth = useCallback(async (eventId: string, status: 'Going' | 'Interested') => {
+    if (!user) {
+      navigate('/login');
+      return false;
+    }
+    
+    return stateManagerHandleRsvp(eventId, status);
+  }, [user, navigate, stateManagerHandleRsvp]);
+  
+  // Context props that will be passed to children
+  const contextProps: EventsDataContextProps = {
     filteredEvents,
     similarEvents,
     eventsLoading,
@@ -206,8 +216,10 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     handleRemoveVenue,
     handleClearDateFilter,
     resetFilters,
-    handleRsvp: user ? enhancedHandleRsvp : undefined,
+    handleRsvp: handleRsvpWithAuth,
     showRsvpButtons: !!user,
     loadingEventId
-  });
+  };
+  
+  return <>{children(contextProps)}</>;
 };

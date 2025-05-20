@@ -7,4 +7,9 @@ interface Window {
     scrollPosition: number;
     timestamp: number;
   };
+  _lastRestoredFilterState?: {
+    urlParams: string;
+    eventTypes: string[];
+    timestamp: number;
+  };
 }

@@ -1,184 +1,112 @@
 
-/* RSVP Button Animation Effects */
-@keyframes rsvp-success-pulse {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(102, 204, 102, 0); }
-  30% { transform: scale(1.02); box-shadow: 0 0 0 5px rgba(102, 204, 102, 0.3); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(102, 204, 102, 0); }
-}
-
-.rsvp-success-pulse {
-  animation: rsvp-success-pulse 0.3s ease-out;
-}
-
-/* Nature Theme RSVP Button Animations */
-@keyframes rsvp-going-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(64, 145, 108, 0); }
-  30% { box-shadow: 0 0 0 5px rgba(64, 145, 108, 0.3); }
-  100% { box-shadow: 0 0 0 0 rgba(64, 145, 108, 0); }
-}
-
-@keyframes rsvp-interested-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(0, 153, 204, 0); }
-  30% { box-shadow: 0 0 0 5px rgba(0, 153, 204, 0.3); }
-  100% { box-shadow: 0 0 0 0 rgba(0, 153, 204, 0); }
-}
-
-.rsvp-going-animation {
-  animation: rsvp-going-pulse 0.3s ease-out;
-}
-
-.rsvp-interested-animation {
-  animation: rsvp-interested-pulse 0.3s ease-out;
-}
-
-/* Button click feedback animation */
-@keyframes button-click {
-  0% { transform: scale(1); }
-  50% { transform: scale(0.97); }
-  100% { transform: scale(1); }
-}
-
-.button-click-animation {
-  animation: button-click 0.1s ease-out;
-}
-
-/* Enhanced page transition animations */
-@keyframes content-fade {
-  0% { opacity: 1; }
-  50% { opacity: 0.85; }
-  100% { opacity: 1; }
-}
-
-.event-content-refreshing {
-  animation: content-fade 0.8s ease-in-out;
-  position: relative;
-}
-
-.event-content-refreshing::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2));
-  pointer-events: none;
-  border-radius: 8px;
-  z-index: 1;
-  opacity: 0;
-  animation: content-highlight 0.8s ease-out;
-}
-
-@keyframes content-highlight {
-  0% { opacity: 0; }
-  50% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-/* Smoother transition animations for RSVP actions */
-@keyframes rsvp-fade-pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.7; }
-  100% { opacity: 1; }
-}
-
-.rsvp-section-animating {
-  animation: rsvp-fade-pulse 0.6s ease-in-out;
-  position: relative;
-}
-
-.rsvp-section-animating::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3));
-  pointer-events: none;
-  border-radius: 8px;
-  z-index: 1;
-}
-
-.rsvp-buttons-container {
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.rsvp-buttons-animating {
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  filter: blur(0.5px);
-}
-
-/* Page transition animations to reduce flickering */
-@keyframes content-refresh {
-  0% { opacity: 1; }
-  10% { opacity: 0.8; }
-  100% { opacity: 1; }
-}
-
-.content-refreshing {
-  animation: content-refresh 0.5s ease-out;
-}
-
-/* Loading indicator for transitions */
+/* RSVP transition indicators */
 .rsvp-transition-indicator {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 3px;
-  background-image: linear-gradient(to right, #10b981, #3b82f6);
-  transform: translateX(-100%);
+  background: linear-gradient(to right, #3b82f6, #10b981);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease-out;
+  z-index: 9999;
   opacity: 0;
-  transition: transform 0.4s ease-out, opacity 0.3s ease;
-  z-index: 100;
 }
 
-.rsvp-transition-active .rsvp-transition-indicator {
+.rsvp-transition-indicator.active {
   opacity: 1;
-  transform: translateX(0);
+  transform: scaleX(1);
 }
 
-/* Enhanced page overlay during RSVP operations */
+/* Body indicators */
+body[data-rsvp-in-progress="true"] {
+  position: relative;
+}
+
+/* Animation for RSVP buttons */
+.rsvp-button-animating {
+  position: relative;
+  overflow: hidden;
+}
+
+.rsvp-button-animating::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 1s infinite;
+  transform: skewX(-20deg);
+}
+
+/* Animation for content during RSVP */
+.event-content-refreshing {
+  position: relative;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+/* Mobile footer animations */
+.mobile-footer-animating {
+  position: relative;
+}
+
+.rsvp-going-animation {
+  position: relative;
+  overflow: hidden;
+}
+
+.rsvp-interested-animation {
+  position: relative;
+  overflow: hidden;
+}
+
+.rsvp-section-animating {
+  position: relative;
+}
+
+/* Shimmer animation */
+.rsvp-shimmer {
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Overlay for transition effects */
 .rsvp-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(2px);
-  z-index: 90;
-  opacity: 0;
+  background-color: rgba(255, 255, 255, 0);
   pointer-events: none;
-  transition: opacity 0.3s ease;
+  z-index: 999;
+  transition: background-color 0.3s ease;
 }
 
 .rsvp-overlay.active {
-  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Content shimmer animation */
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-.rsvp-shimmer::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.2) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  z-index: 1;
-  animation: shimmer 1.5s infinite;
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
 }

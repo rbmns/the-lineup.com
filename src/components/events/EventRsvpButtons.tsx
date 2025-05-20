@@ -39,7 +39,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   const isGoing = currentStatus === 'Going';
   const isInterested = currentStatus === 'Interested';
 
-  // Enhanced RSVP handler with complete event isolation
+  // Enhanced RSVP handler with improved state management
   const handleRsvp = async (status: 'Going' | 'Interested', e?: React.MouseEvent) => {
     // Comprehensive event isolation
     if (e) {
@@ -61,45 +61,19 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       setActiveButton(status);
       setInternalLoading(true);
       
-      // Store current filter state from URL and scroll position
-      const urlParams = window.location.search;
-      const scrollPos = window.scrollY;
-      
-      // Set global RSVP in progress flag if available
-      if (typeof window !== 'undefined') {
-        window.rsvpInProgress = true;
-      }
-      
       // Call the provided onRsvp handler
       const result = await onRsvp(status);
-      
-      // Attempt to restore state if needed
-      setTimeout(() => {
-        // Check if URL params changed during the RSVP operation
-        const currentParams = window.location.search;
-        if (window.location.pathname.includes('/events') && urlParams !== currentParams) {
-          console.log('Filter state changed during RSVP, attempting to restore');
-          window.history.replaceState({}, '', `${window.location.pathname}${urlParams}`);
-        }
-        
-        // Restore scroll position
-        window.scrollTo({ top: scrollPos, behavior: 'auto' });
-        
-        // Reset RSVP in progress flag
-        if (typeof window !== 'undefined') {
-          window.rsvpInProgress = false;
-        }
-      }, 50);
       
       return result;
     } catch (error) {
       console.error('Error in RSVP handler:', error);
+      return false;
     } finally {
-      setInternalLoading(false);
+      // Add slight delay for better UX
+      setTimeout(() => {
+        setInternalLoading(false);
+      }, 300);
     }
-    
-    // Return false to prevent any default behavior
-    return false;
   };
 
   // If minimal UI is requested, use the compact button version
