@@ -6,6 +6,7 @@ import { SecondaryResults } from '@/components/events/list-components/SecondaryR
 import { ResultsDivider } from '@/components/home/events-list/ResultsDivider';
 import { EventsSignupTeaser } from '@/components/events/list-components/EventsSignupTeaser';
 import { useAuth } from '@/contexts/AuthContext';
+import { RsvpHandler } from '@/components/events/rsvp/types';
 
 interface LazyEventsListProps {
   mainEvents: Event[];
@@ -32,13 +33,20 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
 }) => {
   const { isAuthenticated } = useAuth();
   
+  // Create a wrapper function that adapts onRsvp to the expected type
+  const handleRsvp = onRsvp 
+    ? async (eventId: string, status: 'Going' | 'Interested'): Promise<void> => {
+        await onRsvp(eventId, status);
+      }
+    : undefined;
+  
   return (
     <div className="space-y-8">
       {/* Primary Results */}
       <PrimaryResults 
         events={mainEvents}
         isLoading={isLoading}
-        onRsvp={onRsvp}
+        onRsvp={handleRsvp}
         showRsvpButtons={showRsvpButtons}
         loadingEventId={loadingEventId}
         hideCount={hideCount}
@@ -55,7 +63,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
           <SecondaryResults 
             events={relatedEvents}
             isLoading={isLoading}
-            onRsvp={onRsvp}
+            onRsvp={handleRsvp}
             showRsvpButtons={showRsvpButtons}
             loadingEventId={loadingEventId}
             compact={compact}
