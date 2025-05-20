@@ -23,6 +23,7 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = ({
   className
 }) => {
   const isAllSelected = selectedEventTypes.length === allEventTypes.length;
+  const isAnySelected = selectedEventTypes.length > 0;
   
   const handleAllClick = () => {
     if (isAllSelected) {

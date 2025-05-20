@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import EventCard from '@/components/EventCard';
 import { cn } from '@/lib/utils';
-import { EventGrid as ListEventGrid } from './list-components/EventGrid';
+import { EventGrid as InfiniteEventGrid } from './list-components/EventGrid';
 
 interface EventGridProps {
   events: Event[];
@@ -15,6 +16,8 @@ interface EventGridProps {
   hasMore?: boolean;
   isLoading?: boolean;
   onLoadMore?: () => void;
+  showSignupTeaser?: boolean;
+  eventsBeforeTeaserCount?: number;
 }
 
 export const EventGrid: React.FC<EventGridProps> = ({
@@ -27,13 +30,15 @@ export const EventGrid: React.FC<EventGridProps> = ({
   visibleCount,
   hasMore,
   isLoading,
-  onLoadMore
+  onLoadMore,
+  showSignupTeaser = false,
+  eventsBeforeTeaserCount = 6
 }) => {
-  // If we have the lazy loading props, use the ListEventGrid component
+  // If we have the lazy loading props, use the InfiniteEventGrid component
   if (visibleCount !== undefined && hasMore !== undefined && 
       isLoading !== undefined && onLoadMore !== undefined) {
     return (
-      <ListEventGrid
+      <InfiniteEventGrid
         events={events}
         visibleCount={visibleCount}
         hasMore={hasMore}
@@ -44,6 +49,8 @@ export const EventGrid: React.FC<EventGridProps> = ({
         className={className}
         style={style}
         loadingEventId={loadingEventId}
+        showSignupTeaser={showSignupTeaser}
+        eventsBeforeTeaserCount={eventsBeforeTeaserCount}
       />
     );
   }

@@ -1,16 +1,15 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Event } from '@/types';
 import { EventGrid } from '@/components/events/EventGrid';
 import { RelatedEventsSection } from '@/components/events/RelatedEventsSection';
 import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
-import { SkeletonEventCard } from '@/components/events/SkeletonEventCard';
-import { cn } from '@/lib/utils';
 import { EventsLoadingState } from '@/components/events/list-components/EventsLoadingState';
 import { EventsSignupTeaser } from '@/components/events/list-components/EventsSignupTeaser';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Button } from '@/components/ui/button';
+import { useScrollPositionHandler } from '@/hooks/events/useScrollPositionHandler';
+import { useEventListState } from '@/hooks/events/useEventListState';
 
 // Number of events to load initially
 const INITIAL_VISIBLE_COUNT = 9;
@@ -46,95 +45,85 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   
+  // Get event list state from custom hook
+  const {
+    similarEvents,
+    initialRenderRef,
+    scrollRestoredRef,
+    rsvpInProgressRef
+  } = useEventListState();
+  
   // State for handling lazy loading
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   
-  // Reset visible count when main events change
+  // Reset visible count when main events change due to filters
   useEffect(() => {
-    setVisibleCount(INITIAL_VISIBLE_COUNT);
-  }, [mainEvents]);
-
-  const skeletonCards = Array.from({ length: 6 }, (_, i) => <SkeletonEventCard key={`skeleton-${i}`} />);
-  const showNoResults = !isLoading && mainEvents.length === 0 && !hasActiveFilters;
-
-  const resetFilters = () => {
-    console.log("Reset filters clicked");
-  };
+    // Only reset if it's not the initial render and not during RSVP operations
+    if (!initialRenderRef.current && !rsvpInProgressRef.current) {
+      setVisibleCount(INITIAL_VISIBLE_COUNT);
+      console.log("Events changed, resetting visible count");
+    }
+  }, [mainEvents, initialRenderRef, rsvpInProgressRef]);
+  
+  // Handle scroll position for navigation and RSVP operations
+  useScrollPositionHandler(initialRenderRef, scrollRestoredRef, rsvpInProgressRef, mainEvents);
   
   // Determine if we have more events to load
   const hasMore = mainEvents.length > visibleCount;
   
   // Handler for loading more events
-  const handleLoadMore = () => {
-    setVisibleCount(prev => Math.min(prev + LOAD_MORE_INCREMENT, mainEvents.length));
-  };
+  const handleLoadMore = useCallback(() => {
+    if (isLoadingMore || !hasMore) return;
+    
+    setIsLoadingMore(true);
+    console.log("Loading more events...");
+    
+    // Use setTimeout to simulate a small delay for smoother UX
+    setTimeout(() => {
+      setVisibleCount(prev => Math.min(prev + LOAD_MORE_INCREMENT, mainEvents.length));
+      setIsLoadingMore(false);
+    }, 300);
+  }, [isLoadingMore, hasMore, mainEvents.length]);
 
-  // Check if we have no main events but have related/similar events to show
-  const showRelatedEventsMessage = !isLoading && mainEvents.length === 0 && hasActiveFilters && relatedEvents.length > 0;
-
+  // Prepare the events to display
+  const visibleEvents = mainEvents.slice(0, visibleCount);
+  
+  const showNoResults = !isLoading && mainEvents.length === 0;
+  const showRelatedEventsMessage = showNoResults && hasActiveFilters && relatedEvents.length > 0;
+  
   // Determine if we should show the signup teaser
   // Show only for non-authenticated users and when we have more than EVENTS_BEFORE_TEASER events
   const showSignupTeaser = !isAuthenticated && mainEvents.length > EVENTS_BEFORE_TEASER;
-
-  // Split events into before and after teaser
-  const eventsBeforeTeaser = mainEvents.slice(0, EVENTS_BEFORE_TEASER);
-  const eventsAfterTeaser = mainEvents.slice(EVENTS_BEFORE_TEASER, visibleCount);
-
+  
   return (
-    <div className={cn('space-y-6', compact ? 'compact-view' : '')}>
+    <div className="space-y-6">
       {isLoading && <EventsLoadingState />}
 
-      {showNoResults && (
-        <NoResultsFound resetFilters={resetFilters} />
+      {showNoResults && !isLoading && (
+        <NoResultsFound 
+          resetFilters={() => console.log("Reset filters clicked")} 
+          message={hasActiveFilters ? "No events found with the current filters." : "No events found."}
+        />
       )}
       
       {!isLoading && mainEvents.length > 0 && (
         <>
-          {/* Display events before the teaser */}
+          {/* All events displayed with unified grid */}
           <EventGrid
-            events={eventsBeforeTeaser}
-            visibleCount={Math.min(eventsBeforeTeaser.length, EVENTS_BEFORE_TEASER)}
-            hasMore={false}
-            isLoading={isLoading}
-            onLoadMore={() => {}}
+            events={visibleEvents}
+            visibleCount={visibleCount}
+            hasMore={hasMore}
+            isLoading={isLoadingMore}
+            onLoadMore={handleLoadMore}
             onRsvp={onRsvp}
             showRsvpButtons={showRsvpButtons}
             className="animate-fade-in"
             style={{ animationDuration: '150ms' }}
             loadingEventId={loadingEventId}
+            showSignupTeaser={showSignupTeaser}
+            eventsBeforeTeaserCount={EVENTS_BEFORE_TEASER}
           />
-
-          {/* Show signup teaser after the first set of events */}
-          {showSignupTeaser && <EventsSignupTeaser />}
-
-          {/* Display remaining events after the teaser if there are any */}
-          {eventsAfterTeaser.length > 0 && (
-            <EventGrid
-              events={eventsAfterTeaser}
-              visibleCount={eventsAfterTeaser.length}
-              hasMore={hasMore}
-              isLoading={isLoading}
-              onLoadMore={handleLoadMore}
-              onRsvp={onRsvp}
-              showRsvpButtons={showRsvpButtons}
-              className="animate-fade-in"
-              style={{ animationDuration: '150ms' }}
-              loadingEventId={loadingEventId}
-            />
-          )}
-          
-          {/* If there are more events to load and we're at the end of visible events */}
-          {hasMore && visibleCount >= EVENTS_BEFORE_TEASER + eventsAfterTeaser.length && (
-            <div className="flex justify-center pt-4 pb-8">
-              <Button 
-                onClick={handleLoadMore} 
-                variant="outline"
-                className="border-gray-300"
-              >
-                Load more events
-              </Button>
-            </div>
-          )}
         </>
       )}
 
@@ -151,13 +140,6 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
 
       {relatedEvents && relatedEvents.length > 0 && (
         <RelatedEventsSection events={relatedEvents} />
-      )}
-
-      {!isLoading && mainEvents.length === 0 && hasActiveFilters && relatedEvents.length === 0 && (
-        <NoResultsFound 
-          message="No events found with the current filters."
-          resetFilters={resetFilters}
-        />
       )}
     </div>
   );

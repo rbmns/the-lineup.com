@@ -1,18 +1,35 @@
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Event } from '@/types';
 
 export const useEventListState = () => {
+  // State for similar/related events
   const [similarEvents, setSimilarEvents] = useState<Event[]>([]);
-  const initialRenderRef = useRef<boolean>(true);
+  
+  // Refs to track render and scroll state
+  const initialRenderRef = useRef<boolean>(false);
   const scrollRestoredRef = useRef<boolean>(false);
   const rsvpInProgressRef = useRef<boolean>(false);
+  
+  // Function to mark RSVP as in progress (to prevent scroll position resets)
+  const setRsvpInProgress = useCallback((inProgress: boolean) => {
+    rsvpInProgressRef.current = inProgress;
+    console.log(`RSVP in progress: ${inProgress}`);
+  }, []);
+  
+  // Function to reset state for navigation
+  const resetState = useCallback(() => {
+    initialRenderRef.current = false;
+    scrollRestoredRef.current = false;
+  }, []);
   
   return {
     similarEvents,
     setSimilarEvents,
     initialRenderRef,
     scrollRestoredRef,
-    rsvpInProgressRef
+    rsvpInProgressRef,
+    setRsvpInProgress,
+    resetState
   };
 };

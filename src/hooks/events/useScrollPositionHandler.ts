@@ -1,7 +1,9 @@
 
-import { useEffect, useState, RefObject } from 'react';
+import { useEffect, useRef, RefObject } from 'react';
 import { Event } from '@/types';
 import { useScrollPosition } from '@/hooks/useScrollPosition';
+
+const SCROLL_POSITION_KEY = 'eventsScrollPosition';
 
 export const useScrollPositionHandler = (
   initialRenderRef: RefObject<boolean>,
@@ -9,60 +11,88 @@ export const useScrollPositionHandler = (
   rsvpInProgressRef: RefObject<boolean>,
   events: Event[]
 ) => {
-  const { savePosition, restorePosition, savePositionAndState, restorePositionAndState } = useScrollPosition();
-  const [initialRender, setInitialRender] = useState(false);
-  const [scrollRestored, setScrollRestored] = useState(false);
+  const { savePosition, restorePosition } = useScrollPosition();
+  const isRestoringRef = useRef(false);
+  const lastEventsLengthRef = useRef(0);
+  const scrollTimeoutRef = useRef<number | null>(null);
 
-  // Restore scroll position after RSVP operations
+  // Effect for handling initial page load and scroll restoration
   useEffect(() => {
-    // Only run this effect once on initial render
-    if (!initialRender && !initialRenderRef.current) {
-      setInitialRender(true);
-      // We can't modify the ref directly, but we can work around it
-      // by using our local state
+    if (!initialRenderRef.current) {
+      initialRenderRef.current = true;
+      console.log("Initial render of events list");
       
       // Get position from sessionStorage
-      const storedPosition = sessionStorage.getItem('eventsScrollPosition');
+      const storedPosition = sessionStorage.getItem(SCROLL_POSITION_KEY);
       
-      if (storedPosition && !scrollRestored && !scrollRestoredRef.current) {
+      if (storedPosition && !scrollRestoredRef.current && !isRestoringRef.current) {
+        isRestoringRef.current = true;
+        
         // Restore position after data is loaded and components are rendered
-        setTimeout(() => {
+        const timeout = window.setTimeout(() => {
           try {
             const position = parseInt(storedPosition, 10);
-            restorePosition(position);
+            if (!isNaN(position) && position > 0) {
+              restorePosition(position);
+              console.log('Scroll position restored:', position);
+            }
             
-            // Mark scroll as restored to prevent duplicate restoration
-            setScrollRestored(true);
-            // We can't modify the ref directly
+            scrollRestoredRef.current = true;
+            isRestoringRef.current = false;
             
             // Clear the stored position
-            sessionStorage.removeItem('eventsScrollPosition');
-            
-            console.log('Scroll position restored:', position);
+            sessionStorage.removeItem(SCROLL_POSITION_KEY);
           } catch (error) {
             console.error('Error restoring scroll position:', error);
+            isRestoringRef.current = false;
           }
         }, 100);
+        
+        return () => {
+          if (timeout) clearTimeout(timeout);
+        };
       }
     }
     
-    // Save scroll position before unmount
+    return () => {};
+  }, [initialRenderRef, scrollRestoredRef, restorePosition]);
+  
+  // Effect for handling events list changes
+  useEffect(() => {
+    // Skip the first render and if RSVP is in progress
+    if (!initialRenderRef.current || rsvpInProgressRef.current) return;
+    
+    // If events length changed and it wasn't empty before, it's likely a filter change
+    if (lastEventsLengthRef.current > 0 && events.length !== lastEventsLengthRef.current) {
+      console.log('Events list changed, scrolling to top');
+      // Scroll to top with a small delay to ensure render is complete
+      if (scrollTimeoutRef.current) window.clearTimeout(scrollTimeoutRef.current);
+      
+      scrollTimeoutRef.current = window.setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }, 100) as unknown as number;
+    }
+    
+    lastEventsLengthRef.current = events.length;
+    
+    return () => {
+      if (scrollTimeoutRef.current) {
+        window.clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [events, initialRenderRef, rsvpInProgressRef]);
+  
+  // Save scroll position before unmount
+  useEffect(() => {
     return () => {
       // Don't save position during RSVP operations
       if (!rsvpInProgressRef.current && events.length > 0) {
         const position = savePosition();
-        sessionStorage.setItem('eventsScrollPosition', String(position));
-        console.log('Saved scroll position on unmount:', position);
+        if (position > 0) {
+          sessionStorage.setItem(SCROLL_POSITION_KEY, String(position));
+          console.log('Saved scroll position on unmount:', position);
+        }
       }
     };
-  }, [
-    initialRender,
-    initialRenderRef, 
-    scrollRestored,
-    scrollRestoredRef, 
-    rsvpInProgressRef, 
-    events, 
-    savePosition, 
-    restorePosition
-  ]);
+  }, [events, rsvpInProgressRef, savePosition]);
 };

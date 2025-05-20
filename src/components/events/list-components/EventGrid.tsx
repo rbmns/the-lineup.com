@@ -4,6 +4,7 @@ import { Event } from '@/types';
 import EventCard from '@/components/EventCard';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { EventsSignupTeaser } from '@/components/events/list-components/EventsSignupTeaser';
 
 interface EventGridProps {
   events: Event[];
@@ -16,6 +17,8 @@ interface EventGridProps {
   className?: string;
   style?: React.CSSProperties;
   loadingEventId?: string | null;
+  showSignupTeaser?: boolean;
+  eventsBeforeTeaserCount?: number;
 }
 
 export const EventGrid: React.FC<EventGridProps> = ({
@@ -28,22 +31,31 @@ export const EventGrid: React.FC<EventGridProps> = ({
   showRsvpButtons = true,
   className,
   style,
-  loadingEventId
+  loadingEventId,
+  showSignupTeaser = false,
+  eventsBeforeTeaserCount = 6
 }) => {
   const observerTarget = useRef<HTMLDivElement>(null);
-  const visibleEvents = events.slice(0, visibleCount);
+  
+  // Split events if teaser should be shown
+  const eventsBeforeTeaser = showSignupTeaser ? events.slice(0, eventsBeforeTeaserCount) : [];
+  const eventsAfterTeaser = showSignupTeaser ? events.slice(eventsBeforeTeaserCount) : [];
+  
+  // If no teaser, show all events
+  const eventsToDisplay = showSignupTeaser ? [] : events;
   
   // Set up intersection observer for lazy loading
   useEffect(() => {
-    if (!hasMore) return;
+    if (!hasMore || isLoading) return;
     
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting && !isLoading) {
+          console.log("Intersection observer triggered, loading more...");
           onLoadMore();
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.1, rootMargin: '100px' }
     );
     
     const currentTarget = observerTarget.current;
@@ -69,7 +81,6 @@ export const EventGrid: React.FC<EventGridProps> = ({
       const result = await onRsvp(eventId, status);
       console.log('EventGrid - RSVP result:', result);
       
-      // Make sure the event doesn't propagate further
       return result;
     } catch (error) {
       console.error('Error in EventGrid RSVP handler:', error);
@@ -77,30 +88,59 @@ export const EventGrid: React.FC<EventGridProps> = ({
     }
   };
 
+  // Render event card helper function
+  const renderEventCard = (event: Event) => (
+    <div key={event.id} className="h-full">
+      <EventCard 
+        key={event.id} 
+        event={event}
+        onRsvp={handleRsvp}
+        showRsvpButtons={showRsvpButtons}
+        className="h-full"
+        loadingEventId={loadingEventId}
+      />
+    </div>
+  );
+
   return (
-    <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8", className)} style={style}>
-      {visibleEvents.map((event) => (
-        <div key={event.id} className="h-full">
-          <EventCard 
-            key={event.id} 
-            event={event}
-            onRsvp={handleRsvp}
-            showRsvpButtons={showRsvpButtons}
-            className="h-full"
-            loadingEventId={loadingEventId}
-          />
-        </div>
-      ))}
+    <>
+      {/* Grid with proper layout */}
+      <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6", className)} style={style}>
+        {/* If using teaser, render events before teaser */}
+        {showSignupTeaser && eventsBeforeTeaser.map(renderEventCard)}
+        
+        {/* If not using teaser, render all events */}
+        {!showSignupTeaser && eventsToDisplay.map(renderEventCard)}
+      </div>
       
-      {/* Loading indicator */}
-      {hasMore && visibleEvents.length < events.length && (
-        <div 
-          ref={observerTarget}
-          className="flex justify-center py-8"
-        >
-          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+      {/* Signup Teaser */}
+      {showSignupTeaser && eventsBeforeTeaser.length > 0 && (
+        <div className="my-8">
+          <EventsSignupTeaser />
         </div>
       )}
-    </div>
+      
+      {/* Events after teaser if any */}
+      {showSignupTeaser && eventsAfterTeaser.length > 0 && (
+        <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6", className)}>
+          {eventsAfterTeaser.map(renderEventCard)}
+        </div>
+      )}
+      
+      {/* Loading indicator - only show if we have more events to load */}
+      {hasMore && (
+        <div 
+          ref={observerTarget}
+          className="flex justify-center py-6 my-4"
+          data-testid="load-more-trigger"
+        >
+          {isLoading ? (
+            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          ) : (
+            <div className="h-8 w-full" /> {/* Invisible element for intersection observer */}
+          )}
+        </div>
+      )}
+    </>
   );
 };
