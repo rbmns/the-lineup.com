@@ -15,6 +15,8 @@ interface SecondaryResultsProps {
   visibleCount?: number;
   hasMore?: boolean;
   onLoadMore?: () => void;
+  loadingEventId?: string | null;
+  compact?: boolean;
 }
 
 export const SecondaryResults: React.FC<SecondaryResultsProps> = ({
@@ -25,7 +27,9 @@ export const SecondaryResults: React.FC<SecondaryResultsProps> = ({
   showRsvpButtons = true,
   visibleCount: externalVisibleCount,
   hasMore: externalHasMore,
-  onLoadMore: externalOnLoadMore
+  onLoadMore: externalOnLoadMore,
+  loadingEventId,
+  compact
 }) => {
   const [internalVisibleCount, setInternalVisibleCount] = useState(EVENTS_PER_PAGE);
   const [internalHasMore, setInternalHasMore] = useState(true);
@@ -66,6 +70,8 @@ export const SecondaryResults: React.FC<SecondaryResultsProps> = ({
         onLoadMore={loadMore}
         onRsvp={onRsvp}
         showRsvpButtons={showRsvpButtons}
+        loadingEventId={loadingEventId}
+        compact={compact}
       />
     </div>
   );

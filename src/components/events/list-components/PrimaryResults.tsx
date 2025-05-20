@@ -15,6 +15,9 @@ interface PrimaryResultsProps {
   visibleCount?: number;
   hasMore?: boolean;
   onLoadMore?: () => void;
+  loadingEventId?: string | null;
+  hideCount?: boolean;
+  compact?: boolean;
 }
 
 export const PrimaryResults: React.FC<PrimaryResultsProps> = ({
@@ -25,7 +28,10 @@ export const PrimaryResults: React.FC<PrimaryResultsProps> = ({
   showRsvpButtons = true,
   visibleCount: externalVisibleCount,
   hasMore: externalHasMore,
-  onLoadMore: externalOnLoadMore
+  onLoadMore: externalOnLoadMore,
+  loadingEventId,
+  hideCount,
+  compact
 }) => {
   const [internalVisibleCount, setInternalVisibleCount] = useState(EVENTS_PER_PAGE);
   const [internalHasMore, setInternalHasMore] = useState(true);
@@ -79,7 +85,7 @@ export const PrimaryResults: React.FC<PrimaryResultsProps> = ({
 
   return (
     <div>
-      {searchQuery && events.length > 0 && (
+      {searchQuery && events.length > 0 && !hideCount && (
         <h3 className="text-lg font-medium text-gray-900 mb-6">
           {events.length} {events.length === 1 ? 'result' : 'results'}
           {searchQuery ? ` for "${searchQuery}"` : ''}
@@ -94,6 +100,8 @@ export const PrimaryResults: React.FC<PrimaryResultsProps> = ({
         onLoadMore={loadMore}
         onRsvp={onRsvp ? handleRsvp : undefined}
         showRsvpButtons={showRsvpButtons}
+        loadingEventId={loadingEventId}
+        compact={compact}
       />
     </div>
   );
