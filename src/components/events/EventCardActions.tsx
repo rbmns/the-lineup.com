@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { EventRsvpButtons } from './EventRsvpButtons';
 import { cn } from '@/lib/utils';
@@ -44,6 +45,11 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       console.log('EventCardActions - Handling RSVP for event:', eventId, status);
       setIsLoading(true);
       
+      // Store current scroll and URL state for recovery
+      const scrollPosition = window.scrollY;
+      const currentUrl = window.location.href;
+      const currentSearch = window.location.search;
+      
       // Set optimistic status update
       const newStatus = localRsvpStatus === status ? undefined : status;
       setLocalRsvpStatus(newStatus);
@@ -70,6 +76,21 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       if (!success) {
         setLocalRsvpStatus(currentRsvpStatus);
       }
+      
+      // Ensure we restore scroll position and URL state
+      setTimeout(() => {
+        if (scrollPosition > 0) {
+          window.scrollTo({ top: scrollPosition, behavior: 'auto' });
+        }
+        
+        // If URL has changed but we're still on the events page, restore filters
+        if (window.location.href !== currentUrl && window.location.pathname.includes('/events')) {
+          if (window.location.search !== currentSearch) {
+            history.replaceState({}, '', currentUrl);
+            console.log('Restored URL filters after RSVP');
+          }
+        }
+      }, 50);
       
       return success;
     } catch (error) {

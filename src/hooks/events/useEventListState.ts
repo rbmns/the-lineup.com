@@ -13,8 +13,15 @@ export const useEventListState = () => {
   
   // Function to mark RSVP as in progress (to prevent scroll position resets)
   const setRsvpInProgress = useCallback((inProgress: boolean) => {
-    rsvpInProgressRef.current = inProgress;
-    console.log(`RSVP in progress: ${inProgress}`);
+    if (rsvpInProgressRef.current !== inProgress) {
+      rsvpInProgressRef.current = inProgress;
+      console.log(`RSVP in progress: ${inProgress}`);
+      
+      // Also set global flag if available
+      if (window.rsvpInProgress !== undefined) {
+        window.rsvpInProgress = inProgress;
+      }
+    }
   }, []);
   
   // Function to reset state for navigation

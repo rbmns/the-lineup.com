@@ -1,118 +1,71 @@
 
-import { useCallback } from 'react';
-import { User } from '@supabase/supabase-js';
-import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, RefObject } from 'react';
 
-/**
- * A hook to handle RSVP actions with proper caching to maintain RSVP state across pages
- * while preserving filter state
- */
 export const useRsvpHandler = (
-  user: User | null | undefined,
-  handleRsvp: ((eventId: string, status: "Going" | "Interested") => Promise<boolean>) | undefined,
-  rsvpInProgressRef: React.MutableRefObject<boolean>
+  user: any | null | undefined,
+  rsvpFunction: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>,
+  rsvpInProgressRef: RefObject<boolean>
 ) => {
-  const queryClient = useQueryClient();
-  
+  // Helper to handle RSVP with proper flag management
   const handleEventRsvp = useCallback(async (
     eventId: string, 
-    status: "Going" | "Interested"
-  ): Promise<boolean | void> => {
-    if (!user || !handleRsvp) {
-      return false;
-    }
+    status: 'Going' | 'Interested'
+  ): Promise<boolean> => {
+    if (!user || !rsvpFunction) return false;
 
-    // Store current filter state and scroll position
-    const scrollPosition = window.scrollY;
-    const urlSearchParams = window.location.search;
+    // Store filter and scroll state
+    const currentUrl = window.location.href;
+    const currentScroll = window.scrollY;
+    const currentSearch = window.location.search;
     
-    // Get filter states from session storage if available
-    let storedCategoryFilters = null;
     try {
-      const categoryFiltersRaw = sessionStorage.getItem('event-category-filters');
-      if (categoryFiltersRaw) {
-        storedCategoryFilters = JSON.parse(categoryFiltersRaw);
-      }
-    } catch (e) {
-      console.error("Error reading stored category filters:", e);
-    }
-    
-    // Use event ID specific check to prevent cross-event interference
-    const eventRsvpKey = `rsvp-${eventId}`;
-    if ((window as any)[eventRsvpKey]) {
-      console.log(`RSVP request in progress for event: ${eventId}, please wait`);
-      return false;
-    }
-
-    try {
-      // Set event-specific lock
-      (window as any)[eventRsvpKey] = true;
-      rsvpInProgressRef.current = true;
-      
-      // Track start time for performance measurement
-      const startTime = performance.now();
-      const success = await handleRsvp(eventId, status);
-      const endTime = performance.now();
-      
-      console.log(`RSVP operation completed in ${endTime - startTime}ms`);
-      
-      if (success) {
-        // Instead of invalidating all queries, only invalidate the specific event
-        // This helps preserve filter state
-        console.log('Performing selective cache invalidation after successful RSVP');
-        queryClient.invalidateQueries({ queryKey: ['event', eventId] });
-        
-        // Don't invalidate these queries to preserve filter state
-        // queryClient.invalidateQueries({ queryKey: ['events'] });
-        // queryClient.invalidateQueries({ queryKey: ['filtered-events'] });
-        
-        // Give time for any React state updates to stabilize
-        setTimeout(() => {
-          // Restore scroll position
-          window.scrollTo({
-            top: scrollPosition,
-            behavior: 'auto'
-          });
-          
-          // If we're on the events page with filters, ensure the filters are preserved
-          if (window.location.pathname.includes('/events') && urlSearchParams) {
-            const currentParams = new URLSearchParams(window.location.search).toString();
-            const originalParams = new URLSearchParams(urlSearchParams).toString();
-            
-            if (currentParams !== originalParams) {
-              console.log("Restoring URL parameters:", originalParams);
-              // Use history.replaceState to avoid triggering navigation
-              window.history.replaceState(
-                {}, 
-                '', 
-                `${window.location.pathname}?${originalParams}`
-              );
-            }
-          }
-          
-          // If we had stored category filters, restore them
-          if (storedCategoryFilters && Array.isArray(storedCategoryFilters)) {
-            try {
-              sessionStorage.setItem('event-category-filters', JSON.stringify(storedCategoryFilters));
-            } catch (e) {
-              console.error("Error restoring category filters:", e);
-            }
-          }
-        }, 100);
+      // Set flag to prevent unwanted resets
+      if (rsvpInProgressRef) {
+        rsvpInProgressRef.current = true;
       }
       
-      return success;
+      console.log(`useRsvpHandler - Starting RSVP operation: ${eventId}, ${status}`);
+      console.log(`Current state - URL: ${currentUrl}, Scroll: ${currentScroll}px`);
+      
+      // Perform the RSVP action
+      const result = await rsvpFunction(eventId, status);
+      
+      // Add a delay to ensure UI updates complete before we check/restore state
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
+      // Check if we need to restore filter state
+      const urlChanged = currentSearch !== window.location.search;
+      if (urlChanged && window.location.pathname.includes('/events')) {
+        console.log('Filter state lost during RSVP, restoring');
+        window.history.replaceState({}, '', `${window.location.pathname}${currentSearch}`);
+      }
+      
+      // Check if we need to restore scroll position
+      const scrollChanged = Math.abs(currentScroll - window.scrollY) > 100;
+      if (scrollChanged) {
+        console.log(`Scroll position changed during RSVP, restoring to ${currentScroll}px`);
+        window.scrollTo({ top: currentScroll, behavior: 'auto' });
+      }
+      
+      return result;
     } catch (error) {
-      console.error('Error in RSVP handler:', error);
+      console.error("Error in RSVP handler:", error);
       return false;
     } finally {
-      // Small delay to prevent multiple rapid clicks
+      // Small delay before resetting flag to ensure all callbacks complete
       setTimeout(() => {
-        (window as any)[eventRsvpKey] = false;
-        rsvpInProgressRef.current = false;
-      }, 300);
+        if (rsvpInProgressRef) {
+          rsvpInProgressRef.current = false;
+          console.log('useRsvpHandler - Reset RSVP in progress flag');
+        }
+      }, 150);
     }
-  }, [user, handleRsvp, rsvpInProgressRef, queryClient]);
+  }, [user, rsvpFunction, rsvpInProgressRef]);
 
-  return { handleEventRsvp };
+  // Add utility to get current RSVP state
+  const isRsvpInProgress = useCallback(() => {
+    return rsvpInProgressRef ? rsvpInProgressRef.current : false;
+  }, [rsvpInProgressRef]);
+
+  return { handleEventRsvp, isRsvpInProgress };
 };

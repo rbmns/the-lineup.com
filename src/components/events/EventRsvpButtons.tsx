@@ -65,6 +65,11 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       const urlParams = window.location.search;
       const scrollPos = window.scrollY;
       
+      // Set global RSVP in progress flag if available
+      if (window.rsvpInProgress !== undefined) {
+        window.rsvpInProgress = true;
+      }
+      
       // Call the provided onRsvp handler
       const result = await onRsvp(status);
       
@@ -79,6 +84,11 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         
         // Restore scroll position
         window.scrollTo({ top: scrollPos, behavior: 'auto' });
+        
+        // Reset RSVP in progress flag
+        if (window.rsvpInProgress !== undefined) {
+          window.rsvpInProgress = false;
+        }
       }, 50);
       
       return result;

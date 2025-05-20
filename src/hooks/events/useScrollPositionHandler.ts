@@ -20,6 +20,30 @@ export const useScrollPositionHandler = (
   const localInitialRender = useRef(initialRenderRef.current);
   const localScrollRestored = useRef(scrollRestoredRef.current);
 
+  // Make the RSVP flag globally accessible for event handlers
+  useEffect(() => {
+    // Define the property on window if it doesn't exist
+    if (window.rsvpInProgress === undefined) {
+      Object.defineProperty(window, 'rsvpInProgress', {
+        get: () => rsvpInProgressRef.current,
+        set: (value) => {
+          if (rsvpInProgressRef.current !== value) {
+            console.log(`Setting RSVP in progress: ${value}`);
+            rsvpInProgressRef.current = value;
+          }
+        },
+        configurable: true
+      });
+    }
+    
+    return () => {
+      // Clean up by deleting the property when component unmounts
+      if (window.rsvpInProgress !== undefined) {
+        delete window.rsvpInProgress;
+      }
+    };
+  }, [rsvpInProgressRef]);
+
   // Effect for handling initial page load and scroll restoration
   useEffect(() => {
     if (!localInitialRender.current) {

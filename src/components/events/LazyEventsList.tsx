@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Event } from '@/types';
 import { EventGrid } from '@/components/events/EventGrid';
 import { RelatedEventsSection } from '@/components/events/RelatedEventsSection';
@@ -50,19 +50,53 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
     similarEvents,
     initialRenderRef,
     scrollRestoredRef,
-    rsvpInProgressRef
+    rsvpInProgressRef,
+    setRsvpInProgress
   } = useEventListState();
   
   // State for handling lazy loading
   const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const previousEventsRef = useRef<Event[]>([]);
+  const hasFilterChangeRef = useRef(false);
   
-  // Reset visible count when main events change due to filters
+  // Check if events changed due to filters vs RSVP
   useEffect(() => {
-    // Only reset if it's not the initial render and not during RSVP operations
-    if (!initialRenderRef.current && !rsvpInProgressRef.current) {
+    if (previousEventsRef.current.length > 0) {
+      // If length is different, likely a filter change
+      if (previousEventsRef.current.length !== mainEvents.length) {
+        hasFilterChangeRef.current = true;
+      } else {
+        // Check if the events are the same but with different RSVP status
+        const sameIdsWithRsvpChanges = mainEvents.every(event => {
+          const previousEvent = previousEventsRef.current.find(prev => prev.id === event.id);
+          return previousEvent && (
+            previousEvent.rsvp_status !== event.rsvp_status || 
+            Object.keys(previousEvent).every(key => 
+              key === 'rsvp_status' || previousEvent[key as keyof Event] === event[key as keyof Event]
+            )
+          );
+        });
+        
+        hasFilterChangeRef.current = !sameIdsWithRsvpChanges;
+      }
+    }
+    
+    previousEventsRef.current = [...mainEvents];
+  }, [mainEvents]);
+  
+  // Reset visible count when main events change due to filters (not RSVP)
+  useEffect(() => {
+    // Only reset if it's not the initial render, not during RSVP operations,
+    // and events have changed due to filter changes
+    if (
+      initialRenderRef.current && 
+      !rsvpInProgressRef.current && 
+      hasFilterChangeRef.current
+    ) {
+      console.log("Filter change detected, resetting visible count");
       setVisibleCount(INITIAL_VISIBLE_COUNT);
-      console.log("Events changed, resetting visible count");
+      hasFilterChangeRef.current = false;
     }
   }, [mainEvents, initialRenderRef, rsvpInProgressRef]);
   
@@ -85,6 +119,48 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
       setIsLoadingMore(false);
     }, 300);
   }, [isLoadingMore, hasMore, mainEvents.length]);
+
+  // Wrap RSVP handler to set the global RSVP flag
+  const handleRsvpWithFlag = async (eventId: string, status: 'Going' | 'Interested') => {
+    if (!onRsvp) return false;
+    
+    try {
+      // Set flag to prevent unwanted scroll/filter resets
+      setRsvpInProgress(true);
+      console.log(`LazyEventsList - Setting RSVP in progress flag: ${eventId}, ${status}`);
+      
+      // Store current URL and scroll position
+      const currentUrl = window.location.href;
+      const scrollPos = window.scrollY;
+      
+      // Call the actual RSVP handler
+      const result = await onRsvp(eventId, status);
+      
+      // Give a small delay before restoring state and resetting flag
+      setTimeout(() => {
+        // Restore scroll position
+        if (scrollPos > 0) {
+          console.log(`Restoring scroll position: ${scrollPos}px`);
+          window.scrollTo({ top: scrollPos, behavior: 'auto' });
+        }
+        
+        // Check if URL changed and restore if needed
+        if (window.location.href !== currentUrl && currentUrl.includes('/events')) {
+          console.log('URL changed, restoring original URL with filters');
+          window.history.replaceState({}, '', currentUrl);
+        }
+        
+        // Reset the flag
+        setRsvpInProgress(false);
+      }, 100);
+      
+      return result;
+    } catch (error) {
+      console.error('Error in LazyEventsList RSVP handler:', error);
+      setRsvpInProgress(false);
+      return false;
+    }
+  };
 
   // Prepare the events to display
   const visibleEvents = mainEvents.slice(0, visibleCount);
@@ -116,7 +192,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
             hasMore={hasMore}
             isLoading={isLoadingMore}
             onLoadMore={handleLoadMore}
-            onRsvp={onRsvp}
+            onRsvp={handleRsvpWithFlag}
             showRsvpButtons={showRsvpButtons}
             className="animate-fade-in"
             style={{ animationDuration: '150ms' }}
