@@ -118,7 +118,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
                 compact={compact}
                 onRsvp={onRsvp}
                 showRsvpButtons={showRsvpButtons}
-                isRsvpLoading={loadingEventId === event.id}
+                loadingEventId={loadingEventId}
               />
             ))}
           </div>
@@ -140,7 +140,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
                 compact={compact}
                 onRsvp={onRsvp}
                 showRsvpButtons={showRsvpButtons}
-                isRsvpLoading={loadingEventId === event.id}
+                loadingEventId={loadingEventId}
               />
             ))}
           </div>
