@@ -1,4 +1,3 @@
-
 import { NavigateFunction } from 'react-router-dom';
 import { Event } from '@/types';
 
@@ -112,4 +111,75 @@ export const updateUrlParameters = (
   window.history.replaceState({}, '', newUrl);
   
   return params.toString();
+};
+
+/**
+ * Navigate to a user profile with consistent URL parameters
+ * and state management for back navigation
+ */
+export const navigateToUserProfile = (
+  userId: string,
+  navigate: NavigateFunction,
+  friendshipStatus?: 'none' | 'pending' | 'accepted',
+  isCurrentUser: boolean = false
+) => {
+  if (!userId) {
+    console.error('Cannot navigate to profile: missing user ID');
+    return;
+  }
+  
+  try {
+    // Set the navigation timestamp for potential back navigation
+    const timestamp = Date.now();
+    
+    console.log(`Navigating to user profile: ${userId} (${friendshipStatus}) at ${timestamp}`);
+    
+    // Set a flag in sessionStorage to track navigation
+    sessionStorage.setItem('lastProfileNavigation', JSON.stringify({
+      userId,
+      timestamp,
+      fromUrl: window.location.href,
+      fromPath: window.location.pathname,
+      friendshipStatus
+    }));
+    
+    // Navigate with state information
+    navigate(`/users/${userId}`, {
+      state: {
+        fromDirectNavigation: true,
+        timestamp,
+        friendshipStatus,
+        previousPath: window.location.pathname
+      }
+    });
+  } catch (error) {
+    console.error('Profile navigation error:', error);
+    // Fallback direct navigation
+    navigate(`/users/${userId}`);
+  }
+};
+
+/**
+ * Safely navigate back, with fallback to a default path
+ * if no history is available
+ */
+export const safeGoBack = (
+  navigate: NavigateFunction,
+  defaultPath: string = '/events'
+) => {
+  try {
+    // Check if we have history to go back to
+    if (window.history.length > 2) {
+      console.log('Navigating back in history');
+      navigate(-1);
+    } else {
+      // Otherwise go to the default path
+      console.log(`No history available, navigating to default: ${defaultPath}`);
+      navigate(defaultPath);
+    }
+  } catch (error) {
+    console.error('Navigation error:', error);
+    // Fallback to default path on error
+    navigate(defaultPath);
+  }
 };
