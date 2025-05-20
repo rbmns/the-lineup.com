@@ -23,6 +23,7 @@ import Profile from './pages/Profile';
 import ProfileEdit from './pages/ProfileEdit';
 import ProfileSettings from './pages/ProfileSettings';
 import Friends from './pages/Friends';
+import Index from './pages/Index';
 
 function App() {
   return (
@@ -33,8 +34,11 @@ function App() {
             <Router>
               <div className="flex flex-col min-h-screen bg-background">
                 <Routes>
+                  {/* Add explicit route for the index page */}
+                  <Route path="/" element={<Index />} />
+                  
                   <Route element={<Layout />}>
-                    <Route path="/" element={<Home />} />
+                    <Route path="/home" element={<Home />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/events" element={<EventsPageRefactored />} />

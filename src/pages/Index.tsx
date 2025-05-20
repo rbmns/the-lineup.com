@@ -1,10 +1,21 @@
 
-import React from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
 const Index = () => {
-  // Simple redirect component using Navigate
+  const navigate = useNavigate();
+
+  // Use useEffect for navigation instead of Navigate component
+  useEffect(() => {
+    // Short timeout to allow any initial renders to complete
+    const redirectTimeout = setTimeout(() => {
+      navigate('/events', { replace: true });
+    }, 200);
+    
+    return () => clearTimeout(redirectTimeout);
+  }, [navigate]);
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <h1 className="text-4xl font-bold mb-6 tracking-tight">Welcome to Events</h1>
@@ -21,9 +32,6 @@ const Index = () => {
           </Button>
         </div>
       </div>
-      
-      {/* Use Navigate component for redirection instead of useEffect */}
-      <Navigate to="/events" replace />
     </div>
   );
 };

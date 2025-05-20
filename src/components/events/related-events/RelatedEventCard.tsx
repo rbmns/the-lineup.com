@@ -1,25 +1,22 @@
-
 import React, { useState } from 'react';
 import { Event } from '@/types';
 import EventCard from '@/components/EventCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { useOptimisticRsvp } from '@/hooks/event-rsvp/useOptimisticRsvp';
-import { useEventInteractions } from '@/hooks/events/useEventInteractions';
 import { formatInTimeZone } from 'date-fns-tz';
 import { AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
 
 interface RelatedEventCardProps {
   event: Event;
-  isSameType?: boolean;
+  onClick?: () => void;
 }
 
 export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({ 
   event,
-  isSameType = false
+  onClick
 }) => {
   const { user, isAuthenticated } = useAuth();
   const { handleRsvp, loadingEventId } = useOptimisticRsvp(user?.id);
-  const { handleEventClick } = useEventInteractions();
   const [localRsvpStatus, setLocalRsvpStatus] = useState<'Going' | 'Interested' | undefined>(event.rsvp_status);
   
   // Format event date and time according to requirements
@@ -124,7 +121,7 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({
         showRsvpButtons={isAuthenticated}
         compact={true}
         className="h-full border hover:shadow-md transition-all duration-300"
-        onClick={() => handleEventClick(event)}
+        onClick={onClick || undefined}
         onRsvp={isAuthenticated ? handleRsvpAction : undefined}
         loadingEventId={loadingEventId}
       />
