@@ -1,5 +1,4 @@
-
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
 import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp';
@@ -49,18 +48,36 @@ export const useEventsPageData = () => {
     selectAll,
     deselectAll,
     isNoneSelected
-  } = useCategoryFilterSelection(allEventTypes);
+  } = useCategoryFilterSelection(allEventTypes, selectedEventTypes);
   
-  // Keep the category filter and event type filter in sync
-  useEffect(() => {
-    if (selectedCategories.length === 0 && allEventTypes.length > 0) {
-      // If no categories are selected but we have event types, select all by default
-      selectAll();
-    } else {
-      // Otherwise, sync the selected event types with the categories
+  // Keep the category filter and event type filter in sync with a debounce
+  // to prevent infinite loops
+  const syncFilters = useCallback(() => {
+    // Only sync if the arrays are actually different to prevent loops
+    if (
+      selectedCategories.length !== selectedEventTypes.length ||
+      selectedCategories.some(category => !selectedEventTypes.includes(category))
+    ) {
       setSelectedEventTypes(selectedCategories);
     }
-  }, [selectedCategories, allEventTypes, selectAll, setSelectedEventTypes]);
+  }, [selectedCategories, selectedEventTypes, setSelectedEventTypes]);
+  
+  // Use effect with debounce to prevent rapid re-renders
+  useEffect(() => {
+    // Sync with a small delay to avoid render loops
+    const timer = setTimeout(() => {
+      syncFilters();
+    }, 50);
+    
+    return () => clearTimeout(timer);
+  }, [selectedCategories, syncFilters]);
+  
+  // Initialize with all event types selected when they become available
+  useEffect(() => {
+    if (selectedCategories.length === 0 && allEventTypes.length > 0) {
+      selectAll();
+    }
+  }, [allEventTypes, selectedCategories.length, selectAll]);
   
   // Fetch all venues for the filter
   useEffect(() => {
@@ -82,7 +99,7 @@ export const useEventsPageData = () => {
           setVenues(venueOptions);
         }
         
-        // Create sample locations for the design (now just fixed to "Zandvoort Area")
+        // Create sample locations for the design
         setLocations([
           { value: 'zandvoort-area', label: 'Zandvoort Area' }
         ]);
@@ -106,9 +123,6 @@ export const useEventsPageData = () => {
     selectedDateFilter
   });
 
-  // Update events count for display
-  const eventsCount = filteredEvents.length;
-  
   const { 
     handleRsvp: enhancedHandleRsvp, 
     loadingEventId
@@ -145,7 +159,6 @@ export const useEventsPageData = () => {
     handleRemoveEventType,
     handleRemoveVenue,
     handleClearDateFilter,
-    eventsCount,
     enhancedHandleRsvp,
     loadingEventId
   };

@@ -35,6 +35,7 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = memo(({
     }
   };
 
+  // Use memo to prevent unnecessary recreations of this function
   const handleToggleEventType = React.useCallback((eventType: string) => {
     onToggleEventType(eventType);
   }, [onToggleEventType]);

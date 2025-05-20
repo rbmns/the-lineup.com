@@ -1,67 +1,53 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 export const useCategoryFilterSelection = (
   allEventTypes: string[], 
-  externalSelectedTypes?: string[]
+  externalSelectedTypes: string[] = []
 ) => {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(() => {
-    // Use external types if provided
-    if (externalSelectedTypes && externalSelectedTypes.length > 0) {
-      console.log('Using external selected types:', externalSelectedTypes);
-      return externalSelectedTypes;
-    }
-    
-    // Default to all event types if available
-    if (allEventTypes.length > 0) {
-      console.log('Selecting all event types by default:', allEventTypes);
-      return [...allEventTypes];
-    }
-    
-    return [];
-  });
+  // Internal state to track selected categories
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(externalSelectedTypes);
   
-  // Update selectedCategories when externalSelectedTypes changes
+  // Sync with external selected types when they change
   useEffect(() => {
-    if (externalSelectedTypes && externalSelectedTypes.length > 0) {
-      // Only update if there's an actual difference to prevent loops
-      const sameSelection = 
-        externalSelectedTypes.length === selectedCategories.length && 
-        externalSelectedTypes.every(type => selectedCategories.includes(type));
-      
-      if (!sameSelection) {
-        console.log('Updating selected categories from external types:', externalSelectedTypes);
-        setSelectedCategories(externalSelectedTypes);
-      }
-    } else if (allEventTypes.length > 0 && selectedCategories.length === 0) {
-      // If we have event types but none selected, select all by default
-      console.log('No categories selected, selecting all event types');
-      setSelectedCategories([...allEventTypes]);
+    // Only update if the arrays are actually different to prevent loops
+    if (
+      externalSelectedTypes.length !== selectedCategories.length || 
+      externalSelectedTypes.some(type => !selectedCategories.includes(type))
+    ) {
+      setSelectedCategories(externalSelectedTypes);
     }
-  }, [externalSelectedTypes, allEventTypes, selectedCategories]);
-  
-  const toggleCategory = (type: string) => {
+  }, [externalSelectedTypes]);
+
+  // Select all event types
+  const selectAll = useCallback(() => {
+    setSelectedCategories([...allEventTypes]);
+  }, [allEventTypes]);
+
+  // Deselect all event types (empty array)
+  const deselectAll = useCallback(() => {
+    setSelectedCategories([]);
+  }, []);
+
+  // Toggle a specific event type
+  const toggleCategory = useCallback((type: string) => {
     setSelectedCategories(prev => {
       if (prev.includes(type)) {
+        // If removing the last category, select all instead
+        if (prev.length === 1) {
+          return [...allEventTypes];
+        }
+        // Otherwise, remove this category
         return prev.filter(t => t !== type);
       } else {
+        // Add the category
         return [...prev, type];
       }
     });
-  };
-  
-  const selectAll = () => {
-    if (allEventTypes.length > 0) {
-      setSelectedCategories([...allEventTypes]);
-    }
-  };
-  
-  const deselectAll = () => {
-    setSelectedCategories([]);
-  };
-  
+  }, [allEventTypes]);
+
+  // Check if no categories are selected
   const isNoneSelected = selectedCategories.length === 0;
-  
+
   return {
     selectedCategories,
     toggleCategory,
