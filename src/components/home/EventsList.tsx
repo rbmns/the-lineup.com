@@ -42,15 +42,6 @@ export const EventsList: React.FC<EventsListProps> = ({
   const primaryObserverTarget = useRef<HTMLDivElement>(null);
   const secondaryObserverTarget = useRef<HTMLDivElement>(null);
   
-  if (isLoading || isSearching) {
-    return (
-      <div className="flex justify-center items-center py-16">
-        <Loader2 className="h-8 w-8 animate-spin text-purple" />
-        <span className="ml-2 text-gray-500">Loading events...</span>
-      </div>
-    );
-  }
-  
   // Always show events - either the matched ones, similar ones, or a combination
   // This ensures we never show "no results"
   let eventsToDisplay = [];
@@ -90,11 +81,14 @@ export const EventsList: React.FC<EventsListProps> = ({
     setVisibleSecondaryCount(EVENTS_PER_PAGE);
   }, [searchQuery]);
   
-  // Intersection Observer for primary results
+  // Intersection Observer for primary results - moved outside of any conditional
   useEffect(() => {
+    // Only set up the observer if there are more events to load
+    if (!hasMore || isLoading) return;
+    
     const observer = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
+        if (entries[0].isIntersecting) {
           loadMorePrimary();
         }
       },
@@ -111,13 +105,16 @@ export const EventsList: React.FC<EventsListProps> = ({
         observer.unobserve(currentTarget);
       }
     };
-  }, [hasMore, isLoading]);
+  }, [hasMore, isLoading]); // Removed any dependencies that could change conditionally
   
-  // Intersection Observer for secondary results
+  // Intersection Observer for secondary results - moved outside of any conditional
   useEffect(() => {
+    // Only set up the observer if there are more events to load
+    if (!hasMoreSecondary || isLoading) return;
+    
     const observer = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting && hasMoreSecondary && !isLoading) {
+        if (entries[0].isIntersecting) {
           loadMoreSecondary();
         }
       },
@@ -134,7 +131,7 @@ export const EventsList: React.FC<EventsListProps> = ({
         observer.unobserve(currentTarget);
       }
     };
-  }, [hasMoreSecondary, isLoading]);
+  }, [hasMoreSecondary, isLoading]); // Removed any dependencies that could change conditionally
   
   const loadMorePrimary = () => {
     setVisibleEventsCount(prev => prev + EVENTS_PER_PAGE);
@@ -153,6 +150,16 @@ export const EventsList: React.FC<EventsListProps> = ({
       console.error('Error in EventsList RSVP handler:', error);
     }
   };
+  
+  // Loading state
+  if (isLoading || isSearching) {
+    return (
+      <div className="flex justify-center items-center py-16">
+        <Loader2 className="h-8 w-8 animate-spin text-purple" />
+        <span className="ml-2 text-gray-500">Loading events...</span>
+      </div>
+    );
+  }
   
   return (
     <div id="search-results" className="space-y-12">
