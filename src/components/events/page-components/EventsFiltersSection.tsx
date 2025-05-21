@@ -44,7 +44,7 @@ export const EventsFiltersSection: React.FC<EventsFiltersSectionProps> = ({
   venues,
   selectedVenues,
   setSelectedVenues,
-  locations, // We'll keep this in the props but not pass it to AdvancedFiltersPanel
+  locations,
   hasAdvancedFilters,
   handleRemoveVenue,
   handleClearDateFilter,
@@ -85,6 +85,7 @@ export const EventsFiltersSection: React.FC<EventsFiltersSectionProps> = ({
           venues={venues}
           selectedVenues={selectedVenues}
           onVenueChange={setSelectedVenues}
+          locations={locations}
           className="mb-6"
         />
       )}
