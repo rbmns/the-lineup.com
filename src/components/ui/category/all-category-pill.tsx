@@ -19,12 +19,12 @@ export const AllCategoryPill: React.FC<AllCategoryPillProps> = ({
   label,
   isSelectAll = true
 }) => {
-  // Base styles with more distinct active/inactive states
+  // Base styles with more subtle text-only appearance
   const baseClasses = 'rounded-md font-medium transition-colors cursor-pointer border';
   
-  // Use a darker, more prominent active state
+  // Use colors from design-system.css for active state
   const stateClasses = active 
-    ? 'bg-twilight text-white hover:bg-night shadow-sm border-transparent font-semibold'
+    ? 'bg-twilight text-white hover:bg-night shadow-sm border-transparent'
     : 'bg-white text-gray-600 hover:bg-gray-50 border-gray-200';
   
   // Size classes
@@ -36,8 +36,7 @@ export const AllCategoryPill: React.FC<AllCategoryPillProps> = ({
   };
 
   // Dynamic label based on active state and isSelectAll prop
-  // When none selected or all selected, show "All" instead of "Select all"
-  const displayLabel = label || (active ? "All" : isSelectAll ? "Select all" : "Deselect all");
+  const displayLabel = label || (isSelectAll ? "Select all" : "Deselect all");
 
   return (
     <div

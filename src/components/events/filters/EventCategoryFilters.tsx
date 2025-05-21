@@ -41,9 +41,10 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = memo(({
   return (
     <div className={cn("flex gap-2 flex-wrap", className)}>
       <AllCategoryPill
-        active={isAllSelected || isNoneSelected}
+        active={isAllSelected}
         onClick={handleAllClick}
         size="default"
+        label={isNoneSelected ? "Select all" : isAllSelected ? "Deselect all" : "All"}
         className="text-sm"
       />
       

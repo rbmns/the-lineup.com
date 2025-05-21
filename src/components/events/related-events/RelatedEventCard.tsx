@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { Event } from '@/types';
 import EventCard from '@/components/EventCard';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { useOptimisticRsvp } from '@/hooks/event-rsvp/useOptimisticRsvp';
 import { formatInTimeZone } from 'date-fns-tz';
-import { AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
+import { AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
 
 interface RelatedEventCardProps {
   event: Event;
@@ -111,13 +110,6 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({
     rsvp_status: localRsvpStatus // Use the local state for RSVP status
   };
 
-  // Handle click handler to wrap the onClick prop
-  const handleEventClick = () => {
-    if (onClick) {
-      onClick();
-    }
-  };
-
   return (
     <div 
       className="h-full transition-all duration-300 hover:scale-[1.01] relative" 
@@ -129,7 +121,7 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({
         showRsvpButtons={isAuthenticated}
         compact={true}
         className="h-full border hover:shadow-md transition-all duration-300"
-        onClick={handleEventClick}
+        onClick={onClick || undefined}
         onRsvp={isAuthenticated ? handleRsvpAction : undefined}
         loadingEventId={loadingEventId}
       />
