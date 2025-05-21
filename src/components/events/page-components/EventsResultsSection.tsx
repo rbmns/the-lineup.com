@@ -34,7 +34,7 @@ export const EventsResultsSection: React.FC<EventsResultsSectionProps> = ({
   const eventsCount = filteredEvents.length;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 mt-12">
       {/* Hide the EventCountDisplay */}
       <EventCountDisplay count={eventsCount} hidden={true} />
       
@@ -43,6 +43,11 @@ export const EventsResultsSection: React.FC<EventsResultsSectionProps> = ({
         <NoResultsFound 
           resetFilters={selectAll}
           message="No event types selected. Select at least one event type to see events."
+        />
+      ) : filteredEvents.length === 0 && hasActiveFilters ? (
+        <NoResultsFound 
+          resetFilters={selectAll}
+          message="No exact results found for your filters."
         />
       ) : (
         <LazyEventsList 

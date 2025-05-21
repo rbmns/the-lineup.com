@@ -61,7 +61,7 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1.5">
         {quickFilters.map((filter) => (
           <Button
             key={filter}
@@ -69,9 +69,9 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
             size="sm"
             onClick={() => handleQuickFilterClick(filter)}
             className={cn(
-              "capitalize",
-              selectedDateFilter === filter ? "bg-[#9b87f5] hover:bg-[#7E69AB]" : "",
-              selectedDateFilter === filter ? "border-[#9b87f5]" : ""
+              "capitalize text-xs px-2.5 py-1 h-7",
+              selectedDateFilter === filter ? "bg-[#9b87f5] hover:bg-[#7E69AB]" : "bg-transparent",
+              selectedDateFilter === filter ? "border-[#9b87f5]" : "border-gray-200"
             )}
           >
             {filter}

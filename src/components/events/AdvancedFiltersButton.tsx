@@ -34,24 +34,15 @@ export const AdvancedFiltersButton: React.FC<AdvancedFiltersButtonProps> = ({
           size="sm"
           onClick={() => onOpen && onOpen(!isOpen)}
           className={cn(
-            "flex items-center gap-2 transition-all duration-200 shadow-sm w-full sm:w-auto justify-between sm:justify-start", 
+            "flex items-center justify-center w-9 h-9 p-0 transition-all duration-200 shadow-sm", 
             hasActiveFilters ? "bg-slate-800 hover:bg-slate-900 text-white" : 
             "border-slate-300 text-slate-700 hover:bg-slate-50"
           )}
         >
-          <span className="flex items-center gap-1">
-            <SlidersHorizontal className="h-4 w-4" />
-            <span className="whitespace-nowrap">Advanced Filters</span>
-          </span>
-          {isOpen ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
+          <SlidersHorizontal className="h-4 w-4" />
+          <span className="sr-only">Advanced Filters</span>
           {hasActiveFilters && (
-            <span className="bg-white text-slate-800 text-xs px-1.5 py-0.5 rounded-full ml-1">
-              Active
-            </span>
+            <span className="absolute top-0 right-0 w-2 h-2 bg-[#9b87f5] rounded-full transform translate-x-1/2 -translate-y-1/3"></span>
           )}
         </Button>
         {isOpen && (
@@ -70,18 +61,16 @@ export const AdvancedFiltersButton: React.FC<AdvancedFiltersButtonProps> = ({
           variant={hasActiveFilters ? "default" : "outline"} 
           size="sm"
           className={cn(
-            "flex items-center gap-2 shadow-sm transition-all duration-200 w-full sm:w-auto", 
+            "flex items-center justify-center w-9 h-9 p-0 shadow-sm transition-all duration-200", 
             hasActiveFilters ? "bg-slate-800 hover:bg-slate-900 text-white" : 
             "border-slate-300 text-slate-700 hover:bg-slate-50",
             className
           )}
         >
           <SlidersHorizontal className="h-4 w-4" />
-          <span className="whitespace-nowrap">Advanced Filters</span>
+          <span className="sr-only">Advanced Filters</span>
           {hasActiveFilters && (
-            <span className="bg-white text-slate-800 text-xs px-1.5 py-0.5 rounded-full ml-1">
-              Active
-            </span>
+            <span className="absolute top-0 right-0 w-2 h-2 bg-[#9b87f5] rounded-full transform translate-x-1/2 -translate-y-1/3"></span>
           )}
         </Button>
       </PopoverTrigger>

@@ -16,9 +16,9 @@ export const EventsEmptyState: React.FC<EventsEmptyStateProps> = ({
   hasActiveFilters = false,
   title = hasActiveFilters ? "No events match your filters" : "No events found",
   message = hasActiveFilters 
-    ? "Try adjusting your search filters to find more events." 
+    ? "No exact results found for your filters." 
     : "There are no events to display at the moment.",
-  actionLabel = "Reset filters",
+  actionLabel = "Show all events instead",
 }) => {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
@@ -30,7 +30,7 @@ export const EventsEmptyState: React.FC<EventsEmptyStateProps> = ({
       <p className="text-gray-600 max-w-md mb-6">{message}</p>
       
       {hasActiveFilters && onResetFilters && (
-        <Button onClick={onResetFilters} variant="default">
+        <Button onClick={onResetFilters} variant="default" className="bg-[#9b87f5] hover:bg-[#7E69AB]">
           {actionLabel}
         </Button>
       )}

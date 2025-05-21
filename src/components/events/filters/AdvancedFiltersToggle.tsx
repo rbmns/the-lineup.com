@@ -17,14 +17,14 @@ export const AdvancedFiltersToggle: React.FC<AdvancedFiltersToggleProps> = ({
       variant="outline"
       size="sm"
       onClick={toggleAdvancedFilters}
-      className="flex items-center gap-2 text-sm"
+      className="flex items-center justify-center w-9 h-9 p-0"
     >
       <Filter className="h-4 w-4" />
-      Advanced Filters
+      <span className="sr-only">Advanced Filters</span>
       {showAdvancedFilters ? (
-        <ChevronUp className="h-4 w-4" />
+        <span className="sr-only">Hide filters</span>
       ) : (
-        <ChevronDown className="h-4 w-4" />
+        <span className="sr-only">Show filters</span>
       )}
     </Button>
   );

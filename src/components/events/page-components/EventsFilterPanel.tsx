@@ -61,7 +61,7 @@ export const EventsFilterPanel: React.FC<EventsFilterPanelProps> = ({
           selectedVenues={selectedVenues}
           onVenueChange={setSelectedVenues}
           locations={locations}
-          className="mb-6"
+          className="mb-8"
         />
       )}
       
@@ -75,6 +75,7 @@ export const EventsFilterPanel: React.FC<EventsFilterPanelProps> = ({
         handleRemoveVenue={handleRemoveVenue}
         handleClearDateFilter={handleClearDateFilter}
         resetFilters={resetFilters}
+        className="mb-8"
       />
     </>
   );
