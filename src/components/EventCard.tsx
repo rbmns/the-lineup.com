@@ -1,15 +1,13 @@
 
 import React from 'react';
 import { Event } from '@/types';
-import { formatEventDate } from '@/lib/dates';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, MapPin, Clock, Star } from 'lucide-react';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { cn } from '@/lib/utils';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/hooks/useAuth';
 
 interface EventCardProps {
   event: Event;
@@ -18,6 +16,7 @@ interface EventCardProps {
   compact?: boolean;
   className?: string;
   loadingEventId?: string | null;
+  onClick?: (event: Event) => void;
 }
 
 const EventCard = ({
@@ -26,7 +25,8 @@ const EventCard = ({
   showRsvpButtons = true,
   compact = false,
   className,
-  loadingEventId
+  loadingEventId,
+  onClick
 }: EventCardProps) => {
   const { isAuthenticated } = useAuth();
   const isLoading = loadingEventId === event.id;
@@ -46,6 +46,29 @@ const EventCard = ({
     return `${description.substring(0, maxLength)}...`;
   };
   
+  const formatEventDate = (startDate?: string | null, endDate?: string | null) => {
+    if (!startDate) return '';
+    
+    const start = new Date(startDate);
+    const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+    const formattedStart = start.toLocaleDateString('en-US', options);
+    
+    if (endDate) {
+      const end = new Date(endDate);
+      const formattedEnd = end.toLocaleDateString('en-US', options);
+      return `${formattedStart} - ${formattedEnd}`;
+    }
+    
+    return formattedStart;
+  };
+
+  // Handler for card click
+  const handleCardClick = () => {
+    if (onClick && event) {
+      onClick(event);
+    }
+  };
+  
   return (
     <div className={cn(
       "border rounded-lg shadow-sm overflow-hidden flex flex-col bg-white h-full",
@@ -53,9 +76,9 @@ const EventCard = ({
     )}>
       <Link to={`/events/${event.id}`} className="block flex-shrink-0">
         <div className="relative w-full pt-[56.25%] bg-gray-100 overflow-hidden">
-          {event.image_url && (
+          {event.image_urls && event.image_urls.length > 0 && (
             <img 
-              src={event.image_url} 
+              src={event.image_urls[0]} 
               alt={event.title || 'Event'} 
               className="absolute top-0 left-0 w-full h-full object-cover transition-transform duration-300 hover:scale-105"
               loading="lazy"
@@ -88,8 +111,8 @@ const EventCard = ({
           </h3>
         </Link>
         
-        {!compact && event.short_description && (
-          <p className="text-sm text-gray-600">{truncateDescription(event.short_description)}</p>
+        {!compact && event.description && (
+          <p className="text-sm text-gray-600">{truncateDescription(event.description)}</p>
         )}
         
         <div className={cn(
@@ -98,7 +121,7 @@ const EventCard = ({
         )}>
           <div className="flex items-center text-gray-600">
             <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
-            <span className="text-sm truncate">{formatEventDate(event.start_date, event.end_date)}</span>
+            <span className="text-sm truncate">{formatEventDate(event.start_date)}</span>
           </div>
           
           {event.location && (
@@ -127,7 +150,15 @@ const EventCard = ({
               onClick={() => handleRsvp('Going')}
               disabled={isLoading}
             >
-              {isLoading ? <LoadingSpinner size="sm" /> : "Going"}
+              {isLoading ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Loading
+                </span>
+              ) : "Going"}
             </Button>
             
             <Button 
