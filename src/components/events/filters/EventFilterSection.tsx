@@ -74,7 +74,7 @@ export const EventFilterSection: React.FC<EventFilterSectionProps> = ({
   
   return (
     <div className="flex flex-col space-y-3 mb-6">
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2 md:gap-3">
         <span className="font-medium text-sm">Filter by:</span>
         
         <DropdownMenu open={showEventTypeFilter} onOpenChange={setShowEventTypeFilter}>
@@ -162,7 +162,7 @@ export const EventFilterSection: React.FC<EventFilterSectionProps> = ({
           
           {showAdvancedFilters && (
             <div className="absolute left-0 mt-2 w-[calc(100vw-40px)] max-w-3xl bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-50">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <h3 className="font-medium mb-2">Date Range</h3>
                   <DateRangeFilter
@@ -187,13 +187,6 @@ export const EventFilterSection: React.FC<EventFilterSectionProps> = ({
                         <ChevronDown className="h-4 w-4 text-gray-400" />
                       </div>
                     )}
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-medium mb-2">Location</h3>
-                  <div className="flex items-center space-x-2 p-2 border border-gray-200 rounded-md bg-gray-50">
-                    <span className="text-sm">Zandvoort Area</span>
-                    <span className="text-xs text-gray-500">(coming soon)</span>
                   </div>
                 </div>
               </div>
