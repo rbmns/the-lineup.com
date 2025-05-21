@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
@@ -24,6 +23,7 @@ import ProfileEdit from './pages/ProfileEdit';
 import ProfileSettings from './pages/ProfileSettings';
 import Friends from './pages/Friends';
 import Index from './pages/Index';
+import DesignSystem from './pages/DesignSystem';
 
 function App() {
   return (
@@ -50,6 +50,7 @@ function App() {
                     <Route path="/profile/settings" element={<ProfileSettings />} />
                     <Route path="/friends" element={<Friends />} />
                     <Route path="/admin" element={<Admin />} />
+                    <Route path="/design-system" element={<DesignSystem />} />
                     <Route path="*" element={<NotFound />} />
                   </Route>
                 </Routes>

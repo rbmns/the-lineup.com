@@ -36,7 +36,7 @@ export const AllCategoryPill: React.FC<AllCategoryPillProps> = ({
   };
 
   // Dynamic label based on active state and isSelectAll prop
-  const displayLabel = label || (isSelectAll ? "Select all" : "Deselect all");
+  const displayLabel = label || (isSelectAll ? "All" : "Deselect all");
 
   return (
     <div
