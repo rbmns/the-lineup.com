@@ -18,6 +18,7 @@ interface AdvancedFiltersPanelProps {
   venues: Array<{value: string, label: string}>;
   selectedVenues: string[];
   onVenueChange: (venues: string[]) => void;
+  locations?: Array<{value: string, label: string}>;
   className?: string;
 }
 
@@ -31,12 +32,13 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
   venues,
   selectedVenues,
   onVenueChange,
+  locations = [],
   className
 }) => {
   if (!isOpen) return null;
 
   return (
-    <div className={cn("border rounded-lg p-3 md:p-4 bg-white shadow-sm relative", className)}>
+    <div className={cn("border rounded-lg p-4 bg-white shadow-sm relative", className)}>
       {/* Close button */}
       <Button 
         variant="ghost" 
@@ -48,9 +50,9 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
         <span className="sr-only">Close advanced filters</span>
       </Button>
       
-      <h2 className="font-medium mb-4 text-base md:text-lg">Advanced Filters</h2>
+      <h2 className="font-medium mb-4 text-lg">Advanced Filters</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="space-y-2">
           <h3 className="text-sm font-medium">Date Range</h3>
           <DateRangeFilter
@@ -77,6 +79,14 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
                 onReset={() => onVenueChange([])}
               />
             </ScrollArea>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <h3 className="text-sm font-medium">Location</h3>
+          <div className="flex items-center border rounded-md p-2 bg-gray-100 text-gray-500 cursor-not-allowed">
+            <span className="text-sm">Zandvoort Area</span>
+            <span className="text-xs ml-auto italic">(Coming soon)</span>
           </div>
         </div>
       </div>

@@ -19,8 +19,11 @@ export const NavItems: React.FC<NavItemsProps> = ({ className }) => {
       <Link to="/events" className="text-sm font-medium transition-colors hover:text-primary">
         Events
       </Link>
-      <Link to="/friends" className="text-sm font-medium transition-colors hover:text-primary">
-        Friends
+      <Link 
+        to="/design-system" 
+        className="text-sm font-medium transition-colors hover:text-primary"
+      >
+        Design System
       </Link>
       {isAuthenticated ? (
         <>
