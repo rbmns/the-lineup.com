@@ -23,8 +23,8 @@ export const NoResultsFound: React.FC<NoResultsFoundProps> = ({
   return (
     <div className="text-center py-10 max-w-xl mx-auto animate-fade-in" style={{ animationDelay: '300ms' }}>
       <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-        <h3 className="text-xl font-medium text-gray-900 mb-3">No matches found</h3>
-        <p className="text-gray-600 mb-4">{displayMessage}</p>
+        <h3 className="text-xl font-semibold tracking-tight text-gray-900 mb-3">No matches found</h3>
+        <p className="text-base leading-7 text-gray-600 mb-4">{displayMessage}</p>
         <Button 
           variant="default" 
           onClick={resetFilters}

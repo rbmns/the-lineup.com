@@ -50,7 +50,6 @@ export function DateRangePicker({
   // Handle internal changes - store temporarily without triggering onChange
   const handleSelect = (newDate: DateRange | undefined) => {
     // Always replace the existing range with the new selection
-    // instead of trying to extend an existing range
     setDate(newDate);
     
     // Auto-apply single date selections
@@ -64,7 +63,6 @@ export function DateRangePicker({
     if (date) {
       onChange(date);
       setOpen(false); // Close the popover after confirming
-      console.log("DateRangePicker confirmed:", date);
     }
   };
 
@@ -82,14 +80,14 @@ export function DateRangePicker({
             id="date"
             variant={"outline"}
             className={cn(
-              "w-full justify-start text-left font-normal",
+              "w-full justify-start text-left font-normal rounded-md border border-gray-300 text-sm h-9",
               !date && "text-muted-foreground",
               disabled && "opacity-50 cursor-not-allowed"
             )}
             disabled={disabled}
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            {formatDateRange(date)}
+            <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
+            <span className="text-gray-700">{formatDateRange(date)}</span>
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">

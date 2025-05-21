@@ -40,8 +40,6 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
       onDateFilterChange(filter);
       // Always clear any existing date range when selecting a quick filter
       onDateRangeChange(undefined);
-      
-      console.log(`Date filter applied: ${filter}`);
     }
   };
 
@@ -51,8 +49,6 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
       if (selectedDateFilter) {
         onDateFilterChange('');
       }
-      
-      console.log(`Date range applied:`, newDateRange);
     }
     
     // Always set the new date range directly, replacing any existing range
@@ -69,9 +65,10 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
             size="sm"
             onClick={() => handleQuickFilterClick(filter)}
             className={cn(
-              "capitalize text-xs px-2.5 py-1 h-7",
-              selectedDateFilter === filter ? "bg-[#9b87f5] hover:bg-[#7E69AB]" : "bg-transparent",
-              selectedDateFilter === filter ? "border-[#9b87f5]" : "border-gray-200"
+              "capitalize text-xs px-2.5 py-1 h-7 rounded-full border",
+              selectedDateFilter === filter ? "bg-[#444] hover:bg-[#555] border-[#444]" : "bg-transparent hover:bg-gray-100",
+              selectedDateFilter === filter ? "text-white" : "text-gray-700",
+              "border-gray-300"
             )}
           >
             {filter}
@@ -84,6 +81,7 @@ export const DateRangeFilter: React.FC<DateRangeFilterProps> = ({
           value={dateRange}
           onChange={handleDateRangeChange}
           className="w-full"
+          placeholder="Select dates"
         />
         
         {(dateRange || selectedDateFilter) && (

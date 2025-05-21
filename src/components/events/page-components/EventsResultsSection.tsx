@@ -32,9 +32,10 @@ export const EventsResultsSection: React.FC<EventsResultsSectionProps> = ({
 }) => {
   // Update events count for display
   const eventsCount = filteredEvents.length;
+  const showNoResults = !isLoading && !isFilterLoading && !isVenuesLoading && filteredEvents.length === 0 && hasActiveFilters;
 
   return (
-    <div className="space-y-8 mt-12">
+    <div className="space-y-8 mt-16">
       {/* Hide the EventCountDisplay */}
       <EventCountDisplay count={eventsCount} hidden={true} />
       
@@ -44,7 +45,7 @@ export const EventsResultsSection: React.FC<EventsResultsSectionProps> = ({
           resetFilters={selectAll}
           message="No event types selected. Select at least one event type to see events."
         />
-      ) : filteredEvents.length === 0 && hasActiveFilters ? (
+      ) : showNoResults ? (
         <NoResultsFound 
           resetFilters={selectAll}
           message="No exact results found for your filters."

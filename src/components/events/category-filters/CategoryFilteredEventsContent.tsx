@@ -27,7 +27,7 @@ export const CategoryFilteredEventsContent: React.FC<CategoryFilteredEventsConte
   loadingEventId // Destructure new prop
 }) => {
   return (
-    <div className="space-y-12">
+    <div className="space-y-16">
       {/* No Exact Matches Message */}
       {showNoExactMatchesMessage && (
         <NoResultsFound resetFilters={resetFilters} />
