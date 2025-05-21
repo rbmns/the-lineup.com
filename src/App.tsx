@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
@@ -24,6 +25,7 @@ import ProfileSettings from './pages/ProfileSettings';
 import Friends from './pages/Friends';
 import Index from './pages/Index';
 import DesignSystem from './pages/DesignSystem';
+import GoodbyePage from './pages/GoodbyePage';
 
 function App() {
   return (
@@ -36,6 +38,9 @@ function App() {
                 <Routes>
                   {/* Add explicit route for the index page */}
                   <Route path="/" element={<Index />} />
+                  
+                  {/* Add the GoodbyePage route outside of the Layout */}
+                  <Route path="/goodbye" element={<GoodbyePage />} />
                   
                   <Route element={<Layout />}>
                     <Route path="/home" element={<Home />} />
