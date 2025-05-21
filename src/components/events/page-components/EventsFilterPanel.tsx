@@ -15,7 +15,6 @@ interface EventsFilterPanelProps {
   venues: Array<{ value: string, label: string }>;
   selectedVenues: string[];
   setSelectedVenues: (venues: string[]) => void;
-  locations: Array<{ value: string, label: string }>;
   hasAdvancedFilters: boolean;
   handleRemoveVenue: (venue: string) => void;
   handleClearDateFilter: () => void;
@@ -32,7 +31,6 @@ export const EventsFilterPanel: React.FC<EventsFilterPanelProps> = ({
   venues,
   selectedVenues,
   setSelectedVenues,
-  locations,
   hasAdvancedFilters,
   handleRemoveVenue,
   handleClearDateFilter,
@@ -60,7 +58,6 @@ export const EventsFilterPanel: React.FC<EventsFilterPanelProps> = ({
           venues={venues}
           selectedVenues={selectedVenues}
           onVenueChange={setSelectedVenues}
-          locations={locations}
           className="mb-6"
         />
       )}
