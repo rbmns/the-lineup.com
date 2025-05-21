@@ -22,25 +22,6 @@ export const NavItems: React.FC<NavItemsProps> = ({ className }) => {
         <Users className="h-4 w-4" />
         <span>Friends</span>
       </Link>
-      {isAuthenticated ? (
-        <>
-          <Link to="/profile" className="text-sm font-medium transition-colors hover:text-primary">
-            {user?.email?.split('@')[0] || 'Profile'}
-          </Link>
-          <Button variant="outline" size="sm" onClick={logout}>
-            Logout
-          </Button>
-        </>
-      ) : (
-        <>
-          <Link to="/login" className="text-sm font-medium transition-colors hover:text-primary">
-            Login
-          </Link>
-          <Link to="/register" className="text-sm font-medium transition-colors hover:text-primary">
-            Register
-          </Link>
-        </>
-      )}
     </div>
   );
 };

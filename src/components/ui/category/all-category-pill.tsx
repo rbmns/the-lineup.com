@@ -19,18 +19,18 @@ export const AllCategoryPill: React.FC<AllCategoryPillProps> = ({
   label,
   isSelectAll = true
 }) => {
-  // Base styles with more subtle text-only appearance
-  const baseClasses = 'rounded-md font-medium transition-colors cursor-pointer border';
+  // Base styles with more subtle rounded appearance
+  const baseClasses = 'rounded-full font-medium transition-colors cursor-pointer flex items-center justify-center';
   
-  // Use colors from design-system.css for active state
+  // Use darker and lighter gray colors for active/inactive states
   const stateClasses = active 
-    ? 'bg-twilight text-white hover:bg-night shadow-sm border-transparent'
-    : 'bg-white text-gray-600 hover:bg-gray-50 border-gray-200';
+    ? 'bg-gray-800 text-white hover:bg-gray-700'
+    : 'bg-gray-200 text-gray-700 hover:bg-gray-300';
   
-  // Size classes
+  // Size classes - making them more compact to fit text better
   const sizeClasses = {
-    'xs': 'text-xs py-0.5 px-1.5',
-    'sm': 'text-xs py-1 px-2',
+    'xs': 'text-xs py-0.5 px-2',
+    'sm': 'text-xs py-1 px-2.5',
     'default': 'text-sm py-1.5 px-3',
     'lg': 'text-sm py-2 px-4 font-medium'
   };

@@ -86,7 +86,6 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
           <h3 className="text-sm font-medium">Location</h3>
           <div className="flex items-center border rounded-md p-2 bg-gray-100 text-gray-500 cursor-not-allowed">
             <span className="text-sm">Zandvoort Area</span>
-            <span className="text-xs ml-auto italic">(Coming soon)</span>
           </div>
         </div>
       </div>
