@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Event } from '@/types';
 import EventCard from '@/components/events/EventCard';
 import { useAuth } from '@/hooks/useAuth';
-import { useEventRsvp } from '@/hooks/useEventRsvp';
+import { useEventRSVP } from '@/hooks/useEventRSVP';
 import { useNavigate } from 'react-router-dom';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { cn } from '@/lib/utils';
@@ -31,7 +31,7 @@ export const UserFeed: React.FC<UserFeedProps> = ({
   onClick
 }) => {
   const { user } = useAuth();
-  const { handleRsvp, loadingEventId } = useEventRsvp(user?.id);
+  const { handleRsvp, loadingEventId } = useEventRSVP(user?.id);
   const navigate = useNavigate();
   
   // Extract all unique event types from events
