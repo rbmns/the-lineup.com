@@ -39,15 +39,15 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
 
   return (
     <div className={cn("border rounded-lg p-4 bg-white shadow-sm relative", className)}>
-      {/* Close button */}
+      {/* Close button - more visible on mobile */}
       <Button 
         variant="ghost" 
         size="sm" 
         onClick={onClose}
-        className="absolute top-2 right-2 h-8 w-8 p-0"
+        className="absolute top-2 right-2 h-8 w-8 p-0 md:flex items-center justify-center sm:hidden"
+        aria-label="Close advanced filters"
       >
         <X className="h-4 w-4" />
-        <span className="sr-only">Close advanced filters</span>
       </Button>
       
       <h2 className="font-medium mb-4 text-lg">Advanced Filters</h2>
@@ -84,11 +84,23 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
 
         <div className="space-y-2">
           <h3 className="text-sm font-medium">Location</h3>
-          <div className="flex items-center border rounded-md p-2 bg-gray-100 text-gray-500 cursor-not-allowed">
+          <div className="flex items-center border rounded-md p-2">
             <span className="text-sm">Zandvoort Area</span>
-            <span className="text-xs ml-auto italic">(Coming soon)</span>
           </div>
         </div>
+      </div>
+      
+      {/* Mobile-friendly close button at bottom */}
+      <div className="mt-4 text-center sm:hidden">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={onClose}
+          className="w-full"
+        >
+          Close
+          <X className="h-4 w-4 ml-2" />
+        </Button>
       </div>
     </div>
   );
