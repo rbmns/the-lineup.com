@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export const useCategoryFilterSelection = (
@@ -8,46 +8,59 @@ export const useCategoryFilterSelection = (
 ) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(selectedEventTypes);
   const location = useLocation();
+  const isInitialLoad = useRef(true);
+  const lastSelectedTypes = useRef<string[]>([]);
 
   // Sync with URL parameters and provided selectedEventTypes
   useEffect(() => {
-    // Only update if we have categories and the selected types changed
+    // Prevent unnecessary updates by checking if the arrays are actually different
     if (allCategories.length > 0 && 
-        JSON.stringify(selectedCategories) !== JSON.stringify(selectedEventTypes)) {
+        JSON.stringify(selectedCategories) !== JSON.stringify(selectedEventTypes) &&
+        JSON.stringify(lastSelectedTypes.current) !== JSON.stringify(selectedEventTypes)) {
+      
       console.log('Updating selected categories from selectedEventTypes:', selectedEventTypes);
+      lastSelectedTypes.current = [...selectedEventTypes];
       setSelectedCategories(selectedEventTypes);
     }
   }, [selectedEventTypes, allCategories.length, selectedCategories]);
 
   // Initialize from URL on first load
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const typesFromUrl = searchParams.getAll('type');
-    
-    if (typesFromUrl.length > 0 && selectedCategories.length === 0) {
-      console.log('Setting categories from URL parameters:', typesFromUrl);
-      setSelectedCategories(typesFromUrl);
+    if (isInitialLoad.current) {
+      const searchParams = new URLSearchParams(location.search);
+      const typesFromUrl = searchParams.getAll('type');
+      
+      if (typesFromUrl.length > 0 && selectedCategories.length === 0) {
+        console.log('Setting categories from URL parameters:', typesFromUrl);
+        setSelectedCategories(typesFromUrl);
+        lastSelectedTypes.current = [...typesFromUrl];
+      }
+      isInitialLoad.current = false;
     }
   }, [location.search, selectedCategories.length]);
 
   // Toggle a category selection
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev => {
-      if (prev.includes(category)) {
-        return prev.filter(c => c !== category);
-      } else {
-        return [...prev, category];
-      }
+      const newSelection = prev.includes(category) 
+        ? prev.filter(c => c !== category)
+        : [...prev, category];
+      
+      lastSelectedTypes.current = [...newSelection];
+      return newSelection;
     });
   };
 
   // Select all categories
   const selectAll = () => {
-    setSelectedCategories([...allCategories]);
+    const newSelection = [...allCategories];
+    lastSelectedTypes.current = newSelection;
+    setSelectedCategories(newSelection);
   };
 
   // Deselect all categories
   const deselectAll = () => {
+    lastSelectedTypes.current = [];
     setSelectedCategories([]);
   };
 

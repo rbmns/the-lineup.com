@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { EventsFilterBar } from '@/components/events/page-components/EventsFilterBar';
 import { EventsFilterPanel } from '@/components/events/page-components/EventsFilterPanel';
@@ -52,8 +52,9 @@ export const EventsPageFilters: React.FC<EventsPageFiltersProps> = ({
 }) => {
   const location = useLocation();
   const { saveFilterState } = useNavigationHistory();
+  const lastSavedFilter = useRef<string>('');
   
-  // Save filter state whenever it changes
+  // Save filter state whenever it changes, with debounce to prevent excessive saves
   useEffect(() => {
     if (location.pathname === '/events') {
       const filterState = {
@@ -63,8 +64,19 @@ export const EventsPageFilters: React.FC<EventsPageFiltersProps> = ({
         dateFilter: selectedDateFilter
       };
       
-      saveFilterState(filterState);
-      console.log("Filter state saved in EventsPageFilters", filterState);
+      // Only save if state has actually changed
+      const stateString = JSON.stringify(filterState);
+      if (stateString !== lastSavedFilter.current) {
+        lastSavedFilter.current = stateString;
+        
+        // Debounce the save operation
+        const timer = setTimeout(() => {
+          saveFilterState(filterState);
+          console.log("Filter state saved in EventsPageFilters", filterState);
+        }, 300);
+        
+        return () => clearTimeout(timer);
+      }
     }
   }, [
     location.pathname,

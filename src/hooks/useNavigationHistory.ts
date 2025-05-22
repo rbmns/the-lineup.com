@@ -1,5 +1,5 @@
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
 // Type definition for filter state
@@ -12,19 +12,26 @@ interface FilterState {
 
 export const useNavigationHistory = () => {
   const location = useLocation();
+  const lastSavedState = useRef<string>('');
 
   // Save filter state to session storage
   const saveFilterState = useCallback((filterState: Partial<FilterState>) => {
     try {
-      // Store the current filter state
-      sessionStorage.setItem('event-filter-state', JSON.stringify({
+      // Create the complete state object
+      const completeState = {
         ...filterState,
         path: location.pathname,
         search: location.search,
         timestamp: Date.now()
-      }));
+      };
       
-      console.log('Filter state saved in navigation history:', filterState);
+      // Only save if the state has actually changed
+      const stateString = JSON.stringify(completeState);
+      if (stateString !== lastSavedState.current) {
+        sessionStorage.setItem('event-filter-state', stateString);
+        lastSavedState.current = stateString;
+        console.log('Filter state saved in navigation history:', filterState);
+      }
     } catch (error) {
       console.error('Error saving filter state:', error);
     }
@@ -47,6 +54,7 @@ export const useNavigationHistory = () => {
   const clearFilterState = useCallback(() => {
     try {
       sessionStorage.removeItem('event-filter-state');
+      lastSavedState.current = '';
     } catch (error) {
       console.error('Error clearing filter state:', error);
     }
