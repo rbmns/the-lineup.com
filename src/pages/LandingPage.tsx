@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Calendar, Music, Beach, Utensils, Sports } from 'lucide-react';
+import { Calendar, Music, Waves, Utensils, Dumbbell } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const LandingPage = () => {
@@ -91,7 +91,7 @@ const LandingPage = () => {
             </div>
             
             <div className="flex flex-col items-center p-4 hover:bg-white rounded-lg transition-colors">
-              <Beach size={40} strokeWidth={1.5} className="text-blue-500 mb-3" />
+              <Waves size={40} strokeWidth={1.5} className="text-blue-500 mb-3" />
               <span className="font-medium">Beach &<br />Wellness</span>
             </div>
             
@@ -101,7 +101,7 @@ const LandingPage = () => {
             </div>
             
             <div className="flex flex-col items-center p-4 hover:bg-white rounded-lg transition-colors">
-              <Sports size={40} strokeWidth={1.5} className="text-green-500 mb-3" />
+              <Dumbbell size={40} strokeWidth={1.5} className="text-green-500 mb-3" />
               <span className="font-medium">Sports &<br />Games</span>
             </div>
             
