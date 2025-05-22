@@ -7,7 +7,6 @@ import { NavItems } from '@/components/nav/NavItems';
 import { BrandLogo } from '@/components/ui/brand-logo';
 import UserMenu from '@/components/nav/UserMenu';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Search } from 'lucide-react';
 
 const MainNav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -43,44 +42,37 @@ const MainNav = () => {
         <div className="flex h-16 items-center justify-between gap-2">
           <div className="flex items-center">
             <BrandLogo showText={!isMobile} />
-          </div>
-          
-          <div className="flex items-center mx-auto max-w-md w-full px-3 relative">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <input 
-                type="text" 
-                placeholder="Search events, friends..." 
-                className="w-full rounded-full bg-gray-100 pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-              />
+            
+            {/* Add NavItems to the right of the logo */}
+            <div className="ml-4 hidden md:block">
+              <NavItems />
             </div>
           </div>
+          
+          {/* Mobile NavItems */}
+          <div className="md:hidden">
+            <NavItems showIconsOnly={true} />
+          </div>
 
-          <div className="flex items-center justify-end gap-2">
+          <div className="flex items-center gap-2">
             {isAuthenticated && user ? (
               <UserMenu user={user} profile={profile} handleSignOut={signOut} />
             ) : (
-              <div className="flex items-center">
-                {isMobile ? (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="font-inter"
-                    onClick={handleRegisterClick}
-                  >
-                    <span className="hidden sm:inline">Create Event</span>
-                    <span className="sm:hidden">+</span>
-                  </Button>
-                ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="font-inter"
-                    onClick={handleRegisterClick}
-                  >
-                    + Create Event
-                  </Button>
-                )}
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSignInClick}
+                  className="hidden sm:flex"
+                >
+                  Sign in
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleRegisterClick}
+                >
+                  Sign up
+                </Button>
               </div>
             )}
           </div>

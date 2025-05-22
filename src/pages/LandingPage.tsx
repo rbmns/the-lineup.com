@@ -1,28 +1,26 @@
 
-import React, { useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useRef, useState, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Calendar, Music, Waves, Utensils, Dumbbell, Users, Search, Map, Heart, MessageSquare, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, Users, Search, Map, ChevronLeft, ChevronRight, Edit, UserCircle, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { EventCategoryIcon } from '@/components/ui/event-category-icon';
 import { Footer } from '@/components/ui/footer';
-import { EventsSignupTeaser } from '@/components/events/list-components/EventsSignupTeaser';
 import { useEvents } from '@/hooks/useEvents';
-import EventCard from '@/components/EventCard';
-import { Card, CardContent } from '@/components/ui/card';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEventImages } from '@/hooks/useEventImages';
+import { Event } from '@/types';
 
 const LandingPage = () => {
   const { isAuthenticated } = useAuth();
   const { data: events, isLoading } = useEvents();
   const eventsContainerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
-  const [activeCategory, setActiveCategory] = useState<string>('all');
   const { getEventImageUrl } = useEventImages();
+  const navigate = useNavigate();
   
-  // Filter events for the next week and make sure we have one from each category if possible
-  const featuredEvents = React.useMemo(() => {
+  // Get upcoming events for the next week
+  const upcomingEvents = React.useMemo(() => {
     if (!events || events.length === 0) return [];
     
     const oneWeekFromNow = new Date();
@@ -35,7 +33,7 @@ const LandingPage = () => {
       return eventDate <= oneWeekFromNow;
     });
     
-    // Group by event type
+    // Group by event type to ensure diversity
     const eventsByType = nextWeekEvents.reduce((acc, event) => {
       if (!event.event_type) return acc;
       if (!acc[event.event_type]) acc[event.event_type] = [];
@@ -44,10 +42,30 @@ const LandingPage = () => {
     }, {} as Record<string, typeof events>);
     
     // Get one event from each type
-    const featured = Object.values(eventsByType).map(typeEvents => typeEvents[0]).slice(0, 6);
+    const featured = Object.values(eventsByType).map(typeEvents => typeEvents[0]);
+    
+    // If we don't have at least 5 events, add more from any category
+    if (featured.length < 5 && nextWeekEvents.length > 0) {
+      const moreEvents = nextWeekEvents
+        .filter(event => !featured.some(f => f.id === event.id))
+        .slice(0, 5 - featured.length);
+      
+      return [...featured, ...moreEvents];
+    }
     
     return featured;
   }, [events]);
+
+  // Get unique event types from upcoming events
+  const eventTypes = React.useMemo(() => {
+    if (!upcomingEvents || upcomingEvents.length === 0) return [];
+    
+    return Array.from(new Set(
+      upcomingEvents
+        .filter(event => event.event_type)
+        .map(event => event.event_type as string)
+    )).sort();
+  }, [upcomingEvents]);
 
   const scrollEvents = (direction: 'left' | 'right') => {
     if (!eventsContainerRef.current) return;
@@ -57,23 +75,11 @@ const LandingPage = () => {
     container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
   };
 
-  const categoryTypes = [
-    { type: 'all', label: 'All' },
-    { type: 'surf', label: 'Surf' },
-    { type: 'yoga', label: 'Yoga' },
-    { type: 'beach', label: 'Beach' },
-    { type: 'music', label: 'Music' },
-    { type: 'food', label: 'Food' },
-    { type: 'workshop', label: 'Workshop' },
-    { type: 'community', label: 'Community' },
-    { type: 'wellness', label: 'Wellness' }, 
-    { type: 'location', label: 'Location' },
-    { type: 'event', label: 'Event' },
-  ];
-
-  const filteredEvents = activeCategory === 'all' 
-    ? featuredEvents 
-    : featuredEvents.filter(event => event.event_type === activeCategory);
+  const handleEventClick = useCallback((event: Event) => {
+    if (event.id) {
+      navigate(`/events/${event.id}`);
+    }
+  }, [navigate]);
 
   return (
     <div>
@@ -89,41 +95,38 @@ const LandingPage = () => {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button asChild size="lg" className="bg-black hover:bg-black/90 text-white">
               <Link to="/events">
-                Explore Events
+                <Search className="mr-2 h-5 w-5" /> Search Events
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="border-2 bg-transparent border-white text-white hover:bg-white/10">
-              <Link to="/events">
-                Create Event
+              <Link to="/login">
+                Sign Up
               </Link>
             </Button>
           </div>
         </div>
       </section>
 
-      {/* Featured Events Section with Category Pills */}
+      {/* Upcoming Events Section */}
       <section className="py-8">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-6">Featured Events</h2>
+          <h2 className="text-2xl font-bold mb-6">Upcoming Events</h2>
           
           {/* Category Pills */}
-          <div className="overflow-x-auto pb-4 mb-4 no-scrollbar">
-            <div className="flex gap-2">
-              {categoryTypes.map(category => (
-                <button
-                  key={category.type}
-                  onClick={() => setActiveCategory(category.type)}
-                  className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${
-                    activeCategory === category.type 
-                      ? 'bg-black text-white' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {category.label}
-                </button>
-              ))}
+          {eventTypes.length > 0 && (
+            <div className="overflow-x-auto pb-4 mb-4 no-scrollbar">
+              <div className="flex gap-2">
+                {eventTypes.map(type => (
+                  <div
+                    key={type}
+                    className="px-3 py-1 rounded-full text-sm whitespace-nowrap bg-gray-100 text-gray-700"
+                  >
+                    {type}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
           
           {/* Events Horizontal Slider */}
           <div className="relative">
@@ -144,13 +147,14 @@ const LandingPage = () => {
                 <div className="flex justify-center w-full py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-2 border-black"></div>
                 </div>
-              ) : filteredEvents.length > 0 ? (
-                filteredEvents.map((event) => (
+              ) : upcomingEvents.length > 0 ? (
+                upcomingEvents.map((event) => (
                   <div 
                     key={event.id}
                     className="min-w-[270px] sm:min-w-[300px] max-w-[300px] flex-shrink-0 snap-start"
+                    onClick={() => handleEventClick(event)}
                   >
-                    <div className="border rounded-lg overflow-hidden h-full">
+                    <div className="border rounded-lg overflow-hidden h-full cursor-pointer hover:shadow-md transition-shadow">
                       <div className="relative">
                         <img 
                           src={event.image_urls && event.image_urls.length > 0 ? event.image_urls[0] : getEventImageUrl(event)} 
@@ -163,20 +167,15 @@ const LandingPage = () => {
                           </div>
                         )}
                       </div>
-                      <div className="p-4">
-                        <h3 className="font-semibold mb-1">{event.title}</h3>
+                      <div className="p-4 flex flex-col h-[120px]">
+                        <h3 className="font-semibold mb-1 line-clamp-2">{event.title}</h3>
                         <div className="flex items-center text-sm text-gray-600 mb-2">
-                          <Map size={14} className="mr-1" />
-                          <span>{event.location || 'Location TBD'}</span>
+                          <Map size={14} className="mr-1 flex-shrink-0" />
+                          <span className="truncate">{event.location || 'Location TBD'}</span>
                         </div>
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Calendar size={14} className="mr-1" />
+                        <div className="flex items-center text-sm text-gray-600 mt-auto">
+                          <Calendar size={14} className="mr-1 flex-shrink-0" />
                           <span>{event.start_date ? new Date(event.start_date).toLocaleDateString() : 'Date TBD'}</span>
-                        </div>
-                        <div className="flex gap-2 mt-4">
-                          <Button size="sm" className="w-full">
-                            RSVP
-                          </Button>
                         </div>
                       </div>
                     </div>
@@ -184,7 +183,7 @@ const LandingPage = () => {
                 ))
               ) : (
                 <div className="flex justify-center w-full py-8">
-                  <p>No events found for this category</p>
+                  <p>No upcoming events found</p>
                 </div>
               )}
             </div>
@@ -201,133 +200,128 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* How It Works Section */}
+      <section className="py-12 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-8">How It Works</h2>
+          <p className="text-center text-lg mb-12 max-w-2xl mx-auto">
+            Create a profile to connect with friends and get personalized recommendations.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Step 1 */}
+            <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+              <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                <UserCircle className="w-8 h-8 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Create Your Profile</h3>
+              <p className="text-gray-600">Tell us a bit about yourself and your vibe.</p>
+            </div>
+            
+            {/* Step 2 */}
+            <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                <Users className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Connect with Friends</h3>
+              <p className="text-gray-600">Find your crew and see what they're up to.</p>
+            </div>
+            
+            {/* Step 3 */}
+            <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+              <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
+                <Sparkles className="w-8 h-8 text-purple-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Discover Events</h3>
+              <p className="text-gray-600">Join local events your friends love.</p>
+            </div>
+          </div>
+          
+          <div className="text-center mt-8">
+            <Button asChild variant="outline">
+              <Link to="/events">
+                Or... Just Browse Events
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* Browse by Category Section */}
-      <section className="py-8 bg-gray-50">
+      <section className="py-8 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl font-bold mb-6">Browse by Category</h2>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all">
+            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
               <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-2">
                 <span className="text-blue-500 font-bold">S</span>
               </div>
               <span className="text-sm font-medium">Surf</span>
             </Link>
             
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all">
+            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
               <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-2">
                 <span className="text-green-500 font-bold">Y</span>
               </div>
               <span className="text-sm font-medium">Yoga</span>
             </Link>
             
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all">
+            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
               <div className="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center mb-2">
                 <span className="text-yellow-600 font-bold">B</span>
               </div>
               <span className="text-sm font-medium">Beach</span>
             </Link>
             
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all">
+            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
               <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mb-2">
                 <span className="text-purple-500 font-bold">M</span>
               </div>
               <span className="text-sm font-medium">Music</span>
             </Link>
             
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all">
+            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
               <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-2">
                 <span className="text-red-500 font-bold">F</span>
               </div>
               <span className="text-sm font-medium">Food</span>
             </Link>
             
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all">
+            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
               <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mb-2">
                 <span className="text-orange-500 font-bold">W</span>
               </div>
               <span className="text-sm font-medium">Workshop</span>
             </Link>
             
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all">
+            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
               <div className="w-12 h-12 rounded-full bg-cyan-100 flex items-center justify-center mb-2">
                 <span className="text-cyan-500 font-bold">C</span>
               </div>
               <span className="text-sm font-medium">Community</span>
             </Link>
             
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all">
+            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
               <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mb-2">
                 <span className="text-emerald-500 font-bold">W</span>
               </div>
               <span className="text-sm font-medium">Wellness</span>
             </Link>
             
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all">
+            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
               <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mb-2">
                 <span className="text-indigo-500 font-bold">L</span>
               </div>
               <span className="text-sm font-medium">Location</span>
             </Link>
             
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all">
+            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
               <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center mb-2">
                 <span className="text-pink-500 font-bold">E</span>
               </div>
               <span className="text-sm font-medium">Event</span>
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Upcoming Events Section */}
-      <section className="py-8">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">Upcoming Events</h2>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm">All</Button>
-              <Button variant="outline" size="sm" className="hidden sm:block">My Events</Button>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {featuredEvents.slice(0, 3).map((event) => (
-              <div key={event.id} className="border rounded-lg overflow-hidden">
-                <div className="relative">
-                  <img 
-                    src={event.image_urls && event.image_urls.length > 0 ? event.image_urls[0] : getEventImageUrl(event)} 
-                    alt={event.title} 
-                    className="w-full h-40 object-cover" 
-                  />
-                  {event.event_type && (
-                    <div className="absolute top-2 right-2">
-                      <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">{event.event_type}</span>
-                    </div>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold mb-1">{event.title}</h3>
-                  <div className="flex flex-col text-sm text-gray-600">
-                    <div className="flex items-center mb-1">
-                      <Calendar size={14} className="mr-1" />
-                      <span>{event.start_date ? new Date(event.start_date).toLocaleDateString() : 'Date TBD'}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Map size={14} className="mr-1" />
-                      <span>{event.location || 'Location TBD'}</span>
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <Button size="sm" className="w-full">RSVP</Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          <div className="mt-8 text-center">
-            <Button variant="outline">View All Events</Button>
           </div>
         </div>
       </section>
@@ -340,7 +334,11 @@ const LandingPage = () => {
             Connect with like-minded individuals, discover new experiences, and create
             unforgettable memories with The Lineup.
           </p>
-          <Button size="lg" className="bg-black hover:bg-black/90">Sign Up Now</Button>
+          <Button asChild size="lg" className="bg-black hover:bg-black/90">
+            <Link to="/login">
+              Sign Up Now
+            </Link>
+          </Button>
         </div>
       </section>
       
