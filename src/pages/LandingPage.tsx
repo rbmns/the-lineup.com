@@ -87,10 +87,11 @@ const LandingPage = () => {
       <section className="bg-blue-500 py-12 md:py-20">
         <div className="container mx-auto px-4 text-center text-white">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Discover local events and connect with friends
+            Connect with the Local Vibe
           </h1>
           <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
-            Find yoga sessions, surf lessons, beach activities and more in your area
+            Discover markets, music, wellness, and community events happening nearby — plus see what your friends recommend.
+            Whether you’re exploring alone or with others, the Lineup helps you dive into the local scene and make the most of your time.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button asChild size="lg" className="bg-black hover:bg-black/90 text-white">
