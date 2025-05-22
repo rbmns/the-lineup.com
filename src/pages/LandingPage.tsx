@@ -121,12 +121,12 @@ const LandingPage = () => {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button asChild size="lg" className="bg-black hover:bg-black/90 text-white">
               <Link to="/events">
-                <Search className="mr-2 h-5 w-5" /> Search Events
+                <Search className="mr-2 h-5 w-5" /> Browse Events
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="border-2 bg-transparent border-white text-white hover:bg-white/10">
               <Link to="/login">
-                Sign Up
+                Create Your Free Profile
               </Link>
             </Button>
           </div>
