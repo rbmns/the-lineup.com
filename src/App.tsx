@@ -26,6 +26,7 @@ import Friends from './pages/Friends';
 import Index from './pages/Index';
 import DesignSystem from './pages/DesignSystem';
 import GoodbyePage from './pages/GoodbyePage';
+import LandingPage from './pages/LandingPage';
 
 function App() {
   return (
@@ -43,7 +44,7 @@ function App() {
                   <Route path="/goodbye" element={<GoodbyePage />} />
                   
                   <Route element={<Layout />}>
-                    <Route path="/home" element={<Home />} />
+                    <Route path="/home" element={<LandingPage />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/events" element={<EventsPageRefactored />} />

@@ -25,7 +25,7 @@ export const BrandLogo = React.forwardRef<HTMLDivElement, BrandLogoProps>(
             <span className="sr-only">Toggle menu</span>
           </Button>
         )}
-        <Link to="/" className="flex items-center gap-2 group transition-all duration-300">
+        <Link to="/home" className="flex items-center gap-2 group transition-all duration-300">
           <div className="flex items-center">
             <img 
               src="/lovable-uploads/5fe11e41-bcfb-44e1-b1bb-03f5c6fd9df1.png" 
