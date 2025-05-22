@@ -235,7 +235,6 @@ const LandingPage = () => {
         </div>
       </section>
       
-      <EventsSignupTeaser />
     </div>
   );
 };
