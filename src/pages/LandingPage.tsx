@@ -10,7 +10,6 @@ import { useEvents } from '@/hooks/useEvents';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEventImages } from '@/hooks/useEventImages';
 import { CategoryPill } from '@/components/ui/category-pill';
-import MainNav from '@/components/MainNav';
 import { Event } from '@/types';
 
 const LandingPage = () => {
@@ -20,6 +19,7 @@ const LandingPage = () => {
   const isMobile = useIsMobile();
   const { getEventImageUrl } = useEventImages();
   const navigate = useNavigate();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   
   // Get upcoming events for the next week
   const upcomingEvents = React.useMemo(() => {
@@ -58,6 +58,12 @@ const LandingPage = () => {
     return featured;
   }, [events]);
 
+  // Filter events by selected category
+  const filteredEvents = React.useMemo(() => {
+    if (!selectedCategory) return upcomingEvents;
+    return upcomingEvents.filter(event => event.event_type === selectedCategory);
+  }, [upcomingEvents, selectedCategory]);
+
   // Get unique event types from upcoming events
   const eventTypes = React.useMemo(() => {
     if (!upcomingEvents || upcomingEvents.length === 0) return [];
@@ -68,6 +74,10 @@ const LandingPage = () => {
         .map(event => event.event_type as string)
     )).sort();
   }, [upcomingEvents]);
+
+  const handleCategoryClick = (category: string) => {
+    setSelectedCategory(prevCategory => prevCategory === category ? null : category);
+  };
 
   const scrollEvents = (direction: 'left' | 'right') => {
     if (!eventsContainerRef.current) return;
@@ -123,8 +133,9 @@ const LandingPage = () => {
                   <CategoryPill
                     key={type}
                     category={type}
-                    active={true}
-                    showIcon={true}
+                    active={selectedCategory === type}
+                    noBorder={true}
+                    onClick={() => handleCategoryClick(type)}
                   />
                 ))}
               </div>
@@ -150,8 +161,8 @@ const LandingPage = () => {
                 <div className="flex justify-center w-full py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-2 border-black"></div>
                 </div>
-              ) : upcomingEvents.length > 0 ? (
-                upcomingEvents.map((event) => (
+              ) : filteredEvents.length > 0 ? (
+                filteredEvents.map((event) => (
                   <div 
                     key={event.id}
                     className="min-w-[270px] sm:min-w-[300px] max-w-[300px] flex-shrink-0 snap-start"
@@ -169,7 +180,7 @@ const LandingPage = () => {
                             <CategoryPill 
                               category={event.event_type} 
                               active={true}
-                              showIcon={true}
+                              noBorder={true}
                             />
                           </div>
                         )}
@@ -260,75 +271,18 @@ const LandingPage = () => {
           <h2 className="text-3xl font-semibold tracking-tight mb-6">Browse by Category</h2>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center mb-2 text-white">
-                <span className="text-white font-bold">S</span>
-              </div>
-              <span className="text-sm font-medium">Surf</span>
-            </Link>
-            
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-lime-500 flex items-center justify-center mb-2 text-white">
-                <span className="text-white font-bold">Y</span>
-              </div>
-              <span className="text-sm font-medium">Yoga</span>
-            </Link>
-            
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-yellow-500 flex items-center justify-center mb-2 text-white">
-                <span className="text-white font-bold">B</span>
-              </div>
-              <span className="text-sm font-medium">Beach</span>
-            </Link>
-            
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-fuchsia-500 flex items-center justify-center mb-2 text-white">
-                <span className="text-white font-bold">M</span>
-              </div>
-              <span className="text-sm font-medium">Music</span>
-            </Link>
-            
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center mb-2 text-white">
-                <span className="text-white font-bold">F</span>
-              </div>
-              <span className="text-sm font-medium">Food</span>
-            </Link>
-            
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center mb-2 text-white">
-                <span className="text-white font-bold">W</span>
-              </div>
-              <span className="text-sm font-medium">Workshop</span>
-            </Link>
-            
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center mb-2 text-white">
-                <span className="text-white font-bold">C</span>
-              </div>
-              <span className="text-sm font-medium">Community</span>
-            </Link>
-            
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-lime-500 flex items-center justify-center mb-2 text-white">
-                <span className="text-white font-bold">W</span>
-              </div>
-              <span className="text-sm font-medium">Wellness</span>
-            </Link>
-            
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-indigo-500 flex items-center justify-center mb-2 text-white">
-                <span className="text-white font-bold">L</span>
-              </div>
-              <span className="text-sm font-medium">Location</span>
-            </Link>
-            
-            <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-pink-500 flex items-center justify-center mb-2 text-white">
-                <span className="text-white font-bold">E</span>
-              </div>
-              <span className="text-sm font-medium">Event</span>
-            </Link>
+            {eventTypes.map(type => (
+              <Link 
+                key={type} 
+                to={`/events?type=${type}`} 
+                className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border"
+              >
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 text-white ${getCategoryColorState(type).active.split(' ')[0]}`}>
+                  <span className="text-white font-bold">{type.charAt(0).toUpperCase()}</span>
+                </div>
+                <span className="text-sm font-medium">{type}</span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

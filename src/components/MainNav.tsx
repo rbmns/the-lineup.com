@@ -47,7 +47,7 @@ const MainNav = () => {
           {/* Center the navigation items */}
           <div className="flex-1 flex justify-center">
             <div className="hidden md:block">
-              <NavItems className="text-base font-medium" />
+              <NavItems className="text-lg font-medium" />
             </div>
             
             {/* Mobile NavItems */}

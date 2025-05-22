@@ -34,7 +34,7 @@ export const CategoryPill: React.FC<CategoryPillProps & {
   
   // Border styles - only apply if noBorder is false
   const borderClasses = !noBorder ? 
-    (active ? 'border-2 border-black shadow-sm' : 'border border-gray-300') : '';
+    (active ? 'border border-transparent shadow-sm' : 'border border-gray-300') : '';
   
   // Size classes
   const sizeClasses = {
