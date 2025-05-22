@@ -1,158 +1,178 @@
 
-import { useState, useEffect, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { DateRange } from 'react-day-picker';
+import { useEffect, useCallback } from 'react';
 import { useFilterStateContext } from '@/contexts/FilterStateContext';
-import { useNavigationHistory } from '@/hooks/useNavigationHistory';
+import { DateRange } from 'react-day-picker';
 
+// Hook that connects the global filter state to the event filtering system
 export const useGlobalFilterState = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { filterState, setEventTypes, setVenues, setDateRange, setDateFilter, resetFilters: contextResetFilters } = useFilterStateContext();
-  const { saveFilterState } = useNavigationHistory();
+  const {
+    filterState,
+    setEventTypes,
+    setVenues,
+    setDateRange,
+    setDateFilter,
+    saveFilterState,
+    restoreFilterState,
+    resetFilters: contextResetFilters,
+    isRestoringFilters,
+    isInitialized
+  } = useFilterStateContext();
+
+  // Memoized getters
+  const selectedEventTypes = filterState.eventTypes;
+  const selectedVenues = filterState.venues;
+  const dateRange = filterState.dateRange;
+  const selectedDateFilter = filterState.dateFilter;
   
-  const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>(filterState.eventTypes || []);
-  const [selectedVenues, setSelectedVenues] = useState<string[]>(filterState.venues || []);
-  const [dateRange, setDateRangeState] = useState<DateRange | undefined>(filterState.dateRange);
-  const [selectedDateFilter, setSelectedDateFilter] = useState<string>(filterState.dateFilter || '');
-  const [isFilterLoading, setIsFilterLoading] = useState(false);
-  
-  // Use refs to track previous values and prevent unnecessary updates
-  const isInitialized = useRef(false);
-  const previousSearch = useRef(location.search);
-  const updatingFromUrl = useRef(false);
-  const updatingUrl = useRef(false);
+  // Save state with current URL and scroll position
+  const handleSaveFilterState = useCallback(() => {
+    saveFilterState({
+      urlParams: window.location.search,
+      scrollPosition: window.scrollY
+    });
+  }, [saveFilterState]);
 
-  // Initialize filters from URL parameters on first load
-  useEffect(() => {
-    if (!isInitialized.current) {
-      const searchParams = new URLSearchParams(location.search);
-      const types = searchParams.getAll('type');
-      
-      if (types.length > 0 && selectedEventTypes.length === 0) {
-        console.log('Setting event types from URL:', types);
-        setSelectedEventTypes(types);
-        setEventTypes(types);
-        saveFilterState({ eventTypes: types });
-      }
-      
-      isInitialized.current = true;
-    }
-  }, [location.search, setEventTypes, selectedEventTypes.length, saveFilterState]);
+  // Wrapper for setting event types that also saves state
+  const setSelectedEventTypes = useCallback((types: string[]) => {
+    setEventTypes(types);
+    handleSaveFilterState();
+  }, [setEventTypes, handleSaveFilterState]);
 
-  // Handle URL changes without triggering a update loop
-  useEffect(() => {
-    if (previousSearch.current !== location.search && !updatingUrl.current) {
-      console.log('URL changed externally, updating filter state');
-      updatingFromUrl.current = true;
-      
-      const searchParams = new URLSearchParams(location.search);
-      const types = searchParams.getAll('type');
-      
-      if (types.length > 0) {
-        setSelectedEventTypes(types);
-        setEventTypes(types);
-      }
-      
-      previousSearch.current = location.search;
-      setTimeout(() => {
-        updatingFromUrl.current = false;
-      }, 100);
-    }
-  }, [location.search, setEventTypes]);
+  // Wrapper for setting venues that also saves state
+  const setSelectedVenues = useCallback((venues: string[]) => {
+    setVenues(venues);
+    handleSaveFilterState();
+  }, [setVenues, handleSaveFilterState]);
 
-  // Sync local state with context state only when needed
-  useEffect(() => {
-    if (!updatingFromUrl.current && filterState.eventTypes) {
-      setSelectedEventTypes(filterState.eventTypes);
-    }
-    setSelectedVenues(filterState.venues || []);
-    setDateRangeState(filterState.dateRange);
-    setSelectedDateFilter(filterState.dateFilter || '');
-  }, [filterState]);
-
-  // Handle updating the date range
-  const handleDateRangeChange = (range: DateRange | undefined) => {
-    setDateRangeState(range);
+  // Wrapper for setting date range that also saves state
+  const setSelectedDateRange = useCallback((range: DateRange | undefined) => {
     setDateRange(range);
-  };
+    handleSaveFilterState();
+  }, [setDateRange, handleSaveFilterState]);
 
-  // Handle updating the date filter
-  const handleDateFilterChange = (filter: string) => {
-    setSelectedDateFilter(filter);
+  // Wrapper for setting date filter that also saves state
+  const setSelectedDateFilter = useCallback((filter: string) => {
     setDateFilter(filter);
-  };
+    handleSaveFilterState();
+  }, [setDateFilter, handleSaveFilterState]);
 
-  // Reset all filters
-  const resetFilters = () => {
-    setSelectedEventTypes([]);
-    setSelectedVenues([]);
-    setDateRangeState(undefined);
-    setSelectedDateFilter('');
+  // Enhanced reset that clears all filters and updates UI
+  const resetFilters = useCallback(() => {
     contextResetFilters();
     
-    // Update URL to remove filter parameters
-    updatingUrl.current = true;
-    navigate('/events', { replace: true });
-    previousSearch.current = '';
-    setTimeout(() => {
-      updatingUrl.current = false;
-    }, 100);
-  };
+    // Dispatch event for components that need to react to filter reset
+    const resetEvent = new CustomEvent('filtersReset', {
+      detail: { timestamp: Date.now() }
+    });
+    document.dispatchEvent(resetEvent);
+  }, [contextResetFilters]);
 
-  // Handle removing a venue from the selected venues
-  const handleRemoveVenue = (venue: string) => {
-    const updatedVenues = selectedVenues.filter(v => v !== venue);
-    setSelectedVenues(updatedVenues);
-    setVenues(updatedVenues);
-  };
+  // Helper functions for individual filter types
+  const handleRemoveEventType = useCallback((type: string) => {
+    setSelectedEventTypes(selectedEventTypes.filter(t => t !== type));
+  }, [selectedEventTypes, setSelectedEventTypes]);
 
-  // Handle clearing the date filter
-  const handleClearDateFilter = () => {
+  const handleRemoveVenue = useCallback((venue: string) => {
+    setSelectedVenues(selectedVenues.filter(v => v !== venue));
+  }, [selectedVenues, setSelectedVenues]);
+
+  const handleClearDateFilter = useCallback(() => {
+    setSelectedDateRange(undefined);
     setSelectedDateFilter('');
-    setDateRangeState(undefined);
-    setDateFilter('');
-    setDateRange(undefined);
-  };
+  }, [setSelectedDateRange, setSelectedDateFilter]);
 
-  // Check if any filters are active
-  const hasActiveFilters = selectedEventTypes.length > 0 || 
-                          selectedVenues.length > 0 || 
-                          !!selectedDateFilter || 
-                          (dateRange && dateRange.from !== undefined);
+  // Calculate derived state
+  const hasActiveFilters = 
+    selectedEventTypes.length > 0 ||
+    selectedVenues.length > 0 ||
+    dateRange !== undefined ||
+    selectedDateFilter !== '';
 
-  // Check if any advanced filters are active
-  const hasAdvancedFilters = selectedVenues.length > 0 || 
-                            !!selectedDateFilter || 
-                            (dateRange && dateRange.from !== undefined);
+  const hasAdvancedFilters =
+    selectedVenues.length > 0 ||
+    dateRange !== undefined ||
+    selectedDateFilter !== '';
+
+  // Load filters when entering events page
+  useEffect(() => {
+    if (window.location.pathname.includes('/events')) {
+      // Only restore if not already initialized to prevent double-loading
+      if (!isInitialized) {
+        restoreFilterState();
+      }
+      
+      // Add event listener for page visibility changes
+      // This helps restore state when returning to the tab
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible' && 
+            window.location.pathname.includes('/events')) {
+          console.log('Page became visible, checking filter state');
+          // Use a small delay to ensure all page state is ready
+          setTimeout(() => {
+            restoreFilterState();
+          }, 100);
+        }
+      };
+      
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
+    }
+  }, [isInitialized, restoreFilterState]);
+
+  // Enhanced listener for RSVP operations
+  useEffect(() => {
+    const handleRsvpStart = () => {
+      // Capture current filter state when RSVP starts
+      if (window.location.pathname.includes('/events')) {
+        console.log('RSVP operation detected, preserving filter state');
+        handleSaveFilterState();
+      }
+    };
+    
+    // Add attribute observer to detect RSVP operations
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach(mutation => {
+        if (mutation.type === 'attributes' && 
+            mutation.attributeName === 'data-rsvp-in-progress') {
+          const inProgress = document.body.hasAttribute('data-rsvp-in-progress');
+          if (inProgress) {
+            handleRsvpStart();
+          }
+        }
+      });
+    });
+    
+    observer.observe(document.body, { attributes: true });
+    
+    // Also listen for explicit RSVP events
+    document.addEventListener('rsvpStarted', handleRsvpStart);
+    
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('rsvpStarted', handleRsvpStart);
+    };
+  }, [handleSaveFilterState]);
 
   return {
     selectedEventTypes,
-    setSelectedEventTypes: (types: string[]) => {
-      if (JSON.stringify(selectedEventTypes) !== JSON.stringify(types)) {
-        setSelectedEventTypes(types);
-        setEventTypes(types);
-        
-        // Don't update URL if we're already updating from URL
-        if (!updatingFromUrl.current) {
-          saveFilterState({ eventTypes: types });
-        }
-      }
-    },
+    setSelectedEventTypes,
     selectedVenues,
-    setSelectedVenues: (venues: string[]) => {
-      setSelectedVenues(venues);
-      setVenues(venues);
-    },
+    setSelectedVenues,
     dateRange,
-    setDateRange: handleDateRangeChange,
+    setDateRange: setSelectedDateRange,
     selectedDateFilter,
-    setSelectedDateFilter: handleDateFilterChange,
+    setSelectedDateFilter,
+    saveFilterState: handleSaveFilterState,
+    restoreFilterState,
     resetFilters,
+    handleRemoveEventType,
     handleRemoveVenue,
     handleClearDateFilter,
     hasActiveFilters,
     hasAdvancedFilters,
-    isFilterLoading
+    isFilterLoading: isRestoringFilters,
   };
 };

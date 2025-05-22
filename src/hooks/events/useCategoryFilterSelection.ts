@@ -1,68 +1,49 @@
-
-import { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useState, useCallback, useEffect } from 'react';
 
 export const useCategoryFilterSelection = (
-  allCategories: string[],
-  selectedEventTypes: string[]
+  allEventTypes: string[], 
+  externalSelectedTypes: string[] = []
 ) => {
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(selectedEventTypes);
-  const location = useLocation();
-  const isInitialLoad = useRef(true);
-  const lastSelectedTypes = useRef<string[]>([]);
-
-  // Sync with URL parameters and provided selectedEventTypes
+  // Internal state to track selected categories
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(externalSelectedTypes);
+  
+  // Sync with external selected types when they change
   useEffect(() => {
-    // Prevent unnecessary updates by checking if the arrays are actually different
-    if (allCategories.length > 0 && 
-        JSON.stringify(selectedCategories) !== JSON.stringify(selectedEventTypes) &&
-        JSON.stringify(lastSelectedTypes.current) !== JSON.stringify(selectedEventTypes)) {
-      
-      console.log('Updating selected categories from selectedEventTypes:', selectedEventTypes);
-      lastSelectedTypes.current = [...selectedEventTypes];
-      setSelectedCategories(selectedEventTypes);
+    // Only update if the arrays are actually different to prevent loops
+    if (
+      externalSelectedTypes.length !== selectedCategories.length || 
+      externalSelectedTypes.some(type => !selectedCategories.includes(type))
+    ) {
+      setSelectedCategories(externalSelectedTypes);
     }
-  }, [selectedEventTypes, allCategories.length, selectedCategories]);
+  }, [externalSelectedTypes]);
 
-  // Initialize from URL on first load
-  useEffect(() => {
-    if (isInitialLoad.current) {
-      const searchParams = new URLSearchParams(location.search);
-      const typesFromUrl = searchParams.getAll('type');
-      
-      if (typesFromUrl.length > 0 && selectedCategories.length === 0) {
-        console.log('Setting categories from URL parameters:', typesFromUrl);
-        setSelectedCategories(typesFromUrl);
-        lastSelectedTypes.current = [...typesFromUrl];
-      }
-      isInitialLoad.current = false;
-    }
-  }, [location.search, selectedCategories.length]);
+  // Select all event types
+  const selectAll = useCallback(() => {
+    setSelectedCategories([...allEventTypes]);
+  }, [allEventTypes]);
 
-  // Toggle a category selection
-  const toggleCategory = (category: string) => {
-    setSelectedCategories(prev => {
-      const newSelection = prev.includes(category) 
-        ? prev.filter(c => c !== category)
-        : [...prev, category];
-      
-      lastSelectedTypes.current = [...newSelection];
-      return newSelection;
-    });
-  };
-
-  // Select all categories
-  const selectAll = () => {
-    const newSelection = [...allCategories];
-    lastSelectedTypes.current = newSelection;
-    setSelectedCategories(newSelection);
-  };
-
-  // Deselect all categories
-  const deselectAll = () => {
-    lastSelectedTypes.current = [];
+  // Deselect all event types (empty array)
+  const deselectAll = useCallback(() => {
     setSelectedCategories([]);
-  };
+  }, []);
+
+  // Toggle a specific event type
+  const toggleCategory = useCallback((type: string) => {
+    setSelectedCategories(prev => {
+      if (prev.includes(type)) {
+        // If removing the last category, select all instead
+        if (prev.length === 1) {
+          return [...allEventTypes];
+        }
+        // Otherwise, remove this category
+        return prev.filter(t => t !== type);
+      } else {
+        // Add the category
+        return [...prev, type];
+      }
+    });
+  }, [allEventTypes]);
 
   // Check if no categories are selected
   const isNoneSelected = selectedCategories.length === 0;
