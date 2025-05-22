@@ -1,4 +1,5 @@
-import React, { useRef, useState, useCallback } from 'react';
+
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Calendar, Users, Search, Map, ChevronLeft, ChevronRight, Edit, UserCircle, Sparkles } from 'lucide-react';
@@ -10,6 +11,7 @@ import { useEventImages } from '@/hooks/useEventImages';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { getCategoryColorState } from '@/components/ui/category/category-color-mapping';
 import { Event } from '@/types';
+import { useEventCategories } from '@/hooks/home/useEventCategories';
 
 const LandingPage = () => {
   const { isAuthenticated } = useAuth();
@@ -19,6 +21,7 @@ const LandingPage = () => {
   const { getEventImageUrl } = useEventImages();
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const { availableCategories } = useEventCategories(events);
   
   // Get upcoming events for the next week
   const upcomingEvents = React.useMemo(() => {
@@ -73,6 +76,17 @@ const LandingPage = () => {
         .map(event => event.event_type as string)
     )).sort();
   }, [upcomingEvents]);
+
+  // Get all event types from all events, not just upcoming ones
+  const allEventTypes = React.useMemo(() => {
+    if (!events || events.length === 0) return [];
+    
+    return Array.from(new Set(
+      events
+        .filter(event => event.event_type)
+        .map(event => event.event_type as string)
+    )).sort();
+  }, [events]);
 
   const handleCategoryClick = (category: string) => {
     setSelectedCategory(prevCategory => prevCategory === category ? null : category);
@@ -164,7 +178,7 @@ const LandingPage = () => {
                 filteredEvents.map((event) => (
                   <div 
                     key={event.id}
-                    className="min-w-[270px] sm:min-w-[300px] max-w-[300px] flex-shrink-0 snap-start"
+                    className="min-w-[300px] max-w-[300px] flex-shrink-0 snap-start"
                     onClick={() => handleEventClick(event)}
                   >
                     <div className="border rounded-lg overflow-hidden h-full cursor-pointer hover:shadow-md transition-shadow">
@@ -184,8 +198,8 @@ const LandingPage = () => {
                           </div>
                         )}
                       </div>
-                      <div className="p-4 flex flex-col h-[120px]">
-                        <h3 className="font-semibold mb-1 line-clamp-2">{event.title}</h3>
+                      <div className="p-4 flex flex-col" style={{ minHeight: '150px' }}>
+                        <h3 className="font-semibold mb-2 line-clamp-2 min-h-[48px]">{event.title}</h3>
                         <div className="flex items-center text-sm text-gray-600 mb-2">
                           <Map size={14} className="mr-1 flex-shrink-0" />
                           <span className="truncate">{event.location || 'Location TBD'}</span>
@@ -264,13 +278,13 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Browse by Category Section */}
+      {/* Browse by Category Section - Now showing all available categories */}
       <section className="py-8 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-semibold tracking-tight mb-6">Browse by Category</h2>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            {eventTypes.map(type => (
+            {allEventTypes.map(type => (
               <Link 
                 key={type} 
                 to={`/events?type=${type}`} 
