@@ -14,7 +14,7 @@ const EventsPageRefactored = () => {
   return (
     <div className="w-full px-4 md:px-6 py-4 md:py-8">
       <div className="max-w-7xl mx-auto">
-        <EventsPageHeader title="Upcoming Events" />
+        <EventsPageHeader title="What's Happening @ Zandvoort Area?" />
         
         <EventsDataProvider>
           {({
