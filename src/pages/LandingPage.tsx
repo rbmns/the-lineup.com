@@ -17,22 +17,20 @@ const LandingPage = () => {
       <section className="py-10 md:py-16">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-4">
-            Discover What's Happening Around You.
+            Find the Best Local Events — Beachlife, Markets, Music & More
           </h1>
           <p className="text-xl text-muted-foreground leading-relaxed mb-6">
-            The-Lineup.com helps you find the best local events — from markets and music to wellness and beach vibes.
-            Check who's going, plan your day, or just show up.
-            Social or solo, you're in the right place.
+            Whether you’re flying solo or meeting up with friends, the Lineup helps you explore Zandvoort’s best local vibes — from wellness sessions and food festivals to parties and beachside hangouts.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="bg-black hover:bg-black/90 text-white font-inter px-6">
               <Link to={isAuthenticated ? "/profile" : "/signup"}>
-                Start Exploring – Sign Up Free
+                Create Your Free Profile
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="border-2 px-6">
               <Link to="/events">
-                Just See Events
+               Just Browse Events
               </Link>
             </Button>
           </div>
