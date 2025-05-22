@@ -287,7 +287,7 @@ const LandingPage = () => {
             {allEventTypes.map(type => (
               <Link 
                 key={type} 
-                to={`/events?type=${type}`} 
+                to={`/events?type=${encodeURIComponent(type)}`} 
                 className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border"
               >
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 text-white ${getCategoryColorState(type).active.split(' ')[0]}`}>
