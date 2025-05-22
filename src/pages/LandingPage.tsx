@@ -11,6 +11,7 @@ import { useEvents } from '@/hooks/useEvents';
 import EventCard from '@/components/EventCard';
 import { Card, CardContent } from '@/components/ui/card';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useEventImages } from '@/hooks/useEventImages';
 
 const LandingPage = () => {
   const { isAuthenticated } = useAuth();
@@ -18,6 +19,7 @@ const LandingPage = () => {
   const eventsContainerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const [activeCategory, setActiveCategory] = useState<string>('all');
+  const { getEventImageUrl } = useEventImages();
   
   // Filter events for the next week and make sure we have one from each category if possible
   const featuredEvents = React.useMemo(() => {
@@ -149,20 +151,18 @@ const LandingPage = () => {
                     className="min-w-[270px] sm:min-w-[300px] max-w-[300px] flex-shrink-0 snap-start"
                   >
                     <div className="border rounded-lg overflow-hidden h-full">
-                      {event.image_url && (
-                        <div className="relative">
-                          <img 
-                            src={event.image_url} 
-                            alt={event.title} 
-                            className="w-full h-40 object-cover" 
-                          />
-                          {event.event_type && (
-                            <div className="absolute top-2 right-2">
-                              <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">{event.event_type}</span>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                      <div className="relative">
+                        <img 
+                          src={event.image_urls && event.image_urls.length > 0 ? event.image_urls[0] : getEventImageUrl(event)} 
+                          alt={event.title} 
+                          className="w-full h-40 object-cover" 
+                        />
+                        {event.event_type && (
+                          <div className="absolute top-2 right-2">
+                            <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">{event.event_type}</span>
+                          </div>
+                        )}
+                      </div>
                       <div className="p-4">
                         <h3 className="font-semibold mb-1">{event.title}</h3>
                         <div className="flex items-center text-sm text-gray-600 mb-2">
@@ -294,20 +294,18 @@ const LandingPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {featuredEvents.slice(0, 3).map((event) => (
               <div key={event.id} className="border rounded-lg overflow-hidden">
-                {event.image_url && (
-                  <div className="relative">
-                    <img 
-                      src={event.image_url} 
-                      alt={event.title} 
-                      className="w-full h-40 object-cover" 
-                    />
-                    {event.event_type && (
-                      <div className="absolute top-2 right-2">
-                        <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">{event.event_type}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
+                <div className="relative">
+                  <img 
+                    src={event.image_urls && event.image_urls.length > 0 ? event.image_urls[0] : getEventImageUrl(event)} 
+                    alt={event.title} 
+                    className="w-full h-40 object-cover" 
+                  />
+                  {event.event_type && (
+                    <div className="absolute top-2 right-2">
+                      <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">{event.event_type}</span>
+                    </div>
+                  )}
+                </div>
                 <div className="p-4">
                   <h3 className="font-semibold mb-1">{event.title}</h3>
                   <div className="flex flex-col text-sm text-gray-600">
@@ -347,7 +345,8 @@ const LandingPage = () => {
       </section>
       
       {/* Add CSS for hiding scrollbars but allowing scrolling */}
-      <style jsx global>{`
+      <style>
+        {`
         .no-scrollbar {
           -ms-overflow-style: none;  /* IE and Edge */
           scrollbar-width: none;  /* Firefox */
@@ -355,7 +354,8 @@ const LandingPage = () => {
         .no-scrollbar::-webkit-scrollbar {
           display: none; /* Chrome, Safari, Opera*/
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };
