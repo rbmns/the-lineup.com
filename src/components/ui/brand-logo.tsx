@@ -8,10 +8,11 @@ interface BrandLogoProps {
   className?: string;
   onMenuClick?: () => void;
   showMenu?: boolean;
+  showText?: boolean;
 }
 
 export const BrandLogo = React.forwardRef<HTMLDivElement, BrandLogoProps>(
-  ({ className = '', onMenuClick, showMenu = false }, ref) => {
+  ({ className = '', onMenuClick, showMenu = false, showText = true }, ref) => {
     return (
       <div ref={ref} className={`flex items-center gap-2 ${className}`}>
         {showMenu && (
@@ -32,9 +33,11 @@ export const BrandLogo = React.forwardRef<HTMLDivElement, BrandLogoProps>(
               alt="the lineup logo" 
               className="h-8 w-auto group-hover:scale-105 transition-transform bg-transparent" 
             />
-            <span className="font-inter text-xl font-normal tracking-tight lowercase flex items-center ml-2 group-hover:text-primary transition-colors">
-              thelineup
-            </span>
+            {showText && (
+              <span className="font-inter text-xl font-normal tracking-tight lowercase flex items-center ml-2 group-hover:text-primary transition-colors">
+                thelineup
+              </span>
+            )}
           </div>
         </Link>
       </div>

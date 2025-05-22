@@ -41,11 +41,11 @@ const MainNav = () => {
       <div className="container mx-auto px-2 md:px-4">
         <div className="flex h-16 items-center justify-between gap-2">
           <div className="flex items-center">
-            <BrandLogo />
+            <BrandLogo showText={!isMobile} />
           </div>
           
           <div className="flex justify-center mx-1">
-            <NavItems className="gap-3 md:gap-6" />
+            <NavItems className="gap-3 md:gap-6" showIconsOnly={isMobile} />
           </div>
 
           <div className="flex items-center justify-end gap-2 md:gap-6">
