@@ -1,11 +1,9 @@
-
 import React, { useRef, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Calendar, Users, Search, Map, ChevronLeft, ChevronRight, Edit, UserCircle, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { EventCategoryIcon } from '@/components/ui/event-category-icon';
-import { Footer } from '@/components/ui/footer';
 import { useEvents } from '@/hooks/useEvents';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEventImages } from '@/hooks/useEventImages';

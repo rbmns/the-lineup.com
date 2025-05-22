@@ -37,13 +37,12 @@ function App() {
             <Router>
               <div className="flex flex-col min-h-screen bg-background">
                 <Routes>
-                  {/* Add explicit route for the index page */}
-                  <Route path="/" element={<LandingPage />} />
-                  
                   {/* Add the GoodbyePage route outside of the Layout */}
                   <Route path="/goodbye" element={<GoodbyePage />} />
                   
                   <Route element={<Layout />}>
+                    {/* Put the root route inside the Layout */}
+                    <Route path="/" element={<LandingPage />} />
                     <Route path="/home" element={<LandingPage />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
