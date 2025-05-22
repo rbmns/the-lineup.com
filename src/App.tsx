@@ -38,7 +38,7 @@ function App() {
               <div className="flex flex-col min-h-screen bg-background">
                 <Routes>
                   {/* Add explicit route for the index page */}
-                  <Route path="/" element={<Index />} />
+                  <Route path="/" element={<LandingPage />} />
                   
                   {/* Add the GoodbyePage route outside of the Layout */}
                   <Route path="/goodbye" element={<GoodbyePage />} />

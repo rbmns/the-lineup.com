@@ -7,6 +7,7 @@ import { NavItems } from '@/components/nav/NavItems';
 import { BrandLogo } from '@/components/ui/brand-logo';
 import UserMenu from '@/components/nav/UserMenu';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Search } from 'lucide-react';
 
 const MainNav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -44,42 +45,41 @@ const MainNav = () => {
             <BrandLogo showText={!isMobile} />
           </div>
           
-          <div className="flex justify-center mx-1">
-            <NavItems className="gap-3 md:gap-6" showIconsOnly={isMobile} />
+          <div className="flex items-center mx-auto max-w-md w-full px-3 relative">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <input 
+                type="text" 
+                placeholder="Search events, friends..." 
+                className="w-full rounded-full bg-gray-100 pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+            </div>
           </div>
 
-          <div className="flex items-center justify-end gap-2 md:gap-6">
+          <div className="flex items-center justify-end gap-2">
             {isAuthenticated && user ? (
               <UserMenu user={user} profile={profile} handleSignOut={signOut} />
             ) : (
               <div className="flex items-center">
                 {isMobile ? (
-                  <Button 
-                    onClick={handleSignInClick}
-                    variant="default" 
-                    size="sm" 
-                    className="font-inter bg-black text-white hover:bg-black/90"
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="font-inter"
+                    onClick={handleRegisterClick}
                   >
-                    Sign in
+                    <span className="hidden sm:inline">Create Event</span>
+                    <span className="sm:hidden">+</span>
                   </Button>
                 ) : (
-                  <div className="flex items-center gap-2">
-                    <Button 
-                      onClick={handleSignInClick}
-                      variant="outline" 
-                      size="sm" 
-                      className="font-inter"
-                    >
-                      Sign in
-                    </Button>
-                    <Button 
-                      onClick={handleRegisterClick} 
-                      className="bg-black hover:bg-black/90 text-white font-inter" 
-                      size="sm"
-                    >
-                      Register
-                    </Button>
-                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="font-inter"
+                    onClick={handleRegisterClick}
+                  >
+                    + Create Event
+                  </Button>
                 )}
               </div>
             )}

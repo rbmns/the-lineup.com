@@ -14,7 +14,7 @@ export const NavItems: React.FC<NavItemsProps> = ({ className, showIconsOnly = f
   const { isAuthenticated, user, logout } = useAuth();
 
   return (
-    <div className={`flex items-center space-x-6 ${className || ''}`}>
+    <div className={`flex items-center space-x-4 ${className || ''}`}>
       <Link to="/events" className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-1.5">
         <Calendar className="h-4 w-4" />
         {!showIconsOnly && <span>Events</span>}

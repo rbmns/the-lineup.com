@@ -34,4 +34,16 @@
   animation: rsvpInterestedPulse 0.3s ease-out;
 }
 
+/* Hide scrollbar but keep functionality */
+@layer utilities {
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera*/
+  }
+}
+
 /* ... keep existing code */
