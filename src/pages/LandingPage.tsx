@@ -10,6 +10,7 @@ import { useEvents } from '@/hooks/useEvents';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEventImages } from '@/hooks/useEventImages';
 import { CategoryPill } from '@/components/ui/category-pill';
+import { getCategoryColorState } from '@/components/ui/category/category-color-mapping';
 import { Event } from '@/types';
 
 const LandingPage = () => {
