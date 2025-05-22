@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import LandingPage from './LandingPage';
+import MainNav from '@/components/MainNav';
 
 const Home = () => {
   const { user } = useAuth();
@@ -21,20 +22,12 @@ const Home = () => {
   console.log('Events loading status:', isLoading);
   console.log('Events data available:', events?.length || 0);
   
-  // Instead of rendering PublicHome, now render our new LandingPage
-  return <LandingPage />;
-  
-  // Preserving original return for future reference:
-  // return (
-  //   <div className="min-h-screen">
-  //     <PublicHome 
-  //       events={events || []} 
-  //       isLoading={isLoading} 
-  //       showSearch={true}
-  //       showFilters={true}
-  //     />
-  //   </div>
-  // );
+  return (
+    <div className="min-h-screen">
+      <MainNav />
+      <LandingPage />
+    </div>
+  );
 };
 
 export default Home;

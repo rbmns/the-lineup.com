@@ -50,7 +50,7 @@ export const getCategoryColorState = (category: string): CategoryColorState => {
     },
     'yoga': {
       active: 'bg-lime-500 text-white hover:bg-lime-600',
-      inactive: 'bg-lime-50 text-lime-700 hover:bg-lime-100'
+      inactive: 'bg-lime-100 text-lime-700 hover:bg-lime-200'
     },
     'community': {
       active: 'bg-purple-500 text-white hover:bg-purple-600',

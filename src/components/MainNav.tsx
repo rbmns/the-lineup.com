@@ -42,16 +42,18 @@ const MainNav = () => {
         <div className="flex h-16 items-center justify-between gap-2">
           <div className="flex items-center">
             <BrandLogo showText={!isMobile} />
-            
-            {/* Add NavItems to the right of the logo */}
-            <div className="ml-4 hidden md:block">
-              <NavItems />
-            </div>
           </div>
           
-          {/* Mobile NavItems */}
-          <div className="md:hidden">
-            <NavItems showIconsOnly={true} />
+          {/* Center the navigation items */}
+          <div className="flex-1 flex justify-center">
+            <div className="hidden md:block">
+              <NavItems className="text-base font-medium" />
+            </div>
+            
+            {/* Mobile NavItems */}
+            <div className="md:hidden flex justify-center">
+              <NavItems showIconsOnly={true} />
+            </div>
           </div>
 
           <div className="flex items-center gap-2">

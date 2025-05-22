@@ -14,13 +14,13 @@ export const NavItems: React.FC<NavItemsProps> = ({ className, showIconsOnly = f
   const { isAuthenticated, user, logout } = useAuth();
 
   return (
-    <div className={`flex items-center space-x-4 ${className || ''}`}>
-      <Link to="/events" className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-1.5">
-        <Calendar className="h-4 w-4" />
+    <div className={`flex items-center space-x-6 ${className || ''}`}>
+      <Link to="/events" className="text-base font-medium transition-colors hover:text-primary flex items-center gap-1.5">
+        <Calendar className="h-5 w-5" />
         {!showIconsOnly && <span>Events</span>}
       </Link>
-      <Link to="/friends" className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-1.5">
-        <Users className="h-4 w-4" />
+      <Link to="/friends" className="text-base font-medium transition-colors hover:text-primary flex items-center gap-1.5">
+        <Users className="h-5 w-5" />
         {!showIconsOnly && <span>Friends</span>}
       </Link>
     </div>

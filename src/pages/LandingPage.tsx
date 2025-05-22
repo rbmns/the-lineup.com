@@ -9,6 +9,8 @@ import { Footer } from '@/components/ui/footer';
 import { useEvents } from '@/hooks/useEvents';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEventImages } from '@/hooks/useEventImages';
+import { CategoryPill } from '@/components/ui/category-pill';
+import MainNav from '@/components/MainNav';
 import { Event } from '@/types';
 
 const LandingPage = () => {
@@ -89,9 +91,9 @@ const LandingPage = () => {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Connect with the Local Vibe
           </h1>
-          <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
+          <p className="text-xl leading-relaxed mb-8 max-w-2xl mx-auto">
             Discover markets, music, wellness, and community events happening nearby — plus see what your friends recommend.
-            Whether you’re exploring alone or with others, the Lineup helps you dive into the local scene and make the most of your time.
+            Whether you're exploring alone or with others, the Lineup helps you dive into the local scene and make the most of your time.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button asChild size="lg" className="bg-black hover:bg-black/90 text-white">
@@ -111,19 +113,19 @@ const LandingPage = () => {
       {/* Upcoming Events Section */}
       <section className="py-8">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-6">Upcoming Events</h2>
+          <h2 className="text-3xl font-semibold tracking-tight mb-6">Upcoming Events</h2>
           
           {/* Category Pills */}
           {eventTypes.length > 0 && (
             <div className="overflow-x-auto pb-4 mb-4 no-scrollbar">
               <div className="flex gap-2">
                 {eventTypes.map(type => (
-                  <div
+                  <CategoryPill
                     key={type}
-                    className="px-3 py-1 rounded-full text-sm whitespace-nowrap bg-gray-100 text-gray-700"
-                  >
-                    {type}
-                  </div>
+                    category={type}
+                    active={true}
+                    showIcon={true}
+                  />
                 ))}
               </div>
             </div>
@@ -163,8 +165,12 @@ const LandingPage = () => {
                           className="w-full h-40 object-cover" 
                         />
                         {event.event_type && (
-                          <div className="absolute top-2 right-2">
-                            <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded">{event.event_type}</span>
+                          <div className="absolute top-2 left-2 z-10">
+                            <CategoryPill 
+                              category={event.event_type} 
+                              active={true}
+                              showIcon={true}
+                            />
                           </div>
                         )}
                       </div>
@@ -204,37 +210,37 @@ const LandingPage = () => {
       {/* How It Works Section */}
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8">How It Works</h2>
-          <p className="text-center text-lg mb-12 max-w-2xl mx-auto">
+          <h2 className="text-3xl font-semibold tracking-tight text-center mb-4">How It Works</h2>
+          <p className="text-xl text-muted-foreground leading-relaxed text-center mb-12 max-w-2xl mx-auto">
             Create a profile to connect with friends and get personalized recommendations.
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Step 1 */}
-            <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+            <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow transform hover:translate-y-[-5px] transition-all duration-300">
               <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
                 <UserCircle className="w-8 h-8 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Create Your Profile</h3>
-              <p className="text-gray-600">Tell us a bit about yourself and your vibe.</p>
+              <p className="text-muted-foreground">Tell us a bit about yourself and your vibe.</p>
             </div>
             
             {/* Step 2 */}
-            <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+            <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow transform hover:translate-y-[-5px] transition-all duration-300">
               <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
                 <Users className="w-8 h-8 text-green-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Connect with Friends</h3>
-              <p className="text-gray-600">Find your crew and see what they're up to.</p>
+              <p className="text-muted-foreground">Find your crew and see what they're up to.</p>
             </div>
             
             {/* Step 3 */}
-            <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
+            <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow transform hover:translate-y-[-5px] transition-all duration-300">
               <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
                 <Sparkles className="w-8 h-8 text-purple-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Discover Events</h3>
-              <p className="text-gray-600">Join local events your friends love.</p>
+              <p className="text-muted-foreground">Join local events your friends love.</p>
             </div>
           </div>
           
@@ -251,75 +257,75 @@ const LandingPage = () => {
       {/* Browse by Category Section */}
       <section className="py-8 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-6">Browse by Category</h2>
+          <h2 className="text-3xl font-semibold tracking-tight mb-6">Browse by Category</h2>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
             <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-2">
-                <span className="text-blue-500 font-bold">S</span>
+              <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center mb-2 text-white">
+                <span className="text-white font-bold">S</span>
               </div>
               <span className="text-sm font-medium">Surf</span>
             </Link>
             
             <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-2">
-                <span className="text-green-500 font-bold">Y</span>
+              <div className="w-12 h-12 rounded-full bg-lime-500 flex items-center justify-center mb-2 text-white">
+                <span className="text-white font-bold">Y</span>
               </div>
               <span className="text-sm font-medium">Yoga</span>
             </Link>
             
             <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center mb-2">
-                <span className="text-yellow-600 font-bold">B</span>
+              <div className="w-12 h-12 rounded-full bg-yellow-500 flex items-center justify-center mb-2 text-white">
+                <span className="text-white font-bold">B</span>
               </div>
               <span className="text-sm font-medium">Beach</span>
             </Link>
             
             <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mb-2">
-                <span className="text-purple-500 font-bold">M</span>
+              <div className="w-12 h-12 rounded-full bg-fuchsia-500 flex items-center justify-center mb-2 text-white">
+                <span className="text-white font-bold">M</span>
               </div>
               <span className="text-sm font-medium">Music</span>
             </Link>
             
             <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-2">
-                <span className="text-red-500 font-bold">F</span>
+              <div className="w-12 h-12 rounded-full bg-red-500 flex items-center justify-center mb-2 text-white">
+                <span className="text-white font-bold">F</span>
               </div>
               <span className="text-sm font-medium">Food</span>
             </Link>
             
             <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mb-2">
-                <span className="text-orange-500 font-bold">W</span>
+              <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center mb-2 text-white">
+                <span className="text-white font-bold">W</span>
               </div>
               <span className="text-sm font-medium">Workshop</span>
             </Link>
             
             <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-cyan-100 flex items-center justify-center mb-2">
-                <span className="text-cyan-500 font-bold">C</span>
+              <div className="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center mb-2 text-white">
+                <span className="text-white font-bold">C</span>
               </div>
               <span className="text-sm font-medium">Community</span>
             </Link>
             
             <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mb-2">
-                <span className="text-emerald-500 font-bold">W</span>
+              <div className="w-12 h-12 rounded-full bg-lime-500 flex items-center justify-center mb-2 text-white">
+                <span className="text-white font-bold">W</span>
               </div>
               <span className="text-sm font-medium">Wellness</span>
             </Link>
             
             <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mb-2">
-                <span className="text-indigo-500 font-bold">L</span>
+              <div className="w-12 h-12 rounded-full bg-indigo-500 flex items-center justify-center mb-2 text-white">
+                <span className="text-white font-bold">L</span>
               </div>
               <span className="text-sm font-medium">Location</span>
             </Link>
             
             <Link to="/events" className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border">
-              <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center mb-2">
-                <span className="text-pink-500 font-bold">E</span>
+              <div className="w-12 h-12 rounded-full bg-pink-500 flex items-center justify-center mb-2 text-white">
+                <span className="text-white font-bold">E</span>
               </div>
               <span className="text-sm font-medium">Event</span>
             </Link>
@@ -330,8 +336,8 @@ const LandingPage = () => {
       {/* CTA Section */}
       <section className="py-12 bg-gray-100">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">Join our community of adventurers</h2>
-          <p className="text-lg mb-8 max-w-2xl mx-auto">
+          <h2 className="text-3xl font-semibold tracking-tight mb-4">Join our community of adventurers</h2>
+          <p className="text-xl mb-8 max-w-2xl mx-auto">
             Connect with like-minded individuals, discover new experiences, and create
             unforgettable memories with The Lineup.
           </p>
