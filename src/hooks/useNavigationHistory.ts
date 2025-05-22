@@ -52,9 +52,74 @@ export const useNavigationHistory = () => {
     }
   }, []);
 
+  // Get the previous path and associated data
+  const getPreviousPath = useCallback(() => {
+    try {
+      const filterState = loadFilterState();
+      return {
+        path: filterState?.path || '/events',
+        fullPath: `${filterState?.path || '/events'}${filterState?.search || ''}`,
+        filterState: filterState || {},
+        timestamp: filterState?.timestamp || 0
+      };
+    } catch (error) {
+      console.error('Error getting previous path:', error);
+      return {
+        path: '/events',
+        fullPath: '/events',
+        filterState: {},
+        timestamp: 0
+      };
+    }
+  }, [loadFilterState]);
+
+  // Check if we have history of filtered events
+  const hasFilteredEventsHistory = useCallback(() => {
+    try {
+      const filterState = loadFilterState();
+      return !!(filterState && 
+        filterState.path === '/events' && 
+        (filterState.eventTypes?.length > 0 || 
+         filterState.venues?.length > 0 || 
+         filterState.dateFilter || 
+         filterState.dateRange?.from));
+    } catch (error) {
+      console.error('Error checking filtered events history:', error);
+      return false;
+    }
+  }, [loadFilterState]);
+
+  // Get the filtered events path with preserved search parameters
+  const getFilteredEventsPath = useCallback(() => {
+    try {
+      const filterState = loadFilterState();
+      return filterState && filterState.search ? 
+        `/events${filterState.search}` : 
+        '/events';
+    } catch (error) {
+      console.error('Error getting filtered events path:', error);
+      return '/events';
+    }
+  }, [loadFilterState]);
+
+  // Get the last saved filter state
+  const getLastFilterState = useCallback(() => {
+    try {
+      const filterState = loadFilterState();
+      return filterState || {};
+    } catch (error) {
+      console.error('Error getting last filter state:', error);
+      return {};
+    }
+  }, [loadFilterState]);
+
   return {
     saveFilterState,
     loadFilterState,
-    clearFilterState
+    clearFilterState,
+    getPreviousPath,
+    hasFilteredEventsHistory,
+    getFilteredEventsPath,
+    getLastFilterState
   };
 };
