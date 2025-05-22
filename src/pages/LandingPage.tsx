@@ -96,11 +96,7 @@ const LandingPage = () => {
             </div>
           )}
           
-          <div className="text-center mt-6">
-            <Button asChild variant="outline">
-              <Link to="/events">See All Events</Link>
-            </Button>
-          </div>
+        
         </div>
       </section>
 
