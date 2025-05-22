@@ -20,7 +20,7 @@ const LandingPage = () => {
             Find the Best Local Events — Beachlife, Markets, Music & More
           </h1>
           <p className="text-xl text-muted-foreground leading-relaxed mb-6">
-            Whether you’re flying solo or meeting up with friends, the Lineup helps you explore Zandvoort’s best local vibes — from wellness sessions and food festivals to parties and beachside hangouts.
+            Whether you’re flying solo or meeting up with friends, the Lineup helps you explore Zandvoort’s best local vibes — from wellness sessions and food festivals to laidback parties and beachside hangouts.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="bg-black hover:bg-black/90 text-white font-inter px-6">
