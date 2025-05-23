@@ -10,18 +10,18 @@ export const Footer: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
           <div className="mb-2 md:mb-0">
-            <p>&copy; {currentYear} the lineup. 
+            <p>&copy; {currentYear} the lineup. All rights reserved. </p>
       
             <a 
               href="https://humblestudio.ai/?utm_source=thelineup&utm_medium=footer&utm_campaign=label" target="_blank" rel="noopener noreferrer"
-              className="hover:opacity-80 transition-opacity"
+              className="flex justify-center"
             >
               <img 
                 src="https://res.cloudinary.com/dita7stkt/image/upload/v1747993915/MadeByHS_kry9in.png" 
                 alt="Made by HumbleStudio.ai" 
                 className="h-14"
               />
-            </a></p>
+            </a>
           </div>
           <div className="flex space-x-5">
             <Link to="/privacy" className="hover:text-gray-900 transition">
