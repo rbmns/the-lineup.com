@@ -12,9 +12,9 @@ export const Footer: React.FC = () => {
           <div className="mb-2 md:mb-0">
             <p>&copy; {currentYear} the lineup. All rights reserved.</p>
           </div>
-          <div className="flex justify-center">
+          <div className="flex justify-left">
             <a 
-              href="https://humblestudio.ai/" 
+              href="https://humblestudio.ai/?utm_source=thelineup&utm_medium=footer&utm_campaign=madebylabel" 
               target="_blank" 
               rel="noopener noreferrer"
               className="hover:opacity-80 transition-opacity"
