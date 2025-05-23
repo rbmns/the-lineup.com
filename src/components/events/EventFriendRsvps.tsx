@@ -62,6 +62,8 @@ export const EventFriendRsvps: React.FC<EventFriendRsvpsProps> = ({
   const renderAttendeeAvatars = (users: User[], status: string) => {
     if (users.length === 0) return null;
     
+    const showUsernames = !isMobile && users.length <= 3; // Show usernames on desktop for 3 or fewer users
+    
     return (
       <div className="space-y-1.5">
         <h4 className="text-sm font-medium text-gray-500 mb-2 flex items-center">
@@ -72,29 +74,54 @@ export const EventFriendRsvps: React.FC<EventFriendRsvpsProps> = ({
           </Badge>
         </h4>
         
-        <div className="flex items-center">
-          <div className="flex -space-x-2 mr-2 overflow-hidden">
-            {users.slice(0, 5).map((user) => (
-              <TooltipProvider key={user.id} delayDuration={300}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Avatar 
-                      className="h-8 w-8 border-2 border-white cursor-pointer hover:opacity-80 transition-opacity"
-                      onClick={() => handleUserClick(user.id)}
-                    >
-                      <AvatarImage src={getAvatarUrl(user)} alt={getDisplayName(user)} />
-                      <AvatarFallback className="text-xs bg-gray-200">
-                        {getInitials(getDisplayName(user))}
-                      </AvatarFallback>
-                    </Avatar>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" className="bg-white border border-gray-200 shadow-md z-50">
-                    <p className="font-medium">{getDisplayName(user)}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            ))}
-          </div>
+        <div className="flex items-center flex-wrap gap-2">
+          {users.slice(0, 5).map((user) => (
+            <div key={user.id}>
+              {showUsernames ? (
+                // Desktop: Show avatar + username for few users
+                <div 
+                  className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                  onClick={() => handleUserClick(user.id)}
+                >
+                  <Avatar className="h-8 w-8 border-2 border-white">
+                    <AvatarImage 
+                      src={getAvatarUrl(user)} 
+                      alt={getDisplayName(user)}
+                      className="object-cover w-full h-full"
+                    />
+                    <AvatarFallback className="text-xs bg-gray-200">
+                      {getInitials(getDisplayName(user))}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm font-medium text-gray-700">{getDisplayName(user)}</span>
+                </div>
+              ) : (
+                // Mobile or many users: Show avatar with tooltip
+                <TooltipProvider delayDuration={300}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Avatar 
+                        className="h-8 w-8 border-2 border-white cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => handleUserClick(user.id)}
+                      >
+                        <AvatarImage 
+                          src={getAvatarUrl(user)} 
+                          alt={getDisplayName(user)}
+                          className="object-cover w-full h-full"
+                        />
+                        <AvatarFallback className="text-xs bg-gray-200">
+                          {getInitials(getDisplayName(user))}
+                        </AvatarFallback>
+                      </Avatar>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="bg-white border border-gray-200 shadow-md z-50">
+                      <p className="font-medium">{getDisplayName(user)}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
+          ))}
           
           {users.length > 5 && (
             <button 
@@ -119,7 +146,11 @@ export const EventFriendRsvps: React.FC<EventFriendRsvpsProps> = ({
             onClick={() => handleUserClick(user.id)}
           >
             <Avatar className="h-10 w-10 mr-3">
-              <AvatarImage src={getAvatarUrl(user)} alt={getDisplayName(user)} />
+              <AvatarImage 
+                src={getAvatarUrl(user)} 
+                alt={getDisplayName(user)}
+                className="object-cover w-full h-full"
+              />
               <AvatarFallback className="bg-gray-200">
                 {getInitials(getDisplayName(user))}
               </AvatarFallback>

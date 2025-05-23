@@ -10,9 +10,9 @@ export const navigateToUserProfile = (userId: string, navigate: NavigateFunction
     return;
   }
   
-  // Navigate to user profile page
+  // Navigate to user profile page - using /users/:userId route
   console.log(`Navigating to user profile: ${userId}`);
-  navigate(`/user/${userId}`, {
+  navigate(`/users/${userId}`, {
     state: { 
       fromProfileNavigation: true,
       timestamp: Date.now()
