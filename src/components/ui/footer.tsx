@@ -10,7 +10,7 @@ export const Footer: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
           <div className="mb-2 md:mb-0">
-            <p>&copy; {currentYear} the lineup. All rights reserved.</p>
+            <p>&copy; {currentYear} the lineup. All rights reserved.
       
             <a 
               href="https://humblestudio.ai/" 
@@ -23,7 +23,7 @@ export const Footer: React.FC = () => {
                 alt="Made by HumbleStudio.ai" 
                 className="h-14"
               />
-            </a>
+            </a></p>
           </div>
           <div className="flex space-x-5">
             <Link to="/privacy" className="hover:text-gray-900 transition">
