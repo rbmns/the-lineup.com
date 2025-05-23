@@ -152,7 +152,7 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({ userId }) => {
         />
         <PrivacySettingItem
           title="Show Event Attendance"
-          description="Share which events you are attending with your friends (GDPR compliant - friends only)"
+          description="Share with firneds on which events you are attending"
           checked={localSettings.show_event_attendance}
           onCheckedChange={(checked) => handleLocalChange('show_event_attendance', checked)}
         />
@@ -162,12 +162,7 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({ userId }) => {
           checked={localSettings.share_activity_with_friends}
           onCheckedChange={(checked) => handleLocalChange('share_activity_with_friends', checked)}
         />
-        <PrivacySettingItem
-          title="Allow Tagging"
-          description="Allow friends to tag you in events and posts"
-          checked={localSettings.allow_tagging}
-          onCheckedChange={(checked) => handleLocalChange('allow_tagging', checked)}
-        />
+     
 
         {hasChanges && (
           <div className="pt-4 border-t">
