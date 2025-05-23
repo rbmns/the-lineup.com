@@ -489,6 +489,39 @@ export type Database = {
         }
         Relationships: []
       }
+      user_privacy_settings: {
+        Row: {
+          allow_tagging: boolean | null
+          created_at: string
+          id: string
+          public_profile: boolean | null
+          share_activity_with_friends: boolean | null
+          show_event_attendance: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          allow_tagging?: boolean | null
+          created_at?: string
+          id?: string
+          public_profile?: boolean | null
+          share_activity_with_friends?: boolean | null
+          show_event_attendance?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          allow_tagging?: boolean | null
+          created_at?: string
+          id?: string
+          public_profile?: boolean | null
+          share_activity_with_friends?: boolean | null
+          show_event_attendance?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

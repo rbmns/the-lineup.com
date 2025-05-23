@@ -4,7 +4,7 @@ import { NavigateFunction } from 'react-router-dom';
 /**
  * Navigate to a user's profile page with proper state management
  */
-export const navigateToUserProfile = (userId: string, navigate: NavigateFunction, friendshipStatus?: string, isCurrentUser?: boolean) => {
+export const navigateToUserProfile = (userId: string, navigate: NavigateFunction) => {
   if (!userId) {
     console.error('Cannot navigate: missing user ID');
     return;
@@ -23,7 +23,7 @@ export const navigateToUserProfile = (userId: string, navigate: NavigateFunction
 /**
  * Navigate to an event detail page with proper state management
  */
-export const navigateToEvent = (eventId: string, navigate: NavigateFunction, event?: any, preserveFilters?: boolean) => {
+export const navigateToEvent = (eventId: string, navigate: NavigateFunction) => {
   if (!eventId) {
     console.error('Cannot navigate: missing event ID');
     return;
@@ -34,7 +34,6 @@ export const navigateToEvent = (eventId: string, navigate: NavigateFunction, eve
   navigate(`/events/${eventId}`, {
     state: { 
       fromEventNavigation: true,
-      preserveFilters: preserveFilters || false,
       timestamp: Date.now()
     }
   });
