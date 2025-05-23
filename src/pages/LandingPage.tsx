@@ -240,33 +240,31 @@ const LandingPage = () => {
           </p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Step 1 */}<a href="/signup">
+            {/* Step 1 */}
             <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow transform hover:translate-y-[-5px] transition-all duration-300">
               <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
                 <UserCircle className="w-8 h-8 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Create Your Profile</h3>
-              <p className="text-muted-foreground">Tell us a bit about yourself and your vibe.</p></a>
+              <p className="text-muted-foreground">Tell us a bit about yourself and your vibe.</p>
             </div>
             
             {/* Step 2 */}
             <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow transform hover:translate-y-[-5px] transition-all duration-300">
-           <a href="/friends">
               <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
                 <Users className="w-8 h-8 text-green-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Connect with Friends</h3>
-              <p className="text-muted-foreground">Find your crew and see what they're up to.</p></a>
+              <p className="text-muted-foreground">Find your crew and see what they're up to.</p>
             </div>
             
             {/* Step 3 */}
             <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow transform hover:translate-y-[-5px] transition-all duration-300">
-            <a href="/friends">
               <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
                 <Sparkles className="w-8 h-8 text-purple-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Discover Events</h3>
-              <p className="text-muted-foreground">Join local events your friends love.</p></a>
+              <p className="text-muted-foreground">Join local events your friends love.</p>
             </div>
           </div>
           
