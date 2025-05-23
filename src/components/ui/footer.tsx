@@ -11,8 +11,7 @@ export const Footer: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
           <div className="mb-2 md:mb-0">
             <p>&copy; {currentYear} the lineup. All rights reserved.</p>
-          </div>
-          <div className="flex justify-center">
+      
             <a 
               href="https://humblestudio.ai/" 
               target="_blank" 
