@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
 
 export interface PrivacySettings {
@@ -79,29 +78,14 @@ export function usePrivacySettings(userId?: string | null) {
         .eq('user_id', userId);
 
       if (error) {
-        toast({
-          title: "Failed to update privacy setting",
-          description: error.message,
-          variant: "destructive"
-        });
-        return;
+        throw error;
       }
 
       // Update local state
       setSettings(prev => prev ? { ...prev, [field]: value } : null);
-
-      toast({
-        title: "Settings updated",
-        description: "Your privacy preferences have been saved",
-        variant: "default"
-      });
     } catch (err) {
       console.error('Error updating privacy setting:', err);
-      toast({
-        title: "An error occurred",
-        description: "Could not update your settings",
-        variant: "destructive"
-      });
+      throw err;
     }
   };
 

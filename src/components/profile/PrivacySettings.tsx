@@ -1,9 +1,11 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PrivacySettings as PrivacySettingsType, usePrivacySettings } from '@/hooks/usePrivacySettings';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Save } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 interface PrivacySettingItemProps {
   title: string;
@@ -24,12 +26,13 @@ const PrivacySettingItem: React.FC<PrivacySettingItemProps> = ({
     <div className="flex items-center justify-between space-x-4 py-3">
       <div className="flex-1">
         <h4 className="font-medium">{title}</h4>
-        <p className="text-sm text-gray-500">{description}</p>
+        <p className="text-sm text-muted-foreground">{description}</p>
       </div>
       <Switch 
         checked={checked}
         onCheckedChange={onCheckedChange}
         disabled={disabled}
+        className="data-[state=unchecked]:bg-gray-200"
       />
     </div>
   );
@@ -41,6 +44,76 @@ interface PrivacySettingsProps {
 
 export const PrivacySettings: React.FC<PrivacySettingsProps> = ({ userId }) => {
   const { settings, loading, updateSetting } = usePrivacySettings(userId);
+  const [localSettings, setLocalSettings] = useState<PrivacySettingsType | null>(null);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Initialize local settings when server settings are loaded
+  useEffect(() => {
+    if (settings && !localSettings) {
+      setLocalSettings(settings);
+    }
+  }, [settings, localSettings]);
+
+  // Check if there are unsaved changes
+  useEffect(() => {
+    if (settings && localSettings) {
+      const hasUnsavedChanges = 
+        settings.public_profile !== localSettings.public_profile ||
+        settings.show_event_attendance !== localSettings.show_event_attendance ||
+        settings.share_activity_with_friends !== localSettings.share_activity_with_friends ||
+        settings.allow_tagging !== localSettings.allow_tagging;
+      
+      setHasChanges(hasUnsavedChanges);
+    }
+  }, [settings, localSettings]);
+
+  const handleLocalChange = (field: keyof Omit<PrivacySettingsType, 'id' | 'user_id' | 'created_at' | 'updated_at'>, value: boolean) => {
+    if (localSettings) {
+      setLocalSettings(prev => prev ? { ...prev, [field]: value } : null);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!localSettings || !hasChanges) return;
+
+    setIsSaving(true);
+    try {
+      // Update each changed setting
+      if (settings) {
+        const updates: Promise<void>[] = [];
+        
+        if (settings.public_profile !== localSettings.public_profile) {
+          updates.push(updateSetting('public_profile', localSettings.public_profile));
+        }
+        if (settings.show_event_attendance !== localSettings.show_event_attendance) {
+          updates.push(updateSetting('show_event_attendance', localSettings.show_event_attendance));
+        }
+        if (settings.share_activity_with_friends !== localSettings.share_activity_with_friends) {
+          updates.push(updateSetting('share_activity_with_friends', localSettings.share_activity_with_friends));
+        }
+        if (settings.allow_tagging !== localSettings.allow_tagging) {
+          updates.push(updateSetting('allow_tagging', localSettings.allow_tagging));
+        }
+
+        await Promise.all(updates);
+        
+        toast({
+          title: "Settings saved",
+          description: "Your privacy preferences have been updated",
+          variant: "default"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error saving settings",
+        description: "Could not update your privacy preferences",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -50,7 +123,7 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({ userId }) => {
     );
   }
 
-  if (!settings) {
+  if (!settings || !localSettings) {
     return (
       <Card>
         <CardHeader>
@@ -58,7 +131,7 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({ userId }) => {
           <CardDescription>Manage your profile and data visibility</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-500">Could not load your privacy settings</p>
+          <p className="text-muted-foreground">Could not load your privacy settings</p>
         </CardContent>
       </Card>
     );
@@ -68,33 +141,50 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({ userId }) => {
     <Card>
       <CardHeader>
         <CardTitle>Privacy Settings</CardTitle>
-        <CardDescription>Manage your profile and data visibility</CardDescription>
+        <CardDescription>Control who can see your information and activities</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <PrivacySettingItem
           title="Public Profile"
-          description="Allow others to view your profile"
-          checked={settings.public_profile}
-          onCheckedChange={(checked) => updateSetting('public_profile', checked)}
+          description="Allow others to view your profile information"
+          checked={localSettings.public_profile}
+          onCheckedChange={(checked) => handleLocalChange('public_profile', checked)}
         />
         <PrivacySettingItem
           title="Show Event Attendance"
-          description="Show which events you are attending or interested in"
-          checked={settings.show_event_attendance}
-          onCheckedChange={(checked) => updateSetting('show_event_attendance', checked)}
+          description="Share which events you are attending with your friends (GDPR compliant - friends only)"
+          checked={localSettings.show_event_attendance}
+          onCheckedChange={(checked) => handleLocalChange('show_event_attendance', checked)}
         />
         <PrivacySettingItem
           title="Activity Sharing"
           description="Share your activity updates with friends"
-          checked={settings.share_activity_with_friends}
-          onCheckedChange={(checked) => updateSetting('share_activity_with_friends', checked)}
+          checked={localSettings.share_activity_with_friends}
+          onCheckedChange={(checked) => handleLocalChange('share_activity_with_friends', checked)}
         />
         <PrivacySettingItem
-          title="Tagging"
-          description="Allow others to tag you in events and posts"
-          checked={settings.allow_tagging}
-          onCheckedChange={(checked) => updateSetting('allow_tagging', checked)}
+          title="Allow Tagging"
+          description="Allow friends to tag you in events and posts"
+          checked={localSettings.allow_tagging}
+          onCheckedChange={(checked) => handleLocalChange('allow_tagging', checked)}
         />
+
+        {hasChanges && (
+          <div className="pt-4 border-t">
+            <Button 
+              onClick={handleSave}
+              disabled={isSaving || !hasChanges}
+              className="flex items-center gap-2"
+            >
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              {isSaving ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
