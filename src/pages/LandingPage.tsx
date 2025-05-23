@@ -249,25 +249,25 @@ const LandingPage = () => {
               <p className="text-muted-foreground">Tell us a bit about yourself and your vibe.</p></a>
             </div>
             
-            {/* Step 2 */}<a href="/friends">
+            {/* Step 2 */}
             <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow transform hover:translate-y-[-5px] transition-all duration-300">
-           
+           <a href="/friends">
               <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
                 <Users className="w-8 h-8 text-green-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Connect with Friends</h3>
-              <p className="text-muted-foreground">Find your crew and see what they're up to.</p>
-            </div></a>
+              <p className="text-muted-foreground">Find your crew and see what they're up to.</p></a>
+            </div>
             
-            {/* Step 3 */}<a href="/events">
+            {/* Step 3 */}
             <div className="text-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow transform hover:translate-y-[-5px] transition-all duration-300">
-            
+            <a href="/friends">
               <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
                 <Sparkles className="w-8 h-8 text-purple-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Discover Events</h3>
-              <p className="text-muted-foreground">Join local events your friends love.</p>
-            </div></a>
+              <p className="text-muted-foreground">Join local events your friends love.</p></a>
+            </div>
           </div>
           
           <div className="text-center mt-8">
@@ -281,7 +281,26 @@ const LandingPage = () => {
       </section>
 
       {/* Browse by Category Section - Now showing all available categories */}
-     
+      <section className="py-8 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-semibold tracking-tight mb-6">Browse by Category</h2>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            {allEventTypes.map(type => (
+              <Link 
+                key={type} 
+                to={`/events?type=${type}`} 
+                className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border"
+              >
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 text-white ${getCategoryColorState(type).active.split(' ')[0]}`}>
+                  <span className="text-white font-bold">{type.charAt(0).toUpperCase()}</span>
+                </div>
+                <span className="text-sm font-medium">{type}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* CTA Section */}
       <section className="py-12 bg-gray-100">
