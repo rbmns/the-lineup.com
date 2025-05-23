@@ -42,7 +42,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
       console.log(`ProfileCard: Attempting to navigate to profile ${profile.id}`);
       console.log(`ProfileCard: Current friendship status: ${friendStatus}`);
       
-      navigateToUserProfile(profile.id, navigate, friendStatus, false);
+      navigateToUserProfile(profile.id, navigate);
     } else {
       console.log(`ProfileCard: Profile is not clickable with status ${friendStatus}`);
     }

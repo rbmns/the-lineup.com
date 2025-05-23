@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { UserProfile } from '@/types';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -93,7 +92,7 @@ export const FriendCard: React.FC<FriendCardProps> = ({
     console.log("FriendCard: Event target:", e.target);
     console.log("FriendCard: Current URL:", window.location.href);
     
-    navigateToUserProfile(profileId, navigate, friendshipStatus, isCurrentUser);
+    navigateToUserProfile(profileId, navigate);
   };
 
   const handleAddFriend = (id: string) => {

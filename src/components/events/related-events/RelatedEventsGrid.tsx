@@ -29,7 +29,7 @@ export const RelatedEventsGrid: React.FC<RelatedEventsGridProps> = ({
   // Handle navigation with URL parameters
   const handleEventClick = (event: Event) => {
     // Build URL with source parameter
-    navigateToEvent(event.id, navigate, event, true);
+    navigateToEvent(event.id, navigate);
   };
 
   return (
