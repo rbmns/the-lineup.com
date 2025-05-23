@@ -12,7 +12,20 @@ export const Footer: React.FC = () => {
           <div className="mb-2 md:mb-0">
             <p>&copy; {currentYear} the lineup. All rights reserved.</p>
           </div>
-          
+          <div className="flex justify-center">
+            <a 
+              href="https://humblestudio.ai/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:opacity-80 transition-opacity"
+            >
+              <img 
+                src="https://res.cloudinary.com/dita7stkt/image/upload/v1747993915/MadeByHS_kry9in.png" 
+                alt="Made by HumbleStudio.ai" 
+                className="h-14"
+              />
+            </a>
+          </div>
           <div className="flex space-x-5">
             <Link to="/privacy" className="hover:text-gray-900 transition">
               Privacy Policy
