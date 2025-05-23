@@ -13,7 +13,7 @@ export const Footer: React.FC = () => {
             <p>&copy; {currentYear} the lineup. 
       
             <a 
-              href="https://humblestudio.ai/?utm_source=clientname&utm_medium=footer&utm_campaign=branding" target="_blank" rel="noopener noreferrer"
+              href="https://humblestudio.ai/?utm_source=thelineup&utm_medium=footer&utm_campaign=label" target="_blank" rel="noopener noreferrer"
               className="hover:opacity-80 transition-opacity"
             >
               <img 
