@@ -11,7 +11,7 @@ export const Footer: React.FC = () => {
         <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
           <div className="mb-2 md:mb-0">
             <p>&copy; {currentYear} the lineup. All rights reserved. </p>
-      
+</div><div>      
             <a 
               href="https://humblestudio.ai/?utm_source=thelineup&utm_medium=footer&utm_campaign=label" target="_blank" rel="noopener noreferrer"
               className="flex justify-center"
@@ -22,7 +22,7 @@ export const Footer: React.FC = () => {
                 className="h-14"
               />
             </a>
-          </div>
+</div>          </div>
           <div className="flex space-x-5">
             <Link to="/privacy" className="hover:text-gray-900 transition">
               Privacy Policy
