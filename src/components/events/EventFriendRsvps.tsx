@@ -133,8 +133,6 @@ export const EventFriendRsvps: React.FC<EventFriendRsvpsProps> = ({
 
   return (
     <div className={`space-y-4 ${className}`}>
-      <h3 className="text-md font-semibold mb-3">Friends Attending</h3>
-      
       {renderAttendeeAvatars(going, 'going')}
       {renderAttendeeAvatars(interested, 'interested')}
       

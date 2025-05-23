@@ -12,12 +12,14 @@ import TeaseLoginSignup from './detail-sections/TeaseLoginSignup';
 interface SidebarContentProps {
   event: Event;
   attendees: { going: any[]; interested: any[] };
+  friendAttendees?: { going: any[]; interested: any[] };
   isAuthenticated: boolean;
 }
 
 export const SidebarContent: React.FC<SidebarContentProps> = ({
   event,
   attendees,
+  friendAttendees = { going: [], interested: [] },
   isAuthenticated
 }) => {
   const hasFee = typeof event.fee === 'number' && event.fee > 0;
@@ -27,6 +29,10 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({
   
   // Check if we need to show booking info
   const showBookingInfo = hasFee || hasBookingLink || hasExtraInfo || hasOrganizerLink;
+
+  // Check if there are any friend attendees
+  const hasFriendAttendees = 
+    (friendAttendees?.going?.length > 0 || friendAttendees?.interested?.length > 0);
 
   return (
     <div className="space-y-4">
@@ -108,14 +114,27 @@ export const SidebarContent: React.FC<SidebarContentProps> = ({
         <Card className="shadow-md border border-gray-200 animate-fade-in" style={{ animationDelay: '300ms' }}>
           <CardContent className="p-5">
             <h3 className="text-lg font-semibold mb-3">Friends Attending</h3>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-sm font-medium">Going: {attendees?.going?.length || 0}</span>
-              <span className="text-sm font-medium">Interested: {attendees?.interested?.length || 0}</span>
+            
+            {hasFriendAttendees ? (
+              <EventFriendRsvps 
+                going={friendAttendees.going || []} 
+                interested={friendAttendees.interested || []} 
+              />
+            ) : (
+              <div className="text-gray-500 text-sm">
+                None of your friends are attending this event yet. Invite them!
+              </div>
+            )}
+            
+            <Separator className="my-4" />
+            
+            <div>
+              <h4 className="text-sm font-medium mb-2">All Attendees</h4>
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-sm font-medium">Going: {attendees?.going?.length || 0}</span>
+                <span className="text-sm font-medium">Interested: {attendees?.interested?.length || 0}</span>
+              </div>
             </div>
-            <EventAttendeesList 
-              going={attendees?.going || []} 
-              interested={attendees?.interested || []} 
-            />
           </CardContent>
         </Card>
       ) : (

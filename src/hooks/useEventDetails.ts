@@ -7,12 +7,14 @@ import { useEventDetailsFetcher } from './events/useEventDetailsFetcher';
 import { useEventAttendees } from './events/useEventAttendees';
 import { useEventRsvpHandler } from './events/useEventRsvpHandler';
 import { useRsvpActions } from './useRsvpActions';
+import { useEventRSVP } from './useEventRSVP';
 
 interface UseEventDetailsResult {
   event: Event | null;
   isLoading: boolean;
   error: Error | string | null;
   attendees: { going: any[]; interested: any[] };
+  friendAttendees: { going: any[]; interested: any[] };
   rsvpLoading: boolean;
   handleRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
   handleRsvpAction: (eventId: string, status: 'Going' | 'Interested') => Promise<void>;
@@ -23,18 +25,42 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { handleRsvp: hookHandleRsvp, loading: rsvpLoadingState } = useRsvpActions();
+  const { getFriendAttendeesForEvent } = useEventRSVP();
   
   // Use our extracted hooks
   const { event, isLoading, error, refreshData } = useEventDetailsFetcher(eventId);
   const { attendees, fetchAttendees } = useEventAttendees(eventId);
   const { handleRsvp: directRsvpHandler, rsvpLoading: localRsvpLoading } = useEventRsvpHandler(eventId);
+  
+  // State for friend attendees
+  const [friendAttendees, setFriendAttendees] = useState<{ going: any[]; interested: any[] }>({ 
+    going: [], 
+    interested: [] 
+  });
 
   // Fetch attendees whenever the event changes
   useEffect(() => {
     if (event) {
       fetchAttendees();
+      
+      // Also fetch friend attendees if user is authenticated
+      if (user?.id) {
+        fetchFriendAttendees();
+      }
     }
-  }, [event]);
+  }, [event, user?.id]);
+
+  // Function to fetch friend attendees
+  const fetchFriendAttendees = async () => {
+    if (!user?.id || !eventId) return;
+    
+    try {
+      const friendAttendeesData = await getFriendAttendeesForEvent(eventId, user.id);
+      setFriendAttendees(friendAttendeesData);
+    } catch (error) {
+      console.error('Error fetching friend attendees:', error);
+    }
+  };
 
   // Handle RSVP for a specific event - Using the directRsvpHandler
   const rsvpToEvent = async (status: 'Going' | 'Interested'): Promise<boolean> => {
@@ -66,6 +92,11 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
         
         // Refresh attendees data
         await fetchAttendees();
+        
+        // Also refresh friend attendees
+        if (user?.id) {
+          await fetchFriendAttendees();
+        }
       }
       
       return result;
@@ -85,6 +116,7 @@ export const useEventDetails = (eventId: string): UseEventDetailsResult => {
     isLoading,
     error,
     attendees,
+    friendAttendees,
     rsvpLoading: rsvpLoadingState || localRsvpLoading,
     handleRsvp: rsvpToEvent,
     handleRsvpAction,

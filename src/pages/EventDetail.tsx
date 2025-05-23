@@ -46,6 +46,7 @@ const EventDetail = () => {
     isLoading, 
     error, 
     attendees, 
+    friendAttendees, 
     rsvpLoading,
     handleRsvp 
   } = useEventDetails(effectiveId);
@@ -216,12 +217,13 @@ const EventDetail = () => {
             <SidebarContent 
               event={event}
               attendees={attendees}
+              friendAttendees={friendAttendees}
               isAuthenticated={isAuthenticated}
             />
           </div>
         </div>
         
-        {/* Related Events Section - properly implemented */}
+        {/* Related Events Section */}
         <div className="mt-12">
           <RelatedEvents 
             eventId={event.id} 
@@ -232,7 +234,7 @@ const EventDetail = () => {
           />
         </div>
             
-        {/* Bottom back to events button - desktop and mobile */}
+        {/* Bottom back to events button */}
         <div className="mt-8 mb-4 flex justify-center">
           <Button 
             variant="outline" 
