@@ -47,7 +47,7 @@ const MainNav = () => {
           {/* Center the navigation items */}
           <div className="flex-1 flex justify-center">
             <div className="hidden md:block">
-              <NavItems className="text-lg font-medium" />
+              <NavItems className="text-base font-medium" />
             </div>
             
             {/* Mobile NavItems */}
@@ -65,13 +65,14 @@ const MainNav = () => {
                   variant="ghost"
                   size="sm"
                   onClick={handleSignInClick}
-                  className="hidden sm:flex"
+                  className="hidden sm:flex text-base"
                 >
                   Sign in
                 </Button>
                 <Button
                   size="sm"
                   onClick={handleRegisterClick}
+                  className="text-base"
                 >
                   Sign up
                 </Button>

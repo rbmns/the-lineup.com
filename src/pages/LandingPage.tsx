@@ -23,6 +23,19 @@ const LandingPage = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { availableCategories } = useEventCategories(events);
   
+  // Scroll to top when coming from another page (but not on initial load)
+  useEffect(() => {
+    const scrollToTop = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    
+    // Only scroll to top if we're navigating from another page
+    if (window.location.pathname === '/' && document.referrer && 
+        !document.referrer.includes(window.location.origin + '/')) {
+      scrollToTop();
+    }
+  }, []);
+
   // Get upcoming events for the next week
   const upcomingEvents = React.useMemo(() => {
     if (!events || events.length === 0) return [];
@@ -77,15 +90,23 @@ const LandingPage = () => {
     )).sort();
   }, [upcomingEvents]);
 
-  // Get all event types from all events, not just upcoming ones
+  // Get all event types from all events, not just upcoming ones - UPDATED to include art & culture
   const allEventTypes = React.useMemo(() => {
     if (!events || events.length === 0) return [];
     
-    return Array.from(new Set(
+    const eventTypesFromData = Array.from(new Set(
       events
         .filter(event => event.event_type)
         .map(event => event.event_type as string)
-    )).sort();
+    ));
+    
+    // Make sure to include art & culture even if not in data
+    const allTypes = [...eventTypesFromData];
+    if (!allTypes.includes('art & culture')) {
+      allTypes.push('art & culture');
+    }
+    
+    return allTypes.sort();
   }, [events]);
 
   const handleCategoryClick = (category: string) => {
@@ -202,7 +223,9 @@ const LandingPage = () => {
                         <h3 className="font-semibold mb-2 line-clamp-2 min-h-[48px]">{event.title}</h3>
                         <div className="flex items-center text-sm text-gray-600 mb-2">
                           <Map size={14} className="mr-1 flex-shrink-0" />
-                          <span className="truncate">{event.location || 'Location TBD'}</span>
+                          <span className="truncate">
+                            {event.venues?.name || event.location || 'Location TBD'}
+                          </span>
                         </div>
                         <div className="flex items-center text-sm text-gray-600 mt-auto">
                           <Calendar size={14} className="mr-1 flex-shrink-0" />
