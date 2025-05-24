@@ -71,6 +71,10 @@ export const getCategoryColorState = (category: string): CategoryColorState => {
     'market': {
       active: 'bg-orange-500 text-white hover:bg-orange-600',
       inactive: 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+    },
+    'art & culture': {
+      active: 'bg-pink-500 text-white hover:bg-pink-600',
+      inactive: 'bg-pink-100 text-pink-700 hover:bg-pink-200'
     }
   };
   

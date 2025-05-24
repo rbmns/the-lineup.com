@@ -150,6 +150,7 @@ export type Database = {
           creator: string | null
           description: string | null
           destination: string | null
+          end_date: string | null
           end_time: string | null
           event_type: string | null
           "Extra info": string | null
@@ -173,6 +174,7 @@ export type Database = {
           creator?: string | null
           description?: string | null
           destination?: string | null
+          end_date?: string | null
           end_time?: string | null
           event_type?: string | null
           "Extra info"?: string | null
@@ -196,6 +198,7 @@ export type Database = {
           creator?: string | null
           description?: string | null
           destination?: string | null
+          end_date?: string | null
           end_time?: string | null
           event_type?: string | null
           "Extra info"?: string | null

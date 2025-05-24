@@ -9,10 +9,8 @@ export const Footer: React.FC = () => {
     <footer className="w-full border-t border-gray-200 bg-white py-4">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
-          <div className="mb-2 md:mb-0">
+          <div className="mb-2 md:mb-0 flex items-center gap-4">
             <p>&copy; {currentYear} the lineup. All rights reserved.</p>
-          </div>
-          <div className="flex justify-left">
             <a 
               href="https://humblestudio.ai/?utm_source=thelineup&utm_medium=footer&utm_campaign=madebylabel" 
               target="_blank" 

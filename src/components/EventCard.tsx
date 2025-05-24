@@ -92,6 +92,9 @@ const EventCard: React.FC<EventCardProps> = ({
   // Determine card height
   const cardHeightClass = compact ? "max-h-[280px]" : "";
 
+  // Get location from venue or fallback to event location
+  const displayLocation = event.venues?.name || event.location || 'No location';
+
   return (
     <div
       className={cn(
@@ -140,7 +143,7 @@ const EventCard: React.FC<EventCardProps> = ({
         
         <div className="flex items-center text-sm text-gray-500">
           <MapPin className="h-3.5 w-3.5 mr-1 flex-shrink-0" />
-          <span className="truncate">{event.venues?.name || event.location || 'No location'}</span>
+          <span className="truncate">{displayLocation}</span>
         </div>
         
         <div className="flex-grow min-h-[8px]"></div>

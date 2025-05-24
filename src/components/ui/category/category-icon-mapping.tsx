@@ -1,7 +1,7 @@
 
 import { 
   Music, Award, Heart, Wind, Waves, Gamepad, MoreHorizontal, 
-  Trophy, Pizza, ShoppingCart, UsersRound, Droplet 
+  Trophy, Pizza, ShoppingCart, UsersRound, Droplet, Palette 
 } from 'lucide-react';
 import React from 'react';
 
@@ -24,7 +24,8 @@ export const getCategoryIcon = (category: string): React.FC<React.SVGProps<SVGSV
     'water': Droplet,
     'music': Music,
     'food': Pizza,
-    'market': ShoppingCart
+    'market': ShoppingCart,
+    'art & culture': Palette
   };
   
   // Return the icon component for the category, or a default if not found
