@@ -19,5 +19,10 @@ export const useEventNavigation = () => {
     });
   };
 
-  return { navigateToEvent };
+  const navigateToDestinationEvents = (destination: string) => {
+    // Navigate to events page with destination filter
+    navigate(`/events?destination=${encodeURIComponent(destination)}`);
+  };
+
+  return { navigateToEvent, navigateToDestinationEvents };
 };
