@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
@@ -218,10 +217,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       console.log("Sign in successful:", data.user?.id);
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully logged in.",
-      });
       
       if (data.session) {
         setSession(data.session);
@@ -404,11 +399,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       console.log("Profile updated successfully");
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully.",
-      });
-
+      
       setProfile((prevProfile) => ({
           ...prevProfile,
           username,

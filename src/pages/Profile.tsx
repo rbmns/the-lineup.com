@@ -4,8 +4,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useProfileData } from '@/hooks/useProfileData';
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
+import { PrivacySettings } from '@/components/profile/PrivacySettings';
 import { Button } from '@/components/ui/button';
-import { MapPin, Calendar, Edit3, User, Shield, CalendarDays } from 'lucide-react';
+import { MapPin, Edit3, User, Shield, CalendarDays } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 
 const Profile: React.FC = () => {
@@ -89,14 +90,6 @@ const Profile: React.FC = () => {
               </div>
               
               <div>
-                <label className="text-sm font-medium text-gray-700">Member Since</label>
-                <p className="mt-1 text-gray-900 flex items-center">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  May 2025
-                </p>
-              </div>
-              
-              <div>
                 <label className="text-sm font-medium text-gray-700">About</label>
                 <p className="mt-1 text-gray-900">{profile?.tagline || 'No bio added yet'}</p>
               </div>
@@ -110,46 +103,7 @@ const Profile: React.FC = () => {
         );
         
       case 'privacy':
-        return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Privacy Settings</h2>
-              <p className="text-gray-600 mb-6">Control who can see your information and activities</p>
-            </div>
-            
-            <div className="space-y-6">
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <h3 className="font-medium">Public Profile</h3>
-                  <p className="text-sm text-gray-600">Allow others to view your profile information</p>
-                </div>
-                <div className="w-11 h-6 bg-black rounded-full relative">
-                  <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 right-0.5"></div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <h3 className="font-medium">Show Event Attendance</h3>
-                  <p className="text-sm text-gray-600">Share with friends on which events you are attending</p>
-                </div>
-                <div className="w-11 h-6 bg-black rounded-full relative">
-                  <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 right-0.5"></div>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <h3 className="font-medium">Activity Sharing</h3>
-                  <p className="text-sm text-gray-600">Share your activity updates with friends</p>
-                </div>
-                <div className="w-11 h-6 bg-gray-200 rounded-full relative">
-                  <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
+        return <PrivacySettings userId={user?.id} />;
         
       case 'events':
         return (
@@ -180,13 +134,10 @@ const Profile: React.FC = () => {
             <div className="flex items-center space-x-4">
               <ProfileAvatar profile={profile} size="lg" className="border-4 border-white/20" />
               <div className="text-white">
-                <h1 className="text-2xl font-bold">My Profile</h1>
-                <p className="text-purple-100">{displayName}</p>
+                <h1 className="text-2xl font-bold">{displayName}</h1>
                 <div className="flex items-center mt-1 text-sm text-purple-100">
                   <MapPin className="h-4 w-4 mr-1" />
                   <span>{profile?.location || 'Location not set'}</span>
-                  <Calendar className="h-4 w-4 ml-4 mr-1" />
-                  <span>Member since May 2025</span>
                 </div>
               </div>
             </div>

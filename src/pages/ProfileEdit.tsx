@@ -1,10 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { toast } from '@/hooks/use-toast';
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { useProfileData } from '@/hooks/useProfileData';
 import { AvatarUploadWrapper } from '@/components/profile/AvatarUploadWrapper';
@@ -26,11 +24,6 @@ const ProfileEdit = () => {
 
   const handleSubmit = async (formData: any) => {
     if (!user) {
-      toast({
-        title: "Not authenticated",
-        description: "You must be logged in to update your profile.",
-        variant: "destructive",
-      });
       return;
     }
 
@@ -41,23 +34,15 @@ const ProfileEdit = () => {
         throw error;
       }
 
-      toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully.",
-      });
-      
-      // Navigate to profile with state to indicate a refresh is needed
+      // Navigate to profile without showing toast
       navigate('/profile', { 
         replace: true,
         state: { refreshNeeded: true }
       });
       
     } catch (error: any) {
-      toast({
-        title: "Error updating profile",
-        description: error.message || "An error occurred while updating your profile.",
-        variant: "destructive",
-      });
+      // Only show error toasts, not success toasts
+      console.error('Error updating profile:', error);
     }
   };
 
