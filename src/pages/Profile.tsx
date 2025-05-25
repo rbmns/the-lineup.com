@@ -3,11 +3,13 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useProfileData } from '@/hooks/useProfileData';
+import { useUserEvents } from '@/hooks/useUserEvents';
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { PrivacySettings } from '@/components/profile/PrivacySettings';
 import { Button } from '@/components/ui/button';
 import { MapPin, Edit3, User, Shield, CalendarDays } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
+import EventCardList from '@/components/events/EventCardList';
 
 const Profile: React.FC = () => {
   const { user } = useAuth();
@@ -22,6 +24,7 @@ const Profile: React.FC = () => {
   }, [user, navigate]);
 
   const { profile, loading } = useProfileData(user?.id);
+  const { pastEvents, upcomingEvents, isLoading: eventsLoading } = useUserEvents(user?.id);
   
   if (!user) {
     return (
@@ -46,15 +49,15 @@ const Profile: React.FC = () => {
   };
 
   const stats = [
-    { label: 'Events Attended', value: '28' },
-    { label: 'Interested In', value: '42' },
+    { label: 'Events Attended', value: pastEvents.length.toString() },
+    { label: 'Upcoming Events', value: upcomingEvents.length.toString() },
     { label: 'Friends', value: '17' }
   ];
 
   const tabs = [
-    { id: 'personal', label: 'Personal Info', icon: User },
-    { id: 'privacy', label: 'Preferences', icon: Shield },
-    { id: 'events', label: 'My Events', icon: CalendarDays }
+    { id: 'personal', label: 'Personal Info', icon: User, shortLabel: 'Personal' },
+    { id: 'privacy', label: 'Privacy', icon: Shield, shortLabel: 'Privacy' },
+    { id: 'events', label: 'My Events', icon: CalendarDays, shortLabel: 'Events' }
   ];
 
   const renderTabContent = () => {
@@ -95,13 +98,74 @@ const Profile: React.FC = () => {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-xl font-semibold mb-4">My Events</h2>
-              <p className="text-gray-600 mb-6">Events you've created and are attending</p>
+              <h2 className="text-xl font-semibold mb-2">Events</h2>
+              <p className="text-gray-600 mb-6">Your upcoming and past events</p>
             </div>
             
-            <div className="text-center py-12 text-gray-500">
-              <CalendarDays className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>No events to display</p>
+            {/* Upcoming Events Section */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium text-gray-900">Your Upcoming Events</h3>
+                <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                  {upcomingEvents.length}
+                </span>
+              </div>
+              
+              {eventsLoading ? (
+                <div className="space-y-3">
+                  <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+                  <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+                </div>
+              ) : upcomingEvents.length > 0 ? (
+                <div className="space-y-3">
+                  {upcomingEvents.map(event => (
+                    <EventCardList
+                      key={event.id}
+                      event={event}
+                      showRsvpStatus={true}
+                      showRsvpButtons={false}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
+                  <CalendarDays className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                  <p>No upcoming events</p>
+                </div>
+              )}
+            </div>
+
+            {/* Past Events Section */}
+            <div className="space-y-4 mt-8">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium text-gray-900">Past Events</h3>
+                <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                  {pastEvents.length}
+                </span>
+              </div>
+              
+              {eventsLoading ? (
+                <div className="space-y-3">
+                  <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+                  <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+                </div>
+              ) : pastEvents.length > 0 ? (
+                <div className="space-y-3">
+                  {pastEvents.map(event => (
+                    <EventCardList
+                      key={event.id}
+                      event={event}
+                      showRsvpStatus={true}
+                      showRsvpButtons={false}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
+                  <CalendarDays className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                  <p>No past events</p>
+                </div>
+              )}
             </div>
           </div>
         );
@@ -159,7 +223,7 @@ const Profile: React.FC = () => {
         </div>
       </div>
 
-      {/* Navigation tabs */}
+      {/* Navigation tabs - Optimized for mobile */}
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex overflow-x-auto">
@@ -170,14 +234,15 @@ const Profile: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-3 md:px-4 py-3 md:py-4 border-b-2 transition-colors whitespace-nowrap text-sm md:text-base ${
+                  className={`flex items-center space-x-1 md:space-x-2 px-2 md:px-4 py-3 md:py-4 border-b-2 transition-colors whitespace-nowrap text-xs md:text-base min-w-0 ${
                     isActive 
                       ? 'border-purple-600 text-purple-600 bg-gray-50' 
                       : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                   }`}
                 >
-                  <Icon className="h-4 w-4" />
-                  <span className="font-medium">{tab.label}</span>
+                  <Icon className="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
+                  <span className="font-medium hidden sm:block">{tab.label}</span>
+                  <span className="font-medium block sm:hidden">{tab.shortLabel}</span>
                 </button>
               );
             })}
