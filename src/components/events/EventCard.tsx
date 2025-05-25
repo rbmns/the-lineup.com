@@ -80,7 +80,7 @@ const EventCard: React.FC<EventCardProps> = ({
   const isLoading = loadingEventId === event.id;
   
   // Determine card height - make it smaller by default
-  const cardHeightClass = compact ? "max-h-[260px]" : "";
+  const cardHeightClass = compact ? "max-h-[320px]" : "";
 
   return (
     <div
@@ -93,7 +93,7 @@ const EventCard: React.FC<EventCardProps> = ({
       data-event-id={event.id}
     >
       {/* Image container with event type label positioned on top - smaller image */}
-      <div className="aspect-[16/8] relative overflow-hidden">
+      <div className="aspect-[16/10] relative overflow-hidden">
         <img
           src={imageUrl}
           alt={event.title}
@@ -155,7 +155,7 @@ const EventCard: React.FC<EventCardProps> = ({
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
-              size={compact ? "small" : "default"}
+              size={compact ? "sm" : "default"}
               isLoading={isLoading}
             />
           </div>

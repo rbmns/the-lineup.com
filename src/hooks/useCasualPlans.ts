@@ -21,6 +21,8 @@ export const useCasualPlans = () => {
           attendees:casual_plan_attendees(
             id,
             user_id,
+            plan_id,
+            created_at,
             user_profile:user_id(id, username, avatar_url)
           )
         `)
@@ -33,7 +35,10 @@ export const useCasualPlans = () => {
       // Transform the data to include attendee count and user attendance status
       const transformedPlans: CasualPlan[] = (plansData || []).map(plan => {
         // Handle creator_profile which might be null or have an error
-        const creator_profile = plan.creator_profile && typeof plan.creator_profile === 'object' && !('error' in plan.creator_profile)
+        const creator_profile = plan.creator_profile && 
+          typeof plan.creator_profile === 'object' && 
+          !('error' in plan.creator_profile) &&
+          plan.creator_profile !== null
           ? {
               id: plan.creator_profile.id,
               username: plan.creator_profile.username,
@@ -41,11 +46,30 @@ export const useCasualPlans = () => {
             }
           : undefined;
 
+        // Handle attendees data transformation
+        const attendees = (plan.attendees || []).map(attendee => ({
+          id: attendee.id,
+          plan_id: attendee.plan_id || plan.id,
+          user_id: attendee.user_id,
+          created_at: attendee.created_at || new Date().toISOString(),
+          user_profile: attendee.user_profile && 
+            typeof attendee.user_profile === 'object' && 
+            !('error' in attendee.user_profile) &&
+            attendee.user_profile !== null
+            ? {
+                id: attendee.user_profile.id,
+                username: attendee.user_profile.username,
+                avatar_url: attendee.user_profile.avatar_url
+              }
+            : undefined
+        }));
+
         return {
           ...plan,
           creator_profile,
-          attendee_count: plan.attendees?.length || 0,
-          user_attending: user ? plan.attendees?.some(att => att.user_id === user.id) : false
+          attendees,
+          attendee_count: attendees.length,
+          user_attending: user ? attendees.some(att => att.user_id === user.id) : false
         };
       });
 
