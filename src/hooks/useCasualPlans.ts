@@ -36,9 +36,10 @@ export const useCasualPlans = () => {
         // Handle creator_profile which might be null or have an error
         let creator_profile: { id: string; username: string; avatar_url?: string[]; } | undefined;
         
-        // Simplified type checking for creator data
+        // More explicit type checking for creator data
         const creatorData = plan.creator_profile;
-        if (creatorData && 
+        if (creatorData !== null && 
+            creatorData !== undefined &&
             typeof creatorData === 'object' && 
             'id' in creatorData &&
             'username' in creatorData &&
@@ -56,9 +57,10 @@ export const useCasualPlans = () => {
         const attendees = (plan.attendees || []).map(attendee => {
           let user_profile: { id: string; username: string; avatar_url?: string[]; } | undefined;
           
-          // Simplified type checking for user data
+          // More explicit type checking for user data
           const userData = attendee.user_profile;
-          if (userData && 
+          if (userData !== null && 
+              userData !== undefined &&
               typeof userData === 'object' && 
               'id' in userData &&
               'username' in userData &&
