@@ -23,13 +23,13 @@ export const useCasualPlans = () => {
         .from('casual_plans')
         .select(`
           *,
-          creator_profile:creator_id(id, username, avatar_url),
+          creator_profile:profiles!creator_id(id, username, avatar_url),
           attendees:casual_plan_attendees(
             id,
             user_id,
             plan_id,
             created_at,
-            user_profile:user_id(id, username, avatar_url)
+            user_profile:profiles!user_id(id, username, avatar_url)
           )
         `)
         .gte('date', new Date().toISOString().split('T')[0]) // Only future plans
