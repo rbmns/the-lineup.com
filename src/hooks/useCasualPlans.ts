@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -40,14 +41,14 @@ export const useCasualPlans = () => {
         const creatorData = plan.creator_profile;
         if (creatorData && 
             typeof creatorData === 'object' && 
-            !('error' in creatorData) &&
             creatorData !== null &&
+            !('error' in creatorData) &&
             'id' in creatorData &&
             'username' in creatorData) {
           creator_profile = {
-            id: creatorData.id,
-            username: creatorData.username,
-            avatar_url: creatorData.avatar_url
+            id: creatorData.id as string,
+            username: creatorData.username as string,
+            avatar_url: creatorData.avatar_url as string[] | undefined
           };
         }
 
@@ -59,14 +60,14 @@ export const useCasualPlans = () => {
           const userData = attendee.user_profile;
           if (userData && 
               typeof userData === 'object' && 
-              !('error' in userData) &&
               userData !== null &&
+              !('error' in userData) &&
               'id' in userData &&
               'username' in userData) {
             user_profile = {
-              id: userData.id,
-              username: userData.username,
-              avatar_url: userData.avatar_url
+              id: userData.id as string,
+              username: userData.username as string,
+              avatar_url: userData.avatar_url as string[] | undefined
             };
           }
 
