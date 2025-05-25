@@ -1,107 +1,298 @@
 
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useUserEvents } from '@/hooks/useUserEvents';
+import { useFriendship } from '@/hooks/useFriendship';
 import { useProfileData } from '@/hooks/useProfileData';
-import { ProfileHeaderContainer } from '@/components/profile/ProfileHeaderContainer';
-import { ProfileEventsContainer } from '@/components/profile/ProfileEventsContainer';
-import { ProfileNotFound } from '@/components/profile/ProfileNotFound';
-import { ProfileLoading } from '@/components/profile/ProfileLoading';
-import { AuthCheck } from '@/components/profile/AuthCheck';
-import { UserProfile } from '@/types';
+import { ProfileEventsSection } from '@/components/profile/ProfileEventsSection';
+import { PrivacySettings } from '@/components/profile/PrivacySettings';
+import { 
+  Loader2, 
+  User, 
+  Settings, 
+  Calendar, 
+  Pencil, 
+  Shield, 
+  Users, 
+  Mail, 
+  MapPin
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
+import { format } from 'date-fns';
+import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
+import { ProfileCard } from '@/components/profile/ProfileCard';
 
-interface UserProfilePageProps {
-  hideTitle?: boolean;
-}
-
-const UserProfilePage: React.FC<UserProfilePageProps> = ({ hideTitle = false }) => {
-  const { username } = useParams<{ username: string }>();
+const UserProfilePage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { userId } = useParams<{ userId: string }>();
+  const [activeTab, setActiveTab] = useState('info');
+  
+  // Determine if viewing own profile
+  const isOwnProfile = !userId || userId === user?.id;
+  const profileId = isOwnProfile ? user?.id : userId;
+  
+  // Fetch profile data
+  const { profile, loading: profileLoading } = useProfileData(profileId);
+  
+  // Get friendship status if viewing another user's profile
+  const { 
+    status: friendshipStatus, 
+    sendFriendRequest 
+  } = useFriendship(user?.id, userId);
+  
+  // Fetch user events based on friendship status
+  const { 
+    upcomingEvents, 
+    pastEvents, 
+    isLoading: eventsLoading 
+  } = useUserEvents(profileId);
+  
+  // Redirect to login if trying to view own profile but not logged in
+  useEffect(() => {
+    if (isOwnProfile && !user) {
+      navigate('/login');
+    }
+  }, [isOwnProfile, user, navigate]);
 
-  // Determine which profile to load
-  const profileIdentifier = username || user?.id || null;
-  const isOwnProfile = !username || username === user?.email?.split('@')[0];
+  // Handle adding friend
+  const handleAddFriend = async () => {
+    if (userId && sendFriendRequest) {
+      await sendFriendRequest();
+    }
+  };
 
-  const {
-    profile,
-    loading,
-    error,
-    isNotFound,
-    refreshProfile
-  } = useProfileData(profileIdentifier);
+  // Determine if user can view events based on friendship status
+  const canViewEvents = isOwnProfile || friendshipStatus === 'accepted';
 
-  const [friendshipStatus, setFriendshipStatus] = useState<string>('none');
-  const [isBlocked, setIsBlocked] = useState<boolean>(false);
-
-  if (!user && isOwnProfile) {
-    return <AuthCheck />;
+  if (isOwnProfile && !user) {
+    return null; // Will redirect in effect
   }
 
-  if (loading) {
-    return <ProfileLoading />;
+  if (profileLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-center items-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+        </div>
+      </div>
+    );
   }
 
-  if (isNotFound || error) {
-    return <ProfileNotFound error={error} />;
-  }
+  // Calculate member since date
+  const memberSince = profile?.created_at 
+    ? format(new Date(profile.created_at), 'MMMM yyyy')
+    : 'Unknown';
 
-  const displayName = profile?.username || user?.email?.split('@')[0] || 'User';
+  // Activity stats
+  const activityStats = [
+    { value: pastEvents?.length || 0, label: 'Events Attended' },
+    { value: upcomingEvents?.length || 0, label: 'Upcoming Events' },
+    { value: 17, label: 'Friends' } // Placeholder, would need to fetch actual friends count
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 text-white py-8 md:py-12">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            {!hideTitle && (
-              <h1 className="text-4xl font-bold tracking-tight mb-2">
-                {isOwnProfile ? displayName : `${displayName}'s Profile`}
-              </h1>
-            )}
-            {isOwnProfile && (
-              <p className="text-xl text-purple-100 leading-relaxed">
-                Manage your profile and see your event activity
-              </p>
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
+      {/* Hero section with background and profile overview */}
+      <div className="relative mb-8 rounded-lg overflow-hidden bg-gradient-to-r from-purple-600 to-blue-500">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-start md:items-end gap-6 text-white">
+          <ProfileAvatar profile={profile} size="xl" className="w-24 h-24 md:w-32 md:h-32 border-4 border-white/80 shadow-xl" />
+          <div className="flex-1">
+            <h1 className="text-4xl font-bold tracking-tight">
+              {isOwnProfile ? 'My Profile' : `${profile?.username || 'User'}'s Profile`}
+            </h1>
+            <p className="text-xl text-white/80 mt-2">
+              {profile?.tagline || (isOwnProfile ? "Add a tagline to tell others about yourself" : "No tagline provided")}
+            </p>
+            <div className="flex items-center mt-3 text-white/80">
+              {profile?.location && (
+                <div className="flex items-center mr-6">
+                  <MapPin className="h-4 w-4 mr-1" />
+                  <span>{profile.location}</span>
+                </div>
+              )}
+              <div className="flex items-center">
+                <Calendar className="h-4 w-4 mr-1" />
+                <span>Member since {memberSince}</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Action buttons */}
+          <div className="flex mt-4 md:mt-0 gap-3">
+            {isOwnProfile ? (
+              <Button 
+                onClick={() => navigate('/profile/edit')}
+                className="flex items-center gap-2"
+                variant="secondary"
+              >
+                <Pencil className="h-4 w-4" />
+                Edit Profile
+              </Button>
+            ) : (
+              <ProfileCard 
+                profile={profile} 
+                friendStatus={friendshipStatus as 'none' | 'pending' | 'accepted'}
+                onAddFriend={handleAddFriend}
+                isCompact={true}
+                linkToProfile={false}
+              />
             )}
           </div>
         </div>
       </div>
-
-      {/* Profile Content */}
-      <div className="container mx-auto px-4 py-6 md:py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-            {/* Profile Header - Full width on mobile, sidebar on desktop */}
-            <div className="lg:col-span-1">
-              <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg shadow-sm p-6 text-white sticky top-6">
-                <ProfileHeaderContainer
-                  profile={profile}
-                  isOwnProfile={isOwnProfile}
-                  user={user}
-                  profileId={profile?.id || null}
-                  refreshProfile={refreshProfile}
-                  onUpdateFriendship={setFriendshipStatus}
-                  onUpdateBlockStatus={setIsBlocked}
-                />
-              </div>
-            </div>
-
-            {/* Events Section */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <ProfileEventsContainer
-                  profileId={profile?.id || null}
-                  profile={profile as UserProfile}
-                  isLoading={loading}
-                  isOwnProfile={isOwnProfile}
-                  isBlocked={isBlocked}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+      
+      {/* Activity Stats */}
+      <div className="grid grid-cols-3 gap-4 mb-8">
+        {activityStats.map((stat, index) => (
+          <Card key={index} className="text-center border-0 shadow-md">
+            <CardContent className="p-6">
+              <p className="text-4xl font-bold tracking-tight text-purple-600">{stat.value}</p>
+              <p className="text-gray-500">{stat.label}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
+
+      {/* Tabs Navigation */}
+      <Tabs defaultValue="info" value={activeTab} onValueChange={setActiveTab} className="mb-6">
+        <TabsList className="grid w-full grid-cols-3 mb-8">
+          <TabsTrigger value="info" className="flex items-center gap-2">
+            <User className="h-4 w-4" />
+            <span>Personal Info</span>
+          </TabsTrigger>
+          <TabsTrigger value="privacy" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            <span>Privacy</span>
+          </TabsTrigger>
+          <TabsTrigger value="events" className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            <span>My Events</span>
+          </TabsTrigger>
+        </TabsList>
+        
+        {/* Personal Info Tab */}
+        <TabsContent value="info">
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle>Personal Information</CardTitle>
+              <CardDescription>Your personal details and profile information</CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              <div className="space-y-6">
+                {profile?.username && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">Username</h3>
+                    <p className="text-base leading-7">{profile.username}</p>
+                  </div>
+                )}
+                
+                {profile?.email && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">Email</h3>
+                    <div className="flex items-center">
+                      <Mail className="h-4 w-4 mr-2 text-gray-500" />
+                      <p className="text-base leading-7">{profile.email}</p>
+                    </div>
+                  </div>
+                )}
+                
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500">Location</h3>
+                  <div className="flex items-center">
+                    <MapPin className="h-4 w-4 mr-2 text-gray-500" />
+                    <p className="text-base leading-7">{profile?.location || "Not specified"}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500">Member Since</h3>
+                  <div className="flex items-center">
+                    <Calendar className="h-4 w-4 mr-2 text-gray-500" />
+                    <p className="text-base leading-7">{memberSince}</p>
+                  </div>
+                </div>
+                
+                {profile?.tagline && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">About</h3>
+                    <p className="text-base leading-7">{profile.tagline}</p>
+                  </div>
+                )}
+              </div>
+              
+              {isOwnProfile && (
+                <div className="mt-8 pt-6 border-t">
+                  <Button 
+                    onClick={() => navigate('/profile/edit')} 
+                    className="flex items-center gap-2"
+                  >
+                    <Pencil className="h-4 w-4" />
+                    Edit Profile
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        {/* Privacy Tab */}
+        <TabsContent value="privacy">
+          {isOwnProfile ? (
+            <PrivacySettings userId={user?.id} />
+          ) : (
+            <Card className="border-0 shadow-md">
+              <CardHeader>
+                <CardTitle>Privacy Settings</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-500">Privacy settings are only visible to the account owner.</p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+        
+        {/* Events Tab */}
+        <TabsContent value="events">
+          <Card className="border-0 shadow-md">
+            <CardHeader>
+              <CardTitle>Events</CardTitle>
+              <CardDescription>
+                {isOwnProfile ? 'Your upcoming and past events' : `${profile?.username || 'User'}'s events`}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6">
+              {canViewEvents ? (
+                <ProfileEventsSection 
+                  canViewEvents={canViewEvents}
+                  upcomingEvents={upcomingEvents}
+                  pastEvents={pastEvents}
+                  eventsLoading={eventsLoading}
+                  isCurrentUser={isOwnProfile}
+                  username={profile?.username}
+                  handleAddFriend={handleAddFriend}
+                  friendshipStatus={friendshipStatus as 'none' | 'pending' | 'accepted'}
+                />
+              ) : (
+                <div className="text-center p-8">
+                  <Shield className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+                  <h3 className="text-lg font-medium mb-2">Private Events</h3>
+                  <p className="text-gray-500 mb-4">You need to be friends to view events.</p>
+                  <Button onClick={handleAddFriend}>
+                    <Users className="h-4 w-4 mr-2" />
+                    Add Friend
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

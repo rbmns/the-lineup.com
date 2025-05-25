@@ -16,7 +16,7 @@ interface LoginFormProps {
 export const LoginForm: React.FC<LoginFormProps> = ({ 
   onToggleMode, 
   onForgotPassword,
-  suppressSuccessToast = true // Changed default to true to suppress success toasts
+  suppressSuccessToast = false
 }) => {
   const {
     email,

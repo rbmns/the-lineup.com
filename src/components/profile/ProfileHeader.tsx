@@ -45,36 +45,36 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     <div className="space-y-4">
       {showAvatar && (
         <div className="flex justify-center">
-          <ProfileAvatar profile={profile} size="xl" className="w-32 h-32 border-4 border-white/20" />
+          <ProfileAvatar profile={profile} size="xl" className="w-48 h-48" />
         </div>
       )}
       
       <div className="space-y-2 text-center">
-        <h2 className="text-2xl font-bold text-white">
+        <h2 className="text-xl font-semibold">
           {profile?.username || 'Anonymous User'}
         </h2>
         
         {profile?.location && (
-          <p className="text-purple-100 flex items-center justify-center gap-1">
+          <p className="text-sm text-gray-500 flex items-center justify-center gap-1">
             <MapPin className="h-4 w-4" />
             {profile.location}
           </p>
         )}
 
         {profile?.status && (
-          <p className="text-sm text-white font-medium px-3 py-1 bg-white/20 rounded-full inline-block">
+          <p className="text-sm text-purple-600 font-medium px-3 py-1 bg-purple-50 rounded-full inline-block">
             {profile.status}
           </p>
         )}
 
         {profile?.tagline && (
-          <p className="text-purple-100 italic">
+          <p className="text-sm text-gray-600 italic">
             "{profile.tagline}"
           </p>
         )}
         
         {viewingOwnProfile ? (
-          <Button variant="secondary" size="sm" onClick={handleEditClick} className="bg-white text-purple-700 hover:bg-purple-50">
+          <Button variant="outline" size="sm" onClick={handleEditClick}>
             Edit Profile
           </Button>
         ) : (
@@ -83,16 +83,16 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               variant="outline" 
               size="sm" 
               onClick={onRemoveFriend}
-              className="border-white/30 text-white hover:bg-white/10 bg-transparent"
+              className="border-red-500 text-black hover:bg-red-50 bg-white"
             >
               Unfriend
             </Button>
           ) : friendStatus === 'pending' ? (
-            <Button variant="secondary" size="sm" disabled className="bg-white/20 text-white">
+            <Button variant="secondary" size="sm" disabled>
               Pending...
             </Button>
           ) : (
-            <Button size="sm" onClick={onAddFriend} className="bg-white text-purple-700 hover:bg-purple-50">
+            <Button size="sm" onClick={onAddFriend}>
               Add Friend
             </Button>
           )

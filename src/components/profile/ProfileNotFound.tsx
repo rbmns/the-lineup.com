@@ -4,11 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, UserX } from 'lucide-react';
 
-interface ProfileNotFoundProps {
-  error?: string;
-}
-
-export const ProfileNotFound: React.FC<ProfileNotFoundProps> = ({ error }) => {
+export const ProfileNotFound = () => {
   const navigate = useNavigate();
   
   return (
@@ -21,9 +17,6 @@ export const ProfileNotFound: React.FC<ProfileNotFoundProps> = ({ error }) => {
       <h2 className="text-xl font-semibold text-gray-700 mb-2">Profile Not Found</h2>
       <p className="text-gray-500 mb-6 max-w-md mx-auto">
         The user profile you're looking for doesn't exist or you may not have permission to view it.
-        {error && (
-          <span className="block mt-2 text-sm text-red-500">{error}</span>
-        )}
       </p>
       <div className="flex justify-center space-x-3">
         <Button variant="outline" onClick={() => navigate('/friends')}>

@@ -26,7 +26,7 @@ const Profile: React.FC = () => {
   }
 
   // Use the UserProfilePage component for the current user
-  return <UserProfilePage hideTitle={true} />;
+  return <UserProfilePage />;
 };
 
 export default Profile;
