@@ -135,10 +135,13 @@ const LandingPage = () => {
       <section className="bg-blue-500 py-12 md:py-20">
         <div className="container mx-auto px-4 text-center text-white">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Discover Local Events. See What Friends Recommend.
+           Find your flow — discover local events and casual plans that fit your vibe
           </h1>
           <p className="text-xl leading-relaxed mb-8 max-w-2xl mx-auto">
-           The Lineup helps you connect with what's happening nearby — from markets and music to yoga and food. Create a profile to see who's around, what your friends love, and plan your time with ease.
+Meet new people or enjoy the moment — no pressure to sign up.<br>
+	Explore what’s happening nearby — music, surf, art, community, and more
+	•	See casual plans by locals and visitors when formal events are quiet
+	•	Join events or post your own casual plans — sign up only when you want to connect</br>
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button asChild size="lg" className="bg-black hover:bg-black/90 text-white">
