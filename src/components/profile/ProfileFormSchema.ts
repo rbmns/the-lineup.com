@@ -21,3 +21,4 @@ export const profileFormSchema = z.object({
 });
 
 export type ProfileFormValues = z.infer<typeof profileFormSchema>;
+export type ProfileFormData = ProfileFormValues; // Add alias for backward compatibility

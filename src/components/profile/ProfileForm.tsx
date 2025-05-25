@@ -5,14 +5,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { UserProfile } from '@/types';
-import { profileFormSchema, ProfileFormData } from './ProfileFormSchema';
+import { profileFormSchema, ProfileFormValues } from './ProfileFormSchema';
 import { UsernameSection } from './form-sections/UsernameSection';
 import { LocationSection } from './form-sections/LocationSection';
 import { TaglineSection } from './form-sections/TaglineSection';
 
 interface ProfileFormProps {
   profile: UserProfile | null;
-  onSubmit: (data: ProfileFormData) => Promise<void>;
+  onSubmit: (data: ProfileFormValues) => Promise<void>;
   onCancel: () => void;
   showRequiredFields?: boolean;
 }
@@ -23,7 +23,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
   onCancel,
   showRequiredFields = false
 }) => {
-  const form = useForm<ProfileFormData>({
+  const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
       username: profile?.username || '',
@@ -32,9 +32,14 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     },
   });
 
-  const handleSubmit = async (data: ProfileFormData) => {
+  const handleSubmit = async (data: ProfileFormValues) => {
     await onSubmit(data);
     // No toast message here - removed as requested
+  };
+
+  const handleEditUsername = () => {
+    // This would open a username edit dialog - placeholder for now
+    console.log('Edit username clicked');
   };
 
   return (
@@ -42,12 +47,12 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <UsernameSection 
           form={form} 
-          isRequired={showRequiredFields}
+          showRequiredFields={showRequiredFields}
+          onEditUsername={handleEditUsername}
         />
         
         <LocationSection 
           form={form} 
-          isRequired={showRequiredFields}
         />
         
         <TaglineSection form={form} />
