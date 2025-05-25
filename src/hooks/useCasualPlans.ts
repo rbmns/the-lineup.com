@@ -36,21 +36,19 @@ export const useCasualPlans = () => {
         // Handle creator_profile which might be null or have an error
         let creator_profile: { id: string; username: string; avatar_url?: string[]; } | undefined;
         
-        // Use explicit null check and type guards
+        // Simplified type checking for creator data
         const creatorData = plan.creator_profile;
-        if (creatorData !== null && 
-            creatorData !== undefined &&
+        if (creatorData && 
             typeof creatorData === 'object' && 
-            !('error' in creatorData) &&
             'id' in creatorData &&
-            'username' in creatorData) {
+            'username' in creatorData &&
+            typeof creatorData.id === 'string' &&
+            typeof creatorData.username === 'string') {
           
-          // TypeScript assertion after proper checks
-          const safeCreatorData = creatorData as { id: string; username: string; avatar_url?: string[]; };
           creator_profile = {
-            id: safeCreatorData.id,
-            username: safeCreatorData.username,
-            avatar_url: safeCreatorData.avatar_url
+            id: creatorData.id,
+            username: creatorData.username,
+            avatar_url: creatorData.avatar_url as string[] | undefined
           };
         }
 
@@ -58,21 +56,19 @@ export const useCasualPlans = () => {
         const attendees = (plan.attendees || []).map(attendee => {
           let user_profile: { id: string; username: string; avatar_url?: string[]; } | undefined;
           
-          // Use explicit null check and type guards
+          // Simplified type checking for user data
           const userData = attendee.user_profile;
-          if (userData !== null && 
-              userData !== undefined &&
+          if (userData && 
               typeof userData === 'object' && 
-              !('error' in userData) &&
               'id' in userData &&
-              'username' in userData) {
+              'username' in userData &&
+              typeof userData.id === 'string' &&
+              typeof userData.username === 'string') {
             
-            // TypeScript assertion after proper checks
-            const safeUserData = userData as { id: string; username: string; avatar_url?: string[]; };
             user_profile = {
-              id: safeUserData.id,
-              username: safeUserData.username,
-              avatar_url: safeUserData.avatar_url
+              id: userData.id,
+              username: userData.username,
+              avatar_url: userData.avatar_url as string[] | undefined
             };
           }
 
