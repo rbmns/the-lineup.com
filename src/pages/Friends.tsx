@@ -161,9 +161,9 @@ const Friends: React.FC = () => {
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="max-w-md mx-auto text-center">
             <div className="bg-white rounded-lg shadow-sm p-8">
-              <h2 className="text-2xl font-semibold mb-4">Sign up or in to find your people</h2>
+              <h2 className="text-2xl font-semibold mb-4">Sign up or in to see others</h2>
               <p className="text-gray-600 mb-6">
-                Connect with friends and discover new people in your area.
+                Connect with friends and discover new things in your area.
               </p>
               <div className="space-y-3">
                 <Button 
