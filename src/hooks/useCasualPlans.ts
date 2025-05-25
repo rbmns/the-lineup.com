@@ -37,7 +37,7 @@ export const useCasualPlans = () => {
         // Handle creator_profile which might be null or have an error
         let creator_profile: { id: string; username: string; avatar_url?: string[]; } | undefined;
         
-        // Use explicit null check and type guard for creator data
+        // Use type assertion after null/undefined check
         const creatorData = plan.creator_profile;
         if (creatorData !== null && 
             creatorData !== undefined &&
@@ -45,11 +45,13 @@ export const useCasualPlans = () => {
             !('error' in creatorData) &&
             'id' in creatorData &&
             'username' in creatorData) {
-          // Now TypeScript knows creatorData is not null/undefined and has the required properties
+          
+          // Type assertion to help TypeScript understand the type
+          const typedCreatorData = creatorData as { id: string; username: string; avatar_url?: string[]; };
           creator_profile = {
-            id: creatorData.id as string,
-            username: creatorData.username as string,
-            avatar_url: creatorData.avatar_url as string[] | undefined
+            id: typedCreatorData.id,
+            username: typedCreatorData.username,
+            avatar_url: typedCreatorData.avatar_url
           };
         }
 
@@ -57,7 +59,7 @@ export const useCasualPlans = () => {
         const attendees = (plan.attendees || []).map(attendee => {
           let user_profile: { id: string; username: string; avatar_url?: string[]; } | undefined;
           
-          // Use explicit null check and type guard for user data
+          // Use type assertion after null/undefined check
           const userData = attendee.user_profile;
           if (userData !== null && 
               userData !== undefined &&
@@ -65,11 +67,13 @@ export const useCasualPlans = () => {
               !('error' in userData) &&
               'id' in userData &&
               'username' in userData) {
-            // Now TypeScript knows userData is not null/undefined and has the required properties
+            
+            // Type assertion to help TypeScript understand the type
+            const typedUserData = userData as { id: string; username: string; avatar_url?: string[]; };
             user_profile = {
-              id: userData.id as string,
-              username: userData.username as string,
-              avatar_url: userData.avatar_url as string[] | undefined
+              id: typedUserData.id,
+              username: typedUserData.username,
+              avatar_url: typedUserData.avatar_url
             };
           }
 
