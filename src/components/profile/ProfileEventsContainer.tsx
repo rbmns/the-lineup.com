@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { UserProfileContent } from './UserProfileContent';
+import { ProfileEventsSection } from './ProfileEventsSection';
 import { Event, UserProfile } from '@/types';
 import { filterPastEvents, sortEventsByDate } from '@/utils/date-filtering';
 
@@ -22,6 +22,7 @@ export const ProfileEventsContainer: React.FC<ProfileEventsContainerProps> = ({
 }) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
+  const [friendshipStatus, setFriendshipStatus] = useState<'none' | 'pending' | 'accepted'>('none');
 
   useEffect(() => {
     if (profileId) {
@@ -36,7 +37,7 @@ export const ProfileEventsContainer: React.FC<ProfileEventsContainerProps> = ({
         .from('events')
         .select('*')
         .eq('creator_id', profileId)
-        .order('start_date', { ascending: false });
+        .order('start_date', { ascending: true });
       
       if (error) {
         console.error('Error fetching events:', error);
@@ -50,14 +51,30 @@ export const ProfileEventsContainer: React.FC<ProfileEventsContainerProps> = ({
     }
   };
 
+  // Separate upcoming and past events
+  const now = new Date();
+  const upcomingEvents = events.filter(event => new Date(event.start_date) >= now);
   const pastEvents = filterPastEvents(events);
   const sortedPastEvents = sortEventsByDate(pastEvents);
 
+  const handleAddFriend = () => {
+    // Friend request logic would go here
+    console.log('Add friend clicked');
+  };
+
+  // Determine if user can view events based on friendship status and profile privacy
+  const canViewEvents = isOwnProfile || friendshipStatus === 'accepted' || !isBlocked;
+
   return (
-    <UserProfileContent
-      profile={profile}
+    <ProfileEventsSection
+      canViewEvents={canViewEvents}
+      upcomingEvents={upcomingEvents}
       pastEvents={sortedPastEvents}
-      isLoading={loadingEvents || isLoading}
+      eventsLoading={loadingEvents || isLoading}
+      isCurrentUser={isOwnProfile}
+      username={profile?.username}
+      handleAddFriend={handleAddFriend}
+      friendshipStatus={friendshipStatus}
     />
   );
 };

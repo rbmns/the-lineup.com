@@ -55,12 +55,12 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({ hideTitle = false }) 
         <div className="container mx-auto px-4">
           <div className="text-center">
             {!hideTitle && (
-              <h1 className="text-2xl md:text-4xl font-bold tracking-tight mb-2">
+              <h1 className="text-4xl font-bold tracking-tight mb-2">
                 {isOwnProfile ? displayName : `${displayName}'s Profile`}
               </h1>
             )}
             {isOwnProfile && (
-              <p className="text-lg md:text-xl text-purple-100 leading-relaxed">
+              <p className="text-xl text-purple-100 leading-relaxed">
                 Manage your profile and see your event activity
               </p>
             )}
@@ -74,7 +74,7 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({ hideTitle = false }) 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
             {/* Profile Header - Full width on mobile, sidebar on desktop */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-sm p-4 md:p-6 sticky top-6">
+              <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg shadow-sm p-6 text-white sticky top-6">
                 <ProfileHeaderContainer
                   profile={profile}
                   isOwnProfile={isOwnProfile}
@@ -89,13 +89,15 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({ hideTitle = false }) 
 
             {/* Events Section */}
             <div className="lg:col-span-2">
-              <ProfileEventsContainer
-                profileId={profile?.id || null}
-                profile={profile as UserProfile}
-                isLoading={loading}
-                isOwnProfile={isOwnProfile}
-                isBlocked={isBlocked}
-              />
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <ProfileEventsContainer
+                  profileId={profile?.id || null}
+                  profile={profile as UserProfile}
+                  isLoading={loading}
+                  isOwnProfile={isOwnProfile}
+                  isBlocked={isBlocked}
+                />
+              </div>
             </div>
           </div>
         </div>
