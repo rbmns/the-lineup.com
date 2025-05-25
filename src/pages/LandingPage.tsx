@@ -138,7 +138,9 @@ const LandingPage = () => {
            Find your flow — discover local events and casual plans that fit your vibe
           </h1>
           <p className="text-xl leading-relaxed mb-8 max-w-2xl mx-auto">
-Meet new people or enjoy the moment — no pressure to sign up.
+Explore what’s happening nearby — music, surf, art, community, and more. 
+See casual plans by locals and visitors when formal events are quiet. 
+Join events or post your own casual plans — or just browse events. 
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button asChild size="lg" className="bg-black hover:bg-black/90 text-white">
