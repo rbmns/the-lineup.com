@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -40,6 +41,7 @@ export const useCasualPlans = () => {
         const creatorData = plan.creator_profile;
         if (creatorData && 
             typeof creatorData === 'object' && 
+            creatorData !== null &&
             'id' in creatorData &&
             'username' in creatorData) {
           
@@ -66,6 +68,7 @@ export const useCasualPlans = () => {
           const userData = attendee.user_profile;
           if (userData && 
               typeof userData === 'object' && 
+              userData !== null &&
               'id' in userData &&
               'username' in userData) {
             
