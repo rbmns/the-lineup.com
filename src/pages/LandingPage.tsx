@@ -135,7 +135,7 @@ const LandingPage = () => {
       <section className="bg-blue-500 py-12 md:py-20">
         <div className="container mx-auto px-4 text-center text-white">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-           See what's happening in Zandvoort
+           See what's on in Zandvoort
           </h1>
           <p className="text-xl leading-relaxed mb-8 max-w-2xl mx-auto">
 Discover local events and casual plans that fit your vibe. Explore what’s happening nearby — music, surf, art, community, and more. 
@@ -261,9 +261,7 @@ Join events or post your own casual plans. Or just browse events.
         </div>
       </section>
 
-      {/* Browse Categories Section */}
-      <CategoriesBrowseSection categories={allEventTypes} />
-
+     
       {/* How It Works Section */}
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
@@ -319,6 +317,13 @@ Join events or post your own casual plans. Or just browse events.
           </div>
         </div>
       </section>
+
+ {/* Browse Categories Section */}
+      <CategoriesBrowseSection categories={allEventTypes} />
+
+
+
+      
 
       {/* CTA Section */}
       <section className="py-12 bg-gray-100">
