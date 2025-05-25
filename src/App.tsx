@@ -1,72 +1,80 @@
 
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from '@/components/ui/toaster';
-import { ThemeProvider } from '@/components/providers/theme-provider';
-import { AuthProvider } from '@/contexts/AuthContext';
-import { FilterStateProvider } from '@/contexts/FilterStateContext';
-import { queryClient } from '@/lib/queryClient';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import Layout from "@/components/Layout";
 
-// Import routes
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import Events from './pages/Events';
-import EventDetail from './pages/EventDetail';
-import Users from './pages/Users';
-import UserProfilePage from './pages/UserProfilePage';
-import NotFound from './pages/NotFound';
-import Layout from './components/Layout';
-import EventsPageRefactored from './pages/EventsPageRefactored';
-import Admin from './pages/Admin';
-import Profile from './pages/Profile';
-import ProfileEdit from './pages/ProfileEdit';
-import ProfileSettings from './pages/ProfileSettings';
-import Friends from './pages/Friends';
-import Index from './pages/Index';
-import DesignSystem from './pages/DesignSystem';
-import GoodbyePage from './pages/GoodbyePage';
-import LandingPage from './pages/LandingPage';
+// Import pages
+import Index from "./pages/Index";
+import Events from "./pages/Events";
+import EventDetail from "./pages/EventDetail";
+import Friends from "./pages/Friends";
+import Profile from "./pages/Profile";
+import UserProfile from "./pages/UserProfile";
+import ProfileEdit from "./pages/ProfileEdit";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import NotFound from "./pages/NotFound";
+import Explore from "./pages/Explore";
+import Home from "./pages/Home";
+import LandingPage from "./pages/LandingPage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import GoodbyePage from "./pages/GoodbyePage";
+import ProfileSettings from "./pages/ProfileSettings";
+import Admin from "./pages/Admin";
+import AdminSettings from "./pages/AdminSettings";
+import VenueEvents from "./pages/VenueEvents";
+import CategoryFilteredEventsPage from "./pages/CategoryFilteredEventsPage";
+import CasualPlans from "./pages/CasualPlans";
 
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-        <AuthProvider>
-          <FilterStateProvider>
-            <Router>
-              <div className="flex flex-col min-h-screen bg-background">
-                <Routes>
-                  {/* Add the GoodbyePage route outside of the Layout */}
-                  <Route path="/goodbye" element={<GoodbyePage />} />
-                  
-                  <Route element={<Layout />}>
-                    {/* Put the root route inside the Layout */}
-                    <Route path="/" element={<LandingPage />} />
-                    <Route path="/home" element={<LandingPage />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<Signup />} />
-                    <Route path="/events" element={<EventsPageRefactored />} />
-                    <Route path="/events/:eventId" element={<EventDetail />} />
-                    <Route path="/users" element={<Users />} />
-                    <Route path="/users/:userId" element={<UserProfilePage />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/profile/edit" element={<ProfileEdit />} />
-                    <Route path="/profile/settings" element={<ProfileSettings />} />
-                    <Route path="/friends" element={<Friends />} />
-                    <Route path="/admin" element={<Admin />} />
-                    <Route path="/design-system" element={<DesignSystem />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Route>
-                </Routes>
-              </div>
-            </Router>
-          </FilterStateProvider>
-        </AuthProvider>
+const queryClient = new QueryClient();
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <AuthProvider>
         <Toaster />
-      </ThemeProvider>
-    </QueryClientProvider>
-  );
-}
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<LandingPage />} />
+              <Route path="events" element={<Events />} />
+              <Route path="events/:id" element={<EventDetail />} />
+              <Route path="casual-plans" element={<CasualPlans />} />
+              <Route path="friends" element={<Friends />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="profile/edit" element={<ProfileEdit />} />
+              <Route path="profile/settings" element={<ProfileSettings />} />
+              <Route path="users/:username" element={<UserProfile />} />
+              <Route path="explore" element={<Explore />} />
+              <Route path="home" element={<Home />} />
+              <Route path="venues/:slug" element={<VenueEvents />} />
+              <Route path="categories/:category" element={<CategoryFilteredEventsPage />} />
+              <Route path="admin" element={<Admin />} />
+              <Route path="admin/settings" element={<AdminSettings />} />
+            </Route>
+            
+            {/* Routes without layout */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/goodbye" element={<GoodbyePage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
 export default App;

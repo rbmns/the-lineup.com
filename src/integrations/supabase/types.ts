@@ -36,6 +36,80 @@ export type Database = {
         }
         Relationships: []
       }
+      casual_plan_attendees: {
+        Row: {
+          created_at: string
+          id: string
+          plan_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          plan_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          plan_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "casual_plan_attendees_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "casual_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      casual_plans: {
+        Row: {
+          created_at: string
+          creator_id: string
+          date: string
+          description: string | null
+          id: string
+          location: string
+          location_coordinates: string | null
+          max_attendees: number | null
+          time: string
+          title: string
+          updated_at: string
+          vibe: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          date: string
+          description?: string | null
+          id?: string
+          location: string
+          location_coordinates?: string | null
+          max_attendees?: number | null
+          time: string
+          title: string
+          updated_at?: string
+          vibe: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          date?: string
+          description?: string | null
+          id?: string
+          location?: string
+          location_coordinates?: string | null
+          max_attendees?: number | null
+          time?: string
+          title?: string
+          updated_at?: string
+          vibe?: string
+        }
+        Relationships: []
+      }
       event_rsvps: {
         Row: {
           created_at: string | null

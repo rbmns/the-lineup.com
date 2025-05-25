@@ -1,28 +1,51 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { Calendar, Users } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Calendar, Users, Search, Map } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface NavItemsProps {
   className?: string;
   showIconsOnly?: boolean;
 }
 
-export const NavItems: React.FC<NavItemsProps> = ({ className, showIconsOnly = false }) => {
-  const { isAuthenticated, user, logout } = useAuth();
+export const NavItems: React.FC<NavItemsProps> = ({ 
+  className = "",
+  showIconsOnly = false 
+}) => {
+  const location = useLocation();
+
+  const navItems = [
+    { href: '/events', label: 'Events', icon: Calendar },
+    { href: '/casual-plans', label: 'Casual Plans', icon: Users },
+    { href: '/friends', label: 'Friends', icon: Users },
+    { href: '/explore', label: 'Explore', icon: Map },
+  ];
 
   return (
-    <div className={`flex items-center space-x-6 ${className || ''}`}>
-      <Link to="/events" className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-1.5">
-        <Calendar className="h-5 w-5" />
-        {!showIconsOnly && <span>Events</span>}
-      </Link>
-      <Link to="/friends" className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-1.5">
-        <Users className="h-5 w-5" />
-        {!showIconsOnly && <span>Friends</span>}
-      </Link>
-    </div>
+    <nav className={cn("flex items-center", className)}>
+      <div className="flex space-x-1 md:space-x-6">
+        {navItems.map(({ href, label, icon: Icon }) => {
+          const isActive = location.pathname === href;
+          
+          return (
+            <Link
+              key={href}
+              to={href}
+              className={cn(
+                "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                isActive 
+                  ? "bg-gray-100 text-gray-900" 
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50",
+                showIconsOnly && "px-2"
+              )}
+            >
+              <Icon className={cn("h-4 w-4", !showIconsOnly && "mr-2")} />
+              {!showIconsOnly && <span>{label}</span>}
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
   );
 };

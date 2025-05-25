@@ -79,8 +79,8 @@ const EventCard: React.FC<EventCardProps> = ({
   // Determine if this specific event is loading
   const isLoading = loadingEventId === event.id;
   
-  // Determine card height
-  const cardHeightClass = compact ? "max-h-[280px]" : "";
+  // Determine card height - make it smaller by default
+  const cardHeightClass = compact ? "max-h-[260px]" : "";
 
   return (
     <div
@@ -92,8 +92,8 @@ const EventCard: React.FC<EventCardProps> = ({
       onClick={handleClick}
       data-event-id={event.id}
     >
-      {/* Image container with event type label positioned on top */}
-      <div className="aspect-[16/9] relative overflow-hidden">
+      {/* Image container with event type label positioned on top - smaller image */}
+      <div className="aspect-[16/8] relative overflow-hidden">
         <img
           src={imageUrl}
           alt={event.title}
@@ -112,18 +112,18 @@ const EventCard: React.FC<EventCardProps> = ({
         )}
       </div>
 
-      {/* Content Section */}
-      <div className="p-4 flex flex-col flex-grow space-y-2">
+      {/* Content Section - more compact */}
+      <div className="p-3 flex flex-col flex-grow space-y-1">
         {/* Title - First */}
         <h3 className={cn(
           "font-semibold text-gray-900",
-          compact ? "text-base line-clamp-2" : "text-xl line-clamp-2"
+          compact ? "text-sm line-clamp-2" : "text-xl line-clamp-2"
         )}>
           {event.title}
         </h3>
         
         {/* Date & Time */}
-        <div className="text-sm text-gray-600 font-medium">
+        <div className="text-xs text-gray-600 font-medium">
           {formattedDate && timeDisplay ? (
             <>
               {formattedDate} • {timeDisplay}
@@ -134,18 +134,18 @@ const EventCard: React.FC<EventCardProps> = ({
         </div>
         
         {/* Venue/Location */}
-        <div className="flex items-center text-sm text-gray-500">
-          <MapPin className="h-3.5 w-3.5 mr-1 flex-shrink-0" />
+        <div className="flex items-center text-xs text-gray-500">
+          <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
           <span className="truncate">{event.venues?.name || event.location || 'No location'}</span>
         </div>
         
         {/* Spacer to push RSVP buttons to bottom */}
-        <div className="flex-grow min-h-[8px]"></div>
+        <div className="flex-grow min-h-[4px]"></div>
         
-        {/* RSVP Buttons - UPDATED to use default size instead of small */}
+        {/* RSVP Buttons - smaller size for compact cards */}
         {showRsvpButtons && (
           <div 
-            className="mt-2" 
+            className="mt-1" 
             data-rsvp-container="true"
             onClick={(e) => {
               e.stopPropagation();
@@ -155,7 +155,7 @@ const EventCard: React.FC<EventCardProps> = ({
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
-              size="default"
+              size={compact ? "small" : "default"}
               isLoading={isLoading}
             />
           </div>

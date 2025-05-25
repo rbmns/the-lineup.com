@@ -177,7 +177,7 @@ const LandingPage = () => {
             </div>
           )}
           
-          {/* Events Horizontal Slider - UPDATED for larger cards */}
+          {/* Events Horizontal Slider - UPDATED for larger cards with reduced whitespace */}
           <div className="relative">
             <div className="absolute top-1/2 left-0 -ml-4 z-10 transform -translate-y-1/2 hidden md:block">
               <button 
@@ -200,7 +200,7 @@ const LandingPage = () => {
                 filteredEvents.map((event) => (
                   <div 
                     key={event.id}
-                    className="min-w-[360px] max-w-[360px] flex-shrink-0 snap-start"
+                    className="min-w-[400px] max-w-[400px] flex-shrink-0 snap-start"
                     onClick={() => handleEventClick(event)}
                   >
                     <div className="border rounded-lg overflow-hidden h-full cursor-pointer hover:shadow-md transition-shadow">
@@ -208,7 +208,7 @@ const LandingPage = () => {
                         <img 
                           src={event.image_urls && event.image_urls.length > 0 ? event.image_urls[0] : getEventImageUrl(event)} 
                           alt={event.title} 
-                          className="w-full h-48 object-cover" 
+                          className="w-full h-56 object-cover" 
                         />
                         {event.event_type && (
                           <div className="absolute top-3 left-3 z-10">
@@ -220,15 +220,15 @@ const LandingPage = () => {
                           </div>
                         )}
                       </div>
-                      <div className="p-5 flex flex-col" style={{ minHeight: '180px' }}>
-                        <h3 className="text-xl font-semibold mb-3 line-clamp-2 min-h-[56px]">{event.title}</h3>
-                        <div className="flex items-center text-sm text-gray-600 mb-3">
+                      <div className="p-4 flex flex-col">
+                        <h3 className="text-xl font-semibold mb-2 line-clamp-2">{event.title}</h3>
+                        <div className="flex items-center text-sm text-gray-600 mb-2">
                           <Map size={16} className="mr-1 flex-shrink-0" />
                           <span className="truncate">
                             {event.venues?.name || event.location || 'Location TBD'}
                           </span>
                         </div>
-                        <div className="flex items-center text-base font-medium text-gray-800 mt-auto">
+                        <div className="flex items-center text-base font-medium text-gray-800">
                           <Calendar size={16} className="mr-2 flex-shrink-0" />
                           <span>
                             {event.start_date && event.start_time ? 
