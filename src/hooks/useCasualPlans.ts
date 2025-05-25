@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,9 +44,11 @@ export const useCasualPlans = () => {
             'id' in creatorData &&
             'username' in creatorData) {
           
-          const id = (creatorData as any).id;
-          const username = (creatorData as any).username;
-          const avatar_url = (creatorData as any).avatar_url;
+          // Use type assertion after comprehensive checks
+          const typedCreatorData = creatorData as any;
+          const id = typedCreatorData.id;
+          const username = typedCreatorData.username;
+          const avatar_url = typedCreatorData.avatar_url;
           
           if (typeof id === 'string' && typeof username === 'string') {
             creator_profile = {
@@ -70,9 +71,11 @@ export const useCasualPlans = () => {
               'id' in userData &&
               'username' in userData) {
             
-            const id = (userData as any).id;
-            const username = (userData as any).username;
-            const avatar_url = (userData as any).avatar_url;
+            // Use type assertion after comprehensive checks
+            const typedUserData = userData as any;
+            const id = typedUserData.id;
+            const username = typedUserData.username;
+            const avatar_url = typedUserData.avatar_url;
             
             if (typeof id === 'string' && typeof username === 'string') {
               user_profile = {
