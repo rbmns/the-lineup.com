@@ -18,6 +18,19 @@ export const formatDate = (dateString: string): string => {
 };
 
 /**
+ * Helper to format event date in featured format (Sun, 25 May)
+ */
+export const formatFeaturedDate = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, d MMM");
+  } catch (error) {
+    console.error('Error formatting featured date:', error);
+    return dateString;
+  }
+};
+
+/**
  * Helper to format event time in a consistent way - 24h format
  */
 export const formatTime = (timeString: string): string => {
@@ -52,5 +65,5 @@ export const formatEventTime = (startTime: string, endTime?: string | null): str
   if (!endTime) return formattedStartTime;
   
   const formattedEndTime = formatTime(endTime);
-  return `${formattedStartTime} - ${formattedEndTime}`;
+  return `${formattedStartTime}-${formattedEndTime}`;
 };

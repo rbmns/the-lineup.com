@@ -61,21 +61,43 @@ const MainNav = () => {
               <UserMenu user={user} profile={profile} handleSignOut={signOut} />
             ) : (
               <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleSignInClick}
-                  className="hidden sm:flex text-base font-medium"
-                >
-                  Sign in
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleRegisterClick}
-                  className="text-base font-medium"
-                >
-                  Sign up
-                </Button>
+                {/* Desktop buttons */}
+                <div className="hidden sm:flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleSignInClick}
+                    className="text-base font-medium"
+                  >
+                    Sign in
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleRegisterClick}
+                    className="text-base font-medium"
+                  >
+                    Sign up
+                  </Button>
+                </div>
+                
+                {/* Mobile buttons */}
+                <div className="sm:hidden flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleSignInClick}
+                    className="text-xs px-2"
+                  >
+                    Sign in
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleRegisterClick}
+                    className="text-xs px-2"
+                  >
+                    Sign up
+                  </Button>
+                </div>
               </div>
             )}
           </div>

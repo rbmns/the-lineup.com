@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -12,6 +11,8 @@ import { CategoryPill } from '@/components/ui/category-pill';
 import { getCategoryColorState } from '@/components/ui/category/category-color-mapping';
 import { Event } from '@/types';
 import { useEventCategories } from '@/hooks/home/useEventCategories';
+import { formatFeaturedDate, formatEventTime } from '@/utils/date-formatting';
+import { CategoriesBrowseSection } from '@/components/home/CategoriesBrowseSection';
 
 const LandingPage = () => {
   const { isAuthenticated } = useAuth();
