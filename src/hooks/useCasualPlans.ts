@@ -45,10 +45,12 @@ export const useCasualPlans = () => {
             'id' in creatorData &&
             'username' in creatorData) {
           
+          // TypeScript assertion after proper checks
+          const safeCreatorData = creatorData as { id: string; username: string; avatar_url?: string[]; };
           creator_profile = {
-            id: creatorData.id as string,
-            username: creatorData.username as string,
-            avatar_url: creatorData.avatar_url as string[] | undefined
+            id: safeCreatorData.id,
+            username: safeCreatorData.username,
+            avatar_url: safeCreatorData.avatar_url
           };
         }
 
@@ -65,10 +67,12 @@ export const useCasualPlans = () => {
               'id' in userData &&
               'username' in userData) {
             
+            // TypeScript assertion after proper checks
+            const safeUserData = userData as { id: string; username: string; avatar_url?: string[]; };
             user_profile = {
-              id: userData.id as string,
-              username: userData.username as string,
-              avatar_url: userData.avatar_url as string[] | undefined
+              id: safeUserData.id,
+              username: safeUserData.username,
+              avatar_url: safeUserData.avatar_url
             };
           }
 
