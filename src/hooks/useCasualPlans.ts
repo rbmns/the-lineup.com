@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,18 +37,19 @@ export const useCasualPlans = () => {
         // Handle creator_profile which might be null or have an error
         let creator_profile: { id: string; username: string; avatar_url?: string[]; } | undefined;
         
-        // Use more explicit type checking for creator data
+        // Use type assertion after null check for creator data
         const creatorData = plan.creator_profile;
-        if (creatorData !== null && 
-            creatorData !== undefined &&
+        if (creatorData != null && 
             typeof creatorData === 'object' && 
             !('error' in creatorData) &&
             'id' in creatorData &&
             'username' in creatorData) {
+          // Type assert after null check
+          const validCreatorData = creatorData as { id: string; username: string; avatar_url?: string[]; };
           creator_profile = {
-            id: creatorData.id as string,
-            username: creatorData.username as string,
-            avatar_url: creatorData.avatar_url as string[] | undefined
+            id: validCreatorData.id,
+            username: validCreatorData.username,
+            avatar_url: validCreatorData.avatar_url
           };
         }
 
@@ -55,18 +57,19 @@ export const useCasualPlans = () => {
         const attendees = (plan.attendees || []).map(attendee => {
           let user_profile: { id: string; username: string; avatar_url?: string[]; } | undefined;
           
-          // Use more explicit type checking for user data
+          // Use type assertion after null check for user data
           const userData = attendee.user_profile;
-          if (userData !== null && 
-              userData !== undefined &&
+          if (userData != null && 
               typeof userData === 'object' && 
               !('error' in userData) &&
               'id' in userData &&
               'username' in userData) {
+            // Type assert after null check
+            const validUserData = userData as { id: string; username: string; avatar_url?: string[]; };
             user_profile = {
-              id: userData.id as string,
-              username: userData.username as string,
-              avatar_url: userData.avatar_url as string[] | undefined
+              id: validUserData.id,
+              username: validUserData.username,
+              avatar_url: validUserData.avatar_url
             };
           }
 
