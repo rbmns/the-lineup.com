@@ -168,7 +168,7 @@ const Friends: React.FC = () => {
               Friends
             </h1>
             <p className="text-lg md:text-xl text-teal-100 leading-relaxed max-w-2xl mx-auto">
-              Find your crew
+              Find your crew. Join the People, Not Just the Plans.
             </p>
           </div>
         </div>
