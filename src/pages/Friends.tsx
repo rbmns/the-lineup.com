@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -156,8 +155,8 @@ const Friends: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-br from-orange-500 via-pink-500 to-red-500 text-white py-8 md:py-12">
+      {/* Hero Section with surf and travel vibe */}
+      <div className="bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-600 text-white py-8 md:py-12">
         <div className="container mx-auto px-4">
           <div className="text-center">
             <div className="flex justify-center mb-4">
@@ -168,8 +167,8 @@ const Friends: React.FC = () => {
             <h1 className="text-2xl md:text-4xl font-bold tracking-tight mb-2">
               Friends
             </h1>
-            <p className="text-lg md:text-xl text-orange-100 leading-relaxed max-w-2xl mx-auto">
-              Connect with your community and discover new people to share amazing experiences with
+            <p className="text-lg md:text-xl text-teal-100 leading-relaxed max-w-2xl mx-auto">
+              Connect with fellow adventurers and discover amazing people to explore the world with
             </p>
           </div>
         </div>

@@ -46,14 +46,14 @@ const Profile: React.FC = () => {
   };
 
   const stats = [
-    { label: 'Events Attended', value: '11' },
-    { label: 'Upcoming Events', value: '64' },
+    { label: 'Events Attended', value: '28' },
+    { label: 'Interested In', value: '42' },
     { label: 'Friends', value: '17' }
   ];
 
   const tabs = [
     { id: 'personal', label: 'Personal Info', icon: User },
-    { id: 'privacy', label: 'Privacy', icon: Shield },
+    { id: 'privacy', label: 'Preferences', icon: Shield },
     { id: 'events', label: 'My Events', icon: CalendarDays }
   ];
 
@@ -64,21 +64,12 @@ const Profile: React.FC = () => {
           <div className="space-y-6">
             <div>
               <h2 className="text-xl font-semibold mb-4">Personal Information</h2>
-              <p className="text-gray-600 mb-6">Your personal details and profile information</p>
             </div>
             
-            <div className="space-y-6">
-              <div>
-                <label className="text-sm font-medium text-gray-700">Username</label>
-                <p className="mt-1 text-gray-900">{profile?.username || 'Not set'}</p>
-              </div>
-              
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="text-sm font-medium text-gray-700">Email</label>
-                <p className="mt-1 text-gray-900 flex items-center">
-                  <span className="mr-2">📧</span>
-                  {user?.email}
-                </p>
+                <p className="mt-1 text-gray-900">{user?.email}</p>
               </div>
               
               <div>
@@ -87,11 +78,6 @@ const Profile: React.FC = () => {
                   <MapPin className="h-4 w-4 mr-2" />
                   {profile?.location || 'Not set'}
                 </p>
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium text-gray-700">About</label>
-                <p className="mt-1 text-gray-900">{profile?.tagline || 'No bio added yet'}</p>
               </div>
             </div>
             
@@ -128,14 +114,17 @@ const Profile: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Purple gradient header */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <ProfileAvatar profile={profile} size="lg" className="border-4 border-white/20" />
+      <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-6 md:py-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center md:justify-between space-y-4 md:space-y-0">
+            <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4 text-center md:text-left">
+              <ProfileAvatar profile={profile} size="lg" className="border-4 border-white/20 w-20 h-20 md:w-24 md:h-24" />
               <div className="text-white">
-                <h1 className="text-2xl font-bold">{displayName}</h1>
-                <div className="flex items-center mt-1 text-sm text-purple-100">
+                <h1 className="text-xl md:text-2xl font-bold">{displayName}</h1>
+                {profile?.tagline && (
+                  <p className="text-sm md:text-base text-purple-100 italic mt-1">"{profile.tagline}"</p>
+                )}
+                <div className="flex items-center justify-center md:justify-start mt-2 text-sm text-purple-100">
                   <MapPin className="h-4 w-4 mr-1" />
                   <span>{profile?.location || 'Location not set'}</span>
                 </div>
@@ -144,7 +133,7 @@ const Profile: React.FC = () => {
             <Button 
               variant="secondary" 
               onClick={handleEditProfile}
-              className="bg-white text-purple-700 hover:bg-purple-50"
+              className="bg-white text-purple-700 hover:bg-purple-50 w-full md:w-auto"
             >
               <Edit3 className="h-4 w-4 mr-2" />
               Edit Profile
@@ -153,14 +142,17 @@ const Profile: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats summary */}
+      {/* Activity Stats */}
       <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="grid grid-cols-3 gap-8">
+        <div className="max-w-4xl mx-auto px-4 py-4 md:py-6">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Activity</h2>
+          </div>
+          <div className="grid grid-cols-3 gap-4 md:gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="text-3xl font-bold text-purple-600">{stat.value}</div>
-                <div className="text-sm text-gray-600 mt-1">{stat.label}</div>
+                <div className="text-2xl md:text-3xl font-bold text-purple-600">{stat.value}</div>
+                <div className="text-xs md:text-sm text-gray-600 mt-1">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -169,8 +161,8 @@ const Profile: React.FC = () => {
 
       {/* Navigation tabs */}
       <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex space-x-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="flex overflow-x-auto">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -178,10 +170,10 @@ const Profile: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 py-4 border-b-2 transition-colors ${
+                  className={`flex items-center space-x-2 px-3 md:px-4 py-3 md:py-4 border-b-2 transition-colors whitespace-nowrap text-sm md:text-base ${
                     isActive 
-                      ? 'border-purple-600 text-purple-600' 
-                      : 'border-transparent text-gray-600 hover:text-gray-900'
+                      ? 'border-purple-600 text-purple-600 bg-gray-50' 
+                      : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -194,8 +186,8 @@ const Profile: React.FC = () => {
       </div>
 
       {/* Tab content */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-sm p-6">
+      <div className="max-w-4xl mx-auto px-4 py-6 md:py-8">
+        <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
           {renderTabContent()}
         </div>
       </div>
