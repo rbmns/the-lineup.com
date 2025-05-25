@@ -310,39 +310,17 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Browse by Category Section - Now showing all available categories */}
-      <section className="py-8 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-semibold tracking-tight mb-6">Browse by Category</h2>
-          
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            {allEventTypes.map(type => (
-              <Link 
-                key={type} 
-                to={`/events?type=${type}`} 
-                className="flex flex-col items-center p-3 bg-white rounded-lg hover:shadow-md transition-all border"
-              >
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 text-white ${getCategoryColorState(type).active.split(' ')[0]}`}>
-                  <span className="text-white font-bold">{type.charAt(0).toUpperCase()}</span>
-                </div>
-                <span className="text-sm font-medium">{type}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* CTA Section */}
       <section className="py-12 bg-gray-100">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-semibold tracking-tight mb-4">Join our community of adventurers</h2>
+          <h2 className="text-3xl font-semibold tracking-tight mb-4">Join Our Growing Community</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Connect with like-minded individuals, discover new experiences, and create
-            unforgettable memories with The Lineup.
+            We’re still in beta and looking for testers! Sign up to be the first to try new features, share feedback, and help shape The Lineup.
           </p>
           <Button asChild size="lg" className="bg-black hover:bg-black/90">
             <Link to="/login">
-              Sign Up Now
+              Sign Up – It’s Free
             </Link>
           </Button>
         </div>
