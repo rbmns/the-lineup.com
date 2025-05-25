@@ -48,7 +48,7 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
       <div className="flex items-center justify-between mb-3">
         <CategoryPill 
           category={plan.vibe} 
-          size="small"
+          size="sm"
           className="capitalize"
         />
         <div className="flex items-center text-sm text-gray-500">

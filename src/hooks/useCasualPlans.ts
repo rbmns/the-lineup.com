@@ -31,11 +31,23 @@ export const useCasualPlans = () => {
       if (plansError) throw plansError;
 
       // Transform the data to include attendee count and user attendance status
-      const transformedPlans: CasualPlan[] = (plansData || []).map(plan => ({
-        ...plan,
-        attendee_count: plan.attendees?.length || 0,
-        user_attending: user ? plan.attendees?.some(att => att.user_id === user.id) : false
-      }));
+      const transformedPlans: CasualPlan[] = (plansData || []).map(plan => {
+        // Handle creator_profile which might be null or have an error
+        const creator_profile = plan.creator_profile && typeof plan.creator_profile === 'object' && !('error' in plan.creator_profile)
+          ? {
+              id: plan.creator_profile.id,
+              username: plan.creator_profile.username,
+              avatar_url: plan.creator_profile.avatar_url
+            }
+          : undefined;
+
+        return {
+          ...plan,
+          creator_profile,
+          attendee_count: plan.attendees?.length || 0,
+          user_attending: user ? plan.attendees?.some(att => att.user_id === user.id) : false
+        };
+      });
 
       return transformedPlans;
     },

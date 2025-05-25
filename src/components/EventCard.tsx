@@ -90,7 +90,7 @@ const EventCard: React.FC<EventCardProps> = ({
   const isLoading = loadingEventId === event.id;
   
   // Determine card height
-  const cardHeightClass = compact ? "max-h-[280px]" : "";
+  const cardHeightClass = compact ? "max-h-[320px]" : "";
 
   // Get location from venue or fallback to event location
   const displayLocation = event.venues?.name || event.location || 'No location';
@@ -105,7 +105,7 @@ const EventCard: React.FC<EventCardProps> = ({
       onClick={handleClick}
       data-event-id={event.id}
     >
-      <div className="aspect-[16/9] relative overflow-hidden">
+      <div className="aspect-[16/10] relative overflow-hidden">
         <img
           src={imageUrl}
           alt={event.title}
