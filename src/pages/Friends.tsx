@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -45,26 +46,29 @@ const Friends: React.FC = () => {
     }
   }, [user, navigate]);
 
-  // Filter friends based on search query
+  // Filter friends based on search query - EXCLUDE current user
   useEffect(() => {
-    if (!friends) return;
+    if (!friends || !user) return;
+    
+    // Filter out the current user from friends list
+    const friendsWithoutCurrentUser = friends.filter(friend => friend.id !== user.id);
     
     if (!friendsSearchQuery) {
-      setFilteredFriends(friends as UserProfile[]);
+      setFilteredFriends(friendsWithoutCurrentUser as UserProfile[]);
       return;
     }
     
     const query = friendsSearchQuery.toLowerCase();
-    const filtered = friends.filter(friend => 
+    const filtered = friendsWithoutCurrentUser.filter(friend => 
       friend.username?.toLowerCase().includes(query) || 
       friend.location?.toLowerCase().includes(query) ||
       friend.status?.toLowerCase().includes(query)
     );
     
     setFilteredFriends(filtered as UserProfile[]);
-  }, [friendsSearchQuery, friends]);
+  }, [friendsSearchQuery, friends, user]);
 
-  // Handle search for new people
+  // Handle search for new people - EXCLUDE current user
   const handleSearch = useCallback(async () => {
     if (!searchQuery.trim() || !user) return;
     
@@ -81,9 +85,11 @@ const Friends: React.FC = () => {
         
       if (error) throw error;
       
-      // Filter out users who are already friends
+      // Filter out users who are already friends AND exclude current user
       const friendIds = friends?.map(f => f.id) || [];
-      const filteredResults = (data || []).filter(profile => !friendIds.includes(profile.id));
+      const filteredResults = (data || []).filter(profile => 
+        !friendIds.includes(profile.id) && profile.id !== user.id
+      );
       
       setSearchResults(filteredResults as UserProfile[]);
     } catch (error) {
@@ -160,7 +166,7 @@ const Friends: React.FC = () => {
                 Friends
               </h1>
               <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-                Find your crew. Join the People, Not Just the Plans.
+                Sign up or in to find your people
               </p>
             </div>
           </div>

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { MapPin } from 'lucide-react';
@@ -20,7 +21,7 @@ export interface EventCardProps {
 
 const EventCard: React.FC<EventCardProps> = ({
   event,
-  compact = false,
+  compact = true, // Default to compact for events page
   showRsvpButtons = false,
   onRsvp,
   className,
