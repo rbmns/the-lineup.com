@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,7 +8,7 @@ import Layout from "@/components/Layout";
 
 // Import pages
 import Index from "./pages/Index";
-import Events from "./pages/Events";
+import EventsPageRefactored from "./pages/EventsPageRefactored";
 import EventDetail from "./pages/EventDetail";
 import Friends from "./pages/Friends";
 import Profile from "./pages/Profile";
@@ -45,7 +44,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<LandingPage />} />
-              <Route path="events" element={<Events />} />
+              <Route path="events" element={<EventsPageRefactored />} />
               <Route path="events/:id" element={<EventDetail />} />
               <Route path="casual-plans" element={<CasualPlans />} />
               <Route path="friends" element={<Friends />} />

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Calendar, Users, Search, Map } from 'lucide-react';
+import { Calendar, Users, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItemsProps {
@@ -19,7 +19,6 @@ export const NavItems: React.FC<NavItemsProps> = ({
     { href: '/events', label: 'Events', icon: Calendar },
     { href: '/casual-plans', label: 'Casual Plans', icon: Users },
     { href: '/friends', label: 'Friends', icon: Users },
-    { href: '/explore', label: 'Explore', icon: Map },
   ];
 
   return (
