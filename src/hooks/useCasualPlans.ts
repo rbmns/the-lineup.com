@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -37,11 +36,11 @@ export const useCasualPlans = () => {
         // Handle creator_profile which might be null or have an error
         let creator_profile: { id: string; username: string; avatar_url?: string[]; } | undefined;
         
-        // Use optional chaining and proper type checking
+        // Use more explicit type checking for creator data
         const creatorData = plan.creator_profile;
-        if (creatorData && 
+        if (creatorData !== null && 
+            creatorData !== undefined &&
             typeof creatorData === 'object' && 
-            creatorData !== null &&
             !('error' in creatorData) &&
             'id' in creatorData &&
             'username' in creatorData) {
@@ -56,11 +55,11 @@ export const useCasualPlans = () => {
         const attendees = (plan.attendees || []).map(attendee => {
           let user_profile: { id: string; username: string; avatar_url?: string[]; } | undefined;
           
-          // Use optional chaining and proper type checking
+          // Use more explicit type checking for user data
           const userData = attendee.user_profile;
-          if (userData && 
+          if (userData !== null && 
+              userData !== undefined &&
               typeof userData === 'object' && 
-              userData !== null &&
               !('error' in userData) &&
               'id' in userData &&
               'username' in userData) {
