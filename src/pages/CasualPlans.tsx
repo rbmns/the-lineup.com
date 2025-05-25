@@ -38,16 +38,10 @@ const CasualPlans: React.FC = () => {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="border-b bg-white">
-          <div className="container mx-auto px-4 py-6 md:py-8">
-            <h1 className={`font-bold tracking-tight mb-2 ${isMobile ? 'text-2xl' : 'text-4xl'}`}>
-              Casual Plans
-            </h1>
-            <p className={`text-muted-foreground leading-relaxed ${isMobile ? 'text-base' : 'text-xl'}`}>
-              Find spontaneous meetups and create your own casual get-togethers
-            </p>
-          </div>
-        </div>
+        <EventsPageHeader 
+          title="Casual Plans" 
+          subtitle="Find spontaneous meetups and create your own casual get-togethers"
+        />
 
         <div className="container mx-auto px-4 py-4 md:py-6">
           {/* Mobile-optimized action bar */}
@@ -103,16 +97,10 @@ const CasualPlans: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="border-b bg-white">
-        <div className="container mx-auto px-4 py-6 md:py-8">
-          <h1 className={`font-bold tracking-tight mb-2 ${isMobile ? 'text-2xl' : 'text-4xl'}`}>
-            Casual Plans
-          </h1>
-          <p className={`text-muted-foreground leading-relaxed ${isMobile ? 'text-base' : 'text-xl'}`}>
-            Find spontaneous meetups and create your own casual get-togethers
-          </p>
-        </div>
-      </div>
+      <EventsPageHeader 
+        title="Casual Plans" 
+        subtitle="Find spontaneous meetups and create your own casual get-togethers"
+      />
 
       <div className="container mx-auto px-4 py-4 md:py-6">
         {/* Mobile-optimized action bar */}
@@ -152,14 +140,14 @@ const CasualPlans: React.FC = () => {
           </Button>
         </div>
 
-        {/* Plans layout - list on mobile, grid on desktop */}
+        {/* Plans layout - improved list on mobile, grid on desktop */}
         {isLoading ? (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-2 border-black"></div>
           </div>
         ) : filteredPlans.length > 0 ? (
           <div className={isMobile 
-            ? "space-y-2" 
+            ? "space-y-0" 
             : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6"
           }>
             {filteredPlans.map((plan) => (

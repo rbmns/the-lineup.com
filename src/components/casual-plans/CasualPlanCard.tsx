@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { CasualPlan } from '@/types/casual-plans';
 import { Button } from '@/components/ui/button';
@@ -44,14 +45,14 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
   const formattedDate = formatFeaturedDate(plan.date);
   const formattedTime = formatTime(plan.time);
 
-  // Mobile list layout
+  // Mobile list layout - improved spacing and visual hierarchy
   if (isMobile) {
     return (
-      <div className="bg-white rounded-lg border p-3 mb-2">
+      <div className="bg-white rounded-lg border p-4 mb-3 shadow-sm">
         <div className="flex items-start justify-between">
-          <div className="flex-1 min-w-0 pr-3">
-            {/* Header with vibe and title */}
-            <div className="flex items-center gap-2 mb-1">
+          <div className="flex-1 min-w-0 pr-4">
+            {/* Header with vibe and attendee count */}
+            <div className="flex items-center justify-between mb-2">
               <CategoryPill 
                 category={plan.vibe} 
                 size="sm"
@@ -65,28 +66,34 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
             </div>
             
             {/* Title */}
-            <h3 className="font-medium text-sm mb-1 line-clamp-1">{plan.title}</h3>
+            <h3 className="font-semibold text-base mb-2 line-clamp-2 leading-tight">{plan.title}</h3>
             
-            {/* Compact info */}
-            <div className="flex items-center gap-3 text-xs text-gray-600 mb-1">
+            {/* Description if available */}
+            {plan.description && (
+              <p className="text-sm text-gray-600 mb-2 line-clamp-2">{plan.description}</p>
+            )}
+            
+            {/* Date and time info */}
+            <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
               <div className="flex items-center">
-                <Calendar className="h-3 w-3 mr-1" />
-                <span className="truncate">{formattedDate}</span>
+                <Calendar className="h-3.5 w-3.5 mr-1.5" />
+                <span>{formattedDate}</span>
               </div>
               <div className="flex items-center">
-                <Clock className="h-3 w-3 mr-1" />
+                <Clock className="h-3.5 w-3.5 mr-1.5" />
                 <span>{formattedTime}</span>
               </div>
             </div>
             
-            <div className="flex items-center text-xs text-gray-600 mb-2">
-              <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+            {/* Location */}
+            <div className="flex items-center text-sm text-gray-600 mb-3">
+              <MapPin className="h-3.5 w-3.5 mr-1.5 flex-shrink-0" />
               <span className="truncate">{plan.location}</span>
             </div>
             
             {/* Creator info */}
             <div className="flex items-center">
-              <Avatar className="h-4 w-4 mr-1.5">
+              <Avatar className="h-5 w-5 mr-2">
                 <AvatarImage 
                   src={plan.creator_profile?.avatar_url?.[0]} 
                   alt={plan.creator_profile?.username}
@@ -95,27 +102,29 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
                   {plan.creator_profile?.username?.[0]?.toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-xs text-gray-600 truncate">
-                {plan.creator_profile?.username || 'Anonymous'}
+              <span className="text-sm text-gray-600">
+                by {plan.creator_profile?.username || 'Anonymous'}
               </span>
             </div>
           </div>
           
           {/* Action button */}
-          <Button
-            onClick={handleJoinLeave}
-            disabled={isJoining || isLeaving}
-            size="sm"
-            variant={plan.user_attending ? "outline" : "default"}
-            className={`flex-shrink-0 px-3 py-1 text-xs ${plan.user_attending ? "text-red-600 border-red-200 hover:bg-red-50" : ""}`}
-          >
-            {isJoining || isLeaving 
-              ? "..." 
-              : plan.user_attending 
-                ? "Leave" 
-                : "Join"
-            }
-          </Button>
+          <div className="flex-shrink-0">
+            <Button
+              onClick={handleJoinLeave}
+              disabled={isJoining || isLeaving}
+              size="sm"
+              variant={plan.user_attending ? "outline" : "default"}
+              className={`px-4 py-2 ${plan.user_attending ? "text-red-600 border-red-200 hover:bg-red-50" : ""}`}
+            >
+              {isJoining || isLeaving 
+                ? "..." 
+                : plan.user_attending 
+                  ? "Leave" 
+                  : "Join"
+              }
+            </Button>
+          </div>
         </div>
       </div>
     );
