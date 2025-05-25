@@ -41,17 +41,19 @@ const CasualPlans: React.FC = () => {
           subtitle="Find spontaneous meetups and create your own casual get-togethers"
         />
 
-        <div className="container mx-auto px-4 py-6">
-          {/* Action bar with disabled button for non-auth users */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="flex-1">
-              {/* Vibe filters */}
-              <div className="flex flex-wrap gap-2">
+        <div className="container mx-auto px-4 py-4 md:py-6">
+          {/* Mobile-optimized action bar */}
+          <div className="space-y-4 mb-6">
+            {/* Vibe filters - horizontal scroll on mobile */}
+            <div className="space-y-2">
+              <h3 className="text-sm font-medium text-gray-700">Filter by vibe:</h3>
+              <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
                 <CategoryPill
                   category="all"
                   active={selectedVibe === null}
                   onClick={() => setSelectedVibe(null)}
                   noBorder={true}
+                  className="flex-shrink-0"
                 />
                 {CASUAL_PLAN_VIBES.map((vibe) => (
                   <CategoryPill
@@ -60,15 +62,17 @@ const CasualPlans: React.FC = () => {
                     active={selectedVibe === vibe}
                     onClick={() => setSelectedVibe(selectedVibe === vibe ? null : vibe)}
                     noBorder={true}
-                    className="capitalize"
+                    className="capitalize flex-shrink-0"
                   />
                 ))}
               </div>
             </div>
             
+            {/* Create button - full width on mobile */}
             <Button 
               onClick={handleLoginPrompt}
-              className="shrink-0"
+              className="w-full md:w-auto"
+              size="lg"
             >
               <Plus className="h-4 w-4 mr-2" />
               Post a Plan
@@ -77,10 +81,10 @@ const CasualPlans: React.FC = () => {
 
           {/* Login prompt */}
           <div className="text-center py-12">
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 mb-4 text-base">
               Sign in to see and create casual plans
             </p>
-            <Button onClick={handleLoginPrompt}>
+            <Button onClick={handleLoginPrompt} size="lg">
               Sign In
             </Button>
           </div>
@@ -96,17 +100,19 @@ const CasualPlans: React.FC = () => {
         subtitle="Find spontaneous meetups and create your own casual get-togethers"
       />
 
-      <div className="container mx-auto px-4 py-6">
-        {/* Action bar */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1">
-            {/* Vibe filters */}
-            <div className="flex flex-wrap gap-2">
+      <div className="container mx-auto px-4 py-4 md:py-6">
+        {/* Mobile-optimized action bar */}
+        <div className="space-y-4 mb-6">
+          {/* Vibe filters - horizontal scroll on mobile */}
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium text-gray-700">Filter by vibe:</h3>
+            <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
               <CategoryPill
                 category="all"
                 active={selectedVibe === null}
                 onClick={() => setSelectedVibe(null)}
                 noBorder={true}
+                className="flex-shrink-0"
               />
               {CASUAL_PLAN_VIBES.map((vibe) => (
                 <CategoryPill
@@ -115,28 +121,30 @@ const CasualPlans: React.FC = () => {
                   active={selectedVibe === vibe}
                   onClick={() => setSelectedVibe(selectedVibe === vibe ? null : vibe)}
                   noBorder={true}
-                  className="capitalize"
+                  className="capitalize flex-shrink-0"
                 />
               ))}
             </div>
           </div>
           
+          {/* Create button - full width on mobile */}
           <Button 
             onClick={() => setShowCreateForm(true)}
-            className="shrink-0"
+            className="w-full md:w-auto"
+            size="lg"
           >
             <Plus className="h-4 w-4 mr-2" />
             Post a Plan
           </Button>
         </div>
 
-        {/* Plans grid */}
+        {/* Plans grid - responsive */}
         {isLoading ? (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-2 border-black"></div>
           </div>
         ) : filteredPlans.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {filteredPlans.map((plan) => (
               <CasualPlanCard
                 key={plan.id}
@@ -152,13 +160,17 @@ const CasualPlans: React.FC = () => {
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 mb-4 text-base">
               {selectedVibe 
                 ? `No ${selectedVibe} plans found. Be the first to create one!`
                 : 'No casual plans found. Be the first to create one!'
               }
             </p>
-            <Button onClick={() => setShowCreateForm(true)}>
+            <Button 
+              onClick={() => setShowCreateForm(true)}
+              size="lg"
+              className="w-full md:w-auto"
+            >
               <Plus className="h-4 w-4 mr-2" />
               Create a Plan
             </Button>

@@ -43,8 +43,8 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
   const formattedTime = formatTime(plan.time);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow p-4">
-      {/* Header with vibe tag */}
+    <div className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow p-4 h-full flex flex-col">
+      {/* Header with vibe tag and attendee count */}
       <div className="flex items-center justify-between mb-3">
         <CategoryPill 
           category={plan.vibe} 
@@ -61,35 +61,35 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
       </div>
 
       {/* Title and description */}
-      <h3 className="font-semibold text-lg mb-2 line-clamp-2">{plan.title}</h3>
+      <h3 className="font-semibold text-lg mb-2 line-clamp-2 leading-tight">{plan.title}</h3>
       {plan.description && (
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2">{plan.description}</p>
+        <p className="text-gray-600 text-sm mb-3 line-clamp-2 flex-grow">{plan.description}</p>
       )}
 
-      {/* Date, time, and location */}
+      {/* Date, time, and location - compact mobile layout */}
       <div className="space-y-2 mb-4">
         <div className="flex items-center text-sm text-gray-600">
-          <Calendar className="h-4 w-4 mr-2" />
-          <span>{formattedDate}</span>
+          <Calendar className="h-3.5 w-3.5 mr-2 flex-shrink-0" />
+          <span className="truncate">{formattedDate}</span>
         </div>
         <div className="flex items-center text-sm text-gray-600">
-          <Clock className="h-4 w-4 mr-2" />
-          <span>{formattedTime}</span>
+          <Clock className="h-3.5 w-3.5 mr-2 flex-shrink-0" />
+          <span className="truncate">{formattedTime}</span>
         </div>
         <div className="flex items-center text-sm text-gray-600">
-          <MapPin className="h-4 w-4 mr-2" />
+          <MapPin className="h-3.5 w-3.5 mr-2 flex-shrink-0" />
           <span className="truncate">{plan.location}</span>
         </div>
       </div>
 
-      {/* Attendees preview */}
+      {/* Attendees preview - responsive */}
       {plan.attendees && plan.attendees.length > 0 && (
         <div className="mb-4">
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">Going:</span>
-            <div className="flex -space-x-2">
-              {plan.attendees.slice(0, 3).map((attendee) => (
-                <Avatar key={attendee.id} className="h-6 w-6 border-2 border-white">
+            <span className="text-xs text-gray-600">Going:</span>
+            <div className="flex -space-x-1.5">
+              {plan.attendees.slice(0, 4).map((attendee) => (
+                <Avatar key={attendee.id} className="h-5 w-5 border border-white">
                   <AvatarImage 
                     src={attendee.user_profile?.avatar_url?.[0]} 
                     alt={attendee.user_profile?.username}
@@ -99,9 +99,9 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
                   </AvatarFallback>
                 </Avatar>
               ))}
-              {(plan.attendee_count || 0) > 3 && (
-                <div className="h-6 w-6 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center">
-                  <span className="text-xs text-gray-600">+{(plan.attendee_count || 0) - 3}</span>
+              {(plan.attendee_count || 0) > 4 && (
+                <div className="h-5 w-5 rounded-full bg-gray-200 border border-white flex items-center justify-center">
+                  <span className="text-xs text-gray-600">+{(plan.attendee_count || 0) - 4}</span>
                 </div>
               )}
             </div>
@@ -109,10 +109,10 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
         </div>
       )}
 
-      {/* Creator info */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Avatar className="h-6 w-6">
+      {/* Creator info and action button */}
+      <div className="flex items-center justify-between mt-auto">
+        <div className="flex items-center space-x-2 min-w-0 flex-1">
+          <Avatar className="h-5 w-5 flex-shrink-0">
             <AvatarImage 
               src={plan.creator_profile?.avatar_url?.[0]} 
               alt={plan.creator_profile?.username}
@@ -121,7 +121,7 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
               {plan.creator_profile?.username?.[0]?.toUpperCase() || 'U'}
             </AvatarFallback>
           </Avatar>
-          <span className="text-sm text-gray-600">
+          <span className="text-xs text-gray-600 truncate">
             by {plan.creator_profile?.username || 'Anonymous'}
           </span>
         </div>
@@ -132,7 +132,7 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
           disabled={isJoining || isLeaving}
           size="sm"
           variant={plan.user_attending ? "outline" : "default"}
-          className={plan.user_attending ? "text-red-600 border-red-200 hover:bg-red-50" : ""}
+          className={`flex-shrink-0 ml-2 ${plan.user_attending ? "text-red-600 border-red-200 hover:bg-red-50" : ""}`}
         >
           {isJoining || isLeaving 
             ? "..." 
