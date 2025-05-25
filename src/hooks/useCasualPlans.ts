@@ -132,12 +132,19 @@ export const useCasualPlans = () => {
 
       console.log('Creating plan with data:', planData);
 
+      // Ensure location is properly set
+      const planToCreate = {
+        ...planData,
+        creator_id: user.id,
+        location: planData.location || '', // Ensure location is never null
+        location_coordinates: planData.location_coordinates || null,
+      };
+
+      console.log('Plan data being inserted:', planToCreate);
+
       const { data, error } = await supabase
         .from('casual_plans')
-        .insert({
-          ...planData,
-          creator_id: user.id,
-        })
+        .insert(planToCreate)
         .select()
         .single();
 
