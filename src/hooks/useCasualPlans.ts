@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -92,31 +93,6 @@ export const useCasualPlans = () => {
             user_profile
           };
         });
-
-        // Safely combine date and time - handle potential invalid dates
-        let combinedDateTime;
-        try {
-          // Parse the date and time more carefully
-          const dateStr = plan.date;
-          const timeStr = plan.time;
-          
-          if (dateStr && timeStr) {
-            // Create date string in ISO format
-            const dateTimeStr = `${dateStr}T${timeStr}`;
-            combinedDateTime = new Date(dateTimeStr);
-            
-            // Check if the date is valid
-            if (isNaN(combinedDateTime.getTime())) {
-              console.warn('Invalid date/time combination:', dateStr, timeStr);
-              combinedDateTime = new Date(dateStr); // Fallback to just the date
-            }
-          } else {
-            combinedDateTime = new Date(dateStr || new Date());
-          }
-        } catch (error) {
-          console.error('Error combining date and time:', error);
-          combinedDateTime = new Date(plan.date || new Date());
-        }
 
         return {
           ...plan,
