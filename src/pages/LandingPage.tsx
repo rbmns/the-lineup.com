@@ -139,13 +139,12 @@ const LandingPage = () => {
           </h1>
           <p className="text-xl leading-relaxed mb-8 max-w-2xl mx-auto">
 Discover local events and casual plans that fit your vibe. Explore what’s happening nearby — music, surf, art, community, and more. 
-
-Join events or post your own casual plans.. — or just browse events. 
+Join events or post your own casual plans. Or just browse events. 
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button asChild size="lg" className="bg-black hover:bg-black/90 text-white">
               <Link to="/events">
-                <Search className="mr-2 h-5 w-5" /> Browse Events
+                <Search className="mr-2 h-5 w-5" /> Explore Events
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="border-2 bg-transparent border-white text-white hover:bg-white/10">
@@ -324,9 +323,9 @@ Join events or post your own casual plans.. — or just browse events.
       {/* CTA Section */}
       <section className="py-12 bg-gray-100">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-semibold tracking-tight mb-4">Join Our Growing Community</h2>
+          <h2 className="text-3xl font-semibold tracking-tight mb-4">Want to connect with others attending?</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            We're still in beta and looking for testers! Sign up to be the first to try new features, share feedback, and help shape The Lineup.
+            Sign up to join events, meet people, and save your favorites. 
           </p>
           <Button asChild size="lg" className="bg-black hover:bg-black/90">
             <Link to="/login">
