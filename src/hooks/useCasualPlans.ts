@@ -39,19 +39,22 @@ export const useCasualPlans = () => {
         
         // More explicit type checking for creator data
         const creatorData = plan.creator_profile;
-        if (creatorData !== null && 
-            creatorData !== undefined &&
+        if (creatorData && 
             typeof creatorData === 'object' && 
             'id' in creatorData &&
-            'username' in creatorData &&
-            typeof (creatorData as any).id === 'string' &&
-            typeof (creatorData as any).username === 'string') {
+            'username' in creatorData) {
           
-          creator_profile = {
-            id: (creatorData as any).id,
-            username: (creatorData as any).username,
-            avatar_url: (creatorData as any).avatar_url as string[] | undefined
-          };
+          const id = (creatorData as any).id;
+          const username = (creatorData as any).username;
+          const avatar_url = (creatorData as any).avatar_url;
+          
+          if (typeof id === 'string' && typeof username === 'string') {
+            creator_profile = {
+              id,
+              username,
+              avatar_url: avatar_url as string[] | undefined
+            };
+          }
         }
 
         // Handle attendees data transformation
@@ -60,19 +63,22 @@ export const useCasualPlans = () => {
           
           // More explicit type checking for user data
           const userData = attendee.user_profile;
-          if (userData !== null && 
-              userData !== undefined &&
+          if (userData && 
               typeof userData === 'object' && 
               'id' in userData &&
-              'username' in userData &&
-              typeof (userData as any).id === 'string' &&
-              typeof (userData as any).username === 'string') {
+              'username' in userData) {
             
-            user_profile = {
-              id: (userData as any).id,
-              username: (userData as any).username,
-              avatar_url: (userData as any).avatar_url as string[] | undefined
-            };
+            const id = (userData as any).id;
+            const username = (userData as any).username;
+            const avatar_url = (userData as any).avatar_url;
+            
+            if (typeof id === 'string' && typeof username === 'string') {
+              user_profile = {
+                id,
+                username,
+                avatar_url: avatar_url as string[] | undefined
+              };
+            }
           }
 
           return {
