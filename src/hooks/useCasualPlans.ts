@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -37,21 +36,18 @@ export const useCasualPlans = () => {
         // Handle creator_profile which might be null or have an error
         let creator_profile: { id: string; username: string; avatar_url?: string[]; } | undefined;
         
-        // Use type assertion after null/undefined check
+        // Use proper type checking for creator data
         const creatorData = plan.creator_profile;
-        if (creatorData !== null && 
-            creatorData !== undefined &&
+        if (creatorData && 
             typeof creatorData === 'object' && 
             !('error' in creatorData) &&
             'id' in creatorData &&
             'username' in creatorData) {
           
-          // Type assertion to help TypeScript understand the type
-          const typedCreatorData = creatorData as { id: string; username: string; avatar_url?: string[]; };
           creator_profile = {
-            id: typedCreatorData.id,
-            username: typedCreatorData.username,
-            avatar_url: typedCreatorData.avatar_url
+            id: creatorData.id as string,
+            username: creatorData.username as string,
+            avatar_url: creatorData.avatar_url as string[] | undefined
           };
         }
 
@@ -59,21 +55,18 @@ export const useCasualPlans = () => {
         const attendees = (plan.attendees || []).map(attendee => {
           let user_profile: { id: string; username: string; avatar_url?: string[]; } | undefined;
           
-          // Use type assertion after null/undefined check
+          // Use proper type checking for user data
           const userData = attendee.user_profile;
-          if (userData !== null && 
-              userData !== undefined &&
+          if (userData && 
               typeof userData === 'object' && 
               !('error' in userData) &&
               'id' in userData &&
               'username' in userData) {
             
-            // Type assertion to help TypeScript understand the type
-            const typedUserData = userData as { id: string; username: string; avatar_url?: string[]; };
             user_profile = {
-              id: typedUserData.id,
-              username: typedUserData.username,
-              avatar_url: typedUserData.avatar_url
+              id: userData.id as string,
+              username: userData.username as string,
+              avatar_url: userData.avatar_url as string[] | undefined
             };
           }
 
