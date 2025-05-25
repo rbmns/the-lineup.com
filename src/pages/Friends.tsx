@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +9,6 @@ import { FriendsTabs } from '@/components/friends/FriendsTabs';
 import { UserProfile } from '@/types';
 import { DiscoverTabContent } from '@/components/friends/DiscoverTabContent';
 import { supabase } from '@/lib/supabase';
-import { Users, UserPlus } from 'lucide-react';
 
 const Friends: React.FC = () => {
   const { user } = useAuth();
@@ -155,19 +155,14 @@ const Friends: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section with surf and travel vibe */}
-      <div className="bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-600 text-white py-8 md:py-12">
-        <div className="container mx-auto px-4">
+      {/* Clean header section */}
+      <div className="bg-white border-b">
+        <div className="container mx-auto px-4 py-6 md:py-8">
           <div className="text-center">
-            <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                <Users className="w-8 h-8 text-white" />
-              </div>
-            </div>
-            <h1 className="text-2xl md:text-4xl font-bold tracking-tight mb-2">
+            <h1 className="text-4xl font-bold tracking-tight mb-2">
               Friends
             </h1>
-            <p className="text-lg md:text-xl text-teal-100 leading-relaxed max-w-2xl mx-auto">
+            <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
               Find your crew. Join the People, Not Just the Plans.
             </p>
           </div>

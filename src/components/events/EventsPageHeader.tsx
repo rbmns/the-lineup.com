@@ -11,9 +11,9 @@ export const EventsPageHeader: React.FC<EventsPageHeaderProps> = ({
   subtitle
 }) => {
   return (
-    <div className="mb-8">
-      <h1 className="text-4xl font-bold tracking-tight">{title}</h1>
-      {subtitle && <p className="text-xl text-muted-foreground leading-relaxed mt-2">{subtitle}</p>}
+    <div className="text-center">
+      <h1 className="text-4xl font-bold tracking-tight mb-2">{title}</h1>
+      {subtitle && <p className="text-xl text-muted-foreground leading-relaxed">{subtitle}</p>}
     </div>
   );
 };

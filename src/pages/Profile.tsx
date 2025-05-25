@@ -185,27 +185,27 @@ const Profile: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Purple gradient header */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-6 md:py-8">
-        <div className="max-w-4xl mx-auto">
+      {/* Clean header with profile info */}
+      <div className="bg-white border-b">
+        <div className="max-w-4xl mx-auto px-4 py-6 md:py-8">
           <div className="flex flex-col md:flex-row items-center md:justify-between space-y-4 md:space-y-0">
             <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4 text-center md:text-left">
-              <ProfileAvatar profile={profile} size="lg" className="border-4 border-white/20 w-20 h-20 md:w-24 md:h-24" />
-              <div className="text-white">
+              <ProfileAvatar profile={profile} size="lg" className="w-20 h-20 md:w-24 md:h-24" />
+              <div>
                 <h1 className="text-xl md:text-2xl font-bold">{displayName}</h1>
                 {profile?.tagline && (
-                  <p className="text-sm md:text-base text-purple-100 italic mt-1">"{profile.tagline}"</p>
+                  <p className="text-sm md:text-base text-gray-600 italic mt-1">"{profile.tagline}"</p>
                 )}
-                <div className="flex items-center justify-center md:justify-start mt-2 text-sm text-purple-100">
+                <div className="flex items-center justify-center md:justify-start mt-2 text-sm text-gray-600">
                   <MapPin className="h-4 w-4 mr-1" />
                   <span>{profile?.location || 'Location not set'}</span>
                 </div>
               </div>
             </div>
             <Button 
-              variant="secondary" 
+              variant="outline" 
               onClick={handleEditProfile}
-              className="bg-white text-purple-700 hover:bg-purple-50 w-full md:w-auto"
+              className="w-full md:w-auto"
             >
               <Edit3 className="h-4 w-4 mr-2" />
               Edit Profile
@@ -223,7 +223,7 @@ const Profile: React.FC = () => {
           <div className="grid grid-cols-3 gap-4 md:gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="text-2xl md:text-3xl font-bold text-purple-600">{stat.value}</div>
+                <div className="text-2xl md:text-3xl font-bold text-black">{stat.value}</div>
                 <div className="text-xs md:text-sm text-gray-600 mt-1">{stat.label}</div>
               </div>
             ))}
