@@ -46,9 +46,9 @@ export const useCasualPlans = () => {
           
           // Use type assertion after comprehensive checks
           const typedCreatorData = creatorData as any;
-          const id = typedCreatorData.id;
-          const username = typedCreatorData.username;
-          const avatar_url = typedCreatorData.avatar_url;
+          const id = typedCreatorData?.id;
+          const username = typedCreatorData?.username;
+          const avatar_url = typedCreatorData?.avatar_url;
           
           if (typeof id === 'string' && typeof username === 'string') {
             creator_profile = {
@@ -73,9 +73,9 @@ export const useCasualPlans = () => {
             
             // Use type assertion after comprehensive checks
             const typedUserData = userData as any;
-            const id = typedUserData.id;
-            const username = typedUserData.username;
-            const avatar_url = typedUserData.avatar_url;
+            const id = typedUserData?.id;
+            const username = typedUserData?.username;
+            const avatar_url = typedUserData?.avatar_url;
             
             if (typeof id === 'string' && typeof username === 'string') {
               user_profile = {
