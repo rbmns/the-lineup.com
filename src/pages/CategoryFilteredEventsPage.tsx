@@ -65,7 +65,10 @@ const CategoryFilteredEventsPage = () => {
   return (
     <div className="w-full px-4 md:px-6 py-8">
       <div className="max-w-7xl mx-auto">
-        <EventsPageHeader title="Explore Events" />
+        <EventsPageHeader 
+          title="Explore Events" 
+          subtitle="Find the perfect events for you"
+        />
         
         <div className="space-y-12">
           {/* New Filter Section */}
