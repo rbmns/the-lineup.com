@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -161,7 +160,7 @@ export const Toaster = ({ toasts = [], ...props }: ToasterProps) => {
 }
 
 const TOAST_LIMIT = 5
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_REMOVE_DELAY = 2000 // Changed from 1000000 to 2 seconds
 
 const actionTypes = {
   ADD_TOAST: "ADD_TOAST",
