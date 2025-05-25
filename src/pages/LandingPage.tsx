@@ -135,7 +135,7 @@ const LandingPage = () => {
       <section className="bg-blue-500 py-12 md:py-20">
         <div className="container mx-auto px-4 text-center text-white">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-           Get into the local flow 
+           Connect with the Local Vibe
           </h1>
           <p className="text-xl leading-relaxed mb-8 max-w-2xl mx-auto">
 Discover local events and casual plans that fit your vibe. Explore what’s happening nearby — music, surf, art, community, and more. 
