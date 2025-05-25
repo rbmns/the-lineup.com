@@ -6,13 +6,19 @@ import { CasualPlan, CreateCasualPlanData } from '@/types/casual-plans';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const useCasualPlans = () => {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
 
-  // Fetch casual plans with attendee information
+  // Fetch casual plans with attendee information - only if authenticated
   const { data: plans, isLoading, error } = useQuery({
     queryKey: ['casual-plans'],
     queryFn: async () => {
+      if (!isAuthenticated) {
+        return []; // Return empty array for non-authenticated users
+      }
+
+      console.log('Fetching casual plans...');
+      
       const { data: plansData, error: plansError } = await supabase
         .from('casual_plans')
         .select(`
@@ -30,10 +36,17 @@ export const useCasualPlans = () => {
         .order('date', { ascending: true })
         .order('time', { ascending: true });
 
-      if (plansError) throw plansError;
+      if (plansError) {
+        console.error('Error fetching plans:', plansError);
+        throw plansError;
+      }
+
+      console.log('Raw plans data:', plansData);
 
       // Transform the data to include attendee count and user attendance status
       const transformedPlans: CasualPlan[] = (plansData || []).map(plan => {
+        console.log('Processing plan:', plan.id, plan.title);
+        
         // Handle creator_profile which might be null or have an error
         let creator_profile: { id: string; username: string; avatar_url?: string[]; } | undefined;
         
@@ -94,23 +107,30 @@ export const useCasualPlans = () => {
           };
         });
 
-        return {
+        const transformedPlan = {
           ...plan,
           creator_profile,
           attendees,
           attendee_count: attendees.length,
           user_attending: user ? attendees.some(att => att.user_id === user.id) : false
         };
+
+        console.log('Transformed plan:', transformedPlan.id, transformedPlan.title);
+        return transformedPlan;
       });
 
+      console.log('Final transformed plans:', transformedPlans);
       return transformedPlans;
     },
+    enabled: isAuthenticated, // Only run query if authenticated
   });
 
   // Create a new casual plan
   const createPlanMutation = useMutation({
     mutationFn: async (planData: CreateCasualPlanData) => {
       if (!user) throw new Error('User must be logged in');
+
+      console.log('Creating plan with data:', planData);
 
       const { data, error } = await supabase
         .from('casual_plans')
@@ -121,11 +141,20 @@ export const useCasualPlans = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error creating plan:', error);
+        throw error;
+      }
+
+      console.log('Plan created successfully:', data);
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Plan creation successful, invalidating queries');
       queryClient.invalidateQueries({ queryKey: ['casual-plans'] });
+    },
+    onError: (error) => {
+      console.error('Plan creation failed:', error);
     },
   });
 

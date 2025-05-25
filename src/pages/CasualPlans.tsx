@@ -32,6 +32,63 @@ const CasualPlans: React.FC = () => {
     ? plans.filter(plan => plan.vibe === selectedVibe)
     : plans;
 
+  // Show different content for non-authenticated users
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <EventsPageHeader 
+          title="Casual Plans"
+          subtitle="Find spontaneous meetups and create your own casual get-togethers"
+        />
+
+        <div className="container mx-auto px-4 py-6">
+          {/* Action bar with disabled button for non-auth users */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex-1">
+              {/* Vibe filters */}
+              <div className="flex flex-wrap gap-2">
+                <CategoryPill
+                  category="all"
+                  active={selectedVibe === null}
+                  onClick={() => setSelectedVibe(null)}
+                  noBorder={true}
+                />
+                {CASUAL_PLAN_VIBES.map((vibe) => (
+                  <CategoryPill
+                    key={vibe}
+                    category={vibe}
+                    active={selectedVibe === vibe}
+                    onClick={() => setSelectedVibe(selectedVibe === vibe ? null : vibe)}
+                    noBorder={true}
+                    className="capitalize"
+                  />
+                ))}
+              </div>
+            </div>
+            
+            <Button 
+              onClick={handleLoginPrompt}
+              className="shrink-0"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Post a Plan
+            </Button>
+          </div>
+
+          {/* Login prompt */}
+          <div className="text-center py-12">
+            <p className="text-gray-600 mb-4">
+              Sign in to see and create casual plans
+            </p>
+            <Button onClick={handleLoginPrompt}>
+              Sign In
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <EventsPageHeader 
@@ -65,13 +122,7 @@ const CasualPlans: React.FC = () => {
           </div>
           
           <Button 
-            onClick={() => {
-              if (!isAuthenticated) {
-                handleLoginPrompt();
-                return;
-              }
-              setShowCreateForm(true);
-            }}
+            onClick={() => setShowCreateForm(true)}
             className="shrink-0"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -107,13 +158,7 @@ const CasualPlans: React.FC = () => {
                 : 'No casual plans found. Be the first to create one!'
               }
             </p>
-            <Button onClick={() => {
-              if (!isAuthenticated) {
-                handleLoginPrompt();
-                return;
-              }
-              setShowCreateForm(true);
-            }}>
+            <Button onClick={() => setShowCreateForm(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Create a Plan
             </Button>
