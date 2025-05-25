@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PrivacySettings as PrivacySettingsType, usePrivacySettings } from '@/hooks/usePrivacySettings';
 import { Loader2, Save } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
 
 interface PrivacySettingItemProps {
   title: string;
@@ -98,18 +97,12 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({ userId }) => {
 
         await Promise.all(updates);
         
-        toast({
-          title: "Settings saved",
-          description: "Your privacy preferences have been updated",
-          variant: "default"
-        });
+        // Reset the has changes flag after successful save
+        setHasChanges(false);
+        console.log('Privacy settings saved successfully');
       }
     } catch (error) {
-      toast({
-        title: "Error saving settings",
-        description: "Could not update your privacy preferences",
-        variant: "destructive"
-      });
+      console.error('Error saving privacy settings:', error);
     } finally {
       setIsSaving(false);
     }
@@ -152,7 +145,7 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({ userId }) => {
         />
         <PrivacySettingItem
           title="Show Event Attendance"
-          description="Share with firneds on which events you are attending"
+          description="Share with friends which events you are attending"
           checked={localSettings.show_event_attendance}
           onCheckedChange={(checked) => handleLocalChange('show_event_attendance', checked)}
         />
@@ -162,7 +155,12 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({ userId }) => {
           checked={localSettings.share_activity_with_friends}
           onCheckedChange={(checked) => handleLocalChange('share_activity_with_friends', checked)}
         />
-     
+        <PrivacySettingItem
+          title="Allow Tagging"
+          description="Allow friends to tag you in posts and events"
+          checked={localSettings.allow_tagging}
+          onCheckedChange={(checked) => handleLocalChange('allow_tagging', checked)}
+        />
 
         {hasChanges && (
           <div className="pt-4 border-t">

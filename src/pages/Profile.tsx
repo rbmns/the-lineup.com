@@ -7,6 +7,7 @@ import { useUserEvents } from '@/hooks/useUserEvents';
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { PrivacySettings } from '@/components/profile/PrivacySettings';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MapPin, Edit3, User, Shield, CalendarDays } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import EventCardList from '@/components/events/EventCardList';
@@ -102,71 +103,78 @@ const Profile: React.FC = () => {
               <p className="text-gray-600 mb-6">Your upcoming and past events</p>
             </div>
             
-            {/* Upcoming Events Section */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium text-gray-900">Your Upcoming Events</h3>
-                <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                  {upcomingEvents.length}
-                </span>
-              </div>
+            <Tabs defaultValue="upcoming" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="upcoming" className="text-sm font-medium">
+                  Upcoming Events
+                </TabsTrigger>
+                <TabsTrigger value="past" className="text-sm font-medium">
+                  Past Events
+                </TabsTrigger>
+              </TabsList>
               
-              {eventsLoading ? (
-                <div className="space-y-3">
-                  <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
-                  <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+              <TabsContent value="upcoming" className="space-y-0">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-gray-900">Your Upcoming Events</h3>
+                  </div>
+                  
+                  {eventsLoading ? (
+                    <div className="space-y-3">
+                      <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+                      <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+                    </div>
+                  ) : upcomingEvents.length > 0 ? (
+                    <div className="space-y-3">
+                      {upcomingEvents.map(event => (
+                        <EventCardList
+                          key={event.id}
+                          event={event}
+                          showRsvpStatus={true}
+                          showRsvpButtons={false}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
+                      <CalendarDays className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                      <p>No upcoming events</p>
+                    </div>
+                  )}
                 </div>
-              ) : upcomingEvents.length > 0 ? (
-                <div className="space-y-3">
-                  {upcomingEvents.map(event => (
-                    <EventCardList
-                      key={event.id}
-                      event={event}
-                      showRsvpStatus={true}
-                      showRsvpButtons={false}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
-                  <CalendarDays className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-                  <p>No upcoming events</p>
-                </div>
-              )}
-            </div>
+              </TabsContent>
 
-            {/* Past Events Section */}
-            <div className="space-y-4 mt-8">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium text-gray-900">Past Events</h3>
-                <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                  {pastEvents.length}
-                </span>
-              </div>
-              
-              {eventsLoading ? (
-                <div className="space-y-3">
-                  <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
-                  <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+              <TabsContent value="past" className="space-y-0">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-gray-900">Past Events</h3>
+                  </div>
+                  
+                  {eventsLoading ? (
+                    <div className="space-y-3">
+                      <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+                      <div className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
+                    </div>
+                  ) : pastEvents.length > 0 ? (
+                    <div className="space-y-3">
+                      {pastEvents.map(event => (
+                        <EventCardList
+                          key={event.id}
+                          event={event}
+                          showRsvpStatus={true}
+                          showRsvpButtons={false}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
+                      <CalendarDays className="h-8 w-8 mx-auto mb-2 text-gray-300" />
+                      <p>No past events</p>
+                    </div>
+                  )}
                 </div>
-              ) : pastEvents.length > 0 ? (
-                <div className="space-y-3">
-                  {pastEvents.map(event => (
-                    <EventCardList
-                      key={event.id}
-                      event={event}
-                      showRsvpStatus={true}
-                      showRsvpButtons={false}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
-                  <CalendarDays className="h-8 w-8 mx-auto mb-2 text-gray-300" />
-                  <p>No past events</p>
-                </div>
-              )}
-            </div>
+              </TabsContent>
+            </Tabs>
           </div>
         );
         
@@ -223,7 +231,7 @@ const Profile: React.FC = () => {
         </div>
       </div>
 
-      {/* Navigation tabs - Optimized for mobile */}
+      {/* Navigation tabs */}
       <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex overflow-x-auto">
@@ -236,8 +244,8 @@ const Profile: React.FC = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center space-x-1 md:space-x-2 px-2 md:px-4 py-3 md:py-4 border-b-2 transition-colors whitespace-nowrap text-xs md:text-base min-w-0 ${
                     isActive 
-                      ? 'border-purple-600 text-purple-600 bg-gray-50' 
-                      : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      ? 'border-gray-400 text-gray-700 bg-gray-50' 
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                   }`}
                 >
                   <Icon className="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
