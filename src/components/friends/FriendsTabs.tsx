@@ -38,7 +38,7 @@ export const FriendsTabs: React.FC<FriendsTabsProps> = ({
             </Badge>
           )}
         </TabsTrigger>
-        <TabsTrigger value="discover">Discover People</TabsTrigger>
+        <TabsTrigger value="discover">Search Friends</TabsTrigger>
       </TabsList>
       
       <TabsContent value="friends">
