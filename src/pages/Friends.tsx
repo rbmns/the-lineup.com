@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -9,6 +8,7 @@ import { FriendsTabs } from '@/components/friends/FriendsTabs';
 import { UserProfile } from '@/types';
 import { DiscoverTabContent } from '@/components/friends/DiscoverTabContent';
 import { supabase } from '@/lib/supabase';
+import { Button } from '@/components/ui/button';
 
 const Friends: React.FC = () => {
   const { user } = useAuth();
@@ -150,7 +150,50 @@ const Friends: React.FC = () => {
   }, [searchQuery, handleSearch]);
 
   if (!user) {
-    return null; // Will redirect in the effect
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Clean header section */}
+        <div className="bg-white border-b">
+          <div className="container mx-auto px-4 py-6 md:py-8">
+            <div className="text-center">
+              <h1 className="text-4xl font-bold tracking-tight mb-2">
+                Friends
+              </h1>
+              <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+                Find your crew. Join the People, Not Just the Plans.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Sign up prompt */}
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="max-w-md mx-auto text-center">
+            <div className="bg-white rounded-lg shadow-sm p-8">
+              <h2 className="text-2xl font-semibold mb-4">Sign up or in to find your people</h2>
+              <p className="text-gray-600 mb-6">
+                Connect with friends and discover new people in your area.
+              </p>
+              <div className="space-y-3">
+                <Button 
+                  onClick={() => navigate('/signup')} 
+                  className="w-full bg-black text-white hover:bg-gray-800"
+                >
+                  Sign Up
+                </Button>
+                <Button 
+                  onClick={() => navigate('/login')} 
+                  variant="outline"
+                  className="w-full"
+                >
+                  Log In
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

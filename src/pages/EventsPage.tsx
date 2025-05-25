@@ -65,25 +65,30 @@ const EventsPage = () => {
   const eventsCount = displayEvents.length;
 
   return (
-    <div className="w-full px-4 md:px-6 py-8">
-      <div className="max-w-7xl mx-auto">
-        <EventsPageHeader title="Upcoming Events" />
-        
-        {/* Hide the EventCountDisplay */}
-        <EventCountDisplay count={eventsCount} hidden={true} />
-        
-        <div className="space-y-8 mt-8">
-          <LazyEventsList 
-            mainEvents={displayEvents}
-            relatedEvents={similarEvents}
-            isLoading={isLoading}
-            onRsvp={user ? handleEventRsvp : undefined}
-            showRsvpButtons={!!user}
-            hasActiveFilters={displayEvents.length === 0} // Show related events message if no events
-            compact={false}
-            loadingEventId={loadingEventId}
-            hideCount={true} // Keep this true to hide the count in LazyEventsList
-          />
+    <div className="min-h-screen bg-gray-50">
+      <EventsPageHeader 
+        title="Upcoming Events" 
+        subtitle="Discover events in the Zandvoort area"
+      />
+      
+      <div className="w-full px-4 md:px-6 py-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Hide the EventCountDisplay */}
+          <EventCountDisplay count={eventsCount} hidden={true} />
+          
+          <div className="space-y-8 mt-8">
+            <LazyEventsList 
+              mainEvents={displayEvents}
+              relatedEvents={similarEvents}
+              isLoading={isLoading}
+              onRsvp={user ? handleEventRsvp : undefined}
+              showRsvpButtons={!!user}
+              hasActiveFilters={displayEvents.length === 0} // Show related events message if no events
+              compact={false}
+              loadingEventId={loadingEventId}
+              hideCount={true} // Keep this true to hide the count in LazyEventsList
+            />
+          </div>
         </div>
       </div>
     </div>
