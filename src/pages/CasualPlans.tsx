@@ -10,6 +10,7 @@ import { CategoryPill } from '@/components/ui/category-pill';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { CASUAL_PLAN_VIBES } from '@/types/casual-plans';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const CasualPlans: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
@@ -17,6 +18,7 @@ const CasualPlans: React.FC = () => {
   const { plans, isLoading, createPlan, joinPlan, leavePlan, isCreating, isJoining, isLeaving } = useCasualPlans();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
+  const isMobile = useIsMobile();
 
   const handleLoginPrompt = () => {
     navigate('/login');
@@ -36,10 +38,16 @@ const CasualPlans: React.FC = () => {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <EventsPageHeader 
-          title="Casual Plans"
-          subtitle="Find spontaneous meetups and create your own casual get-togethers"
-        />
+        <div className="border-b bg-white">
+          <div className="container mx-auto px-4 py-6 md:py-8">
+            <h1 className={`font-bold tracking-tight mb-2 ${isMobile ? 'text-2xl' : 'text-4xl'}`}>
+              Casual Plans
+            </h1>
+            <p className={`text-muted-foreground leading-relaxed ${isMobile ? 'text-base' : 'text-xl'}`}>
+              Find spontaneous meetups and create your own casual get-togethers
+            </p>
+          </div>
+        </div>
 
         <div className="container mx-auto px-4 py-4 md:py-6">
           {/* Mobile-optimized action bar */}
@@ -47,7 +55,7 @@ const CasualPlans: React.FC = () => {
             {/* Vibe filters - horizontal scroll on mobile */}
             <div className="space-y-2">
               <h3 className="text-sm font-medium text-gray-700">Filter by vibe:</h3>
-              <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 <CategoryPill
                   category="all"
                   active={selectedVibe === null}
@@ -95,10 +103,16 @@ const CasualPlans: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <EventsPageHeader 
-        title="Casual Plans"
-        subtitle="Find spontaneous meetups and create your own casual get-togethers"
-      />
+      <div className="border-b bg-white">
+        <div className="container mx-auto px-4 py-6 md:py-8">
+          <h1 className={`font-bold tracking-tight mb-2 ${isMobile ? 'text-2xl' : 'text-4xl'}`}>
+            Casual Plans
+          </h1>
+          <p className={`text-muted-foreground leading-relaxed ${isMobile ? 'text-base' : 'text-xl'}`}>
+            Find spontaneous meetups and create your own casual get-togethers
+          </p>
+        </div>
+      </div>
 
       <div className="container mx-auto px-4 py-4 md:py-6">
         {/* Mobile-optimized action bar */}
@@ -106,7 +120,7 @@ const CasualPlans: React.FC = () => {
           {/* Vibe filters - horizontal scroll on mobile */}
           <div className="space-y-2">
             <h3 className="text-sm font-medium text-gray-700">Filter by vibe:</h3>
-            <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
               <CategoryPill
                 category="all"
                 active={selectedVibe === null}
@@ -138,13 +152,16 @@ const CasualPlans: React.FC = () => {
           </Button>
         </div>
 
-        {/* Plans grid - responsive */}
+        {/* Plans layout - list on mobile, grid on desktop */}
         {isLoading ? (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-2 border-black"></div>
           </div>
         ) : filteredPlans.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+          <div className={isMobile 
+            ? "space-y-2" 
+            : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6"
+          }>
             {filteredPlans.map((plan) => (
               <CasualPlanCard
                 key={plan.id}

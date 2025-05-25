@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { CasualPlan } from '@/types/casual-plans';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MapPin, Clock, Users, Calendar } from 'lucide-react';
 import { formatFeaturedDate, formatTime } from '@/utils/date-formatting';
 import { CategoryPill } from '@/components/ui/category-pill';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface CasualPlanCardProps {
   plan: CasualPlan;
@@ -26,6 +26,8 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
   isAuthenticated,
   onLoginPrompt,
 }) => {
+  const isMobile = useIsMobile();
+  
   const handleJoinLeave = () => {
     if (!isAuthenticated) {
       onLoginPrompt();
@@ -42,6 +44,84 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
   const formattedDate = formatFeaturedDate(plan.date);
   const formattedTime = formatTime(plan.time);
 
+  // Mobile list layout
+  if (isMobile) {
+    return (
+      <div className="bg-white rounded-lg border p-3 mb-2">
+        <div className="flex items-start justify-between">
+          <div className="flex-1 min-w-0 pr-3">
+            {/* Header with vibe and title */}
+            <div className="flex items-center gap-2 mb-1">
+              <CategoryPill 
+                category={plan.vibe} 
+                size="sm"
+                className="capitalize text-xs"
+              />
+              <div className="flex items-center text-xs text-gray-500">
+                <Users className="h-3 w-3 mr-1" />
+                <span>{plan.attendee_count || 0}</span>
+                {plan.max_attendees && <span>/{plan.max_attendees}</span>}
+              </div>
+            </div>
+            
+            {/* Title */}
+            <h3 className="font-medium text-sm mb-1 line-clamp-1">{plan.title}</h3>
+            
+            {/* Compact info */}
+            <div className="flex items-center gap-3 text-xs text-gray-600 mb-1">
+              <div className="flex items-center">
+                <Calendar className="h-3 w-3 mr-1" />
+                <span className="truncate">{formattedDate}</span>
+              </div>
+              <div className="flex items-center">
+                <Clock className="h-3 w-3 mr-1" />
+                <span>{formattedTime}</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center text-xs text-gray-600 mb-2">
+              <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+              <span className="truncate">{plan.location}</span>
+            </div>
+            
+            {/* Creator info */}
+            <div className="flex items-center">
+              <Avatar className="h-4 w-4 mr-1.5">
+                <AvatarImage 
+                  src={plan.creator_profile?.avatar_url?.[0]} 
+                  alt={plan.creator_profile?.username}
+                />
+                <AvatarFallback className="text-xs">
+                  {plan.creator_profile?.username?.[0]?.toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-xs text-gray-600 truncate">
+                {plan.creator_profile?.username || 'Anonymous'}
+              </span>
+            </div>
+          </div>
+          
+          {/* Action button */}
+          <Button
+            onClick={handleJoinLeave}
+            disabled={isJoining || isLeaving}
+            size="sm"
+            variant={plan.user_attending ? "outline" : "default"}
+            className={`flex-shrink-0 px-3 py-1 text-xs ${plan.user_attending ? "text-red-600 border-red-200 hover:bg-red-50" : ""}`}
+          >
+            {isJoining || isLeaving 
+              ? "..." 
+              : plan.user_attending 
+                ? "Leave" 
+                : "Join"
+            }
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop card layout (unchanged)
   return (
     <div className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow p-4 h-full flex flex-col">
       {/* Header with vibe tag and attendee count */}
