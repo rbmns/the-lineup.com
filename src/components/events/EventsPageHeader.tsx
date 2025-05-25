@@ -13,10 +13,10 @@ export const EventsPageHeader: React.FC<EventsPageHeaderProps> = ({ title, subti
   return (
     <div className="border-b bg-white">
       <div className="container mx-auto px-4 py-6 md:py-8 text-center">
-        <h1 className={`font-bold tracking-tight mb-2 ${isMobile ? 'text-xl' : 'text-3xl md:text-4xl'}`}>
+        <h1 className={`font-bold tracking-tight mb-2 ${isMobile ? 'text-2xl' : 'text-3xl md:text-4xl'}`}>
           {title}
         </h1>
-        <p className={`text-muted-foreground leading-relaxed ${isMobile ? 'text-sm' : 'text-lg md:text-xl'}`}>
+        <p className={`text-muted-foreground leading-relaxed ${isMobile ? 'text-base' : 'text-lg md:text-xl'}`}>
           {subtitle}
         </p>
       </div>

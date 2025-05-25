@@ -10,6 +10,7 @@ import { UserProfile } from '@/types';
 import { DiscoverTabContent } from '@/components/friends/DiscoverTabContent';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
+import { EventsPageHeader } from '@/components/events/EventsPageHeader';
 
 const Friends: React.FC = () => {
   const { user } = useAuth();
@@ -38,13 +39,6 @@ const Friends: React.FC = () => {
     handleDeclineRequest,
     refreshRequests
   } = useFriendRequests(user?.id);
-
-  // Redirect to login if not authenticated
-  React.useEffect(() => {
-    if (!user) {
-      navigate('/login');
-    }
-  }, [user, navigate]);
 
   // Filter friends based on search query - EXCLUDE current user
   useEffect(() => {
@@ -158,19 +152,10 @@ const Friends: React.FC = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50">
-        {/* Clean header section */}
-        <div className="bg-white border-b">
-          <div className="container mx-auto px-4 py-6 md:py-8">
-            <div className="text-center">
-              <h1 className="text-4xl font-bold tracking-tight mb-2">
-                Friends
-              </h1>
-              <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-                Sign up or in to find your people
-              </p>
-            </div>
-          </div>
-        </div>
+        <EventsPageHeader 
+          title="Friends" 
+          subtitle="Find your crew. Join the People, Not Just the Plans."
+        />
 
         {/* Sign up prompt */}
         <div className="container mx-auto px-4 py-12 md:py-16">
@@ -204,19 +189,10 @@ const Friends: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Clean header section */}
-      <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-6 md:py-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight mb-2">
-              Friends
-            </h1>
-            <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-              Find your crew. Join the People, Not Just the Plans.
-            </p>
-          </div>
-        </div>
-      </div>
+      <EventsPageHeader 
+        title="Friends" 
+        subtitle="Find your crew. Join the People, Not Just the Plans."
+      />
 
       {/* Friends Content */}
       <div className="container mx-auto px-4 py-6 md:py-8">
