@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -41,22 +40,21 @@ export const useCasualPlans = () => {
         const creatorData = plan.creator_profile;
         if (creatorData && 
             typeof creatorData === 'object' && 
-            creatorData !== null &&
-            'id' in creatorData &&
-            'username' in creatorData) {
+            creatorData !== null) {
           
-          // Use type assertion after comprehensive checks - now properly typed
-          const typedCreatorData = creatorData as { id: unknown; username: unknown; avatar_url?: unknown };
-          const id = typedCreatorData.id;
-          const username = typedCreatorData.username;
-          const avatar_url = typedCreatorData.avatar_url;
-          
-          if (typeof id === 'string' && typeof username === 'string') {
-            creator_profile = {
-              id,
-              username,
-              avatar_url: avatar_url as string[] | undefined
-            };
+          const typedCreatorData = creatorData as Record<string, unknown>;
+          if ('id' in typedCreatorData && 'username' in typedCreatorData) {
+            const id = typedCreatorData.id;
+            const username = typedCreatorData.username;
+            const avatar_url = typedCreatorData.avatar_url;
+            
+            if (typeof id === 'string' && typeof username === 'string') {
+              creator_profile = {
+                id,
+                username,
+                avatar_url: avatar_url as string[] | undefined
+              };
+            }
           }
         }
 
@@ -68,22 +66,21 @@ export const useCasualPlans = () => {
           const userData = attendee.user_profile;
           if (userData && 
               typeof userData === 'object' && 
-              userData !== null &&
-              'id' in userData &&
-              'username' in userData) {
+              userData !== null) {
             
-            // Use type assertion after comprehensive checks - now properly typed
-            const typedUserData = userData as { id: unknown; username: unknown; avatar_url?: unknown };
-            const id = typedUserData.id;
-            const username = typedUserData.username;
-            const avatar_url = typedUserData.avatar_url;
-            
-            if (typeof id === 'string' && typeof username === 'string') {
-              user_profile = {
-                id,
-                username,
-                avatar_url: avatar_url as string[] | undefined
-              };
+            const typedUserData = userData as Record<string, unknown>;
+            if ('id' in typedUserData && 'username' in typedUserData) {
+              const id = typedUserData.id;
+              const username = typedUserData.username;
+              const avatar_url = typedUserData.avatar_url;
+              
+              if (typeof id === 'string' && typeof username === 'string') {
+                user_profile = {
+                  id,
+                  username,
+                  avatar_url: avatar_url as string[] | undefined
+                };
+              }
             }
           }
 
