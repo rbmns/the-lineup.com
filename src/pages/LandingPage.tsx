@@ -135,12 +135,12 @@ const LandingPage = () => {
       <section className="bg-blue-500 py-12 md:py-20">
         <div className="container mx-auto px-4 text-center text-white">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-           Find your flow — discover local events and casual plans that fit your vibe
+           Get into the local flow 
           </h1>
           <p className="text-xl leading-relaxed mb-8 max-w-2xl mx-auto">
-Explore what’s happening nearby — music, surf, art, community, and more. 
-See casual plans by locals and visitors when formal events are quiet. 
-Join events or post your own casual plans — or just browse events. 
+Discover local events and casual plans that fit your vibe. Explore what’s happening nearby — music, surf, art, community, and more. 
+
+Join events or post your own casual plans.. — or just browse events. 
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button asChild size="lg" className="bg-black hover:bg-black/90 text-white">
