@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -37,16 +36,18 @@ export const useCasualPlans = () => {
         // Handle creator_profile which might be null or have an error
         let creator_profile: { id: string; username: string; avatar_url?: string[]; } | undefined;
         
-        if (plan.creator_profile && 
-            typeof plan.creator_profile === 'object' && 
-            !('error' in plan.creator_profile) &&
-            plan.creator_profile !== null &&
-            'id' in plan.creator_profile &&
-            'username' in plan.creator_profile) {
+        // Use optional chaining and proper type checking
+        const creatorData = plan.creator_profile;
+        if (creatorData && 
+            typeof creatorData === 'object' && 
+            !('error' in creatorData) &&
+            creatorData !== null &&
+            'id' in creatorData &&
+            'username' in creatorData) {
           creator_profile = {
-            id: plan.creator_profile.id,
-            username: plan.creator_profile.username,
-            avatar_url: plan.creator_profile.avatar_url
+            id: creatorData.id,
+            username: creatorData.username,
+            avatar_url: creatorData.avatar_url
           };
         }
 
@@ -54,16 +55,18 @@ export const useCasualPlans = () => {
         const attendees = (plan.attendees || []).map(attendee => {
           let user_profile: { id: string; username: string; avatar_url?: string[]; } | undefined;
           
-          if (attendee.user_profile && 
-              typeof attendee.user_profile === 'object' && 
-              !('error' in attendee.user_profile) &&
-              attendee.user_profile !== null &&
-              'id' in attendee.user_profile &&
-              'username' in attendee.user_profile) {
+          // Use optional chaining and proper type checking
+          const userData = attendee.user_profile;
+          if (userData && 
+              typeof userData === 'object' && 
+              !('error' in userData) &&
+              userData !== null &&
+              'id' in userData &&
+              'username' in userData) {
             user_profile = {
-              id: attendee.user_profile.id,
-              username: attendee.user_profile.username,
-              avatar_url: attendee.user_profile.avatar_url
+              id: userData.id,
+              username: userData.username,
+              avatar_url: userData.avatar_url
             };
           }
 
