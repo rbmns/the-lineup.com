@@ -90,7 +90,9 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({ hideTitle = false }) 
             {/* Events Section */}
             <div className="lg:col-span-2">
               <ProfileEventsContainer
+                profileId={profile?.id || null}
                 profile={profile as UserProfile}
+                isLoading={loading}
                 isOwnProfile={isOwnProfile}
                 isBlocked={isBlocked}
               />
