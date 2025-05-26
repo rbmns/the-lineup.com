@@ -14,15 +14,15 @@ export const eventImageMap = {
   market: 'https://github.com/rbmns/the-lineup.com/blob/051135f253c03fb98eaf9bce191ff9c786bdff2c/img/shopping.jpg',
   music: 'https://github.com/rbmns/the-lineup.com/blob/051135f253c03fb98eaf9bce191ff9c786bdff2c/img/music.jpg',
   beach: 'https://github.com/rbmns/the-lineup.com/blob/051135f253c03fb98eaf9bce191ff9c786bdff2c/img/beach.jpg',
-  concert: 'https://res.cloudinary.com/dita7stkt/image/upload/v1745876521/concert_ithgk3.jpg',
+  concert: 'https://github.com/rbmns/the-lineup.com/blob/63da302226f6bf3c77b888d29651d362f8129297/img/concert.jpg',
   band: 'https://github.com/rbmns/the-lineup.com/blob/e43b1fae25723e90b8de097117d495e8f93e33d0/img/band.jpg',
-  food: 'https://res.cloudinary.com/dita7stkt/image/upload/v1745407971/cld-sample-4.jpg',
+  food: 'https://github.com/rbmns/the-lineup.com/blob/63da302226f6bf3c77b888d29651d362f8129297/img/food.jpg',
   party: 'https://github.com/rbmns/the-lineup.com/blob/051135f253c03fb98eaf9bce191ff9c786bdff2c/img/beachparty.jpg',
   community: 'https://github.com/rbmns/the-lineup.com/blob/e43b1fae25723e90b8de097117d495e8f93e33d0/img/Community.jpg',
   
   // Special tag combinations
-  'beach-party': 'https://res.cloudinary.com/dita7stkt/image/upload/v1745876553/beacrave_iebfd8.jpg',
-  'live-band': 'https://res.cloudinary.com/dita7stkt/image/upload/v1745876517/band_dziaco.jpg',
+  'beach-party': 'https://github.com/rbmns/the-lineup.com/blob/051135f253c03fb98eaf9bce191ff9c786bdff2c/img/beachparty.jpg',
+  'live-band': 'https://github.com/rbmns/the-lineup.com/blob/e43b1fae25723e90b8de097117d495e8f93e33d0/img/band.jpg',
   
   // Default fallback
   default: 'https://github.com/rbmns/the-lineup.com/blob/051135f253c03fb98eaf9bce191ff9c786bdff2c/img/default.jpg'
