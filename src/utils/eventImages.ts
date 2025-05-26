@@ -14,15 +14,15 @@ export const eventImageMap = {
   market: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/shopping.jpg',
   music: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/music.jpg',
   beach: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/beach.jpg',
-  concert: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/',
-  band: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/',
-  food: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/',
-  party: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/',
-  community: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/',
+  concert: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/concert.jpg',
+  band: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/bang.jpg',
+  food: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/food.jpg',
+  party: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/beachparty.jpg',
+  community: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/community.jpg',
   
   // Special tag combinations
-  'beach-party': 'https://github.com/rbmns/the-lineup.com/blob/051135f253c03fb98eaf9bce191ff9c786bdff2c/img/beachparty.jpg',
-  'live-band': 'https://github.com/rbmns/the-lineup.com/blob/e43b1fae25723e90b8de097117d495e8f93e33d0/img/band.jpg',
+  'beach-party': 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/beachparty.jpg',
+  'live-band': 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/band.jpg',
   
   // Default fallback
   default: 'https://github.com/rbmns/the-lineup.com/blob/051135f253c03fb98eaf9bce191ff9c786bdff2c/img/default.jpg'
