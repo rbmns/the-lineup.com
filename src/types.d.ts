@@ -39,6 +39,7 @@ export interface Event {
   start_time: string | null;
   end_time?: string | null;
   start_date?: string | null;
+  end_date?: string | null; // Added end_date property for multi-day events
   created_at?: string;
   updated_at?: string;
   image_urls: string[];

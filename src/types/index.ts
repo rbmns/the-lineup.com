@@ -37,6 +37,8 @@ export interface Event {
   event_type?: string;
   start_time: string | null;
   end_time?: string | null;
+  start_date?: string | null;
+  end_date?: string | null; // Added end_date property for multi-day events
   created_at?: string;
   updated_at?: string;
   image_urls?: string[];
@@ -67,7 +69,6 @@ export interface Event {
   destination?: string;
   recurring_count?: number;
   isExactMatch?: boolean;
-  start_date?: string | null;
   cover_image?: string | null;
   share_image?: string | null;
   user_rsvp_status?: 'Going' | 'Interested' | null;
