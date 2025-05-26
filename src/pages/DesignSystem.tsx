@@ -11,6 +11,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Calendar, MapPin, Users, Clock, Search, Plus, Heart, Star } from 'lucide-react';
 
 const DesignSystem = () => {
+  // All category pills from the image
+  const eventCategories = [
+    'Festival', 'Wellness', 'Kite', 'Beach', 'Game', 'Other', 
+    'Sports', 'Surf', 'Party', 'Yoga', 'Community', 'Water', 
+    'Music', 'Food', 'Market', 'Art & Culture'
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-6xl">
@@ -54,20 +61,28 @@ const DesignSystem = () => {
                     <h4 className="text-sm font-medium text-gray-700 mb-3">Headings</h4>
                     <div className="space-y-3">
                       <div>
-                        <h1 className="text-4xl font-bold tracking-tight">Display Heading</h1>
+                        <h1 className="text-5xl md:text-6xl font-bold tracking-tight">Display Heading</h1>
+                        <code className="text-xs text-gray-500">text-5xl md:text-6xl font-bold tracking-tight</code>
+                      </div>
+                      <div>
+                        <h2 className="text-4xl font-bold tracking-tight">H1 Heading</h2>
                         <code className="text-xs text-gray-500">text-4xl font-bold tracking-tight</code>
                       </div>
                       <div>
-                        <h2 className="text-3xl font-semibold tracking-tight">H1 Heading</h2>
+                        <h3 className="text-3xl font-semibold tracking-tight">H2 Heading</h3>
                         <code className="text-xs text-gray-500">text-3xl font-semibold tracking-tight</code>
                       </div>
                       <div>
-                        <h3 className="text-2xl font-semibold">H2 Heading</h3>
+                        <h4 className="text-2xl font-semibold">H3 Heading</h4>
                         <code className="text-xs text-gray-500">text-2xl font-semibold</code>
                       </div>
                       <div>
-                        <h4 className="text-xl font-medium">H3 Heading</h4>
+                        <h5 className="text-xl font-medium">H4 Heading</h5>
                         <code className="text-xs text-gray-500">text-xl font-medium</code>
+                      </div>
+                      <div>
+                        <h6 className="text-lg font-medium">H5 Heading</h6>
+                        <code className="text-xs text-gray-500">text-lg font-medium</code>
                       </div>
                     </div>
                   </div>
@@ -93,8 +108,8 @@ const DesignSystem = () => {
                   <div>
                     <h4 className="text-sm font-medium text-gray-700 mb-3">Mobile Scaling</h4>
                     <div className="space-y-2 text-sm">
-                      <p><strong>Page Headers:</strong> text-xl on mobile, text-3xl md:text-4xl on desktop</p>
-                      <p><strong>Page Subtitles:</strong> text-sm on mobile, text-lg md:text-xl on desktop</p>
+                      <p><strong>Page Headers:</strong> text-2xl on mobile, text-4xl on desktop</p>
+                      <p><strong>Page Subtitles:</strong> text-base on mobile, text-xl on desktop</p>
                       <p><strong>Card Titles:</strong> text-base on mobile, text-lg on desktop</p>
                     </div>
                   </div>
@@ -197,36 +212,58 @@ const DesignSystem = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Category Pills</CardTitle>
-                  <CardDescription>Event type and filter indicators</CardDescription>
+                  <CardDescription>Event type and filter indicators - complete set as used across the platform</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Event Types</h4>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">All Event Categories (Active State)</h4>
+                    <p className="text-sm text-gray-600 mb-4">These colors are used on event cards to label the event type</p>
                     <div className="flex flex-wrap gap-2">
-                      <CategoryPill category="music" active={false} />
-                      <CategoryPill category="sport" active={false} />
-                      <CategoryPill category="food" active={false} />
-                      <CategoryPill category="art & culture" active={false} />
-                      <CategoryPill category="community" active={false} />
+                      {eventCategories.map((category) => (
+                        <CategoryPill
+                          key={category}
+                          category={category}
+                          active={true}
+                          showIcon={true}
+                          size="default"
+                        />
+                      ))}
                     </div>
                   </div>
                   
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Active States</h4>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Filter Pills (Inactive State)</h4>
+                    <p className="text-sm text-gray-600 mb-4">Lighter colors used for unselected filter options</p>
                     <div className="flex flex-wrap gap-2">
-                      <CategoryPill category="music" active={true} />
-                      <CategoryPill category="sport" active={true} />
-                      <CategoryPill category="food" active={true} />
+                      {eventCategories.slice(0, 8).map((category) => (
+                        <CategoryPill
+                          key={category}
+                          category={category}
+                          active={false}
+                          showIcon={true}
+                          size="default"
+                        />
+                      ))}
                     </div>
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Casual Plan Vibes</h4>
-                    <div className="flex flex-wrap gap-2">
-                      <CategoryPill category="surf" active={false} className="capitalize" />
-                      <CategoryPill category="chill" active={false} className="capitalize" />
-                      <CategoryPill category="party" active={false} className="capitalize" />
-                      <CategoryPill category="coffee" active={false} className="capitalize" />
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Sizes</h4>
+                    <div className="flex flex-wrap gap-2 items-center">
+                      <CategoryPill category="Music" size="xs" active={true} />
+                      <CategoryPill category="Music" size="sm" active={true} />
+                      <CategoryPill category="Music" size="default" active={true} />
+                      <CategoryPill category="Music" size="lg" active={true} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Usage Guidelines</h4>
+                    <div className="text-sm space-y-2">
+                      <p><strong>Event Cards:</strong> Always use active state (vibrant colors) to clearly identify event type</p>
+                      <p><strong>Filter Systems:</strong> Use inactive state for unselected options, active for selected</p>
+                      <p><strong>Icons:</strong> Include icons for better visual recognition and accessibility</p>
+                      <p><strong>Consistency:</strong> Same colors and styling across all platforms and contexts</p>
                     </div>
                   </div>
                 </CardContent>
@@ -275,7 +312,7 @@ const DesignSystem = () => {
                     <h4 className="text-sm font-medium text-gray-700 mb-3">Event Card (Mobile Optimized)</h4>
                     <div className="bg-white rounded-lg border border-gray-200 p-4 max-w-sm">
                       <div className="flex items-center justify-between mb-3">
-                        <CategoryPill category="music" size="sm" />
+                        <CategoryPill category="music" size="sm" active={true} />
                         <Badge variant="secondary">15 going</Badge>
                       </div>
                       <h3 className="font-semibold text-base mb-2">Sample Event Title</h3>

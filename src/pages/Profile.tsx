@@ -6,9 +6,10 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { useUserEvents } from '@/hooks/useUserEvents';
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { PrivacySettings } from '@/components/profile/PrivacySettings';
+import { DataManagement } from '@/components/profile/DataManagement';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MapPin, Edit3, User, Shield, CalendarDays } from 'lucide-react';
+import { MapPin, Edit3, User, Shield, CalendarDays, Database } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import EventCardList from '@/components/events/EventCardList';
 
@@ -58,6 +59,7 @@ const Profile: React.FC = () => {
   const tabs = [
     { id: 'personal', label: 'Personal Info', icon: User, shortLabel: 'Personal' },
     { id: 'privacy', label: 'Privacy', icon: Shield, shortLabel: 'Privacy' },
+    { id: 'data', label: 'Data Management', icon: Database, shortLabel: 'Data' },
     { id: 'events', label: 'My Events', icon: CalendarDays, shortLabel: 'Events' }
   ];
 
@@ -94,6 +96,9 @@ const Profile: React.FC = () => {
         
       case 'privacy':
         return <PrivacySettings userId={user?.id} />;
+        
+      case 'data':
+        return <DataManagement />;
         
       case 'events':
         return (

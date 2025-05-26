@@ -75,10 +75,10 @@ export const CookieConsent: React.FC = () => {
         <div className="flex-1 pr-2 md:pr-4">
           <h3 className="font-semibold mb-0.5 md:mb-1 text-sm md:text-base">Cookie & Privacy Notice</h3>
           <p className="text-xs md:text-sm text-gray-600 mb-1 md:mb-2 leading-tight">
-            We use essential cookies for functionality and optional analytics cookies (Google Analytics) to improve our service. 
+            We use essential cookies for functionality and optional analytics cookies (Google Analytics & Tag Manager) to improve our service. 
             We also collect data for casual plans features and user interactions. 
             By clicking "Accept All", you consent to all cookies and data processing. 
-            Read our <Link to="/privacy" className="text-blue-600 hover:underline">Privacy Policy</Link> and <Link to="/terms" className="text-blue-600 hover:underline">Terms of Service</Link> for details on how we handle your data, including casual plans and social features.
+            Read our <Link to="/privacy" className="text-blue-600 hover:underline">Privacy Policy</Link>, <Link to="/terms" className="text-blue-600 hover:underline">Terms of Service</Link>, and <Link to="/cookies" className="text-blue-600 hover:underline">Cookie Policy</Link> for details on how we handle your data.
           </p>
         </div>
         
