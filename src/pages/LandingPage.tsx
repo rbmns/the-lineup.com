@@ -132,7 +132,7 @@ const LandingPage = () => {
   return (
     <div>
       {/* Hero Section with Blue Background */}
-      <section className="bg-blue-500 py-12 md:py-20">
+      <section style={{ backgroundColor: '#feedcc' }} className="py-12 md:py-20">
         <div className="container mx-auto px-4 text-center text-white">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
            See what's on Nearby
