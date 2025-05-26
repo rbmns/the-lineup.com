@@ -6,46 +6,67 @@ import { Badge } from '@/components/ui/badge';
 interface FriendsTabsProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  pendingRequestsCount: number;
+  suggestedFriendsCount?: number;
   friendsContent: React.ReactNode;
   discoverContent: React.ReactNode;
-  pendingRequestsCount?: number;
+  suggestedContent?: React.ReactNode;
 }
 
-export const FriendsTabs: React.FC<FriendsTabsProps> = ({
+export const FriendsTabs = ({
   activeTab,
   setActiveTab,
+  pendingRequestsCount,
+  suggestedFriendsCount = 0,
   friendsContent,
   discoverContent,
-  pendingRequestsCount = 0
-}) => {
-  const [requestCount, setRequestCount] = useState<number>(0);
-  
-  // Update request count whenever pendingRequestsCount changes
-  useEffect(() => {
-    setRequestCount(pendingRequestsCount);
-  }, [pendingRequestsCount]);
-  
+  suggestedContent
+}: FriendsTabsProps) => {
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="grid w-full grid-cols-2 mb-4">
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="friends" className="relative">
           My Friends
-          {requestCount > 0 && (
+          {pendingRequestsCount > 0 && (
             <Badge 
-              className="absolute -top-2 -right-2 bg-purple text-white text-xs h-5 min-w-[20px] flex items-center justify-center px-1.5 rounded-full"
+              variant="destructive" 
+              className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-xs"
             >
-              {requestCount}
+              {pendingRequestsCount}
             </Badge>
           )}
         </TabsTrigger>
-        <TabsTrigger value="discover">Search Friends</TabsTrigger>
+        
+        <TabsTrigger value="suggested" className="relative">
+          Suggested
+          {suggestedFriendsCount > 0 && (
+            <Badge 
+              variant="secondary" 
+              className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center text-xs bg-blue-500 text-white"
+            >
+              {suggestedFriendsCount}
+            </Badge>
+          )}
+        </TabsTrigger>
+        
+        <TabsTrigger value="discover">
+          Discover
+        </TabsTrigger>
       </TabsList>
-      
-      <TabsContent value="friends">
+
+      <TabsContent value="friends" className="space-y-4">
         {friendsContent}
       </TabsContent>
-      
-      <TabsContent value="discover">
+
+      <TabsContent value="suggested" className="space-y-4">
+        {suggestedContent || (
+          <div className="text-center py-8 text-gray-500">
+            Suggested friends feature not available
+          </div>
+        )}
+      </TabsContent>
+
+      <TabsContent value="discover" className="space-y-4">
         {discoverContent}
       </TabsContent>
     </Tabs>

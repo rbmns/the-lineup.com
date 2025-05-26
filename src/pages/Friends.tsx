@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +10,8 @@ import { DiscoverTabContent } from '@/components/friends/DiscoverTabContent';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { EventsPageHeader } from '@/components/events/EventsPageHeader';
+import { SuggestedFriendsTabContent } from '@/components/friends/SuggestedFriendsTabContent';
+import { useSuggestedFriends } from '@/hooks/useSuggestedFriends';
 
 const Friends: React.FC = () => {
   const { user } = useAuth();
@@ -39,6 +40,14 @@ const Friends: React.FC = () => {
     handleDeclineRequest,
     refreshRequests
   } = useFriendRequests(user?.id);
+
+  // Get suggested friends functionality
+  const {
+    suggestedFriends,
+    loading: suggestedLoading,
+    dismissSuggestion,
+    refreshSuggestions
+  } = useSuggestedFriends(user?.id);
 
   // Filter friends based on search query - EXCLUDE current user
   useEffect(() => {
@@ -124,6 +133,17 @@ const Friends: React.FC = () => {
     }
   };
 
+  // Handle adding a suggested friend
+  const handleAddSuggestedFriend = async (friendId: string) => {
+    await handleAddFriend(friendId);
+    refreshSuggestions(); // Refresh suggestions after adding friend
+  };
+
+  // Handle dismissing a suggested friend
+  const handleDismissSuggestion = (friendId: string) => {
+    dismissSuggestion(friendId);
+  };
+
   // Handle accepting a friend request with refresh
   const onAcceptRequest = async (requestId: string) => {
     const success = await handleAcceptRequest(requestId);
@@ -202,6 +222,7 @@ const Friends: React.FC = () => {
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               pendingRequestsCount={requests?.length || 0}
+              suggestedFriendsCount={suggestedFriends?.length || 0}
               friendsContent={
                 <FriendsTabContent
                   friends={filteredFriends as UserProfile[]}
@@ -212,6 +233,14 @@ const Friends: React.FC = () => {
                   showFriendRequests={true}
                   searchQuery={friendsSearchQuery}
                   onSearchChange={(e) => setFriendsSearchQuery(e.target.value)}
+                />
+              }
+              suggestedContent={
+                <SuggestedFriendsTabContent
+                  suggestedFriends={suggestedFriends}
+                  loading={suggestedLoading}
+                  onAddFriend={handleAddSuggestedFriend}
+                  onDismiss={handleDismissSuggestion}
                 />
               }
               discoverContent={
