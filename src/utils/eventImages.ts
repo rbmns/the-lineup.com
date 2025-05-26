@@ -9,16 +9,16 @@
 export const eventImageMap = {
   // Event type specific fallback images
   yoga: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/yoga.jpg',
-  kite: 'https://github.com/rbmns/the-lineup.com/blob/051135f253c03fb98eaf9bce191ff9c786bdff2c/img/kite.jpg',
-  surf: 'https://github.com/rbmns/the-lineup.com/blob/051135f253c03fb98eaf9bce191ff9c786bdff2c/img/surf.jpg',
-  market: 'https://github.com/rbmns/the-lineup.com/blob/051135f253c03fb98eaf9bce191ff9c786bdff2c/img/shopping.jpg',
-  music: 'https://github.com/rbmns/the-lineup.com/blob/051135f253c03fb98eaf9bce191ff9c786bdff2c/img/music.jpg',
-  beach: 'https://github.com/rbmns/the-lineup.com/blob/051135f253c03fb98eaf9bce191ff9c786bdff2c/img/beach.jpg',
-  concert: 'https://github.com/rbmns/the-lineup.com/blob/63da302226f6bf3c77b888d29651d362f8129297/img/concert.jpg',
-  band: 'https://github.com/rbmns/the-lineup.com/blob/e43b1fae25723e90b8de097117d495e8f93e33d0/img/band.jpg',
-  food: 'https://github.com/rbmns/the-lineup.com/blob/63da302226f6bf3c77b888d29651d362f8129297/img/food.jpg',
-  party: 'https://github.com/rbmns/the-lineup.com/blob/051135f253c03fb98eaf9bce191ff9c786bdff2c/img/beachparty.jpg',
-  community: 'https://github.com/rbmns/the-lineup.com/blob/6c74995d3800980ce374ab2c736ff24225be086b/img/Community.jpg',
+  kite: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/kite.jpg',
+  surf: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/surf.jpg',
+  market: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/shopping.jpg',
+  music: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/music.jpg',
+  beach: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/beach.jpg',
+  concert: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/',
+  band: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/',
+  food: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/',
+  party: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/',
+  community: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/',
   
   // Special tag combinations
   'beach-party': 'https://github.com/rbmns/the-lineup.com/blob/051135f253c03fb98eaf9bce191ff9c786bdff2c/img/beachparty.jpg',
