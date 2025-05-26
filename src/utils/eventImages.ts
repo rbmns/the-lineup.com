@@ -9,23 +9,23 @@
 export const eventImageMap = {
   // Event type specific fallback images
   yoga: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/yoga.jpg',
-  kite: 'https://raw.githubusercontent.com/rbmns/images/lineup/kite.jpg',
-  surf: 'https://raw.githubusercontent.com/rbmns/images/lineup/surf.jpg',
-  market: 'https://raw.githubusercontent.com/rbmns/images/lineup/shopping.jpg',
-  music: 'https://raw.githubusercontent.com/rbmns/images/lineup/music.jpg',
-  beach: 'https://raw.githubusercontent.com/rbmns/images/lineup/beach.jpg',
-  concert: 'https://raw.githubusercontent.com/rbmns/images/lineup/concert.jpg',
-  band: 'https://raw.githubusercontent.com/rbmns/images/lineup/bang.jpg',
-  food: 'https://raw.githubusercontent.com/rbmns/images/lineup/food.jpg',
-  party: 'https://raw.githubusercontent.com/rbmns/images/lineup/beachparty.jpg',
-  community: 'https://raw.githubusercontent.com/rbmns/images/lineup/community.jpg',
+  kite: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/kite.jpg',
+  surf: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/surf.jpg',
+  market: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/shopping.jpg',
+  music: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/music.jpg',
+  beach: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/beach.jpg',
+  concert: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/concert.jpg',
+  band: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/bang.jpg',
+  food: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/food.jpg',
+  party: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/beachparty.jpg',
+  community: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/community.jpg',
   
   // Special tag combinations
-  'beach-party': 'https://raw.githubusercontent.com/rbmns/images/lineup/beachparty.jpg',
-  'live-band': 'https://raw.githubusercontent.com/rbmns/images/lineup/band.jpg',
+  'beach-party': 'https://raw.githubusercontent.com/rbmns/images/main/lineup/beachparty.jpg',
+  'live-band': 'https://raw.githubusercontent.com/rbmns/images/main/lineup/band.jpg',
   
   // Default fallback
-  default: 'https://raw.githubusercontent.com/rbmns/images/lineup/default.jpg'
+  default: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg'
 };
 
 /**
