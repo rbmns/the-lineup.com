@@ -66,3 +66,62 @@ export const combineDateAndTime = (dateStr: string, timeStr: string): string => 
     return '';
   }
 };
+
+/**
+ * Checks if an event is a multi-day event
+ */
+export const isMultiDayEvent = (event: Event): boolean => {
+  if (!event.start_date || !event.end_date) return false;
+  
+  const startDate = new Date(event.start_date);
+  const endDate = new Date(event.end_date);
+  
+  // Compare dates without time
+  const startDateOnly = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+  const endDateOnly = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+  
+  return endDateOnly > startDateOnly;
+};
+
+/**
+ * Gets a formatted date range for multi-day events
+ */
+export const getMultiDayDateRange = (event: Event): string => {
+  if (!isMultiDayEvent(event)) return '';
+  
+  const startDate = new Date(event.start_date!);
+  const endDate = new Date(event.end_date!);
+  
+  const options: Intl.DateTimeFormatOptions = { 
+    month: 'short', 
+    day: 'numeric',
+    year: startDate.getFullYear() !== endDate.getFullYear() ? 'numeric' : undefined
+  };
+  
+  const startFormatted = startDate.toLocaleDateString('en-US', options);
+  const endFormatted = endDate.toLocaleDateString('en-US', options);
+  
+  return `${startFormatted} - ${endFormatted}`;
+};
+
+/**
+ * Checks if a given date falls within a multi-day event's range
+ */
+export const isDateInEventRange = (date: Date, event: Event): boolean => {
+  if (!isMultiDayEvent(event)) {
+    // For single-day events, check if it matches the start date
+    if (!event.start_date) return false;
+    const eventDate = new Date(event.start_date);
+    return date.toDateString() === eventDate.toDateString();
+  }
+  
+  const startDate = new Date(event.start_date!);
+  const endDate = new Date(event.end_date!);
+  
+  // Remove time components for date comparison
+  const checkDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const startDateOnly = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+  const endDateOnly = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+  
+  return checkDate >= startDateOnly && checkDate <= endDateOnly;
+};

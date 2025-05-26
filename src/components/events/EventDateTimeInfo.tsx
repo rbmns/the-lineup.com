@@ -1,8 +1,10 @@
+
 import React from 'react';
-import { Calendar, Clock, RepeatIcon } from 'lucide-react';
+import { Calendar, Clock, RepeatIcon, CalendarDays } from 'lucide-react';
 import { Event } from '@/types';
 import { formatInTimeZone } from 'date-fns-tz';
 import { AMSTERDAM_TIMEZONE, formatDate, formatTime, getEventDateTime } from '@/utils/dateUtils';
+import { isMultiDayEvent, getMultiDayDateRange } from '@/utils/event-date-utils';
 import { Badge } from '../ui/badge';
 
 interface EventDateTimeInfoProps {
@@ -23,6 +25,7 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
   // Check if we have valid date information
   const eventStartTime = getEventDateTime(event);
   const eventEndTime = event.end_time;
+  const isMultiDay = isMultiDayEvent(event);
   
   if (!eventStartTime) {
     return (
@@ -57,29 +60,44 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
   const startDate = formatDateStr(eventStartTime);
   const startTime = formatTimeStr(eventStartTime);
   const endTime = eventEndTime ? formatTimeStr(eventEndTime) : null;
-  const isMultiDay = eventEndTime && formatDateStr(eventStartTime) !== formatDateStr(eventEndTime);
   const endDate = eventEndTime ? formatDateStr(eventEndTime) : null;
   
   const isRecurring = recurringEvents && recurringEvents.length > 0;
 
   return (
     <div className={`flex flex-col gap-2 text-gray-700 ${className}`}>
+      {/* Multi-day event badge */}
+      {isMultiDay && (
+        <div className="flex items-center gap-2 mb-1">
+          <CalendarDays className="h-4 w-4 text-blue-600" />
+          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+            Multi-day event
+          </Badge>
+        </div>
+      )}
+
       {/* Main date display */}
       <div className="flex items-start gap-2">
         <Calendar className={`flex-shrink-0 text-gray-500 mt-1 ${iconClassName}`} />
         <div className="space-y-1">
-          <div className="font-medium">{startDate}</div>
-          <div className="flex items-center gap-1 text-sm">
-            <Clock className="h-3.5 w-3.5 text-gray-500" />
-            <span>{startTime}</span>
-            {endTime && <span>- {endTime}</span>}
-          </div>
-          
-          {/* Show end date if it's different from start date */}
-          {isMultiDay && endDate && (
-            <div className="text-sm text-gray-600 mt-1">
-              Until {endDate}
-            </div>
+          {isMultiDay ? (
+            <>
+              <div className="font-medium">{getMultiDayDateRange(event)}</div>
+              <div className="flex items-center gap-1 text-sm">
+                <Clock className="h-3.5 w-3.5 text-gray-500" />
+                <span>Starts {startTime}</span>
+                {endTime && <span>• Ends {endTime}</span>}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="font-medium">{startDate}</div>
+              <div className="flex items-center gap-1 text-sm">
+                <Clock className="h-3.5 w-3.5 text-gray-500" />
+                <span>{startTime}</span>
+                {endTime && <span>- {endTime}</span>}
+              </div>
+            </>
           )}
         </div>
       </div>

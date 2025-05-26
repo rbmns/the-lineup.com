@@ -10,15 +10,29 @@ import {
   endOfWeek,
   compareAsc
 } from 'date-fns';
+import { isDateInEventRange } from './event-date-utils';
 
 /**
- * Filters upcoming events (events with start date in the future)
+ * Filters upcoming events (events with start date in the future or ongoing multi-day events)
  */
 export const filterUpcomingEvents = (events: Event[]): Event[] => {
   const now = new Date();
+  const today = startOfDay(now);
+  
   return events.filter(event => {
     // If no start_date, include the event
     if (!event.start_date) return true;
+    
+    // For multi-day events, check if today falls within the event range
+    if (event.end_date) {
+      const startDate = new Date(event.start_date);
+      const endDate = new Date(event.end_date);
+      
+      // If it's a multi-day event and today is within the range, include it
+      if (endDate > startDate && isDateInEventRange(now, event)) {
+        return true;
+      }
+    }
     
     // Convert to Date object if it's a string
     const eventDate = typeof event.start_date === 'string' 
@@ -26,18 +40,26 @@ export const filterUpcomingEvents = (events: Event[]): Event[] => {
       : event.start_date;
       
     // Keep events that are today or in the future
-    return eventDate >= startOfDay(now);
+    return eventDate >= today;
   });
 };
 
 /**
- * Filters past events (events with start date in the past)
+ * Filters past events (events with start date in the past and not ongoing)
  */
 export const filterPastEvents = (events: Event[]): Event[] => {
   const now = new Date();
+  const today = startOfDay(now);
+  
   return events.filter(event => {
     // If no start_date, exclude the event
     if (!event.start_date) return false;
+    
+    // For multi-day events, check if the event has completely ended
+    if (event.end_date) {
+      const endDate = new Date(event.end_date);
+      return endDate < today;
+    }
     
     // Convert to Date object if it's a string
     const eventDate = typeof event.start_date === 'string' 
@@ -45,7 +67,7 @@ export const filterPastEvents = (events: Event[]): Event[] => {
       : event.start_date;
       
     // Keep events that are in the past
-    return eventDate < startOfDay(now);
+    return eventDate < today;
   });
 };
 
@@ -65,7 +87,36 @@ export const sortEventsByDate = (events: Event[]): Event[] => {
 };
 
 /**
- * Filters events by date criteria
+ * Checks if an event matches a date filter (handles multi-day events)
+ */
+const eventMatchesDateFilter = (event: Event, targetDate: Date): boolean => {
+  if (!event.start_date) return false;
+  
+  // For multi-day events, check if the target date falls within the range
+  if (event.end_date) {
+    return isDateInEventRange(targetDate, event);
+  }
+  
+  // For single-day events, check exact match
+  const eventDate = new Date(event.start_date);
+  return isSameDay(eventDate, targetDate);
+};
+
+/**
+ * Checks if an event falls within a date interval (handles multi-day events)
+ */
+const eventMatchesDateInterval = (event: Event, start: Date, end: Date): boolean => {
+  if (!event.start_date) return false;
+  
+  const eventStart = new Date(event.start_date);
+  const eventEnd = event.end_date ? new Date(event.end_date) : eventStart;
+  
+  // Check if there's any overlap between the event period and the target interval
+  return eventStart <= end && eventEnd >= start;
+};
+
+/**
+ * Filters events by date criteria (handles multi-day events)
  */
 export const filterEventsByDate = (
   events: Event[], 
@@ -81,78 +132,40 @@ export const filterEventsByDate = (
     const from = startOfDay(dateRange.from);
     const to = dateRange.to ? endOfDay(dateRange.to) : endOfDay(dateRange.from);
     
-    return events.filter(event => {
-      if (!event.start_date) return false;
-      
-      const eventDate = typeof event.start_date === 'string' 
-        ? new Date(event.start_date) 
-        : event.start_date;
-        
-      return isWithinInterval(eventDate, { start: from, end: to });
-    });
+    return events.filter(event => eventMatchesDateInterval(event, from, to));
   }
   
   // If predefined date filter is selected
   switch (dateFilter.toLowerCase()) {
     case 'today':
-      return events.filter(event => {
-        if (!event.start_date) return false;
-        const eventDate = typeof event.start_date === 'string' 
-          ? new Date(event.start_date) 
-          : event.start_date;
-        return isSameDay(eventDate, now);
-      });
+      return events.filter(event => eventMatchesDateFilter(event, now));
       
     case 'tomorrow':
-      return events.filter(event => {
-        if (!event.start_date) return false;
-        const eventDate = typeof event.start_date === 'string' 
-          ? new Date(event.start_date) 
-          : event.start_date;
-        return isSameDay(eventDate, addDays(now, 1));
-      });
+      return events.filter(event => eventMatchesDateFilter(event, addDays(now, 1)));
       
     case 'this week':
-      return events.filter(event => {
-        if (!event.start_date) return false;
-        const eventDate = typeof event.start_date === 'string' 
-          ? new Date(event.start_date) 
-          : event.start_date;
-        const weekStart = startOfWeek(now);
-        const weekEnd = endOfWeek(now);
-        return isWithinInterval(eventDate, { start: weekStart, end: weekEnd });
-      });
+      const weekStart = startOfWeek(now);
+      const weekEnd = endOfWeek(now);
+      return events.filter(event => eventMatchesDateInterval(event, weekStart, weekEnd));
       
     case 'this weekend':
-      return events.filter(event => {
-        if (!event.start_date) return false;
-        const eventDate = typeof event.start_date === 'string' 
-          ? new Date(event.start_date) 
-          : event.start_date;
-        // Define weekend as Saturday and Sunday
-        const saturday = addDays(startOfWeek(now), 5);
-        const sunday = addDays(startOfWeek(now), 6);
-        return isSameDay(eventDate, saturday) || isSameDay(eventDate, sunday);
-      });
+      // Define weekend as Saturday and Sunday
+      const saturday = addDays(startOfWeek(now), 5);
+      const sunday = addDays(startOfWeek(now), 6);
+      return events.filter(event => 
+        eventMatchesDateFilter(event, saturday) || eventMatchesDateFilter(event, sunday)
+      );
       
     case 'next week':
-      return events.filter(event => {
-        if (!event.start_date) return false;
-        const eventDate = typeof event.start_date === 'string' 
-          ? new Date(event.start_date) 
-          : event.start_date;
-        const nextWeekStart = addDays(startOfWeek(now), 7);
-        const nextWeekEnd = addDays(endOfWeek(now), 7);
-        return isWithinInterval(eventDate, { start: nextWeekStart, end: nextWeekEnd });
-      });
+      const nextWeekStart = addDays(startOfWeek(now), 7);
+      const nextWeekEnd = addDays(endOfWeek(now), 7);
+      return events.filter(event => eventMatchesDateInterval(event, nextWeekStart, nextWeekEnd));
       
     case 'later':
+      const twoWeeksFromNow = addDays(now, 14);
       return events.filter(event => {
         if (!event.start_date) return false;
-        const eventDate = typeof event.start_date === 'string' 
-          ? new Date(event.start_date) 
-          : event.start_date;
-        const twoWeeksFromNow = addDays(now, 14);
+        const eventDate = new Date(event.start_date);
         return eventDate > twoWeeksFromNow;
       });
       
@@ -169,46 +182,41 @@ export const filterEventsByDateRange = (event: Event, dateFilter: string, dateRa
   
   const now = new Date();
   
-  // For a single event
-  if (!event.start_date) return false;
-  
-  const eventDate = typeof event.start_date === 'string' 
-    ? new Date(event.start_date) 
-    : event.start_date;
-  
   // If custom date range is selected
   if (dateRange?.from) {
     const from = startOfDay(dateRange.from);
     const to = dateRange.to ? endOfDay(dateRange.to) : endOfDay(dateRange.from);
     
-    return isWithinInterval(eventDate, { start: from, end: to });
+    return eventMatchesDateInterval(event, from, to);
   }
   
   // If predefined date filter is selected
   switch (dateFilter.toLowerCase()) {
     case 'today':
-      return isSameDay(eventDate, now);
+      return eventMatchesDateFilter(event, now);
       
     case 'tomorrow':
-      return isSameDay(eventDate, addDays(now, 1));
+      return eventMatchesDateFilter(event, addDays(now, 1));
       
     case 'this week':
       const weekStart = startOfWeek(now);
       const weekEnd = endOfWeek(now);
-      return isWithinInterval(eventDate, { start: weekStart, end: weekEnd });
+      return eventMatchesDateInterval(event, weekStart, weekEnd);
       
     case 'this weekend':
       // Define weekend as Saturday and Sunday
       const saturday = addDays(startOfWeek(now), 5);
       const sunday = addDays(startOfWeek(now), 6);
-      return isSameDay(eventDate, saturday) || isSameDay(eventDate, sunday);
+      return eventMatchesDateFilter(event, saturday) || eventMatchesDateFilter(event, sunday);
       
     case 'next week':
       const nextWeekStart = addDays(startOfWeek(now), 7);
       const nextWeekEnd = addDays(endOfWeek(now), 7);
-      return isWithinInterval(eventDate, { start: nextWeekStart, end: nextWeekEnd });
+      return eventMatchesDateInterval(event, nextWeekStart, nextWeekEnd);
       
     case 'later':
+      if (!event.start_date) return false;
+      const eventDate = new Date(event.start_date);
       const twoWeeksFromNow = addDays(now, 14);
       return eventDate > twoWeeksFromNow;
       
