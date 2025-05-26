@@ -21,11 +21,11 @@ export const eventImageMap = {
   community: 'https://raw.githubusercontent.com/rbmns/images/lineup/community.jpg',
   
   // Special tag combinations
-  'beach-party': 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/beachparty.jpg',
-  'live-band': 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/band.jpg',
+  'beach-party': 'https://raw.githubusercontent.com/rbmns/images/lineup/beachparty.jpg',
+  'live-band': 'https://raw.githubusercontent.com/rbmns/images/lineup/band.jpg',
   
   // Default fallback
-  default: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/refs/heads/main/img/default.jpg'
+  default: 'https://raw.githubusercontent.com/rbmns/images/lineup/default.jpg'
 };
 
 /**
