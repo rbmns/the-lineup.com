@@ -15,7 +15,7 @@ export const eventImageMap = {
   music: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/music.jpg',
   beach: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/beach.jpg',
   concert: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/concert.jpg',
-  band: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/bang.jpg',
+  band: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/band.jpg',
   food: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/food.jpg',
   party: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/beachparty.jpg',
   community: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/community.jpg',
