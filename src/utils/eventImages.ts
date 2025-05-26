@@ -8,7 +8,7 @@
  */
 export const eventImageMap = {
   // Event type specific fallback images
-  yoga: 'https://github.com/rbmns/the-lineup.com/blob/main/img/yoga.jpg',
+  yoga: 'https://github.com/rbmns/the-lineup.com/blob/6c74995d3800980ce374ab2c736ff24225be086b/img/yoga.jpg',
   kite: 'https://res.cloudinary.com/dita7stkt/image/upload/v1745907656/kite_gzxprm.jpg',
   surf: 'https://res.cloudinary.com/dita7stkt/image/upload/v1745907546/surf_whzonm.jpg',
   market: 'https://res.cloudinary.com/dita7stkt/image/upload/v1745876578/shopping_tqeotp.jpg',
