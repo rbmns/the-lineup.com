@@ -104,8 +104,10 @@ export const useSuggestedFriends = (userId: string | undefined) => {
 
       // Sort by most recent event first
       const sortedCoAttendees = coAttendees.sort((a, b) => {
-        const dateA = new Date(a.events?.start_date || '');
-        const dateB = new Date(b.events?.start_date || '');
+        const eventA = Array.isArray(a.events) ? a.events[0] : a.events;
+        const eventB = Array.isArray(b.events) ? b.events[0] : b.events;
+        const dateA = new Date(eventA?.start_date || '');
+        const dateB = new Date(eventB?.start_date || '');
         return dateB.getTime() - dateA.getTime();
       });
 
@@ -125,8 +127,9 @@ export const useSuggestedFriends = (userId: string | undefined) => {
 
         seenUsers.add(attendeeUserId);
 
-        const profile = attendee.profiles;
-        const event = attendee.events;
+        // Handle array or single object from Supabase joins
+        const profile = Array.isArray(attendee.profiles) ? attendee.profiles[0] : attendee.profiles;
+        const event = Array.isArray(attendee.events) ? attendee.events[0] : attendee.events;
 
         if (profile && event) {
           suggestions.push({
