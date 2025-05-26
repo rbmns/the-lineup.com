@@ -9,16 +9,16 @@
 export const eventImageMap = {
   // Event type specific fallback images
   yoga: 'https://raw.githubusercontent.com/rbmns/images/lineup/yoga.jpg',
-  kite: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/kite.jpg',
-  surf: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/surf.jpg',
-  market: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/shopping.jpg',
-  music: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/music.jpg',
-  beach: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/beach.jpg',
-  concert: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/concert.jpg',
-  band: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/bang.jpg',
-  food: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/food.jpg',
-  party: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/beachparty.jpg',
-  community: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/community.jpg',
+  kite: 'https://raw.githubusercontent.com/rbmns/images/lineup/kite.jpg',
+  surf: 'https://raw.githubusercontent.com/rbmns/images/lineup/surf.jpg',
+  market: 'https://raw.githubusercontent.com/rbmns/images/lineup/shopping.jpg',
+  music: 'https://raw.githubusercontent.com/rbmns/images/lineup/music.jpg',
+  beach: 'https://raw.githubusercontent.com/rbmns/images/lineup/beach.jpg',
+  concert: 'https://raw.githubusercontent.com/rbmns/images/lineup/concert.jpg',
+  band: 'https://raw.githubusercontent.com/rbmns/images/lineup/bang.jpg',
+  food: 'https://raw.githubusercontent.com/rbmns/images/lineup/food.jpg',
+  party: 'https://raw.githubusercontent.com/rbmns/images/lineup/beachparty.jpg',
+  community: 'https://raw.githubusercontent.com/rbmns/images/lineup/community.jpg',
   
   // Special tag combinations
   'beach-party': 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/beachparty.jpg',
