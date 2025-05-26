@@ -25,7 +25,7 @@ export const eventImageMap = {
   'live-band': 'https://raw.githubusercontent.com/rbmns/the-lineup.com/main/img/band.jpg',
   
   // Default fallback
-  default: 'https://github.com/rbmns/the-lineup.com/blob/051135f253c03fb98eaf9bce191ff9c786bdff2c/img/default.jpg'
+  default: 'https://raw.githubusercontent.com/rbmns/the-lineup.com/refs/heads/main/img/default.jpg'
 };
 
 /**
