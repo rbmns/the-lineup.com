@@ -24,6 +24,8 @@ export const useSuggestedFriends = (userId: string | undefined) => {
     setLoading(true);
     
     try {
+      console.log('Fetching suggested friends for user:', userId);
+      
       // First, get current friends to exclude them
       const { data: friendships, error: friendshipsError } = await supabase
         .from('friendships')
@@ -39,29 +41,35 @@ export const useSuggestedFriends = (userId: string | undefined) => {
       const friendIds = friendships?.map(friendship => 
         friendship.user_id === userId ? friendship.friend_id : friendship.user_id
       ) || [];
+      
+      console.log('Current friend IDs:', friendIds);
 
-      // Get events where the current user had "Going" status
-      const { data: userEvents, error: userEventsError } = await supabase
+      // Get events where the current user had "Going" status (including past events)
+      const { data: userRSVPs, error: userRSVPsError } = await supabase
         .from('event_rsvps')
         .select(`
           event_id,
-          events!inner(id, title, start_date, end_date)
+          events!inner(id, title, start_date)
         `)
         .eq('user_id', userId)
         .eq('status', 'Going');
 
-      if (userEventsError) {
-        console.error('Error fetching user events:', userEventsError);
-        throw userEventsError;
+      if (userRSVPsError) {
+        console.error('Error fetching user RSVPs:', userRSVPsError);
+        throw userRSVPsError;
       }
 
-      if (!userEvents || userEvents.length === 0) {
+      console.log('User RSVPs found:', userRSVPs?.length || 0);
+
+      if (!userRSVPs || userRSVPs.length === 0) {
+        console.log('No events found for user');
         setSuggestedFriends([]);
         setLoading(false);
         return;
       }
 
-      const eventIds = userEvents.map(ue => ue.event_id);
+      const eventIds = userRSVPs.map(rsvp => rsvp.event_id);
+      console.log('Event IDs to check:', eventIds);
 
       // Get other users who also had "Going" status for the same events
       const { data: coAttendees, error: coAttendeesError } = await supabase
@@ -81,7 +89,10 @@ export const useSuggestedFriends = (userId: string | undefined) => {
         throw coAttendeesError;
       }
 
-      if (!coAttendees) {
+      console.log('Co-attendees found:', coAttendees?.length || 0);
+
+      if (!coAttendees || coAttendees.length === 0) {
+        console.log('No co-attendees found');
         setSuggestedFriends([]);
         setLoading(false);
         return;
@@ -93,10 +104,12 @@ export const useSuggestedFriends = (userId: string | undefined) => {
 
       // Sort by most recent event first
       const sortedCoAttendees = coAttendees.sort((a, b) => {
-        const dateA = new Date(a.events.start_date || '');
-        const dateB = new Date(b.events.start_date || '');
+        const dateA = new Date(a.events?.start_date || '');
+        const dateB = new Date(b.events?.start_date || '');
         return dateB.getTime() - dateA.getTime();
       });
+
+      console.log('Processing co-attendees...');
 
       sortedCoAttendees.forEach(attendee => {
         const attendeeUserId = attendee.user_id;
@@ -112,18 +125,31 @@ export const useSuggestedFriends = (userId: string | undefined) => {
 
         seenUsers.add(attendeeUserId);
 
-        const profile = attendee.profiles as any;
-        const event = attendee.events as any;
+        const profile = attendee.profiles;
+        const event = attendee.events;
 
-        suggestions.push({
-          ...profile,
-          sharedEventId: event.id,
-          sharedEventTitle: event.title,
-          sharedEventDate: event.start_date,
-          connectionReason: `You both attended "${event.title}"`
-        });
+        if (profile && event) {
+          suggestions.push({
+            id: profile.id,
+            username: profile.username,
+            avatar_url: profile.avatar_url,
+            email: profile.email,
+            location: profile.location,
+            location_category: profile.location_category,
+            status: profile.status,
+            status_details: profile.status_details,
+            tagline: profile.tagline,
+            created_at: profile.created_at,
+            updated_at: profile.updated_at,
+            sharedEventId: event.id,
+            sharedEventTitle: event.title,
+            sharedEventDate: event.start_date,
+            connectionReason: `You both attended "${event.title}"`
+          });
+        }
       });
 
+      console.log('Final suggestions:', suggestions.length);
       setSuggestedFriends(suggestions.slice(0, 10)); // Limit to 10 suggestions
     } catch (error) {
       console.error('Error fetching suggested friends:', error);
