@@ -8,15 +8,16 @@
  */
 export const eventImageMap = {
   // Event type specific fallback images
-  yoga: 'https://res.cloudinary.com/dita7stkt/image/upload/v1745907885/yoga_jftzwz.jpg',
+  yoga: 'https://github.com/rbmns/the-lineup.com/blob/main/img/yoga.jpg',
   kite: 'https://res.cloudinary.com/dita7stkt/image/upload/v1745907656/kite_gzxprm.jpg',
   surf: 'https://res.cloudinary.com/dita7stkt/image/upload/v1745907546/surf_whzonm.jpg',
   market: 'https://res.cloudinary.com/dita7stkt/image/upload/v1745876578/shopping_tqeotp.jpg',
   music: 'https://res.cloudinary.com/dita7stkt/image/upload/v1745876568/music_ppovn1.jpg',
   beach: 'https://res.cloudinary.com/dita7stkt/image/upload/v1745876567/beach_gunp5r.jpg',
   concert: 'https://res.cloudinary.com/dita7stkt/image/upload/v1745876521/concert_ithgk3.jpg',
-  band: 'https://res.cloudinary.com/dita7stkt/image/upload/v1745876517/band_dziaco.jpg',
+  band: 'https://github.com/rbmns/the-lineup.com/blob/e43b1fae25723e90b8de097117d495e8f93e33d0/img/band.jpg',
   food: 'https://res.cloudinary.com/dita7stkt/image/upload/v1745407971/cld-sample-4.jpg',
+  community: 'https://github.com/rbmns/the-lineup.com/blob/e43b1fae25723e90b8de097117d495e8f93e33d0/img/Community.jpg',
   
   // Special tag combinations
   'beach-party': 'https://res.cloudinary.com/dita7stkt/image/upload/v1745876553/beacrave_iebfd8.jpg',
