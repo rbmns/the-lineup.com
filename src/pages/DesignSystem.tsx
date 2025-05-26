@@ -1,330 +1,399 @@
 
 import React from 'react';
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { toast } from "@/components/ui/use-toast"
-import { CategoryPillShowcase } from "@/components/ui/CategoryPillShowcase"
+import { Button } from '@/components/ui/button';
+import { CategoryPill } from '@/components/ui/category-pill';
+import { EventCategoryIcon } from '@/components/ui/event-category-icon';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Calendar, MapPin, Users, Clock, Search, Plus, Heart, Star } from 'lucide-react';
 
-export default function DesignSystem() {
+const DesignSystem = () => {
   return (
-    <div className="container mx-auto p-4 pb-24">
-      <h1 className="text-4xl font-bold tracking-tight mb-8">Design System</h1>
-      
-      {/* Typography section based on brand guidelines */}
-      <section className="mb-12 p-6 bg-white rounded-lg shadow">
-        <h2 className="text-3xl font-semibold tracking-tight mb-6">Typography</h2>
-        
-        <div className="space-y-8">
-          <div>
-            <h3 className="text-2xl font-semibold mb-4">Headings</h3>
-            <div className="space-y-4 border-l-4 border-gray-200 pl-4">
-              <div>
-                <span className="text-sm text-gray-500 block mb-1">Display</span>
-                <p className="text-5xl md:text-6xl font-bold tracking-tight">Display Heading</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500 block mb-1">H1</span>
-                <h1 className="text-4xl font-bold tracking-tight">Heading 1</h1>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500 block mb-1">H2</span>
-                <h2 className="text-3xl font-semibold tracking-tight">Heading 2</h2>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500 block mb-1">H3</span>
-                <h3 className="text-2xl font-semibold">Heading 3</h3>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500 block mb-1">H4</span>
-                <h4 className="text-xl font-medium">Heading 4</h4>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500 block mb-1">H5</span>
-                <h5 className="text-lg font-medium">Heading 5</h5>
-              </div>
-            </div>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4 max-w-6xl">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold tracking-tight mb-2">Design System</h1>
+          <p className="text-xl text-muted-foreground">The lineup's comprehensive design guidelines and components</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Sidebar Navigation */}
+          <div className="lg:col-span-3">
+            <Card className="sticky top-8">
+              <CardHeader>
+                <CardTitle className="text-lg">Components</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <a href="#typography" className="block text-sm hover:text-blue-600">Typography</a>
+                <a href="#colors" className="block text-sm hover:text-blue-600">Colors</a>
+                <a href="#buttons" className="block text-sm hover:text-blue-600">Buttons</a>
+                <a href="#category-pills" className="block text-sm hover:text-blue-600">Category Pills</a>
+                <a href="#forms" className="block text-sm hover:text-blue-600">Forms</a>
+                <a href="#cards" className="block text-sm hover:text-blue-600">Cards</a>
+                <a href="#icons" className="block text-sm hover:text-blue-600">Icons</a>
+                <a href="#spacing" className="block text-sm hover:text-blue-600">Spacing</a>
+              </CardContent>
+            </Card>
           </div>
-          
-          <div>
-            <h3 className="text-2xl font-semibold mb-4">Body Text</h3>
-            <div className="space-y-4 border-l-4 border-gray-200 pl-4">
-              <div>
-                <span className="text-sm text-gray-500 block mb-1">Lead Paragraph</span>
-                <p className="text-xl text-muted-foreground leading-relaxed">This is a lead paragraph that introduces the main content. It should be engaging and informative.</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500 block mb-1">Body</span>
-                <p className="text-base leading-7">This is the standard body text used for the main content. It should be easily readable with good line height.</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500 block mb-1">Small</span>
-                <p className="text-sm text-muted-foreground">This smaller text is used for less important information or notes.</p>
-              </div>
-              <div>
-                <span className="text-sm text-gray-500 block mb-1">Quote</span>
-                <blockquote className="text-lg italic border-l-4 border-primary pl-4 py-2">This is a quotation or a highlighted piece of text that stands out from the rest of the content.</blockquote>
-              </div>
-            </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-9 space-y-12">
+            
+            {/* Typography */}
+            <section id="typography">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Typography</CardTitle>
+                  <CardDescription>Consistent text styles across the platform</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Headings</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <h1 className="text-4xl font-bold tracking-tight">Display Heading</h1>
+                        <code className="text-xs text-gray-500">text-4xl font-bold tracking-tight</code>
+                      </div>
+                      <div>
+                        <h2 className="text-3xl font-semibold tracking-tight">H1 Heading</h2>
+                        <code className="text-xs text-gray-500">text-3xl font-semibold tracking-tight</code>
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-semibold">H2 Heading</h3>
+                        <code className="text-xs text-gray-500">text-2xl font-semibold</code>
+                      </div>
+                      <div>
+                        <h4 className="text-xl font-medium">H3 Heading</h4>
+                        <code className="text-xs text-gray-500">text-xl font-medium</code>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Body Text</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-xl text-muted-foreground leading-relaxed">Lead paragraph text for subtitles and descriptions</p>
+                        <code className="text-xs text-gray-500">text-xl text-muted-foreground leading-relaxed</code>
+                      </div>
+                      <div>
+                        <p className="text-base leading-7">Regular body text for main content and descriptions</p>
+                        <code className="text-xs text-gray-500">text-base leading-7</code>
+                      </div>
+                      <div>
+                        <p className="text-sm text-muted-foreground">Small text for metadata and secondary information</p>
+                        <code className="text-xs text-gray-500">text-sm text-muted-foreground</code>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Mobile Scaling</h4>
+                    <div className="space-y-2 text-sm">
+                      <p><strong>Page Headers:</strong> text-xl on mobile, text-3xl md:text-4xl on desktop</p>
+                      <p><strong>Page Subtitles:</strong> text-sm on mobile, text-lg md:text-xl on desktop</p>
+                      <p><strong>Card Titles:</strong> text-base on mobile, text-lg on desktop</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* Colors */}
+            <section id="colors">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Colors</CardTitle>
+                  <CardDescription>Primary color palette and usage guidelines</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="space-y-2">
+                      <div className="h-12 bg-black rounded"></div>
+                      <div className="text-sm">
+                        <div className="font-medium">Primary</div>
+                        <div className="text-gray-500">#121212</div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="h-12 bg-gray-100 rounded border"></div>
+                      <div className="text-sm">
+                        <div className="font-medium">Secondary</div>
+                        <div className="text-gray-500">#F5F5F5</div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="h-12 bg-blue-500 rounded"></div>
+                      <div className="text-sm">
+                        <div className="font-medium">Blue</div>
+                        <div className="text-gray-500">#3B82F6</div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="h-12 bg-green-600 rounded"></div>
+                      <div className="text-sm">
+                        <div className="font-medium">Success</div>
+                        <div className="text-gray-500">#16A34A</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* Buttons */}
+            <section id="buttons">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Buttons</CardTitle>
+                  <CardDescription>Button variants and states</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Primary Actions</h4>
+                    <div className="flex flex-wrap gap-3">
+                      <Button>Default</Button>
+                      <Button size="sm">Small</Button>
+                      <Button size="lg">Large</Button>
+                      <Button disabled>Disabled</Button>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Secondary Actions</h4>
+                    <div className="flex flex-wrap gap-3">
+                      <Button variant="outline">Outline</Button>
+                      <Button variant="ghost">Ghost</Button>
+                      <Button variant="secondary">Secondary</Button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Special States</h4>
+                    <div className="flex flex-wrap gap-3">
+                      <Button className="bg-green-600 hover:bg-green-700">Going</Button>
+                      <Button variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50 bg-blue-50">Interested</Button>
+                      <Button variant="destructive">Remove</Button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Icon Buttons</h4>
+                    <div className="flex flex-wrap gap-3">
+                      <Button><Plus className="h-4 w-4 mr-2" />Create</Button>
+                      <Button variant="outline"><Search className="h-4 w-4 mr-2" />Search</Button>
+                      <Button size="icon"><Heart className="h-4 w-4" /></Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* Category Pills */}
+            <section id="category-pills">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Category Pills</CardTitle>
+                  <CardDescription>Event type and filter indicators</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Event Types</h4>
+                    <div className="flex flex-wrap gap-2">
+                      <CategoryPill category="music" active={false} />
+                      <CategoryPill category="sport" active={false} />
+                      <CategoryPill category="food" active={false} />
+                      <CategoryPill category="art & culture" active={false} />
+                      <CategoryPill category="community" active={false} />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Active States</h4>
+                    <div className="flex flex-wrap gap-2">
+                      <CategoryPill category="music" active={true} />
+                      <CategoryPill category="sport" active={true} />
+                      <CategoryPill category="food" active={true} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Casual Plan Vibes</h4>
+                    <div className="flex flex-wrap gap-2">
+                      <CategoryPill category="surf" active={false} className="capitalize" />
+                      <CategoryPill category="chill" active={false} className="capitalize" />
+                      <CategoryPill category="party" active={false} className="capitalize" />
+                      <CategoryPill category="coffee" active={false} className="capitalize" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* Forms */}
+            <section id="forms">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Form Elements</CardTitle>
+                  <CardDescription>Input fields and form components</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Text Input</label>
+                      <Input placeholder="Enter text..." />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Search Input</label>
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                        <Input placeholder="Search..." className="pl-10" />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Textarea</label>
+                    <Textarea placeholder="Enter description..." rows={3} />
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* Cards */}
+            <section id="cards">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Card Components</CardTitle>
+                  <CardDescription>Different card layouts and styles</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Event Card (Mobile Optimized)</h4>
+                    <div className="bg-white rounded-lg border border-gray-200 p-4 max-w-sm">
+                      <div className="flex items-center justify-between mb-3">
+                        <CategoryPill category="music" size="sm" />
+                        <Badge variant="secondary">15 going</Badge>
+                      </div>
+                      <h3 className="font-semibold text-base mb-2">Sample Event Title</h3>
+                      <div className="flex items-center text-sm text-gray-600 mb-1">
+                        <Calendar className="h-3.5 w-3.5 mr-1.5" />
+                        <span>Sat, May 25</span>
+                        <span className="mx-2">•</span>
+                        <Clock className="h-3.5 w-3.5 mr-1.5" />
+                        <span>20:00</span>
+                      </div>
+                      <div className="flex items-center text-sm text-gray-600 mb-4">
+                        <MapPin className="h-3.5 w-3.5 mr-1.5" />
+                        <span>Sample Location</span>
+                      </div>
+                      <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                        <div className="flex items-center">
+                          <Avatar className="h-6 w-6 mr-2">
+                            <AvatarFallback className="bg-gray-100">U</AvatarFallback>
+                          </Avatar>
+                          <span className="text-sm text-gray-600">Username</span>
+                        </div>
+                        <Button size="sm" className="bg-green-600 hover:bg-green-700">Going</Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* Icons */}
+            <section id="icons">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Icons</CardTitle>
+                  <CardDescription>Common icons and usage patterns</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="flex items-center space-x-2">
+                      <Calendar className="h-4 w-4" />
+                      <span className="text-sm">Calendar</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Clock className="h-4 w-4" />
+                      <span className="text-sm">Clock</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <MapPin className="h-4 w-4" />
+                      <span className="text-sm">Location</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Users className="h-4 w-4" />
+                      <span className="text-sm">Users</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Search className="h-4 w-4" />
+                      <span className="text-sm">Search</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Plus className="h-4 w-4" />
+                      <span className="text-sm">Add</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Heart className="h-4 w-4" />
+                      <span className="text-sm">Favorite</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Star className="h-4 w-4" />
+                      <span className="text-sm">Star</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* Spacing */}
+            <section id="spacing">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Spacing & Layout</CardTitle>
+                  <CardDescription>Consistent spacing patterns</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Container Padding</h4>
+                    <div className="text-sm space-y-1">
+                      <p><strong>Mobile:</strong> px-4 (16px)</p>
+                      <p><strong>Desktop:</strong> px-6 (24px)</p>
+                      <p><strong>Page sections:</strong> py-8 md:py-12</p>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Card Spacing</h4>
+                    <div className="text-sm space-y-1">
+                      <p><strong>Card padding:</strong> p-4 (16px)</p>
+                      <p><strong>Card gap (mobile):</strong> space-y-3 (12px)</p>
+                      <p><strong>Card gap (desktop):</strong> gap-6 (24px)</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Element Spacing</h4>
+                    <div className="text-sm space-y-1">
+                      <p><strong>Title to subtitle:</strong> mb-2 (8px)</p>
+                      <p><strong>Between sections:</strong> space-y-4 (16px)</p>
+                      <p><strong>Icon to text:</strong> mr-1.5 (6px)</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+
           </div>
         </div>
-      </section>
-      
-      {/* Color Palette Section */}
-      <section className="mb-12 p-6 bg-white rounded-lg shadow">
-        <h2 className="text-3xl font-semibold tracking-tight mb-6">Nature-Inspired Color Palette</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Ocean Theme */}
-          <div className="space-y-2">
-            <h3 className="text-xl font-medium mb-3">Ocean Theme</h3>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-md bg-ocean-deep"></div>
-              <div>
-                <p className="font-medium">Ocean Deep</p>
-                <p className="text-sm text-gray-500">#005F73</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-md bg-ocean-medium"></div>
-              <div>
-                <p className="font-medium">Ocean Medium</p>
-                <p className="text-sm text-gray-500">#0099CC</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-md bg-ocean-light"></div>
-              <div>
-                <p className="font-medium">Ocean Light</p>
-                <p className="text-sm text-gray-500">#94D2BD</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-md bg-ocean-foam"></div>
-              <div>
-                <p className="font-medium">Ocean Foam</p>
-                <p className="text-sm text-gray-500">#E9F5F5</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-md bg-teal"></div>
-              <div>
-                <p className="font-medium">Teal</p>
-                <p className="text-sm text-gray-500">#00CCCC</p>
-              </div>
-            </div>
-          </div>
-          
-          {/* Earth Theme */}
-          <div className="space-y-2">
-            <h3 className="text-xl font-medium mb-3">Earth Theme</h3>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-md bg-sand"></div>
-              <div>
-                <p className="font-medium">Sand</p>
-                <p className="text-sm text-gray-500">#FFCC99</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-md bg-sunset"></div>
-              <div>
-                <p className="font-medium">Sunset</p>
-                <p className="text-sm text-gray-500">#FF9933</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-md bg-coral"></div>
-              <div>
-                <p className="font-medium">Coral</p>
-                <p className="text-sm text-gray-500">#FF6666</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-md bg-amber"></div>
-              <div>
-                <p className="font-medium">Amber</p>
-                <p className="text-sm text-gray-500">#EE9B00</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-md bg-sandstone"></div>
-              <div>
-                <p className="font-medium">Sandstone</p>
-                <p className="text-sm text-gray-500">#CA6702</p>
-              </div>
-            </div>
-          </div>
-          
-          {/* Forest Theme */}
-          <div className="space-y-2">
-            <h3 className="text-xl font-medium mb-3">Forest Theme</h3>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-md bg-leaf"></div>
-              <div>
-                <p className="font-medium">Leaf</p>
-                <p className="text-sm text-gray-500">#66CC66</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-md bg-lime"></div>
-              <div>
-                <p className="font-medium">Lime</p>
-                <p className="text-sm text-gray-500">#99CC33</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-md bg-jungle"></div>
-              <div>
-                <p className="font-medium">Jungle</p>
-                <p className="text-sm text-gray-500">#2D6A4F</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-md bg-palm"></div>
-              <div>
-                <p className="font-medium">Palm</p>
-                <p className="text-sm text-gray-500">#40916C</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-md bg-moss"></div>
-              <div>
-                <p className="font-medium">Moss</p>
-                <p className="text-sm text-gray-500">#74C69D</p>
-              </div>
-            </div>
-          </div>
-          
-          {/* Sky Theme */}
-          <div className="space-y-2">
-            <h3 className="text-xl font-medium mb-3">Sky Theme</h3>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-md bg-dawn"></div>
-              <div>
-                <p className="font-medium">Dawn</p>
-                <p className="text-sm text-gray-500">#FFADAD</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-md bg-dusk"></div>
-              <div>
-                <p className="font-medium">Dusk</p>
-                <p className="text-sm text-gray-500">#9966FF</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-md bg-daylight"></div>
-              <div>
-                <p className="font-medium">Daylight</p>
-                <p className="text-sm text-gray-500">#AED9E0</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-md bg-twilight"></div>
-              <div>
-                <p className="font-medium">Twilight</p>
-                <p className="text-sm text-gray-500">#5E60CE</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-md bg-night"></div>
-              <div>
-                <p className="font-medium">Night</p>
-                <p className="text-sm text-gray-500">#3A0CA3</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      {/* Add the Category Pills Showcase */}
-      <section className="mb-12 p-6 bg-white rounded-lg shadow">
-        <CategoryPillShowcase />
-      </section>
-
-      <section className="mb-8">
-        <h2 className="text-3xl font-semibold tracking-tight mb-6">Buttons</h2>
-        <div className="flex flex-wrap gap-4">
-          <Button>Default Button</Button>
-          <Button variant="outline">Outline Button</Button>
-          <Button variant="secondary">Secondary Button</Button>
-          <Button variant="ghost">Ghost Button</Button>
-          <Button 
-            variant="default"
-            onClick={() => toast({
-              title: "Success",
-              description: "Your action was successful!",
-            })}
-          >
-            Success Toast
-          </Button>
-
-          <Button 
-            variant="destructive"
-            onClick={() => toast({
-              title: "Error",
-              description: "There was an error with your action!",
-              variant: "destructive",
-            })}
-          >
-            Error Toast
-          </Button>
-        </div>
-      </section>
-
-      <section className="mb-8">
-        <h2 className="text-3xl font-semibold tracking-tight mb-6">Cards</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Card Title</CardTitle>
-              <CardDescription>Card Description</CardDescription>
-            </CardHeader>
-            <CardContent>
-              This is the content of the card.
-            </CardContent>
-            <CardFooter>
-              <Button>Action</Button>
-            </CardFooter>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Feature Card</CardTitle>
-              <CardDescription>With custom styling</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-base leading-7">This card demonstrates the use of body text styling from the brand guidelines.</p>
-            </CardContent>
-            <CardFooter>
-              <Button className="bg-ocean-medium hover:bg-ocean-deep">Ocean Button</Button>
-            </CardFooter>
-          </Card>
-        </div>
-      </section>
-
-      <section className="mb-8">
-        <h2 className="text-3xl font-semibold tracking-tight mb-6">Forms</h2>
-        <form className="space-y-4 max-w-md">
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input type="email" id="email" placeholder="Enter your email" />
-          </div>
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input type="password" id="password" placeholder="Enter your password" />
-          </div>
-          <Button>Submit</Button>
-        </form>
-      </section>
+      </div>
     </div>
   );
-}
+};
+
+export default DesignSystem;

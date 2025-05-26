@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -32,6 +31,7 @@ import AdminSettings from "./pages/AdminSettings";
 import VenueEvents from "./pages/VenueEvents";
 import CategoryFilteredEventsPage from "./pages/CategoryFilteredEventsPage";
 import CasualPlans from "./pages/CasualPlans";
+import DesignSystem from "./pages/DesignSystem";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +59,7 @@ const App = () => (
               <Route path="categories/:category" element={<CategoryFilteredEventsPage />} />
               <Route path="admin" element={<Admin />} />
               <Route path="admin/settings" element={<AdminSettings />} />
+              <Route path="design-system" element={<DesignSystem />} />
               <Route path="login" element={<Login />} />
               <Route path="signup" element={<Signup />} />
               <Route path="forgot-password" element={<ForgotPassword />} />

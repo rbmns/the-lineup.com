@@ -5,6 +5,13 @@ import { X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
 
+declare global {
+  interface Window {
+    gtag: (command: string, ...args: any[]) => void;
+    dataLayer: any[];
+  }
+}
+
 export const CookieConsent: React.FC = () => {
   const [showConsent, setShowConsent] = useState(false);
   const isMobile = useIsMobile();
@@ -18,17 +25,36 @@ export const CookieConsent: React.FC = () => {
         setShowConsent(true);
       }, 1000);
       return () => clearTimeout(timer);
+    } else {
+      // Apply previous consent choice
+      const consentValue = hasConsented === 'true';
+      updateGoogleConsent(consentValue);
     }
   }, []);
 
+  const updateGoogleConsent = (hasConsented: boolean) => {
+    // Update Google Tag Manager consent mode
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('consent', 'update', {
+        'analytics_storage': hasConsented ? 'granted' : 'denied',
+        'ad_storage': hasConsented ? 'granted' : 'denied',
+        'ad_user_data': hasConsented ? 'granted' : 'denied',
+        'ad_personalization': hasConsented ? 'granted' : 'denied',
+        'functionality_storage': 'granted', // Always allow functional cookies
+        'security_storage': 'granted', // Always allow security cookies
+      });
+    }
+  };
+
   const acceptCookies = () => {
     localStorage.setItem('cookie-consent', 'true');
+    updateGoogleConsent(true);
     setShowConsent(false);
-    // Optionally enable analytics/tracking cookies here
   };
 
   const declineCookies = () => {
     localStorage.setItem('cookie-consent', 'false');
+    updateGoogleConsent(false);
     setShowConsent(false);
   };
 
@@ -47,11 +73,12 @@ export const CookieConsent: React.FC = () => {
     >
       <div className="container mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-2 md:gap-4">
         <div className="flex-1 pr-2 md:pr-4">
-          <h3 className="font-semibold mb-0.5 md:mb-1 text-sm md:text-base">Cookie Notice</h3>
+          <h3 className="font-semibold mb-0.5 md:mb-1 text-sm md:text-base">Cookie & Privacy Notice</h3>
           <p className="text-xs md:text-sm text-gray-600 mb-1 md:mb-2 leading-tight">
-            We use cookies to enhance your browsing experience, serve personalized ads or content, and analyze our traffic. 
-            By clicking "Accept All", you consent to our use of cookies. 
-            Read our <Link to="/privacy" className="text-blue-600 hover:underline">Privacy Policy</Link> and <Link to="/terms" className="text-blue-600 hover:underline">Terms of Service</Link> for more information.
+            We use essential cookies for functionality and optional analytics cookies (Google Analytics) to improve our service. 
+            We also collect data for casual plans features and user interactions. 
+            By clicking "Accept All", you consent to all cookies and data processing. 
+            Read our <Link to="/privacy" className="text-blue-600 hover:underline">Privacy Policy</Link> and <Link to="/terms" className="text-blue-600 hover:underline">Terms of Service</Link> for details on how we handle your data, including casual plans and social features.
           </p>
         </div>
         
@@ -62,7 +89,7 @@ export const CookieConsent: React.FC = () => {
             onClick={declineCookies}
             className="whitespace-nowrap text-xs h-7 md:h-8"
           >
-            Necessary Only
+            Essential Only
           </Button>
           <Button 
             variant="default" 
