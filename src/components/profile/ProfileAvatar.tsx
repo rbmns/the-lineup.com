@@ -26,6 +26,10 @@ export const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
   // Use processImageUrls to handle both array and string formats
   const avatarUrls = processImageUrls(profile?.avatar_url);
   const avatarUrl = !imageError && avatarUrls.length > 0 ? avatarUrls[0] : '';
+  
+  console.log('ProfileAvatar - profile avatar_url:', profile?.avatar_url);
+  console.log('ProfileAvatar - processed URLs:', avatarUrls);
+  console.log('ProfileAvatar - using URL:', avatarUrl);
     
   return (
     <Avatar className={`${sizeMap[size]} border border-gray-200 shadow-sm overflow-hidden ${className}`}>
@@ -33,7 +37,13 @@ export const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
         src={avatarUrl} 
         alt={profile?.username || ''}
         className="object-cover w-full h-full"
-        onError={() => setImageError(true)}
+        onError={() => {
+          console.log('ProfileAvatar - Image load error for URL:', avatarUrl);
+          setImageError(true);
+        }}
+        onLoad={() => {
+          console.log('ProfileAvatar - Image loaded successfully:', avatarUrl);
+        }}
       />
       <AvatarFallback className="bg-gray-100 text-gray-800">
         {getInitials(profile?.username || profile?.email || '?')}

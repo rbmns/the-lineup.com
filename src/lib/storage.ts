@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 // Function to create a storage bucket if it doesn't exist
 export const ensureBucketExists = async (bucketName: string, isPublic = true) => {
   try {
+    console.log(`Checking if ${bucketName} bucket exists...`);
+    
     // Check if bucket already exists
     const { data: buckets, error: listError } = await supabase.storage.listBuckets();
     
@@ -16,6 +18,7 @@ export const ensureBucketExists = async (bucketName: string, isPublic = true) =>
     const bucketExists = buckets?.some(bucket => bucket.name === bucketName);
     
     if (!bucketExists) {
+      console.log(`Creating ${bucketName} bucket...`);
       // Create the bucket
       const { error } = await supabase.storage.createBucket(bucketName, {
         public: isPublic,
@@ -27,7 +30,7 @@ export const ensureBucketExists = async (bucketName: string, isPublic = true) =>
         return false;
       }
       
-      console.log(`Created ${bucketName} bucket`);
+      console.log(`Created ${bucketName} bucket successfully`);
     } else {
       console.log(`${bucketName} bucket already exists`);
     }
@@ -44,21 +47,24 @@ export const ensureAvatarsBucketExists = async () => {
   return ensureBucketExists('avatars', true);
 };
 
-// Function to upload avatar image
+// Updated function to upload avatar image with better error handling
 export const uploadAvatar = async (userId: string, file: File) => {
   try {
+    console.log('Starting uploadAvatar function for user:', userId);
+    
     // Ensure the avatars bucket exists
     const bucketReady = await ensureAvatarsBucketExists();
     if (!bucketReady) {
       throw new Error('Could not ensure avatars bucket exists');
     }
     
-    // Create a unique file name with timestamp
-    const timestamp = new Date().getTime();
+    // Create a consistent file name (no timestamp to allow overwriting)
     const fileExt = file.name.split('.').pop();
-    const fileName = `${userId}_${timestamp}.${fileExt}`;
+    const fileName = `${userId}.${fileExt}`;
     
-    // Upload the file
+    console.log('Uploading file with name:', fileName);
+    
+    // Upload the file with upsert: true to replace existing
     const { data, error } = await supabase.storage
       .from('avatars')
       .upload(fileName, file, {
@@ -68,14 +74,19 @@ export const uploadAvatar = async (userId: string, file: File) => {
       });
       
     if (error) {
+      console.error('Storage upload error:', error);
       throw error;
     }
+    
+    console.log('File uploaded successfully:', data);
     
     // Get the public URL
     const { data: urlData } = supabase.storage
       .from('avatars')
       .getPublicUrl(fileName);
       
+    console.log('Got public URL:', urlData.publicUrl);
+    
     // Check if the profile exists
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
@@ -83,16 +94,18 @@ export const uploadAvatar = async (userId: string, file: File) => {
       .eq('id', userId)
       .maybeSingle();
       
-    if (profileError && !profileError.message.includes('No rows found')) {
+    if (profileError) {
       console.error("Error fetching profile:", profileError);
       throw profileError;
     }
     
     // Always use an array for avatar_url to match the database schema
     const avatarUrlArray = [urlData.publicUrl];
+    console.log('Setting avatar_url array:', avatarUrlArray);
     
     // If no profile exists, create one
     if (!profileData) {
+      console.log('No profile found, creating new one...');
       // Get user info from auth
       const { data: userData, error: userError } = await supabase.auth.getUser();
       
@@ -121,11 +134,13 @@ export const uploadAvatar = async (userId: string, file: File) => {
         return urlData.publicUrl;
       }
     } else {
+      console.log('Updating existing profile...');
       // Update profile with the new avatar URL array
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ 
-          avatar_url: avatarUrlArray 
+          avatar_url: avatarUrlArray,
+          updated_at: new Date().toISOString()
         })
         .eq('id', userId);
         
@@ -133,9 +148,10 @@ export const uploadAvatar = async (userId: string, file: File) => {
         console.error("Error updating avatar URL:", updateError);
         throw updateError;
       }
+      
+      console.log("Profile updated successfully with avatar URL:", avatarUrlArray);
     }
     
-    console.log("Avatar URL updated successfully to:", avatarUrlArray);
     return urlData.publicUrl;
   } catch (error) {
     console.error('Error uploading avatar:', error);

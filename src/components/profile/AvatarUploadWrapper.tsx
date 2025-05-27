@@ -22,26 +22,41 @@ export const AvatarUploadWrapper: React.FC<AvatarUploadWrapperProps> = ({
   
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file) {
+      console.log('No file selected');
+      return;
+    }
+    
+    console.log('File selected for upload:', file.name);
     
     try {
       // Create preview
       const reader = new FileReader();
       reader.onload = (e) => {
-        setPreview(e.target?.result as string);
+        const previewUrl = e.target?.result as string;
+        console.log('Setting preview URL:', previewUrl);
+        setPreview(previewUrl);
       };
       reader.readAsDataURL(file);
       
       // Upload file
-      console.log('Uploading avatar file:', file.name);
-      await uploadAvatar(file);
-      console.log('Avatar upload completed');
+      console.log('Starting avatar upload...');
+      const result = await uploadAvatar(file);
+      
+      if (result) {
+        console.log('Avatar upload successful:', result);
+      } else {
+        console.log('Avatar upload failed');
+        setPreview(null); // Clear preview on failure
+      }
     } catch (error) {
       console.error('Error in handleFileChange:', error);
+      setPreview(null); // Clear preview on error
     }
   };
   
   const avatarUrl = getAvatarUrl();
+  console.log('Current avatar URL in wrapper:', avatarUrl);
   
   return (
     <div className={`flex flex-col items-center gap-4 ${className}`}>
