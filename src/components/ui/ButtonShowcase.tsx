@@ -44,7 +44,7 @@ export const ButtonShowcase: React.FC = () => {
 
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Full Width Button</h2>
-        <Button size="full">Full Width Button</Button>
+        <Button size="lg" className="w-full">Full Width Button</Button>
       </div>
 
       <div className="space-y-4">
