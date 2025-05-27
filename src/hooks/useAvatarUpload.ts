@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
-import { asTypedParam, asInsertParam } from '@/utils/supabaseTypeUtils';
 
 export const useAvatarUpload = () => {
   const [uploading, setUploading] = useState(false);
@@ -57,27 +56,16 @@ export const useAvatarUpload = () => {
       // Add a timestamp to avoid caching issues
       const cacheBustUrl = `${url}?t=${new Date().getTime()}`;
       
-      // Ensure avatar_url is treated as an array
-      const currentAvatarUrls = Array.isArray(profile.avatar_url) 
-        ? profile.avatar_url || [] 
-        : profile.avatar_url ? [profile.avatar_url] : [];
+      console.log('Updating profile with avatar URL array:', [cacheBustUrl]);
 
-      console.log('Current avatar URLs:', currentAvatarUrls);
-
-      // Update user profile in the database using type-safe parameters
-      const updates = asInsertParam<any>({
-        id: user.id,
-        avatar_url: [cacheBustUrl], // Replace with new avatar rather than append
-        updated_at: new Date().toISOString(),
-      });
-
-      console.log('Updating profile with:', updates);
-
+      // Update user profile in the database - ensure avatar_url is stored as array
       const { error: dbError } = await supabase
         .from('profiles')
-        .upsert(updates, {
-          onConflict: 'id',
-        });
+        .update({ 
+          avatar_url: [cacheBustUrl], // Always store as array
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
 
       if (dbError) {
         console.error('Database update error:', dbError);

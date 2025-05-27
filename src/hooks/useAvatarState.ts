@@ -21,11 +21,12 @@ export const useAvatarState = () => {
     }
   }, [preview, profile, refreshProfile]);
 
-  // Get avatar URL from profile
+  // Get avatar URL from profile - ensure we handle array format
   const getAvatarUrl = () => {
     if (preview) return preview;
     if (!profile?.avatar_url) return null;
     
+    // Ensure we're working with arrays
     const urls = processImageUrls(profile.avatar_url);
     return urls.length > 0 ? urls[0] : null;
   };

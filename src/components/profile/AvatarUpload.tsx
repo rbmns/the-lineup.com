@@ -1,13 +1,14 @@
+
 import React, { useState, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase, ensureAvatarsBucketExists } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Loader2 } from 'lucide-react';
-import { typeAssert } from '@/utils/supabaseUtils';
+import { processImageUrls } from '@/utils/imageUtils';
 
 const AvatarUpload = () => {
   const [uploading, setUploading] = useState(false);
@@ -24,11 +25,6 @@ const AvatarUpload = () => {
 
     setUploading(true);
     try {
-      const bucketExists = await ensureAvatarsBucketExists();
-      if (!bucketExists) {
-        throw new Error("Could not create or access the avatars bucket.");
-      }
-
       const fileExt = file.name.split('.').pop();
       const fileName = `${user?.id}.${fileExt}`;
       const filePath = `${fileName}`;
@@ -45,7 +41,11 @@ const AvatarUpload = () => {
         throw uploadError;
       }
 
-      const newAvatarUrl = `https://vbxhcqlcbusqwsqesoxw.supabase.co/storage/v1/object/public/avatars/${filePath}`;
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const newAvatarUrl = urlData.publicUrl;
       setAvatarUrl(newAvatarUrl);
 
       const success = await updateAvatarInProfile(newAvatarUrl);
@@ -71,8 +71,8 @@ const AvatarUpload = () => {
       
       const { error } = await supabase
         .from('profiles')
-        .update({ avatar_url: [avatarUrl] } as any)
-        .eq('id', user.id as any);
+        .update({ avatar_url: [avatarUrl] }) // Store as array
+        .eq('id', user.id);
         
       if (error) throw error;
       
@@ -99,10 +99,17 @@ const AvatarUpload = () => {
     }
   };
 
+  // Get avatar URL from profile using processImageUrls
+  const displayAvatarUrl = (() => {
+    if (avatarUrl) return avatarUrl;
+    const profileUrls = processImageUrls(profile?.avatar_url);
+    return profileUrls.length > 0 ? profileUrls[0] : `https://avatar.vercel.sh/${profile?.username}.png`;
+  })();
+
   return (
     <div className="flex flex-col items-center space-y-4">
       <Avatar className="h-24 w-24">
-        <AvatarImage src={profile?.avatar_url?.[0] || avatarUrl || `https://avatar.vercel.sh/${profile?.username}.png`} alt="Avatar" />
+        <AvatarImage src={displayAvatarUrl} alt="Avatar" />
         <AvatarFallback>{profile?.username?.substring(0, 2).toUpperCase()}</AvatarFallback>
       </Avatar>
       

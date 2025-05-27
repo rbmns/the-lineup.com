@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '@/utils/profileUtils';
+import { processImageUrls } from '@/utils/imageUtils';
 
 interface ProfileAvatarProps {
   profile: any;
@@ -22,15 +23,9 @@ export const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
     xl: 'h-24 w-24'
   };
   
-  let avatarUrl = '';
-  
-  if (profile?.avatar_url && !imageError) {
-    if (Array.isArray(profile.avatar_url) && profile.avatar_url.length > 0) {
-      avatarUrl = profile.avatar_url[0];
-    } else if (typeof profile.avatar_url === 'string') {
-      avatarUrl = profile.avatar_url;
-    }
-  }
+  // Use processImageUrls to handle both array and string formats
+  const avatarUrls = processImageUrls(profile?.avatar_url);
+  const avatarUrl = !imageError && avatarUrls.length > 0 ? avatarUrls[0] : '';
     
   return (
     <Avatar className={`${sizeMap[size]} border border-gray-200 shadow-sm overflow-hidden ${className}`}>
