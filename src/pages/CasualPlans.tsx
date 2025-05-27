@@ -1,195 +1,204 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/contexts/AuthContext';
-import { useCasualPlans } from '@/hooks/useCasualPlans';
-import { CasualPlanCard } from '@/components/casual-plans/CasualPlanCard';
-import { CreateCasualPlanForm } from '@/components/casual-plans/CreateCasualPlanForm';
-import { EventsPageHeader } from '@/components/events/EventsPageHeader';
+import { toast } from "@/hooks/use-toast"
 import { Button } from '@/components/ui/button';
-import { CategoryPill } from '@/components/ui/category-pill';
-import { Plus } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { CASUAL_PLAN_VIBES } from '@/types/casual-plans';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Calendar, MapPin, User, CheckCircle, AlertCircle } from 'lucide-react';
+import { format } from 'date-fns';
 
-const CasualPlans: React.FC = () => {
-  const { isAuthenticated, user } = useAuth();
-  const navigate = useNavigate();
-  const { plans, isLoading, createPlan, joinPlan, leavePlan, isCreating, isJoining, isLeaving } = useCasualPlans();
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
-  const isMobile = useIsMobile();
+const CasualPlans = () => {
+  const { user } = useAuth();
+  const [plans, setPlans] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [optimisticUpdates, setOptimisticUpdates] = useState({});
 
-  const handleLoginPrompt = () => {
-    navigate('/login');
+  useEffect(() => {
+    fetchPlans();
+  }, []);
+
+  const fetchPlans = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('casual_plans')
+        .select(`
+          *,
+          rsvps:casual_plan_rsvps (
+            status,
+            user_id
+          )
+        `);
+
+      if (error) throw error;
+
+      setPlans(data || []);
+    } catch (error) {
+      console.error('Error fetching plans:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load casual plans. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleCreatePlan = (planData: any) => {
-    createPlan(planData);
-    setShowCreateForm(false);
+  const refetch = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('casual_plans')
+        .select(`
+          *,
+          rsvps:casual_plan_rsvps (
+            status,
+            user_id
+          )
+        `);
+
+      if (error) throw error;
+
+      setPlans(data || []);
+    } catch (error) {
+      console.error('Error refetching plans:', error);
+      toast({
+        title: "Error",
+        description: "Failed to refresh casual plans. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  // Filter plans by selected vibe
-  const filteredPlans = selectedVibe 
-    ? plans.filter(plan => plan.vibe === selectedVibe)
-    : plans;
+  const handleRsvpUpdate = useCallback(async (planId: string, newStatus: 'going' | 'interested' | 'not_going') => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to RSVP to plans.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  // Show different content for non-authenticated users
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <EventsPageHeader 
-          title="Casual Plans" 
-          subtitle="Find spontaneous meetups and create your own casual get-togethers"
-        />
+    try {
+      setOptimisticUpdates(prev => ({ ...prev, [planId]: newStatus }));
 
-        <div className="container mx-auto px-4 py-4 md:py-6">
-          {/* Mobile-optimized action bar */}
-          <div className="space-y-4 mb-6">
-            {/* Vibe filters - horizontal scroll on mobile */}
-            <div className="space-y-2">
-              <h3 className="text-sm font-medium text-gray-700">Filter by vibe:</h3>
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                <CategoryPill
-                  category="all"
-                  active={selectedVibe === null}
-                  onClick={() => setSelectedVibe(null)}
-                  noBorder={true}
-                  className="flex-shrink-0"
-                />
-                {CASUAL_PLAN_VIBES.map((vibe) => (
-                  <CategoryPill
-                    key={vibe}
-                    category={vibe}
-                    active={selectedVibe === vibe}
-                    onClick={() => setSelectedVibe(selectedVibe === vibe ? null : vibe)}
-                    noBorder={true}
-                    className="capitalize flex-shrink-0"
-                  />
-                ))}
-              </div>
-            </div>
-            
-            {/* Create button - full width on mobile */}
-            <Button 
-              onClick={handleLoginPrompt}
-              className="w-full md:w-auto"
-              size="lg"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Post a Plan
-            </Button>
-          </div>
+      const { error } = await supabase
+        .from('casual_plan_rsvps')
+        .upsert({
+          plan_id: planId,
+          user_id: user.id,
+          status: newStatus,
+          is_going: newStatus === 'going',
+          is_interested: newStatus === 'interested'
+        }, {
+          onConflict: 'plan_id,user_id'
+        });
 
-          {/* Login prompt */}
-          <div className="text-center py-12">
-            <p className="text-gray-600 mb-4 text-base">
-              Sign in to see and create casual plans
-            </p>
-            <Button onClick={handleLoginPrompt} size="lg">
-              Sign In
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+      if (error) throw error;
+      
+      await refetch();
+      
+      toast({
+        title: "RSVP updated",
+        description: `You're now marked as ${newStatus.replace('_', ' ')} for this plan.`,
+      });
+    } catch (error) {
+      console.error('Error updating RSVP:', error);
+      setOptimisticUpdates(prev => {
+        const updated = { ...prev };
+        delete updated[planId];
+        return updated;
+      });
+      
+      toast({
+        title: "Error",
+        description: "Failed to update RSVP. Please try again.",
+        variant: "destructive",
+      });
+    }
+  }, [user, supabase, refetch]);
+
+  const getRsvpStatus = (plan: any) => {
+    const rsvp = plan.rsvps?.find((rsvp: any) => rsvp.user_id === user?.id);
+    return rsvp ? rsvp.status : 'not_going';
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <EventsPageHeader 
-        title="Casual Plans" 
-        subtitle="Find spontaneous meetups and create your own casual get-togethers"
-      />
-
-      <div className="container mx-auto px-4 py-4 md:py-6">
-        {/* Mobile-optimized action bar */}
-        <div className="space-y-4 mb-6">
-          {/* Vibe filters - horizontal scroll on mobile */}
-          <div className="space-y-2">
-            <h3 className="text-sm font-medium text-gray-700">Filter by vibe:</h3>
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-              <CategoryPill
-                category="all"
-                active={selectedVibe === null}
-                onClick={() => setSelectedVibe(null)}
-                noBorder={true}
-                className="flex-shrink-0"
-              />
-              {CASUAL_PLAN_VIBES.map((vibe) => (
-                <CategoryPill
-                  key={vibe}
-                  category={vibe}
-                  active={selectedVibe === vibe}
-                  onClick={() => setSelectedVibe(selectedVibe === vibe ? null : vibe)}
-                  noBorder={true}
-                  className="capitalize flex-shrink-0"
-                />
-              ))}
-            </div>
-          </div>
-          
-          {/* Create button - full width on mobile */}
-          <Button 
-            onClick={() => setShowCreateForm(true)}
-            className="w-full md:w-auto"
-            size="lg"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Post a Plan
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-semibold mb-6">Casual Plans</h1>
+      {loading ? (
+        <p>Loading plans...</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {plans.map(plan => (
+            <Card key={plan.id}>
+              <CardHeader>
+                <CardTitle>{plan.title}</CardTitle>
+                <CardDescription>{plan.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Calendar className="h-4 w-4 text-gray-500" />
+                  <span>{format(new Date(plan.date), 'MMMM dd, yyyy')}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <MapPin className="h-4 w-4 text-gray-500" />
+                  <span>{plan.location}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <User className="h-4 w-4 text-gray-500" />
+                  <span>{plan.organizer_name}</span>
+                </div>
+              </CardContent>
+              <CardFooter className="flex justify-between">
+                <div>
+                  {getRsvpStatus(plan) === 'going' ? (
+                    <div className="flex items-center text-green-500">
+                      <CheckCircle className="h-4 w-4 mr-1" />
+                      Going
+                    </div>
+                  ) : getRsvpStatus(plan) === 'interested' ? (
+                    <div className="flex items-center text-yellow-500">
+                      <AlertCircle className="h-4 w-4 mr-1" />
+                      Interested
+                    </div>
+                  ) : null}
+                </div>
+                <div className="space-x-2">
+                  <Button
+                    variant={optimisticUpdates[plan.id] === 'going' || getRsvpStatus(plan) === 'going' ? 'secondary' : 'outline'}
+                    onClick={() => handleRsvpUpdate(plan.id, 'going')}
+                    disabled={optimisticUpdates[plan.id] && optimisticUpdates[plan.id] !== 'going'}
+                  >
+                    {optimisticUpdates[plan.id] === 'going' ? 'Updating...' : 'Going'}
+                  </Button>
+                  <Button
+                    variant={optimisticUpdates[plan.id] === 'interested' || getRsvpStatus(plan) === 'interested' ? 'secondary' : 'outline'}
+                    onClick={() => handleRsvpUpdate(plan.id, 'interested')}
+                    disabled={optimisticUpdates[plan.id] && optimisticUpdates[plan.id] !== 'interested'}
+                  >
+                    {optimisticUpdates[plan.id] === 'interested' ? 'Updating...' : 'Interested'}
+                  </Button>
+                  <Button
+                    variant={getRsvpStatus(plan) === 'not_going' ? 'default' : 'outline'}
+                    onClick={() => handleRsvpUpdate(plan.id, 'not_going')}
+                  >
+                    Not Going
+                  </Button>
+                </div>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      )}
+      {user && (
+        <div className="mt-6">
+          <Button asChild>
+            <Link to="/casual-plans/create">Create a New Plan</Link>
           </Button>
         </div>
-
-        {/* Plans layout - improved list on mobile, grid on desktop */}
-        {isLoading ? (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-black"></div>
-          </div>
-        ) : filteredPlans.length > 0 ? (
-          <div className={isMobile 
-            ? "space-y-0" 
-            : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6"
-          }>
-            {filteredPlans.map((plan) => (
-              <CasualPlanCard
-                key={plan.id}
-                plan={plan}
-                onJoin={joinPlan}
-                onLeave={leavePlan}
-                isJoining={isJoining}
-                isLeaving={isLeaving}
-                isAuthenticated={isAuthenticated}
-                onLoginPrompt={handleLoginPrompt}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-gray-600 mb-4 text-base">
-              {selectedVibe 
-                ? `No ${selectedVibe} plans found. Be the first to create one!`
-                : 'No casual plans found. Be the first to create one!'
-              }
-            </p>
-            <Button 
-              onClick={() => setShowCreateForm(true)}
-              size="lg"
-              className="w-full md:w-auto"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Create a Plan
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {/* Create form modal */}
-      {showCreateForm && (
-        <CreateCasualPlanForm
-          onSubmit={handleCreatePlan}
-          onCancel={() => setShowCreateForm(false)}
-          isCreating={isCreating}
-        />
       )}
     </div>
   );
