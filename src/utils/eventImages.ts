@@ -18,6 +18,7 @@ export const eventImageMap = {
   band: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/band.jpg',
   food: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/food.jpg',
   party: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/beachparty.jpg',
+  sports: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/sports.jpg',
   community: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/community.jpg',
   
   // Special tag combinations
