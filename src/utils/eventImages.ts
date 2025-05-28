@@ -18,7 +18,11 @@ export const eventImageMap = {
   band: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/band.jpg',
   food: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/food.jpg',
   party: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/beachparty.jpg',
+  sports: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/sports.jpg',
   community: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/community.jpg',
+  culture: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/culture.jpg',
+  festival: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/festival.jpg',
+  game: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/game.jpg',
   
   // Special tag combinations
   'beach-party': 'https://raw.githubusercontent.com/rbmns/images/main/lineup/beachparty.jpg',
