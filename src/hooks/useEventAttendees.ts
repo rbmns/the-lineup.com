@@ -128,7 +128,7 @@ export const useEventAttendees = (eventId: string) => {
               rsvp_status: 'Interested' as const
             };
           })
-          .filter((item): item is EventAttendee => item !== null);
+          .filter(Boolean) as EventAttendee[];
 
         setAttendees({
           going: goingAttendees,
