@@ -81,24 +81,24 @@ export const useEventAttendees = (eventId: string) => {
           console.error('Error fetching interested attendees:', interestedError);
         }
 
-        // Process the data correctly with proper type guard
-        const goingAttendees: EventAttendee[] = (goingData || [])
+        // Process the data correctly with proper typing
+        const goingAttendees = (goingData || [])
           .map(item => {
             if (!item.profiles) return null;
             return {
               ...item.profiles,
               rsvp_status: 'Going' as const
-            };
+            } as EventAttendee;
           })
           .filter((item): item is EventAttendee => item !== null);
 
-        const interestedAttendees: EventAttendee[] = (interestedData || [])
+        const interestedAttendees = (interestedData || [])
           .map(item => {
             if (!item.profiles) return null;
             return {
               ...item.profiles,
               rsvp_status: 'Interested' as const
-            };
+            } as EventAttendee;
           })
           .filter((item): item is EventAttendee => item !== null);
 
