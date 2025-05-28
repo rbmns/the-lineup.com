@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, MapPin, User, CheckCircle, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
+import { Helmet } from 'react-helmet-async';
+
+
 
 const CasualPlans = () => {
   const { user } = useAuth();
@@ -136,7 +139,19 @@ const CasualPlans = () => {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-semibold mb-6">Casual Plans</h1>
+
+    <Helmet>
+      <title>The Lineup | Join and create Casual Plans from others nearby</title>
+      <meta name="description" content="Explore the best surf, yoga, and music events in coastal towns. Join the flow with the-lineup.com." />
+      <meta property="og:title" content="The Lineup | Join and create Casual Plans from others nearby" />
+      <meta property="og:description" content="Explore the best surf, yoga, and music events in coastal towns. Join the flow with the-lineup.com." />
+      <meta property="og:image" content="https://raw.githubusercontent.com/rbmns/images/refs/heads/main/lineup/marketing/casualevents.jpg" />
+      <meta name="twitter:card" content="summary_large_image" />
+    </Helmet>
+    
+    <h1 className="text-3xl font-semibold mb-6">Casual Plans</h1>
+
+
       {loading ? (
         <p>Loading plans...</p>
       ) : (
