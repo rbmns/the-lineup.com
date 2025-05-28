@@ -45,28 +45,26 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<LandingPage />} />
-              <Route path="events" element={<EventsPageRefactored />} />
-              <Route path="events/:id" element={<EventDetail />} />
-              <Route path="casual-plans" element={<CasualPlans />} />
-              <Route path="friends" element={<Friends />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="profile/edit" element={<ProfileEdit />} />
-              <Route path="profile/settings" element={<ProfileSettings />} />
-              <Route path="users/:username" element={<UserProfile />} />
-              <Route path="explore" element={<Explore />} />
-              <Route path="home" element={<Home />} />
-              <Route path="venues/:slug" element={<VenueEvents />} />
-              <Route path="categories/:category" element={<CategoryFilteredEventsPage />} />
-              <Route path="admin" element={<Admin />} />
-              <Route path="admin/settings" element={<AdminSettings />} />
-              <Route path="design-system" element={<DesignSystem />} />
-              <Route path="login" element={<Login />} />
-              <Route path="signup" element={<Signup />} />
-              <Route path="forgot-password" element={<ForgotPassword />} />
-              <Route path="reset-password" element={<ResetPassword />} />
-            </Route>
+            <Route path="/" element={<Layout><LandingPage /></Layout>} />
+            <Route path="/events" element={<Layout><EventsPageRefactored /></Layout>} />
+            <Route path="/events/:id" element={<Layout><EventDetail /></Layout>} />
+            <Route path="/casual-plans" element={<Layout><CasualPlans /></Layout>} />
+            <Route path="/friends" element={<Layout><Friends /></Layout>} />
+            <Route path="/profile" element={<Layout><Profile /></Layout>} />
+            <Route path="/profile/edit" element={<Layout><ProfileEdit /></Layout>} />
+            <Route path="/profile/settings" element={<Layout><ProfileSettings /></Layout>} />
+            <Route path="/users/:username" element={<Layout><UserProfile /></Layout>} />
+            <Route path="/explore" element={<Layout><Explore /></Layout>} />
+            <Route path="/home" element={<Layout><Home /></Layout>} />
+            <Route path="/venues/:slug" element={<Layout><VenueEvents /></Layout>} />
+            <Route path="/categories/:category" element={<Layout><CategoryFilteredEventsPage /></Layout>} />
+            <Route path="/admin" element={<Layout><Admin /></Layout>} />
+            <Route path="/admin/settings" element={<Layout><AdminSettings /></Layout>} />
+            <Route path="/design-system" element={<Layout><DesignSystem /></Layout>} />
+            <Route path="/login" element={<Layout><Login /></Layout>} />
+            <Route path="/signup" element={<Layout><Signup /></Layout>} />
+            <Route path="/forgot-password" element={<Layout><ForgotPassword /></Layout>} />
+            <Route path="/reset-password" element={<Layout><ResetPassword /></Layout>} />
             
             {/* Routes without layout */}
             <Route path="/privacy" element={<PrivacyPolicy />} />

@@ -1,8 +1,9 @@
+
 import { useAuth } from "@/contexts/AuthContext";
-import { MainNav } from "@/components/MainNav";
+import MainNav from "@/components/MainNav";
 import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/toaster";
-import CookieConsent from "@/components/CookieConsent";
+import { CookieConsent } from "@/components/CookieConsent";
 import { useEffect } from "react";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { PageWithImageGuide } from './PageWithImageGuide';
@@ -11,7 +12,7 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const Layout = ({ children }: LayoutProps) => {
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
