@@ -32,13 +32,16 @@ export const useEventAttendees = (eventId: string) => {
           .from('event_rsvps')
           .select(`
             status,
-            attendee_profile:profiles!event_rsvps_user_id_fkey(
+            user_id,
+            profiles!event_rsvps_user_id_fkey(
               id,
               username,
               avatar_url,
               email,
               location,
+              location_category,
               status,
+              status_details,
               tagline,
               created_at,
               updated_at
@@ -56,13 +59,16 @@ export const useEventAttendees = (eventId: string) => {
           .from('event_rsvps')
           .select(`
             status,
-            attendee_profile:profiles!event_rsvps_user_id_fkey(
+            user_id,
+            profiles!event_rsvps_user_id_fkey(
               id,
               username,
               avatar_url,
               email,
               location,
+              location_category,
               status,
+              status_details,
               tagline,
               created_at,
               updated_at
@@ -75,16 +81,22 @@ export const useEventAttendees = (eventId: string) => {
           console.error('Error fetching interested attendees:', interestedError);
         }
 
-        // Process the data
-        const goingAttendees = goingData?.map(item => ({
-          ...item.attendee_profile,
-          rsvp_status: 'Going' as const
-        })).filter(Boolean) || [];
+        // Process the data correctly
+        const goingAttendees: EventAttendee[] = goingData?.map(item => {
+          if (!item.profiles) return null;
+          return {
+            ...item.profiles,
+            rsvp_status: 'Going' as const
+          };
+        }).filter(Boolean) || [];
 
-        const interestedAttendees = interestedData?.map(item => ({
-          ...item.attendee_profile,
-          rsvp_status: 'Interested' as const
-        })).filter(Boolean) || [];
+        const interestedAttendees: EventAttendee[] = interestedData?.map(item => {
+          if (!item.profiles) return null;
+          return {
+            ...item.profiles,
+            rsvp_status: 'Interested' as const
+          };
+        }).filter(Boolean) || [];
 
         setAttendees({
           going: goingAttendees,

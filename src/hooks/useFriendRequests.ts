@@ -16,7 +16,7 @@ export const useFriendRequests = (userId: string | undefined) => {
     try {
       setLoading(true);
       
-      // Get requests sent to this user with proper foreign key relationship
+      // Get requests sent to this user
       const { data: friendshipData, error } = await supabase
         .from('friendships')
         .select(`
@@ -25,13 +25,15 @@ export const useFriendRequests = (userId: string | undefined) => {
           created_at,
           user_id,
           friend_id,
-          sender_profile:profiles!friendships_user_id_fkey(
+          profiles!friendships_user_id_fkey(
             id,
             username,
             avatar_url,
             email,
             location,
+            location_category,
             status,
+            status_details,
             tagline
           )
         `)
@@ -46,7 +48,7 @@ export const useFriendRequests = (userId: string | undefined) => {
       }
       
       // Process the data into the correct format
-      const processedRequests = friendshipData?.map(req => ({
+      const processedRequests: FriendRequest[] = friendshipData?.map(req => ({
         id: req.id,
         status: req.status.toLowerCase() as 'pending',
         created_at: req.created_at,
@@ -54,7 +56,7 @@ export const useFriendRequests = (userId: string | undefined) => {
         friend_id: req.friend_id,
         sender_id: req.user_id,
         receiver_id: req.friend_id,
-        profile: req.sender_profile
+        profile: req.profiles as any // Cast to avoid type conflicts since profiles is a single object
       })).filter(req => req.profile) || [];
       
       setRequests(processedRequests);
