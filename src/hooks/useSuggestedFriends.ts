@@ -26,7 +26,7 @@ export const useSuggestedFriends = (userId: string | undefined) => {
     try {
       console.log('Fetching suggested friends for user:', userId);
       
-      // First, get current friends to exclude them - fix the query structure
+      // First, get current friends to exclude them
       const { data: friendships, error: friendshipsError } = await supabase
         .from('friendships')
         .select('user_id, friend_id')
@@ -35,7 +35,6 @@ export const useSuggestedFriends = (userId: string | undefined) => {
 
       if (friendshipsError) {
         console.error('Error fetching friendships:', friendshipsError);
-        // Continue even if this fails
       }
 
       const friendIds = friendships?.map(friendship => 
