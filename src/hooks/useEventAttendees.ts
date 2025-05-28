@@ -81,26 +81,54 @@ export const useEventAttendees = (eventId: string) => {
           console.error('Error fetching interested attendees:', interestedError);
         }
 
-        // Process the data correctly - profiles is a single object, not an array
+        // Process the data correctly - handle both single object and array cases
         const goingAttendees: EventAttendee[] = (goingData || [])
-          .filter(item => item.profiles && typeof item.profiles === 'object')
+          .filter(item => item.profiles)
           .map(item => {
-            const profile = item.profiles as UserProfile;
+            // Handle case where profiles might be an array (take first item) or single object
+            const profile = Array.isArray(item.profiles) ? item.profiles[0] : item.profiles;
+            if (!profile) return null;
+            
             return {
-              ...profile,
+              id: profile.id,
+              username: profile.username,
+              avatar_url: profile.avatar_url,
+              email: profile.email,
+              location: profile.location,
+              location_category: profile.location_category,
+              status: profile.status,
+              status_details: profile.status_details,
+              tagline: profile.tagline,
+              created_at: profile.created_at,
+              updated_at: profile.updated_at,
               rsvp_status: 'Going' as const
             };
-          });
+          })
+          .filter((item): item is EventAttendee => item !== null);
 
         const interestedAttendees: EventAttendee[] = (interestedData || [])
-          .filter(item => item.profiles && typeof item.profiles === 'object')
+          .filter(item => item.profiles)
           .map(item => {
-            const profile = item.profiles as UserProfile;
+            // Handle case where profiles might be an array (take first item) or single object
+            const profile = Array.isArray(item.profiles) ? item.profiles[0] : item.profiles;
+            if (!profile) return null;
+            
             return {
-              ...profile,
+              id: profile.id,
+              username: profile.username,
+              avatar_url: profile.avatar_url,
+              email: profile.email,
+              location: profile.location,
+              location_category: profile.location_category,
+              status: profile.status,
+              status_details: profile.status_details,
+              tagline: profile.tagline,
+              created_at: profile.created_at,
+              updated_at: profile.updated_at,
               rsvp_status: 'Interested' as const
             };
-          });
+          })
+          .filter((item): item is EventAttendee => item !== null);
 
         setAttendees({
           going: goingAttendees,
