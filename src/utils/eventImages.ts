@@ -1,161 +1,252 @@
 
-import { EVENT_CATEGORIES, getCategoryColor, isValidCategory } from '@/utils/categorySystem';
+/**
+ * Utility for handling event images and fallback images
+ */
 
-// Image treatment configuration based on the style guide
-export interface ImageTreatment {
-  overlay?: string;
-  filter?: string;
-  borderRadius?: string;
-  aspectRatio?: string;
-  gradient?: string;
-}
+/**
+ * Default event image mapping by type and tags
+ */
+export const eventImageMap = {
+  // Event type specific fallback images
+  yoga: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/yoga.jpg',
+  kite: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/kite.jpg',
+  surf: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/surf.jpg',
+  market: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/shopping.jpg',
+  music: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/music.jpg',
+  beach: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/beach.jpg',
+  concert: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/concert.jpg',
+  band: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/band.jpg',
+  food: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/food.jpg',
+  party: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/beachparty.jpg',
+  sports: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/sports.jpg',
+  community: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/community.jpg',
+  culture: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/culture.jpg',
+  festival: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/festival.jpg',
+  game: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/game.jpg',
+  
+  // Special tag combinations
+  'beach-party': 'https://raw.githubusercontent.com/rbmns/images/main/lineup/beachparty.jpg',
+  'live-band': 'https://raw.githubusercontent.com/rbmns/images/main/lineup/band.jpg',
+  
+  // Default fallback
+  default: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg'
+};
 
-// Category-specific image treatments
-const CATEGORY_TREATMENTS: Record<string, ImageTreatment> = {
-  festival: {
-    overlay: 'linear-gradient(135deg, rgba(255, 107, 107, 0.3), rgba(255, 107, 107, 0.1))',
-    filter: 'saturate(1.2) brightness(1.1)',
-    borderRadius: '12px',
-    aspectRatio: '16/9'
+/**
+ * Get a fallback image for an event based on its type and tags
+ */
+export const getEventFallbackImage = (eventType: string | undefined, tags?: string[]): string => {
+  // Normalize event type to lowercase
+  const normalizedType = eventType?.toLowerCase() || '';
+  
+  // Check for direct type match first
+  if (normalizedType && eventImageMap[normalizedType as keyof typeof eventImageMap]) {
+    return eventImageMap[normalizedType as keyof typeof eventImageMap];
+  }
+  
+  // If has tags, check for tag-based matches
+  if (tags && Array.isArray(tags) && tags.length > 0) {
+    // Check for special tag combinations first
+    const tagString = tags.join('-').toLowerCase();
+    
+    // Look for specific tag combinations
+    if (tagString.includes('beach') && tagString.includes('party')) {
+      return eventImageMap['beach-party'];
+    }
+    
+    if ((tagString.includes('live') && tagString.includes('band')) || 
+        tagString.includes('live-band')) {
+      return eventImageMap['band'];
+    }
+    
+    // Check individual tags
+    for (const tag of tags) {
+      const normalizedTag = tag.toLowerCase().trim();
+      if (eventImageMap[normalizedTag as keyof typeof eventImageMap]) {
+        return eventImageMap[normalizedTag as keyof typeof eventImageMap];
+      }
+    }
+  }
+  
+  // Return default image if no matches
+  return eventImageMap.default;
+};
+
+// Event type color mapping with nature-inspired colors
+export const eventTypeColors = {
+  // Water-themed events
+  surf: {
+    default: {
+      bg: 'bg-blue-50',
+      text: 'text-blue-600'
+    },
+    active: {
+      bg: 'bg-blue-600',
+      text: 'text-blue-50'
+    }
   },
-  wellness: {
-    overlay: 'linear-gradient(135deg, rgba(78, 205, 196, 0.3), rgba(78, 205, 196, 0.1))',
-    filter: 'sepia(0.1) brightness(1.05)',
-    borderRadius: '12px',
-    aspectRatio: '4/3'
+  kite: {
+    default: {
+      bg: 'bg-cyan-50',
+      text: 'text-cyan-600'
+    },
+    active: {
+      bg: 'bg-cyan-600',
+      text: 'text-cyan-50'
+    }
   },
   beach: {
-    overlay: 'linear-gradient(135deg, rgba(247, 220, 111, 0.2), rgba(247, 220, 111, 0.05))',
-    filter: 'saturate(1.3) brightness(1.15)',
-    borderRadius: '12px',
-    aspectRatio: '16/9'
+    default: {
+      bg: 'bg-amber-50',
+      text: 'text-amber-500'
+    },
+    active: {
+      bg: 'bg-amber-500',
+      text: 'text-amber-50'
+    }
   },
-  music: {
-    overlay: 'linear-gradient(135deg, rgba(210, 180, 222, 0.3), rgba(210, 180, 222, 0.1))',
-    filter: 'contrast(1.1) saturate(1.2)',
-    borderRadius: '12px',
-    aspectRatio: '1/1'
+  water: {
+    default: {
+      bg: 'bg-sky-50',
+      text: 'text-sky-600'
+    },
+    active: {
+      bg: 'bg-sky-600',
+      text: 'text-sky-50'
+    }
   },
-  sports: {
-    overlay: 'linear-gradient(135deg, rgba(88, 214, 141, 0.3), rgba(88, 214, 141, 0.1))',
-    filter: 'contrast(1.15) brightness(1.1)',
-    borderRadius: '12px',
-    aspectRatio: '16/9'
-  },
+  
+  // Earth/food themed events
   food: {
-    overlay: 'linear-gradient(135deg, rgba(250, 219, 216, 0.3), rgba(250, 219, 216, 0.1))',
-    filter: 'saturate(1.4) brightness(1.05)',
-    borderRadius: '12px',
-    aspectRatio: '4/3'
+    default: {
+      bg: 'bg-orange-50',
+      text: 'text-orange-600'
+    },
+    active: {
+      bg: 'bg-orange-600',
+      text: 'text-orange-50'
+    }
   },
-  art: {
-    overlay: 'linear-gradient(135deg, rgba(249, 231, 159, 0.3), rgba(249, 231, 159, 0.1))',
-    filter: 'saturate(1.1) brightness(1.05)',
-    borderRadius: '12px',
-    aspectRatio: '1/1'
+  market: {
+    default: {
+      bg: 'bg-amber-50',
+      text: 'text-amber-600'
+    },
+    active: {
+      bg: 'bg-amber-600', 
+      text: 'text-amber-50'
+    }
   },
-  // Default treatment for other categories
-  default: {
-    overlay: 'linear-gradient(135deg, rgba(149, 165, 166, 0.2), rgba(149, 165, 166, 0.05))',
-    filter: 'brightness(1.05)',
-    borderRadius: '12px',
-    aspectRatio: '16/9'
-  }
-};
-
-// Fallback images for each category
-const CATEGORY_FALLBACK_IMAGES: Record<string, string> = {
-  festival: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&h=600&fit=crop',
-  wellness: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&h=600&fit=crop',
-  kite: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop',
-  beach: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop',
-  game: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&h=600&fit=crop',
-  sports: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop',
-  surf: 'https://images.unsplash.com/photo-1502933691298-84fc14542831?w=800&h=600&fit=crop',
-  party: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&h=600&fit=crop',
-  yoga: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&h=600&fit=crop',
-  community: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=600&fit=crop',
-  music: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=600&fit=crop',
-  food: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=600&fit=crop',
-  market: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=600&fit=crop',
-  art: 'https://images.unsplash.com/photo-1549490349-8643362247b5?w=800&h=600&fit=crop',
-  other: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'
-};
-
-/**
- * Get the appropriate image treatment for a category
- */
-export const getCategoryImageTreatment = (category: string): ImageTreatment => {
-  const normalizedCategory = category?.toLowerCase();
-  return CATEGORY_TREATMENTS[normalizedCategory] || CATEGORY_TREATMENTS.default;
-};
-
-/**
- * Get fallback image for a category
- */
-export const getCategoryFallbackImage = (category: string): string => {
-  const normalizedCategory = category?.toLowerCase();
-  return CATEGORY_FALLBACK_IMAGES[normalizedCategory] || CATEGORY_FALLBACK_IMAGES.other;
-};
-
-/**
- * Apply automatic image treatment based on category
- */
-export const getProcessedImageUrl = (
-  originalUrl: string | undefined, 
-  category: string, 
-  variant: 'card' | 'hero' | 'thumbnail' = 'card'
-): string => {
-  // Return fallback if no image provided
-  if (!originalUrl) {
-    return getCategoryFallbackImage(category);
-  }
-
-  // For external images, return as-is (treatments will be applied via CSS)
-  return originalUrl;
-};
-
-/**
- * Generate CSS styles for image treatment
- */
-export const getImageTreatmentStyles = (category: string): React.CSSProperties => {
-  const treatment = getCategoryImageTreatment(category);
   
-  return {
-    filter: treatment.filter || 'none',
-    borderRadius: treatment.borderRadius || '0',
-    aspectRatio: treatment.aspectRatio || 'auto',
-    position: 'relative',
-    overflow: 'hidden'
-  };
-};
-
-/**
- * Generate overlay styles for image treatment
- */
-export const getImageOverlayStyles = (category: string): React.CSSProperties => {
-  const treatment = getCategoryImageTreatment(category);
+  // Music/Art themed events
+  music: {
+    default: {
+      bg: 'bg-purple-50',
+      text: 'text-purple-600'
+    },
+    active: {
+      bg: 'bg-purple-600',
+      text: 'text-purple-50'
+    }
+  },
+  concert: {
+    default: {
+      bg: 'bg-indigo-50',
+      text: 'text-indigo-600'
+    },
+    active: {
+      bg: 'bg-indigo-600',
+      text: 'text-indigo-50'
+    }
+  },
+  band: {
+    default: {
+      bg: 'bg-violet-50',
+      text: 'text-violet-600'
+    },
+    active: {
+      bg: 'bg-violet-600',
+      text: 'text-violet-50'
+    }
+  },
   
-  return {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: treatment.overlay || 'none',
-    pointerEvents: 'none' as const,
-    zIndex: 1
-  };
-};
-
-/**
- * Check if an image URL is valid
- */
-export const isValidImageUrl = (url: string): boolean => {
-  try {
-    new URL(url);
-    return url.match(/\.(jpg|jpeg|png|gif|webp)$/i) !== null;
-  } catch {
-    return false;
+  // Nature/Wellness themed events
+  yoga: {
+    default: {
+      bg: 'bg-emerald-50',
+      text: 'text-emerald-600'
+    },
+    active: {
+      bg: 'bg-emerald-600',
+      text: 'text-emerald-50'
+    }
+  },
+  wellness: {
+    default: {
+      bg: 'bg-green-50',
+      text: 'text-green-600'
+    },
+    active: {
+      bg: 'bg-green-600',
+      text: 'text-green-50'
+    }
+  },
+  
+  // Community events
+  community: {
+    default: {
+      bg: 'bg-fuchsia-50',
+      text: 'text-fuchsia-600'
+    },
+    active: {
+      bg: 'bg-fuchsia-600',
+      text: 'text-fuchsia-50'
+    }
+  },
+  
+  // Sports events
+  sports: {
+    default: {
+      bg: 'bg-lime-50',
+      text: 'text-lime-600'
+    },
+    active: {
+      bg: 'bg-lime-600',
+      text: 'text-lime-50'
+    }
+  },
+  
+  // Special events
+  party: {
+    default: {
+      bg: 'bg-pink-50',
+      text: 'text-pink-600'
+    },
+    active: {
+      bg: 'bg-pink-600',
+      text: 'text-pink-50'
+    }
+  },
+  festival: {
+    default: {
+      bg: 'bg-rose-50',
+      text: 'text-rose-600'
+    },
+    active: {
+      bg: 'bg-rose-600',
+      text: 'text-rose-50'
+    }
+  },
+  
+  // Default/other events
+  other: {
+    default: {
+      bg: 'bg-gray-50',
+      text: 'text-gray-600'
+    },
+    active: {
+      bg: 'bg-gray-600',
+      text: 'text-gray-50'
+    }
   }
 };

@@ -1,11 +1,10 @@
 
 import { Event } from '@/types';
-import { EVENT_CATEGORIES, EVENT_VIBES } from '@/utils/categorySystem';
 
 export type FormValues = {
   title: string;
   description: string;
-  event_category: string;
+  event_type: string;
   start_date: Date;
   start_time: string;
   end_date: Date;
@@ -16,26 +15,24 @@ export type FormValues = {
   booking_link: string;
   extra_info: string;
   tags: string;
-  vibe?: string;
 };
 
 export type SafeEventData = {
   id?: string;
   title?: string;
   description?: string;
-  event_category?: string; // Updated from event_type
+  event_type?: string;
   start_time?: string;
   end_time?: string;
-  start_date?: string;
+  start_date?: string; // Added this field
   venue_id?: string;
   organizer_link?: string;
-  fee?: number;
+  fee?: number; // Changed from string | number to number to match Event type
   booking_link?: string;
   extra_info?: string;
   tags?: string[] | string;
-  created_by?: string;
-  slug?: string;
-  vibe?: string;
+  created_by?: string; // Added this property to match usage in EventFormUtils.ts
+  slug?: string; // Added slug property to fix the TypeScript error
 };
 
 export interface EventFormProps {
@@ -43,6 +40,8 @@ export interface EventFormProps {
   isEditMode?: boolean;
 }
 
-export const EVENT_TYPES = EVENT_CATEGORIES; // For backwards compatibility
-
-export { EVENT_CATEGORIES, EVENT_VIBES };
+export const EVENT_TYPES = [
+  'music', 'art', 'food', 'tech', 'sports',
+  'community', 'business', 'education', 'wellness',
+  'outdoor', 'social', 'networking', 'other'
+];

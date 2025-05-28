@@ -110,24 +110,6 @@ export type Database = {
         }
         Relationships: []
       }
-      event_categories: {
-        Row: {
-          created_at: string
-          id: string
-          name: string | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          name?: string | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          name?: string | null
-        }
-        Relationships: []
-      }
       event_rsvps: {
         Row: {
           created_at: string | null
@@ -163,6 +145,24 @@ export type Database = {
           },
         ]
       }
+      event_types: {
+        Row: {
+          created_at: string
+          id: string
+          name: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string | null
+        }
+        Relationships: []
+      }
       event_types_tags: {
         Row: {
           created_at: string
@@ -187,7 +187,7 @@ export type Database = {
             foreignKeyName: "event_types_tags_event_type_fkey"
             columns: ["event_type"]
             isOneToOne: false
-            referencedRelation: "event_categories"
+            referencedRelation: "event_types"
             referencedColumns: ["name"]
           },
           {
@@ -226,7 +226,7 @@ export type Database = {
           destination: string | null
           end_date: string | null
           end_time: string | null
-          event_category: string | null
+          event_type: string | null
           "Extra info": string | null
           fee: number | null
           id: string
@@ -250,7 +250,7 @@ export type Database = {
           destination?: string | null
           end_date?: string | null
           end_time?: string | null
-          event_category?: string | null
+          event_type?: string | null
           "Extra info"?: string | null
           fee?: number | null
           id?: string
@@ -274,7 +274,7 @@ export type Database = {
           destination?: string | null
           end_date?: string | null
           end_time?: string | null
-          event_category?: string | null
+          event_type?: string | null
           "Extra info"?: string | null
           fee?: number | null
           id?: string
@@ -299,10 +299,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "events_event_category_fkey"
-            columns: ["event_category"]
+            foreignKeyName: "events_event_type_fkey"
+            columns: ["event_type"]
             isOneToOne: false
-            referencedRelation: "event_categories"
+            referencedRelation: "event_types"
             referencedColumns: ["name"]
           },
           {
