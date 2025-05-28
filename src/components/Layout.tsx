@@ -1,36 +1,20 @@
 
-import { useAuth } from "@/contexts/AuthContext";
-import MainNav from "@/components/MainNav";
-import { Footer } from "@/components/Footer";
-import { Toaster } from "@/components/ui/toaster";
-import { CookieConsent } from "@/components/CookieConsent";
-import { useEffect } from "react";
-import { useNavigate, useLocation } from 'react-router-dom';
+import React from 'react';
+import { Outlet } from 'react-router-dom';
+import MainNav from './MainNav';
+import { Footer } from './ui/footer';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-const Layout = ({ children }: LayoutProps) => {
-  const { user, loading, signOut } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    if (!loading && !user && location.pathname !== '/login' && location.pathname !== '/register') {
-      navigate('/login');
-    }
-  }, [user, loading, navigate, location]);
-
+const Layout = () => {
+  useScrollToTop();
+  
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col">
       <MainNav />
       <main className="flex-1">
-        {children}
+        <Outlet />
       </main>
       <Footer />
-      <Toaster />
-      <CookieConsent />
     </div>
   );
 };

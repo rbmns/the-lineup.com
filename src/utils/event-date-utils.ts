@@ -49,53 +49,20 @@ export const getEventEndDateTime = (event: Event): string => {
  */
 export const combineDateAndTime = (dateStr: string, timeStr: string): string => {
   try {
-    // Validate inputs
-    if (!dateStr || !timeStr) {
-      console.warn('combineDateAndTime: Missing dateStr or timeStr', { dateStr, timeStr });
-      return '';
-    }
-
     // Convert the date string to a Date object
     const date = new Date(dateStr);
     
-    // Check if date is valid
-    if (isNaN(date.getTime())) {
-      console.warn('combineDateAndTime: Invalid date string', dateStr);
-      return '';
-    }
-    
     // Extract hours and minutes from the time string
-    const timeParts = timeStr.split(':');
-    if (timeParts.length < 2) {
-      console.warn('combineDateAndTime: Invalid time format', timeStr);
-      return '';
-    }
-    
-    const hours = parseInt(timeParts[0], 10);
-    const minutes = parseInt(timeParts[1], 10);
-    
-    // Validate hours and minutes
-    if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
-      console.warn('combineDateAndTime: Invalid hours or minutes', { hours, minutes, timeStr });
-      return '';
-    }
+    const [hours, minutes] = timeStr.split(':').map(Number);
     
     // Set the hours and minutes on the date
     date.setHours(hours);
     date.setMinutes(minutes);
-    date.setSeconds(0);
-    date.setMilliseconds(0);
-    
-    // Check if the resulting date is valid
-    if (isNaN(date.getTime())) {
-      console.warn('combineDateAndTime: Invalid combined date/time', { dateStr, timeStr });
-      return '';
-    }
     
     // Return an ISO string
     return date.toISOString();
   } catch (error) {
-    console.error('Error combining date and time:', error, { dateStr, timeStr });
+    console.error('Error combining date and time:', error);
     return '';
   }
 };

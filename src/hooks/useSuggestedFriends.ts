@@ -35,6 +35,7 @@ export const useSuggestedFriends = (userId: string | undefined) => {
 
       if (friendshipsError) {
         console.error('Error fetching friendships:', friendshipsError);
+        throw friendshipsError;
       }
 
       const friendIds = friendships?.map(friendship => 
@@ -52,9 +53,7 @@ export const useSuggestedFriends = (userId: string | undefined) => {
 
       if (userRSVPsError) {
         console.error('Error fetching user RSVPs:', userRSVPsError);
-        setSuggestedFriends([]);
-        setLoading(false);
-        return;
+        throw userRSVPsError;
       }
 
       console.log('User RSVPs found:', userRSVPs?.length || 0);
@@ -72,16 +71,17 @@ export const useSuggestedFriends = (userId: string | undefined) => {
       // Get other users who also had "Going" status for the same events
       const { data: coAttendees, error: coAttendeesError } = await supabase
         .from('event_rsvps')
-        .select('user_id, event_id')
+        .select(`
+          user_id,
+          event_id
+        `)
         .in('event_id', eventIds)
         .eq('status', 'Going')
         .neq('user_id', userId);
 
       if (coAttendeesError) {
         console.error('Error fetching co-attendees:', coAttendeesError);
-        setSuggestedFriends([]);
-        setLoading(false);
-        return;
+        throw coAttendeesError;
       }
 
       console.log('Co-attendees found:', coAttendees?.length || 0);
@@ -93,8 +93,11 @@ export const useSuggestedFriends = (userId: string | undefined) => {
         return;
       }
 
-      // Get unique user IDs and filter out existing friends and dismissed suggestions
+      // Get unique user IDs and their profile data
       const uniqueUserIds = [...new Set(coAttendees.map(attendee => attendee.user_id))];
+      console.log('Unique co-attendee user IDs:', uniqueUserIds);
+
+      // Filter out existing friends and dismissed suggestions
       const filteredUserIds = uniqueUserIds.filter(id => 
         !friendIds.includes(id) && !dismissedSuggestions.includes(id)
       );
@@ -116,9 +119,7 @@ export const useSuggestedFriends = (userId: string | undefined) => {
 
       if (profilesError) {
         console.error('Error fetching profiles:', profilesError);
-        setSuggestedFriends([]);
-        setLoading(false);
-        return;
+        throw profilesError;
       }
 
       console.log('Profiles found:', profiles?.length || 0);
@@ -131,9 +132,7 @@ export const useSuggestedFriends = (userId: string | undefined) => {
 
       if (eventsError) {
         console.error('Error fetching events:', eventsError);
-        setSuggestedFriends([]);
-        setLoading(false);
-        return;
+        throw eventsError;
       }
 
       console.log('Events found:', events?.length || 0);
