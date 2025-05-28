@@ -104,7 +104,7 @@ export const useEventAttendees = (eventId: string) => {
               rsvp_status: 'Going' as const
             };
           })
-          .filter((item): item is EventAttendee => item !== null);
+          .filter(Boolean) as EventAttendee[];
 
         const interestedAttendees: EventAttendee[] = (interestedData || [])
           .filter(item => item.profiles)
