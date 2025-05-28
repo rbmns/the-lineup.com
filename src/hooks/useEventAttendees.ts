@@ -81,26 +81,26 @@ export const useEventAttendees = (eventId: string) => {
           console.error('Error fetching interested attendees:', interestedError);
         }
 
-        // Process the data correctly with proper typing
-        const goingAttendees = (goingData || [])
+        // Process the data correctly - profiles is a single object, not an array
+        const goingAttendees: EventAttendee[] = (goingData || [])
+          .filter(item => item.profiles && typeof item.profiles === 'object')
           .map(item => {
-            if (!item.profiles) return null;
+            const profile = item.profiles as UserProfile;
             return {
-              ...item.profiles,
+              ...profile,
               rsvp_status: 'Going' as const
-            } as EventAttendee;
-          })
-          .filter((item): item is EventAttendee => item !== null);
+            };
+          });
 
-        const interestedAttendees = (interestedData || [])
+        const interestedAttendees: EventAttendee[] = (interestedData || [])
+          .filter(item => item.profiles && typeof item.profiles === 'object')
           .map(item => {
-            if (!item.profiles) return null;
+            const profile = item.profiles as UserProfile;
             return {
-              ...item.profiles,
+              ...profile,
               rsvp_status: 'Interested' as const
-            } as EventAttendee;
-          })
-          .filter((item): item is EventAttendee => item !== null);
+            };
+          });
 
         setAttendees({
           going: goingAttendees,
