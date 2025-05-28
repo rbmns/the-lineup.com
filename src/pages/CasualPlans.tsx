@@ -141,9 +141,9 @@ const CasualPlans = () => {
     <div className="container mx-auto py-8">
 
     <Helmet>
-      <title>The Lineup | Join and create Casual Plans from others nearby</title>
+      <title>the lineup | Join and create Casual Plans from others nearby</title>
       <meta name="description" content="Explore the best surf, yoga, and music events in coastal towns. Join the flow with the-lineup.com." />
-      <meta property="og:title" content="The Lineup | Join and create Casual Plans from others nearby" />
+      <meta property="og:title" content="the lineup | Join and create Casual Plans with others nearby" />
       <meta property="og:description" content="Explore the best surf, yoga, and music events in coastal towns. Join the flow with the-lineup.com." />
       <meta property="og:image" content="https://raw.githubusercontent.com/rbmns/images/refs/heads/main/lineup/marketing/casualevents.jpg" />
       <meta name="twitter:card" content="summary_large_image" />
