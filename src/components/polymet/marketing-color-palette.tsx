@@ -1,301 +1,145 @@
+
 import React from 'react';
 import { brandColors } from '@/components/polymet/brand-colors';
-import { cn } from '@/lib/utils';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-// Extended marketing color palette based on the brand colors
-export const marketingColors = {
-  // Core brand colors
-  primary: brandColors.primary,
-  secondary: brandColors.secondary,
-
-  // Extended vibrant palette for marketing
-  vibrant: {
-    ...brandColors.vibrant,
-    // Additional vibrant colors
-    purple: "#5D3FD3",
-    pink: "#F72585",
-    amber: "#FF9E00",
-    lime: "#84CC16",
-    sky: "#00B4D8",
-    rose: "#E11D48",
-  },
-
-  // Extended nature palette for marketing
-  nature: {
-    ...brandColors.nature,
-    // Additional nature colors
-    leaf: "#386641",
-    sand: "#E9C46A",
-    sky: "#90E0EF",
-    sunset: "#E9C46A",
-    forest: "#1B4332",
-  },
-
-  // Gradient combinations for marketing materials
-  gradients: {
-    oceanSunset: "bg-gradient-to-r from-[#005F73] to-[#EE6C4D]",
-    purpleRose: "bg-gradient-to-r from-[#5D3FD3] to-[#E11D48]",
-    seafoamTeal: "bg-gradient-to-r from-[#2A9D8F] to-[#005F73]",
-    sunsetAmber: "bg-gradient-to-r from-[#E9C46A] to-[#FF9E00]",
-    coralPink: "bg-gradient-to-r from-[#EE6C4D] to-[#F72585]",
-    oceanDeep: "bg-gradient-to-r from-[#003944] to-[#005F73]",
-    sandyShores: "bg-gradient-to-r from-[#F4E7D3] to-[#E9C46A]",
-  },
-
-  // Overlay colors with transparency for images
-  overlays: {
-    dark: "bg-black/50",
-    light: "bg-white/20",
-    ocean: "bg-[#005F73]/70",
-    coral: "bg-[#EE6C4D]/60",
-    seafoam: "bg-[#2A9D8F]/60",
-    sand: "bg-[#F4E7D3]/60",
-  },
-
-  // Text colors optimized for marketing
-  text: {
-    onDark: "text-white",
-    onLight: "text-[#1C1C1C]",
-    accent: "text-[#005F73]",
-    highlight: "text-[#EE6C4D]",
-    muted: "text-[#5C5C5C]",
-    sand: "text-[#F4E7D3]",
-  },
-
-  // Background patterns
-  patterns: {
-    dots: "bg-[radial-gradient(#5C5C5C_1px,transparent_1px)] bg-[length:20px_20px]",
-    lines:
-      "bg-[linear-gradient(to_right,#E5E5E5_1px,transparent_1px)] bg-[length:20px_20px]",
-    waves:
-      "bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAwIDIwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0wIDEwQzMwIDEwIDMwIDAgNTAgMEM3MCAwIDcwIDEwIDEwMCAxMEMxMzAgMTAgMTMwIDAgMTUwIDBDMTcwIDAgMTcwIDEwIDIwMCAxMFYyMEgwVjEwWiIgZmlsbD0iIzAwNUY3MyIgZmlsbC1vcGFjaXR5PSIwLjEiLz48L3N2Zz4=')]",
-    beach:
-      "bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjAwIDIwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0wIDEwQzMwIDEwIDMwIDAgNTAgMEM3MCAwIDcwIDEwIDEwMCAxMEMxMzAgMTAgMTMwIDAgMTUwIDBDMTcwIDAgMTcwIDEwIDIwMCAxMFYyMEgwVjEwWiIgZmlsbD0iI0U5QzQ2QSIgZmlsbC1vcGFjaXR5PSIwLjIiLz48L3N2Zz4=')]",
-  },
-
-  // Social media specific colors
-  social: {
-    instagram: {
-      gradient: "bg-gradient-to-tr from-[#FCAF45] via-[#E1306C] to-[#5851DB]",
-      text: "text-white",
-    },
-    facebook: {
-      bg: "bg-[#1877F2]",
-      text: "text-white",
-    },
-    twitter: {
-      bg: "bg-[#1DA1F2]",
-      text: "text-white",
-    },
-  },
-
-  // Seasonal color themes
-  seasonal: {
-    summer: {
-      primary: "#FF9E00", // Amber
-      secondary: "#90E0EF", // Sky blue
-      accent: "#FF6B4A", // Coral
-    },
-    winter: {
-      primary: "#003944", // Deep ocean
-      secondary: "#F4E7D3", // Sand beige
-      accent: "#5D3FD3", // Purple
-    },
-  },
-};
-
-interface ColorSwatchProps {
-  color: string;
+interface ColorCardProps {
   name: string;
-  hex?: string;
-  className?: string;
+  value: string;
+  textColor?: string;
 }
 
-function ColorSwatch({ color, name, hex, className }: ColorSwatchProps) {
+const ColorCard: React.FC<ColorCardProps> = ({ name, value, textColor = 'text-white' }) => (
+  <div 
+    className={`p-4 rounded-lg ${textColor}`}
+    style={{ backgroundColor: value }}
+  >
+    <div className="font-medium">{name}</div>
+    <div className="text-sm opacity-90">{value}</div>
+  </div>
+);
+
+const MarketingColorPalette: React.FC = () => {
+  const vibrantColors = brandColors.vibrant || { 500: '#ec4899' };
+  const natureColors = brandColors.nature || { 500: '#22c55e' };
+
+  const colorPalettes = {
+    vibrant: {
+      name: 'Vibrant',
+      colors: vibrantColors
+    },
+    nature: {
+      name: 'Nature', 
+      colors: natureColors
+    }
+  };
+
+  const gradientExamples = [
+    {
+      name: 'Ocean Sunset',
+      gradient: 'linear-gradient(135deg, #0891b2 0%, #f59e0b 100%)',
+      text: 'text-white'
+    },
+    {
+      name: 'Beach Vibes',
+      gradient: 'linear-gradient(135deg, #06b6d4 0%, #84cc16 100%)',
+      text: 'text-white'
+    }
+  ];
+
+  const socialMediaColors = [
+    { 
+      name: 'Instagram Story',
+      bg: brandColors.vibrant?.[500] || '#ec4899',
+      text: 'text-white' 
+    },
+    { 
+      name: 'Facebook Post',
+      bg: brandColors.primary[500],
+      text: 'text-white' 
+    },
+    { 
+      name: 'Twitter Header',
+      bg: brandColors.nature?.[500] || '#22c55e',
+      text: 'text-white' 
+    }
+  ];
+
+  // Type-safe access to brand colors
+  const getPrimaryColorValue = (shade: string): string => {
+    return (brandColors.primary as any)[shade] || '#0891b2';
+  };
+
+  const getSecondaryColorValue = (shade: string): string => {
+    return (brandColors.secondary as any)[shade] || '#f59e0b';
+  };
+
   return (
-    <div className={cn("flex flex-col", className)}>
-      <div
-        className="h-16 w-full rounded-md shadow-sm mb-2"
-        style={{ backgroundColor: hex || color }}
-      />
+    <div className="space-y-8 p-6">
+      <div>
+        <h2 className="text-2xl font-bold mb-4">Marketing Color Palette</h2>
+        <p className="text-gray-600 mb-6">
+          A comprehensive color system for marketing materials and brand applications.
+        </p>
+      </div>
 
-      <div className="text-sm font-medium">{name}</div>
-      {hex && <div className="text-xs text-gray-500">{hex}</div>}
-    </div>
-  );
-}
-
-interface GradientSwatchProps {
-  gradient: string;
-  name: string;
-  className?: string;
-}
-
-function GradientSwatch({ gradient, name, className }: GradientSwatchProps) {
-  return (
-    <div className={cn("flex flex-col", className)}>
-      <div className={cn("h-16 w-full rounded-md shadow-sm mb-2", gradient)} />
-
-      <div className="text-sm font-medium">{name}</div>
-    </div>
-  );
-}
-
-interface PatternSwatchProps {
-  pattern: string;
-  name: string;
-  className?: string;
-}
-
-function PatternSwatch({ pattern, name, className }: PatternSwatchProps) {
-  return (
-    <div className={cn("flex flex-col", className)}>
-      <div className={cn("h-16 w-full rounded-md shadow-sm mb-2", pattern)} />
-
-      <div className="text-sm font-medium">{name}</div>
-    </div>
-  );
-}
-
-interface MarketingColorPaletteProps {
-  className?: string;
-}
-
-export default function MarketingColorPalette({
-  className,
-}: MarketingColorPaletteProps) {
-  return (
-    <div className={cn("space-y-8", className)}>
+      {/* Primary Colors */}
       <section>
-        <h2 className="text-xl font-semibold mb-4 text-primary">
-          Extended Vibrant Colors for Marketing
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {Object.entries(marketingColors.vibrant).map(([name, color]) => (
-            <ColorSwatch key={name} color={color} name={name} hex={color} />
+        <h3 className="text-xl font-semibold mb-4">Primary Colors</h3>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {Object.entries(brandColors.primary).map(([shade, color]) => (
+            <ColorCard
+              key={shade}
+              name={`Primary ${shade}`}
+              value={color}
+              textColor={['50', '100'].includes(shade) ? 'text-gray-800' : 'text-white'}
+            />
           ))}
         </div>
       </section>
 
+      {/* Secondary Colors */}
       <section>
-        <h2 className="text-xl font-semibold mb-4 text-primary">
-          Extended Nature Colors for Marketing
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {Object.entries(marketingColors.nature).map(([name, color]) => (
-            <ColorSwatch key={name} color={color} name={name} hex={color} />
+        <h3 className="text-xl font-semibold mb-4">Secondary Colors</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {Object.entries(brandColors.secondary).map(([shade, color]) => (
+            <ColorCard
+              key={shade}
+              name={`Secondary ${shade}`}
+              value={color}
+              textColor={['50', '100'].includes(shade) ? 'text-gray-800' : 'text-white'}
+            />
           ))}
         </div>
       </section>
 
+      {/* Accent Colors */}
       <section>
-        <h2 className="text-xl font-semibold mb-4 text-primary">
-          Marketing Gradients
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {Object.entries(marketingColors.gradients).map(([name, gradient]) => (
-            <GradientSwatch key={name} gradient={gradient} name={name} />
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-4 text-primary">
-          Overlay Colors
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {Object.entries(marketingColors.overlays).map(([name, overlay]) => (
-            <div key={name} className="flex flex-col">
-              <div className="relative h-16 w-full rounded-md shadow-sm mb-2 overflow-hidden">
-                <img
-                  src="https://picsum.photos/seed/overlay123/400/200"
-                  alt="Sample"
-                  className="w-full h-full object-cover"
-                />
-
-                <div className={cn("absolute inset-0", overlay)}></div>
-              </div>
-              <div className="text-sm font-medium">{name}</div>
-              <div className="text-xs text-gray-500">{overlay}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-4 text-primary">Text Colors</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {Object.entries(marketingColors.text).map(([name, textColor]) => (
-            <div key={name} className="flex flex-col">
-              <div
-                className={cn(
-                  "h-16 w-full rounded-md shadow-sm mb-2 flex items-center justify-center font-medium",
-                  textColor,
-                  name.includes("onDark")
-                    ? "bg-[#1C1C1C]"
-                    : "bg-white border border-gray-200"
-                )}
-              >
-                Sample Text
-              </div>
-              <div className="text-sm font-medium">{name}</div>
-              <div className="text-xs text-gray-500">{textColor}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-4 text-primary">
-          Background Patterns
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Object.entries(marketingColors.patterns).map(([name, pattern]) => (
-            <PatternSwatch key={name} pattern={pattern} name={name} />
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-4 text-primary">
-          Social Media Colors
-        </h2>
+        <h3 className="text-xl font-semibold mb-4">Accent Colors</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {Object.entries(marketingColors.social).map(([platform, colors]) => (
-            <div key={platform} className="flex flex-col">
-              <div
-                className={cn(
-                  "h-16 w-full rounded-md shadow-sm mb-2 flex items-center justify-center",
-                  colors.bg || colors.gradient,
-                  colors.text
-                )}
-              >
-                {platform.charAt(0).toUpperCase() + platform.slice(1)}
-              </div>
-              <div className="text-sm font-medium">
-                {platform.charAt(0).toUpperCase() + platform.slice(1)}
-              </div>
-            </div>
+          {Object.entries(brandColors.accent).map(([name, color]) => (
+            <ColorCard
+              key={name}
+              name={`Accent ${name.charAt(0).toUpperCase() + name.slice(1)}`}
+              value={color}
+            />
           ))}
         </div>
       </section>
 
+      {/* Extended Palette */}
       <section>
-        <h2 className="text-xl font-semibold mb-4 text-primary">
-          Seasonal Color Themes
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {Object.entries(marketingColors.seasonal).map(([season, colors]) => (
-            <div key={season} className="space-y-3">
-              <h3 className="text-lg font-medium capitalize">{season}</h3>
-              <div className="grid grid-cols-3 gap-3">
-                {Object.entries(colors).map(([colorName, colorValue]) => (
-                  <ColorSwatch
-                    key={colorName}
-                    color={colorValue}
-                    name={colorName}
-                    hex={colorValue}
+        <h3 className="text-xl font-semibold mb-4">Extended Palette</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {Object.entries(colorPalettes).map(([key, palette]) => (
+            <div key={key}>
+              <h4 className="text-lg font-medium mb-3">{palette.name}</h4>
+              <div className="grid grid-cols-2 gap-2">
+                {Object.entries(palette.colors).map(([shade, color]) => (
+                  <ColorCard
+                    key={shade}
+                    name={shade}
+                    value={color}
+                    textColor={['50', '100'].includes(shade) ? 'text-gray-800' : 'text-white'}
                   />
                 ))}
               </div>
@@ -304,79 +148,75 @@ export default function MarketingColorPalette({
         </div>
       </section>
 
+      {/* Gradient Examples */}
       <section>
-        <h2 className="text-xl font-semibold mb-4 text-primary">
-          Usage Examples
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Social Media Post</h3>
+        <h3 className="text-xl font-semibold mb-4">Gradient Examples</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {gradientExamples.map((example, index) => (
             <div
-              className={`${marketingColors.gradients.oceanSunset} p-6 rounded-lg text-white`}
+              key={index}
+              className={`p-6 rounded-lg ${example.text}`}
+              style={{ background: example.gradient }}
             >
-              <h4 className="text-xl font-bold mb-2">Discover Local Events</h4>
-              <p className="opacity-90">
-                Find and join events that match your interests
-              </p>
+              <h4 className="text-lg font-medium">{example.name}</h4>
+              <p className="text-sm opacity-90">Perfect for hero sections and CTAs</p>
             </div>
-          </div>
+          ))}
+        </div>
+      </section>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Feature Highlight</h3>
-            <div
-              className={`${marketingColors.gradients.seafoamTeal} p-6 rounded-lg text-white`}
-            >
-              <h4 className="text-xl font-bold mb-2">Connect with Friends</h4>
-              <p className="opacity-90">
-                See what events your friends are attending
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Event Promotion</h3>
-            <div className="relative h-48 rounded-lg overflow-hidden">
-              <img
-                src="https://picsum.photos/seed/event456/600/300"
-                alt="Event"
-                className="w-full h-full object-cover"
-              />
-
+      {/* Social Media Applications */}
+      <section>
+        <h3 className="text-xl font-semibold mb-4">Social Media Applications</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {socialMediaColors.map((item, index) => {
+            const hasGradient = 'gradient' in item;
+            const style = hasGradient 
+              ? { background: (item as any).gradient }
+              : { backgroundColor: (item as any).bg };
+            
+            return (
               <div
-                className={`absolute inset-0 ${marketingColors.overlays.ocean}`}
-              ></div>
-              <div className="absolute inset-0 p-6 flex flex-col justify-end">
-                <h4 className="text-xl font-bold text-white mb-1">
-                  Beach Yoga Session
-                </h4>
-                <p className="text-white/90 text-sm">
-                  Saturday, 10:00 AM • Zandvoort Beach
-                </p>
+                key={index}
+                className={`p-6 rounded-lg ${item.text}`}
+                style={style}
+              >
+                <h4 className="text-lg font-medium">{item.name}</h4>
+                <p className="text-sm opacity-90">Optimized for platform visibility</p>
               </div>
-            </div>
-          </div>
+            );
+          })}
+        </div>
+      </section>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">App Introduction</h3>
-            <div className="relative h-48 rounded-lg overflow-hidden">
-              <div
-                className={`absolute inset-0 ${marketingColors.patterns.waves} bg-repeat-x bg-bottom`}
-              ></div>
-              <div
-                className={`absolute inset-0 ${marketingColors.gradients.oceanDeep} opacity-90`}
-              ></div>
-              <div className="absolute inset-0 p-6 flex flex-col justify-center items-center text-center">
-                <h4 className="text-xl font-bold text-white mb-2">
-                  Join thelineup
-                </h4>
-                <p className="text-white/90">
-                  Your community event discovery app
-                </p>
-              </div>
+      {/* Usage Guidelines */}
+      <section>
+        <h3 className="text-xl font-semibold mb-4">Usage Guidelines</h3>
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 className="font-medium text-green-800 mb-3">Do</h4>
+              <ul className="space-y-2 text-sm">
+                <li>• Use primary colors for main CTAs and navigation</li>
+                <li>• Apply secondary colors for highlights and accents</li>
+                <li>• Maintain sufficient contrast ratios</li>
+                <li>• Use gradients sparingly for hero sections</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-medium text-red-800 mb-3">Don't</h4>
+              <ul className="space-y-2 text-sm">
+                <li>• Mix too many colors in one design</li>
+                <li>• Use light colors on light backgrounds</li>
+                <li>• Override brand colors without approval</li>
+                <li>• Apply gradients to text or small elements</li>
+              </ul>
             </div>
           </div>
         </div>
       </section>
     </div>
   );
-}
+};
+
+export default MarketingColorPalette;

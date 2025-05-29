@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Event } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
-import { useSimilarEvents } from '../events/useSimilarEvents';
 
 interface UseFetchRelatedEventsProps {
   eventType: string;
@@ -14,259 +13,60 @@ interface UseFetchRelatedEventsProps {
   startDate?: string;
 }
 
+interface RelatedEventsResult {
+  relatedEvents: Event[];
+  loading: boolean;
+}
+
 export const useFetchRelatedEvents = ({ 
   eventType, 
   currentEventId,
   userId,
   tags,
   vibe,
-  minResults = 2, // Default to minimum 2 results
+  minResults = 2,
   startDate
-}: UseFetchRelatedEventsProps) => {
+}: UseFetchRelatedEventsProps): RelatedEventsResult => {
   const [relatedEvents, setRelatedEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const { fetchSimilarEvents } = useSimilarEvents([], []);
   const loadingRef = useRef(false);
   const dataFetchedRef = useRef(false);
   
   useEffect(() => {
     const loadRelatedEvents = async () => {
-      // Avoid duplicate fetches
       if (loadingRef.current) return;
-      
-      // If we already have enough events, don't fetch again
       if (dataFetchedRef.current && relatedEvents.length >= minResults) return;
       
       try {
         loadingRef.current = true;
         setLoading(true);
         
-        // Get current date to filter out past events
         const today = new Date().toISOString().split('T')[0];
         
-        // First strategy: Fetch events with the same event type
-        let query = supabase.from('events').select(`
-          *,
-          creator:profiles(id, username, avatar_url, email, location, status),
-          venues:venue_id(*)
-        `)
-        .eq('event_type', eventType)
-        .neq('id', currentEventId)
-        .gte('start_date', today) // Only future events
-        .order('start_time', { ascending: true })
-        .limit(8);
-        
-        const { data, error } = await query;
-        
-        if (error) {
-          console.error('Error fetching related events:', error);
-        }
-        
-        let filteredEvents: Event[] = [];
-        
-        if (data && data.length > 0) {
-          // Filter to just future events
-          // Use type assertion to handle the attendees property that will be added later
-          const rawEvents = data as unknown as any[];
-          
-          // If we have a userId, fetch RSVP status for each event
-          if (userId) {
-            console.log(`Fetching RSVP status for user ${userId} for related events`);
-            
-            // Get all event IDs
-            const eventIds = rawEvents.map(event => event.id);
-            
-            // Fetch RSVP status for these events for the current user
-            if (eventIds.length > 0) {
-              const { data: rsvpData, error: rsvpError } = await supabase
-                .from('event_rsvps')
-                .select('event_id, status')
-                .eq('user_id', userId)
-                .in('event_id', eventIds);
-                
-              if (rsvpError) {
-                console.error('Error fetching RSVP status for related events:', rsvpError);
-              } else if (rsvpData) {
-                // Create a map of event ID to RSVP status for quick lookup
-                const rsvpMap = new Map();
-                rsvpData.forEach(rsvp => {
-                  rsvpMap.set(rsvp.event_id, rsvp.status);
-                });
-                
-                // Update the events with their RSVP status and proper attendees object
-                filteredEvents = rawEvents.map(event => ({
-                  ...event,
-                  rsvp_status: rsvpMap.get(event.id) as 'Going' | 'Interested' | undefined,
-                  attendees: {
-                    going: 0,
-                    interested: 0
-                  }
-                }));
-                
-                console.log('RSVP status applied to related events:', 
-                  filteredEvents.map(e => ({ id: e.id, rsvp: e.rsvp_status })));
-              }
-            }
-          } else {
-            // Add proper attendees object to satisfy the Event type
-            filteredEvents = rawEvents.map(event => ({
-              ...event,
-              attendees: {
-                going: 0,
-                interested: 0
-              }
-            }));
-          }
-        }
-        
-        // If we don't have enough events from the first strategy, try more aggressive fallbacks
-        if (filteredEvents.length < minResults) {
-          console.log(`Not enough primary events (${filteredEvents.length}), trying second strategy...`);
-          
-          // Second strategy: Fetch events regardless of type but try to filter by tags if available
-          let fallbackQuery = supabase.from('events').select(`
+        const { data, error } = await supabase
+          .from('events')
+          .select(`
             *,
             creator:profiles(id, username, avatar_url, email, location, status),
             venues:venue_id(*)
           `)
+          .eq('event_type', eventType)
           .neq('id', currentEventId)
-          .gte('start_date', today) // Only future events
+          .gte('start_date', today)
           .order('start_time', { ascending: true })
-          .limit(10);
-          
-          const { data: fallbackData, error: fallbackError } = await fallbackQuery;
-          
-          if (!fallbackError && fallbackData && fallbackData.length > 0) {
-            // Cast to any[] first since we'll add the attendees property
-            let additionalEvents = fallbackData as unknown as any[];
-            
-            // Add proper attendees object to satisfy the Event type
-            additionalEvents = additionalEvents.map(event => ({
-              ...event,
-              attendees: {
-                going: 0,
-                interested: 0
-              }
-            }));
-            
-            // If we have tags, prefer events with matching tags
-            if (tags && tags.length > 0) {
-              additionalEvents = [...additionalEvents].sort((a, b) => {
-                // Calculate tag match score
-                const aTagsStr = String(a.tags || '');
-                const bTagsStr = String(b.tags || '');
-                
-                const aMatchCount = tags.filter(tag => aTagsStr.includes(tag)).length;
-                const bMatchCount = tags.filter(tag => bTagsStr.includes(tag)).length;
-                
-                // Sort by match count (descending)
-                return bMatchCount - aMatchCount;
-              });
-            }
-            
-            // Fetch RSVP status for additional events if we have a userId
-            if (userId && additionalEvents.length > 0) {
-              const additionalIds = additionalEvents.map(event => event.id);
-              
-              const { data: additionalRsvpData, error: additionalRsvpError } = await supabase
-                .from('event_rsvps')
-                .select('event_id, status')
-                .eq('user_id', userId)
-                .in('event_id', additionalIds);
-                
-              if (additionalRsvpError) {
-                console.error('Error fetching RSVP status for additional events:', additionalRsvpError);
-              } else if (additionalRsvpData) {
-                const rsvpMap = new Map();
-                additionalRsvpData.forEach(rsvp => {
-                  rsvpMap.set(rsvp.event_id, rsvp.status);
-                });
-                
-                // Update the additional events with their RSVP status
-                additionalEvents = additionalEvents.map(event => ({
-                  ...event,
-                  rsvp_status: rsvpMap.get(event.id) as 'Going' | 'Interested' | undefined
-                }));
-              }
-            }
-            
-            // Combine the events, prioritizing the direct type matches
-            const combinedEvents = [...filteredEvents];
-            
-            // Add additional events until we reach the minimum
-            for (const event of additionalEvents) {
-              if (!combinedEvents.some(e => e.id === event.id)) {
-                combinedEvents.push(event);
-                if (combinedEvents.length >= minResults) break;
-              }
-            }
-            
-            setRelatedEvents(combinedEvents);
-            
-          } else {
-            // Last resort - try similar events
-            console.log('Trying similar events as last resort...');
-            const rawSimilarEvents = await fetchSimilarEvents([eventType]);
-          
-            // Filter out the current event and past events and add attendees
-            const now = new Date();
-            const additionalEvents = rawSimilarEvents
-              .filter(event => {
-                if (event.id === currentEventId) return false;
-                if (!event.start_time) return false;
-                return new Date(event.start_time) > now;
-              })
-              .map(event => ({
-                ...event,
-                attendees: {
-                  going: 0,
-                  interested: 0
-                }
-              }));
-            
-            // Add RSVP status if available
-            if (userId && additionalEvents.length > 0) {
-              const additionalIds = additionalEvents.map(event => event.id);
-              
-              const { data: additionalRsvpData, error: additionalRsvpError } = await supabase
-                .from('event_rsvps')
-                .select('event_id, status')
-                .eq('user_id', userId)
-                .in('event_id', additionalIds);
-                
-              if (additionalRsvpError) {
-                console.error('Error fetching RSVP status for similar events:', additionalRsvpError);
-              } else if (additionalRsvpData) {
-                const rsvpMap = new Map();
-                additionalRsvpData.forEach(rsvp => {
-                  rsvpMap.set(rsvp.event_id, rsvp.status);
-                });
-                
-                // Update the events with their RSVP status
-                for (let i = 0; i < additionalEvents.length; i++) {
-                  additionalEvents[i].rsvp_status = rsvpMap.get(additionalEvents[i].id) as 'Going' | 'Interested' | undefined;
-                }
-              }
-            }
-            
-            // Combine all events we've found
-            const combinedEvents = [...filteredEvents];
-            
-            // Add additional events until we reach the minimum
-            for (const event of additionalEvents) {
-              if (!combinedEvents.some(e => e.id === event.id)) {
-                combinedEvents.push(event);
-                if (combinedEvents.length >= minResults) break;
-              }
-            }
-            
-            setRelatedEvents(combinedEvents);
-          }
-        } else {
-          setRelatedEvents(filteredEvents);
+          .limit(8);
+        
+        if (error) {
+          console.error('Error fetching related events:', error);
+          setRelatedEvents([]);
+        } else if (data) {
+          const eventsWithAttendees = data.map(event => ({
+            ...event,
+            attendees: { going: 0, interested: 0 }
+          }));
+          setRelatedEvents(eventsWithAttendees);
         }
         
-        // Mark as fetched
         dataFetchedRef.current = true;
       } catch (error) {
         console.error('Error in related events hook:', error);
@@ -282,7 +82,7 @@ export const useFetchRelatedEvents = ({
     } else {
       setLoading(false);
     }
-  }, [eventType, currentEventId, userId, minResults, tags, vibe, fetchSimilarEvents, startDate]); 
+  }, [eventType, currentEventId, userId, minResults, tags, vibe, startDate]); 
   
   return { relatedEvents, loading };
 };

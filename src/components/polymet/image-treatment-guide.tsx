@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { brandColors, type BackgroundColor } from '@/components/polymet/brand-colors';
@@ -19,7 +20,7 @@ const ImageTreatmentExample: React.FC<ImageTreatmentExampleProps> = ({
   imageSrc,
   className,
 }) => {
-  const bgColorClass = `bg-${backgroundColor}-500`;
+  const bgColorClass = `bg-primary-${backgroundColor}`;
 
   return (
     <Card className={className}>
@@ -58,19 +59,19 @@ const ImageTreatmentGuide: React.FC = () => {
   return (
     <section className="container grid items-start gap-6 py-8 md:grid-cols-2 lg:grid-cols-3">
       <ImageTreatmentExample
-        backgroundColor="primary"
+        backgroundColor="500"
         title="Hero Image"
         description="Used for main website banners and promotional materials."
         imageSrc="https://images.unsplash.com/photo-1680269243397-099a9fc9904f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2835&q=80"
       />
       <ImageTreatmentExample
-        backgroundColor="secondary"
+        backgroundColor="600"
         title="Event Thumbnail"
         description="Smaller images used in event listings and cards."
         imageSrc="https://images.unsplash.com/photo-1679759017939-153956a4974c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2787&q=80"
       />
       <ImageTreatmentExample
-        backgroundColor="accent"
+        backgroundColor="50"
         title="Profile Avatar"
         description="Circular images used for user profiles."
         imageSrc="https://images.unsplash.com/photo-1679692474059-619f5ca95944?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2787&q=80"

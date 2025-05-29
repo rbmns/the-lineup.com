@@ -1,153 +1,162 @@
+
 import React from 'react';
 import { brandColors } from '@/components/polymet/brand-colors';
-import { Logo } from '@/components/polymet/logo';
-import { cn } from '@/lib/utils';
+import { Calendar, MapPin } from 'lucide-react';
 
-// Platform-specific configurations
-const platformConfig = {
-  instagram: {
-    aspectRatio: "aspect-[1/1]", // Square for feed posts
-    dimensions: "1080x1080px",
-    overlayGradient: "bg-gradient-to-t from-black/80 via-black/30 to-black/50",
-  },
-  facebook: {
-    aspectRatio: "aspect-[1.91/1]", // Landscape for feed
-    dimensions: "1200x630px",
-    overlayGradient: "bg-gradient-to-tr from-black/70 via-black/40 to-black/20",
-  },
-  twitter: {
-    aspectRatio: "aspect-[1.91/1]", // Standard Twitter card
-    dimensions: "1200x675px",
-    overlayGradient: "bg-gradient-to-b from-black/60 via-black/30 to-black/70",
-  },
-};
+// Simple Logo component for social media
+const Logo: React.FC<{ className?: string }> = ({ className }) => (
+  <div className={`flex items-center gap-2 ${className}`}>
+    <div className="w-6 h-6 bg-white rounded-full"></div>
+    <span className="font-medium text-white">thelineup</span>
+  </div>
+);
 
-interface SocialMediaExampleProps {
-  platform: "instagram" | "facebook" | "twitter";
-  title: string;
-  category: string;
-  date: string;
-  location: string;
-  image: string;
-  className?: string;
-}
-
-export default function SocialMediaExample({
-  platform,
-  title,
-  category,
-  date,
-  location,
-  image,
-  className,
-}: SocialMediaExampleProps) {
-  const config = platformConfig[platform];
-
-  // Color selection based on category
-  const getCategoryColor = (category: string) => {
-    const categoryMap: Record<string, string> = {
-      Yoga: brandColors.vibrant.seafoam,
-      Surf: brandColors.nature.ocean,
-      Music: "#9D4EDD", // Purple
-      Food: "#E85D04", // Orange
-      Market: "#386641", // Green
-      Community: "#00B4D8", // Blue
-      Culture: "#F72585", // Pink
-      Festival: "#9D4EDD", // Purple
-    };
-
-    return categoryMap[category] || brandColors.vibrant.teal;
-  };
-
-  const categoryColor = getCategoryColor(category);
+const SocialMediaExample: React.FC = () => {
+  const vibrantColor = brandColors.vibrant?.[500] || '#ec4899';
+  const natureColor = brandColors.nature?.[500] || '#22c55e';
+  const primaryColor = brandColors.primary[500];
 
   return (
-    <div
-      className={cn(
-        "relative overflow-hidden rounded-lg shadow-lg",
-        config.aspectRatio,
-        className
-      )}
-    >
-      {/* Background image with overlay */}
-      <div className="absolute inset-0">
-        <img src={image} alt={title} className="w-full h-full object-cover" />
-
-        <div className="absolute inset-0 bg-black/30"></div>
-
-        {/* Gradient overlay for better text visibility */}
-        <div className={cn("absolute inset-0", config.overlayGradient)}></div>
+    <div className="space-y-8 p-6">
+      <div>
+        <h2 className="text-2xl font-bold mb-4">Social Media Templates</h2>
+        <p className="text-gray-600">
+          Ready-to-use templates for social media posts and stories.
+        </p>
       </div>
 
-      {/* Content container */}
-      <div className="relative h-full flex flex-col p-6">
-        {/* Header with logo and category */}
-        <div className="flex justify-between items-start mb-auto">
-          <Logo variant="white" size="sm" />
-
-          <span
-            className="px-3 py-1 rounded-full text-sm font-medium bg-white/20 text-white"
-            style={{ backgroundColor: `${categoryColor}80` }}
-          >
-            {category}
-          </span>
-        </div>
-
-        {/* Main content area */}
-        <div className="mt-auto">
-          {/* Title */}
-          <h2
-            className={cn(
-              "font-bold text-white mb-3",
-              platform === "instagram"
-                ? "text-lg md:text-xl"
-                : "text-xl md:text-2xl"
-            )}
-          >
-            {title}
-          </h2>
-
-          {/* Event details */}
-          <div className="flex flex-col gap-2 mt-4">
-            <div className="flex items-center gap-2 text-white/80 text-sm">
-              <CalendarIcon size={16} />
-
-              <span>{date}</span>
+      {/* Instagram Story Template */}
+      <section>
+        <h3 className="text-xl font-semibold mb-4">Instagram Story</h3>
+        <div 
+          className="w-80 h-[568px] rounded-lg p-6 flex flex-col justify-between text-white relative overflow-hidden"
+          style={{ backgroundColor: vibrantColor }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/20"></div>
+          
+          <div className="relative z-10">
+            <Logo />
+            <div className="mt-4">
+              <span className="text-sm uppercase tracking-wider opacity-90">Join the Flow</span>
             </div>
+          </div>
 
-            <div className="flex items-center gap-2 text-white/80 text-sm">
-              <MapPinIcon size={16} />
-
-              <span>{location}</span>
+          <div className="relative z-10">
+            <h3 className="text-2xl font-bold mb-2">Beach Yoga Session</h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4" />
+                <span>March 15, 2024 • 7:00 AM</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4" />
+                <span>Santa Monica Beach</span>
+              </div>
+            </div>
+            <div className="mt-4 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-center">
+              <span className="font-medium">Swipe up to RSVP</span>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Footer with CTA or app info */}
-        <div className="mt-4 pt-3 border-t border-white/20 text-white/90 text-xs flex justify-between items-center">
-          <span>thelineup.app</span>
-          <span>#JoinTheFlow</span>
+      {/* Facebook Post Template */}
+      <section>
+        <h3 className="text-xl font-semibold mb-4">Facebook Post</h3>
+        <div className="max-w-lg bg-white border border-gray-200 rounded-lg overflow-hidden">
+          <div 
+            className="h-64 relative"
+            style={{ backgroundColor: primaryColor }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary opacity-90"></div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center text-white">
+                <h3 className="text-3xl font-bold mb-2">Surf & Sunset</h3>
+                <p className="text-lg opacity-90">Join the Flow</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 bg-primary rounded-full"></div>
+              <div>
+                <div className="font-medium">the lineup</div>
+                <div className="text-sm text-gray-500">2 hours ago</div>
+              </div>
+            </div>
+            
+            <p className="text-gray-800 mb-3">
+              🏄‍♀️ Ready for an epic sunset surf session? Join us at Malibu Beach for an 
+              unforgettable evening on the waves! Perfect for all skill levels.
+            </p>
+            
+            <div className="text-sm text-gray-500 mb-3">
+              📅 Tonight, 6:00 PM<br/>
+              📍 Malibu Beach, CA<br/>
+              💰 $25 per person
+            </div>
+            
+            <div className="flex items-center justify-between text-sm text-gray-500">
+              <span>❤️ 42 likes</span>
+              <span>💬 8 comments</span>
+              <span>🔄 Share</span>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* Platform-specific overlay elements */}
-      {platform === "instagram" && (
-        <div className="absolute top-0 right-0 m-2 p-1 bg-black/50 rounded text-white text-xs">
-          {config.dimensions}
+      {/* Twitter Header Template */}
+      <section>
+        <h3 className="text-xl font-semibold mb-4">Twitter Header</h3>
+        <div 
+          className="w-full h-48 rounded-lg relative overflow-hidden"
+          style={{ backgroundColor: natureColor }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-accent-teal to-accent-lime opacity-90"></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center text-white">
+              <h2 className="text-4xl font-bold mb-2">the lineup</h2>
+              <p className="text-xl opacity-90">Curating coastal experiences • Join the Flow</p>
+              <div className="mt-4 flex justify-center gap-4 text-sm">
+                <span>🏄‍♀️ Surf</span>
+                <span>🧘‍♀️ Yoga</span>
+                <span>🎵 Music</span>
+                <span>🌊 Beach Life</span>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
+      </section>
 
-      {platform === "facebook" && (
-        <div className="absolute top-0 right-0 m-2 p-1 bg-black/50 rounded text-white text-xs">
-          {config.dimensions}
+      {/* Usage Guidelines */}
+      <section>
+        <h3 className="text-xl font-semibold mb-4">Template Guidelines</h3>
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 className="font-medium text-gray-800 mb-3">Best Practices</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li>• Keep text readable with proper contrast</li>
+                <li>• Use consistent brand colors and fonts</li>
+                <li>• Include clear call-to-action</li>
+                <li>• Optimize images for each platform</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-medium text-gray-800 mb-3">Platform Specifications</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li>• Instagram Story: 1080x1920px</li>
+                <li>• Facebook Post: 1200x630px</li>
+                <li>• Twitter Header: 1500x500px</li>
+                <li>• LinkedIn Banner: 1584x396px</li>
+              </ul>
+            </div>
+          </div>
         </div>
-      )}
-
-      {platform === "twitter" && (
-        <div className="absolute top-0 right-0 m-2 p-1 bg-black/50 rounded text-white text-xs">
-          {config.dimensions}
-        </div>
-      )}
+      </section>
     </div>
   );
-}
+};
+
+export default SocialMediaExample;
