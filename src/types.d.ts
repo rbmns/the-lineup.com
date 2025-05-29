@@ -70,6 +70,8 @@ export interface Event {
   interested_count?: number;
   formattedDate?: string; // Add the missing property
   formattedTime?: string; // Add the missing property
+  cover_image?: string | null; // Add missing property
+  share_image?: string | null; // Add missing property
 }
 
 export interface EventsResponse {

@@ -55,7 +55,13 @@ const EventDetail = () => {
   }
 
   if (error || !event) {
-    return <EventDetailErrorState />;
+    return (
+      <EventDetailErrorState 
+        error={error as Error | null}
+        onBackToEvents={() => navigate('/events')}
+        notFound={!event}
+      />
+    );
   }
 
   return (
@@ -75,7 +81,7 @@ const EventDetail = () => {
           </div>
         </div>
         
-        <RelatedEventsSection currentEvent={event} />
+        <RelatedEventsSection event={event} />
       </div>
     </div>
   );

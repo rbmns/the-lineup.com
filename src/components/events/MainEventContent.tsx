@@ -15,9 +15,9 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({ event }) => 
     <div className="space-y-6">
       <EventMetaInfo event={event} />
       
-      <EventDescription event={event} />
+      <EventDescription description={event.description || ''} isMobile={false} />
       
-      <EventLocationInfo event={event} />
+      <EventLocationInfo venue={event.venues} />
       
       <EventAdditionalInfo event={event} />
       

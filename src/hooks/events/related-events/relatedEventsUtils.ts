@@ -41,3 +41,35 @@ export const getRelatedEvents = (currentEvent: Event, allEvents: Event[], limit:
     
   return eventsWithScores.map(({ event }) => event);
 };
+
+export const sortEventsByRelevance = (events: Event[], referenceEvent: Event): Event[] => {
+  return events
+    .map(event => ({
+      event,
+      score: calculateEventSimilarity(referenceEvent, event)
+    }))
+    .sort((a, b) => b.score - a.score)
+    .map(({ event }) => event);
+};
+
+export const sortEventsByTagMatch = (events: Event[], tags: string[]): Event[] => {
+  return events.sort((a, b) => {
+    const aTagsStr = String(a.tags || '');
+    const bTagsStr = String(b.tags || '');
+    
+    const aMatchCount = tags.filter(tag => aTagsStr.includes(tag)).length;
+    const bMatchCount = tags.filter(tag => bTagsStr.includes(tag)).length;
+    
+    return bMatchCount - aMatchCount;
+  });
+};
+
+export const applyRsvpStatus = async (events: any[], userId?: string): Promise<Event[]> => {
+  return events.map(event => ({
+    ...event,
+    attendees: {
+      going: 0,
+      interested: 0
+    }
+  }));
+};
