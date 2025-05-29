@@ -60,11 +60,12 @@ export const EventDayDetails: React.FC<EventDayDetailsProps> = ({
               <div className="flex gap-1.5 items-center">
                 {Array.from(new Set(events.map(event => event.event_type))).map((type, index) => {
                   const eventType = type?.toLowerCase() || 'other';
-                  const colors = eventTypeColors[eventType as keyof typeof eventTypeColors] || eventTypeColors.other;
+                  const color = eventTypeColors[eventType as keyof typeof eventTypeColors] || eventTypeColors.other;
                   return (
                     <div 
                       key={index}
-                      className={`h-2.5 w-2.5 rounded-full ${colors.active.bg}`}
+                      className="h-2.5 w-2.5 rounded-full"
+                      style={{ backgroundColor: color }}
                     />
                   );
                 })}

@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, SubmitHandler } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -27,12 +26,12 @@ interface EventFormProps {
   isEditMode?: boolean;
 }
 
-export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode }) => {
+export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = false }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { venues, isLoading: isLoadingVenues } = useVenues();
-  const [defaultValues, setDefaultValues] = useState<Partial<FormValues>>({});
+  const [eventData, setEventData] = useState<Event | null>(null);
 
   const {
     register,
@@ -42,7 +41,7 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode }) => 
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(EventSchema),
-    defaultValues: defaultValues,
+    defaultValues: {},
     mode: 'onChange',
   });
 
@@ -53,30 +52,7 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode }) => 
         try {
           const eventData = await fetchEventById(eventId, user?.id);
           if (eventData) {
-            // Convert the event data to form values
-            const formValues: FormValues = {
-              title: eventData.title,
-              description: eventData.description,
-              event_category: eventData.event_category || eventData.event_type,
-              start_date: new Date(eventData.start_time),
-              start_time: format(new Date(eventData.start_time), 'HH:mm'),
-              end_date: new Date(eventData.end_time),
-              end_time: format(new Date(eventData.end_time), 'HH:mm'),
-              venue_id: eventData.venue_id,
-              organizer_link: eventData.organizer_link || '',
-              fee: eventData.fee ? eventData.fee.toString() : '0',
-              booking_link: eventData.booking_link || '',
-              extra_info: eventData.extra_info || '',
-              tags: Array.isArray(eventData.tags) ? eventData.tags.join(',') : (typeof eventData.tags === 'string' ? eventData.tags : ''),
-            };
-            
-            // Set default values for the form
-            setDefaultValues(formValues);
-            
-            // Manually set the values for the form
-            Object.keys(formValues).forEach(key => {
-              setValue(key as keyof FormValues, formValues[key as keyof FormValues]);
-            });
+            setEventData(eventData);
           }
         } catch (error) {
           console.error("Failed to fetch event data for editing", error);
@@ -87,6 +63,43 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode }) => 
 
     fetchEventData();
   }, [isEditMode, eventId, setValue]);
+
+  const defaultValues: FormValues = useMemo(() => {
+    if (eventData && isEditMode) {
+      return {
+        title: eventData.title || '',
+        description: eventData.description || '',
+        event_category: eventData.event_category || eventData.event_type || 'other',
+        start_date: eventData.start_date ? new Date(eventData.start_date) : new Date(),
+        start_time: eventData.start_time?.substring(0, 5) || '',
+        end_date: eventData.end_date ? new Date(eventData.end_date) : new Date(),
+        end_time: eventData.end_time?.substring(0, 5) || '',
+        venue_id: eventData.venue_id || '',
+        organizer_link: eventData.organizer_link || '',
+        fee: eventData.fee?.toString() || '0',
+        booking_link: eventData.booking_link || '',
+        extra_info: eventData.extra_info || '',
+        tags: Array.isArray(eventData.tags) ? eventData.tags.join(', ') : (eventData.tags || ''),
+        vibe: eventData.vibe || '',
+      };
+    }
+    return {
+      title: '',
+      description: '',
+      event_category: 'other',
+      start_date: new Date(),
+      start_time: '',
+      end_date: new Date(),
+      end_time: '',
+      venue_id: '',
+      organizer_link: '',
+      fee: '0',
+      booking_link: '',
+      extra_info: '',
+      tags: '',
+      vibe: '',
+    };
+  }, [eventData, isEditMode]);
 
   // Convert form values to event data
   const convertFormToEventData = (data: FormValues, userId: string | undefined): SafeEventData => {
@@ -155,6 +168,26 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode }) => 
       setIsSubmitting(false);
     }
   };
+
+  const processedData = useMemo(() => {
+    if (!user?.id) return null;
+    
+    return {
+      ...getValues(),
+      event_category: getValues('event_category'),
+      created_by: user.id,
+    };
+  }, [user?.id, getValues]);
+
+  // Watch for changes to update categories
+  const watchedCategory = watch('event_category');
+  const categories = watchedCategory ? [watchedCategory] : [];
+
+  useEffect(() => {
+    if (categories.length > 0) {
+      setValue('event_category', categories[0]);
+    }
+  }, [categories, setValue]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -385,3 +418,5 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode }) => 
     </form>
   );
 };
+
+export default EventForm;

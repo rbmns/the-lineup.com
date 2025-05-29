@@ -8,14 +8,6 @@ import { ArrowLeft } from 'lucide-react';
 export default function CreateCasualPlanPage() {
   const navigate = useNavigate();
 
-  const handleSuccess = () => {
-    navigate('/casual-plans');
-  };
-
-  const handleCancel = () => {
-    navigate('/casual-plans');
-  };
-
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       {/* Header */}
@@ -41,8 +33,12 @@ export default function CreateCasualPlanPage() {
       {/* Form */}
       <div className="bg-white rounded-lg border shadow-sm p-6">
         <CreateCasualPlanForm 
-          onSuccess={handleSuccess}
-          onCancel={handleCancel}
+          onSubmit={(data) => {
+            console.log('Plan created:', data);
+            navigate('/casual-plans');
+          }}
+          onCancel={() => navigate('/casual-plans')}
+          isCreating={false}
         />
       </div>
     </div>
