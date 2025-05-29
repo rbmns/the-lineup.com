@@ -1,6 +1,7 @@
+
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { vibeOptions } from "@/polymet/components/event-vibe-label-enhanced";
+import { vibeOptions } from "@/components/polymet/event-vibe-label-enhanced";
 
 interface VibeFilterProps {
   selectedVibe: string | null;

@@ -1,6 +1,7 @@
+
 import { cn } from "@/lib/utils";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import CategoryBadge from "@/polymet/components/category-badge";
+import CategoryBadge from "@/components/polymet/category-badge";
 
 interface CategoryFilterProps {
   categories: string[];
