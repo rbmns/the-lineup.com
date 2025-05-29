@@ -1,3 +1,4 @@
+
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/polymet/button";
 
@@ -39,7 +40,7 @@ export default function CallToAction({
 
         {buttonHref ? (
           <Button
-            variant={variant === "default" ? "default" : "vibrant"}
+            variant={variant === "default" ? "default" : "secondary"}
             size="lg"
             asChild
           >
@@ -47,7 +48,7 @@ export default function CallToAction({
           </Button>
         ) : (
           <Button
-            variant={variant === "default" ? "default" : "vibrant"}
+            variant={variant === "default" ? "default" : "secondary"}
             size="lg"
             onClick={onClick}
           >

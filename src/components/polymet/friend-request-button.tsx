@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { Button } from "@/polymet/components/button";
+import { Button } from "@/components/polymet/button";
 import { UserPlusIcon, CheckIcon, UserIcon } from "lucide-react";
 
 export type FriendRequestStatus = "none" | "pending" | "accepted" | "sent";
@@ -64,7 +65,7 @@ export default function FriendRequestButton({
   if (status === "pending") {
     return (
       <Button
-        variant="vibrant"
+        variant="default"
         size={size}
         className={className}
         onClick={handleAcceptRequest}

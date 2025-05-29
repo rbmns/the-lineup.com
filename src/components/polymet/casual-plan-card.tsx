@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
@@ -149,7 +148,7 @@ export default function CasualPlanCard({
         {showRsvp && (
           <div className="mt-4 flex gap-2 border-t border-secondary-50 pt-3">
             <Button
-              variant={rsvpStatus === "going" ? "nature" : "outline"}
+              variant={rsvpStatus === "going" ? "default" : "outline"}
               size="sm"
               className={cn(
                 "flex-1",
@@ -160,7 +159,6 @@ export default function CasualPlanCard({
               disabled={isAtCapacity && rsvpStatus !== "going"}
             >
               <UsersIcon size={14} className="mr-1" />
-
               {rsvpStatus === "going"
                 ? "Going"
                 : isAtCapacity
@@ -178,7 +176,6 @@ export default function CasualPlanCard({
               onClick={(e) => handleRSVP(e, "interested")}
             >
               <HeartIcon size={14} className="mr-1" />
-
               {rsvpStatus === "interested" ? "Interested" : "Interested"}
             </Button>
           </div>

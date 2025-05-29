@@ -202,7 +202,7 @@ export default function AuthForm({
             <Button
               type="submit"
               className="w-full"
-              variant="vibrant"
+              variant="default"
               disabled={isLoading}
             >
               {isLoading ? "Logging in..." : "Login"}
@@ -383,7 +383,7 @@ export default function AuthForm({
             <Button
               type="submit"
               className="w-full"
-              variant="vibrant"
+              variant="default"
               disabled={isLoading}
             >
               {isLoading ? "Creating account..." : "Create Account"}
