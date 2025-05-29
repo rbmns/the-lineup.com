@@ -1,5 +1,7 @@
-import { cn } from "@/lib/utils";
-import { brandColors } from "@/polymet/components/brand-colors";
+import React from 'react';
+import { brandColors } from '@/components/polymet/brand-colors';
+import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 // Extended marketing color palette based on the brand colors
 export const marketingColors = {

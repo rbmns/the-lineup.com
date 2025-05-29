@@ -1,700 +1,315 @@
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
-import { brandColors } from "@/polymet/components/brand-colors";
-import {
-  TypographyH1,
-  TypographyH2,
-  TypographyH3,
-  TypographyH4,
-  TypographyP,
-  TypographyLead,
-  TypographySmall,
-  TypographyMono,
-  TypographyAccent,
-  TypographyTagline,
-} from "@/polymet/components/brand-typography";
-import WaveIcon from "@/polymet/components/wave-icon";
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { brandColors } from '@/components/polymet/brand-colors';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/polymet/button';
+import { 
+  Palette, 
+  Type, 
+  Layout, 
+  Image as ImageIcon, 
+  Zap, 
+  Eye,
+  Download,
+  Share2,
+  Heart,
+  Star
+} from 'lucide-react';
+import { typography } from '@/components/polymet/brand-typography';
+import { WaveIcon } from '@/components/polymet/wave-icon';
 
-interface BrandStyleGuideProps {
-  className?: string;
-}
-
-export default function BrandStyleGuide({ className }: BrandStyleGuideProps) {
-  const [logoBackground, setLogoBackground] = useState<
-    "white" | "dark" | "image" | "color"
-  >("white");
-
+export default function BrandStyleGuide() {
   return (
-    <div
-      className={cn(
-        "flex flex-col w-full max-w-6xl mx-auto space-y-12 bg-secondary-10 p-8 rounded-lg",
-        className
-      )}
-    >
-      {/* Brand Style Guide Header */}
-      <div className="space-y-2 text-center">
-        <TypographyTagline className="text-nature-ocean">
-          Brand Style Guide
-        </TypographyTagline>
-        <TypographyH1>the lineup</TypographyH1>
-        <TypographyLead>
-          A curated platform connecting nomads, locals, and travelers with surf,
-          yoga, music, and lifestyle events along coastal communities.
-        </TypographyLead>
+    <div className="container mx-auto py-8 space-y-8">
+      <div className="flex flex-col gap-2">
+        <h1 className={typography.h1}>Brand Style Guide</h1>
+        <p className={typography.lead}>
+          A comprehensive guide to our visual identity and design system
+        </p>
       </div>
 
-      {/* Brand Essence */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StyleGuideCard
+          icon={<Palette className="h-5 w-5" />}
+          title="Color Palette"
+          description="Our brand colors and how to use them"
+        />
+        <StyleGuideCard
+          icon={<Type className="h-5 w-5" />}
+          title="Typography"
+          description="Font families, sizes, and styles"
+        />
+        <StyleGuideCard
+          icon={<Layout className="h-5 w-5" />}
+          title="Layout & Grid"
+          description="Spacing, containers, and responsive design"
+        />
+        <StyleGuideCard
+          icon={<ImageIcon className="h-5 w-5" />}
+          title="Imagery"
+          description="Photography style, illustrations, and icons"
+        />
+        <StyleGuideCard
+          icon={<Zap className="h-5 w-5" />}
+          title="Components"
+          description="UI components and patterns"
+        />
+        <StyleGuideCard
+          icon={<Eye className="h-5 w-5" />}
+          title="Brand Voice"
+          description="Tone, messaging, and communication"
+        />
+      </div>
+
       <section className="space-y-6">
-        <TypographyH2>Brand Essence</TypographyH2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-4">
-            <TypographyH3>Tagline</TypographyH3>
-            <div className="p-6 bg-nature-ocean text-white rounded-lg">
-              <TypographyTagline className="text-2xl">
-                Join the Flow.
-              </TypographyTagline>
+        <div>
+          <h2 className={typography.h2}>Color Palette</h2>
+          <p className={typography.body}>
+            Our color palette is designed to be vibrant, accessible, and versatile.
+          </p>
+        </div>
+
+        <div className="space-y-6">
+          <div>
+            <h3 className={typography.h3}>Primary Colors</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mt-4">
+              <ColorSwatch color="#0891b2" name="Primary 500" />
+              <ColorSwatch color="#0e7490" name="Primary 600" />
+              <ColorSwatch color="#164e63" name="Primary 900" />
+              <ColorSwatch color="#e0f2fe" name="Primary 100" />
+              <ColorSwatch color="#f0f9ff" name="Primary 50" />
             </div>
-            <TypographyP>
-              Our tagline encapsulates the essence of our platform: an
-              invitation to become part of a natural rhythm of connection,
-              discovery, and coastal lifestyle.
-            </TypographyP>
           </div>
 
-          <div className="space-y-4">
-            <TypographyH3>Core Values</TypographyH3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {[
-                {
-                  name: "Freedom",
-                  description:
-                    "The ability to explore and experience without constraints",
-                  color: "bg-nature-ocean",
-                },
-                {
-                  name: "Authentic Connection",
-                  description:
-                    "Fostering genuine relationships between people and places",
-                  color: "bg-nature-coral",
-                },
-                {
-                  name: "Adventure",
-                  description:
-                    "Embracing new experiences and stepping outside comfort zones",
-                  color: "bg-nature-sand text-primary",
-                },
-                {
-                  name: "Simplicity",
-                  description:
-                    "Focusing on what matters most and reducing complexity",
-                  color: "bg-vibrant-seafoam",
-                },
-                {
-                  name: "Local Culture",
-                  description:
-                    "Celebrating and preserving the uniqueness of coastal communities",
-                  color: "bg-vibrant-teal",
-                },
-              ].map((value) => (
-                <div
-                  key={value.name}
-                  className={cn("p-4 rounded-lg text-white", value.color)}
-                >
-                  <h4 className="font-bold mb-1">{value.name}</h4>
-                  <p className="text-sm opacity-90">{value.description}</p>
-                </div>
-              ))}
+          <div>
+            <h3 className={typography.h3}>Secondary Colors</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
+              <ColorSwatch color="#f59e0b" name="Secondary 500" />
+              <ColorSwatch color="#d97706" name="Secondary 600" />
+              <ColorSwatch color="#fde68a" name="Secondary 100" />
+              <ColorSwatch color="#fef3c7" name="Secondary 50" />
+            </div>
+          </div>
+
+          <div>
+            <h3 className={typography.h3}>Accent Colors</h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
+              <ColorSwatch color="#06b6d4" name="Teal" />
+              <ColorSwatch color="#f43f5e" name="Coral" />
+              <ColorSwatch color="#84cc16" name="Lime" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Logo */}
+      <Separator />
+
       <section className="space-y-6">
-        <TypographyH2>Logo</TypographyH2>
-        <Tabs defaultValue="primary" className="w-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="primary">Primary Logo</TabsTrigger>
-            <TabsTrigger value="variations">Variations</TabsTrigger>
-            <TabsTrigger value="usage">Usage</TabsTrigger>
-            <TabsTrigger value="spacing">Spacing</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="primary" className="space-y-6">
-            <div className="flex flex-col items-center space-y-8">
-              <div className="p-12 border border-secondary-50 rounded-lg bg-white">
-                <div className="flex items-center space-x-4">
-                  <WaveIcon size="lg" />
-
-                  <span className="text-4xl font-medium text-nature-ocean">
-                    the-lineup
-                  </span>
-                </div>
-              </div>
-              <TypographyP className="text-center max-w-lg">
-                Our primary logo combines a wave symbol with clean, lowercase
-                typography. The stylized waves represent flow, connection, and
-                coastal lifestyle.
-              </TypographyP>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="variations" className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-              <div className="flex flex-col items-center space-y-3">
-                <div className="p-8 border border-secondary-50 rounded-lg bg-white w-full flex justify-center">
-                  <div className="flex items-center space-x-3">
-                    <WaveIcon size="md" />
-
-                    <span className="text-2xl font-medium text-nature-ocean">
-                      the-lineup
-                    </span>
-                  </div>
-                </div>
-                <TypographySmall>Default</TypographySmall>
-              </div>
-              <div className="flex flex-col items-center space-y-3">
-                <div className="p-8 border border-secondary-50 rounded-lg bg-primary w-full flex justify-center">
-                  <div className="flex items-center space-x-3">
-                    <WaveIcon size="md" variant="circle" />
-
-                    <span className="text-2xl font-medium text-white">
-                      the-lineup
-                    </span>
-                  </div>
-                </div>
-                <TypographySmall>White (on dark)</TypographySmall>
-              </div>
-              <div className="flex flex-col items-center space-y-3">
-                <div className="p-8 border border-secondary-50 rounded-lg bg-white w-full flex justify-center">
-                  <WaveIcon size="md" />
-                </div>
-                <TypographySmall>Icon Only</TypographySmall>
-              </div>
-              <div className="flex flex-col items-center space-y-3">
-                <div className="p-8 border border-secondary-50 rounded-lg bg-white w-full flex justify-center">
-                  <span className="text-2xl font-medium text-nature-ocean">
-                    the-lineup
-                  </span>
-                </div>
-                <TypographySmall>Text Only</TypographySmall>
-              </div>
-              <div className="flex flex-col items-center space-y-3">
-                <div className="p-8 border border-secondary-50 rounded-lg bg-white w-full flex justify-center">
-                  <div className="flex items-center space-x-2">
-                    <WaveIcon size="sm" />
-
-                    <span className="text-lg font-medium text-nature-ocean">
-                      the-lineup
-                    </span>
-                  </div>
-                </div>
-                <TypographySmall>Small</TypographySmall>
-              </div>
-              <div className="flex flex-col items-center space-y-3">
-                <div className="p-8 border border-secondary-50 rounded-lg bg-white w-full flex justify-center">
-                  <div className="flex items-center space-x-4">
-                    <WaveIcon size="lg" />
-
-                    <span className="text-3xl font-medium text-nature-ocean">
-                      the-lineup
-                    </span>
-                  </div>
-                </div>
-                <TypographySmall>Large</TypographySmall>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="usage" className="space-y-6">
-            <div className="space-y-6">
-              <TypographyH4>Logo on Different Backgrounds</TypographyH4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-4">
-                    {["white", "dark", "image", "color"].map((bg) => (
-                      <button
-                        key={bg}
-                        onClick={() =>
-                          setLogoBackground(
-                            bg as "white" | "dark" | "image" | "color"
-                          )
-                        }
-                        className={cn(
-                          "px-3 py-1 text-sm rounded-full",
-                          logoBackground === bg
-                            ? "bg-nature-ocean text-white"
-                            : "bg-secondary-25"
-                        )}
-                      >
-                        {bg.charAt(0).toUpperCase() + bg.slice(1)}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div
-                    className={cn(
-                      "h-64 rounded-lg flex items-center justify-center p-8",
-                      {
-                        "bg-white": logoBackground === "white",
-                        "bg-primary": logoBackground === "dark",
-                        "bg-gradient-to-r from-nature-ocean to-nature-seafoam":
-                          logoBackground === "color",
-                      }
-                    )}
-                    style={
-                      logoBackground === "image"
-                        ? {
-                            backgroundImage:
-                              "url(https://picsum.photos/seed/beach123/800/600)",
-                            backgroundSize: "cover",
-                            backgroundPosition: "center",
-                          }
-                        : {}
-                    }
-                  >
-                    <div className="flex items-center space-x-3">
-                      <WaveIcon
-                        size="md"
-                        variant={
-                          logoBackground === "white" ? "default" : "circle"
-                        }
-                      />
-
-                      <span
-                        className={cn(
-                          "text-2xl font-medium",
-                          logoBackground === "white"
-                            ? "text-nature-ocean"
-                            : "text-white"
-                        )}
-                      >
-                        the-lineup
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <TypographyH4>Do's and Don'ts</TypographyH4>
-                  <div className="space-y-3">
-                    <div className="p-4 border border-green-200 bg-green-50 rounded-lg">
-                      <h5 className="font-medium text-green-800 mb-2">Do</h5>
-                      <ul className="list-disc pl-5 space-y-1 text-sm">
-                        <li>Maintain clear space around the logo</li>
-                        <li>Use approved color variations</li>
-                        <li>Scale proportionally</li>
-                        <li>
-                          Use the white version on dark or busy backgrounds
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="p-4 border border-red-200 bg-red-50 rounded-lg">
-                      <h5 className="font-medium text-red-800 mb-2">Don't</h5>
-                      <ul className="list-disc pl-5 space-y-1 text-sm">
-                        <li>Stretch or distort the logo</li>
-                        <li>Change the logo colors</li>
-                        <li>Add effects like shadows or outlines</li>
-                        <li>Place on busy backgrounds without contrast</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="spacing" className="space-y-6">
-            <div className="flex flex-col items-center space-y-8">
-              <div className="p-12 border border-secondary-50 rounded-lg bg-white relative">
-                <div className="absolute inset-0 border-2 border-dashed border-nature-ocean/30 m-12"></div>
-                <div className="flex items-center space-x-4">
-                  <WaveIcon size="lg" />
-
-                  <span className="text-4xl font-medium text-nature-ocean">
-                    the-lineup
-                  </span>
-                </div>
-              </div>
-              <TypographyP className="text-center max-w-lg">
-                Always maintain a minimum clear space around the logo equal to
-                the height of the wave icon. This ensures the logo remains
-                visible and impactful in all applications.
-              </TypographyP>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </section>
-
-      {/* Color Palette */}
-      <section className="space-y-6">
-        <TypographyH2>Color Palette</TypographyH2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-4">
-            <TypographyH3>Primary Colors</TypographyH3>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <div className="h-24 bg-nature-ocean rounded-lg"></div>
-                <div>
-                  <TypographySmall className="font-bold">
-                    Ocean Deep
-                  </TypographySmall>
-                  <TypographySmall className="text-primary-75">
-                    #005F73
-                  </TypographySmall>
-                </div>
-                <TypographySmall className="text-primary-75">
-                  Primary brand color, used for key elements and accents
-                </TypographySmall>
-              </div>
-              <div className="space-y-2">
-                <div className="h-24 bg-nature-coral rounded-lg"></div>
-                <div>
-                  <TypographySmall className="font-bold">
-                    Sunset Orange
-                  </TypographySmall>
-                  <TypographySmall className="text-primary-75">
-                    #EE6C4D
-                  </TypographySmall>
-                </div>
-                <TypographySmall className="text-primary-75">
-                  Used for calls-to-action and highlighting important elements
-                </TypographySmall>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <TypographyH3>Secondary Colors</TypographyH3>
-            <div className="grid grid-cols-3 gap-3">
-              <div className="space-y-2">
-                <div className="h-16 bg-nature-sand rounded-lg"></div>
-                <div>
-                  <TypographySmall className="font-bold">
-                    Sand Beige
-                  </TypographySmall>
-                  <TypographySmall className="text-primary-75">
-                    #E9C46A
-                  </TypographySmall>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="h-16 bg-vibrant-seafoam rounded-lg"></div>
-                <div>
-                  <TypographySmall className="font-bold">
-                    Seafoam Green
-                  </TypographySmall>
-                  <TypographySmall className="text-primary-75">
-                    #2A9D8F
-                  </TypographySmall>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="h-16 bg-white border border-secondary-50 rounded-lg"></div>
-                <div>
-                  <TypographySmall className="font-bold">White</TypographySmall>
-                  <TypographySmall className="text-primary-75">
-                    #FFFFFF
-                  </TypographySmall>
-                </div>
-              </div>
-            </div>
-            <TypographySmall className="text-primary-75">
-              Secondary colors provide balance and complement the primary
-              palette. Use them for backgrounds, supporting elements, and to
-              create visual hierarchy.
-            </TypographySmall>
-          </div>
+        <div>
+          <h2 className={typography.h2}>Typography</h2>
+          <p className={typography.body}>
+            Our typography system is designed for clarity, readability, and hierarchy.
+          </p>
         </div>
 
-        <div className="mt-8">
-          <TypographyH3>Extended Palette</TypographyH3>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-4">
-            {Object.entries(brandColors.extended.oceanDeep)
-              .sort(
-                ([a], [b]) =>
-                  parseInt(b.replace(/\D/g, "")) -
-                  parseInt(a.replace(/\D/g, ""))
-              )
-              .map(([shade, color]) => (
-                <div key={shade} className="space-y-2">
-                  <div
-                    className="h-12 rounded-lg"
-                    style={{ backgroundColor: color }}
-                  ></div>
-                  <div className="flex justify-between">
-                    <TypographySmall>Ocean {shade}</TypographySmall>
-                    <TypographySmall className="text-primary-75">
-                      {color}
-                    </TypographySmall>
-                  </div>
-                </div>
-              ))}
-          </div>
-          <TypographySmall className="text-primary-75 mt-3">
-            The extended palette provides additional shades of our primary Ocean
-            Deep color for flexibility in design applications.
-          </TypographySmall>
-        </div>
-      </section>
-
-      {/* Typography */}
-      <section className="space-y-6">
-        <TypographyH2>Typography</TypographyH2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="space-y-8">
           <div className="space-y-4">
-            <TypographyH3>Primary Font: Inter</TypographyH3>
-            <div className="p-6 bg-white border border-secondary-50 rounded-lg space-y-4">
-              <div>
-                <TypographyH1>Heading 1</TypographyH1>
-                <TypographySmall className="text-primary-75">
-                  Inter / 48px / Bold / Tracking tight
-                </TypographySmall>
-              </div>
-              <div>
-                <TypographyH2>Heading 2</TypographyH2>
-                <TypographySmall className="text-primary-75">
-                  Inter / 30px / Semibold / Tracking tight
-                </TypographySmall>
-              </div>
-              <div>
-                <TypographyH3>Heading 3</TypographyH3>
-                <TypographySmall className="text-primary-75">
-                  Inter / 24px / Semibold / Tracking tight
-                </TypographySmall>
-              </div>
-              <div>
-                <TypographyH4>Heading 4</TypographyH4>
-                <TypographySmall className="text-primary-75">
-                  Inter / 20px / Semibold / Tracking tight
-                </TypographySmall>
-              </div>
-              <div>
-                <TypographyP>
-                  Body text is set in Inter Regular at 16px with comfortable
-                  line height. The lineup is a platform for discovering and
-                  planning surf, yoga, music, and lifestyle events in coastal
-                  destinations.
-                </TypographyP>
-                <TypographySmall className="text-primary-75">
-                  Inter / 16px / Regular / Leading relaxed
-                </TypographySmall>
-              </div>
+            <h1 className={typography.display}>Display</h1>
+            <div className="text-sm text-muted-foreground">
+              Used for hero sections and major headlines
             </div>
           </div>
 
           <div className="space-y-4">
-            <TypographyH3>Secondary Font: JetBrains Mono</TypographyH3>
-            <div className="p-6 bg-white border border-secondary-50 rounded-lg space-y-4">
-              <div>
-                <TypographyTagline>Tagline Text</TypographyTagline>
-                <TypographySmall className="text-primary-75">
-                  JetBrains Mono / 18px / Medium / Tracking wide
-                </TypographySmall>
-              </div>
-              <div>
-                <TypographyAccent>ACCENT TEXT</TypographyAccent>
-                <TypographySmall className="text-primary-75">
-                  JetBrains Mono / 14px / Uppercase / Tracking wider
-                </TypographySmall>
-              </div>
-              <div>
-                <TypographyMono>Monospace Text</TypographyMono>
-                <TypographySmall className="text-primary-75">
-                  JetBrains Mono / 14px / Regular
-                </TypographySmall>
-              </div>
-              <div className="pt-4">
-                <TypographySmall className="text-primary-75">
-                  JetBrains Mono is used sparingly for accents, labels, and
-                  special text elements to create visual interest and hierarchy.
-                </TypographySmall>
-              </div>
+            <h1 className={typography.h1}>Heading 1</h1>
+            <div className="text-sm text-muted-foreground">
+              Main page headings
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h2 className={typography.h2}>Heading 2</h2>
+            <div className="text-sm text-muted-foreground">
+              Section headings
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className={typography.h3}>Heading 3</h3>
+            <div className="text-sm text-muted-foreground">
+              Subsection headings
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h4 className={typography.h4}>Heading 4</h4>
+            <div className="text-sm text-muted-foreground">
+              Card titles and smaller sections
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <p className={typography.lead}>
+              Lead paragraph text is used to introduce sections with slightly larger, more prominent text.
+            </p>
+            <div className="text-sm text-muted-foreground">
+              Lead paragraph
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <p className={typography.body}>
+              Body text is used for the main content. It should be easy to read and have good contrast.
+              This is an example of body text that might span multiple lines in a paragraph.
+            </p>
+            <div className="text-sm text-muted-foreground">
+              Body text
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <p className={typography.small}>
+              Small text is used for captions, footnotes, and other secondary information.
+            </p>
+            <div className="text-sm text-muted-foreground">
+              Small text
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <blockquote className={typography.quote}>
+              "Design is not just what it looks like and feels like. Design is how it works."
+              <footer className="mt-2 text-sm">— Steve Jobs</footer>
+            </blockquote>
+            <div className="text-sm text-muted-foreground">
+              Blockquote
             </div>
           </div>
         </div>
       </section>
 
-      {/* Imagery Style */}
+      <Separator />
+
       <section className="space-y-6">
-        <TypographyH2>Imagery Style</TypographyH2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-4">
-            <TypographyH3>Photography Guidelines</TypographyH3>
-            <TypographyP>
-              Our imagery style focuses on authentic, candid coastal lifestyle
-              photos with natural lighting and warm tones. Images should evoke a
-              sense of freedom, connection, and the joy of coastal living.
-            </TypographyP>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <img
-                  src="https://picsum.photos/seed/beach123/400/300"
-                  alt="Beach lifestyle"
-                  className="rounded-lg object-cover aspect-4/3 w-full"
-                />
+        <div>
+          <h2 className={typography.h2}>Components</h2>
+          <p className={typography.body}>
+            Our core UI components follow consistent patterns and styling.
+          </p>
+        </div>
 
-                <TypographySmall className="text-primary-75">
-                  Natural lighting with warm tones
-                </TypographySmall>
-              </div>
-              <div className="space-y-2">
-                <img
-                  src="https://picsum.photos/seed/yoga456/400/300"
-                  alt="Yoga session"
-                  className="rounded-lg object-cover aspect-4/3 w-full"
-                />
-
-                <TypographySmall className="text-primary-75">
-                  Authentic activities, not staged
-                </TypographySmall>
-              </div>
+        <div className="space-y-8">
+          <div>
+            <h3 className={typography.h3}>Buttons</h3>
+            <div className="flex flex-wrap gap-4 mt-4">
+              <Button>Default Button</Button>
+              <Button variant="secondary">Secondary</Button>
+              <Button variant="outline">Outline</Button>
+              <Button variant="ghost">Ghost</Button>
+              <Button variant="link">Link</Button>
+              <Button variant="destructive">Destructive</Button>
+            </div>
+            <div className="flex flex-wrap gap-4 mt-4">
+              <Button size="lg">Large</Button>
+              <Button>Default</Button>
+              <Button size="sm">Small</Button>
+              <Button size="icon"><Heart size={16} /></Button>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <TypographyH3>Image Treatment</TypographyH3>
-            <TypographyP>
-              Apply subtle treatments to maintain consistency across all
-              imagery. This helps create a cohesive visual identity while
-              allowing the natural beauty of coastal scenes to shine.
-            </TypographyP>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <div className="relative">
-                  <img
-                    src="https://picsum.photos/seed/surf789/400/300"
-                    alt="Surfing"
-                    className="rounded-lg object-cover aspect-4/3 w-full"
-                  />
+          <div>
+            <h3 className={typography.h3}>Badges</h3>
+            <div className="flex flex-wrap gap-4 mt-4">
+              <Badge>Default</Badge>
+              <Badge variant="secondary">Secondary</Badge>
+              <Badge variant="outline">Outline</Badge>
+              <Badge variant="destructive">Destructive</Badge>
+            </div>
+          </div>
 
-                  <div className="absolute inset-0 bg-nature-ocean/20 mix-blend-overlay rounded-lg"></div>
-                </div>
-                <TypographySmall className="text-primary-75">
-                  Subtle brand color overlay
-                </TypographySmall>
+          <div>
+            <h3 className={typography.h3}>Cards</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Card Title</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>This is a basic card with header and content.</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Interactive Card</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="mb-4">Cards can contain various elements.</p>
+                  <Button>Action</Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          <div>
+            <h3 className={typography.h3}>Icons</h3>
+            <div className="flex flex-wrap gap-6 mt-4">
+              <div className="flex flex-col items-center gap-2">
+                <Heart className="h-6 w-6 text-primary" />
+                <span className="text-xs">Heart</span>
               </div>
-              <div className="space-y-2">
-                <img
-                  src="https://picsum.photos/seed/market123/400/300"
-                  alt="Beach market"
-                  className="rounded-lg object-cover aspect-4/3 w-full brightness-105 saturate-110 sepia-[0.15]"
-                />
-
-                <TypographySmall className="text-primary-75">
-                  Warm filter enhancement
-                </TypographySmall>
+              <div className="flex flex-col items-center gap-2">
+                <Star className="h-6 w-6 text-primary" />
+                <span className="text-xs">Star</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <Download className="h-6 w-6 text-primary" />
+                <span className="text-xs">Download</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <Share2 className="h-6 w-6 text-primary" />
+                <span className="text-xs">Share</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <WaveIcon className="h-6 w-6 text-primary" />
+                <span className="text-xs">Wave</span>
               </div>
             </div>
           </div>
         </div>
       </section>
+    </div>
+  );
+}
 
-      {/* Messaging */}
-      <section className="space-y-6">
-        <TypographyH2>Messaging Framework</TypographyH2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-4">
-            <TypographyH3>Tone of Voice</TypographyH3>
-            <div className="p-6 bg-white border border-secondary-50 rounded-lg space-y-4">
-              <div className="space-y-2">
-                <h4 className="font-medium">Warm</h4>
-                <TypographyP>
-                  We speak with genuine friendliness and approachability,
-                  creating a welcoming atmosphere for all users.
-                </TypographyP>
-              </div>
-              <div className="space-y-2">
-                <h4 className="font-medium">Clear</h4>
-                <TypographyP>
-                  We communicate directly and simply, avoiding jargon and making
-                  information easily accessible.
-                </TypographyP>
-              </div>
-              <div className="space-y-2">
-                <h4 className="font-medium">Genuine</h4>
-                <TypographyP>
-                  We speak honestly and authentically, building trust through
-                  transparency and reliability.
-                </TypographyP>
-              </div>
-              <div className="space-y-2">
-                <h4 className="font-medium">Casual but Professional</h4>
-                <TypographyP>
-                  We strike a balance between friendly conversation and
-                  trustworthy expertise.
-                </TypographyP>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <TypographyH3>Messaging Pillars</TypographyH3>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-4 bg-nature-ocean text-white rounded-lg">
-                <h4 className="font-bold mb-2">Discover</h4>
-                <p className="text-sm">
-                  Explore unique events and experiences in coastal communities
-                </p>
-              </div>
-              <div className="p-4 bg-nature-coral text-white rounded-lg">
-                <h4 className="font-bold mb-2">Connect</h4>
-                <p className="text-sm">
-                  Build meaningful relationships with like-minded people
-                </p>
-              </div>
-              <div className="p-4 bg-vibrant-seafoam text-white rounded-lg">
-                <h4 className="font-bold mb-2">Flow</h4>
-                <p className="text-sm">
-                  Embrace the natural rhythm of coastal living
-                </p>
-              </div>
-              <div className="p-4 bg-nature-sand text-primary rounded-lg">
-                <h4 className="font-bold mb-2">Support Local</h4>
-                <p className="text-sm">
-                  Contribute to thriving coastal communities
-                </p>
-              </div>
-            </div>
-            <div className="mt-4 p-5 bg-secondary-25 rounded-lg">
-              <h4 className="font-medium mb-3">Example Messaging</h4>
-              <div className="space-y-3">
-                <div className="p-3 bg-white rounded border border-secondary-50">
-                  <TypographyTagline className="text-nature-ocean text-sm">
-                    DISCOVER
-                  </TypographyTagline>
-                  <TypographyP className="mt-1">
-                    Find your perfect wave with local surf events happening this
-                    weekend.
-                  </TypographyP>
-                </div>
-                <div className="p-3 bg-white rounded border border-secondary-50">
-                  <TypographyTagline className="text-nature-coral text-sm">
-                    CONNECT
-                  </TypographyTagline>
-                  <TypographyP className="mt-1">
-                    Join fellow yoga enthusiasts for sunrise sessions on the
-                    beach.
-                  </TypographyP>
-                </div>
-              </div>
-            </div>
-          </div>
+function StyleGuideCard({ icon, title, description }: { 
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) {
+  return (
+    <Card className="hover:shadow-md transition-shadow">
+      <CardContent className="pt-6">
+        <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+          <div className="text-primary">{icon}</div>
         </div>
-      </section>
+        <h3 className="mb-2 font-semibold">{title}</h3>
+        <p className="text-sm text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  );
+}
 
-      {/* Footer */}
-      <footer className="pt-12 border-t border-secondary-50 text-center">
-        <TypographySmall className="text-primary-75">
-          © {new Date().getFullYear()} the lineup. All rights reserved.
-        </TypographySmall>
-        <div className="mt-2 flex justify-center">
-          <TypographyTagline className="text-nature-ocean text-sm">
-            Join the Flow.
-          </TypographyTagline>
-        </div>
-      </footer>
+function ColorSwatch({ color, name }: { color: string; name: string }) {
+  return (
+    <div className="flex flex-col">
+      <div 
+        className="h-16 rounded-md border"
+        style={{ backgroundColor: color }}
+      />
+      <div className="mt-2 text-sm font-medium">{name}</div>
+      <div className="text-xs text-muted-foreground">{color}</div>
     </div>
   );
 }

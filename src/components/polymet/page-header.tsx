@@ -1,89 +1,37 @@
-import { ReactNode } from "react";
-import { cn } from "@/lib/utils";
-import { Link } from "react-router-dom";
-import { Button } from "@/polymet/components/button";
-import { PlusIcon } from "lucide-react";
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/polymet/button';
 
 interface PageHeaderProps {
   title: string;
-  subtitle?: string;
-  actionLabel?: string;
-  actionIcon?: ReactNode;
-  actionHref?: string;
-  onActionClick?: () => void;
+  description?: string;
+  backButtonHref?: string;
   className?: string;
-  variant?: "default" | "with-background" | "minimal";
-  children?: ReactNode;
 }
 
-export default function PageHeader({
+const PageHeader: React.FC<PageHeaderProps> = ({
   title,
-  subtitle,
-  actionLabel,
-  actionIcon,
-  actionHref,
-  onActionClick,
+  description,
+  backButtonHref,
   className,
-  variant = "default",
-  children,
-}: PageHeaderProps) {
-  // Determine if we should render the action button
-  const showAction = actionLabel || actionIcon;
-
-  // Determine if the action should be a link or a button
-  const ActionComponent = actionHref ? (
-    <Button variant="default" size="lg" asChild>
-      <Link to={actionHref}>
-        {actionIcon && <span className="mr-2">{actionIcon}</span>}
-        {actionLabel}
-      </Link>
-    </Button>
-  ) : (
-    <Button variant="default" size="lg" onClick={onActionClick}>
-      {actionIcon && <span className="mr-2">{actionIcon}</span>}
-      {actionLabel}
-    </Button>
-  );
-
-  // Styles based on variant
-  const headerStyles = {
-    default: "py-8",
-    "with-background": "bg-nature-ocean text-white px-4 py-12 md:py-16",
-    minimal: "py-6",
-  };
-
+}) => {
   return (
-    <header className={cn("w-full", headerStyles[variant], className)}>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-          <div>
-            <h1
-              className={cn(
-                "text-3xl font-bold",
-                variant === "with-background" ? "text-white" : "text-primary"
-              )}
-            >
-              {title}
-            </h1>
-            {subtitle && (
-              <p
-                className={cn(
-                  "mt-2",
-                  variant === "with-background"
-                    ? "text-white/80"
-                    : "text-primary-75"
-                )}
-              >
-                {subtitle}
-              </p>
-            )}
-          </div>
-
-          {showAction && <div className="flex-shrink-0">{ActionComponent}</div>}
-        </div>
-
-        {children && <div className="mt-6">{children}</div>}
-      </div>
-    </header>
+    <div className={cn("mb-8 space-y-2", className)}>
+      {backButtonHref && (
+        <Button variant="ghost" size="sm" asChild>
+          <a href={backButtonHref} className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </a>
+        </Button>
+      )}
+      <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
+      {description && (
+        <p className="text-sm text-muted-foreground">{description}</p>
+      )}
+    </div>
   );
-}
+};
+
+export default PageHeader;

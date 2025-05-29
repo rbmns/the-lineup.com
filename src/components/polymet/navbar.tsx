@@ -1,217 +1,92 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { MenuIcon, XIcon } from "lucide-react";
-import { Button } from "@/polymet/components/button";
-import Logo from "@/polymet/components/logo";
-import UserAvatarMenu from "@/polymet/components/user-avatar-menu";
+import React, { useState } from 'react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/polymet/button';
+import { Logo } from '@/components/polymet/logo';
+import UserAvatarMenu from '@/components/polymet/user-avatar-menu';
+import { 
+  Menu, 
+  X, 
+  Search, 
+  Bell, 
+  MessageSquare,
+  Calendar,
+  Users,
+  MapPin
+} from 'lucide-react';
 
-export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+interface NavbarProps {
+  className?: string;
+}
 
-  // Mock authentication state - in a real app, this would come from an auth context
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+const Navbar: React.FC<NavbarProps> = ({ className }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Toggle authentication for demo purposes
-  const toggleAuth = () => {
-    setIsAuthenticated(!isAuthenticated);
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // Handle scroll events to add background when scrolled
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   return (
-    <header
-      className={`sticky top-0 z-50 w-full transition-colors duration-300 ${
-        isScrolled
-          ? "bg-white/90 backdrop-blur-md border-b border-secondary-50 dark:bg-primary-950/90 dark:border-primary-800"
-          : "bg-white dark:bg-primary-950"
-      }`}
-    >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-        {/* Logo */}
-        <Link to="/" className="flex items-center">
-          <Logo />
-        </Link>
+    <header className={cn("bg-white border-b border-secondary-10 shadow-sm sticky top-0 z-50", className)}>
+      <div className="container flex items-center justify-between h-16">
+        {/* Logo and Brand */}
+        <Logo className="mr-4" />
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-1">
-          <Link
-            to="/"
-            className="px-3 py-2 text-sm font-medium text-neutral hover:text-primary"
-          >
-            Home
-          </Link>
-          <Link
-            to="/events"
-            className="px-3 py-2 text-sm font-medium text-neutral hover:text-primary"
-          >
+        <div className="hidden lg:flex items-center space-x-4">
+          <Button variant="ghost" size="sm" className="font-medium">
+            <Search className="w-4 h-4 mr-2" />
+            Explore
+          </Button>
+          <Button variant="ghost" size="sm" className="font-medium">
+            <Calendar className="w-4 h-4 mr-2" />
             Events
-          </Link>
-          <Link
-            to="/plans"
-            className="px-3 py-2 text-sm font-medium text-neutral hover:text-primary"
-          >
-            Plans
-          </Link>
-          <Link
-            to="/friends"
-            className="px-3 py-2 text-sm font-medium text-neutral hover:text-primary"
-          >
-            Friends
-          </Link>
-        </nav>
-
-        {/* Auth buttons or user menu */}
-        <div className="hidden md:flex items-center space-x-4">
-          {isAuthenticated ? (
-            <UserAvatarMenu
-              user={{
-                name: "Alex Johnson",
-                email: "alex@example.com",
-                avatar: "https://github.com/yusufhilmi.png",
-              }}
-              notificationCount={2}
-              onLogout={toggleAuth}
-            />
-          ) : (
-            <>
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                onClick={toggleAuth} // For demo purposes
-              >
-                <Link to="/auth">Log in</Link>
-              </Button>
-              <Button
-                variant="default"
-                size="sm"
-                asChild
-                onClick={toggleAuth} // For demo purposes
-              >
-                <Link to="/auth?tab=signup">Sign up</Link>
-              </Button>
-            </>
-          )}
-        </div>
-
-        {/* Mobile menu button */}
-        <div className="md:hidden">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-neutral"
-          >
-            {isMenuOpen ? (
-              <XIcon className="h-6 w-6" />
-            ) : (
-              <MenuIcon className="h-6 w-6" />
-            )}
+          </Button>
+          <Button variant="ghost" size="sm" className="font-medium">
+            <Users className="w-4 h-4 mr-2" />
+            Community
+          </Button>
+          <Button variant="ghost" size="sm" className="font-medium">
+            <MapPin className="w-4 h-4 mr-2" />
+            Places
           </Button>
         </div>
+
+        {/* Mobile Menu Button */}
+        <div className="lg:hidden">
+          <Button variant="ghost" onClick={toggleMobileMenu}>
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </Button>
+        </div>
+
+        {/* User Avatar Menu */}
+        <UserAvatarMenu />
       </div>
 
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="md:hidden border-t border-secondary-50 dark:border-primary-800">
-          <div className="space-y-1 px-4 py-3">
-            <Link
-              to="/"
-              className="block px-3 py-2 text-base font-medium text-neutral hover:text-primary"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link
-              to="/events"
-              className="block px-3 py-2 text-base font-medium text-neutral hover:text-primary"
-              onClick={() => setIsMenuOpen(false)}
-            >
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden bg-white border-b border-secondary-10 py-2">
+          <div className="container flex flex-col space-y-2">
+            <Button variant="ghost" className="justify-start">
+              <Search className="w-4 h-4 mr-2" />
+              Explore
+            </Button>
+            <Button variant="ghost" className="justify-start">
+              <Calendar className="w-4 h-4 mr-2" />
               Events
-            </Link>
-            <Link
-              to="/plans"
-              className="block px-3 py-2 text-base font-medium text-neutral hover:text-primary"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Plans
-            </Link>
-            <Link
-              to="/friends"
-              className="block px-3 py-2 text-base font-medium text-neutral hover:text-primary"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Friends
-            </Link>
-
-            {/* Mobile auth buttons */}
-            <div className="mt-4 pt-4 border-t border-secondary-50 dark:border-primary-800">
-              {isAuthenticated ? (
-                <div className="flex items-center">
-                  <img
-                    src="https://github.com/yusufhilmi.png"
-                    alt="User"
-                    className="h-8 w-8 rounded-full mr-3"
-                  />
-
-                  <div>
-                    <p className="text-sm font-medium">Alex Johnson</p>
-                    <Button
-                      variant="link"
-                      size="sm"
-                      className="p-0 h-auto text-vibrant-sunset"
-                      onClick={() => {
-                        toggleAuth();
-                        setIsMenuOpen(false);
-                      }}
-                    >
-                      Log out
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-col space-y-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      toggleAuth();
-                      setIsMenuOpen(false);
-                    }}
-                    asChild
-                  >
-                    <Link to="/auth">Log in</Link>
-                  </Button>
-                  <Button
-                    variant="default"
-                    onClick={() => {
-                      toggleAuth();
-                      setIsMenuOpen(false);
-                    }}
-                    asChild
-                  >
-                    <Link to="/auth?tab=signup">Sign up</Link>
-                  </Button>
-                </div>
-              )}
-            </div>
+            </Button>
+            <Button variant="ghost" className="justify-start">
+              <Users className="w-4 h-4 mr-2" />
+              Community
+            </Button>
+             <Button variant="ghost" className="justify-start">
+              <MapPin className="w-4 h-4 mr-2" />
+              Places
+            </Button>
           </div>
         </div>
       )}
     </header>
   );
-}
+};
+
+export default Navbar;

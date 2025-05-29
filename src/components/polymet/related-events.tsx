@@ -1,30 +1,40 @@
+import React from 'react';
+
+// Mock data for demo purposes
+const mockEventsData = {
+  events: [
+    {
+      id: "1",
+      title: "Beach Yoga Session",
+      category: "Wellness",
+      date: "2024-03-15",
+      time: "7:00 AM",
+      location: "Santa Monica Beach",
+      price: "Free",
+      image: "/api/placeholder/300/200"
+    }
+  ]
+};
+
+import EventCard from '@/components/polymet/event-card';
 import { cn } from "@/lib/utils";
-import { EventData } from "@/polymet/data/events-data";
-import EventCard from "@/polymet/components/event-card";
 
 interface RelatedEventsProps {
-  events: EventData[];
+  events?: any[]; // Replace 'any' with a more specific type if possible
   className?: string;
-  title?: string;
 }
 
-export default function RelatedEvents({
-  events,
-  className,
-  title = "Related Events",
-}: RelatedEventsProps) {
-  if (!events || events.length === 0) {
-    return null;
-  }
-
+const RelatedEvents: React.FC<RelatedEventsProps> = ({ events = mockEventsData.events, className }) => {
   return (
-    <div className={cn("w-full", className)}>
-      {title && <h3 className="mb-4 text-xl font-semibold">{title}</h3>}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div className={cn("space-y-4", className)}>
+      <h4 className="text-lg font-semibold">Related Events</h4>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {events.map((event) => (
-          <EventCard key={event.id} {...event} showRsvp={true} />
+          <EventCard key={event.id} event={event} compact />
         ))}
       </div>
     </div>
   );
-}
+};
+
+export default RelatedEvents;

@@ -1,77 +1,54 @@
-import { cn } from "@/lib/utils";
-import { UserIcon, UsersIcon, CalendarIcon } from "lucide-react";
-import { Button } from "@/polymet/components/button";
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/polymet/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-interface StepProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}
-
-function Step({ icon, title, description }: StepProps) {
-  return (
-    <div className="flex flex-col items-center text-center">
-      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-nature-ocean/10 text-nature-ocean">
-        {icon}
-      </div>
-      <h3 className="mb-2 text-lg font-semibold">{title}</h3>
-      <p className="text-sm text-primary-75">{description}</p>
-    </div>
-  );
-}
-
-interface HowItWorksSectionProps {
+interface HowItWorksProps {
   className?: string;
-  onBrowse?: () => void;
 }
 
-export default function HowItWorksSection({
-  className,
-  onBrowse,
-}: HowItWorksSectionProps) {
+const HowItWorksSection: React.FC<HowItWorksProps> = ({ className }) => {
   return (
-    <section className={cn("py-16 px-4", className)}>
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-12 text-center">
-          <h2 className="mb-4 text-2xl font-bold sm:text-3xl">How It Works</h2>
-          <p className="mx-auto max-w-2xl text-primary-75">
-            Create a profile to connect with friends and get personalized
-            recommendations.
-          </p>
+    <section className={cn("py-12 bg-secondary", className)}>
+      <div className="container mx-auto px-4">
+        <h2 className="text-3xl font-bold text-center mb-8">How It Works</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Step 1 */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Discover Events</CardTitle>
+            </CardHeader>
+            <CardContent>
+              Browse a wide range of events happening near you. Find something that sparks your interest!
+            </CardContent>
+          </Card>
+
+          {/* Step 2 */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Join the Fun</CardTitle>
+            </CardHeader>
+            <CardContent>
+              RSVP to events, connect with other attendees, and get ready to have a great time.
+            </CardContent>
+          </Card>
+
+          {/* Step 3 */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Share Your Experience</CardTitle>
+            </CardHeader>
+            <CardContent>
+              Share your event experiences with friends and the community. Help others discover amazing events!
+            </CardContent>
+          </Card>
         </div>
-
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
-          <Step
-            icon={<UserIcon size={32} strokeWidth={1.5} />}
-            title="Create Your Profile"
-            description="Tell us a bit about yourself and your vibe."
-          />
-
-          <Step
-            icon={<UsersIcon size={32} strokeWidth={1.5} />}
-            title="Connect with Friends"
-            description="Find your crew and see what they're up to."
-          />
-
-          <Step
-            icon={<CalendarIcon size={32} strokeWidth={1.5} />}
-            title="Discover Events"
-            description="Join local events your friends love."
-          />
+        <div className="text-center mt-8">
+          <Button size="lg">Explore Events</Button>
         </div>
-
-        {onBrowse && (
-          <div className="mt-12 flex justify-center">
-            <Button
-              variant="outline"
-              onClick={onBrowse}
-              className="border-primary-50 text-primary hover:bg-primary-10"
-            >
-              Or... Just Browse Events
-            </Button>
-          </div>
-        )}
       </div>
     </section>
   );
-}
+};
+
+export default HowItWorksSection;

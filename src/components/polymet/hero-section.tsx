@@ -1,78 +1,49 @@
-import { ReactNode } from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/polymet/components/button";
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/polymet/button';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface HeroSectionProps {
   title: string;
-  location?: string;
-  subtitle: string;
-  onExplore?: () => void;
-  onCreateProfile?: () => void;
-  children?: ReactNode;
+  description: string;
+  buttonText: string;
+  buttonLink: string;
+  className?: string;
 }
 
-export default function HeroSection({
+const HeroSection: React.FC<HeroSectionProps> = ({
   title,
-  location,
-  subtitle,
-  onExplore,
-  onCreateProfile,
-  children,
-}: HeroSectionProps) {
+  description,
+  buttonText,
+  buttonLink,
+  className,
+}) => {
   return (
-    <section className="relative overflow-hidden bg-primary px-4 py-16 text-white md:py-24">
-      {/* Background image with overlay */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src="https://picsum.photos/seed/beach123/1920/1080"
-          alt="Background"
-          className="h-full w-full object-cover brightness-75"
-        />
-
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-primary/50" />
-      </div>
-
-      <div className="relative z-10 mx-auto max-w-7xl">
-        <div className="grid items-center gap-8 md:grid-cols-2">
-          <div className="text-center md:text-left">
-            <h1 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl font-inter">
-              {title}{" "}
-              {location && (
-                <span className="text-vibrant-sunset">{location}</span>
-              )}
-            </h1>
-
-            <p className="mx-auto mb-6 max-w-2xl text-lg text-white/90 md:mx-0 font-inter">
-              {subtitle}
-            </p>
-
-            <div className="flex flex-col items-center justify-center gap-4 sm:flex-row md:justify-start">
-              <Button
-                variant="secondary"
-                size="lg"
-                className="w-full bg-white text-primary hover:bg-white/90 sm:w-auto"
-                onClick={onExplore}
-                asChild
-              >
-                <Link to="/events">Explore Events</Link>
-              </Button>
-
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full border-white text-white hover:bg-white/10 sm:w-auto"
-                onClick={onCreateProfile}
-                asChild
-              >
-                <Link to="/auth?tab=signup">Create Profile</Link>
-              </Button>
-            </div>
+    <section className={cn("py-24 bg-white", className)}>
+      <div className="container mx-auto px-4">
+        <div className="lg:flex items-center justify-between">
+          <div className="lg:w-1/2 mb-8 lg:mb-0">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">{title}</h1>
+            <p className="text-lg text-gray-700 mb-6">{description}</p>
+            <Button size="lg" asChild>
+              <a href={buttonLink}>{buttonText}</a>
+            </Button>
           </div>
-
-          {/* Right side content slot */}
-          <div className="hidden md:block">{children}</div>
+          <div className="lg:w-1/2">
+            <Card>
+              <CardContent className="p-4">
+                <img
+                  src="https://source.unsplash.com/random/800x600"
+                  alt="Placeholder"
+                  className="rounded-md"
+                />
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </section>
   );
-}
+};
+
+export default HeroSection;

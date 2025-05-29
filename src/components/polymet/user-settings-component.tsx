@@ -1,6 +1,7 @@
-import { useState } from "react";
+import React, { useState } from 'react';
+import { Button } from '@/components/polymet/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from "@/components/ui/switch";
-import { Button } from "@/polymet/components/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BellIcon, EyeIcon, GlobeIcon, UsersIcon } from "lucide-react";
 

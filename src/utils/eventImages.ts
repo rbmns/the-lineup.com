@@ -19,7 +19,28 @@ const EVENT_FALLBACK_IMAGES = {
   default: "/img/default.jpg",
 };
 
-export const getEventFallbackImage = (category?: string): string => {
+// Export as DEFAULT_EVENT_IMAGES for compatibility
+export const DEFAULT_EVENT_IMAGES = {
+  yoga: "/img/yoga.jpg",
+  surf: "/img/surf.jpg",
+  beach: "/img/beach.jpg",
+  music: "/img/music.jpg",
+  food: "/img/food.jpg",
+  workshop: "/img/default.jpg",
+  other: "/img/default.jpg",
+};
+
+export const eventTypeColors = {
+  yoga: "#8B5CF6",
+  surf: "#06B6D4", 
+  beach: "#F59E0B",
+  music: "#A855F7",
+  food: "#EF4444",
+  workshop: "#6B7280",
+  other: "#6B7280",
+};
+
+export const getEventFallbackImage = (category?: string, tags?: string[]): string => {
   if (!category) return EVENT_FALLBACK_IMAGES.default;
   
   const normalizedCategory = category.toLowerCase();
@@ -30,11 +51,6 @@ export const getEventImage = (event: Event): string => {
   // Check for image_urls array first
   if (event.image_urls && event.image_urls.length > 0) {
     return event.image_urls[0];
-  }
-  
-  // Check for share_image property
-  if (event.share_image) {
-    return event.share_image;
   }
   
   // Fall back to category-based image

@@ -1,20 +1,24 @@
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
-import { brandColors } from "@/polymet/components/brand-colors";
-import {
-  TypographyH1,
-  TypographyH2,
-  TypographyH3,
-  TypographyH4,
-  TypographyP,
-  TypographyLead,
-  TypographySmall,
-  TypographyMono,
-  TypographyAccent,
-  TypographyTagline,
-} from "@/polymet/components/brand-typography";
-import BrandLogo from "@/polymet/components/brand-logo";
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { brandColors } from '@/components/polymet/brand-colors';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/polymet/button';
+import { 
+  Palette, 
+  Type, 
+  Layout, 
+  Image as ImageIcon, 
+  Zap, 
+  Eye,
+  Download,
+  Share2,
+  Heart,
+  Star
+} from 'lucide-react';
+import { typography } from '@/components/polymet/brand-typography';
+import { Logo } from '@/components/polymet/logo';
 
 interface BrandBookProps {
   className?: string;

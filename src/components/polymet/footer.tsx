@@ -1,5 +1,7 @@
+import React from 'react';
 import { Link } from "react-router-dom";
-import Logo from "@/polymet/components/logo";
+import { Logo } from '@/components/polymet/logo';
+import { Separator } from '@/components/ui/separator';
 import {
   FacebookIcon,
   InstagramIcon,

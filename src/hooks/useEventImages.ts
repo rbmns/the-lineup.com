@@ -34,8 +34,8 @@ export const useEventImages = (event?: Event | null): EventImageResult => {
       return eventData.image_urls[0];
     }
     
-    // Use fallback based on event type and tags
-    return getEventFallbackImage(eventData.event_type, eventData.tags);
+    // Use fallback based on event type
+    return getEventFallbackImage(eventData.event_type);
   };
 
   useEffect(() => {
@@ -54,12 +54,12 @@ export const useEventImages = (event?: Event | null): EventImageResult => {
           setCoverImage(event.image_urls[0]);
         } else {
           // Use fallback image based on event type
-          const fallbackImage = getEventFallbackImage(event.event_type, event.tags);
+          const fallbackImage = getEventFallbackImage(event.event_type);
           setCoverImage(fallbackImage);
         }
 
         // Use the same image for share image or fallback
-        setShareImage(coverImage || getEventFallbackImage(event.event_type, event.tags));
+        setShareImage(coverImage || getEventFallbackImage(event.event_type));
 
         setIsLoading(false);
       } catch (err) {

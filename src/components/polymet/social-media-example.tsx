@@ -1,7 +1,7 @@
-import { cn } from "@/lib/utils";
-import { brandColors } from "@/polymet/components/brand-colors";
-import BrandLogo from "@/polymet/components/brand-logo";
-import { CalendarIcon, MapPinIcon } from "lucide-react";
+import React from 'react';
+import { brandColors } from '@/components/polymet/brand-colors';
+import { Logo } from '@/components/polymet/logo';
+import { cn } from '@/lib/utils';
 
 // Platform-specific configurations
 const platformConfig = {
@@ -83,7 +83,7 @@ export default function SocialMediaExample({
       <div className="relative h-full flex flex-col p-6">
         {/* Header with logo and category */}
         <div className="flex justify-between items-start mb-auto">
-          <BrandLogo variant="white" size="sm" />
+          <Logo variant="white" size="sm" />
 
           <span
             className="px-3 py-1 rounded-full text-sm font-medium bg-white/20 text-white"

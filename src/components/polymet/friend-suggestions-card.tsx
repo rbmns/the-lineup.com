@@ -1,129 +1,69 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Button } from "@/polymet/components/button";
-import { UserPlusIcon, XIcon, CalendarIcon } from "lucide-react";
-import { FriendSuggestion } from "@/polymet/data/user-events-data";
+import React from 'react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/polymet/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
+// Mock data for demo purposes
+const mockUserEventsData = {
+  suggestedFriends: [
+    {
+      id: "1",
+      name: "Sarah Johnson",
+      avatar: "/api/placeholder/32/32",
+      mutualFriends: 3,
+      location: "San Francisco, CA"
+    }
+  ]
+};
+
+interface FriendSuggestion {
+  id: string;
+  name: string;
+  avatar?: string;
+  mutualFriends: number;
+  location: string;
+}
 
 interface FriendSuggestionsCardProps {
-  suggestions: FriendSuggestion[];
+  suggestedFriends?: FriendSuggestion[];
   className?: string;
-  onAddFriend?: (userId: string) => void;
-  onDismiss?: (userId: string) => void;
 }
 
 export default function FriendSuggestionsCard({
-  suggestions,
-  className = "",
-  onAddFriend = () => {},
-  onDismiss = () => {},
+  suggestedFriends = mockUserEventsData.suggestedFriends,
+  className,
 }: FriendSuggestionsCardProps) {
-  const [visibleSuggestions, setVisibleSuggestions] = useState<string[]>(
-    suggestions.map((s) => s.id)
-  );
-
-  const handleAddFriend = (userId: string) => {
-    onAddFriend(userId);
-    setVisibleSuggestions(visibleSuggestions.filter((id) => id !== userId));
-  };
-
-  const handleDismiss = (userId: string) => {
-    onDismiss(userId);
-    setVisibleSuggestions(visibleSuggestions.filter((id) => id !== userId));
-  };
-
-  const filteredSuggestions = suggestions.filter((s) =>
-    visibleSuggestions.includes(s.id)
-  );
-
-  if (filteredSuggestions.length === 0) {
-    return null;
-  }
-
   return (
-    <div
-      className={`rounded-lg border border-secondary-50 bg-white ${className}`}
-    >
-      <div className="border-b border-secondary-50 p-4">
-        <h2 className="text-lg font-semibold">People You May Know</h2>
-        <p className="text-sm text-primary-75">
-          Based on events you've attended
-        </p>
-      </div>
-
-      <div className="divide-y divide-secondary-50">
-        {filteredSuggestions.map((suggestion) => (
-          <div key={suggestion.id} className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <img
-                  src={suggestion.avatar}
-                  alt={suggestion.name}
-                  className="h-12 w-12 rounded-full object-cover"
-                />
-
-                <div className="ml-3">
-                  <h3 className="font-medium">{suggestion.name}</h3>
-                  <p className="text-sm text-primary-75">
-                    {suggestion.mutualEvents} mutual{" "}
-                    {suggestion.mutualEvents === 1 ? "event" : "events"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-primary-50 text-primary hover:bg-primary-10"
-                  onClick={() => handleAddFriend(suggestion.id)}
-                >
-                  <UserPlusIcon size={16} className="mr-1.5" />
-                  Add
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDismiss(suggestion.id)}
-                >
-                  <XIcon size={16} />
-                </Button>
-              </div>
-            </div>
-
-            <div className="mt-3 rounded-lg bg-secondary p-3">
-              <div className="flex items-start">
-                <CalendarIcon
-                  size={16}
-                  className="mr-2 mt-0.5 text-primary-75"
-                />
-
+    <Card className={cn("w-full", className)}>
+      <CardHeader>
+        <CardTitle>Suggested Friends</CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">
+        <ul className="divide-y divide-border">
+          {suggestedFriends.map((friend) => (
+            <li key={friend.id} className="flex items-center justify-between p-4">
+              <div className="flex items-center space-x-4">
+                <Avatar>
+                  {friend.avatar ? (
+                    <AvatarImage src={friend.avatar} alt={friend.name} />
+                  ) : (
+                    <AvatarFallback>{friend.name.charAt(0)}</AvatarFallback>
+                  )}
+                </Avatar>
                 <div>
-                  <p className="text-sm">
-                    You both attended{" "}
-                    <Link
-                      to={`/events/${suggestion.lastEvent.id}`}
-                      className="font-medium text-vibrant-teal hover:underline"
-                    >
-                      {suggestion.lastEvent.title}
-                    </Link>
+                  <p className="text-sm font-medium leading-none">{friend.name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {friend.mutualFriends} mutual friends
                   </p>
-                  <p className="text-xs text-primary-75">
-                    {suggestion.lastEvent.date}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{friend.location}</p>
                 </div>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {filteredSuggestions.length > 0 && (
-        <div className="border-t border-secondary-50 p-4 text-center">
-          <Button variant="link" className="text-vibrant-teal">
-            See all suggestions
-          </Button>
-        </div>
-      )}
-    </div>
+              <Button size="sm">Add Friend</Button>
+            </li>
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
   );
 }
