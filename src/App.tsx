@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "sonner";
 import { QueryClient } from "./components/query-client";
 import Layout from "./components/Layout";
-import Index from "./pages/Index";
+import LandingPage from "./pages/LandingPage";
 import EventsPage from "./pages/EventsPage";
 import CreateEvent from "./pages/events/create";
 import EventDetail from "./pages/EventDetail";
@@ -26,7 +26,7 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Layout />}>
-              <Route index element={<Index />} />
+              <Route index element={<LandingPage />} />
               
               {/* Public Events routes */}
               <Route path="/events" element={<EventsPage />} />
