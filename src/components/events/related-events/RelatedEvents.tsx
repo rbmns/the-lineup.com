@@ -1,111 +1,59 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { Event } from '@/types';
 import { RelatedEventsGrid } from './RelatedEventsGrid';
-import { RelatedEventsLoader } from './RelatedEventsLoader';
-import { useFetchRelatedEvents } from '@/hooks/events/related-events';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase';
+import { useEventProcessor } from '@/hooks/useEventProcessor';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface RelatedEventsProps {
-  eventId: string;
-  eventType: string;
-  startDate: string;
-  tags?: string[] | string | null;
-  vibe?: string | null;
+  currentEvent: Event;
+  limit?: number;
 }
 
 export const RelatedEvents: React.FC<RelatedEventsProps> = ({ 
-  eventId, 
-  eventType, 
-  startDate,
-  tags,
-  vibe
+  currentEvent, 
+  limit = 4 
 }) => {
-  const [isVisible, setIsVisible] = useState(false);
   const { user } = useAuth();
+  const { processEvent } = useEventProcessor();
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
+  const { data: relatedEvents = [], isLoading } = useQuery({
+    queryKey: ['related-events', currentEvent.id, currentEvent.event_category],
+    queryFn: async () => {
+      // Find events with same category or venue, excluding current event
+      const { data, error } = await supabase
+        .from('events')
+        .select(`
+          *,
+          venues:venue_id(*),
+          creator:profiles(*),
+          event_rsvps(*)
+        `)
+        .neq('id', currentEvent.id)
+        .or(`event_category.eq.${currentEvent.event_category},venue_id.eq.${currentEvent.venue_id}`)
+        .order('start_date', { ascending: true })
+        .limit(limit);
 
-    // Get the element to observe
-    const elementToObserve = document.getElementById('related-events-section');
-    if (elementToObserve) {
-      observer.observe(elementToObserve);
-    }
+      if (error) {
+        console.error('Error fetching related events:', error);
+        return [];
+      }
 
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
-  // Function to parse tags into array format
-  const parseTags = (tagInput: string[] | string | null): string[] => {
-    if (!tagInput) return [];
-    if (Array.isArray(tagInput)) return tagInput.filter(Boolean);
-    if (typeof tagInput === 'string') {
-      return tagInput.split(',').map(tag => tag.trim()).filter(Boolean);
-    }
-    return [];
-  };
-
-  // Get the event tags as an array
-  const eventTags = parseTags(tags);
-
-  // Use our custom hook to fetch related events with improved relevance scoring
-  const { relatedEvents, loading } = useFetchRelatedEvents({
-    eventType,
-    currentEventId: eventId,
-    tags: eventTags,
-    vibe: vibe ? String(vibe) : undefined,
-    minResults: 4, // Increased minimum results for better selection
-    startDate,
-    userId: user?.id,
-    dateDifference: 21 // Show events within 21 days of the current event
+      return data?.map((eventData: any) => processEvent(eventData, user?.id)) || [];
+    },
+    enabled: !!currentEvent.event_category || !!currentEvent.venue_id,
   });
 
-  // Generate a section title based on event type and result count
-  const getSectionTitle = () => {
-    if (!relatedEvents || relatedEvents.length === 0) {
-      return "Related Events";
-    }
-    
-    // If all events are the same type, use a type-based headline
-    const allSameType = relatedEvents.every(event => event.event_type === eventType);
-    
-    if (allSameType && eventType) {
-      return `More ${eventType} events around the same time`;
-    }
-    
-    // If events have mixed types, use a more general headline
-    return "Events you might be interested in";
-  };
-
-  // Only render when the section becomes visible
-  if (!isVisible) {
-    return <div id="related-events-section" className="w-full"></div>;
+  if (isLoading || relatedEvents.length === 0) {
+    return null;
   }
 
   return (
-    <div id="related-events-section" className="w-full">
-      <h2 className="text-2xl font-bold mb-6">{getSectionTitle()}</h2>
-      
-      {loading ? (
-        <RelatedEventsLoader />
-      ) : (
-        <RelatedEventsGrid 
-          events={relatedEvents || []} 
-          referenceEventType={eventType}
-        />
-      )}
+    <div className="mt-8 pt-8 border-t">
+      <h2 className="text-2xl font-semibold mb-6">Related Events</h2>
+      <RelatedEventsGrid events={relatedEvents} />
     </div>
   );
 };
-
-export default RelatedEvents;
