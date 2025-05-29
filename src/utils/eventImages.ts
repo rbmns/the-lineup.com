@@ -2,7 +2,7 @@
 import { Event } from '@/types';
 
 // Default event images mapping
-const DEFAULT_EVENT_IMAGES = {
+export const DEFAULT_EVENT_IMAGES = {
   festival: '/img/concert.jpg',
   wellness: '/img/yoga.jpg',
   kite: '/img/kite.jpg',
