@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
-import { BohemianButton } from "@/polymet/components/bohemian-button";
+import { BohemianButton } from "@/components/polymet/bohemian-button";
 import { MapPinIcon } from "lucide-react";
-import { bohemianColors } from "@/polymet/components/bohemian-color-palette";
-import BohemianLogo from "@/polymet/components/bohemian-logo";
+import { bohemianColors } from "@/components/polymet/bohemian-color-palette";
+import BohemianLogo from "@/components/polymet/bohemian-logo";
 
 interface BohemianHeroSectionProps {
   title?: string;

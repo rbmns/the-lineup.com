@@ -1,6 +1,7 @@
+
 import { cn } from "@/lib/utils";
-import { BeachThemeCategoryBadge } from "@/polymet/components/beach-theme-category-badge";
-import { BeachThemeButton } from "@/polymet/components/beach-theme-button";
+import { BeachThemeCategoryBadge } from "@/components/polymet/beach-theme-category-badge";
+import { BeachThemeButton } from "@/components/polymet/beach-theme-button";
 import { CalendarIcon, MapPinIcon, UserIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 

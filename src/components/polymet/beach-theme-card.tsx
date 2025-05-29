@@ -1,5 +1,6 @@
+
 import { cn } from "@/lib/utils";
-import { beachLifeColors } from "@/polymet/components/beach-life-color-palette";
+import { beachLifeColors } from "@/components/polymet/beach-life-color-palette";
 import { cva, type VariantProps } from "class-variance-authority";
 import { HTMLAttributes, forwardRef } from "react";
 

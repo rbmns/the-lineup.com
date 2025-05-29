@@ -1,7 +1,7 @@
-import { cn } from "@/lib/utils";
-import { brandColors } from "@/polymet/components/brand-colors";
 
-// Beach life inspired color palette that extends the brand colors
+import { cn } from "@/lib/utils";
+
+// Beach life inspired color palette
 export const beachLifeColors = {
   // Primary colors - lighter and more vibrant
   primary: {
@@ -73,246 +73,22 @@ export const beachLifeColors = {
   },
 };
 
-interface ColorSwatchProps {
-  color: string;
-  name: string;
-  className?: string;
-}
-
-function ColorSwatch({ color, name, className }: ColorSwatchProps) {
+export default function BeachLifeColorPalette() {
   return (
-    <div className={cn("flex flex-col", className)}>
-      <div
-        className="h-16 w-full rounded-md shadow-sm mb-2"
-        style={{ backgroundColor: color }}
-      />
-
-      <div className="text-sm font-medium">{name}</div>
-      <div className="text-xs text-gray-500">{color}</div>
-    </div>
-  );
-}
-
-interface GradientSwatchProps {
-  gradient: string;
-  name: string;
-  className?: string;
-}
-
-function GradientSwatch({ gradient, name, className }: GradientSwatchProps) {
-  return (
-    <div className={cn("flex flex-col", className)}>
-      <div className={cn("h-16 w-full rounded-md shadow-sm mb-2", gradient)} />
-
-      <div className="text-sm font-medium">{name}</div>
-    </div>
-  );
-}
-
-interface PatternSwatchProps {
-  pattern: string;
-  name: string;
-  className?: string;
-}
-
-function PatternSwatch({ pattern, name, className }: PatternSwatchProps) {
-  return (
-    <div className={cn("flex flex-col", className)}>
-      <div className={cn("h-16 w-full rounded-md shadow-sm mb-2", pattern)} />
-
-      <div className="text-sm font-medium">{name}</div>
-    </div>
-  );
-}
-
-interface BeachLifeColorPaletteProps {
-  className?: string;
-}
-
-export default function BeachLifeColorPalette({
-  className,
-}: BeachLifeColorPaletteProps) {
-  return (
-    <div className={cn("space-y-8", className)}>
-      <section>
-        <h2 className="text-xl font-semibold mb-4 text-primary-dark">
-          Primary Colors - Ocean Inspired
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {Object.entries(beachLifeColors.primary).map(([name, color]) => (
-            <ColorSwatch key={name} color={color} name={name} />
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-4 text-primary-dark">
-          Secondary Colors - Sandy Warmth
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {Object.entries(beachLifeColors.secondary).map(([name, color]) => (
-            <ColorSwatch key={name} color={color} name={name} />
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-4 text-primary-dark">
-          Accent Colors - Vibrant Energy
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {Object.entries(beachLifeColors.accent).map(([name, color]) => (
-            <ColorSwatch key={name} color={color} name={name} />
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-4 text-primary-dark">
-          Nature Colors - Beach Life
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {Object.entries(beachLifeColors.nature).map(([name, color]) => (
-            <ColorSwatch key={name} color={color} name={name} />
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-4 text-primary-dark">
-          Vibrant Gradients
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Object.entries(beachLifeColors.gradients).map(([name, gradient]) => (
-            <GradientSwatch key={name} gradient={gradient} name={name} />
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-4 text-primary-dark">
-          Beach Patterns
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {Object.entries(beachLifeColors.patterns).map(([name, pattern]) => (
-            <PatternSwatch key={name} pattern={pattern} name={name} />
-          ))}
-        </div>
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-4 text-primary-dark">
-          UI Status Colors
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {Object.entries(beachLifeColors.status).map(([name, color]) => (
-            <ColorSwatch key={name} color={color} name={name} />
-          ))}
-        </div>
-      </section>
-
-      <section className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-        <h2 className="text-xl font-semibold mb-6 text-primary-dark">
-          Example Applications
-        </h2>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-primary">
-              Beach Yoga Event
-            </h3>
+    <div className="space-y-8">
+      <h2 className="text-2xl font-bold">Beach Life Color Palette</h2>
+      <div className="grid grid-cols-4 gap-4">
+        {Object.entries(beachLifeColors.primary).map(([name, color]) => (
+          <div key={name} className="text-center">
             <div
-              className={`${beachLifeColors.gradients.ocean} p-6 rounded-lg`}
-            >
-              <h4 className="text-xl font-bold mb-2 text-white">
-                Sunset Beach Yoga
-              </h4>
-              <p className="text-white/90">
-                Join us for a relaxing yoga session as the sun sets over the
-                ocean
-              </p>
-              <div className="mt-4 flex justify-between items-center">
-                <span className="bg-white/20 text-white px-3 py-1 rounded-full text-sm">
-                  Yoga
-                </span>
-                <span className="text-white/90 text-sm">
-                  Fri, June 24 • 18:30
-                </span>
-              </div>
-            </div>
+              className="h-16 w-full rounded mb-2"
+              style={{ backgroundColor: color }}
+            />
+            <p className="text-sm font-medium">{name}</p>
+            <p className="text-xs text-gray-500">{color}</p>
           </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-primary">
-              Surf Competition
-            </h3>
-            <div
-              className={`${beachLifeColors.gradients.tropical} p-6 rounded-lg`}
-            >
-              <h4 className="text-xl font-bold mb-2 text-white">
-                Summer Surf Challenge
-              </h4>
-              <p className="text-white/90">
-                Test your skills against local surfers in our friendly
-                competition
-              </p>
-              <div className="mt-4 flex justify-between items-center">
-                <span className="bg-white/20 text-white px-3 py-1 rounded-full text-sm">
-                  Surf
-                </span>
-                <span className="text-white/90 text-sm">
-                  Sat, July 15 • 10:00
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-primary">Beach Party</h3>
-            <div
-              className={`${beachLifeColors.gradients.sunset} p-6 rounded-lg`}
-            >
-              <h4 className="text-xl font-bold mb-2 text-white">
-                Sunset Beach Party
-              </h4>
-              <p className="text-white/90">
-                Dance to live music with your feet in the sand as the sun goes
-                down
-              </p>
-              <div className="mt-4 flex justify-between items-center">
-                <span className="bg-white/20 text-white px-3 py-1 rounded-full text-sm">
-                  Music
-                </span>
-                <span className="text-white/90 text-sm">
-                  Sat, July 22 • 19:00
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-primary">Beach Market</h3>
-            <div
-              className={`${beachLifeColors.gradients.beach} p-6 rounded-lg`}
-            >
-              <h4 className="text-xl font-bold mb-2 text-white">
-                Local Artisan Market
-              </h4>
-              <p className="text-white/90">
-                Browse handcrafted goods and local food at our beachside market
-              </p>
-              <div className="mt-4 flex justify-between items-center">
-                <span className="bg-white/20 text-white px-3 py-1 rounded-full text-sm">
-                  Market
-                </span>
-                <span className="text-white/90 text-sm">
-                  Sun, July 16 • 10:00-16:00
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+        ))}
+      </div>
     </div>
   );
 }

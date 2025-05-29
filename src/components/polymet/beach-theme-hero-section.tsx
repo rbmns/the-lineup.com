@@ -1,6 +1,7 @@
+
 import { cn } from "@/lib/utils";
-import { BeachThemeButton } from "@/polymet/components/beach-theme-button";
-import { beachLifeColors } from "@/polymet/components/beach-life-color-palette";
+import { BeachThemeButton } from "@/components/polymet/beach-theme-button";
+import { beachLifeColors } from "@/components/polymet/beach-life-color-palette";
 import { SearchIcon, MapPinIcon } from "lucide-react";
 
 interface BeachThemeHeroSectionProps {

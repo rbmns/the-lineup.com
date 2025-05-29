@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { CalendarIcon, MapPinIcon, UserIcon } from "lucide-react";
-import { BohemianButton } from "@/polymet/components/bohemian-button";
-import { categoryBadgeVariants } from "@/polymet/components/bohemian-color-palette";
+import { BohemianButton } from "@/components/polymet/bohemian-button";
+import { categoryBadgeVariants } from "@/components/polymet/bohemian-color-palette";
 
 interface BohemianEventCardProps {
   id: string;
