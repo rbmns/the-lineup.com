@@ -44,6 +44,35 @@ const EventDetail = () => {
     enabled: !!eventId,
   });
 
+  // Fetch related events based on the current event
+  const { data: relatedEvents = [] } = useQuery({
+    queryKey: ['related-events', event?.id, event?.event_category],
+    queryFn: async (): Promise<Event[]> => {
+      if (!event) return [];
+
+      const { data, error } = await supabase
+        .from('events')
+        .select(`
+          *,
+          venues:venue_id(*),
+          creator:profiles(*),
+          event_rsvps(*)
+        `)
+        .neq('id', event.id)
+        .or(`event_category.eq.${event.event_category},venue_id.eq.${event.venue_id}`)
+        .order('start_date', { ascending: true })
+        .limit(4);
+
+      if (error) {
+        console.error('Error fetching related events:', error);
+        return [];
+      }
+
+      return data?.map((eventData: any) => processEvent(eventData, user?.id)) || [];
+    },
+    enabled: !!event && (!!event.event_category || !!event.venue_id),
+  });
+
   useEffect(() => {
     if (!eventId) {
       navigate('/events');
@@ -81,7 +110,7 @@ const EventDetail = () => {
           </div>
         </div>
         
-        <RelatedEventsSection event={event} />
+        <RelatedEventsSection events={relatedEvents} />
       </div>
     </div>
   );
