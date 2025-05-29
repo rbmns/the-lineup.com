@@ -68,7 +68,7 @@ export const processFormData = (data: any, userId: string): SafeEventData => {
   return {
     title: data.title,
     description: data.description,
-    event_type: data.event_type,
+    event_category: data.event_category, // Changed from event_type to event_category
     start_date: startDate,  // This is now a valid property in SafeEventData
     start_time: startTime,
     end_time: endTime,
@@ -94,7 +94,7 @@ export const extractEventValues = (event: any): SafeEventData => {
       id: event.id,
       title: event.title || '',
       description: event.description || '',
-      event_type: event.event_type || 'other',
+      event_category: event.event_category || 'other', // Changed from event_type to event_category
       start_date: event.start_date,  // This is now a valid property in SafeEventData
       start_time: event.start_time,
       end_time: event.end_time,

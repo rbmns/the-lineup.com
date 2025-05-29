@@ -22,7 +22,7 @@ export type SafeEventData = {
   id?: string;
   title?: string;
   description?: string;
-  event_category?: string;
+  event_category?: string; // Changed from event_type to event_category
   start_time?: string;
   end_time?: string;
   start_date?: string;
