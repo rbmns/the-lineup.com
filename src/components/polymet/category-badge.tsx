@@ -1,5 +1,6 @@
+
 import { cn } from "@/lib/utils";
-import { badgeVariants } from "@/polymet/components/color-system";
+import { badgeVariants } from "@/components/polymet/color-system";
 import {
   MusicIcon,
   SunIcon,
@@ -92,7 +93,7 @@ export default function CategoryBadge({
 }: CategoryBadgeProps) {
   // Get the appropriate icon component
   const IconComponent =
-    categoryIcons[category.toLowerCase()] || categoryIcons.other;
+    categoryIcons[category.toLowerCase() as keyof typeof categoryIcons] || categoryIcons.other;
 
   // Size classes
   const sizeClasses = {

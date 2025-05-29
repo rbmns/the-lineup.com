@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, SubmitHandler } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -38,6 +38,7 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
     handleSubmit,
     setValue,
     watch,
+    getValues,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(EventSchema),
@@ -69,7 +70,7 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
       return {
         title: eventData.title || '',
         description: eventData.description || '',
-        event_category: eventData.event_category || eventData.event_type || 'other',
+        event_category: (eventData as any).event_category || (eventData as any).event_type || 'other',
         start_date: eventData.start_date ? new Date(eventData.start_date) : new Date(),
         start_time: eventData.start_time?.substring(0, 5) || '',
         end_date: eventData.end_date ? new Date(eventData.end_date) : new Date(),
@@ -80,7 +81,7 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
         booking_link: eventData.booking_link || '',
         extra_info: eventData.extra_info || '',
         tags: Array.isArray(eventData.tags) ? eventData.tags.join(', ') : (eventData.tags || ''),
-        vibe: eventData.vibe || '',
+        vibe: (eventData as any).vibe || '',
       };
     }
     return {
@@ -129,7 +130,7 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
   };
 
   // Fix the EventForm submission handler with proper type conversions
-  const onSubmit = async (data: FormValues) => {
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsSubmitting(true);
     
     try {
@@ -145,8 +146,6 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
           ? eventData.tags 
           : (typeof eventData.tags === 'string' ? eventData.tags.split(',') : [])
       };
-      
-      let result: boolean | string | null;
       
       if (isEditMode && eventId) {
         // Update existing event
