@@ -12,12 +12,16 @@ interface LayoutProps {
 }
 
 const Layout = ({ children }: LayoutProps) => {
-  const { user, loading, signOut } = useAuth();
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Define which routes should be accessible without authentication
+  const publicRoutes = ['/', '/events', '/login', '/signup'];
+  
   useEffect(() => {
-    if (!loading && !user && location.pathname !== '/login' && location.pathname !== '/register') {
+    // Only redirect to login if user is not authenticated AND trying to access a protected route
+    if (!loading && !user && !publicRoutes.includes(location.pathname)) {
       navigate('/login');
     }
   }, [user, loading, navigate, location]);
