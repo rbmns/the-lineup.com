@@ -7,7 +7,7 @@ import { useSearchParams } from 'react-router-dom';
 import { DateRange } from 'react-day-picker';
 
 interface EventFilterOptions {
-  event_type: string;
+  event_category: string;
   venues: { name: string; id: string; };
 }
 
@@ -74,7 +74,7 @@ export const useEventsFiltering = (events: Event[] = [], userId: string | undefi
   useEffect(() => {
     if (events && events.length > 0) {
       // Extract unique event types
-      const uniqueEventTypes = [...new Set(events.map(event => event.event_type).filter(Boolean))]
+      const uniqueEventTypes = [...new Set(events.map(event => event.event_category).filter(Boolean))]
         .map(type => ({ value: type, label: type }))
         .sort((a, b) => a.label.localeCompare(b.label));
       setAvailableEventTypes(uniqueEventTypes);
@@ -143,7 +143,7 @@ export const useEventsFiltering = (events: Event[] = [], userId: string | undefi
     return new Promise((resolve) => {
       setTimeout(() => {
         const similar = events.filter((event) =>
-          selectedEventTypes.includes(event.event_type)
+          selectedEventTypes.includes(event.event_category)
         );
         resolve(similar);
       }, 500);

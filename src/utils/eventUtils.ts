@@ -2,13 +2,13 @@
 import { Event } from '@/types';
 
 /**
- * Filters events by venue IDs
+ * Filters events by event categories
  */
 export const filterEventsByType = (events: Event[], eventTypes: string[]): Event[] => {
   if (!eventTypes.length) return events;
   
   return events.filter(event => 
-    event.event_type && eventTypes.includes(event.event_type)
+    event.event_category && eventTypes.includes(event.event_category)
   );
 };
 

@@ -41,10 +41,10 @@ export const EventCardHeader: React.FC<EventCardHeaderProps> = ({
         <div className="absolute top-0 left-0 w-full h-full bg-black/10"></div>
       </div>
       
-      {event.event_type && (
+      {event.event_category && (
         <div className="absolute top-3 left-3">
           <CategoryPill 
-            category={event.event_type}
+            category={event.event_category}
             size="sm"
           />
         </div>

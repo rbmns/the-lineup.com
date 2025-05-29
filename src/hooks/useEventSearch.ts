@@ -1,240 +1,123 @@
-import { useState, useEffect, useCallback } from 'react';
+
+import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
-import { useAuth } from '@/contexts/AuthContext';
-import { safeGet } from '@/utils/supabaseTypeUtils';
-
-type EventSearchFilter = {
-  eventType?: string | null;
-  venues?: string | null;
-  startDate?: Date | null;
-  endDate?: Date | null;
-  userFilter?: 'going' | 'interested' | 'created' | '' | null;
-  tags?: string[] | null;
-  vibe?: string | null;
-};
 
 export const useEventSearch = () => {
-  const [loading, setLoading] = useState(true);
-  const [events, setEvents] = useState<Event[]>([]);
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
-  const [filters, setFilters] = useState<EventSearchFilter>({
-    eventType: null,
-    venues: null,
-    startDate: null,
-    endDate: null,
-    userFilter: null,
-    tags: null,
-    vibe: null,
-  });
-  const { user } = useAuth();
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<Event[]>([]);
 
-  const processEventData = (event: any): Event => {
-    return {
-      id: event.id,
-      title: event.title,
-      description: event.description,
-      start_time: event.start_time,
-      end_time: event.end_time,
-      created_at: event.created_at || '',
-      updated_at: event.updated_at || '',
-      venues: {
-        id: safeGet(event.venue_id, 'id', ''),
-        name: safeGet(event.venue_id, 'name', 'Unknown venue'),
-        city: safeGet(event.venue_id, 'city', ''),
-        street: safeGet(event.venue_id, 'street', ''),
-        postal_code: safeGet(event.venue_id, 'postal_code', ''),
-      },
-      venue_id: safeGet(event.venue_id, 'id', ''),
-      event_type: event.event_type,
-      creator: event.creator,
-      image_urls: event.image_urls || [],
-      fee: event.fee,
-      tags: event.tags,
-      vibe: event.vibe,
-      attendees: {
-        going: event.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Going').length || 0,
-        interested: event.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Interested').length || 0
-      },
-      coordinates: event.coordinates,
-      created_by: event.created_by,
-    };
+  const searchEvents = async (query: string, filters?: {
+    eventTypes?: string[];
+    venues?: string[];
+    dateRange?: { from: Date; to: Date };
+  }): Promise<Event[]> => {
+    if (!query.trim()) {
+      return [];
+    }
+
+    setIsSearching(true);
+    
+    try {
+      let queryBuilder = supabase
+        .from('events')
+        .select(`
+          *,
+          venues:venue_id(*),
+          creator:profiles(*),
+          event_rsvps(*)
+        `);
+
+      // Add text search
+      queryBuilder = queryBuilder.or(
+        `title.ilike.%${query}%,description.ilike.%${query}%,event_category.ilike.%${query}%`
+      );
+
+      // Add filters if provided
+      if (filters?.eventTypes && filters.eventTypes.length > 0) {
+        queryBuilder = queryBuilder.in('event_category', filters.eventTypes);
+      }
+
+      if (filters?.venues && filters.venues.length > 0) {
+        queryBuilder = queryBuilder.in('venue_id', filters.venues);
+      }
+
+      if (filters?.dateRange) {
+        queryBuilder = queryBuilder
+          .gte('start_date', filters.dateRange.from.toISOString().split('T')[0])
+          .lte('start_date', filters.dateRange.to.toISOString().split('T')[0]);
+      }
+
+      const { data, error } = await queryBuilder
+        .order('start_date', { ascending: true })
+        .limit(20);
+
+      if (error) {
+        console.error('Search error:', error);
+        return [];
+      }
+
+      // Process the results
+      const events: Event[] = data?.map(eventData => ({
+        id: eventData.id,
+        title: eventData.title,
+        description: eventData.description || '',
+        location: eventData.location,
+        event_category: eventData.event_category,
+        start_time: eventData.start_time,
+        end_time: eventData.end_time,
+        start_date: eventData.start_date,
+        end_date: eventData.end_date,
+        created_at: eventData.created_at,
+        updated_at: eventData.updated_at,
+        image_urls: eventData.image_urls || [],
+        attendees: {
+          going: eventData.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Going')?.length || 0,
+          interested: eventData.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Interested')?.length || 0
+        },
+        rsvp_status: null,
+        area: eventData.area,
+        google_maps: eventData.venues?.google_maps || eventData.google_maps,
+        organizer_link: eventData.organizer_link,
+        organiser_name: eventData.organiser_name,
+        booking_link: eventData.booking_link,
+        creator: eventData.creator || null,
+        venues: eventData.venues || null,
+        venue_id: eventData.venue_id,
+        fee: eventData.fee,
+        extra_info: eventData.extra_info,
+        tags: eventData.tags || [],
+        coordinates: eventData.coordinates,
+        created_by: eventData.created_by,
+        vibe: eventData.vibe,
+        slug: eventData.slug,
+        destination: eventData.destination,
+        recurring_count: eventData.recurring_count,
+        cover_image: eventData.cover_image,
+        share_image: eventData.share_image,
+        going_count: eventData.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Going')?.length || 0,
+        interested_count: eventData.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Interested')?.length || 0
+      })) || [];
+
+      setSearchResults(events);
+      return events;
+
+    } catch (error) {
+      console.error('Unexpected search error:', error);
+      return [];
+    } finally {
+      setIsSearching(false);
+    }
   };
 
-  const fetchEvents = useCallback(async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('events')
-        .select('*, venue_id(id, name, city, street)')
-        .order('start_time', { ascending: true });
+  const clearSearch = () => {
+    setSearchResults([]);
+  };
 
-      if (error) {
-        throw error;
-      }
-
-      if (data) {
-        const formattedEvents = data.map(processEventData) as Event[];
-
-        setEvents(formattedEvents);
-        applyFilters(formattedEvents, filters);
-      }
-    } catch (error) {
-      console.error('Error fetching events:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const applyFilters = useCallback((eventsToFilter: Event[], currentFilters: EventSearchFilter) => {
-    let filtered = [...eventsToFilter];
-
-    if (currentFilters.eventType) {
-      filtered = filtered.filter(event => 
-        event.event_type === currentFilters.eventType
-      );
-    }
-
-    if (currentFilters.venues) {
-      filtered = filtered.filter(event => 
-        event.venue_id === currentFilters.venues
-      );
-    }
-
-    if (currentFilters.startDate) {
-      filtered = filtered.filter(event => {
-        const eventDate = typeof event.start_time === 'string' 
-          ? new Date(event.start_time) 
-          : event.start_time;
-        return eventDate >= currentFilters.startDate!;
-      });
-    }
-
-    if (currentFilters.endDate) {
-      filtered = filtered.filter(event => {
-        const eventDate = typeof event.start_time === 'string' 
-          ? new Date(event.start_time) 
-          : event.start_time;
-        return eventDate <= currentFilters.endDate!;
-      });
-    }
-
-    if (currentFilters.tags && currentFilters.tags.length > 0) {
-      filtered = filtered.filter(event => {
-        if (!event.tags) return false;
-        const eventTags = Array.isArray(event.tags) 
-          ? event.tags 
-          : typeof event.tags === 'string' 
-            ? [event.tags] 
-            : [];
-        return currentFilters.tags!.some(tag => eventTags.includes(tag));
-      });
-    }
-
-    if (currentFilters.vibe) {
-      filtered = filtered.filter(event => 
-        event.vibe === currentFilters.vibe
-      );
-    }
-
-    if (user && currentFilters.userFilter) {
-      if (currentFilters.userFilter === 'going') {
-        filtered = filtered.filter(event => 
-          event.rsvp_status === 'Going'
-        );
-      } else if (currentFilters.userFilter === 'interested') {
-        filtered = filtered.filter(event => 
-          event.rsvp_status === 'Interested'
-        );
-      } else if (currentFilters.userFilter === 'created') {
-        filtered = filtered.filter(event => 
-          event.creator?.id === user.id
-        );
-      }
-    }
-
-    setFilteredEvents(filtered);
-  }, [user]);
-
-  const updateFilters = useCallback((newFilters: Partial<EventSearchFilter>) => {
-    const updatedFilters = { ...filters, ...newFilters };
-    setFilters(updatedFilters);
-    applyFilters(events, updatedFilters);
-  }, [events, filters, applyFilters]);
-
-  const fetchSimilarEvents = useCallback(async (searchQuery: string, eventType?: string, tags?: string[]) => {
-    setLoading(true);
-    try {
-      // Build the query to find similar events based on various parameters
-      let query = supabase
-        .from('events')
-        .select('*, venue_id(id, name, city, street)');
-      
-      // If we have an event type, prioritize events with the same type
-      if (eventType) {
-        query = query.eq('event_type', eventType);
-      }
-      
-      // If we have tags, try to find events with matching tags
-      if (tags && tags.length > 0) {
-        // This is a simplified approach - for more complex tag matching
-        // you might need a more sophisticated query strategy
-        query = query.or(`tags.cs.{${tags.join(',')}}}`);
-      }
-      
-      // Limit the number of results and order by start time
-      const { data, error } = await query
-        .order('start_time', { ascending: true })
-        .limit(12);
-
-      if (error) {
-        throw error;
-      }
-
-      if (data && data.length > 0) {
-        return data.map(processEventData) as Event[];
-      }
-      
-      // If no matches found with the specific criteria, fallback to a broader search
-      const { data: fallbackData, error: fallbackError } = await supabase
-        .from('events')
-        .select('*, venue_id(id, name, city, street)')
-        .order('start_time', { ascending: true })
-        .limit(6);
-        
-      if (fallbackError) {
-        throw fallbackError;
-      }
-      
-      if (fallbackData) {
-        return fallbackData.map(processEventData) as Event[];
-      }
-      
-      return [];
-    } catch (error) {
-      console.error('Error fetching similar events:', error);
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchEvents();
-  }, [fetchEvents]);
-
-  useEffect(() => {
-    if (user) {
-      fetchEvents();
-    }
-  }, [user, fetchEvents]);
-
-  return { 
-    events: filteredEvents, 
-    loading, 
-    filters,
-    updateFilters,
-    refreshEvents: fetchEvents,
-    fetchSimilarEvents
+  return {
+    searchEvents,
+    clearSearch,
+    isSearching,
+    searchResults
   };
 };

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { MapPin } from 'lucide-react';
@@ -101,10 +100,10 @@ const EventCard: React.FC<EventCardProps> = ({
         />
         
         {/* Event type pill - UPDATED to not show icons */}
-        {event.event_type && (
+        {event.event_category && (
           <div className="absolute top-3 left-3 z-10">
             <CategoryPill 
-              category={event.event_type} 
+              category={event.event_category} 
               size="default" 
               showIcon={false}
             />

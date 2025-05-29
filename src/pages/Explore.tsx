@@ -44,13 +44,17 @@ const processEventData = (event: any): Event => {
     end_time: event.end_time,
     created_at: event.created_at,
     updated_at: event.updated_at,
-    event_type: event.event_type,
+    event_category: event.event_category,
     image_urls: event.image_urls || [],
     venues: hasValidVenues ? event.venues : null,
     google_maps: hasValidVenues && event.venues.google_maps ? event.venues.google_maps : null,
     rsvp_status: undefined,
     area: null,
     coordinates: event.coordinates || null,
+    attendees: {
+      going: 0,
+      interested: 0
+    }
   } as Event;
 };
 
@@ -132,7 +136,7 @@ const Explore = () => {
             name: event.title,
             type: 'event',
             coordinates: eventCoordinates as [number, number],
-            category: event.event_type,
+            category: event.event_category,
             date: event.start_time,
             eventTitle: event.title,
             location_category: 'Event'

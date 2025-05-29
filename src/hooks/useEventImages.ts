@@ -1,83 +1,74 @@
 
 import { useState, useEffect } from 'react';
 import { Event } from '@/types';
-import { supabase } from '@/lib/supabase';
 import { getEventFallbackImage } from '@/utils/eventImages';
 
-export interface EventImage {
-  id: string;
-  url: string;
-  alt?: string;
-  type: 'cover' | 'gallery' | 'share';
-}
+export const useEventImages = () => {
+  const [cachedImages, setCachedImages] = useState<Record<string, string>>({});
 
-interface EventImageResult {
-  coverImage: string | null;
-  shareImage: string | null;
-  galleryImages: EventImage[];
-  isLoading: boolean;
-  error: Error | null;
-  getEventImageUrl: (event: Event) => string | null;
-}
-
-export const useEventImages = (event?: Event | null): EventImageResult => {
-  const [coverImage, setCoverImage] = useState<string | null>(null);
-  const [shareImage, setShareImage] = useState<string | null>(null);
-  const [galleryImages, setGalleryImages] = useState<EventImage[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  // Function to get image URL for any event (useful when rendering lists)
-  const getEventImageUrl = (eventData: Event): string | null => {
-    // Check for image_urls array first
-    if (eventData.image_urls && eventData.image_urls.length > 0) {
-      return eventData.image_urls[0];
-    }
-    
-    // Use fallback based on event type and tags
-    return getEventFallbackImage(eventData.event_type, eventData.tags);
+  const preloadImage = (src: string): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(src);
+      img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
+      img.src = src;
+    });
   };
 
-  useEffect(() => {
-    const loadImages = async () => {
-      if (!event) {
-        setIsLoading(false);
-        return;
-      }
+  const getEventImageUrl = (event: Event): string => {
+    // Check if we have a cached result
+    if (cachedImages[event.id]) {
+      return cachedImages[event.id];
+    }
 
-      try {
-        setIsLoading(true);
-        setError(null);
+    // Priority order for images:
+    // 1. First image from image_urls array
+    // 2. cover_image
+    // 3. share_image 
+    // 4. Fallback based on event category/tags
 
-        // Process cover image
-        if (event.image_urls && event.image_urls.length > 0) {
-          setCoverImage(event.image_urls[0]);
-        } else {
-          // Use fallback image based on event type
-          const fallbackImage = getEventFallbackImage(event.event_type, event.tags);
-          setCoverImage(fallbackImage);
-        }
+    let imageUrl = '';
 
-        // Use the same image for share image or fallback
-        setShareImage(coverImage || getEventFallbackImage(event.event_type, event.tags));
+    if (event.image_urls && event.image_urls.length > 0) {
+      imageUrl = event.image_urls[0];
+    } else if (event.cover_image) {
+      imageUrl = event.cover_image;
+    } else if (event.share_image) {
+      imageUrl = event.share_image;
+    } else {
+      // Use fallback image based on event category
+      imageUrl = getEventFallbackImage(event.event_category, event.tags);
+    }
 
-        setIsLoading(false);
-      } catch (err) {
-        console.error('Error loading event images:', err);
-        setError(err instanceof Error ? err : new Error('Failed to load images'));
-        setIsLoading(false);
-      }
-    };
+    // Cache the result
+    setCachedImages(prev => ({
+      ...prev,
+      [event.id]: imageUrl
+    }));
 
-    loadImages();
-  }, [event]);
+    return imageUrl;
+  };
 
-  return { 
-    coverImage, 
-    shareImage, 
-    galleryImages, 
-    isLoading, 
-    error, 
-    getEventImageUrl 
+  const preloadEventImages = async (events: Event[]): Promise<void> => {
+    const imagePromises = events.map(event => {
+      const imageUrl = getEventImageUrl(event);
+      return preloadImage(imageUrl).catch(() => {
+        // On error, try to use fallback
+        const fallbackUrl = getEventFallbackImage(event.event_category, event.tags);
+        return preloadImage(fallbackUrl);
+      });
+    });
+
+    try {
+      await Promise.all(imagePromises);
+    } catch (error) {
+      console.warn('Some event images failed to preload:', error);
+    }
+  };
+
+  return {
+    getEventImageUrl,
+    preloadEventImages,
+    cachedImages
   };
 };

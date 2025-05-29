@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin } from 'lucide-react';
@@ -102,10 +101,10 @@ const EventCardList: React.FC<EventCardListProps> = ({
           className="h-full w-full object-cover"
         />
         {/* Event type pill - UPDATED to not show icons */}
-        {event.event_type && (
+        {event.event_category && (
           <div className="absolute top-2 left-2">
             <CategoryPill 
-              category={event.event_type} 
+              category={event.event_category} 
               size="xs" 
               showIcon={false} 
             />
