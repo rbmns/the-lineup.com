@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { UsersIcon, UserPlusIcon } from "lucide-react";
-import AttendeesList, { Attendee } from "@/polymet/components/attendees-list";
+import AttendeesList, { Attendee } from "@/components/polymet/attendees-list";
 
 interface EventAttendeesProps {
   attendees: Attendee[];

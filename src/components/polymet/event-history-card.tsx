@@ -1,12 +1,27 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/polymet/components/button";
+import { Button } from "@/components/polymet/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { CalendarIcon, UsersIcon } from "lucide-react";
-import CategoryBadge from "@/polymet/components/category-badge";
-import { UserEvent } from "@/polymet/data/user-events-data";
+import CategoryBadge from "@/components/polymet/category-badge";
+
+// Simple UserEvent interface
+export interface UserEvent {
+  id: string;
+  title: string;
+  image: string;
+  category: string;
+  date: string;
+  time: string;
+  location: string;
+  isPast: boolean;
+  attendees?: {
+    count: number;
+    avatars?: string[];
+  };
+}
 
 interface EventHistoryCardProps {
   userEvents?: UserEvent[];

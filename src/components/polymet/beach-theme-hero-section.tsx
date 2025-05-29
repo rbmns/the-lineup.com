@@ -52,20 +52,9 @@ export default function BeachThemeHeroSection({
     large: "min-h-[500px] md:min-h-[600px]",
   };
 
-  // Button variants based on hero variant
-  const primaryButtonVariant = {
-    default: "beach",
-    ocean: "beach",
-    sunset: "beach",
-    tropical: "beach",
-  };
-
-  const secondaryButtonVariant = {
-    default: "outline",
-    ocean: "outline",
-    sunset: "outline",
-    tropical: "outline",
-  };
+  // Button variants based on hero variant - fixed to use proper types
+  const primaryButtonVariant: "default" | "secondary" | "outline" | "ghost" | "link" | "coral" | "turquoise" | "lime" | "sunset" | "ocean" | "beach" = "beach";
+  const secondaryButtonVariant: "default" | "secondary" | "outline" | "ghost" | "link" | "coral" | "turquoise" | "lime" | "sunset" | "ocean" | "beach" = "outline";
 
   return (
     <div
@@ -116,7 +105,7 @@ export default function BeachThemeHeroSection({
 
           <div className="flex flex-col sm:flex-row gap-4">
             <BeachThemeButton
-              variant={primaryButtonVariant[variant]}
+              variant={primaryButtonVariant}
               size="lg"
               rounded="full"
               onClick={onExplore}
@@ -126,7 +115,7 @@ export default function BeachThemeHeroSection({
               Explore Events
             </BeachThemeButton>
             <BeachThemeButton
-              variant={secondaryButtonVariant[variant]}
+              variant={secondaryButtonVariant}
               size="lg"
               rounded="full"
               onClick={onCreateProfile}
@@ -139,7 +128,6 @@ export default function BeachThemeHeroSection({
           {/* Location Indicator */}
           <div className="mt-8 flex items-center gap-2 text-white/90">
             <MapPinIcon size={18} className="text-[#F59E0B]" />
-
             <span>Events near {location}</span>
           </div>
         </div>

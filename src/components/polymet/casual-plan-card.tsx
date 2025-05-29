@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
@@ -9,8 +10,8 @@ import {
   HeartIcon,
   ClockIcon,
 } from "lucide-react";
-import { Button } from "@/polymet/components/button";
-import CategoryBadge from "@/polymet/components/category-badge";
+import { Button } from "@/components/polymet/button";
+import CategoryBadge from "@/components/polymet/category-badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export interface CasualPlanCardProps {

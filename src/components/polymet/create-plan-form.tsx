@@ -5,7 +5,7 @@ import * as z from "zod";
 import { CalendarIcon, ClockIcon, MapPinIcon } from "lucide-react";
 import { format } from "date-fns";
 
-import { Button } from "@/polymet/components/button";
+import { Button } from "@/components/polymet/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -30,7 +30,22 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { EVENT_CATEGORIES } from "@/polymet/data/events-data";
+
+const EVENT_CATEGORIES = [
+  "Community",
+  "Music", 
+  "Food",
+  "Sports",
+  "Art",
+  "Culture",
+  "Beach",
+  "Surf",
+  "Yoga",
+  "Market",
+  "Festival",
+  "Game",
+  "Party"
+];
 
 const formSchema = z.object({
   title: z.string().min(3, {
@@ -80,7 +95,6 @@ export default function CreatePlanForm({
       startTime: "",
       endTime: "",
       description: "",
-      maxAttendees: "",
     },
   });
 
@@ -139,7 +153,6 @@ export default function CreatePlanForm({
               <FormControl>
                 <div className="relative">
                   <MapPinIcon className="absolute left-3 top-2.5 h-4 w-4 text-primary-75" />
-
                   <Input
                     className="pl-9"
                     placeholder="Enter location"
@@ -167,7 +180,6 @@ export default function CreatePlanForm({
                         className="w-full pl-3 text-left font-normal"
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-
                         {field.value ? (
                           format(field.value, "PPP")
                         ) : (
@@ -206,7 +218,6 @@ export default function CreatePlanForm({
                   <FormControl>
                     <div className="relative">
                       <ClockIcon className="absolute left-3 top-2.5 h-4 w-4 text-primary-75" />
-
                       <Input className="pl-9" placeholder="14:00" {...field} />
                     </div>
                   </FormControl>
@@ -224,7 +235,6 @@ export default function CreatePlanForm({
                   <FormControl>
                     <div className="relative">
                       <ClockIcon className="absolute left-3 top-2.5 h-4 w-4 text-primary-75" />
-
                       <Input className="pl-9" placeholder="16:00" {...field} />
                     </div>
                   </FormControl>

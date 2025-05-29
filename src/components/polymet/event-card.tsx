@@ -1,7 +1,26 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/polymet/components/button";
-import CategoryBadge from "@/polymet/components/category-badge";
-import EventVibeLabel from "@/polymet/components/event-vibe-label";
+import { Button } from "@/components/polymet/button";
+import CategoryBadge from "@/components/polymet/category-badge";
+
+interface EventVibeLabel {
+  vibe: string;
+  size?: "sm" | "md" | "lg";
+}
+
+// Simple EventVibeLabel component
+function EventVibeLabel({ vibe, size = "md" }: EventVibeLabel) {
+  const sizeClasses = {
+    sm: "text-xs px-2 py-0.5",
+    md: "text-xs px-2.5 py-0.5", 
+    lg: "text-sm px-3 py-1",
+  };
+
+  return (
+    <span className={`inline-flex items-center rounded-full bg-purple-100 text-purple-800 font-medium ${sizeClasses[size]}`}>
+      {vibe}
+    </span>
+  );
+}
 
 interface EventCardProps {
   id: string | number;
