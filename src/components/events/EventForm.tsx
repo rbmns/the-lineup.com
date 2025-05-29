@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Event, Venue } from '@/types';
-import { FormValues, SafeEventData, EVENT_TYPES } from '@/components/events/form/EventFormTypes';
+import { FormValues, SafeEventData, EVENT_CATEGORIES } from '@/components/events/form/EventFormTypes';
 import { EventSchema } from '@/components/events/form/EventFormSchema';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -56,7 +56,7 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode }) => 
             const formValues: FormValues = {
               title: eventData.title,
               description: eventData.description,
-              event_type: eventData.event_type,
+              event_category: eventData.event_category,
               start_date: new Date(eventData.start_time),
               start_time: format(new Date(eventData.start_time), 'HH:mm'),
               end_date: new Date(eventData.end_time),
@@ -101,7 +101,7 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode }) => 
     return {
       title: data.title,
       description: data.description,
-      event_type: data.event_type,
+      event_category: data.event_category,
       start_time: startDateTime.toISOString(),
       end_time: endDateTime.toISOString(),
       venue_id: data.venue_id,
@@ -185,16 +185,16 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode }) => 
       </div>
 
       <div>
-        <Label htmlFor="event_type">Event Type</Label>
+        <Label htmlFor="event_category">Event Category</Label>
         <MultiSelect
-          options={EVENT_TYPES.map(type => ({ label: type, value: type }))}
-          value={watch("event_type")?.split(',') || []}
-          onChange={(values) => setValue("event_type", values.join(','))}
-          placeholder="Select event type(s)"
-          id="event_type"
+          options={EVENT_CATEGORIES.map(category => ({ label: category, value: category }))}
+          value={watch("event_category")?.split(',') || []}
+          onChange={(values) => setValue("event_category", values.join(','))}
+          placeholder="Select event category(s)"
+          id="event_category"
         />
-        {errors.event_type && (
-          <p className="text-red-500 text-sm mt-1">{errors.event_type.message}</p>
+        {errors.event_category && (
+          <p className="text-red-500 text-sm mt-1">{errors.event_category.message}</p>
         )}
       </div>
 

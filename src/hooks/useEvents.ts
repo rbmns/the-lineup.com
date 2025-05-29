@@ -20,7 +20,7 @@ export const useEvents = (userId: string | undefined = undefined): UseEventsResu
         // Get the current date as YYYY-MM-DD for filtering
         const currentDate = new Date().toISOString().split('T')[0];
         
-        // Updated query to include event_types_tags relationship
+        // Updated query to use event_category instead of event_type
         const { data, error } = await supabase
           .from('events')
           .select(`

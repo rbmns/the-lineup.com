@@ -4,61 +4,43 @@
  */
 
 /**
- * Default event image mapping by type and tags
+ * Default event image mapping by category and tags
  */
 export const eventImageMap = {
-  // Event type specific fallback images
+  // Event category specific fallback images
   yoga: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/yoga.jpg',
   kite: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/kite.jpg',
   surf: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/surf.jpg',
   market: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/shopping.jpg',
   music: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/music.jpg',
   beach: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/beach.jpg',
-  concert: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/concert.jpg',
-  band: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/band.jpg',
+  festival: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/festival.jpg',
   food: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/food.jpg',
   party: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/beachparty.jpg',
   sports: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/sports.jpg',
   community: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/community.jpg',
-  culture: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/culture.jpg',
-  festival: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/festival.jpg',
+  art: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/culture.jpg',
   game: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/game.jpg',
-  
-  // Special tag combinations
-  'beach-party': 'https://raw.githubusercontent.com/rbmns/images/main/lineup/beachparty.jpg',
-  'live-band': 'https://raw.githubusercontent.com/rbmns/images/main/lineup/band.jpg',
+  wellness: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/yoga.jpg',
   
   // Default fallback
   default: 'https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg'
 };
 
 /**
- * Get a fallback image for an event based on its type and tags
+ * Get a fallback image for an event based on its category and tags
  */
-export const getEventFallbackImage = (eventType: string | undefined, tags?: string[]): string => {
-  // Normalize event type to lowercase
-  const normalizedType = eventType?.toLowerCase() || '';
+export const getEventFallbackImage = (eventCategory: string | undefined, tags?: string[]): string => {
+  // Normalize event category to lowercase
+  const normalizedCategory = eventCategory?.toLowerCase() || '';
   
-  // Check for direct type match first
-  if (normalizedType && eventImageMap[normalizedType as keyof typeof eventImageMap]) {
-    return eventImageMap[normalizedType as keyof typeof eventImageMap];
+  // Check for direct category match first
+  if (normalizedCategory && eventImageMap[normalizedCategory as keyof typeof eventImageMap]) {
+    return eventImageMap[normalizedCategory as keyof typeof eventImageMap];
   }
   
   // If has tags, check for tag-based matches
   if (tags && Array.isArray(tags) && tags.length > 0) {
-    // Check for special tag combinations first
-    const tagString = tags.join('-').toLowerCase();
-    
-    // Look for specific tag combinations
-    if (tagString.includes('beach') && tagString.includes('party')) {
-      return eventImageMap['beach-party'];
-    }
-    
-    if ((tagString.includes('live') && tagString.includes('band')) || 
-        tagString.includes('live-band')) {
-      return eventImageMap['band'];
-    }
-    
     // Check individual tags
     for (const tag of tags) {
       const normalizedTag = tag.toLowerCase().trim();
@@ -72,8 +54,8 @@ export const getEventFallbackImage = (eventType: string | undefined, tags?: stri
   return eventImageMap.default;
 };
 
-// Event type color mapping with nature-inspired colors
-export const eventTypeColors = {
+// Event category color mapping with nature-inspired colors
+export const eventCategoryColors = {
   // Water-themed events
   surf: {
     default: {
@@ -103,16 +85,6 @@ export const eventTypeColors = {
     active: {
       bg: 'bg-amber-500',
       text: 'text-amber-50'
-    }
-  },
-  water: {
-    default: {
-      bg: 'bg-sky-50',
-      text: 'text-sky-600'
-    },
-    active: {
-      bg: 'bg-sky-600',
-      text: 'text-sky-50'
     }
   },
   
@@ -149,7 +121,7 @@ export const eventTypeColors = {
       text: 'text-purple-50'
     }
   },
-  concert: {
+  festival: {
     default: {
       bg: 'bg-indigo-50',
       text: 'text-indigo-600'
@@ -159,7 +131,7 @@ export const eventTypeColors = {
       text: 'text-indigo-50'
     }
   },
-  band: {
+  art: {
     default: {
       bg: 'bg-violet-50',
       text: 'text-violet-600'
@@ -216,6 +188,18 @@ export const eventTypeColors = {
     }
   },
   
+  // Game events
+  game: {
+    default: {
+      bg: 'bg-teal-50',
+      text: 'text-teal-600'
+    },
+    active: {
+      bg: 'bg-teal-600',
+      text: 'text-teal-50'
+    }
+  },
+  
   // Special events
   party: {
     default: {
@@ -225,16 +209,6 @@ export const eventTypeColors = {
     active: {
       bg: 'bg-pink-600',
       text: 'text-pink-50'
-    }
-  },
-  festival: {
-    default: {
-      bg: 'bg-rose-50',
-      text: 'text-rose-600'
-    },
-    active: {
-      bg: 'bg-rose-600',
-      text: 'text-rose-50'
     }
   },
   
@@ -250,3 +224,6 @@ export const eventTypeColors = {
     }
   }
 };
+
+// Export eventTypeColors as an alias for backwards compatibility
+export const eventTypeColors = eventCategoryColors;
