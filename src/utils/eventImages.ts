@@ -40,6 +40,36 @@ export const eventTypeColors = {
 };
 
 /**
+ * Get fallback image based on event type and tags
+ */
+export const getEventFallbackImage = (eventType?: string | null, tags?: string[] | null): string => {
+  // If no event type, use default
+  if (!eventType) {
+    return DEFAULT_EVENT_IMAGES.other;
+  }
+  
+  const normalizedType = eventType.toLowerCase();
+  
+  // Check if we have a direct match for the event type
+  if (DEFAULT_EVENT_IMAGES[normalizedType as keyof typeof DEFAULT_EVENT_IMAGES]) {
+    return DEFAULT_EVENT_IMAGES[normalizedType as keyof typeof DEFAULT_EVENT_IMAGES];
+  }
+  
+  // If no direct match, check tags for additional context
+  if (tags && Array.isArray(tags)) {
+    for (const tag of tags) {
+      const normalizedTag = tag.toLowerCase();
+      if (DEFAULT_EVENT_IMAGES[normalizedTag as keyof typeof DEFAULT_EVENT_IMAGES]) {
+        return DEFAULT_EVENT_IMAGES[normalizedTag as keyof typeof DEFAULT_EVENT_IMAGES];
+      }
+    }
+  }
+  
+  // Return default if no match found
+  return DEFAULT_EVENT_IMAGES.other;
+};
+
+/**
  * Get the appropriate image URL for an event
  */
 export const getEventImageUrl = (event: Event): string => {
