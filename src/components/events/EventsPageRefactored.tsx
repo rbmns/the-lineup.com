@@ -23,13 +23,76 @@ const EventsPageRefactored = () => {
         <div className="w-full px-4 md:px-6 py-4 md:py-8">
           <div className="max-w-7xl mx-auto">
             <EventsDataProvider>
-              <div className="space-y-6">
-                {/* Basic filters and results display for now */}
-                <div className="text-center py-8">
-                  <h2 className="text-2xl font-bold mb-4">Events coming soon!</h2>
-                  <p className="text-gray-600">We're working on loading your events.</p>
-                </div>
-              </div>
+              {({
+                filteredEvents,
+                similarEvents,
+                eventsLoading,
+                isVenuesLoading,
+                isFilterLoading,
+                allEventTypes,
+                selectedCategories,
+                toggleCategory,
+                selectAll,
+                deselectAll,
+                isNoneSelected,
+                hasActiveFilters,
+                showAdvancedFilters,
+                toggleAdvancedFilters,
+                dateRange,
+                setDateRange,
+                selectedDateFilter,
+                setSelectedDateFilter,
+                selectedVenues,
+                setSelectedVenues,
+                venues,
+                locations,
+                hasAdvancedFilters,
+                handleRemoveVenue,
+                handleClearDateFilter,
+                resetFilters,
+                handleRsvp,
+                showRsvpButtons,
+                loadingEventId
+              }) => (
+                <>
+                  <EventsPageFilters
+                    allEventTypes={allEventTypes}
+                    selectedCategories={selectedCategories}
+                    toggleCategory={toggleCategory}
+                    selectAll={selectAll}
+                    deselectAll={deselectAll}
+                    hasActiveFilters={hasActiveFilters}
+                    showAdvancedFilters={showAdvancedFilters}
+                    toggleAdvancedFilters={toggleAdvancedFilters}
+                    dateRange={dateRange}
+                    setDateRange={setDateRange}
+                    selectedDateFilter={selectedDateFilter}
+                    setSelectedDateFilter={setSelectedDateFilter}
+                    venues={venues}
+                    selectedVenues={selectedVenues}
+                    setSelectedVenues={setSelectedVenues}
+                    locations={locations}
+                    hasAdvancedFilters={hasAdvancedFilters}
+                    handleRemoveVenue={handleRemoveVenue}
+                    handleClearDateFilter={handleClearDateFilter}
+                    resetFilters={resetFilters}
+                  />
+                  
+                  <EventsResultsDisplay
+                    filteredEvents={filteredEvents}
+                    similarEvents={similarEvents}
+                    isLoading={eventsLoading}
+                    isVenuesLoading={isVenuesLoading}
+                    isFilterLoading={isFilterLoading}
+                    hasActiveFilters={hasActiveFilters}
+                    handleRsvp={handleRsvp}
+                    showRsvpButtons={showRsvpButtons}
+                    loadingEventId={loadingEventId}
+                    isNoneSelected={isNoneSelected}
+                    selectAll={selectAll}
+                  />
+                </>
+              )}
             </EventsDataProvider>
           </div>
         </div>

@@ -8,7 +8,7 @@ export const useEventCategories = (events: Event[] | undefined) => {
   // Extract available categories from events
   useEffect(() => {
     if (events && events.length > 0) {
-      const categories = [...new Set(events.map(event => event.event_category).filter(Boolean))];
+      const categories = [...new Set(events.map(event => event.event_type).filter(Boolean))];
       setAvailableCategories(categories);
     }
   }, [events]);

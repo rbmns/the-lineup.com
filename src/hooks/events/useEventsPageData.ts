@@ -14,9 +14,9 @@ export const useEventsPageData = () => {
   const [locations, setLocations] = useState<Array<{ value: string, label: string }>>([]);
   const [isVenuesLoading, setIsVenuesLoading] = useState(true);
   
-  // Get all unique event categories from events
+  // Get all unique event types from events
   const allEventTypes = useMemo(() => {
-    const types = events.map(event => event.event_category).filter(Boolean);
+    const types = events.map(event => event.event_type).filter(Boolean);
     return [...new Set(types)];
   }, [events]);
   

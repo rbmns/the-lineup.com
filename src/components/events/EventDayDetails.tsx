@@ -6,7 +6,7 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { Event } from '@/types';
-import { eventCategoryColors } from '@/utils/eventImages';
+import { eventTypeColors } from '@/utils/eventImages';
 import { formatInTimeZone, toZonedTime } from 'date-fns-tz';
 import { AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
 
@@ -58,9 +58,9 @@ export const EventDayDetails: React.FC<EventDayDetailsProps> = ({
             </div>
             {events.length > 0 && (
               <div className="flex gap-1.5 items-center">
-                {Array.from(new Set(events.map(event => event.event_category))).map((type, index) => {
+                {Array.from(new Set(events.map(event => event.event_type))).map((type, index) => {
                   const eventType = type?.toLowerCase() || 'other';
-                  const colors = eventCategoryColors[eventType as keyof typeof eventCategoryColors] || eventCategoryColors.other;
+                  const colors = eventTypeColors[eventType as keyof typeof eventTypeColors] || eventTypeColors.other;
                   return (
                     <div 
                       key={index}

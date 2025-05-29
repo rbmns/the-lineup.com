@@ -42,7 +42,7 @@ export const useSimilarResults = (
             creator:profiles(id, username, avatar_url, email, location, location_category, status, tagline),
             event_rsvps(id, user_id, status)
           `)
-          .or('event_category.ilike.%Beach%,event_category.ilike.%Party%,title.ilike.%Beach%')
+          .or('event_type.ilike.%Beach%,event_type.ilike.%Party%,title.ilike.%Beach%')
           .order('start_time', { ascending: true })
           .limit(6);
           
@@ -62,7 +62,7 @@ export const useSimilarResults = (
           venues:venue_id(*),
           event_rsvps(id, user_id, status)
         `)
-        .or(`title.ilike.%${query.substring(0, 3)}%,description.ilike.%${query.substring(0, 3)}%,event_category.ilike.%${query.substring(0, 3)}%`)
+        .or(`title.ilike.%${query.substring(0, 3)}%,description.ilike.%${query.substring(0, 3)}%,event_type.ilike.%${query.substring(0, 3)}%`)
         .order('start_time', { ascending: true })
         .limit(6);
         
@@ -97,7 +97,7 @@ export const useSimilarResults = (
     const upcomingEvents = filterUpcomingEvents(formattedEvents);
     
     if (upcomingEvents.length > 0) {
-      const eventTypes = [...new Set(upcomingEvents.map(event => event.event_category).filter(Boolean))];
+      const eventTypes = [...new Set(upcomingEvents.map(event => event.event_type).filter(Boolean))];
       if (eventTypes.length > 0 && selectedEventTypes.length === 0) {
         setSelectedEventTypes(eventTypes);
       }

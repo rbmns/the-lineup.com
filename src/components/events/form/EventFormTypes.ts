@@ -1,5 +1,6 @@
 
 import { Event } from '@/types';
+import { EVENT_CATEGORIES, EVENT_VIBES } from '@/utils/categorySystem';
 
 export type FormValues = {
   title: string;
@@ -22,7 +23,7 @@ export type SafeEventData = {
   id?: string;
   title?: string;
   description?: string;
-  event_category?: string; // Changed from event_type to event_category
+  event_category?: string; // Updated from event_type
   start_time?: string;
   end_time?: string;
   start_date?: string;
@@ -42,12 +43,6 @@ export interface EventFormProps {
   isEditMode?: boolean;
 }
 
-export const EVENT_CATEGORIES = [
-  'festival', 'wellness', 'kite', 'beach', 'game', 'other',
-  'sports', 'surf', 'party', 'yoga', 'community', 'music',
-  'food', 'market', 'art'
-];
+export const EVENT_TYPES = EVENT_CATEGORIES; // For backwards compatibility
 
-export const EVENT_VIBES = [
-  'party', 'chill', 'wellness', 'active', 'social', 'creative'
-];
+export { EVENT_CATEGORIES, EVENT_VIBES };

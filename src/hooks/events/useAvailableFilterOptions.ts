@@ -8,7 +8,7 @@ export const useAvailableFilterOptions = (events: Event[] | undefined) => {
 
   useEffect(() => {
     if (events && events.length > 0) {
-      const uniqueEventTypes = [...new Set(events.map(event => event.event_category).filter(Boolean))]
+      const uniqueEventTypes = [...new Set(events.map(event => event.event_type).filter(Boolean))]
         .map(type => ({ value: type as string, label: type as string }));
       setAvailableEventTypes(uniqueEventTypes);
 

@@ -51,7 +51,7 @@ export const useFilteredEvents = ({
     if (selectedCategories.length < allEventTypes.length) {
       console.log("Some categories selected, filtering by:", selectedCategories);
       filtered = events.filter(event => 
-        event.event_category && selectedCategories.includes(event.event_category)
+        event.event_type && selectedCategories.includes(event.event_type)
       );
     } else {
       console.log("All categories selected, showing all events");

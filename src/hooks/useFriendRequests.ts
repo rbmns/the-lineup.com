@@ -19,53 +19,51 @@ export const useFriendRequests = (userId: string | undefined) => {
       // Get requests sent to this user
       const { data: friendshipData, error } = await supabase
         .from('friendships')
-        .select('*')
+        .select(`
+          id,
+          status,
+          created_at,
+          user_id,
+          friend_id,
+          profiles!friendships_user_id_fkey(
+            id,
+            username,
+            avatar_url,
+            email,
+            location,
+            location_category,
+            status,
+            status_details,
+            tagline
+          )
+        `)
         .eq('friend_id', userId)
         .eq('status', 'Pending');
         
-      if (error) throw error;
-      
-      // Fetch user profiles separately to avoid foreign key issues
-      if (friendshipData.length > 0) {
-        const senderIds = friendshipData.map(req => req.user_id);
-        
-        const { data: profiles, error: profileError } = await supabase
-          .from('profiles')
-          .select('*')
-          .in('id', senderIds);
-          
-        if (profileError) throw profileError;
-        
-        // Process the data into the friendships format
-        const processedRequests = friendshipData.map(req => ({
-          id: req.id,
-          status: req.status.toLowerCase(),
-          created_at: req.created_at,
-          user_id: req.user_id,
-          friend_id: req.friend_id,
-          profile: profiles?.find(p => p.id === req.user_id)
-        })).filter(req => req.profile);
-        
-        setRequests(processedRequests);
-      } else {
+      if (error) {
+        console.error('Error fetching friend requests:', error);
         setRequests([]);
+        setLoading(false);
+        return;
       }
       
-      // Check for recently accepted outgoing friend requests
-      const { data: acceptedRequests, error: acceptedError } = await supabase
-        .from('friendships')
-        .select('*, profiles!friendships_friend_id_fkey(*)')
-        .eq('user_id', userId)
-        .eq('status', 'Accepted')
-        .order('updated_at', { ascending: false })
-        .limit(5);  // Only check recent acceptances
-        
-      if (acceptedError) throw acceptedError;
+      // Process the data into the correct format
+      const processedRequests: FriendRequest[] = friendshipData?.map(req => ({
+        id: req.id,
+        status: req.status.toLowerCase() as 'pending',
+        created_at: req.created_at,
+        user_id: req.user_id,
+        friend_id: req.friend_id,
+        sender_id: req.user_id,
+        receiver_id: req.friend_id,
+        profile: req.profiles as any // Cast to avoid type conflicts since profiles is a single object
+      })).filter(req => req.profile) || [];
       
-      // No toast notifications for accepted requests now
+      setRequests(processedRequests);
       
     } catch (err) {
-      console.error('Error fetching friend requests:', err);
+      console.error('Error in fetchRequests:', err);
+      setRequests([]);
     } finally {
       setLoading(false);
     }
@@ -75,20 +73,16 @@ export const useFriendRequests = (userId: string | undefined) => {
     if (userId) {
       fetchRequests();
       
-      // Set up real-time subscription to friendships table
+      // Set up real-time subscription
       const subscription = supabase
-        .channel('friendship-status-changes')
+        .channel('friendship-changes')
         .on('postgres_changes', {
-          event: 'UPDATE',
+          event: '*',
           schema: 'public',
           table: 'friendships',
-          filter: `user_id=eq.${userId}`,
-        }, (payload) => {
-          // If status changed to Accepted, no toast notification now
-          if (payload.new && payload.new.status === 'Accepted') {
-            // Just refresh requests data
-            fetchRequests();
-          }
+          filter: `friend_id=eq.${userId}`,
+        }, () => {
+          fetchRequests();
         })
         .subscribe();
         
@@ -107,10 +101,8 @@ export const useFriendRequests = (userId: string | undefined) => {
       
       if (error) throw error;
       
-      // Remove the request from the local state
+      // Remove the request from local state
       setRequests(prevRequests => prevRequests.filter(req => req.id !== requestId));
-      
-      // No toast for accepting a request
       
       return true;
     } catch (err) {
@@ -128,10 +120,8 @@ export const useFriendRequests = (userId: string | undefined) => {
       
       if (error) throw error;
       
-      // Remove the request from the local state
+      // Remove the request from local state
       setRequests(prevRequests => prevRequests.filter(req => req.id !== requestId));
-      
-      // No toast notification for declined request
       
       return true;
     } catch (err) {

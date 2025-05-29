@@ -35,7 +35,7 @@ export interface Event {
   title: string;
   description: string;
   location?: string;
-  event_category?: string; // Changed from event_type to event_category
+  event_type: string;
   start_time: string | null;
   end_time?: string | null;
   start_date?: string | null;
@@ -70,8 +70,6 @@ export interface Event {
   interested_count?: number;
   formattedDate?: string; // Add the missing property
   formattedTime?: string; // Add the missing property
-  cover_image?: string | null; // Add missing property
-  share_image?: string | null; // Add missing property
 }
 
 export interface EventsResponse {

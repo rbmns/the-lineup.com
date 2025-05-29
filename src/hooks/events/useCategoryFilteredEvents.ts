@@ -83,7 +83,7 @@ export const useCategoryFilteredEvents = (categorySlug: string | undefined) => {
             creator:profiles (*),
             event_rsvps (*)
           `)
-          .eq('event_category', categorySlug)
+          .eq('event_type', categorySlug)
           .order('start_date', { ascending: true });
         
         if (error) {
@@ -116,7 +116,7 @@ export const useCategoryFilteredEvents = (categorySlug: string | undefined) => {
       // Simple implementation: just return events of the selected types
       // In a real app, you might want to implement more sophisticated logic
       return (eventsData || events).filter(event => 
-        eventTypes.includes(event.event_category as string)
+        eventTypes.includes(event.event_type as string)
       );
     } catch (error) {
       console.error("Error fetching similar events:", error);

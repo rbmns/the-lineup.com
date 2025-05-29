@@ -46,7 +46,7 @@ export const useEventFilteringEngine = ({
     // Apply filters when they are actively selected
     const filteredEvents = events.filter(event => {
       // Event type filter - if no types selected, show all events
-      if (selectedEventTypes.length > 0 && event.event_category && !selectedEventTypes.includes(event.event_category)) {
+      if (selectedEventTypes.length > 0 && event.event_type && !selectedEventTypes.includes(event.event_type)) {
         return false;
       }
       

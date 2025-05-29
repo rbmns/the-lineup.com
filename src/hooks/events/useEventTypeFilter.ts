@@ -12,7 +12,7 @@ export const useEventTypeFilter = (events: Event[] | undefined = []) => {
     if (events && events.length > 0) {
       const eventTypeSet = new Set<string>();
       events.forEach(event => {
-        if (event.event_category) eventTypeSet.add(event.event_category);
+        if (event.event_type) eventTypeSet.add(event.event_type);
       });
       
       const eventTypeOptions = Array.from(eventTypeSet).map(type => ({

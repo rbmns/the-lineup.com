@@ -1,118 +1,276 @@
-
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
-import { Event } from '@/types';
+import { useEventDetailParams } from '@/hooks/useEventDetailParams';
+import { useEventDetails } from '@/hooks/useEventDetails';
+import { useEventImages } from '@/hooks/useEventImages';
+import { useEventNavigation } from '@/hooks/useEventNavigation';
+import { useEventMetaTags } from '@/hooks/useEventMetaTags';
 import { useAuth } from '@/contexts/AuthContext';
-import { useEventProcessor } from '@/hooks/useEventProcessor';
-import { EventDetailLoadingState } from '@/components/events/EventDetailLoadingState';
+import { useDeviceDetection } from '@/hooks/useDeviceDetection';
+import { useEventDetailHandlers } from '@/hooks/useEventDetailHandlers';
+import { ChevronLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { EventDetailErrorState } from '@/components/events/EventDetailErrorState';
-import { EventDetailHeader } from '@/components/events/EventDetailHeader';
-import { EventDetailContent } from '@/components/events/EventDetailContent';
-import { RelatedEventsSection } from '@/components/events/RelatedEventsSection';
+import { EventDetailLoadingState } from '@/components/events/EventDetailLoadingState';
+import { ShareDialog } from '@/components/events/share/ShareDialog';
+import { MainEventContent } from '@/components/events/MainEventContent';
+import { SidebarContent } from '@/components/events/SidebarContent';
+import { MobileRsvpFooter } from '@/components/events/MobileRsvpFooter';
+import { RelatedEvents } from '@/components/events/related-events/RelatedEvents';
+import { useQueryClient } from '@tanstack/react-query';
+import '@/styles/rsvp-animations.css';
 
 const EventDetail = () => {
-  const { eventId } = useParams<{ eventId: string }>();
+  // Use our comprehensive params hook to get all URL parameters
+  const { id, eventId, eventSlug, hasTransitionState } = useEventDetailParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { processEvent } = useEventProcessor();
-
-  const { data: event, isLoading, error } = useQuery({
-    queryKey: ['event', eventId],
-    queryFn: async (): Promise<Event | null> => {
-      if (!eventId) return null;
-
-      const { data, error } = await supabase
-        .from('events')
-        .select(`
-          *,
-          venues:venue_id(*),
-          creator:profiles(*),
-          event_rsvps(*)
-        `)
-        .eq('id', eventId)
-        .single();
-
-      if (error) {
-        console.error('Error fetching event:', error);
-        throw error;
-      }
-
-      return processEvent(data, user?.id);
-    },
-    enabled: !!eventId,
-  });
-
-  // Fetch related events based on the current event
-  const { data: relatedEvents = [] } = useQuery({
-    queryKey: ['related-events', event?.id, event?.event_category],
-    queryFn: async (): Promise<Event[]> => {
-      if (!event) return [];
-
-      const { data, error } = await supabase
-        .from('events')
-        .select(`
-          *,
-          venues:venue_id(*),
-          creator:profiles(*),
-          event_rsvps(*)
-        `)
-        .neq('id', event.id)
-        .or(`event_category.eq.${event.event_category},venue_id.eq.${event.venue_id}`)
-        .order('start_date', { ascending: true })
-        .limit(4);
-
-      if (error) {
-        console.error('Error fetching related events:', error);
-        return [];
-      }
-
-      return data?.map((eventData: any) => processEvent(eventData, user?.id)) || [];
-    },
-    enabled: !!event && (!!event.event_category || !!event.venue_id),
-  });
-
+  const { isAuthenticated, user } = useAuth();
+  const { isMobile } = useDeviceDetection();
+  const queryClient = useQueryClient();
+  const [isRsvpTransitioning, setIsRsvpTransitioning] = useState(false);
+  
+  // Use proper ID for data fetching, prefer explicit ID over slug
+  const effectiveId = id || eventId || '';
+  
+  // Safety check - if no valid ID is available, redirect to events page
   useEffect(() => {
-    if (!eventId) {
+    if (!effectiveId) {
+      console.error("Missing event ID in URL parameters");
       navigate('/events');
     }
-  }, [eventId, navigate]);
+  }, [effectiveId, navigate]);
 
+  // Only fetch when we have a valid ID
+  const { 
+    event, 
+    isLoading, 
+    error, 
+    attendees, 
+    friendAttendees, 
+    rsvpLoading,
+    handleRsvp 
+  } = useEventDetails(effectiveId);
+
+  const { coverImage } = useEventImages(event);
+  const metaTags = useEventMetaTags(event);
+  const { navigateToEvent } = useEventNavigation();
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  
+  // Use the event detail handlers
+  const { 
+    handleBackToEvents,
+    handleEventTypeClick,
+    wrapRsvpWithScrollPreservation
+  } = useEventDetailHandlers();
+  
+  // Set up RSVP transition states
+  useEffect(() => {
+    // Watch for changes in rsvpLoading to manage transition state
+    if (rsvpLoading) {
+      setIsRsvpTransitioning(true);
+      // Add transition class to body
+      document.body.classList.add('rsvp-transition');
+    } else {
+      // Delay removing transition state for smoother visuals
+      setTimeout(() => {
+        setIsRsvpTransitioning(false);
+        document.body.classList.remove('rsvp-transition');
+      }, 600);
+    }
+  }, [rsvpLoading]);
+
+  // Cleanup transitions when unmounting
+  useEffect(() => {
+    return () => {
+      document.body.classList.remove('rsvp-transition');
+      document.body.classList.remove('rsvp-transition-active');
+      document.querySelector('.rsvp-transition-indicator')?.classList.remove('active');
+    };
+  }, []);
+  
+  // When navigating away, make sure to invalidate events to ensure fresh data
+  useEffect(() => {
+    return () => {
+      console.log("EventDetail: Unmounting, invalidating events queries");
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+    };
+  }, [queryClient]);
+  
+  // Enhanced RSVP with scroll preservation
+  const handleRsvpEvent = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    try {
+      console.log("EventDetail: Handling RSVP with status:", status);
+      console.log("EventDetail: Current event RSVP status:", event?.rsvp_status);
+      console.log("EventDetail: Using effectiveId:", effectiveId);
+      
+      if (!event || !effectiveId) {
+        console.error("Missing event ID for RSVP");
+        return false;
+      }
+      
+      setIsRsvpTransitioning(true);
+      
+      // Apply transition indicator
+      const transitionIndicator = document.querySelector('.rsvp-transition-indicator');
+      if (transitionIndicator) {
+        transitionIndicator.classList.add('active');
+      }
+      
+      // Always pass the event ID when handling RSVPs
+      // Make sure to await and return the boolean result
+      const success = await handleRsvp(status);
+      
+      // Force invalidate all events queries to ensure consistency
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      
+      // Keep the transition state active briefly for visual polish
+      setTimeout(() => {
+        if (transitionIndicator) {
+          transitionIndicator.classList.remove('active');
+        }
+      }, 600);
+      
+      return success || false; // Ensure we always return a boolean
+    } catch (error) {
+      console.error('Error handling RSVP:', error);
+      return false;
+    } finally {
+      // Add delay for smoother transition out
+      setTimeout(() => {
+        setIsRsvpTransitioning(false);
+      }, 800);
+    }
+  };
+  
+  // Format date for display
+  const formattedDate = event?.start_time ? new Date(event.start_time).toLocaleDateString(
+    'en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }
+  ) : null;
+  
+  // Set metadata for SEO
+  useEffect(() => {
+    if (event && metaTags) {
+      metaTags.setMetaTags({
+        title: event.title,
+        description: event.description || '',
+        imageUrl: coverImage || '',
+        path: `/events/${event.slug || event.id}`
+      });
+    }
+  }, [event, coverImage, metaTags]);
+
+  // Show loading state while fetching
   if (isLoading) {
     return <EventDetailLoadingState />;
   }
 
+  // Show error state if we encounter problems
   if (error || !event) {
     return (
       <EventDetailErrorState 
-        error={error as Error | null}
-        onBackToEvents={() => navigate('/events')}
-        notFound={!event}
+        error={error ? new Error(error.toString()) : new Error("Event not found")}
+        onBackToEvents={handleBackToEvents}
       />
     );
   }
 
+  const shareUrl = `${window.location.origin}/events/${event.slug || event.id}`;
+
+  console.log("EventDetail: Rendering with event RSVP status:", event.rsvp_status);
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <EventDetailHeader event={event} />
-      
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <EventDetailContent event={event} />
+    <>
+      <div className={`container mx-auto px-4 pt-6 pb-24 transition-opacity duration-300 ${isRsvpTransitioning ? 'opacity-95' : 'opacity-100'}`}>
+        {/* Back button for all screen sizes - Improved styling */}
+        <div className="mb-4">
+          <Button 
+            variant="outline" 
+            onClick={handleBackToEvents}
+            size={isMobile ? "default" : "lg"}
+            className="flex items-center gap-1.5 text-gray-700 border-gray-300 shadow-sm hover:bg-gray-50"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Back to Events
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Main event content - takes up 8/12 of the screen on desktop */}
+          <div className="lg:col-span-8 order-first">
+            <MainEventContent 
+              event={event}
+              attendees={attendees}
+              isAuthenticated={isAuthenticated}
+              rsvpLoading={rsvpLoading || isRsvpTransitioning}
+              handleRsvp={handleRsvpEvent}
+              isMobile={isMobile}
+              imageUrl={coverImage}
+              formattedDate={formattedDate}
+              shareUrl={shareUrl}
+              handleEventTypeClick={handleEventTypeClick}
+              handleBackToEvents={handleBackToEvents}
+            />
           </div>
           
-          <div className="lg:col-span-1">
-            <div className="sticky top-8 space-y-6">
-              {/* Sidebar content can go here */}
-            </div>
+          {/* Sidebar content - takes up 4/12 of the screen on desktop */}
+          <div className="lg:col-span-4 order-last">
+            <SidebarContent 
+              event={event}
+              attendees={attendees}
+              friendAttendees={friendAttendees}
+              isAuthenticated={isAuthenticated}
+            />
           </div>
         </div>
         
-        <RelatedEventsSection events={relatedEvents} />
+        {/* Related Events Section */}
+        <div className="mt-12">
+          <RelatedEvents 
+            eventId={event.id} 
+            eventType={event.event_type || ''}
+            startDate={event.start_date || ''}
+            tags={event.tags}
+            vibe={event.vibe}
+          />
+        </div>
+            
+        {/* Bottom back to events button */}
+        <div className="mt-8 mb-4 flex justify-center">
+          <Button 
+            variant="outline" 
+            onClick={handleBackToEvents}
+            className="flex items-center gap-2 shadow-sm hover:shadow-md transition-all"
+            size={isMobile ? "default" : "lg"}
+          >
+            <ChevronLeft className="h-4 w-4" />
+            <span>Back to Events</span>
+          </Button>
+        </div>
+        
+        {/* Mobile RSVP Footer */}
+        {isMobile && isAuthenticated && (
+          <MobileRsvpFooter 
+            eventId={event.id}
+            currentStatus={event.rsvp_status} 
+            onRsvp={handleRsvpEvent}
+            onShare={() => setShareDialogOpen(true)}
+          />
+        )}
+        
+        {/* Share Dialog */}
+        <ShareDialog 
+          title={event.title}
+          description={event.description || ""}
+          eventUrl={shareUrl}
+          open={shareDialogOpen}
+          onOpenChange={setShareDialogOpen}
+        />
       </div>
-    </div>
+      
+      {/* Global transition indicator */}
+      <div className="rsvp-transition-indicator"></div>
+      {isRsvpTransitioning && <div className="rsvp-overlay"></div>}
+    </>
   );
 };
 
