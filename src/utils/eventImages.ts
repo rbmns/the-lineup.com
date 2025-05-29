@@ -7,7 +7,7 @@ const EVENT_FALLBACK_IMAGES = {
   food: "/img/food.jpg",
   sports: "/img/sports.jpg",
   art: "/img/art.jpg",
-  culture: "/img/culture.jpg",
+  culture: "/img/mills.jpg",
   beach: "/img/beach.jpg",
   surf: "/img/surf.jpg",
   yoga: "/img/yoga.jpg",
