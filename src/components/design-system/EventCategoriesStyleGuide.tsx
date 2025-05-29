@@ -1,26 +1,42 @@
 
-import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import CategoryFilter from "@/polymet/components/category-filter";
-import VibeFilter from "@/polymet/components/vibe-filter";
-import {
-  EventCategoryLabel,
-  EventCategoryLabelsCollection,
-} from "@/polymet/components/event-category-labels";
-import EventVibeLabelEnhanced from "@/polymet/components/event-vibe-label-enhanced";
-import CategoryBadge from "@/polymet/components/category-badge";
+import { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import CategoryFilter from '@/components/polymet/category-filter';
+import VibeFilter from '@/components/polymet/vibe-filter';
+import { EventCategoryLabel, EventCategoryLabelsCollection } from '@/components/polymet/event-category-labels';
+import EventVibeLabelEnhanced from '@/components/polymet/event-vibe-label-enhanced';
+import CategoryBadge from '@/components/polymet/category-badge';
 
 export default function EventCategoriesStyleGuide() {
-  const [selectedCategory, setSelectedCategory] = useState<string>("yoga");
-  const [selectedVibe, setSelectedVibe] = useState<string | null>("wellness");
+  const [selectedCategory, setSelectedCategory] = useState('yoga');
+  const [selectedVibe, setSelectedVibe] = useState('wellness');
 
   const categories = [
-    "festival", "wellness", "kite", "beach", "game", "other", 
-    "sports", "surf", "party", "yoga", "community", "music", 
-    "food", "market", "art"
+    'festival',
+    'wellness', 
+    'kite',
+    'beach',
+    'game',
+    'other',
+    'sports',
+    'surf',
+    'party',
+    'yoga',
+    'community',
+    'music',
+    'food',
+    'market',
+    'art'
   ];
 
-  const vibes = ["party", "chill", "wellness", "active", "social", "creative"];
+  const vibes = [
+    'party',
+    'chill', 
+    'wellness',
+    'active',
+    'social',
+    'creative'
+  ];
 
   return (
     <div className="container py-8 max-w-4xl mx-auto">
@@ -62,17 +78,24 @@ export default function EventCategoriesStyleGuide() {
           </section>
 
           <section className="bg-white rounded-lg border p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-1">Interactive Example</h2>
+            <h2 className="text-xl font-semibold mb-4">Category Labels Collection</h2>
             <p className="text-muted-foreground mb-4">
-              Click on a category to see it selected
+              All category labels in different sizes
             </p>
-            <CategoryFilter
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onSelectCategory={setSelectedCategory}
-            />
-
-            <p className="mt-4">Selected category: {selectedCategory}</p>
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-sm font-medium mb-2">Small Size</h3>
+                <EventCategoryLabelsCollection size="sm" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium mb-2">Medium Size</h3>
+                <EventCategoryLabelsCollection size="md" />
+              </div>
+              <div>
+                <h3 className="text-sm font-medium mb-2">Large Size</h3>
+                <EventCategoryLabelsCollection size="lg" />
+              </div>
+            </div>
           </section>
         </TabsContent>
 
@@ -80,7 +103,7 @@ export default function EventCategoriesStyleGuide() {
           <section className="bg-white rounded-lg border p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Vibe Labels</h2>
             <p className="text-muted-foreground mb-4">
-              Individual vibe labels with distinct colors and patterns
+              Enhanced vibe labels with gradients and patterns
             </p>
             <div className="flex flex-wrap gap-2">
               {vibes.map((vibe) => (
@@ -92,7 +115,7 @@ export default function EventCategoriesStyleGuide() {
           <section className="bg-white rounded-lg border p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-4">Vibe Filter</h2>
             <p className="text-muted-foreground mb-4">
-              Horizontal scrollable filter for selecting event vibes
+              Interactive vibe filter with scroll shadows
             </p>
             <VibeFilter
               selectedVibe={selectedVibe}
@@ -103,44 +126,26 @@ export default function EventCategoriesStyleGuide() {
 
         <TabsContent value="comparison" className="space-y-8">
           <section className="bg-white rounded-lg border p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">
-              When to Use Each Filter Type
-            </h2>
+            <h2 className="text-xl font-semibold mb-4">Categories vs Vibes</h2>
+            <p className="text-muted-foreground mb-4">
+              Comparison of category and vibe styling approaches
+            </p>
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Category Filters</h3>
-                <p className="text-muted-foreground">
-                  Use for filtering events by their primary type or purpose
-                </p>
-                <ul className="list-disc pl-5 space-y-2">
-                  <li>
-                    <strong>Content-based:</strong> Filters by what the event is about
-                  </li>
-                  <li>
-                    <strong>Objective:</strong> Based on event description and activities
-                  </li>
-                  <li>
-                    <strong>Examples:</strong> Yoga, Music, Food, Market, etc.
-                  </li>
-                </ul>
+              <div>
+                <h3 className="text-lg font-medium mb-3">Categories</h3>
+                <div className="flex flex-wrap gap-2">
+                  {categories.slice(0, 8).map((category) => (
+                    <CategoryBadge key={category} category={category} size="md" />
+                  ))}
+                </div>
               </div>
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Vibe Filters</h3>
-                <p className="text-muted-foreground">
-                  Use for filtering events by their atmosphere or emotional experience
-                </p>
-                <ul className="list-disc pl-5 space-y-2">
-                  <li>
-                    <strong>Mood-based:</strong> Filters by how the event feels
-                  </li>
-                  <li>
-                    <strong>Subjective:</strong> Based on atmosphere and emotional experience
-                  </li>
-                  <li>
-                    <strong>Examples:</strong> Chill, Active, Social, Creative, etc.
-                  </li>
-                </ul>
+              <div>
+                <h3 className="text-lg font-medium mb-3">Vibes</h3>
+                <div className="flex flex-wrap gap-2">
+                  {vibes.map((vibe) => (
+                    <EventVibeLabelEnhanced key={vibe} vibe={vibe} size="md" />
+                  ))}
+                </div>
               </div>
             </div>
           </section>
