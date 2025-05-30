@@ -12,7 +12,7 @@ interface EventsAdvancedSectionProps {
   selectedDateFilter: string;
   filteredEventsCount: number;
   showLocationFilter?: boolean;
-  allEventTypes?: string[]; // Add this prop
+  allEventTypes?: string[];
 }
 
 export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
@@ -24,7 +24,7 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
   selectedDateFilter,
   filteredEventsCount,
   showLocationFilter = false,
-  allEventTypes = [], // Default to empty array
+  allEventTypes = [],
 }) => {
   return (
     <div className="space-y-3 md:space-y-4">
@@ -47,7 +47,6 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
               });
             }}
             locations={["Zandvoort Area"]}
-            eventCategories={allEventTypes} // Pass the actual event categories
             initialFilters={{
               location: "Zandvoort Area",
               eventTypes: selectedEventTypes,
@@ -62,7 +61,7 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
             <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-full text-sm text-gray-700">
               <MapPin className="h-3 w-3" />
               <span className="hidden sm:inline">Zandvoort Area</span>
-              <span className="sm:hidden">Area</span>
+              <span className="sm:hidden">Zandvoort</span>
             </div>
           )}
         </div>

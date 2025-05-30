@@ -12,7 +12,6 @@ import {
   MapPinIcon,
   FilterIcon,
   XIcon,
-  TagIcon,
   BuildingIcon,
 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
@@ -30,7 +29,7 @@ interface AdvancedFiltersProps {
   className?: string;
   locations?: string[];
   initialFilters?: Partial<FilterValues>;
-  eventCategories?: string[]; // Add this prop to receive actual categories
+  eventCategories?: string[]; // Keep prop for compatibility but won't use
 }
 
 export interface FilterValues {
@@ -52,7 +51,7 @@ export default function AdvancedFilters({
   className,
   locations = ["Zandvoort Area"],
   initialFilters = {},
-  eventCategories = [], // Default to empty array
+  eventCategories = [], // Keep for compatibility
 }: AdvancedFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [filters, setFilters] = useState<FilterValues>({
@@ -83,16 +82,6 @@ export default function AdvancedFilters({
     updateActiveFiltersCount(newFilters);
   };
 
-  const handleEventTypeChange = (eventType: string, checked: boolean) => {
-    const newEventTypes = checked 
-      ? [...filters.eventTypes, eventType]
-      : filters.eventTypes.filter(type => type !== eventType);
-    const newFilters = { ...filters, eventTypes: newEventTypes };
-    setFilters(newFilters);
-    onFilterChange(newFilters);
-    updateActiveFiltersCount(newFilters);
-  };
-
   const handleVenueChange = (venue: string, checked: boolean) => {
     const newVenues = checked 
       ? [...filters.venues, venue]
@@ -107,7 +96,6 @@ export default function AdvancedFilters({
     let count = 0;
     if (newFilters.date) count++;
     if (newFilters.location && newFilters.location !== "Zandvoort Area") count++;
-    if (newFilters.eventTypes.length > 0) count++;
     if (newFilters.venues.length > 0) count++;
     if (newFilters.eventVibes.length > 0) count++;
     if (newFilters.dateFilter) count++;
@@ -166,35 +154,6 @@ export default function AdvancedFilters({
                 </Button>
               )}
             </div>
-
-            {/* Event Categories - use actual categories from props */}
-            {eventCategories.length > 0 && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium flex items-center gap-2">
-                  <TagIcon size={16} />
-                  Event Categories
-                </label>
-                <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
-                  {eventCategories.map((category) => (
-                    <div key={category} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={category}
-                        checked={filters.eventTypes.includes(category)}
-                        onCheckedChange={(checked) => 
-                          handleEventTypeChange(category, checked as boolean)
-                        }
-                      />
-                      <label
-                        htmlFor={category}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        {category}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Venues */}
             <div className="space-y-2">
@@ -299,24 +258,6 @@ export default function AdvancedFilters({
         </Button>
       )}
 
-      {filters.eventTypes.length > 0 && (
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-2 border-primary-50 bg-primary-10 text-primary"
-          onClick={() => {
-            const newFilters = { ...filters, eventTypes: [] };
-            setFilters(newFilters);
-            onFilterChange(newFilters);
-            updateActiveFiltersCount(newFilters);
-          }}
-        >
-          <TagIcon size={16} />
-          <span>{filters.eventTypes.length} categories</span>
-          <XIcon size={14} />
-        </Button>
-      )}
-
       {filters.venues.length > 0 && (
         <Button
           variant="outline"
@@ -347,7 +288,7 @@ export default function AdvancedFilters({
             updateActiveFiltersCount(newFilters);
           }}
         >
-          <TagIcon size={16} />
+          <BuildingIcon size={16} />
           <span>{filters.eventVibes.length} vibes</span>
           <XIcon size={14} />
         </Button>
