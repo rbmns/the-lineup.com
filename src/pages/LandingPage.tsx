@@ -119,10 +119,10 @@ const LandingPage = () => {
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative container mx-auto px-4 text-center text-white">
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-            Find events and plans that fit your vibe
+            See what's on in Zandvoort
           </h1>
           <p className="text-xl leading-relaxed mb-8 max-w-3xl mx-auto">
-            Discover what's happening nearby — from beach parties to chill yoga sessions. Join when you want, connect if you want.
+            Discover local events and casual plans that fit your vibe. Explore what's happening nearby - music, surf, art, community, and more. Join events or post your own casual plans. Or, just browse events.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
