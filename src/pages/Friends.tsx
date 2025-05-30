@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFriendData } from '@/hooks/useFriendData';
@@ -135,11 +136,13 @@ const Friends: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50">
         <FriendsHeader />
-        <FriendsSearchSection 
-          searchQuery=""
-          onSearchChange={() => {}}
-          disabled={true}
-        />
+        <div className="px-4">
+          <FriendsSearchSection 
+            searchQuery=""
+            onSearchChange={() => {}}
+            disabled={true}
+          />
+        </div>
         <FriendsLoginPrompt />
       </div>
     );
@@ -152,15 +155,17 @@ const Friends: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <FriendsHeader />
       
-      <FriendsSearchSection 
-        searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
-      />
+      <div className="px-4">
+        <FriendsSearchSection 
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchChange}
+        />
+      </div>
 
       {/* Friends Content */}
       <div className="container mx-auto px-4 pb-6 md:pb-8">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
+          <div className="bg-white rounded-lg shadow-sm p-3 md:p-6">
             <FriendsTabsNew
               activeTab={activeTab}
               setActiveTab={setActiveTab}
