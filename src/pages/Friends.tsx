@@ -14,7 +14,6 @@ import { FriendsSearchSection } from '@/components/friends/FriendsSearchSection'
 import { FriendsLoginPrompt } from '@/components/friends/FriendsLoginPrompt';
 import { UserProfile } from '@/types';
 import { supabase } from '@/lib/supabase';
-import React from 'react';
 
 const Friends: React.FC = () => {
   const { user } = useAuth();
@@ -64,7 +63,7 @@ const Friends: React.FC = () => {
     const friendsWithoutCurrentUser = friends.filter(friend => friend.id !== user.id);
     
     if (!searchQuery) {
-      return friendsWithoutCurrentUser as UserProfile[];
+      return friendsWithoutCurrentUser;
     }
     
     const query = searchQuery.toLowerCase();
@@ -74,7 +73,7 @@ const Friends: React.FC = () => {
       friend.status?.toLowerCase().includes(query)
     );
     
-    return filtered as UserProfile[];
+    return filtered;
   }, [searchQuery, friends, user]);
 
   // Handle sending a friend request
@@ -164,7 +163,7 @@ const Friends: React.FC = () => {
               suggestedFriendsCount={suggestedFriendsCount}
               allFriendsContent={
                 <FriendsTabContent
-                  friends={filteredFriends as UserProfile[]}
+                  friends={filteredFriends}
                   loading={friendsLoading}
                   requests={requests || []}
                   onAcceptRequest={onAcceptRequest}
