@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFriendData } from '@/hooks/useFriendData';
 import { useFriendRequests } from '@/hooks/useFriendRequests';

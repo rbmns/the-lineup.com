@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { UserProfile } from '@/types';
+import { UserProfile } from '@/types/index';
 import { FriendsList } from './FriendsList';
 import { FriendRequestsSection } from './FriendRequestsSection';
 import { FriendSearchBar } from './FriendSearchBar';
