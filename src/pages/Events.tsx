@@ -2,7 +2,6 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
-import { EventsPageFilters } from '@/components/events/page-components/EventsPageFilters';
 import { CategoryFilteredEventsContent } from '@/components/events/category-filters/CategoryFilteredEventsContent';
 import { PageHeader } from '@/components/ui/page-header';
 import VibeFilter from '@/components/polymet/vibe-filter';
@@ -51,7 +50,24 @@ const Events = () => {
   };
 
   const handleAdvancedFilterChange = (filters: any) => {
-    // TODO: Implement advanced filter logic
+    // Handle event category filters
+    if (filters.eventTypes) {
+      setSelectedEventTypes(filters.eventTypes);
+    }
+    
+    // Handle venue filters
+    if (filters.venues) {
+      setSelectedVenues(filters.venues);
+    }
+    
+    // Handle date filters
+    if (filters.dateRange) {
+      setDateRange(filters.dateRange);
+    }
+    
+    if (filters.dateFilter) {
+      setSelectedDateFilter(filters.dateFilter);
+    }
   };
 
   return (
@@ -84,10 +100,16 @@ const Events = () => {
             <div className="flex items-center gap-4">
               <AdvancedFilters
                 onFilterChange={handleAdvancedFilterChange}
-                locations={["All locations", "Zandvoort Area"]}
-                initialFilters={{}}
+                locations={["Zandvoort Area"]}
+                initialFilters={{
+                  location: "Zandvoort Area",
+                  eventTypes: selectedEventTypes,
+                  venues: selectedVenues,
+                  dateRange: dateRange,
+                  dateFilter: selectedDateFilter
+                }}
               />
-              <span className="text-sm text-gray-600">8 events found</span>
+              <span className="text-sm text-gray-600">{filteredEvents.length} events found</span>
             </div>
 
             {/* Upcoming Events Section */}

@@ -12,6 +12,8 @@ import {
   MapPinIcon,
   FilterIcon,
   XIcon,
+  TagIcon,
+  BuildingIcon,
 } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -21,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface AdvancedFiltersProps {
   onFilterChange: (filters: FilterValues) => void;
@@ -32,25 +35,34 @@ interface AdvancedFiltersProps {
 export interface FilterValues {
   date: Date | undefined;
   location: string | undefined;
+  eventTypes: string[];
+  venues: string[];
+  dateFilter: string | undefined;
 }
+
+const eventCategories = [
+  "Surf", "Yoga", "Music", "Food", "Art & Culture", "Sports", 
+  "Festival", "Market", "Beach", "Nature"
+];
+
+const venues = [
+  "Beach Club", "Yoga Studio", "Concert Hall", "Restaurant", 
+  "Art Gallery", "Sports Center", "Festival Ground"
+];
 
 export default function AdvancedFilters({
   onFilterChange,
   className,
-  locations = [
-    "All locations",
-    "Zandvoort",
-    "Haarlem",
-    "Amsterdam",
-    "Bloemendaal",
-  ],
-
+  locations = ["Zandvoort Area"],
   initialFilters = {},
 }: AdvancedFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [filters, setFilters] = useState<FilterValues>({
     date: initialFilters.date,
-    location: initialFilters.location || "All locations",
+    location: initialFilters.location || "Zandvoort Area",
+    eventTypes: initialFilters.eventTypes || [],
+    venues: initialFilters.venues || [],
+    dateFilter: initialFilters.dateFilter,
   });
 
   const [activeFiltersCount, setActiveFiltersCount] = useState<number>(
@@ -72,17 +84,43 @@ export default function AdvancedFilters({
     updateActiveFiltersCount(newFilters);
   };
 
+  const handleEventTypeChange = (eventType: string, checked: boolean) => {
+    const newEventTypes = checked 
+      ? [...filters.eventTypes, eventType]
+      : filters.eventTypes.filter(type => type !== eventType);
+    const newFilters = { ...filters, eventTypes: newEventTypes };
+    setFilters(newFilters);
+    onFilterChange(newFilters);
+    updateActiveFiltersCount(newFilters);
+  };
+
+  const handleVenueChange = (venue: string, checked: boolean) => {
+    const newVenues = checked 
+      ? [...filters.venues, venue]
+      : filters.venues.filter(v => v !== venue);
+    const newFilters = { ...filters, venues: newVenues };
+    setFilters(newFilters);
+    onFilterChange(newFilters);
+    updateActiveFiltersCount(newFilters);
+  };
+
   const updateActiveFiltersCount = (newFilters: FilterValues) => {
-    const count = Object.values(newFilters).filter(
-      (value) => value !== undefined && value !== "All locations"
-    ).length;
+    let count = 0;
+    if (newFilters.date) count++;
+    if (newFilters.location && newFilters.location !== "Zandvoort Area") count++;
+    if (newFilters.eventTypes.length > 0) count++;
+    if (newFilters.venues.length > 0) count++;
+    if (newFilters.dateFilter) count++;
     setActiveFiltersCount(count);
   };
 
   const clearFilters = () => {
     const newFilters = {
       date: undefined,
-      location: undefined,
+      location: "Zandvoort Area",
+      eventTypes: [],
+      venues: [],
+      dateFilter: undefined,
     };
     setFilters(newFilters);
     onFilterChange(newFilters);
@@ -103,7 +141,6 @@ export default function AdvancedFilters({
             )}
           >
             <FilterIcon size={16} />
-
             <span>Filters</span>
             {activeFiltersCount > 0 && (
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-white">
@@ -112,7 +149,7 @@ export default function AdvancedFilters({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-80 p-4" align="start">
+        <PopoverContent className="w-96 p-4" align="start">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-medium">Filters</h3>
@@ -129,8 +166,66 @@ export default function AdvancedFilters({
               )}
             </div>
 
+            {/* Event Categories */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Date</label>
+              <label className="text-sm font-medium flex items-center gap-2">
+                <TagIcon size={16} />
+                Event Categories
+              </label>
+              <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
+                {eventCategories.map((category) => (
+                  <div key={category} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={category}
+                      checked={filters.eventTypes.includes(category)}
+                      onCheckedChange={(checked) => 
+                        handleEventTypeChange(category, checked as boolean)
+                      }
+                    />
+                    <label
+                      htmlFor={category}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      {category}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Venues */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <BuildingIcon size={16} />
+                Venues
+              </label>
+              <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
+                {venues.map((venue) => (
+                  <div key={venue} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={venue}
+                      checked={filters.venues.includes(venue)}
+                      onCheckedChange={(checked) => 
+                        handleVenueChange(venue, checked as boolean)
+                      }
+                    />
+                    <label
+                      htmlFor={venue}
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      {venue}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Date */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <CalendarIcon size={16} />
+                Date
+              </label>
               <div className="rounded-md border">
                 <Calendar
                   mode="single"
@@ -142,11 +237,16 @@ export default function AdvancedFilters({
               </div>
             </div>
 
+            {/* Location */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Location</label>
+              <label className="text-sm font-medium flex items-center gap-2">
+                <MapPinIcon size={16} />
+                Location
+              </label>
               <Select
-                value={filters.location || "All locations"}
+                value={filters.location || "Zandvoort Area"}
                 onValueChange={handleLocationChange}
+                disabled
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select location" />
@@ -177,6 +277,7 @@ export default function AdvancedFilters({
         </PopoverContent>
       </Popover>
 
+      {/* Active Filter Pills */}
       {filters.date && (
         <Button
           variant="outline"
@@ -185,7 +286,6 @@ export default function AdvancedFilters({
           onClick={() => handleDateChange(undefined)}
         >
           <CalendarIcon size={16} />
-
           <span>
             {filters.date.toLocaleDateString("en-US", {
               month: "short",
@@ -196,16 +296,38 @@ export default function AdvancedFilters({
         </Button>
       )}
 
-      {filters.location && (
+      {filters.eventTypes.length > 0 && (
         <Button
           variant="outline"
           size="sm"
           className="flex items-center gap-2 border-primary-50 bg-primary-10 text-primary"
-          onClick={() => handleLocationChange("All locations")}
+          onClick={() => {
+            const newFilters = { ...filters, eventTypes: [] };
+            setFilters(newFilters);
+            onFilterChange(newFilters);
+            updateActiveFiltersCount(newFilters);
+          }}
         >
-          <MapPinIcon size={16} />
+          <TagIcon size={16} />
+          <span>{filters.eventTypes.length} categories</span>
+          <XIcon size={14} />
+        </Button>
+      )}
 
-          <span>{filters.location}</span>
+      {filters.venues.length > 0 && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2 border-primary-50 bg-primary-10 text-primary"
+          onClick={() => {
+            const newFilters = { ...filters, venues: [] };
+            setFilters(newFilters);
+            onFilterChange(newFilters);
+            updateActiveFiltersCount(newFilters);
+          }}
+        >
+          <BuildingIcon size={16} />
+          <span>{filters.venues.length} venues</span>
           <XIcon size={14} />
         </Button>
       )}
