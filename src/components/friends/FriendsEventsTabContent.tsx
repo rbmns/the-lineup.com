@@ -36,8 +36,16 @@ export const FriendsEventsTabContent: React.FC<FriendsEventsTabContentProps> = (
     return { upcomingEvents: upcoming, pastEvents: past };
   }, [friendsEvents]);
 
-  const getFriendProfile = (friendUserId: string) => {
-    return friends.find(friend => friend.id === friendUserId);
+  const getFriendProfile = (event: any) => {
+    // For events created by friends, use the creator ID
+    if (event.is_friend_creator && event.creator?.id) {
+      return friends.find(friend => friend.id === event.creator.id);
+    }
+    // For events friends RSVPed to, use the friend_user_id
+    if (event.friend_user_id) {
+      return friends.find(friend => friend.id === event.friend_user_id);
+    }
+    return null;
   };
 
   if (isLoading) {
@@ -112,7 +120,7 @@ export const FriendsEventsTabContent: React.FC<FriendsEventsTabContentProps> = (
                 <FriendEventCard 
                   key={event.id} 
                   event={event}
-                  friendProfile={getFriendProfile(event.friend_user_id || event.creator?.id || '')}
+                  friendProfile={getFriendProfile(event)}
                 />
               ))}
             </div>
@@ -134,7 +142,7 @@ export const FriendsEventsTabContent: React.FC<FriendsEventsTabContentProps> = (
                 <FriendEventCard 
                   key={event.id} 
                   event={event}
-                  friendProfile={getFriendProfile(event.friend_user_id || event.creator?.id || '')}
+                  friendProfile={getFriendProfile(event)}
                 />
               ))}
             </div>
