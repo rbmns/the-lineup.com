@@ -35,7 +35,7 @@ function App() {
               
               {/* Public Events routes */}
               <Route path="/events" element={<EventsPage />} />
-              <Route path="/events/:eventId" element={<EventDetail />} />
+              <Route path="/events/:id" element={<EventDetail />} />
               
               {/* Auth routes */}
               <Route path="/login" element={<LoginPage />} />

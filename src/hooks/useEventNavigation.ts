@@ -11,7 +11,9 @@ export const useEventNavigation = () => {
       return;
     }
 
-    // Determine route based on event properties
+    console.log('Navigating to event:', event.id);
+    
+    // Use simple ID-based route
     const eventRoute = `/events/${event.id}`;
     
     navigate(eventRoute, {

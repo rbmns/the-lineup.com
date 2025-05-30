@@ -11,7 +11,7 @@ import { toast } from '@/hooks/use-toast';
 import { Helmet } from 'react-helmet-async';
 
 const EventDetail = () => {
-  const { id, slug } = useParams<{ id: string; slug?: string }>();
+  const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [event, setEvent] = useState<Event | null>(null);
@@ -22,10 +22,16 @@ const EventDetail = () => {
   // Fetch event data
   useEffect(() => {
     const fetchEvent = async () => {
-      if (!id) return;
+      if (!id) {
+        console.error('No event ID provided');
+        navigate('/events');
+        return;
+      }
 
       try {
         setLoading(true);
+        console.log('Fetching event with ID:', id);
+        
         const { data, error } = await supabase
           .from('events')
           .select(`
@@ -79,6 +85,8 @@ const EventDetail = () => {
             organiser_name: data.organiser_name,
             destination: data.destination,
             slug: data.slug,
+            location: data.location,
+            coordinates: data.coordinates,
             creator: creatorData ? {
               id: creatorData.id,
               username: creatorData.username,
@@ -127,6 +135,8 @@ const EventDetail = () => {
 
           setEvent(formattedEvent);
           setAttendees({ going, interested });
+          
+          console.log('Event loaded successfully:', formattedEvent);
         }
       } catch (error) {
         console.error('Error in event fetch:', error);
@@ -146,7 +156,7 @@ const EventDetail = () => {
 
   // Fetch related events
   const { relatedEvents, loading: relatedLoading } = useFetchRelatedEvents({
-    eventCategory: event?.event_category || '', // Changed from eventType to eventCategory
+    eventCategory: event?.event_category || '',
     currentEventId: event?.id || '',
     userId: user?.id,
     tags: event?.tags,
@@ -260,7 +270,7 @@ const EventDetail = () => {
   }
 
   return (
-    <>
+    <div className="container mx-auto px-4 py-8">
       <Helmet>
         <title>{event.title} | Event Details</title>
         <meta name="description" content={event.description?.substring(0, 160) || `Join us for ${event.title}`} />
@@ -275,7 +285,7 @@ const EventDetail = () => {
         rsvpLoading={rsvpLoading}
         onRsvp={handleRsvp}
       />
-    </>
+    </div>
   );
 };
 
