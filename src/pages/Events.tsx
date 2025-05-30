@@ -89,31 +89,42 @@ const Events = () => {
                 <h2 className="text-2xl font-semibold tracking-tight">Find your vibe</h2>
               </div>
               
-              {/* Vibe Filters */}
-              <VibeFilter
-                selectedVibe={selectedVibe}
-                onChange={handleVibeChange}
-                size="md"
-              />
+              {/* Vibe Filters - Responsive sizing */}
+              <div className="w-full">
+                <VibeFilter
+                  selectedVibe={selectedVibe}
+                  onChange={handleVibeChange}
+                  size="md"
+                  className="w-full"
+                />
+              </div>
             </div>
 
-            {/* Filters Section */}
-            <div className="flex items-center gap-4">
-              <AdvancedFilters
-                onFilterChange={handleAdvancedFilterChange}
-                locations={["Zandvoort Area"]}
-                initialFilters={{
-                  location: "Zandvoort Area",
-                  eventTypes: selectedEventTypes,
-                  venues: selectedVenues,
-                  date: dateRange?.from,
-                  dateFilter: selectedDateFilter
-                }}
-              />
-              <span className="text-sm text-gray-600">{filteredEvents.length} events found</span>
+            {/* Advanced Filters Section */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-medium">Refine your search</h3>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <AdvancedFilters
+                  onFilterChange={handleAdvancedFilterChange}
+                  locations={["Zandvoort Area"]}
+                  initialFilters={{
+                    location: "Zandvoort Area",
+                    eventTypes: selectedEventTypes,
+                    venues: selectedVenues,
+                    date: dateRange?.from,
+                    dateFilter: selectedDateFilter
+                  }}
+                />
+                <span className="text-sm text-gray-600 whitespace-nowrap">
+                  {filteredEvents.length} events found
+                </span>
+              </div>
             </div>
 
-            {/* Upcoming Events Section */}
+            {/* Events Results Section */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-semibold tracking-tight">All Events</h2>

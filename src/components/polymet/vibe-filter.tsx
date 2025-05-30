@@ -36,39 +36,39 @@ export default function VibeFilter({
     return () => window.removeEventListener("resize", handleScroll);
   }, []);
 
-  // Size classes for the filter items
+  // Size classes for the filter items - responsive
   const sizeClasses = {
     sm: "text-xs py-1 px-2",
-    md: "text-sm py-1.5 px-3",
-    lg: "text-base py-2 px-4",
+    md: "text-sm py-1.5 px-3 md:py-2 md:px-4", // Larger on desktop
+    lg: "text-base py-2 px-4 md:py-2.5 md:px-5", // Even larger on desktop
   };
 
   return (
     <div className={cn("relative w-full", className)}>
       {/* Left shadow indicator */}
       {showLeftShadow && (
-        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10" />
+        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
       )}
 
       {/* Right shadow indicator */}
       {showRightShadow && (
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-10" />
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
       )}
 
       {/* Scrollable container */}
       <div
         ref={scrollContainerRef}
-        className="flex overflow-x-auto scrollbar-hide py-2 px-1 -mx-1"
+        className="flex overflow-x-auto scrollbar-hide py-2 px-1 -mx-1 gap-2"
         onScroll={handleScroll}
       >
-        {/* "All" option */}
+        {/* "All Vibes" option */}
         <button
           onClick={() => onChange(null)}
           className={cn(
-            "flex items-center justify-center whitespace-nowrap rounded-full border transition-all duration-200",
+            "flex items-center justify-center whitespace-nowrap rounded-full border transition-all duration-200 flex-shrink-0",
             sizeClasses[size],
             selectedVibe === null
-              ? "bg-primary text-white border-primary"
+              ? "bg-black text-white border-black shadow-sm"
               : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
           )}
         >
@@ -76,24 +76,22 @@ export default function VibeFilter({
         </button>
 
         {/* Vibe options */}
-        <div className="flex gap-2 px-2">
-          {vibeOptions.map((vibe) => (
-            <button
-              key={vibe.id}
-              onClick={() => onChange(vibe.id)}
-              className={cn(
-                "flex items-center gap-1.5 whitespace-nowrap rounded-full border transition-all duration-200",
-                sizeClasses[size],
-                selectedVibe === vibe.id
-                  ? cn(vibe.color, "opacity-100")
-                  : "bg-white text-gray-600 border-gray-200 hover:border-gray-300 opacity-80"
-              )}
-            >
-              {vibe.icon}
-              {vibe.label}
-            </button>
-          ))}
-        </div>
+        {vibeOptions.map((vibe) => (
+          <button
+            key={vibe.id}
+            onClick={() => onChange(vibe.id)}
+            className={cn(
+              "flex items-center gap-1.5 whitespace-nowrap rounded-full border transition-all duration-200 flex-shrink-0",
+              sizeClasses[size],
+              selectedVibe === vibe.id
+                ? cn(vibe.color, "opacity-100 shadow-sm")
+                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300 opacity-80"
+            )}
+          >
+            {vibe.icon}
+            <span>{vibe.label}</span>
+          </button>
+        ))}
       </div>
     </div>
   );
