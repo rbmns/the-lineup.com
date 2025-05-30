@@ -51,7 +51,7 @@ export const useEventBasedSuggestions = (currentUserId?: string, friendIds: stri
               id, title, start_date, event_category
             ),
             profiles!inner (
-              id, username, avatar_url, email, location, status, tagline
+              id, username, avatar_url, email, location, location_category, status, tagline
             )
           `)
           .in('event_id', userEventIds)
@@ -74,8 +74,8 @@ export const useEventBasedSuggestions = (currentUserId?: string, friendIds: stri
         mutualRsvps.forEach(rsvp => {
           const userId = rsvp.user_id;
           // Properly extract the profile data - it should be a single object, not an array
-          const profileData = rsvp.profiles;
-          const eventData = rsvp.events;
+          const profileData = rsvp.profiles as any;
+          const eventData = rsvp.events as any;
 
           // Skip if user is already a friend or has pending request
           if (friendIds.includes(userId)) return;
@@ -87,6 +87,7 @@ export const useEventBasedSuggestions = (currentUserId?: string, friendIds: stri
             avatar_url: profileData.avatar_url || null,
             email: profileData.email || null,
             location: profileData.location || null,
+            location_category: profileData.location_category || null,
             status: profileData.status || null,
             tagline: profileData.tagline || null
           };
