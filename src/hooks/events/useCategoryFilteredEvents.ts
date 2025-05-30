@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -26,15 +25,19 @@ export const useCategoryFilteredEvents = (categorySlug: string | undefined) => {
     setSelectedEventTypes,
     selectedVenues,
     setSelectedVenues,
+    selectedVibes,
+    setSelectedVibes,
     dateRange,
     setDateRange,
     selectedDateFilter,
     setSelectedDateFilter,
     isFilterLoading,
-    setIsFilterLoading,
     hasActiveFilters,
     resetFilters,
   } = useEventFilterState();
+  
+  // Manual state for setIsFilterLoading since it's not in the hook
+  const [localIsFilterLoading, setIsFilterLoading] = useState(false);
   
   // Get available filter options from events
   const {
@@ -62,6 +65,7 @@ export const useCategoryFilteredEvents = (categorySlug: string | undefined) => {
     events,
     selectedEventTypes,
     selectedVenues,
+    selectedVibes,
     dateRange,
     selectedDateFilter,
     hasActiveFilters,
@@ -194,13 +198,13 @@ export const useCategoryFilteredEvents = (categorySlug: string | undefined) => {
     setDateRange,
     selectedDateFilter,
     setSelectedDateFilter,
-    isFilterLoading,
+    isFilterLoading: isFilterLoading || localIsFilterLoading,
+    hasActiveFilters,
     
     // Filtered event data
     exactMatches,
     similarEvents: fetchedSimilarEvents, // Use the fetched similar events here
     showNoExactMatchesMessage,
-    hasActiveFilters,
     
     // Filter actions
     resetFilters,

@@ -7,6 +7,7 @@ interface EventsAdvancedSectionProps {
   onFilterChange: (filters: any) => void;
   selectedEventTypes: string[];
   selectedVenues: string[];
+  selectedVibes: string[];
   dateRange: any;
   selectedDateFilter: string;
   filteredEventsCount: number;
@@ -17,6 +18,7 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
   onFilterChange,
   selectedEventTypes,
   selectedVenues,
+  selectedVibes,
   dateRange,
   selectedDateFilter,
   filteredEventsCount,
@@ -37,6 +39,7 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
               location: "Zandvoort Area",
               eventTypes: selectedEventTypes,
               venues: selectedVenues,
+              vibes: selectedVibes,
               date: dateRange?.from,
               dateFilter: selectedDateFilter
             }}

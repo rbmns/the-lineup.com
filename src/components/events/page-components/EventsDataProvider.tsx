@@ -65,6 +65,8 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     setSelectedEventTypes,
     selectedVenues,
     setSelectedVenues,
+    selectedVibes,
+    setSelectedVibes,
     dateRange,
     setDateRange,
     selectedDateFilter,
@@ -170,6 +172,7 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     selectedCategories,
     allEventTypes,
     selectedVenues,
+    selectedVibes,
     dateRange,
     selectedDateFilter
   });

@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { DateRange } from 'react-day-picker';
 
@@ -62,6 +61,21 @@ const defaultFilterState: FilterState = {
   dateFilter: '',
   timestamp: Date.now(),
 };
+
+// Extend the window interface to include vibes
+declare global {
+  interface Window {
+    _filterStateBeforeRsvp?: {
+      urlParams: string;
+      scrollPosition: number;
+      timestamp: number;
+      eventTypes?: string[];
+      vibes?: string[];
+      pathname?: string;
+    };
+    rsvpInProgress?: boolean;
+  }
+}
 
 export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // Initialize filter state from storage or with default values
