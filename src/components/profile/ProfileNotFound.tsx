@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, UserX } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { UserX } from 'lucide-react';
 
 interface ProfileNotFoundProps {
   error?: string;
@@ -10,28 +10,17 @@ interface ProfileNotFoundProps {
 
 export const ProfileNotFound: React.FC<ProfileNotFoundProps> = ({ error }) => {
   const navigate = useNavigate();
-  
+
   return (
-    <div className="text-center py-12 px-4 bg-gray-50 rounded-lg shadow-sm">
-      <div className="flex justify-center mb-4">
-        <div className="bg-gray-100 p-4 rounded-full">
-          <UserX size={48} className="text-gray-400" />
-        </div>
-      </div>
-      <h2 className="text-xl font-semibold text-gray-700 mb-2">Profile Not Found</h2>
-      <p className="text-gray-500 mb-6 max-w-md mx-auto">
-        The user profile you're looking for doesn't exist or you may not have permission to view it.
-        {error && (
-          <span className="block mt-2 text-sm text-red-500">{error}</span>
-        )}
-      </p>
-      <div className="flex justify-center space-x-3">
-        <Button variant="outline" onClick={() => navigate('/friends')}>
-          View Friends
-        </Button>
-        <Button onClick={() => navigate('/')}>
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Go Home
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center p-8">
+        <UserX className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Profile Not Found</h1>
+        <p className="text-gray-600 mb-6">
+          {error || "The profile you're looking for doesn't exist or you don't have permission to view it."}
+        </p>
+        <Button onClick={() => navigate('/friends')} variant="outline">
+          Back to Friends
         </Button>
       </div>
     </div>

@@ -12,6 +12,7 @@ import CasualPlansPage from "./pages/CasualPlans";
 import FriendsPage from "./pages/Friends";
 import MapPage from "./pages/map";
 import ProfilePage from "./pages/Profile";
+import UserProfilePage from "./pages/UserProfilePage";
 import ProfileEdit from "./pages/ProfileEdit";
 import LoginPage from "./pages/Login";
 import SignupPage from "./pages/Signup";
@@ -56,7 +57,8 @@ function App() {
               <Route path="/map" element={<MapPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/profile/edit" element={<ProfileEdit />} />
-              <Route path="/profile/:userId" element={<ProfilePage />} />
+              <Route path="/profile/:username" element={<UserProfilePage />} />
+              <Route path="/user/:userId" element={<UserProfilePage />} />
               
               {/* Design system routes */}
               <Route path="/style-guide" element={<EventCategoriesStyleGuide />} />

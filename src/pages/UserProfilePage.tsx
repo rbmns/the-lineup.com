@@ -15,13 +15,13 @@ interface UserProfilePageProps {
 }
 
 const UserProfilePage: React.FC<UserProfilePageProps> = ({ hideTitle = false }) => {
-  const { username } = useParams<{ username: string }>();
+  const { username, userId } = useParams<{ username: string; userId: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Determine which profile to load
-  const profileIdentifier = username || user?.id || null;
-  const isOwnProfile = !username || username === user?.email?.split('@')[0];
+  // Determine which profile to load - prioritize userId over username
+  const profileIdentifier = userId || username || user?.id || null;
+  const isOwnProfile = (!userId && !username) || (userId === user?.id) || (username === user?.email?.split('@')[0]);
 
   const {
     profile,
