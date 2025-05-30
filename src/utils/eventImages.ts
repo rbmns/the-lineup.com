@@ -16,6 +16,7 @@ const EVENT_FALLBACK_IMAGES = {
   game: "/img/game.jpg",
   party: "/img/beachparty.jpg",
   kite: "/img/kite.jpg",
+  wellness: "/img/yoga.jpg", // Map wellness to yoga image
   default: "/img/default.jpg",
 };
 
@@ -43,26 +44,27 @@ export const eventTypeColors = {
 export const getEventFallbackImage = (category?: string, tags?: string[]): string => {
   if (!category) return EVENT_FALLBACK_IMAGES.default;
   
-  const normalizedCategory = category.toLowerCase();
+  const normalizedCategory = category.toLowerCase().trim();
   
-  // Check for direct category match
+  // Direct category match first
   if (EVENT_FALLBACK_IMAGES[normalizedCategory as keyof typeof EVENT_FALLBACK_IMAGES]) {
     return EVENT_FALLBACK_IMAGES[normalizedCategory as keyof typeof EVENT_FALLBACK_IMAGES];
   }
   
   // Check for partial matches or related categories
-  if (normalizedCategory.includes('yoga')) return EVENT_FALLBACK_IMAGES.yoga;
+  if (normalizedCategory.includes('yoga') || normalizedCategory.includes('wellness')) return EVENT_FALLBACK_IMAGES.yoga;
   if (normalizedCategory.includes('surf')) return EVENT_FALLBACK_IMAGES.surf;
   if (normalizedCategory.includes('beach')) return EVENT_FALLBACK_IMAGES.beach;
   if (normalizedCategory.includes('music') || normalizedCategory.includes('concert')) return EVENT_FALLBACK_IMAGES.music;
   if (normalizedCategory.includes('food') || normalizedCategory.includes('restaurant')) return EVENT_FALLBACK_IMAGES.food;
   if (normalizedCategory.includes('sport')) return EVENT_FALLBACK_IMAGES.sports;
-  if (normalizedCategory.includes('art')) return EVENT_FALLBACK_IMAGES.art;
-  if (normalizedCategory.includes('culture')) return EVENT_FALLBACK_IMAGES.culture;
+  if (normalizedCategory.includes('art') || normalizedCategory.includes('culture')) return EVENT_FALLBACK_IMAGES.art;
   if (normalizedCategory.includes('festival')) return EVENT_FALLBACK_IMAGES.festival;
   if (normalizedCategory.includes('game')) return EVENT_FALLBACK_IMAGES.game;
   if (normalizedCategory.includes('party')) return EVENT_FALLBACK_IMAGES.party;
   if (normalizedCategory.includes('kite')) return EVENT_FALLBACK_IMAGES.kite;
+  if (normalizedCategory.includes('community')) return EVENT_FALLBACK_IMAGES.community;
+  if (normalizedCategory.includes('market')) return EVENT_FALLBACK_IMAGES.market;
   
   return EVENT_FALLBACK_IMAGES.default;
 };

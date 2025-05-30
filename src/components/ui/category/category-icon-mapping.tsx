@@ -25,9 +25,10 @@ export const getCategoryIcon = (category: string): React.FC<React.SVGProps<SVGSV
     'music': Music,
     'food': Pizza,
     'market': ShoppingCart,
-    'art & culture': Palette
+    'art': Palette,
+    'culture': Palette
   };
   
   // Return the icon component for the category, or a default if not found
-  return categoryIcons[lowerCategory] || MoreHorizontal;
+  return categoryIcons[lowerCategory] || Heart; // Changed default from MoreHorizontal to Heart for yoga
 };
