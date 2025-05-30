@@ -1,12 +1,11 @@
-
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { CategoryPill } from '@/components/ui/category-pill';
 
 interface VibeFilterProps {
   vibes: string[];
-  selectedVibe: string | null;
-  onVibeSelect: (vibe: string | null) => void;
+  selectedVibe?: string | null;
+  onVibeSelect?: (vibe: string | null) => void;
 }
 
 export const VibeFilter: React.FC<VibeFilterProps> = ({ 
@@ -14,34 +13,47 @@ export const VibeFilter: React.FC<VibeFilterProps> = ({
   selectedVibe, 
   onVibeSelect 
 }) => {
-  const navigate = useNavigate();
+  // If onVibeSelect is provided, use local state management
+  if (onVibeSelect) {
+    return (
+      <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+        <CategoryPill 
+          category="All Vibes" 
+          active={selectedVibe === null} 
+          noBorder={true} 
+          onClick={() => onVibeSelect(null)}
+        />
+        {vibes.map((vibe) => (
+          <CategoryPill 
+            key={vibe}
+            category={vibe} 
+            active={selectedVibe === vibe} 
+            noBorder={true} 
+            onClick={() => onVibeSelect(vibe)}
+          />
+        ))}
+      </div>
+    );
+  }
 
-  const handleVibeClick = (vibe: string | null) => {
-    onVibeSelect(vibe);
-    // Navigate to events page with vibe filter
-    if (vibe) {
-      navigate(`/events?vibe=${encodeURIComponent(vibe)}`);
-    } else {
-      navigate('/events');
-    }
-  };
-
+  // Otherwise, use navigation to events page with vibe filter
   return (
     <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-      <CategoryPill 
-        category="All Vibes" 
-        active={selectedVibe === null} 
-        noBorder={true} 
-        onClick={() => handleVibeClick(null)}
-      />
-      {vibes.map((vibe) => (
+      <Link to="/events">
         <CategoryPill 
-          key={vibe}
-          category={vibe} 
-          active={selectedVibe === vibe} 
+          category="All Vibes" 
+          active={false} 
           noBorder={true} 
-          onClick={() => handleVibeClick(vibe)}
         />
+      </Link>
+      {vibes.map((vibe) => (
+        <Link key={vibe} to={`/events?vibe=${encodeURIComponent(vibe)}`}>
+          <CategoryPill 
+            category={vibe} 
+            active={false} 
+            noBorder={true} 
+          />
+        </Link>
       ))}
     </div>
   );

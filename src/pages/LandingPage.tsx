@@ -26,7 +26,6 @@ const LandingPage = () => {
   const { getEventImageUrl } = useEventImages();
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
   const { availableCategories } = useEventCategories(events);
   
   // Scroll to top when coming from another page (but not on initial load)
@@ -164,8 +163,6 @@ const LandingPage = () => {
           ) : (
             <VibeFilter 
               vibes={vibes}
-              selectedVibe={selectedVibe}
-              onVibeSelect={setSelectedVibe}
             />
           )}
         </div>
