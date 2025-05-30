@@ -73,11 +73,23 @@ export const useEventBasedSuggestions = (currentUserId?: string, friendIds: stri
 
         mutualRsvps.forEach(rsvp => {
           const userId = rsvp.user_id;
-          const profile = rsvp.profiles as UserProfile;
-          const event = rsvp.events as any;
+          // Properly extract the profile data - it should be a single object, not an array
+          const profileData = rsvp.profiles;
+          const eventData = rsvp.events;
 
           // Skip if user is already a friend or has pending request
           if (friendIds.includes(userId)) return;
+
+          // Create a proper UserProfile object
+          const profile: UserProfile = {
+            id: profileData.id || userId,
+            username: profileData.username || null,
+            avatar_url: profileData.avatar_url || null,
+            email: profileData.email || null,
+            location: profileData.location || null,
+            status: profileData.status || null,
+            tagline: profileData.tagline || null
+          };
 
           if (!userEventMap.has(userId)) {
             userEventMap.set(userId, {
@@ -88,12 +100,12 @@ export const useEventBasedSuggestions = (currentUserId?: string, friendIds: stri
 
           const userData = userEventMap.get(userId)!;
           // Avoid duplicate events
-          if (!userData.events.find(e => e.id === event.id)) {
+          if (!userData.events.find(e => e.id === eventData.id)) {
             userData.events.push({
-              id: event.id,
-              title: event.title,
-              start_date: event.start_date,
-              event_category: event.event_category
+              id: eventData.id,
+              title: eventData.title,
+              start_date: eventData.start_date,
+              event_category: eventData.event_category
             });
           }
         });
