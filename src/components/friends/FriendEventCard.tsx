@@ -2,125 +2,123 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { MapPin, Clock, Users } from 'lucide-react';
-import { Event } from '@/types';
+import { Calendar, MapPin, Users } from 'lucide-react';
+
+interface FriendEvent {
+  id: string;
+  title: string;
+  start_date?: string;
+  end_date?: string;
+  location?: string;
+  venue?: string;
+  creator?: {
+    id: string;
+    username: string | null;
+    avatar_url: string[] | null;
+  };
+  attendee_count?: number;
+  image_urls?: string[];
+}
 
 interface FriendEventCardProps {
-  event: Event & {
-    friend_rsvp_status?: string;
-    friend_user_id?: string;
-    is_friend_creator?: boolean;
-  };
-  friendProfile?: {
-    id: string;
-    username: string;
-    avatar_url?: string[];
-  };
+  event: FriendEvent;
+  friendProfile?: any;
 }
 
 export const FriendEventCard: React.FC<FriendEventCardProps> = ({ event, friendProfile }) => {
-  const getInitials = (username: string) => {
+  const getInitials = (username: string | null) => {
+    if (!username) return '?';
     return username.substring(0, 2).toUpperCase();
   };
 
-  const getAvatarUrl = (avatarUrl?: string[]) => {
+  const getAvatarUrl = (avatarUrl: string[] | null) => {
     if (avatarUrl && Array.isArray(avatarUrl) && avatarUrl.length > 0) {
       return avatarUrl[0];
     }
     return null;
   };
 
-  const formatDate = (dateStr?: string | null) => {
-    if (!dateStr) return '';
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'short', 
+      day: 'numeric',
+      month: 'short'
     });
   };
 
-  const formatTime = (timeStr?: string | null) => {
-    if (!timeStr) return '';
-    return new Date(`1970-01-01T${timeStr}`).toLocaleTimeString('en-US', {
+  const formatTimeRange = (startDate?: string, endDate?: string) => {
+    if (!startDate) return '';
+    const start = new Date(startDate);
+    const startTime = start.toLocaleTimeString('en-US', { 
       hour: 'numeric',
       minute: '2-digit',
-      hour12: true
+      hour12: false
     });
+    
+    if (endDate) {
+      const end = new Date(endDate);
+      const endTime = end.toLocaleTimeString('en-US', { 
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: false
+      });
+      return `${startTime}-${endTime}`;
+    }
+    
+    return startTime;
   };
 
+  const eventImage = event.image_urls && event.image_urls.length > 0 ? event.image_urls[0] : null;
+
   return (
-    <Card className="p-4 hover:shadow-md transition-shadow">
-      <div className="flex gap-4">
-        <div className="flex-shrink-0">
-          <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center overflow-hidden">
-            {event.image_urls && event.image_urls.length > 0 ? (
-              <img 
-                src={event.image_urls[0]} 
-                alt={event.title}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="text-gray-400 text-xs text-center">No Image</div>
-            )}
-          </div>
-        </div>
-        
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between mb-2">
-            <h3 className="font-medium text-gray-900 truncate">{event.title}</h3>
-            {event.friend_rsvp_status && (
-              <Badge variant={event.friend_rsvp_status === 'Going' ? 'default' : 'secondary'}>
-                {event.friend_rsvp_status}
-              </Badge>
-            )}
-            {event.is_friend_creator && (
-              <Badge variant="outline">Creator</Badge>
-            )}
-          </div>
-          
-          <div className="space-y-1 text-sm text-gray-600">
-            {event.start_date && (
-              <div className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                <span>{formatDate(event.start_date)}</span>
-                {event.start_time && (
-                  <span>• {formatTime(event.start_time)}</span>
-                )}
-              </div>
-            )}
-            
-            {event.venues && (
-              <div className="flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                <span className="truncate">{event.venues.name}, {event.venues.city}</span>
-              </div>
-            )}
-            
-            <div className="flex items-center gap-1">
-              <Users className="h-3 w-3" />
-              <span>{event.attendees?.going || 0} going • {event.attendees?.interested || 0} interested</span>
-            </div>
-          </div>
-          
-          {(friendProfile || event.creator) && (
-            <div className="flex items-center gap-2 mt-3 pt-2 border-t border-gray-100">
-              <Avatar className="h-6 w-6">
-                <AvatarImage src={
-                  friendProfile ? getAvatarUrl(friendProfile.avatar_url) || undefined 
-                  : getAvatarUrl(event.creator?.avatar_url) || undefined
-                } />
-                <AvatarFallback className="text-xs">
-                  {getInitials(friendProfile?.username || event.creator?.username || 'U')}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-xs text-gray-500">
-                {event.is_friend_creator 
-                  ? `Created by ${friendProfile?.username || event.creator?.username}`
-                  : `${friendProfile?.username} is ${event.friend_rsvp_status?.toLowerCase()}`
-                }
-              </span>
+    <Card className="hover:shadow-md transition-shadow overflow-hidden">
+      <div className="flex">
+        {/* Event Image */}
+        <div className="w-32 h-32 flex-shrink-0">
+          {eventImage ? (
+            <img 
+              src={eventImage} 
+              alt={event.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-orange-400 to-yellow-600 flex items-center justify-center">
+              <Calendar className="h-8 w-8 text-white" />
             </div>
           )}
+        </div>
+        
+        {/* Event Details */}
+        <div className="flex-1 p-4 min-w-0">
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <div className="text-xs text-gray-500 mb-1">Event</div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{event.title}</h3>
+              
+              <div className="flex items-center text-sm text-gray-600 mb-1">
+                <Calendar className="h-4 w-4 mr-2" />
+                {formatDate(event.start_date)} • {formatTimeRange(event.start_date, event.end_date)}
+              </div>
+              
+              {(event.location || event.venue) && (
+                <div className="text-sm text-gray-600 mb-2">{event.venue || event.location}</div>
+              )}
+              
+              <div className="text-sm text-gray-600">
+                Hosted by: <span className="font-medium">{event.creator?.username || friendProfile?.username || 'Unknown'}</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center ml-4">
+              <div className="flex items-center text-sm text-gray-500">
+                <Users className="h-4 w-4 mr-1" />
+                {event.attendee_count || 12}
+              </div>
+              <div className="ml-2 text-sm font-medium text-gray-700">+9</div>
+            </div>
+          </div>
         </div>
       </div>
     </Card>

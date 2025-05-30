@@ -5,9 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { FriendsGrid } from './FriendsGrid';
-import { SuggestionsGrid } from './SuggestionsGrid';
+import { SuggestedFriendsTabContent } from './SuggestedFriendsTabContent';
 import { RequestsGrid } from './RequestsGrid';
-import { EventsGrid } from './EventsGrid';
+import { FriendsEventsTabContent } from './FriendsEventsTabContent';
 
 interface FriendsPageLayoutProps {
   activeTab: string;
@@ -20,6 +20,8 @@ interface FriendsPageLayoutProps {
   loading: boolean;
   onAcceptRequest: (requestId: string) => Promise<boolean>;
   onDeclineRequest: (requestId: string) => Promise<boolean>;
+  currentUserId?: string;
+  friendIds: string[];
 }
 
 export const FriendsPageLayout = ({
@@ -32,8 +34,20 @@ export const FriendsPageLayout = ({
   suggestedFriends,
   loading,
   onAcceptRequest,
-  onDeclineRequest
+  onDeclineRequest,
+  currentUserId,
+  friendIds
 }: FriendsPageLayoutProps) => {
+  const handleAddFriend = async (friendId: string) => {
+    // TODO: Implement add friend functionality
+    console.log('Add friend:', friendId);
+  };
+
+  const handleDismiss = (friendId: string) => {
+    // TODO: Implement dismiss functionality
+    console.log('Dismiss suggestion:', friendId);
+  };
+
   return (
     <div className="space-y-6">
       {/* Search Bar */}
@@ -99,7 +113,14 @@ export const FriendsPageLayout = ({
         </TabsContent>
 
         <TabsContent value="suggestions" className="space-y-6 mt-6">
-          <SuggestionsGrid suggestions={suggestedFriends} loading={loading} />
+          <SuggestedFriendsTabContent
+            suggestedFriends={suggestedFriends}
+            loading={loading}
+            onAddFriend={handleAddFriend}
+            onDismiss={handleDismiss}
+            currentUserId={currentUserId}
+            friendIds={friendIds}
+          />
         </TabsContent>
 
         <TabsContent value="requests" className="space-y-6 mt-6">
@@ -112,7 +133,11 @@ export const FriendsPageLayout = ({
         </TabsContent>
 
         <TabsContent value="events" className="space-y-6 mt-6">
-          <EventsGrid />
+          <FriendsEventsTabContent
+            friendIds={friendIds}
+            currentUserId={currentUserId}
+            friends={friends}
+          />
         </TabsContent>
       </Tabs>
     </div>
