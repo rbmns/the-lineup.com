@@ -49,9 +49,6 @@ export const useEventBasedSuggestions = (currentUserId?: string, friendIds: stri
             event_id,
             events!inner (
               id, title, start_date, event_category
-            ),
-            profiles!inner (
-              id, username, avatar_url, email, location, location_category, status, tagline
             )
           `)
           .in('event_id', userEventIds)
@@ -65,24 +62,50 @@ export const useEventBasedSuggestions = (currentUserId?: string, friendIds: stri
 
         if (!mutualRsvps) return [];
 
+        // Get unique user IDs from mutual RSVPs
+        const mutualUserIds = [...new Set(mutualRsvps.map(rsvp => rsvp.user_id))];
+        
+        // Filter out friends
+        const nonFriendUserIds = mutualUserIds.filter(userId => !friendIds.includes(userId));
+        
+        if (nonFriendUserIds.length === 0) return [];
+
+        // Fetch profiles for these users
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, username, avatar_url, email, location, location_category, status, tagline')
+          .in('id', nonFriendUserIds);
+
+        if (profilesError) {
+          console.error('Error fetching profiles:', profilesError);
+          return [];
+        }
+
+        if (!profiles) return [];
+
         // Group by user and collect mutual events
         const userEventMap = new Map<string, {
           profile: UserProfile;
           events: Array<{ id: string; title: string; start_date?: string; event_category: string; }>;
         }>();
 
+        // Create profile map for quick lookup
+        const profileMap = new Map(profiles.map(profile => [profile.id, profile]));
+
         mutualRsvps.forEach(rsvp => {
           const userId = rsvp.user_id;
-          // Properly extract the profile data - it should be a single object, not an array
-          const profileData = rsvp.profiles as any;
           const eventData = rsvp.events as any;
-
-          // Skip if user is already a friend or has pending request
+          
+          // Skip if user is already a friend
           if (friendIds.includes(userId)) return;
+          
+          // Get profile from our fetched profiles
+          const profileData = profileMap.get(userId);
+          if (!profileData) return;
 
           // Create a proper UserProfile object
           const profile: UserProfile = {
-            id: profileData.id || userId,
+            id: profileData.id,
             username: profileData.username || null,
             avatar_url: profileData.avatar_url || null,
             email: profileData.email || null,
