@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -85,8 +86,8 @@ const LandingPage = () => {
     return upcomingEvents.filter(event => event.event_category === selectedCategory);
   }, [upcomingEvents, selectedCategory]);
 
-  // Get unique event types from upcoming events
-  const eventTypes = React.useMemo(() => {
+  // Get categories that exist in upcoming events
+  const availableCategoriesInUpcoming = React.useMemo(() => {
     if (!upcomingEvents || upcomingEvents.length === 0) return [];
     
     return Array.from(new Set(
@@ -95,25 +96,6 @@ const LandingPage = () => {
         .map(event => event.event_category as string)
     )).sort();
   }, [upcomingEvents]);
-
-  // Get all event types from all events, not just upcoming ones
-  const allEventTypes = React.useMemo(() => {
-    if (!events || events.length === 0) return [];
-    
-    const eventTypesFromData = Array.from(new Set(
-      events
-        .filter(event => event.event_category)
-        .map(event => event.event_category as string)
-    ));
-    
-    // Make sure to include art & culture even if not in data
-    const allTypes = [...eventTypesFromData];
-    if (!allTypes.includes('art & culture')) {
-      allTypes.push('art & culture');
-    }
-    
-    return allTypes.sort();
-  }, [events]);
 
   const handleCategoryClick = (category: string) => {
     setSelectedCategory(prevCategory => prevCategory === category ? null : category);
@@ -174,12 +156,30 @@ const LandingPage = () => {
           </div>
           
           {/* Vibe Categories */}
-          {!vibesLoading && (
-            <VibeFilter 
-              vibes={vibes}
-              selectedVibe={selectedVibe}
-              onVibeSelect={setSelectedVibe}
-            />
+          {vibesLoading ? (
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="h-10 bg-gray-200 rounded-full w-20 animate-pulse flex-shrink-0"></div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+              <CategoryPill 
+                category="All Vibes" 
+                active={selectedVibe === null} 
+                noBorder={true} 
+                onClick={() => setSelectedVibe(null)}
+              />
+              {vibes.map((vibe) => (
+                <CategoryPill 
+                  key={vibe}
+                  category={vibe} 
+                  active={selectedVibe === vibe} 
+                  noBorder={true} 
+                  onClick={() => setSelectedVibe(vibe)}
+                />
+              ))}
+            </div>
           )}
         </div>
       </section>
@@ -196,10 +196,21 @@ const LandingPage = () => {
           
           {/* Category Filter Pills */}
           <div className="flex gap-2 mb-8 overflow-x-auto">
-            <CategoryPill category="All categories" active={!selectedCategory} noBorder={true} onClick={() => setSelectedCategory(null)} />
-            <CategoryPill category="Market" active={false} noBorder={true} />
-            <CategoryPill category="Surf" active={false} noBorder={true} />
-            <CategoryPill category="Festival" active={false} noBorder={true} />
+            <CategoryPill 
+              category="All categories" 
+              active={!selectedCategory} 
+              noBorder={true} 
+              onClick={() => setSelectedCategory(null)} 
+            />
+            {availableCategoriesInUpcoming.map((category) => (
+              <CategoryPill 
+                key={category}
+                category={category} 
+                active={selectedCategory === category} 
+                noBorder={true} 
+                onClick={() => handleCategoryClick(category)}
+              />
+            ))}
           </div>
           
           {/* Events Grid */}
