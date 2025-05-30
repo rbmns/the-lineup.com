@@ -32,9 +32,9 @@ export const EventCardHeader: React.FC<EventCardHeaderProps> = ({
           onError={(e) => {
             // Handle image load errors by setting a default
             const target = e.target as HTMLImageElement;
-            if (!target.src.includes('default')) {
+            if (!target.src.includes('/img/default.jpg')) {
               console.log('Image failed to load, using default');
-              target.src = "https://res.cloudinary.com/dita7stkt/image/upload/v1745876584/default_yl5ndt.jpg";
+              target.src = "/img/default.jpg";
             }
           }}
         />

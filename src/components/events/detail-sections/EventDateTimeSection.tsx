@@ -30,10 +30,22 @@ export const EventDateTimeSection = ({ startTime, endTime }: EventDateTimeSectio
     if (!endTime) return '';
     
     try {
-      const start = new Date(startTime);
-      const end = new Date(endTime);
-      const startFormatted = formatInTimeZone(start, AMSTERDAM_TIMEZONE, "HH:mm");
-      const endFormatted = formatInTimeZone(end, AMSTERDAM_TIMEZONE, "HH:mm");
+      // Check if these are full datetime strings or just time strings
+      let startDate, endDate;
+      
+      if (startTime.includes('T') || startTime.includes(' ')) {
+        // Full datetime string
+        startDate = new Date(startTime);
+        endDate = new Date(endTime);
+      } else {
+        // Just time strings - use today's date
+        const today = new Date().toISOString().split('T')[0];
+        startDate = new Date(`${today}T${startTime}`);
+        endDate = new Date(`${today}T${endTime}`);
+      }
+      
+      const startFormatted = formatInTimeZone(startDate, AMSTERDAM_TIMEZONE, "HH:mm");
+      const endFormatted = formatInTimeZone(endDate, AMSTERDAM_TIMEZONE, "HH:mm");
       return `${startFormatted} - ${endFormatted}`;
     } catch (error) {
       console.error('Error formatting time range:', error);
@@ -46,7 +58,15 @@ export const EventDateTimeSection = ({ startTime, endTime }: EventDateTimeSectio
     if (!startTime) return '';
     
     try {
-      const date = new Date(startTime);
+      let date;
+      if (startTime.includes('T') || startTime.includes(' ')) {
+        date = new Date(startTime);
+      } else {
+        // Just time string - use today's date
+        const today = new Date().toISOString().split('T')[0];
+        date = new Date(`${today}T${startTime}`);
+      }
+      
       if (date <= new Date()) return 'Event has started';
       return `Starts ${formatDistanceToNow(date, { addSuffix: true })}`;
     } catch (error) {
@@ -55,14 +75,36 @@ export const EventDateTimeSection = ({ startTime, endTime }: EventDateTimeSectio
     }
   }, [startTime]);
   
-  // Format event duration
+  // Format event duration - only if both times are valid
   const eventDuration = useMemo(() => {
     if (!startTime || !endTime) return '';
     
     try {
-      const start = new Date(startTime);
-      const end = new Date(endTime);
-      const durationHours = Math.abs(end.getTime() - start.getTime()) / 36e5;
+      let startDate, endDate;
+      
+      if (startTime.includes('T') || startTime.includes(' ')) {
+        // Full datetime strings
+        startDate = new Date(startTime);
+        endDate = new Date(endTime);
+      } else {
+        // Just time strings - use today's date
+        const today = new Date().toISOString().split('T')[0];
+        startDate = new Date(`${today}T${startTime}`);
+        endDate = new Date(`${today}T${endTime}`);
+      }
+      
+      // Check if dates are valid
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        return '';
+      }
+      
+      const durationHours = Math.abs(endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
+      
+      if (durationHours < 1) {
+        const durationMinutes = Math.round(durationHours * 60);
+        return `${durationMinutes} minutes`;
+      }
+      
       return `${durationHours.toFixed(1)} hours`;
     } catch (error) {
       console.error('Error calculating event duration:', error);
@@ -75,7 +117,14 @@ export const EventDateTimeSection = ({ startTime, endTime }: EventDateTimeSectio
     if (!startTime) return '';
     
     try {
-      const date = new Date(startTime);
+      let date;
+      if (startTime.includes('T') || startTime.includes(' ')) {
+        date = new Date(startTime);
+      } else {
+        const today = new Date().toISOString().split('T')[0];
+        date = new Date(`${today}T${startTime}`);
+      }
+      
       let formatted = formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEEE, d MMMM yyyy");
       
       if (formattedTimeRange) {

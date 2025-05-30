@@ -34,6 +34,13 @@ export const EventImageHeader: React.FC<EventImageHeaderProps> = ({
           alt={event.title || "Event"}
           className="w-full h-full object-cover"
           loading="lazy"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            if (!target.src.includes('/img/default.jpg')) {
+              console.log('Event image failed to load, using default');
+              target.src = "/img/default.jpg";
+            }
+          }}
         />
         
         {/* Gradient overlay for text readability */}
