@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/polymet/button";
 import {
@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { supabase } from "@/lib/supabase";
 
 interface AdvancedFiltersProps {
   onFilterChange: (filters: FilterValues) => void;
@@ -41,11 +42,6 @@ export interface FilterValues {
   dateFilter: string | undefined;
 }
 
-const venues = [
-  "Beach Club", "Yoga Studio", "Concert Hall", "Restaurant", 
-  "Art Gallery", "Sports Center", "Festival Ground"
-];
-
 export default function AdvancedFilters({
   onFilterChange,
   className,
@@ -54,6 +50,9 @@ export default function AdvancedFilters({
   eventCategories = [], // Keep for compatibility
 }: AdvancedFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [venues, setVenues] = useState<Array<{id: string, name: string}>>([]);
+  const [venuesLoading, setVenuesLoading] = useState(true);
+  
   const [filters, setFilters] = useState<FilterValues>({
     date: initialFilters.date,
     location: initialFilters.location || "Zandvoort Area",
@@ -67,8 +66,62 @@ export default function AdvancedFilters({
     Object.values(initialFilters).filter(Boolean).length
   );
 
+  // Fetch venues from the database
+  useEffect(() => {
+    const fetchVenues = async () => {
+      setVenuesLoading(true);
+      try {
+        // Get venues that are actually used in events
+        const { data: eventsWithVenues, error } = await supabase
+          .from('events')
+          .select(`
+            venue_id,
+            venues:venue_id(id, name)
+          `)
+          .not('venue_id', 'is', null)
+          .not('venues', 'is', null);
+
+        if (error) {
+          console.error('Error fetching venues:', error);
+          return;
+        }
+
+        // Extract unique venues
+        const uniqueVenues = new Map();
+        eventsWithVenues?.forEach(event => {
+          if (event.venues && event.venue_id) {
+            uniqueVenues.set(event.venue_id, {
+              id: event.venue_id,
+              name: event.venues.name
+            });
+          }
+        });
+
+        const venuesList = Array.from(uniqueVenues.values())
+          .filter(venue => venue.name)
+          .sort((a, b) => a.name.localeCompare(b.name));
+
+        console.log('Loaded venues for filtering:', venuesList);
+        setVenues(venuesList);
+      } catch (error) {
+        console.error('Error fetching venues:', error);
+      } finally {
+        setVenuesLoading(false);
+      }
+    };
+
+    fetchVenues();
+  }, []);
+
   const handleDateChange = (date: Date | undefined) => {
-    const newFilters = { ...filters, date };
+    const newFilters = { ...filters, date, dateFilter: undefined }; // Clear dateFilter when setting specific date
+    setFilters(newFilters);
+    onFilterChange(newFilters);
+    updateActiveFiltersCount(newFilters);
+  };
+
+  const handleDateFilterChange = (dateFilter: string) => {
+    const newFilters = { ...filters, dateFilter, date: undefined }; // Clear specific date when setting dateFilter
     setFilters(newFilters);
     onFilterChange(newFilters);
     updateActiveFiltersCount(newFilters);
@@ -82,10 +135,10 @@ export default function AdvancedFilters({
     updateActiveFiltersCount(newFilters);
   };
 
-  const handleVenueChange = (venue: string, checked: boolean) => {
+  const handleVenueChange = (venueId: string, checked: boolean) => {
     const newVenues = checked 
-      ? [...filters.venues, venue]
-      : filters.venues.filter(v => v !== venue);
+      ? [...filters.venues, venueId]
+      : filters.venues.filter(v => v !== venueId);
     const newFilters = { ...filters, venues: newVenues };
     setFilters(newFilters);
     onFilterChange(newFilters);
@@ -95,10 +148,10 @@ export default function AdvancedFilters({
   const updateActiveFiltersCount = (newFilters: FilterValues) => {
     let count = 0;
     if (newFilters.date) count++;
+    if (newFilters.dateFilter) count++;
     if (newFilters.location && newFilters.location !== "Zandvoort Area") count++;
     if (newFilters.venues.length > 0) count++;
     if (newFilters.eventVibes.length > 0) count++;
-    if (newFilters.dateFilter) count++;
     setActiveFiltersCount(count);
   };
 
@@ -115,6 +168,15 @@ export default function AdvancedFilters({
     onFilterChange(newFilters);
     setActiveFiltersCount(0);
   };
+
+  // Date filter options
+  const dateFilterOptions = [
+    { value: 'today', label: 'Today' },
+    { value: 'tomorrow', label: 'Tomorrow' },
+    { value: 'this-weekend', label: 'This Weekend' },
+    { value: 'next-week', label: 'Next Week' },
+    { value: 'this-month', label: 'This Month' },
+  ];
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
@@ -155,38 +217,34 @@ export default function AdvancedFilters({
               )}
             </div>
 
-            {/* Venues */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <BuildingIcon size={16} />
-                Venues
-              </label>
-              <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
-                {venues.map((venue) => (
-                  <div key={venue} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={venue}
-                      checked={filters.venues.includes(venue)}
-                      onCheckedChange={(checked) => 
-                        handleVenueChange(venue, checked as boolean)
-                      }
-                    />
-                    <label
-                      htmlFor={venue}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      {venue}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Date */}
+            {/* Date Filter Options */}
             <div className="space-y-2">
               <label className="text-sm font-medium flex items-center gap-2">
                 <CalendarIcon size={16} />
-                Date
+                Quick Date Filters
+              </label>
+              <Select
+                value={filters.dateFilter || ""}
+                onValueChange={handleDateFilterChange}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select date range" />
+                </SelectTrigger>
+                <SelectContent>
+                  {dateFilterOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Specific Date */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <CalendarIcon size={16} />
+                Specific Date
               </label>
               <div className="rounded-md border">
                 <Calendar
@@ -197,6 +255,39 @@ export default function AdvancedFilters({
                   initialFocus
                 />
               </div>
+            </div>
+
+            {/* Venues */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <BuildingIcon size={16} />
+                Venues
+              </label>
+              {venuesLoading ? (
+                <div className="text-sm text-gray-500">Loading venues...</div>
+              ) : venues.length === 0 ? (
+                <div className="text-sm text-gray-500">No venues found</div>
+              ) : (
+                <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
+                  {venues.map((venue) => (
+                    <div key={venue.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={venue.id}
+                        checked={filters.venues.includes(venue.id)}
+                        onCheckedChange={(checked) => 
+                          handleVenueChange(venue.id, checked as boolean)
+                        }
+                      />
+                      <label
+                        htmlFor={venue.id}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {venue.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Location */}
@@ -240,6 +331,19 @@ export default function AdvancedFilters({
       </Popover>
 
       {/* Active Filter Pills */}
+      {filters.dateFilter && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2 border-primary-50 bg-primary-10 text-primary"
+          onClick={() => handleDateFilterChange("")}
+        >
+          <CalendarIcon size={16} />
+          <span>{dateFilterOptions.find(opt => opt.value === filters.dateFilter)?.label}</span>
+          <XIcon size={14} />
+        </Button>
+      )}
+
       {filters.date && (
         <Button
           variant="outline"
