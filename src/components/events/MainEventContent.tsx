@@ -76,7 +76,7 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
       <EventDetailHeader
         event={event}
         coverImage={imageUrl}
-        eventType={event?.event_type || 'other'}
+        eventType={event?.event_category || 'other'}
         onClose={handleBackToEvents}
         shareUrl={shareUrl}
         title={event?.title || 'Event'}

@@ -53,11 +53,11 @@ const LandingPage = () => {
       return eventDate <= oneWeekFromNow;
     });
     
-    // Group by event type to ensure diversity
+    // Group by event category to ensure diversity
     const eventsByType = nextWeekEvents.reduce((acc, event) => {
-      if (!event.event_type) return acc;
-      if (!acc[event.event_type]) acc[event.event_type] = [];
-      acc[event.event_type].push(event);
+      if (!event.event_category) return acc;
+      if (!acc[event.event_category]) acc[event.event_category] = [];
+      acc[event.event_category].push(event);
       return acc;
     }, {} as Record<string, typeof events>);
     
@@ -79,7 +79,7 @@ const LandingPage = () => {
   // Filter events by selected category
   const filteredEvents = React.useMemo(() => {
     if (!selectedCategory) return upcomingEvents;
-    return upcomingEvents.filter(event => event.event_type === selectedCategory);
+    return upcomingEvents.filter(event => event.event_category === selectedCategory);
   }, [upcomingEvents, selectedCategory]);
 
   // Get unique event types from upcoming events
@@ -88,8 +88,8 @@ const LandingPage = () => {
     
     return Array.from(new Set(
       upcomingEvents
-        .filter(event => event.event_type)
-        .map(event => event.event_type as string)
+        .filter(event => event.event_category)
+        .map(event => event.event_category as string)
     )).sort();
   }, [upcomingEvents]);
 
@@ -99,8 +99,8 @@ const LandingPage = () => {
     
     const eventTypesFromData = Array.from(new Set(
       events
-        .filter(event => event.event_type)
-        .map(event => event.event_type as string)
+        .filter(event => event.event_category)
+        .map(event => event.event_category as string)
     ));
     
     // Make sure to include art & culture even if not in data
@@ -228,10 +228,10 @@ const LandingPage = () => {
                         alt={event.title} 
                         className="w-full h-48 object-cover" 
                       />
-                      {event.event_type && (
+                      {event.event_category && (
                         <div className="absolute top-3 left-3">
                           <CategoryPill 
-                            category={event.event_type} 
+                            category={event.event_category} 
                             active={true}
                             noBorder={true}
                           />
@@ -239,33 +239,18 @@ const LandingPage = () => {
                       )}
                     </div>
                     <CardContent className="p-4">
-                      <h3 className="text-lg font-semibold mb-2 line-clamp-2">{event.title}</h3>
-                      <div className="flex items-center text-sm text-gray-600 mb-2">
-                        <Map size={14} className="mr-1 flex-shrink-0" />
-                        <span className="truncate">
-                          {event.venues?.name || event.location || 'Location TBD'}
-                        </span>
-                      </div>
-                      <div className="flex items-center text-sm text-gray-800 mb-4">
-                        <Calendar size={14} className="mr-1 flex-shrink-0" />
-                        <span>
-                          {event.start_date && event.start_time ? 
-                            `${formatFeaturedDate(event.start_date)}, ${formatEventTime(event.start_time, event.end_time)}` :
-                            event.start_date ? formatFeaturedDate(event.start_date) : 'Date TBD'
-                          }
-                        </span>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" className="flex-1">Going</Button>
-                        <Button size="sm" variant="outline" className="flex-1">Interested</Button>
-                      </div>
+                      <h3 className="font-semibold mb-2">{event.title}</h3>
+                      <p className="text-sm text-gray-600 mb-1">
+                        {formatFeaturedDate(event.start_date)} • {formatEventTime(event.start_time, event.end_time)}
+                      </p>
+                      <p className="text-sm text-gray-600">{event.venues?.name || event.location}</p>
                     </CardContent>
                   </Card>
                 </div>
               ))
             ) : (
-              <div className="flex justify-center w-full py-8 col-span-3">
-                <p>No upcoming events found</p>
+              <div className="col-span-3 text-center py-8 text-gray-500">
+                No events available
               </div>
             )}
           </div>
@@ -274,109 +259,129 @@ const LandingPage = () => {
 
       {/* How The Lineup Works Section */}
       <section className="py-16 bg-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-semibold tracking-tight mb-4">How The Lineup Works</h2>
-          <p className="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">
-            Discover events and connect with others - all on your terms.
-          </p>
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-semibold tracking-tight mb-4">How The Lineup Works</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Discover, connect, and experience amazing events in your area with just a few taps.
+            </p>
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                <Search className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="h-8 w-8 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Discover Events</h3>
-              <p className="text-gray-600">Find events that match your interests and schedule.</p>
+              <p className="text-gray-600">
+                Browse events happening near you, from yoga sessions to beach parties and everything in between.
+              </p>
             </div>
             
             <div className="text-center">
-              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <Users className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Calendar className="h-8 w-8 text-green-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Connect If You Want</h3>
-              <p className="text-gray-600">Meet new people or just enjoy the event. It's up to you.</p>
+              <h3 className="text-xl font-semibold mb-2">RSVP & Plan</h3>
+              <p className="text-gray-600">
+                Show interest or commit to going. Keep track of your plans and never miss out on what matters to you.
+              </p>
             </div>
             
             <div className="text-center">
-              <div className="mx-auto w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                <Calendar className="w-8 h-8 text-purple-600" />
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="h-8 w-8 text-purple-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Join Casual Plans</h3>
-              <p className="text-gray-600">No formal events? No problem. Organize casual meetups with locals.</p>
+              <h3 className="text-xl font-semibold mb-2">Connect & Enjoy</h3>
+              <p className="text-gray-600">
+                Meet like-minded people at events and build meaningful connections in your community.
+              </p>
             </div>
           </div>
-          
-          <Button asChild className="mt-8 bg-black hover:bg-black/90">
-            <Link to="/events">
-              Explore All Events
-            </Link>
-          </Button>
         </div>
       </section>
 
-      {/* Browse by Category */}
-      <CategoriesBrowseSection categories={allEventTypes} />
-
-      {/* What Travelers Are Saying */}
+      {/* Testimonials Section */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-semibold tracking-tight text-center mb-12">What Travelers Are Saying</h2>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-semibold tracking-tight mb-4">What People Are Saying</h2>
+            <p className="text-lg text-gray-600">
+              Join thousands of people who are already discovering amazing events through The Lineup.
+            </p>
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card>
-              <CardContent className="p-6">
-                <p className="text-lg italic mb-4">"The Lineup helped me discover amazing local events during my stay and connected me with like-minded travelers that made the experience even better like a local!"</p>
-                <div className="font-semibold">Sarah K.</div>
-                <div className="text-sm text-gray-600">Digital Nomad</div>
-              </CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <Card className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+                  S
+                </div>
+                <div className="ml-3">
+                  <h4 className="font-semibold">Sarah</h4>
+                  <p className="text-sm text-gray-600">Yoga Enthusiast</p>
+                </div>
+              </div>
+              <p className="text-gray-700">
+                "I've discovered so many amazing yoga sessions and wellness events through The Lineup. It's become my go-to for finding my tribe!"
+              </p>
             </Card>
             
-            <Card>
-              <CardContent className="p-6">
-                <p className="text-lg italic mb-4">"I found a casual beach volleyball meetup through The Lineup and ended up making friends that I met up with several times during my Amsterdam trip for epic adventures."</p>
-                <div className="font-semibold">Michael T.</div>
-                <div className="text-sm text-gray-600">Traveler from Canada</div>
-              </CardContent>
+            <Card className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold">
+                  M
+                </div>
+                <div className="ml-3">
+                  <h4 className="font-semibold">Miguel</h4>
+                  <p className="text-sm text-gray-600">Surf Instructor</p>
+                </div>
+              </div>
+              <p className="text-gray-700">
+                "The lineup helps me connect with fellow surfers and discover new beach events. Perfect for staying connected with the community."
+              </p>
             </Card>
             
-            <Card>
-              <CardContent className="p-6">
-                <p className="text-lg italic mb-4">"As someone who travels for work, The Lineup has helped me find connection in each place I visit by joining some music plans that suit my social needs as someone extrovert."</p>
-                <div className="font-semibold">Ava L.</div>
-                <div className="text-sm text-gray-600">Business Traveler</div>
-              </CardContent>
+            <Card className="p-6">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
+                  A
+                </div>
+                <div className="ml-3">
+                  <h4 className="font-semibold">Anna</h4>
+                  <p className="text-sm text-gray-600">Food Lover</p>
+                </div>
+              </div>
+              <p className="text-gray-700">
+                "From food festivals to intimate dinner events, I never miss out on culinary experiences anymore. Love the variety!"
+              </p>
             </Card>
           </div>
         </div>
       </section>
 
-      {/* Want to connect with others attending? */}
-      <section className="py-16 bg-white">
+      {/* CTA Section */}
+      <section className="py-16 bg-blue-600 text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-semibold tracking-tight mb-4">Want to connect with others attending?</h2>
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Sign up to join events, meet people, and save your favorites.
+          <h2 className="text-3xl font-semibold tracking-tight mb-4">Ready to Find Your Next Adventure?</h2>
+          <p className="text-xl mb-8 max-w-2xl mx-auto">
+            Join our community and start discovering events that match your interests and vibe.
           </p>
-          <Button asChild size="lg" className="bg-black hover:bg-black/90">
-            <Link to="/signup">
-              Sign Up – It's Free
-            </Link>
-          </Button>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild variant="outline" size="lg" className="border-2 border-white text-blue-600 bg-white hover:bg-gray-100">
+              <Link to="/events">
+                Explore Events
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="border-2 bg-transparent border-white text-white hover:bg-white/10">
+              <Link to="/profile">
+                Create Profile
+              </Link>
+            </Button>
+          </div>
         </div>
       </section>
-      
-      {/* Add CSS for hiding scrollbars but allowing scrolling */}
-      <style>
-        {`
-        .no-scrollbar {
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
-        }
-        .no-scrollbar::-webkit-scrollbar {
-          display: none; /* Chrome, Safari, Opera*/
-        }
-        `}
-      </style>
     </div>
   );
 };

@@ -1,3 +1,4 @@
+
 import { Event } from '@/types';
 import { compareAsc, differenceInDays } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
@@ -22,8 +23,8 @@ export const calculateRelevanceScore = (
 ): number => {
   let score = 0;
   
-  // Event type match (highest weight)
-  if (eventA.event_type === eventB.event_type) {
+  // Event category match (highest weight)
+  if (eventA.event_category === eventB.event_category) {
     score += weights.eventType;
   }
   

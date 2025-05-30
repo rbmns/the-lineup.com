@@ -35,7 +35,7 @@ export const useEventProcessor = () => {
       description: event.description || '',
       // Only include location if it exists in the event data
       ...(event.location && { location: event.location }),
-      event_type: event.event_type,
+      event_category: event.event_category,
       start_time: event.start_time,
       end_time: event.end_time,
       created_at: event.created_at,

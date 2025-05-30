@@ -54,11 +54,11 @@ export const EventImageHeader: React.FC<EventImageHeaderProps> = ({
           </div>
         )}
         
-        {/* Event type badge */}
-        {event.event_type && (
+        {/* Event category badge */}
+        {event.event_category && (
           <div className="absolute top-4 left-4">
             <CategoryPill 
-              category={event.event_type}
+              category={event.event_category}
               size="sm"
             />
           </div>

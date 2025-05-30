@@ -22,7 +22,7 @@ export const useSimilarEvents = (selectedEventTypes: string[], selectedVenues: s
         updated_at: item.updated_at,
         venue_id: item.venue_id,
         venues: item.venues,
-        event_type: item.event_type,
+        event_category: item.event_category,
         creator: item.creator,
         image_urls: item.image_urls || [],
         fee: item.fee,
@@ -64,7 +64,7 @@ export const useSimilarEvents = (selectedEventTypes: string[], selectedVenues: s
       
       // Only exclude events that would have matched the exact filters
       if (selectedEventTypes.length > 0) {
-        query = query.not('event_type', 'in', `(${selectedEventTypes.join(',')})`);
+        query = query.not('event_category', 'in', `(${selectedEventTypes.join(',')})`);
       }
       
       if (selectedVenues.length > 0) {

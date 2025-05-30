@@ -58,7 +58,7 @@ export const EventDayDetails: React.FC<EventDayDetailsProps> = ({
             </div>
             {events.length > 0 && (
               <div className="flex gap-1.5 items-center">
-                {Array.from(new Set(events.map(event => event.event_type))).map((type, index) => {
+                {Array.from(new Set(events.map(event => event.event_category))).map((type, index) => {
                   const eventType = type?.toLowerCase() || 'other';
                   const color = eventTypeColors[eventType as keyof typeof eventTypeColors] || eventTypeColors.other;
                   return (
