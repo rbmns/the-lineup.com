@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CategoryFilter from '@/components/polymet/category-filter';
 import VibeFilter from '@/components/polymet/vibe-filter';
 import { EventCategoryLabel, EventCategoryLabelsCollection } from '@/components/polymet/event-category-labels';
-import EventVibeLabelEnhanced from '@/components/polymet/event-vibe-label-enhanced';
+import { EventVibeLabel } from '@/components/polymet/event-vibe-label-enhanced';
 import CategoryBadge from '@/components/polymet/category-badge';
 
 export default function EventCategoriesStyleGuide() {
@@ -30,12 +30,14 @@ export default function EventCategoriesStyleGuide() {
   ];
 
   const vibes = [
-    'party',
-    'chill', 
-    'wellness',
-    'active',
+    'chill',
+    'energetic',
     'social',
-    'creative'
+    'romantic',
+    'adventurous',
+    'cultural',
+    'creative',
+    'mindful'
   ];
 
   return (
@@ -107,7 +109,7 @@ export default function EventCategoriesStyleGuide() {
             </p>
             <div className="flex flex-wrap gap-2">
               {vibes.map((vibe) => (
-                <EventVibeLabelEnhanced key={vibe} vibe={vibe} />
+                <EventVibeLabel key={vibe} vibe={vibe} />
               ))}
             </div>
           </section>
@@ -143,7 +145,7 @@ export default function EventCategoriesStyleGuide() {
                 <h3 className="text-lg font-medium mb-3">Vibes</h3>
                 <div className="flex flex-wrap gap-2">
                   {vibes.map((vibe) => (
-                    <EventVibeLabelEnhanced key={vibe} vibe={vibe} size="md" />
+                    <EventVibeLabel key={vibe} vibe={vibe} size="md" />
                   ))}
                 </div>
               </div>
