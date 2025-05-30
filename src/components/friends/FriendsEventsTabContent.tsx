@@ -17,7 +17,8 @@ const mockEvents = [
     attendees: 12,
     additionalAttendees: 9,
     image: "/lovable-uploads/2de9324a-d7ca-416a-b1fe-0059406dd47f.png",
-    type: "upcoming"
+    type: "upcoming",
+    eventType: "Event"
   }
 ];
 
@@ -81,10 +82,10 @@ export const FriendsEventsTabContent: React.FC = () => {
       {/* Events List */}
       <div className="space-y-4">
         {mockEvents.map((event) => (
-          <Card key={event.id} className="p-0 overflow-hidden">
+          <Card key={event.id} className="p-0 overflow-hidden hover:shadow-md transition-shadow">
             <div className="flex">
               {/* Event Image */}
-              <div className="w-48 h-32 flex-shrink-0">
+              <div className="w-48 h-32 flex-shrink-0 relative">
                 <img
                   src={event.image}
                   alt={event.title}
@@ -93,34 +94,34 @@ export const FriendsEventsTabContent: React.FC = () => {
               </div>
               
               {/* Event Details */}
-              <div className="flex-1 p-6">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <div className="text-sm text-gray-500 mb-1">Event</div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{event.title}</h3>
-                  </div>
-                  <div className="text-right">
-                    <div className="flex items-center gap-1 text-sm text-gray-600">
+              <div className="flex-1 p-6 flex flex-col justify-between">
+                <div>
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <div className="text-sm text-gray-500 mb-1">{event.eventType}</div>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">{event.title}</h3>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
                       <Users className="h-4 w-4" />
-                      <span>{event.attendees}</span>
+                      <span className="font-medium">{event.attendees}</span>
                       <span className="text-gray-400">+{event.additionalAttendees}</span>
                     </div>
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Calendar className="h-4 w-4" />
-                    <span>{event.date} • {event.time}</span>
-                  </div>
                   
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <MapPin className="h-4 w-4" />
-                    <span>{event.location}</span>
-                  </div>
-                  
-                  <div className="text-sm text-gray-600">
-                    Hosted by: <span className="font-medium">{event.host}</span>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Calendar className="h-4 w-4" />
+                      <span>{event.date} • {event.time}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <MapPin className="h-4 w-4" />
+                      <span>{event.location}</span>
+                    </div>
+                    
+                    <div className="text-sm text-gray-600">
+                      Hosted by: <span className="font-medium">{event.host}</span>
+                    </div>
                   </div>
                 </div>
               </div>

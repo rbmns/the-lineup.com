@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UserPlus, X } from 'lucide-react';
 import { StatusBadgeRenderer } from './StatusBadgeRenderer';
+import { EventBasedSuggestions } from './EventBasedSuggestions';
 
 interface SuggestedFriendsTabContentProps {
   suggestedFriends: UserProfile[];
@@ -32,6 +33,16 @@ export const SuggestedFriendsTabContent: React.FC<SuggestedFriendsTabContentProp
     return null;
   };
 
+  const handleEventBasedAddFriend = async (friendId: string) => {
+    // For now, just log it since we don't have real data
+    console.log('Adding event-based friend suggestion:', friendId);
+  };
+
+  const handleEventBasedDismiss = (friendId: string) => {
+    // For now, just log it since we don't have real data  
+    console.log('Dismissing event-based friend suggestion:', friendId);
+  };
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -56,71 +67,80 @@ export const SuggestedFriendsTabContent: React.FC<SuggestedFriendsTabContentProp
     );
   }
 
-  if (suggestedFriends.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <h3 className="text-lg font-medium text-gray-900 mb-2">No suggestions yet</h3>
-        <p className="text-gray-600">Check back later for friend suggestions.</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold">
-        Suggested Friends ({suggestedFriends.length})
-      </h2>
-      
-      <div className="space-y-4">
-        {suggestedFriends.map((friend) => (
-          <Card key={friend.id} className="p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src={getAvatarUrl(friend.avatar_url) || undefined} />
-                  <AvatarFallback>{getInitials(friend.username)}</AvatarFallback>
-                </Avatar>
-                
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-medium text-gray-900 truncate">
-                      {friend.username || 'Unknown User'}
-                    </h3>
-                    <StatusBadgeRenderer status={friend.status} />
+    <div className="space-y-6">
+      {/* Event-based suggestions */}
+      <EventBasedSuggestions 
+        onAddFriend={handleEventBasedAddFriend}
+        onDismiss={handleEventBasedDismiss}
+      />
+
+      {/* Regular suggested friends */}
+      {suggestedFriends.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">
+            Other Suggestions ({suggestedFriends.length})
+          </h2>
+          
+          <div className="space-y-4">
+            {suggestedFriends.map((friend) => (
+              <Card key={friend.id} className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={getAvatarUrl(friend.avatar_url) || undefined} />
+                      <AvatarFallback>{getInitials(friend.username)}</AvatarFallback>
+                    </Avatar>
+                    
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-medium text-gray-900 truncate">
+                          {friend.username || 'Unknown User'}
+                        </h3>
+                        <StatusBadgeRenderer status={friend.status} />
+                      </div>
+                      
+                      {friend.location && (
+                        <p className="text-sm text-gray-500 truncate">{friend.location}</p>
+                      )}
+                      
+                      {friend.tagline && (
+                        <p className="text-sm text-gray-600 truncate mt-1">{friend.tagline}</p>
+                      )}
+                    </div>
                   </div>
                   
-                  {friend.location && (
-                    <p className="text-sm text-gray-500 truncate">{friend.location}</p>
-                  )}
-                  
-                  {friend.tagline && (
-                    <p className="text-sm text-gray-600 truncate mt-1">{friend.tagline}</p>
-                  )}
+                  <div className="flex space-x-2">
+                    <Button
+                      size="sm"
+                      onClick={() => onAddFriend(friend.id)}
+                      disabled={loading}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <UserPlus className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => onDismiss(friend.id)}
+                      disabled={loading}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex space-x-2">
-                <Button
-                  size="sm"
-                  onClick={() => onAddFriend(friend.id)}
-                  disabled={loading}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  <UserPlus className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onDismiss(friend.id)}
-                  disabled={loading}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {suggestedFriends.length === 0 && !loading && (
+        <div className="text-center py-8">
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No additional suggestions</h3>
+          <p className="text-gray-600">Check the event-based suggestions above or check back later.</p>
+        </div>
+      )}
     </div>
   );
 };
