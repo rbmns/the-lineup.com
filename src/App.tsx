@@ -15,6 +15,10 @@ import ProfilePage from "./pages/Profile";
 import ProfileEdit from "./pages/ProfileEdit";
 import LoginPage from "./pages/Login";
 import SignupPage from "./pages/Signup";
+import GoodbyePage from "./pages/GoodbyePage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import CookiePolicy from "./pages/CookiePolicy";
 import EventCategoriesStyleGuide from "./components/design-system/EventCategoriesStyleGuide";
 import CreateCasualPlanPage from '@/components/casual-plans/CreateCasualPlanPage';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -36,6 +40,12 @@ function App() {
               {/* Auth routes */}
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
+              <Route path="/goodbye" element={<GoodbyePage />} />
+              
+              {/* Legal pages */}
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/cookies" element={<CookiePolicy />} />
               
               {/* Protected routes (require authentication) */}
               <Route path="/events/create" element={<CreateEvent />} />

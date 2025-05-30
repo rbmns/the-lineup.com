@@ -24,9 +24,6 @@ export const Footer = () => {
               <Link to="/cookies" className="hover:text-gray-900 transition">
                 Cookie Policy
               </Link>
-              <a href="mailto:contact@the-lineup.com" className="hover:text-gray-900 transition">
-                Contact
-              </a>
             </div>
           </div>
           
