@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFriendData } from '@/hooks/useFriendData';
@@ -75,6 +76,11 @@ const Friends: React.FC = () => {
     
     return filtered;
   }, [searchQuery, friends, user]);
+
+  // Get friend IDs for events and casual plans queries
+  const friendIds = React.useMemo(() => {
+    return friends?.map(friend => friend.id) || [];
+  }, [friends]);
 
   // Handle sending a friend request
   const handleAddFriend = async (friendId: string) => {
@@ -194,10 +200,17 @@ const Friends: React.FC = () => {
                 />
               }
               eventsContent={
-                <FriendsEventsTabContent />
+                <FriendsEventsTabContent 
+                  friendIds={friendIds}
+                  currentUserId={user.id}
+                  friends={friends || []}
+                />
               }
               casualPlansContent={
-                <FriendsCasualPlansTabContent />
+                <FriendsCasualPlansTabContent 
+                  friendIds={friendIds}
+                  currentUserId={user.id}
+                />
               }
             />
           </div>
