@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
@@ -19,10 +18,22 @@ const EventDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [rsvpLoading, setRsvpLoading] = useState(false);
   const [attendees, setAttendees] = useState<{ going: any[]; interested: any[] }>({ going: [], interested: [] });
+
+  // Scroll to top when navigating to this page (but not during RSVP operations)
+  useEffect(() => {
+    // Check if this is a fresh navigation (not from RSVP)
+    const state = location.state as any;
+    const isFromRsvp = state?.fromRsvp || state?.preserveScroll;
+    
+    if (!isFromRsvp) {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+  }, [location.pathname, location.state]);
 
   // Fetch event data
   useEffect(() => {
@@ -159,7 +170,7 @@ const EventDetail = () => {
     fetchEvent();
   }, [id, user, navigate]);
 
-  // Handle RSVP
+  // Handle RSVP with scroll preservation
   const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!user || !event) {
       toast({
@@ -172,6 +183,9 @@ const EventDetail = () => {
 
     try {
       setRsvpLoading(true);
+      
+      // Save current scroll position
+      const currentScrollY = window.scrollY;
 
       // Check if user already has an RSVP
       const { data: existingRsvp } = await supabase
@@ -229,6 +243,11 @@ const EventDetail = () => {
           description: `You are now marked as ${status.toLowerCase()} for this event`,
         });
       }
+
+      // Restore scroll position after RSVP
+      setTimeout(() => {
+        window.scrollTo({ top: currentScrollY, behavior: 'auto' });
+      }, 100);
 
       return true;
     } catch (error) {
