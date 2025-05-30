@@ -33,47 +33,49 @@ export const FriendsTabsNew = ({
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 md:space-y-6">
       <TabsList className={`
+        w-full bg-muted p-1
         ${isMobile 
-          ? 'flex flex-wrap h-auto p-1 gap-1' 
-          : 'grid grid-cols-5 h-10 p-1'
-        } 
-        w-full bg-muted
+          ? 'grid grid-cols-3 h-auto gap-1' 
+          : 'grid grid-cols-5 h-10'
+        }
       `}>
         <TabsTrigger 
           value="all-friends" 
           className={`
             ${isMobile 
-              ? 'flex-1 min-w-[calc(50%-2px)] text-xs px-2 py-2' 
-              : 'flex items-center gap-2 px-3 py-1.5'
+              ? 'flex flex-col items-center gap-1 px-1 py-2 text-xs' 
+              : 'flex items-center gap-2 px-3 py-1.5 text-sm'
             }
-            whitespace-nowrap rounded-sm text-sm font-medium transition-all
+            whitespace-nowrap rounded-sm font-medium transition-all
           `}
         >
-          <Users className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
-          <span className={isMobile ? 'hidden xs:inline' : ''}>All Friends</span>
-          <span className={isMobile ? 'xs:hidden' : 'hidden'}>Friends</span>
+          <Users className={`${isMobile ? 'h-4 w-4' : 'h-4 w-4'}`} />
+          <span className={isMobile ? 'leading-none' : ''}>
+            {isMobile ? 'Friends' : 'All Friends'}
+          </span>
         </TabsTrigger>
         
         <TabsTrigger 
           value="suggestions" 
           className={`
             ${isMobile 
-              ? 'flex-1 min-w-[calc(50%-2px)] text-xs px-2 py-2 relative' 
-              : 'relative flex items-center gap-2 px-3 py-1.5'
+              ? 'flex flex-col items-center gap-1 px-1 py-2 text-xs relative' 
+              : 'relative flex items-center gap-2 px-3 py-1.5 text-sm'
             }
-            whitespace-nowrap rounded-sm text-sm font-medium transition-all
+            whitespace-nowrap rounded-sm font-medium transition-all
           `}
         >
-          <UserPlus className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
-          <span className={isMobile ? 'hidden xs:inline' : ''}>Suggestions</span>
-          <span className={isMobile ? 'xs:hidden' : 'hidden'}>Suggest</span>
+          <UserPlus className={`${isMobile ? 'h-4 w-4' : 'h-4 w-4'}`} />
+          <span className={isMobile ? 'leading-none' : ''}>
+            {isMobile ? 'Discover' : 'Suggestions'}
+          </span>
           {suggestedFriendsCount > 0 && (
             <Badge 
               variant="secondary" 
               className={`
-                absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center 
-                ${isMobile ? 'text-[10px]' : 'text-xs'} 
-                bg-blue-500 text-white
+                absolute ${isMobile ? '-top-0.5 -right-0.5' : '-top-1 -right-1'} 
+                h-4 w-4 p-0 flex items-center justify-center 
+                text-[10px] bg-blue-500 text-white
               `}
             >
               {suggestedFriendsCount}
@@ -85,21 +87,23 @@ export const FriendsTabsNew = ({
           value="requests" 
           className={`
             ${isMobile 
-              ? 'flex-1 min-w-[calc(50%-2px)] text-xs px-2 py-2 relative' 
-              : 'relative flex items-center gap-2 px-3 py-1.5'
+              ? 'flex flex-col items-center gap-1 px-1 py-2 text-xs relative' 
+              : 'relative flex items-center gap-2 px-3 py-1.5 text-sm'
             }
-            whitespace-nowrap rounded-sm text-sm font-medium transition-all
+            whitespace-nowrap rounded-sm font-medium transition-all
           `}
         >
-          <Bell className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
-          <span className={isMobile ? 'hidden xs:inline' : ''}>Requests</span>
-          <span className={isMobile ? 'xs:hidden' : 'hidden'}>Req</span>
+          <Bell className={`${isMobile ? 'h-4 w-4' : 'h-4 w-4'}`} />
+          <span className={isMobile ? 'leading-none' : ''}>
+            {isMobile ? 'Requests' : 'Requests'}
+          </span>
           {pendingRequestsCount > 0 && (
             <Badge 
               variant="destructive" 
               className={`
-                absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center 
-                ${isMobile ? 'text-[10px]' : 'text-xs'}
+                absolute ${isMobile ? '-top-0.5 -right-0.5' : '-top-1 -right-1'}
+                h-4 w-4 p-0 flex items-center justify-center 
+                text-[10px]
               `}
             >
               {pendingRequestsCount}
@@ -107,36 +111,74 @@ export const FriendsTabsNew = ({
           )}
         </TabsTrigger>
         
-        <TabsTrigger 
-          value="events" 
-          className={`
-            ${isMobile 
-              ? 'flex-1 min-w-[calc(50%-2px)] text-xs px-2 py-2' 
-              : 'flex items-center gap-2 px-3 py-1.5'
-            }
-            whitespace-nowrap rounded-sm text-sm font-medium transition-all
-          `}
-        >
-          <Calendar className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
-          <span className={isMobile ? 'hidden xs:inline' : ''}>Events</span>
-          <span className={isMobile ? 'xs:hidden' : 'hidden'}>Events</span>
-        </TabsTrigger>
+        {!isMobile && (
+          <>
+            <TabsTrigger 
+              value="events" 
+              className="flex items-center gap-2 px-3 py-1.5 whitespace-nowrap rounded-sm text-sm font-medium transition-all"
+            >
+              <Calendar className="h-4 w-4" />
+              Events
+            </TabsTrigger>
 
-        <TabsTrigger 
-          value="casual-plans" 
-          className={`
-            ${isMobile 
-              ? 'flex-1 w-full text-xs px-2 py-2' 
-              : 'flex items-center gap-2 px-3 py-1.5'
-            }
-            whitespace-nowrap rounded-sm text-sm font-medium transition-all
-          `}
-        >
-          <MapPin className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
-          <span className={isMobile ? 'hidden xs:inline' : ''}>Casual Plans</span>
-          <span className={isMobile ? 'xs:hidden' : 'hidden'}>Plans</span>
-        </TabsTrigger>
+            <TabsTrigger 
+              value="casual-plans" 
+              className="flex items-center gap-2 px-3 py-1.5 whitespace-nowrap rounded-sm text-sm font-medium transition-all"
+            >
+              <MapPin className="h-4 w-4" />
+              Casual Plans
+            </TabsTrigger>
+          </>
+        )}
       </TabsList>
+
+      {/* Mobile secondary tabs for Events and Casual Plans */}
+      {isMobile && (activeTab === 'events' || activeTab === 'casual-plans') && (
+        <div className="flex gap-2 px-1">
+          <button
+            onClick={() => setActiveTab('events')}
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'events' 
+                ? 'bg-primary text-primary-foreground' 
+                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            }`}
+          >
+            <Calendar className="h-4 w-4" />
+            Events
+          </button>
+          <button
+            onClick={() => setActiveTab('casual-plans')}
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'casual-plans' 
+                ? 'bg-primary text-primary-foreground' 
+                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            }`}
+          >
+            <MapPin className="h-4 w-4" />
+            Plans
+          </button>
+        </div>
+      )}
+
+      {/* Show Events/Plans access buttons on mobile for main tabs */}
+      {isMobile && ['all-friends', 'suggestions', 'requests'].includes(activeTab) && (
+        <div className="flex gap-2 px-1">
+          <button
+            onClick={() => setActiveTab('events')}
+            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium bg-muted text-muted-foreground hover:bg-muted/80 transition-colors"
+          >
+            <Calendar className="h-4 w-4" />
+            View Events
+          </button>
+          <button
+            onClick={() => setActiveTab('casual-plans')}
+            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium bg-muted text-muted-foreground hover:bg-muted/80 transition-colors"
+          >
+            <MapPin className="h-4 w-4" />
+            View Plans
+          </button>
+        </div>
+      )}
 
       <TabsContent value="all-friends" className="space-y-4">
         {allFriendsContent}
