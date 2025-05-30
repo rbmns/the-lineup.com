@@ -12,6 +12,7 @@ interface EventsAdvancedSectionProps {
   selectedDateFilter: string;
   filteredEventsCount: number;
   showLocationFilter?: boolean;
+  allEventTypes?: string[]; // Add this prop
 }
 
 export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
@@ -23,6 +24,7 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
   selectedDateFilter,
   filteredEventsCount,
   showLocationFilter = false,
+  allEventTypes = [], // Default to empty array
 }) => {
   return (
     <div className="space-y-3 md:space-y-4">
@@ -39,17 +41,18 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
               onFilterChange({
                 eventTypes: filters.eventTypes || selectedEventTypes,
                 venues: filters.venues || selectedVenues,
-                vibes: filters.eventVibes || selectedVibes, // Use eventVibes instead of vibes
+                vibes: filters.eventVibes || selectedVibes,
                 date: filters.date,
                 dateFilter: filters.dateFilter
               });
             }}
             locations={["Zandvoort Area"]}
+            eventCategories={allEventTypes} // Pass the actual event categories
             initialFilters={{
               location: "Zandvoort Area",
               eventTypes: selectedEventTypes,
               venues: selectedVenues,
-              eventVibes: selectedVibes, // Use eventVibes instead of vibes
+              eventVibes: selectedVibes,
               date: dateRange?.from,
               dateFilter: selectedDateFilter
             }}

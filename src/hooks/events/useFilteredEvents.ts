@@ -30,8 +30,7 @@ export const useFilteredEvents = ({
 
     let filteredEvents = [...events];
 
-    // Filter by event category/type
-    // Only apply category filter if not all categories are selected
+    // Filter by event category - only apply if some categories are selected (not all or none)
     const hasActiveCategories = selectedCategories.length > 0 && selectedCategories.length < allEventTypes.length;
     if (hasActiveCategories) {
       console.log('Applying category filter:', selectedCategories);

@@ -29,7 +29,8 @@ const EventsContent = () => {
     enhancedHandleRsvp,
     loadingEventId,
     vibes,
-    vibesLoading
+    vibesLoading,
+    allEventTypes // Make sure we get this from the hook
   } = useEventsPageData();
 
   const handleAdvancedFilterChange = (filters: any) => {
@@ -70,7 +71,8 @@ const EventsContent = () => {
     selectedEventTypes,
     selectedVenues,
     selectedVibes,
-    filteredEventsCount: filteredEvents.length
+    filteredEventsCount: filteredEvents.length,
+    allEventTypes
   });
 
   return (
@@ -95,6 +97,7 @@ const EventsContent = () => {
           selectedDateFilter={selectedDateFilter}
           filteredEventsCount={filteredEvents.length}
           showLocationFilter={true}
+          allEventTypes={allEventTypes} // Pass the actual event types
         />
 
         <EventsResultsSection

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/polymet/button";
@@ -29,6 +30,7 @@ interface AdvancedFiltersProps {
   className?: string;
   locations?: string[];
   initialFilters?: Partial<FilterValues>;
+  eventCategories?: string[]; // Add this prop to receive actual categories
 }
 
 export interface FilterValues {
@@ -40,11 +42,6 @@ export interface FilterValues {
   dateFilter: string | undefined;
 }
 
-const eventCategories = [
-  "Surf", "Yoga", "Music", "Food", "Art & Culture", "Sports", 
-  "Festival", "Market", "Beach", "Nature"
-];
-
 const venues = [
   "Beach Club", "Yoga Studio", "Concert Hall", "Restaurant", 
   "Art Gallery", "Sports Center", "Festival Ground"
@@ -55,6 +52,7 @@ export default function AdvancedFilters({
   className,
   locations = ["Zandvoort Area"],
   initialFilters = {},
+  eventCategories = [], // Default to empty array
 }: AdvancedFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [filters, setFilters] = useState<FilterValues>({
@@ -169,32 +167,34 @@ export default function AdvancedFilters({
               )}
             </div>
 
-            {/* Event Categories */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <TagIcon size={16} />
-                Event Categories
-              </label>
-              <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
-                {eventCategories.map((category) => (
-                  <div key={category} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={category}
-                      checked={filters.eventTypes.includes(category)}
-                      onCheckedChange={(checked) => 
-                        handleEventTypeChange(category, checked as boolean)
-                      }
-                    />
-                    <label
-                      htmlFor={category}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      {category}
-                    </label>
-                  </div>
-                ))}
+            {/* Event Categories - use actual categories from props */}
+            {eventCategories.length > 0 && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <TagIcon size={16} />
+                  Event Categories
+                </label>
+                <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
+                  {eventCategories.map((category) => (
+                    <div key={category} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={category}
+                        checked={filters.eventTypes.includes(category)}
+                        onCheckedChange={(checked) => 
+                          handleEventTypeChange(category, checked as boolean)
+                        }
+                      />
+                      <label
+                        htmlFor={category}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {category}
+                      </label>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Venues */}
             <div className="space-y-2">
