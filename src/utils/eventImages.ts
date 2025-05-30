@@ -2,33 +2,33 @@
 import { Event } from "@/types";
 
 const EVENT_FALLBACK_IMAGES = {
-  community: "/img/default.jpg", // Use default since community.jpg doesn't exist
-  music: "/img/music.jpg",
-  food: "/img/food.jpg",
-  sports: "/img/sports.jpg",
-  art: "/img/default.jpg", // Use default since art.jpg doesn't exist
-  culture: "/img/mills.jpg",
-  beach: "/img/beach.jpg",
-  surf: "/img/surf.jpg",
-  yoga: "/img/yoga.jpg",
-  market: "/img/shopping.jpg",
-  festival: "/img/festival.jpg",
-  game: "/img/game.jpg",
-  party: "/img/beachparty.jpg",
-  kite: "/img/kite.jpg",
-  wellness: "/img/yoga.jpg", // Map wellness to yoga image
-  default: "/img/default.jpg",
+  community: "https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg", // Use default since community.jpg doesn't exist
+  music: "https://raw.githubusercontent.com/rbmns/images/main/lineup/music.jpg",
+  food: "https://raw.githubusercontent.com/rbmns/images/main/lineup/food.jpg",
+  sports: "https://raw.githubusercontent.com/rbmns/images/main/lineup/sports.jpg",
+  art: "https://raw.githubusercontent.com/rbmns/images/main/lineup/art.jpg",
+  culture: "https://raw.githubusercontent.com/rbmns/images/main/lineup/mills.jpg",
+  beach: "https://raw.githubusercontent.com/rbmns/images/main/lineup/beach.jpg",
+  surf: "https://raw.githubusercontent.com/rbmns/images/main/lineup/surf.jpg",
+  yoga: "https://raw.githubusercontent.com/rbmns/images/main/lineup/yoga.jpg",
+  market: "https://raw.githubusercontent.com/rbmns/images/main/lineup/shopping.jpg",
+  festival: "https://raw.githubusercontent.com/rbmns/images/main/lineup/festival.jpg",
+  game: "https://raw.githubusercontent.com/rbmns/images/main/lineup/game.jpg",
+  party: "https://raw.githubusercontent.com/rbmns/images/main/lineup/beachparty.jpg",
+  kite: "https://raw.githubusercontent.com/rbmns/images/main/lineup/kite.jpg",
+  wellness: "https://raw.githubusercontent.com/rbmns/images/main/lineup/yoga.jpg", // Map wellness to yoga image
+  default: "https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg",
 };
 
 // Export as DEFAULT_EVENT_IMAGES for compatibility
 export const DEFAULT_EVENT_IMAGES = {
-  yoga: "/img/yoga.jpg",
-  surf: "/img/surf.jpg",
-  beach: "/img/beach.jpg",
-  music: "/img/music.jpg",
-  food: "/img/food.jpg",
-  workshop: "/img/default.jpg",
-  other: "/img/default.jpg",
+  yoga: "https://raw.githubusercontent.com/rbmns/images/main/lineup/yoga.jpg",
+  surf: "https://raw.githubusercontent.com/rbmns/images/main/lineup/surf.jpg",
+  beach: "https://raw.githubusercontent.com/rbmns/images/main/lineup/beach.jpg",
+  music: "https://raw.githubusercontent.com/rbmns/images/main/lineup/music.jpg",
+  food: "https://raw.githubusercontent.com/rbmns/images/main/lineup/food.jpg",
+  workshop: "https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg",
+  other: "https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg",
 };
 
 export const eventTypeColors = {
