@@ -13,13 +13,17 @@ interface SuggestedFriendsTabContentProps {
   loading: boolean;
   onAddFriend: (friendId: string) => Promise<void>;
   onDismiss: (friendId: string) => void;
+  currentUserId?: string;
+  friendIds?: string[];
 }
 
 export const SuggestedFriendsTabContent: React.FC<SuggestedFriendsTabContentProps> = ({
   suggestedFriends,
   loading,
   onAddFriend,
-  onDismiss
+  onDismiss,
+  currentUserId,
+  friendIds = []
 }) => {
   const getInitials = (username: string | null) => {
     if (!username) return '?';
@@ -34,13 +38,11 @@ export const SuggestedFriendsTabContent: React.FC<SuggestedFriendsTabContentProp
   };
 
   const handleEventBasedAddFriend = async (friendId: string) => {
-    // For now, just log it since we don't have real data
-    console.log('Adding event-based friend suggestion:', friendId);
+    await onAddFriend(friendId);
   };
 
   const handleEventBasedDismiss = (friendId: string) => {
-    // For now, just log it since we don't have real data  
-    console.log('Dismissing event-based friend suggestion:', friendId);
+    onDismiss(friendId);
   };
 
   if (loading) {
@@ -71,6 +73,8 @@ export const SuggestedFriendsTabContent: React.FC<SuggestedFriendsTabContentProp
     <div className="space-y-6">
       {/* Event-based suggestions */}
       <EventBasedSuggestions 
+        currentUserId={currentUserId}
+        friendIds={friendIds}
         onAddFriend={handleEventBasedAddFriend}
         onDismiss={handleEventBasedDismiss}
       />

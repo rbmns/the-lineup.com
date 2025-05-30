@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFriendData } from '@/hooks/useFriendData';
@@ -185,6 +184,8 @@ const Friends: React.FC = () => {
                   loading={suggestedLoading}
                   onAddFriend={handleAddSuggestedFriend}
                   onDismiss={handleDismissSuggestion}
+                  currentUserId={user?.id}
+                  friendIds={friendIds}
                 />
               }
               requestsContent={
