@@ -2,7 +2,7 @@
 import { Event } from "@/types";
 
 const EVENT_FALLBACK_IMAGES = {
-  community: "/img/Community.jpg",
+  community: "/img/community.jpg",
   music: "/img/music.jpg",
   food: "/img/food.jpg",
   sports: "/img/sports.jpg",
