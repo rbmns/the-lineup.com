@@ -14,15 +14,22 @@ import { extractEventCoordinates } from './detail-sections/EventCoordinatesExtra
 
 interface EventDetailContentProps {
   event: Event;
-  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
+  attendees?: { going: any[]; interested: any[] };
+  relatedEvents?: Event[];
+  relatedLoading?: boolean;
+  isAuthenticated?: boolean;
+  rsvpLoading?: boolean;
+  onRsvp?: (status: 'Going' | 'Interested') => Promise<boolean>;
   isRsvpLoading?: boolean;
   isOwner?: boolean;
 }
 
 const EventDetailContent = ({
   event,
+  attendees,
   onRsvp,
   isRsvpLoading = false,
+  rsvpLoading = false,
   isOwner = false,
 }: EventDetailContentProps) => {
   // Get coordinates in a standardized format - memoized
@@ -44,13 +51,13 @@ const EventDetailContent = ({
     try {
       console.log(`EventDetailContent: Current RSVP status before handling: ${event.rsvp_status}, handling: ${status}`);
       
-      const result = await onRsvp(event.id, status);
+      const result = await onRsvp(status);
       return result;
     } catch (error) {
       console.error('RSVP error:', error);
       return false;
     }
-  }, [onRsvp, event.id, event.rsvp_status]);
+  }, [onRsvp, event.rsvp_status]);
   
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-12">
@@ -88,14 +95,14 @@ const EventDetailContent = ({
         <EventRsvpSection 
           isOwner={isOwner}
           onRsvp={handleRsvp}
-          isRsvpLoading={isRsvpLoading}
+          isRsvpLoading={isRsvpLoading || rsvpLoading}
           currentStatus={event.rsvp_status || null}
         />
         
         {/* Attendees summary */}
         <EventAttendeesSummary 
-          goingCount={event.attendees?.going || 0}
-          interestedCount={event.attendees?.interested || 0}
+          goingCount={attendees?.going?.length || event.attendees?.going || 0}
+          interestedCount={attendees?.interested?.length || event.attendees?.interested || 0}
         />
         
         {/* External link if available */}

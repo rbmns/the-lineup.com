@@ -79,7 +79,7 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
   
   // Get all unique event types from events
   const allEventTypes = React.useMemo(() => {
-    const types = events.map(event => event.event_type).filter(Boolean);
+    const types = events.map(event => event.event_category).filter(Boolean);
     return [...new Set(types)];
   }, [events]);
   

@@ -77,7 +77,7 @@ export const RelatedEvents: React.FC<RelatedEventsProps> = ({
     }
     
     // If all events are the same type, use a type-based headline
-    const allSameType = relatedEvents.every(event => event.event_type === eventType);
+    const allSameType = relatedEvents.every(event => event.event_category === eventType);
     
     if (allSameType && eventType) {
       return `More ${eventType} events around the same time`;
