@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/polymet/button";
@@ -37,6 +36,7 @@ export interface FilterValues {
   location: string | undefined;
   eventTypes: string[];
   venues: string[];
+  eventVibes: string[];
   dateFilter: string | undefined;
 }
 
@@ -62,6 +62,7 @@ export default function AdvancedFilters({
     location: initialFilters.location || "Zandvoort Area",
     eventTypes: initialFilters.eventTypes || [],
     venues: initialFilters.venues || [],
+    eventVibes: initialFilters.eventVibes || [],
     dateFilter: initialFilters.dateFilter,
   });
 
@@ -110,6 +111,7 @@ export default function AdvancedFilters({
     if (newFilters.location && newFilters.location !== "Zandvoort Area") count++;
     if (newFilters.eventTypes.length > 0) count++;
     if (newFilters.venues.length > 0) count++;
+    if (newFilters.eventVibes.length > 0) count++;
     if (newFilters.dateFilter) count++;
     setActiveFiltersCount(count);
   };
@@ -120,6 +122,7 @@ export default function AdvancedFilters({
       location: "Zandvoort Area",
       eventTypes: [],
       venues: [],
+      eventVibes: [],
       dateFilter: undefined,
     };
     setFilters(newFilters);
@@ -328,6 +331,24 @@ export default function AdvancedFilters({
         >
           <BuildingIcon size={16} />
           <span>{filters.venues.length} venues</span>
+          <XIcon size={14} />
+        </Button>
+      )}
+
+      {filters.eventVibes.length > 0 && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-2 border-primary-50 bg-primary-10 text-primary"
+          onClick={() => {
+            const newFilters = { ...filters, eventVibes: [] };
+            setFilters(newFilters);
+            onFilterChange(newFilters);
+            updateActiveFiltersCount(newFilters);
+          }}
+        >
+          <TagIcon size={16} />
+          <span>{filters.eventVibes.length} vibes</span>
           <XIcon size={14} />
         </Button>
       )}
