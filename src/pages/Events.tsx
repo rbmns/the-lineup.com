@@ -7,6 +7,7 @@ import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayo
 import { EventsVibeSection } from '@/components/events/page-sections/EventsVibeSection';
 import { EventsAdvancedSection } from '@/components/events/page-sections/EventsAdvancedSection';
 import { EventsResultsSection } from '@/components/events/page-sections/EventsResultsSection';
+import { EventCategoryFilters } from '@/components/events/filters/EventCategoryFilters';
 
 const EventsContent = () => {
   const { user } = useAuth();
@@ -30,7 +31,7 @@ const EventsContent = () => {
     loadingEventId,
     vibes,
     vibesLoading,
-    allEventTypes // Make sure we get this from the hook
+    allEventTypes
   } = useEventsPageData();
 
   const handleAdvancedFilterChange = (filters: any) => {
@@ -67,6 +68,26 @@ const EventsContent = () => {
     }
   };
 
+  const handleSelectAll = () => {
+    setSelectedEventTypes(allEventTypes);
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedEventTypes([]);
+  };
+
+  const handleToggleEventType = (eventType: string) => {
+    const isSelected = selectedEventTypes.includes(eventType);
+    
+    if (isSelected) {
+      // Remove the event type
+      setSelectedEventTypes(selectedEventTypes.filter(type => type !== eventType));
+    } else {
+      // Add the event type
+      setSelectedEventTypes([...selectedEventTypes, eventType]);
+    }
+  };
+
   console.log('Current filter state:', {
     selectedEventTypes,
     selectedVenues,
@@ -78,6 +99,19 @@ const EventsContent = () => {
   return (
     <EventsPageLayout>
       <div className="space-y-6 md:space-y-8">
+        {/* Main Category Filters */}
+        <div className="space-y-3">
+          <h2 className="text-xl font-semibold">Browse Events</h2>
+          <EventCategoryFilters
+            allEventTypes={allEventTypes}
+            selectedEventTypes={selectedEventTypes}
+            onToggleEventType={handleToggleEventType}
+            onSelectAll={handleSelectAll}
+            onDeselectAll={handleDeselectAll}
+            className="w-full"
+          />
+        </div>
+
         <EventsVibeSection
           selectedVibes={selectedVibes}
           onVibeChange={(vibes) => {
@@ -97,7 +131,7 @@ const EventsContent = () => {
           selectedDateFilter={selectedDateFilter}
           filteredEventsCount={filteredEvents.length}
           showLocationFilter={true}
-          allEventTypes={allEventTypes} // Pass the actual event types
+          allEventTypes={allEventTypes}
         />
 
         <EventsResultsSection
