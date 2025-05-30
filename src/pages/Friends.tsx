@@ -1,22 +1,24 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useFriendData } from '@/hooks/useFriendData';
 import { useFriendRequests } from '@/hooks/useFriendRequests';
 import { FriendsTabContent } from '@/components/friends/FriendsTabContent';
-import { FriendsTabs } from '@/components/friends/FriendsTabs';
 import { UserProfile } from '@/types';
 import { DiscoverTabContent } from '@/components/friends/DiscoverTabContent';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
-import { EventsPageHeader } from '@/components/events/EventsPageHeader';
 import { SuggestedFriendsTabContent } from '@/components/friends/SuggestedFriendsTabContent';
 import { useSuggestedFriends } from '@/hooks/useSuggestedFriends';
+import { FriendsHeader } from '@/components/friends/FriendsHeader';
+import { FriendsTabsNew } from '@/components/friends/FriendsTabsNew';
+import { FriendsEventsTabContent } from '@/components/friends/FriendsEventsTabContent';
 
 const Friends: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('friends');
+  const [activeTab, setActiveTab] = useState('all-friends');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -172,10 +174,7 @@ const Friends: React.FC = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <EventsPageHeader 
-          title="Friends" 
-          subtitle="Find your crew. Join the People, Not Just the Plans."
-        />
+        <FriendsHeader />
 
         {/* Sign up prompt */}
         <div className="container mx-auto px-4 py-12 md:py-16">
@@ -207,35 +206,35 @@ const Friends: React.FC = () => {
     );
   }
 
+  const pendingRequestsCount = requests?.length || 0;
+  const suggestedFriendsCount = suggestedFriends?.length || 0;
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <EventsPageHeader 
-        title="Friends" 
-        subtitle="Find your crew. Join the People, Not Just the Plans."
-      />
+      <FriendsHeader />
 
       {/* Friends Content */}
       <div className="container mx-auto px-4 py-6 md:py-8">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
-            <FriendsTabs
+            <FriendsTabsNew
               activeTab={activeTab}
               setActiveTab={setActiveTab}
-              pendingRequestsCount={requests?.length || 0}
-              suggestedFriendsCount={suggestedFriends?.length || 0}
-              friendsContent={
+              pendingRequestsCount={pendingRequestsCount}
+              suggestedFriendsCount={suggestedFriendsCount}
+              allFriendsContent={
                 <FriendsTabContent
                   friends={filteredFriends as UserProfile[]}
                   loading={friendsLoading}
                   requests={requests || []}
                   onAcceptRequest={onAcceptRequest}
                   onDeclineRequest={onDeclineRequest}
-                  showFriendRequests={true}
+                  showFriendRequests={false}
                   searchQuery={friendsSearchQuery}
                   onSearchChange={(e) => setFriendsSearchQuery(e.target.value)}
                 />
               }
-              suggestedContent={
+              suggestionsContent={
                 <SuggestedFriendsTabContent
                   suggestedFriends={suggestedFriends}
                   loading={suggestedLoading}
@@ -243,16 +242,20 @@ const Friends: React.FC = () => {
                   onDismiss={handleDismissSuggestion}
                 />
               }
-              discoverContent={
-                <DiscoverTabContent
-                  searchQuery={searchQuery}
-                  onSearchChange={handleSearchChange}
-                  searchResults={searchResults}
-                  onAddFriend={handleAddFriend}
-                  isSearching={isSearching}
-                  pendingRequestIds={pendingRequestIds || []}
-                  onSearch={handleSearch}
+              requestsContent={
+                <FriendsTabContent
+                  friends={[]}
+                  loading={requestsLoading}
+                  requests={requests || []}
+                  onAcceptRequest={onAcceptRequest}
+                  onDeclineRequest={onDeclineRequest}
+                  showFriendRequests={true}
+                  searchQuery=""
+                  onSearchChange={() => {}}
                 />
+              }
+              eventsContent={
+                <FriendsEventsTabContent />
               }
             />
           </div>

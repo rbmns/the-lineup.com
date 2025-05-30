@@ -17,6 +17,7 @@ export const useSuggestedFriends = (userId: string | undefined) => {
 
   const fetchSuggestedFriends = useCallback(async () => {
     if (!userId) {
+      console.log('No userId provided to useSuggestedFriends');
       setLoading(false);
       return;
     }
@@ -24,12 +25,13 @@ export const useSuggestedFriends = (userId: string | undefined) => {
     setLoading(true);
     
     try {
+      console.log('=== DEBUGGING SUGGESTED FRIENDS ===');
       console.log('Fetching suggested friends for user:', userId);
       
       // First, get current friends to exclude them
       const { data: friendships, error: friendshipsError } = await supabase
         .from('friendships')
-        .select('user_id, friend_id')
+        .select('user_id, friend_id, status')
         .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
         .eq('status', 'Accepted');
 
@@ -43,12 +45,11 @@ export const useSuggestedFriends = (userId: string | undefined) => {
       
       console.log('Current friend IDs:', friendIds);
 
-      // Get events where the current user had "Going" status
+      // Get ALL RSVPs for this user (both Going and Interested)
       const { data: userRSVPs, error: userRSVPsError } = await supabase
         .from('event_rsvps')
-        .select('event_id')
-        .eq('user_id', userId)
-        .eq('status', 'Going');
+        .select('event_id, status')
+        .eq('user_id', userId);
 
       if (userRSVPsError) {
         console.error('Error fetching user RSVPs:', userRSVPsError);
@@ -57,22 +58,34 @@ export const useSuggestedFriends = (userId: string | undefined) => {
         return;
       }
 
-      console.log('User RSVPs found:', userRSVPs?.length || 0);
+      console.log('All user RSVPs found:', userRSVPs?.length || 0);
+      console.log('User RSVPs:', userRSVPs);
 
       if (!userRSVPs || userRSVPs.length === 0) {
-        console.log('No events found for user');
+        console.log('No RSVPs found for user');
         setSuggestedFriends([]);
         setLoading(false);
         return;
       }
 
-      const eventIds = userRSVPs.map(rsvp => rsvp.event_id);
-      console.log('Event IDs to check:', eventIds);
+      // Filter to only "Going" RSVPs
+      const goingRSVPs = userRSVPs.filter(rsvp => rsvp.status === 'Going');
+      console.log('Going RSVPs:', goingRSVPs);
+      
+      if (goingRSVPs.length === 0) {
+        console.log('No "Going" RSVPs found for user');
+        setSuggestedFriends([]);
+        setLoading(false);
+        return;
+      }
+
+      const eventIds = goingRSVPs.map(rsvp => rsvp.event_id);
+      console.log('Event IDs where user is going:', eventIds);
 
       // Get other users who also had "Going" status for the same events
       const { data: coAttendees, error: coAttendeesError } = await supabase
         .from('event_rsvps')
-        .select('user_id, event_id')
+        .select('user_id, event_id, status')
         .in('event_id', eventIds)
         .eq('status', 'Going')
         .neq('user_id', userId);
@@ -85,6 +98,7 @@ export const useSuggestedFriends = (userId: string | undefined) => {
       }
 
       console.log('Co-attendees found:', coAttendees?.length || 0);
+      console.log('Co-attendees data:', coAttendees);
 
       if (!coAttendees || coAttendees.length === 0) {
         console.log('No co-attendees found');
@@ -95,6 +109,8 @@ export const useSuggestedFriends = (userId: string | undefined) => {
 
       // Get unique user IDs and filter out existing friends and dismissed suggestions
       const uniqueUserIds = [...new Set(coAttendees.map(attendee => attendee.user_id))];
+      console.log('Unique co-attendee user IDs:', uniqueUserIds);
+      
       const filteredUserIds = uniqueUserIds.filter(id => 
         !friendIds.includes(id) && !dismissedSuggestions.includes(id)
       );
@@ -122,6 +138,7 @@ export const useSuggestedFriends = (userId: string | undefined) => {
       }
 
       console.log('Profiles found:', profiles?.length || 0);
+      console.log('Profile data:', profiles);
 
       // Get event data for the shared events
       const { data: events, error: eventsError } = await supabase
@@ -137,6 +154,7 @@ export const useSuggestedFriends = (userId: string | undefined) => {
       }
 
       console.log('Events found:', events?.length || 0);
+      console.log('Event data:', events);
 
       // Create suggestions by matching users with their shared events
       const suggestions: SuggestedFriend[] = [];
@@ -147,14 +165,25 @@ export const useSuggestedFriends = (userId: string | undefined) => {
         seenUsers.add(attendeeUserId);
 
         const profile = profiles?.find(p => p.id === attendeeUserId);
-        if (!profile) return;
+        if (!profile) {
+          console.log(`No profile found for user ${attendeeUserId}`);
+          return;
+        }
 
         // Find a shared event for this user
         const sharedAttendance = coAttendees.find(attendee => attendee.user_id === attendeeUserId);
-        if (!sharedAttendance) return;
+        if (!sharedAttendance) {
+          console.log(`No shared attendance found for user ${attendeeUserId}`);
+          return;
+        }
 
         const sharedEvent = events?.find(event => event.id === sharedAttendance.event_id);
-        if (!sharedEvent) return;
+        if (!sharedEvent) {
+          console.log(`No shared event found for event ID ${sharedAttendance.event_id}`);
+          return;
+        }
+
+        console.log(`Creating suggestion for user ${profile.username} based on event ${sharedEvent.title}`);
 
         suggestions.push({
           id: profile.id,
@@ -168,6 +197,9 @@ export const useSuggestedFriends = (userId: string | undefined) => {
           tagline: profile.tagline,
           created_at: profile.created_at,
           updated_at: profile.updated_at,
+          onboarded: profile.onboarded,
+          onboarding_data: profile.onboarding_data,
+          role: profile.role,
           sharedEventId: sharedEvent.id,
           sharedEventTitle: sharedEvent.title,
           sharedEventDate: sharedEvent.start_date,
@@ -183,6 +215,7 @@ export const useSuggestedFriends = (userId: string | undefined) => {
       });
 
       console.log('Final suggestions created:', suggestions.length);
+      console.log('Suggestions:', suggestions);
       setSuggestedFriends(suggestions.slice(0, 10)); // Limit to 10 suggestions
     } catch (error) {
       console.error('Error fetching suggested friends:', error);
