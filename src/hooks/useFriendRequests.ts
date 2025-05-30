@@ -63,7 +63,7 @@ export const useFriendRequests = (userId: string | undefined) => {
           
           return {
             id: req.id,
-            status: req.status.toLowerCase() as 'pending',
+            status: 'pending' as const,
             created_at: req.created_at,
             user_id: req.user_id,
             friend_id: req.friend_id,
