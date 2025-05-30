@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Calendar, Users, Sparkle } from 'lucide-react';
@@ -30,6 +31,7 @@ export const NavItems: React.FC<NavItemsProps> = ({
             <Link
               key={href}
               to={href}
+              state={{ from: location.pathname }}
               className={cn(
                 "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
                 isActive 

@@ -10,8 +10,13 @@ export const useScrollToTop = () => {
     const state = location.state as any;
     const preserveScroll = state?.preserveScroll || state?.fromRsvp;
     
-    // Only scroll to top if we're not preserving scroll position
-    if (!preserveScroll) {
+    // Define pages that should always scroll to top when navigating TO events page
+    const alwaysScrollToTopFrom = ['/', '/casual-plans', '/friends'];
+    const comingFromScrollToTopPage = state?.from && alwaysScrollToTopFrom.includes(state.from);
+    
+    // Always scroll to top if coming from home, casual plans, or friends pages
+    // OR if we're not preserving scroll position
+    if (comingFromScrollToTopPage || !preserveScroll) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     
