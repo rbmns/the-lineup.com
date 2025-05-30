@@ -15,6 +15,10 @@ export const EventsVibeSection: React.FC<EventsVibeSectionProps> = ({
   vibes,
   vibesLoading,
 }) => {
+  // Debug logging
+  console.log('EventsVibeSection - vibes:', vibes);
+  console.log('EventsVibeSection - vibesLoading:', vibesLoading);
+
   if (vibesLoading) {
     return (
       <div className="space-y-4">
@@ -30,6 +34,12 @@ export const EventsVibeSection: React.FC<EventsVibeSectionProps> = ({
         </div>
       </div>
     );
+  }
+
+  // Don't render if no vibes are available
+  if (!vibes || vibes.length === 0) {
+    console.log('No vibes available, not rendering vibe section');
+    return null;
   }
 
   return (

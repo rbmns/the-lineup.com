@@ -17,6 +17,13 @@ export const useEventsPageData = () => {
   const [locations, setLocations] = useState<Array<{ value: string, label: string }>>([]);
   const [isVenuesLoading, setIsVenuesLoading] = useState(true);
   
+  // Add console log to debug vibes loading
+  useEffect(() => {
+    console.log('Vibes loading state:', vibesLoading);
+    console.log('Vibes data:', vibes);
+    console.log('Events with vibes:', events.filter(e => e.vibe));
+  }, [vibes, vibesLoading, events]);
+  
   // Get all unique event types from events
   const allEventTypes = useMemo(() => {
     const types = events.map(event => event.event_category).filter(Boolean);
