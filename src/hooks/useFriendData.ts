@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { FriendsData, FriendRequest } from '@/types/friends';
-import { UserProfile } from '@/types';
+import { UserProfile } from '@/types/index';
 
 export const useFriendData = (userId: string | undefined) => {
   const [data, setData] = useState<FriendsData>({

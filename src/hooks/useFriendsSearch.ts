@@ -1,7 +1,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { UserProfile } from '@/types.d';
+import { UserProfile } from '@/types/index';
 
 export const useFriendsSearch = (user: any, friends: UserProfile[] | undefined) => {
   const [searchQuery, setSearchQuery] = useState('');

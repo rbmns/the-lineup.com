@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFriendData } from '@/hooks/useFriendData';
 import { useFriendRequests } from '@/hooks/useFriendRequests';
@@ -12,7 +12,7 @@ import { FriendsTabsNew } from '@/components/friends/FriendsTabsNew';
 import { FriendsEventsTabContent } from '@/components/friends/FriendsEventsTabContent';
 import { FriendsSearchSection } from '@/components/friends/FriendsSearchSection';
 import { FriendsLoginPrompt } from '@/components/friends/FriendsLoginPrompt';
-import { UserProfile } from '@/types';
+import { UserProfile } from '@/types/index';
 import { supabase } from '@/lib/supabase';
 
 const Friends: React.FC = () => {
