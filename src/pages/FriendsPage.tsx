@@ -2,12 +2,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { FriendsHeader } from '@/components/friends/FriendsHeader';
-import { FriendsTabsNew } from '@/components/friends/FriendsTabsNew';
-import { FriendsTabContent } from '@/components/friends/FriendsTabContent';
-import { DiscoverTabContent } from '@/components/friends/DiscoverTabContent';
-import { SuggestedFriendsTabContent } from '@/components/friends/SuggestedFriendsTabContent';
-import { FriendsEventsTabContent } from '@/components/friends/FriendsEventsTabContent';
-import { FriendsCasualPlansTabContent } from '@/components/friends/FriendsCasualPlansTabContent';
+import { FriendsTabs } from '@/components/friends/FriendsTabs';
 import { useFriends } from '@/hooks/useFriends';
 import { useFriendRequests } from '@/hooks/useFriendRequests';
 import { useSuggestedFriends } from '@/hooks/useSuggestedFriends';
@@ -29,67 +24,49 @@ const FriendsPage = () => {
     friend.username?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Get friend IDs for the events and casual plans tabs
-  const friendIds = friends.map(friend => friend.id);
-
   return (
     <div className="container mx-auto px-4 py-8">
       <FriendsHeader />
-      <FriendsTabsNew
+      <FriendsTabs
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         pendingRequestsCount={requests.length}
-        suggestedFriendsCount={suggestedFriends.length}
-        allFriendsContent={
-          <FriendsTabContent
-            friends={filteredFriends}
-            loading={friendsLoading}
-            requests={requests}
-            onAcceptRequest={handleAcceptRequest}
-            onDeclineRequest={handleDeclineRequest}
-            showFriendRequests={false}
-            searchQuery={searchQuery}
-            onSearchChange={handleSearchChange}
-          />
+        friendsContent={
+          <div className="space-y-6">
+            {filteredFriends.map((friend) => (
+              <div key={friend.id} className="bg-white rounded-lg border p-4 flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                  {friend.username ? friend.username.charAt(0).toUpperCase() : '?'}
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-medium">{friend.username}</h3>
+                  <p className="text-sm text-gray-500">{friend.location}</p>
+                </div>
+                <button className="text-blue-500 text-sm">View Profile</button>
+              </div>
+            ))}
+          </div>
         }
-        suggestionsContent={
-          <SuggestedFriendsTabContent
-            suggestedFriends={suggestedFriends}
-            loading={suggestionsLoading}
-            onAddFriend={async (friendId: string) => {
-              // TODO: Implement add friend functionality
-              console.log('Add friend:', friendId);
-            }}
-            onDismiss={(friendId: string) => {
-              // TODO: Implement dismiss functionality
-              console.log('Dismiss suggestion:', friendId);
-            }}
-            currentUserId={user?.id}
-            friendIds={friendIds}
-          />
-        }
-        requestsContent={
-          <FriendsTabContent
-            friends={[]}
-            loading={requestsLoading}
-            requests={requests}
-            onAcceptRequest={handleAcceptRequest}
-            onDeclineRequest={handleDeclineRequest}
-            showFriendRequests={true}
-          />
-        }
-        eventsContent={
-          <FriendsEventsTabContent 
-            friendIds={friendIds}
-            currentUserId={user?.id}
-            friends={friends}
-          />
-        }
-        casualPlansContent={
-          <FriendsCasualPlansTabContent 
-            friendIds={friendIds}
-            currentUserId={user?.id}
-          />
+        discoverContent={
+          <div className="space-y-4">
+            {suggestedFriends.map((suggestion) => (
+              <div key={suggestion.id} className="bg-white rounded-lg border p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
+                    <div>
+                      <h3 className="font-medium">{suggestion.username}</h3>
+                      <p className="text-sm text-gray-500">Based on mutual friends</p>
+                    </div>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm">Add</button>
+                    <button className="p-2 text-gray-400">×</button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         }
       />
     </div>
