@@ -33,38 +33,55 @@ const EventsContent = () => {
   } = useEventsPageData();
 
   const handleAdvancedFilterChange = (filters: any) => {
+    console.log('Handling advanced filter change:', filters);
+    
     // Handle event category filters
-    if (filters.eventTypes) {
+    if (filters.eventTypes !== undefined) {
+      console.log('Setting event types:', filters.eventTypes);
       setSelectedEventTypes(filters.eventTypes);
     }
     
     // Handle venue filters
-    if (filters.venues) {
+    if (filters.venues !== undefined) {
+      console.log('Setting venues:', filters.venues);
       setSelectedVenues(filters.venues);
     }
     
     // Handle vibe filters
-    if (filters.vibes) {
+    if (filters.vibes !== undefined) {
+      console.log('Setting vibes:', filters.vibes);
       setSelectedVibes(filters.vibes);
     }
     
     // Handle date filters - map from 'date' to 'dateRange'
     if (filters.date) {
+      console.log('Setting date range:', filters.date);
       const dateRangeValue = { from: filters.date, to: filters.date };
       setDateRange(dateRangeValue);
     }
     
-    if (filters.dateFilter) {
+    if (filters.dateFilter !== undefined) {
+      console.log('Setting date filter:', filters.dateFilter);
       setSelectedDateFilter(filters.dateFilter);
     }
   };
+
+  console.log('Current filter state:', {
+    selectedEventTypes,
+    selectedVenues,
+    selectedVibes,
+    filteredEventsCount: filteredEvents.length
+  });
 
   return (
     <EventsPageLayout>
       <div className="space-y-6 md:space-y-8">
         <EventsVibeSection
           selectedVibes={selectedVibes}
-          onVibeChange={setSelectedVibes}
+          onVibeChange={(vibes) => {
+            console.log('Vibe section changed:', vibes);
+            setSelectedVibes(vibes);
+          }}
           vibes={vibes}
           vibesLoading={vibesLoading}
         />

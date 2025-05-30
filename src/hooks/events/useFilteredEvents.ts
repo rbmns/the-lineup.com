@@ -31,30 +31,39 @@ export const useFilteredEvents = ({
     let filteredEvents = [...events];
 
     // Filter by event category/type
-    // If categories are selected, filter by them; otherwise show all
-    if (selectedCategories.length > 0 && selectedCategories.length < allEventTypes.length) {
+    // Only apply category filter if not all categories are selected
+    const hasActiveCategories = selectedCategories.length > 0 && selectedCategories.length < allEventTypes.length;
+    if (hasActiveCategories) {
+      console.log('Applying category filter:', selectedCategories);
       filteredEvents = filteredEvents.filter(event => 
         event.event_category && selectedCategories.includes(event.event_category)
       );
+      console.log('Events after category filter:', filteredEvents.length);
     }
 
     // Filter by venues
     if (selectedVenues.length > 0) {
+      console.log('Applying venue filter:', selectedVenues);
       filteredEvents = filteredEvents.filter(event => 
         event.venue_id && selectedVenues.includes(event.venue_id)
       );
+      console.log('Events after venue filter:', filteredEvents.length);
     }
 
-    // Filter by vibes
+    // Filter by vibes - apply filter if any vibes are selected
     if (selectedVibes.length > 0) {
+      console.log('Applying vibe filter:', selectedVibes);
       filteredEvents = filteredEvents.filter(event => 
         event.vibe && selectedVibes.includes(event.vibe)
       );
+      console.log('Events after vibe filter:', filteredEvents.length);
     }
 
     // Filter by date
     if (dateRange || selectedDateFilter) {
+      console.log('Applying date filter:', selectedDateFilter, dateRange);
       filteredEvents = filterEventsByDate(filteredEvents, selectedDateFilter, dateRange);
+      console.log('Events after date filter:', filteredEvents.length);
     }
 
     return filteredEvents;

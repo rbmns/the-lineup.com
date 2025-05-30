@@ -1,11 +1,10 @@
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
 import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp';
 import { useEventVibes } from '@/hooks/useEventVibes';
 import { supabase } from '@/lib/supabase';
-import { useCategoryFilterSelection } from '@/hooks/events/useCategoryFilterSelection';
 import { useEventFilterState } from '@/hooks/events/useEventFilterState';
 import { useFilteredEvents } from '@/hooks/events/useFilteredEvents';
 
@@ -14,7 +13,6 @@ export const useEventsPageData = () => {
   const { data: events = [], isLoading: eventsLoading } = useEvents(user?.id);
   const { data: vibes = [], isLoading: vibesLoading } = useEventVibes();
   const [venues, setVenues] = useState<Array<{ value: string, label: string }>>([]);
-  const [locations, setLocations] = useState<Array<{ value: string, label: string }>>([]);
   const [isVenuesLoading, setIsVenuesLoading] = useState(true);
   
   // Get all unique event types from events
@@ -36,54 +34,9 @@ export const useEventsPageData = () => {
     selectedDateFilter,
     setSelectedDateFilter,
     isFilterLoading,
-    showAdvancedFilters,
-    toggleAdvancedFilters,
     hasActiveFilters,
-    hasAdvancedFilters,
     resetFilters,
-    handleRemoveEventType,
-    handleRemoveVenue,
-    handleRemoveVibe,
-    handleClearDateFilter
   } = useEventFilterState();
-  
-  // Filter events by selected event types - all selected by default
-  const {
-    selectedCategories,
-    toggleCategory,
-    selectAll,
-    deselectAll,
-    isNoneSelected
-  } = useCategoryFilterSelection(allEventTypes, selectedEventTypes);
-  
-  // Keep the category filter and event type filter in sync with a debounce
-  // to prevent infinite loops
-  const syncFilters = useCallback(() => {
-    // Only sync if the arrays are actually different to prevent loops
-    if (
-      selectedCategories.length !== selectedEventTypes.length ||
-      selectedCategories.some(category => !selectedEventTypes.includes(category))
-    ) {
-      setSelectedEventTypes(selectedCategories);
-    }
-  }, [selectedCategories, selectedEventTypes, setSelectedEventTypes]);
-  
-  // Use effect with debounce to prevent rapid re-renders
-  useEffect(() => {
-    // Sync with a small delay to avoid render loops
-    const timer = setTimeout(() => {
-      syncFilters();
-    }, 50);
-    
-    return () => clearTimeout(timer);
-  }, [selectedCategories, syncFilters]);
-  
-  // Initialize with all event types selected when they become available
-  useEffect(() => {
-    if (selectedCategories.length === 0 && allEventTypes.length > 0) {
-      selectAll();
-    }
-  }, [allEventTypes, selectedCategories.length, selectAll]);
   
   // Fetch all venues for the filter
   useEffect(() => {
@@ -104,11 +57,6 @@ export const useEventsPageData = () => {
           }));
           setVenues(venueOptions);
         }
-        
-        // Create sample locations for the design
-        setLocations([
-          { value: 'zandvoort-area', label: 'Zandvoort Area' }
-        ]);
       } catch (err) {
         console.error('Error fetching venues:', err);
       } finally {
@@ -119,10 +67,10 @@ export const useEventsPageData = () => {
     fetchVenues();
   }, []);
   
-  // Use the filtered events hook
+  // Use the filtered events hook - pass selectedEventTypes as selectedCategories
   const filteredEvents = useFilteredEvents({
     events,
-    selectedCategories,
+    selectedCategories: selectedEventTypes,
     allEventTypes,
     selectedVenues,
     selectedVibes,
@@ -141,14 +89,8 @@ export const useEventsPageData = () => {
     eventsLoading,
     filteredEvents,
     venues,
-    locations,
     isVenuesLoading,
     allEventTypes,
-    selectedCategories,
-    toggleCategory,
-    selectAll,
-    deselectAll,
-    isNoneSelected,
     selectedEventTypes,
     setSelectedEventTypes,
     selectedVenues,
@@ -160,15 +102,8 @@ export const useEventsPageData = () => {
     selectedDateFilter,
     setSelectedDateFilter,
     isFilterLoading,
-    showAdvancedFilters,
-    toggleAdvancedFilters,
     hasActiveFilters,
-    hasAdvancedFilters,
     resetFilters,
-    handleRemoveEventType,
-    handleRemoveVenue,
-    handleRemoveVibe,
-    handleClearDateFilter,
     enhancedHandleRsvp,
     loadingEventId,
     vibes,

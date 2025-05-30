@@ -34,10 +34,12 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
         <div className="flex items-center gap-2 md:gap-4">
           <AdvancedFilters
             onFilterChange={(filters) => {
+              console.log('Advanced filters changed:', filters);
               // Map the filter structure to what the parent expects
               onFilterChange({
                 eventTypes: filters.eventTypes,
                 venues: filters.venues,
+                vibes: filters.vibes,
                 date: filters.date,
                 dateFilter: filters.dateFilter
               });
@@ -47,6 +49,7 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
               location: "Zandvoort Area",
               eventTypes: selectedEventTypes,
               venues: selectedVenues,
+              vibes: selectedVibes,
               date: dateRange?.from,
               dateFilter: selectedDateFilter
             }}
