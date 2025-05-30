@@ -132,9 +132,9 @@ const LandingPage = () => {
 
   return (
     <div>
-      {/* Hero Section with Search */}
+      {/* Hero Section with Updated Background */}
       <section className="relative bg-cover bg-center py-20" style={{
-        backgroundImage: "url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')"
+        backgroundImage: "url('/lovable-uploads/68eaf77e-c1bd-4326-bfdc-72328318f27d.png')"
       }}>
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative container mx-auto px-4 text-center text-white">
@@ -145,32 +145,6 @@ const LandingPage = () => {
             Discover what's happening nearby — from beach parties to chill yoga sessions. Join when you want, connect if you want.
           </p>
           
-          {/* Search Card */}
-          <Card className="max-w-md mx-auto bg-white text-black">
-            <CardContent className="p-6 space-y-4">
-              <div>
-                <label className="block text-left text-sm font-medium mb-2">Where are you headed?</label>
-                <input 
-                  type="text" 
-                  placeholder="Zandvoort" 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <input 
-                  type="text" 
-                  placeholder="This weekend" 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <Button asChild className="w-full bg-black hover:bg-black/90">
-                <Link to="/events">
-                  <Search className="mr-2 h-4 w-4" /> Find Events
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-          
           <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
             <Button asChild variant="outline" size="lg" className="border-2 bg-transparent border-white text-white hover:bg-white/10">
               <Link to="/events">
@@ -178,7 +152,7 @@ const LandingPage = () => {
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="border-2 bg-transparent border-white text-white hover:bg-white/10">
-              <Link to="/casual-plans">
+              <Link to="/profile">
                 Create Profile
               </Link>
             </Button>
