@@ -22,7 +22,7 @@ export const EventsFilterBar: React.FC<EventsFilterBarProps> = ({
   isAllSelected = false
 }) => {
   return (
-    <div className="w-full">
+    <div className="w-full bg-white rounded-lg border border-gray-200 p-4">
       <EventFilterBar
         allEventTypes={allEventTypes}
         selectedEventTypes={selectedCategories}
@@ -30,7 +30,7 @@ export const EventsFilterBar: React.FC<EventsFilterBarProps> = ({
         onSelectAll={selectAll}
         onDeselectAll={deselectAll}
         hasActiveFilters={hasActiveFilters}
-        className="py-2 px-1"
+        className="w-full"
       />
     </div>
   );

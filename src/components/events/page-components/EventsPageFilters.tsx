@@ -77,8 +77,8 @@ export const EventsPageFilters: React.FC<EventsPageFiltersProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Mobile-optimized filter bar */}
-      <div className="overflow-x-auto">
+      {/* Main category filter bar - prominently displayed */}
+      <div className="w-full">
         <EventsFilterBar
           allEventTypes={allEventTypes}
           selectedCategories={selectedCategories}
