@@ -73,8 +73,8 @@ export const getEventImage = (event: Event): string => {
     return event.image_urls[0];
   }
   
-  // Fall back to category-based image using event_category (not event_type)
-  return getEventFallbackImage(event.event_category || event.event_type);
+  // Fall back to event_type-based image
+  return getEventFallbackImage(event.event_type);
 };
 
 export const getEventImages = (event: Event): string[] => {

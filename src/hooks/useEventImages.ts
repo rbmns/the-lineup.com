@@ -34,8 +34,8 @@ export const useEventImages = (event?: Event | null): EventImageResult => {
       return eventData.image_urls[0];
     }
     
-    // Use fallback based on event category (try both event_category and event_type)
-    return getEventFallbackImage(eventData.event_category || eventData.event_type);
+    // Use fallback based on event type
+    return getEventFallbackImage(eventData.event_type);
   };
 
   useEffect(() => {
@@ -54,8 +54,8 @@ export const useEventImages = (event?: Event | null): EventImageResult => {
           setCoverImage(event.image_urls[0]);
           setShareImage(event.image_urls[0]);
         } else {
-          // Use fallback image based on event category
-          const fallbackImage = getEventFallbackImage(event.event_category || event.event_type);
+          // Use fallback image based on event type
+          const fallbackImage = getEventFallbackImage(event.event_type);
           setCoverImage(fallbackImage);
           setShareImage(fallbackImage);
         }
