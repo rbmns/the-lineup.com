@@ -16,8 +16,8 @@ export const EventsPageLayout: React.FC<EventsPageLayoutProps> = ({ children }) 
       />
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="space-y-8">
+      <div className="container mx-auto px-3 md:px-4 py-4 md:py-8">
+        <div className="space-y-6 md:space-y-8">
           {children}
         </div>
       </div>

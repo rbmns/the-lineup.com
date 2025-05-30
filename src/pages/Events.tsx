@@ -24,7 +24,9 @@ const Events = () => {
     hasActiveFilters,
     resetFilters,
     enhancedHandleRsvp,
-    loadingEventId
+    loadingEventId,
+    vibes,
+    vibesLoading
   } = useEventsPageData();
 
   const [selectedVibe, setSelectedVibe] = React.useState<string | null>(null);
@@ -32,7 +34,6 @@ const Events = () => {
   const handleVibeChange = (vibe: string | null) => {
     setSelectedVibe(vibe);
     console.log('Vibe filter changed to:', vibe);
-    // TODO: Implement vibe filtering logic in the data hook
   };
 
   const handleAdvancedFilterChange = (filters: any) => {
@@ -57,32 +58,46 @@ const Events = () => {
     }
   };
 
+  // Filter events by selected vibe
+  const vibeFilteredEvents = React.useMemo(() => {
+    if (!selectedVibe) return filteredEvents;
+    return filteredEvents.filter(event => event.vibe === selectedVibe);
+  }, [filteredEvents, selectedVibe]);
+
   return (
     <EventsPageLayout>
-      <EventsVibeSection
-        selectedVibe={selectedVibe}
-        onVibeChange={handleVibeChange}
-      />
+      <div className="space-y-6 md:space-y-8">
+        <EventsVibeSection
+          selectedVibe={selectedVibe}
+          onVibeChange={handleVibeChange}
+          vibes={vibes}
+          vibesLoading={vibesLoading}
+        />
 
-      <EventsAdvancedSection
-        onFilterChange={handleAdvancedFilterChange}
-        selectedEventTypes={selectedEventTypes}
-        selectedVenues={selectedVenues}
-        dateRange={dateRange}
-        selectedDateFilter={selectedDateFilter}
-        filteredEventsCount={filteredEvents.length}
-      />
+        <EventsAdvancedSection
+          onFilterChange={handleAdvancedFilterChange}
+          selectedEventTypes={selectedEventTypes}
+          selectedVenues={selectedVenues}
+          dateRange={dateRange}
+          selectedDateFilter={selectedDateFilter}
+          filteredEventsCount={vibeFilteredEvents.length}
+          showLocationFilter={true}
+        />
 
-      <EventsResultsSection
-        filteredEvents={filteredEvents}
-        hasActiveFilters={hasActiveFilters}
-        resetFilters={resetFilters}
-        eventsLoading={eventsLoading}
-        isFilterLoading={isFilterLoading}
-        user={user}
-        enhancedHandleRsvp={enhancedHandleRsvp}
-        loadingEventId={loadingEventId}
-      />
+        <EventsResultsSection
+          filteredEvents={vibeFilteredEvents}
+          hasActiveFilters={hasActiveFilters || !!selectedVibe}
+          resetFilters={() => {
+            resetFilters();
+            setSelectedVibe(null);
+          }}
+          eventsLoading={eventsLoading}
+          isFilterLoading={isFilterLoading}
+          user={user}
+          enhancedHandleRsvp={enhancedHandleRsvp}
+          loadingEventId={loadingEventId}
+        />
+      </div>
     </EventsPageLayout>
   );
 };

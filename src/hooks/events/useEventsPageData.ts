@@ -1,7 +1,9 @@
+
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
 import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp';
+import { useEventVibes } from '@/hooks/useEventVibes';
 import { supabase } from '@/lib/supabase';
 import { useCategoryFilterSelection } from '@/hooks/events/useCategoryFilterSelection';
 import { useEventFilterState } from '@/hooks/events/useEventFilterState';
@@ -10,6 +12,7 @@ import { useFilteredEvents } from '@/hooks/events/useFilteredEvents';
 export const useEventsPageData = () => {
   const { user } = useAuth();
   const { data: events = [], isLoading: eventsLoading } = useEvents(user?.id);
+  const { data: vibes = [], isLoading: vibesLoading } = useEventVibes();
   const [venues, setVenues] = useState<Array<{ value: string, label: string }>>([]);
   const [locations, setLocations] = useState<Array<{ value: string, label: string }>>([]);
   const [isVenuesLoading, setIsVenuesLoading] = useState(true);
@@ -160,6 +163,8 @@ export const useEventsPageData = () => {
     handleRemoveVenue,
     handleClearDateFilter,
     enhancedHandleRsvp,
-    loadingEventId
+    loadingEventId,
+    vibes,
+    vibesLoading
   };
 };

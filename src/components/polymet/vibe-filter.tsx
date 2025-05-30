@@ -1,11 +1,11 @@
 
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { vibeOptions } from "@/components/polymet/event-vibe-label-enhanced";
 
 interface VibeFilterProps {
   selectedVibe: string | null;
   onChange: (vibe: string | null) => void;
+  vibes: string[];
   size?: "sm" | "md" | "lg";
   className?: string;
 }
@@ -13,6 +13,7 @@ interface VibeFilterProps {
 export default function VibeFilter({
   selectedVibe,
   onChange,
+  vibes,
   size = "md",
   className,
 }: VibeFilterProps) {
@@ -47,18 +48,18 @@ export default function VibeFilter({
     <div className={cn("relative w-full", className)}>
       {/* Left shadow indicator */}
       {showLeftShadow && (
-        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+        <div className="absolute left-0 top-0 bottom-0 w-4 md:w-8 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
       )}
 
       {/* Right shadow indicator */}
       {showRightShadow && (
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
+        <div className="absolute right-0 top-0 bottom-0 w-4 md:w-8 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
       )}
 
       {/* Scrollable container */}
       <div
         ref={scrollContainerRef}
-        className="flex overflow-x-auto scrollbar-hide py-2 px-1 -mx-1 gap-2"
+        className="flex overflow-x-auto scrollbar-hide py-2 px-1 -mx-1 gap-1.5 md:gap-2"
         onScroll={handleScroll}
       >
         {/* "All Vibes" option */}
@@ -75,21 +76,20 @@ export default function VibeFilter({
           All Vibes
         </button>
 
-        {/* Vibe options */}
-        {vibeOptions.map((vibe) => (
+        {/* Vibe options from database */}
+        {vibes.map((vibe) => (
           <button
-            key={vibe.id}
-            onClick={() => onChange(vibe.id)}
+            key={vibe}
+            onClick={() => onChange(vibe)}
             className={cn(
-              "flex items-center gap-1.5 whitespace-nowrap rounded-full border transition-all duration-200 flex-shrink-0",
+              "flex items-center justify-center whitespace-nowrap rounded-full border transition-all duration-200 flex-shrink-0 capitalize",
               sizeClasses[size],
-              selectedVibe === vibe.id
-                ? cn(vibe.color, "opacity-100 shadow-sm")
-                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300 opacity-80"
+              selectedVibe === vibe
+                ? "bg-black text-white border-black shadow-sm"
+                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
             )}
           >
-            {vibe.icon}
-            <span>{vibe.label}</span>
+            {vibe}
           </button>
         ))}
       </div>

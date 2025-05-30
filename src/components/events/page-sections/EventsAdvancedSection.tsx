@@ -1,6 +1,7 @@
 
 import React from 'react';
 import AdvancedFilters from '@/components/polymet/advanced-filters';
+import { MapPin } from 'lucide-react';
 
 interface EventsAdvancedSectionProps {
   onFilterChange: (filters: any) => void;
@@ -9,6 +10,7 @@ interface EventsAdvancedSectionProps {
   dateRange: any;
   selectedDateFilter: string;
   filteredEventsCount: number;
+  showLocationFilter?: boolean;
 }
 
 export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
@@ -18,26 +20,38 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
   dateRange,
   selectedDateFilter,
   filteredEventsCount,
+  showLocationFilter = false,
 }) => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 md:space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-medium">Refine your search</h3>
+        <h3 className="text-lg md:text-xl font-medium">Refine your search</h3>
       </div>
       
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        <AdvancedFilters
-          onFilterChange={onFilterChange}
-          locations={["Zandvoort Area"]}
-          initialFilters={{
-            location: "Zandvoort Area",
-            eventTypes: selectedEventTypes,
-            venues: selectedVenues,
-            date: dateRange?.from,
-            dateFilter: selectedDateFilter
-          }}
-        />
-        <span className="text-sm text-gray-600 whitespace-nowrap">
+      <div className="flex flex-col space-y-3 md:space-y-0 md:flex-row md:items-center md:gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
+          <AdvancedFilters
+            onFilterChange={onFilterChange}
+            locations={["Zandvoort Area"]}
+            initialFilters={{
+              location: "Zandvoort Area",
+              eventTypes: selectedEventTypes,
+              venues: selectedVenues,
+              date: dateRange?.from,
+              dateFilter: selectedDateFilter
+            }}
+          />
+          
+          {showLocationFilter && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-full text-sm text-gray-700">
+              <MapPin className="h-3 w-3" />
+              <span className="hidden sm:inline">Zandvoort Area</span>
+              <span className="sm:hidden">Area</span>
+            </div>
+          )}
+        </div>
+        
+        <span className="text-sm text-gray-600 whitespace-nowrap md:ml-auto">
           {filteredEventsCount} events found
         </span>
       </div>
