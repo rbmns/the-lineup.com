@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -163,23 +162,11 @@ const LandingPage = () => {
               ))}
             </div>
           ) : (
-            <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-              <CategoryPill 
-                category="All Vibes" 
-                active={selectedVibe === null} 
-                noBorder={true} 
-                onClick={() => setSelectedVibe(null)}
-              />
-              {vibes.map((vibe) => (
-                <CategoryPill 
-                  key={vibe}
-                  category={vibe} 
-                  active={selectedVibe === vibe} 
-                  noBorder={true} 
-                  onClick={() => setSelectedVibe(vibe)}
-                />
-              ))}
-            </div>
+            <VibeFilter 
+              vibes={vibes}
+              selectedVibe={selectedVibe}
+              onVibeSelect={setSelectedVibe}
+            />
           )}
         </div>
       </section>
