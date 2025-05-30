@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Icons } from "./ShareIcons";
-import { shareToFacebook, shareToWhatsApp, shareToSnapchat } from "@/utils/sharing/socialShare";
+import { shareToFacebook, shareToWhatsApp, shareToSnapchat, shareToLinkedIn } from "@/utils/sharing/socialShare";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export interface ShareButtonsProps {
@@ -25,51 +25,57 @@ export function ShareButtons({ title, description, url, onCopyLink }: ShareButto
       case "snapchat":
         shareToSnapchat({ title, text: description, url });
         break;
+      case "linkedin":
+        shareToLinkedIn({ title, text: description, url });
+        break;
       default:
         console.log(`Share to ${platform} not implemented`);
     }
   };
 
   // Determine grid columns based on mobile vs desktop
-  const gridClass = isMobile ? "grid-cols-2 gap-4" : "grid-cols-2 gap-2";
+  const gridClass = isMobile ? "grid-cols-2 gap-4" : "grid-cols-2 gap-3";
 
   return (
     <div className={`grid ${gridClass}`}>
       <Button
         variant="outline"
         size={isMobile ? "default" : "sm"}
-        className="flex flex-col items-center justify-center h-16 sm:h-20"
+        className="flex flex-col items-center justify-center h-16 sm:h-20 hover:bg-blue-50"
         onClick={() => handleShare("facebook")}
       >
         <Icons.facebook className="h-6 w-6 mb-1" />
         <span className="text-xs">Facebook</span>
       </Button>
+      
       <Button
         variant="outline"
         size={isMobile ? "default" : "sm"}
-        className="flex flex-col items-center justify-center h-16 sm:h-20"
+        className="flex flex-col items-center justify-center h-16 sm:h-20 hover:bg-green-50"
         onClick={() => handleShare("whatsapp")}
       >
         <Icons.whatsapp className="h-6 w-6 mb-1" />
         <span className="text-xs">WhatsApp</span>
       </Button>
+      
       <Button
         variant="outline"
         size={isMobile ? "default" : "sm"}
-        className="flex flex-col items-center justify-center h-16 sm:h-20"
+        className="flex flex-col items-center justify-center h-16 sm:h-20 hover:bg-gray-50"
         onClick={onCopyLink}
       >
         <Icons.link className="h-6 w-6 mb-1" />
         <span className="text-xs">Copy Link</span>
       </Button>
+      
       <Button
         variant="outline"
         size={isMobile ? "default" : "sm"}
-        className="flex flex-col items-center justify-center h-16 sm:h-20"
-        onClick={() => handleShare("snapchat")}
+        className="flex flex-col items-center justify-center h-16 sm:h-20 hover:bg-blue-50"
+        onClick={() => handleShare("linkedin")}
       >
-        <Icons.snapchat className="h-6 w-6 mb-1" />
-        <span className="text-xs">Snapchat</span>
+        <Icons.linkedin className="h-6 w-6 mb-1" />
+        <span className="text-xs">LinkedIn</span>
       </Button>
     </div>
   );

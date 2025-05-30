@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,6 +14,7 @@ import { formatInTimeZone } from 'date-fns-tz';
 import { AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
 import { useEventImages } from '@/hooks/useEventImages';
 import TeaseLoginSignup from '@/components/events/detail-sections/TeaseLoginSignup';
+import { EventShareDialog } from '@/components/events/share/EventShareDialog';
 
 const EventDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,6 +25,7 @@ const EventDetail = () => {
   const [loading, setLoading] = useState(true);
   const [rsvpLoading, setRsvpLoading] = useState(false);
   const [attendees, setAttendees] = useState<{ going: any[]; interested: any[] }>({ going: [], interested: [] });
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
   // Get event images using the hook
   const { getEventImageUrl } = useEventImages();
@@ -297,6 +298,10 @@ const EventDetail = () => {
     return getEventImageUrl(event) || '/img/default.jpg';
   };
 
+  const handleShareClick = () => {
+    setShareDialogOpen(true);
+  };
+
   if (loading) {
     return <EventDetailSkeleton />;
   }
@@ -353,9 +358,14 @@ const EventDetail = () => {
           <Button
             variant="ghost"
             size="sm"
+            onClick={handleShareClick}
             className="text-white hover:bg-white/20"
           >
-            <Share className="h-4 w-4 mr-2" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 mr-2">
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+              <polyline points="16,6 12,2 8,6"/>
+              <line x1="12" y1="2" x2="12" y2="15"/>
+            </svg>
             Share
           </Button>
         </div>
@@ -510,6 +520,15 @@ const EventDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Share Dialog */}
+      {event && (
+        <EventShareDialog
+          event={event}
+          isOpen={shareDialogOpen}
+          onOpenChange={setShareDialogOpen}
+        />
+      )}
     </div>
   );
 };

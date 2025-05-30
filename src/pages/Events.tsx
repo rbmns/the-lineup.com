@@ -72,7 +72,7 @@ const Events = () => {
   };
 
   return (
-    <div className="w-full">
+    <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <PageHeader 
         title="Find events and plans that fit your vibe"
@@ -80,69 +80,67 @@ const Events = () => {
       />
 
       {/* Main Content */}
-      <div className="px-4 md:px-6 py-6 md:py-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="space-y-6 md:space-y-8">
-            {/* Find Your Vibe Section */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-semibold tracking-tight">Find your vibe</h2>
-              </div>
-              
-              {/* Vibe Filters - Responsive sizing */}
-              <div className="w-full">
-                <VibeFilter
-                  selectedVibe={selectedVibe}
-                  onChange={handleVibeChange}
-                  size="md"
-                  className="w-full"
-                />
-              </div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="space-y-8">
+          {/* Find Your Vibe Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-semibold tracking-tight">Find your vibe</h2>
             </div>
-
-            {/* Advanced Filters Section */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium">Refine your search</h3>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <AdvancedFilters
-                  onFilterChange={handleAdvancedFilterChange}
-                  locations={["Zandvoort Area"]}
-                  initialFilters={{
-                    location: "Zandvoort Area",
-                    eventTypes: selectedEventTypes,
-                    venues: selectedVenues,
-                    date: dateRange?.from,
-                    dateFilter: selectedDateFilter
-                  }}
-                />
-                <span className="text-sm text-gray-600 whitespace-nowrap">
-                  {filteredEvents.length} events found
-                </span>
-              </div>
-            </div>
-
-            {/* Events Results Section */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-semibold tracking-tight">All Events</h2>
-              </div>
-
-              {/* Events Content */}
-              <CategoryFilteredEventsContent 
-                showNoExactMatchesMessage={filteredEvents.length === 0 && hasActiveFilters}
-                resetFilters={resetFilters}
-                exactMatches={filteredEvents}
-                similarEvents={[]}
-                isLoading={eventsLoading || isFilterLoading} 
-                isFilterLoading={isFilterLoading}
-                hasActiveFilters={hasActiveFilters}
-                onRsvp={user ? enhancedHandleRsvp : undefined}
-                loadingEventId={loadingEventId}
+            
+            {/* Vibe Filters */}
+            <div className="w-full">
+              <VibeFilter
+                selectedVibe={selectedVibe}
+                onChange={handleVibeChange}
+                size="md"
+                className="w-full"
               />
             </div>
+          </div>
+
+          {/* Advanced Filters Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xl font-medium">Refine your search</h3>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <AdvancedFilters
+                onFilterChange={handleAdvancedFilterChange}
+                locations={["Zandvoort Area"]}
+                initialFilters={{
+                  location: "Zandvoort Area",
+                  eventTypes: selectedEventTypes,
+                  venues: selectedVenues,
+                  date: dateRange?.from,
+                  dateFilter: selectedDateFilter
+                }}
+              />
+              <span className="text-sm text-gray-600 whitespace-nowrap">
+                {filteredEvents.length} events found
+              </span>
+            </div>
+          </div>
+
+          {/* Events Results Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-semibold tracking-tight">All Events</h2>
+            </div>
+
+            {/* Events Content */}
+            <CategoryFilteredEventsContent 
+              showNoExactMatchesMessage={filteredEvents.length === 0 && hasActiveFilters}
+              resetFilters={resetFilters}
+              exactMatches={filteredEvents}
+              similarEvents={[]}
+              isLoading={eventsLoading || isFilterLoading} 
+              isFilterLoading={isFilterLoading}
+              hasActiveFilters={hasActiveFilters}
+              onRsvp={user ? enhancedHandleRsvp : undefined}
+              loadingEventId={loadingEventId}
+            />
           </div>
         </div>
       </div>
