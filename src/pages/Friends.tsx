@@ -14,6 +14,7 @@ import { useSuggestedFriends } from '@/hooks/useSuggestedFriends';
 import { FriendsHeader } from '@/components/friends/FriendsHeader';
 import { FriendsTabsNew } from '@/components/friends/FriendsTabsNew';
 import { FriendsEventsTabContent } from '@/components/friends/FriendsEventsTabContent';
+import { Search } from 'lucide-react';
 
 const Friends: React.FC = () => {
   const { user } = useAuth();
@@ -176,8 +177,23 @@ const Friends: React.FC = () => {
       <div className="min-h-screen bg-gray-50">
         <FriendsHeader />
 
+        {/* Search Bar */}
+        <div className="container mx-auto px-4 py-6">
+          <div className="max-w-md mx-auto">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search friends by name..."
+                className="w-full pl-12 pr-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black/20"
+                disabled
+              />
+            </div>
+          </div>
+        </div>
+
         {/* Sign up prompt */}
-        <div className="container mx-auto px-4 py-12 md:py-16">
+        <div className="container mx-auto px-4 py-8">
           <div className="max-w-md mx-auto text-center">
             <div className="bg-white rounded-lg shadow-sm p-8">
               <h2 className="text-2xl font-semibold mb-4">Sign up or in to see others</h2>
@@ -213,8 +229,24 @@ const Friends: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <FriendsHeader />
 
+      {/* Search Bar */}
+      <div className="container mx-auto px-4 py-6">
+        <div className="max-w-md mx-auto">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search friends by name..."
+              value={friendsSearchQuery}
+              onChange={(e) => setFriendsSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black/20"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Friends Content */}
-      <div className="container mx-auto px-4 py-6 md:py-8">
+      <div className="container mx-auto px-4 pb-6 md:pb-8">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
             <FriendsTabsNew
@@ -230,8 +262,8 @@ const Friends: React.FC = () => {
                   onAcceptRequest={onAcceptRequest}
                   onDeclineRequest={onDeclineRequest}
                   showFriendRequests={false}
-                  searchQuery={friendsSearchQuery}
-                  onSearchChange={(e) => setFriendsSearchQuery(e.target.value)}
+                  searchQuery=""
+                  onSearchChange={() => {}}
                 />
               }
               suggestionsContent={
