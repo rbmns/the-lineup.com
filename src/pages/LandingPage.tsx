@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,6 @@ import { formatFeaturedDate, formatEventTime } from '@/utils/date-formatting';
 import { CategoriesBrowseSection } from '@/components/home/CategoriesBrowseSection';
 import { Card, CardContent } from '@/components/ui/card';
 import { useEventVibes } from '@/hooks/useEventVibes';
-import { VibeFilter } from '@/components/home/VibeFilter';
 
 const LandingPage = () => {
   const { isAuthenticated } = useAuth();
@@ -143,17 +143,17 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Find Your Vibe Section */}
+      {/* Browse by Vibe Section */}
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-semibold tracking-tight">Find your vibe</h2>
+            <h2 className="text-3xl font-semibold tracking-tight">Browse by vibe</h2>
             <Link to="/events" className="text-blue-600 hover:text-blue-800 font-medium">
               View all →
             </Link>
           </div>
           
-          {/* Vibe Categories */}
+          {/* Vibes Grid */}
           {vibesLoading ? (
             <div className="flex gap-2 overflow-x-auto pb-2">
               {[1, 2, 3, 4, 5].map((i) => (
@@ -161,9 +161,17 @@ const LandingPage = () => {
               ))}
             </div>
           ) : (
-            <VibeFilter 
-              vibes={vibes}
-            />
+            <div className="flex flex-wrap gap-2">
+              {vibes.map((vibe) => (
+                <Link 
+                  key={vibe} 
+                  to={`/events?vibe=${encodeURIComponent(vibe)}`}
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-medium transition-colors"
+                >
+                  {vibe}
+                </Link>
+              ))}
+            </div>
           )}
         </div>
       </section>
