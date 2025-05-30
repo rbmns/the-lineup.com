@@ -32,13 +32,14 @@ const EventDetail = () => {
         setLoading(true);
         console.log('Fetching event with ID:', id);
         
+        // First, fetch the basic event data without the problematic join
         const { data, error } = await supabase
           .from('events')
           .select(`
             *,
             creator:profiles(id, username, avatar_url, email, location, status, tagline),
             venues:venue_id(*),
-            event_rsvps(id, user_id, status, profiles(id, username, avatar_url))
+            event_rsvps(id, user_id, status)
           `)
           .eq('id', id)
           .single();
