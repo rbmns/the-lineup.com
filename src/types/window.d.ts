@@ -7,6 +7,7 @@ interface Window {
     scrollPosition: number;
     timestamp: number;
     eventTypes?: string[];
+    vibes?: string[];
     pathname?: string;
   };
   _lastRestoredFilterState?: {
@@ -27,6 +28,7 @@ interface Window {
   _globalFilterState?: {
     eventTypes: string[];
     venues: string[];
+    vibes?: string[];
     dateRange?: {
       from?: string;
       to?: string;

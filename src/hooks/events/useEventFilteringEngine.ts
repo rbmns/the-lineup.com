@@ -7,6 +7,7 @@ interface UseEventFilteringEngineProps {
   events: Event[] | undefined;
   selectedEventTypes: string[];
   selectedVenues: string[];
+  selectedVibes: string[];
   dateRange: any; // from react-day-picker DateRange
   selectedDateFilter: string;
   hasActiveFilters: boolean;
@@ -17,6 +18,7 @@ export const useEventFilteringEngine = ({
   events,
   selectedEventTypes,
   selectedVenues,
+  selectedVibes,
   dateRange,
   selectedDateFilter,
   hasActiveFilters,
@@ -36,7 +38,7 @@ export const useEventFilteringEngine = ({
     setShowNoExactMatchesMessage(false);
 
     // Default state - show all events when no filters are actively selected
-    if (selectedEventTypes.length === 0 && selectedVenues.length === 0 && !selectedDateFilter && !dateRange) {
+    if (selectedEventTypes.length === 0 && selectedVenues.length === 0 && selectedVibes.length === 0 && !selectedDateFilter && !dateRange) {
       setExactMatches(events);
       setShowNoExactMatchesMessage(false);
       setIsFilterLoading(false);
@@ -52,6 +54,11 @@ export const useEventFilteringEngine = ({
       
       // Venue filter - if no venues selected, show all events
       if (selectedVenues.length > 0 && event.venues?.name && !selectedVenues.includes(event.venues.name)) {
+        return false;
+      }
+      
+      // Vibe filter - if no vibes selected, show all events
+      if (selectedVibes.length > 0 && event.vibe && !selectedVibes.includes(event.vibe)) {
         return false;
       }
       
@@ -77,6 +84,7 @@ export const useEventFilteringEngine = ({
     events,
     selectedEventTypes,
     selectedVenues,
+    selectedVibes,
     dateRange,
     selectedDateFilter,
     hasActiveFilters,
