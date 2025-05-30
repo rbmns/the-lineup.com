@@ -38,7 +38,7 @@ export const useFriendData = (userId: string | undefined) => {
         throw friendshipsError;
       }
       
-      // Get pending requests received by this user
+      // Get pending requests received by this user (separate query)
       const { data: receivedRequests, error: receivedError } = await supabase
         .from('friendships')
         .select('*')
@@ -79,9 +79,10 @@ export const useFriendData = (userId: string | undefined) => {
       // Combine all IDs (removing duplicates)
       const allIds = [...new Set([...friendIds, ...requestSenderIds, ...requestReceiverIds])];
       
-      // Fetch all profiles at once
+      // Fetch all profiles at once if we have IDs
+      let profiles: UserProfile[] = [];
       if (allIds.length > 0) {
-        const { data: profiles, error: profilesError } = await supabase
+        const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
           .select('*')
           .in('id', allIds);
@@ -91,55 +92,59 @@ export const useFriendData = (userId: string | undefined) => {
           throw profilesError;
         }
         
-        // Process the data - ensure we only show accepted friends on friends page
-        const friendProfiles = profiles?.filter(profile => 
-          friendIds.includes(profile.id)
-        ) || [];
-        
-        const requestsWithProfiles = receivedRequests?.map(req => ({
-          id: req.id,
-          status: req.status.toLowerCase(),
-          created_at: req.created_at,
-          user_id: req.user_id,
-          friend_id: req.friend_id,
-          sender_id: req.user_id,
-          receiver_id: req.friend_id,
-          profile: profiles?.find(p => p.id === req.user_id) as UserProfile
-        })) as FriendRequest[];
-        
-        const sentRequestsWithProfiles = sentRequests?.map(req => ({
-          id: req.id,
-          status: req.status.toLowerCase(),
-          created_at: req.created_at,
-          user_id: req.user_id,
-          friend_id: req.friend_id,
-          sender_id: req.user_id,
-          receiver_id: req.friend_id,
-          profile: profiles?.find(p => p.id === req.friend_id) as UserProfile
-        })) as FriendRequest[];
-        
-        setPendingRequests(sentRequestsWithProfiles);
-        
-        console.log('Friend profiles (accepted only):', friendProfiles);
-        console.log('Requests with profiles:', requestsWithProfiles);
-        
-        setData({
-          friends: friendProfiles as UserProfile[],
-          requests: requestsWithProfiles,
-          suggestions: [],
-          allProfiles: profiles as UserProfile[]
-        });
-      } else {
-        setData({
-          friends: [],
-          requests: [],
-          suggestions: [],
-          allProfiles: []
-        });
-        setPendingRequests([]);
+        profiles = profilesData as UserProfile[];
       }
+      
+      // Process the data - ensure we only show accepted friends on friends page
+      const friendProfiles = profiles.filter(profile => 
+        friendIds.includes(profile.id)
+      );
+      
+      // Create requests with profiles (received requests)
+      const requestsWithProfiles = receivedRequests?.map(req => ({
+        id: req.id,
+        status: req.status.toLowerCase(),
+        created_at: req.created_at,
+        user_id: req.user_id,
+        friend_id: req.friend_id,
+        sender_id: req.user_id,
+        receiver_id: req.friend_id,
+        profile: profiles.find(p => p.id === req.user_id) as UserProfile
+      })).filter(req => req.profile) as FriendRequest[];
+      
+      // Create sent requests with profiles
+      const sentRequestsWithProfiles = sentRequests?.map(req => ({
+        id: req.id,
+        status: req.status.toLowerCase(),
+        created_at: req.created_at,
+        user_id: req.user_id,
+        friend_id: req.friend_id,
+        sender_id: req.user_id,
+        receiver_id: req.friend_id,
+        profile: profiles.find(p => p.id === req.friend_id) as UserProfile
+      })).filter(req => req.profile) as FriendRequest[];
+      
+      setPendingRequests(sentRequestsWithProfiles);
+      
+      console.log('Friend profiles (accepted only):', friendProfiles);
+      console.log('Requests with profiles:', requestsWithProfiles);
+      
+      setData({
+        friends: friendProfiles,
+        requests: requestsWithProfiles,
+        suggestions: [],
+        allProfiles: profiles
+      });
     } catch (error) {
       console.error('Error in fetchFriendsData:', error);
+      // Set empty data on error so the UI can still render
+      setData({
+        friends: [],
+        requests: [],
+        suggestions: [],
+        allProfiles: []
+      });
+      setPendingRequests([]);
     } finally {
       setLoading(false);
     }
