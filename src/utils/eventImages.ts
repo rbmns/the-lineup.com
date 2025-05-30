@@ -2,7 +2,7 @@
 import { Event } from "@/types";
 
 const EVENT_FALLBACK_IMAGES = {
-  community: "/img/community.jpg",
+  community: "/img/default.jpg", // Changed to default since community.jpg doesn't exist
   music: "/img/music.jpg",
   food: "/img/food.jpg",
   sports: "/img/sports.jpg",
@@ -63,7 +63,7 @@ export const getEventFallbackImage = (category?: string, tags?: string[]): strin
   if (normalizedCategory.includes('game')) return EVENT_FALLBACK_IMAGES.game;
   if (normalizedCategory.includes('party')) return EVENT_FALLBACK_IMAGES.party;
   if (normalizedCategory.includes('kite')) return EVENT_FALLBACK_IMAGES.kite;
-  if (normalizedCategory.includes('community')) return EVENT_FALLBACK_IMAGES.community;
+  if (normalizedCategory.includes('community')) return EVENT_FALLBACK_IMAGES.default; // Fall back to default
   if (normalizedCategory.includes('market')) return EVENT_FALLBACK_IMAGES.market;
   
   return EVENT_FALLBACK_IMAGES.default;
