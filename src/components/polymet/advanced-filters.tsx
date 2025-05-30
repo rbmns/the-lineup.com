@@ -90,9 +90,10 @@ export default function AdvancedFilters({
         const uniqueVenues = new Map();
         eventsWithVenues?.forEach(event => {
           if (event.venues && event.venue_id) {
+            const venue = event.venues as { id: string; name: string };
             uniqueVenues.set(event.venue_id, {
               id: event.venue_id,
-              name: event.venues.name
+              name: venue.name
             });
           }
         });
@@ -200,7 +201,7 @@ export default function AdvancedFilters({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-96 p-4" align="start">
+        <PopoverContent className="w-auto p-4 z-50 bg-white" align="start">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-medium">Filters</h3>
@@ -217,101 +218,187 @@ export default function AdvancedFilters({
               )}
             </div>
 
-            {/* Date Filter Options */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <CalendarIcon size={16} />
-                Quick Date Filters
-              </label>
-              <Select
-                value={filters.dateFilter || ""}
-                onValueChange={handleDateFilterChange}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select date range" />
-                </SelectTrigger>
-                <SelectContent>
-                  {dateFilterOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {/* Desktop: Horizontal layout */}
+            <div className="hidden md:flex md:gap-6">
+              {/* Date Filter Options */}
+              <div className="space-y-2 min-w-[200px]">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <CalendarIcon size={16} />
+                  Quick Date Filters
+                </label>
+                <Select
+                  value={filters.dateFilter || ""}
+                  onValueChange={handleDateFilterChange}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select date range" />
+                  </SelectTrigger>
+                  <SelectContent className="z-50 bg-white">
+                    {dateFilterOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            {/* Specific Date */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <CalendarIcon size={16} />
-                Specific Date
-              </label>
-              <div className="rounded-md border">
-                <Calendar
-                  mode="single"
-                  selected={filters.date}
-                  onSelect={handleDateChange}
-                  className="rounded-md border-0"
-                  initialFocus
-                />
+              {/* Venues */}
+              <div className="space-y-2 min-w-[200px]">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <BuildingIcon size={16} />
+                  Venues
+                </label>
+                {venuesLoading ? (
+                  <div className="text-sm text-gray-500">Loading venues...</div>
+                ) : venues.length === 0 ? (
+                  <div className="text-sm text-gray-500">No venues found</div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
+                    {venues.map((venue) => (
+                      <div key={venue.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={venue.id}
+                          checked={filters.venues.includes(venue.id)}
+                          onCheckedChange={(checked) => 
+                            handleVenueChange(venue.id, checked as boolean)
+                          }
+                        />
+                        <label
+                          htmlFor={venue.id}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {venue.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Location */}
+              <div className="space-y-2 min-w-[150px]">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <MapPinIcon size={16} />
+                  Location
+                </label>
+                <Select
+                  value={filters.location || "Zandvoort Area"}
+                  onValueChange={handleLocationChange}
+                  disabled
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select location" />
+                  </SelectTrigger>
+                  <SelectContent className="z-50 bg-white">
+                    {locations.map((location) => (
+                      <SelectItem key={location} value={location}>
+                        {location}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
-            {/* Venues */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <BuildingIcon size={16} />
-                Venues
-              </label>
-              {venuesLoading ? (
-                <div className="text-sm text-gray-500">Loading venues...</div>
-              ) : venues.length === 0 ? (
-                <div className="text-sm text-gray-500">No venues found</div>
-              ) : (
-                <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
-                  {venues.map((venue) => (
-                    <div key={venue.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={venue.id}
-                        checked={filters.venues.includes(venue.id)}
-                        onCheckedChange={(checked) => 
-                          handleVenueChange(venue.id, checked as boolean)
-                        }
-                      />
-                      <label
-                        htmlFor={venue.id}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        {venue.name}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            {/* Mobile: Vertical layout */}
+            <div className="md:hidden space-y-4">
+              {/* Date Filter Options */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <CalendarIcon size={16} />
+                  Quick Date Filters
+                </label>
+                <Select
+                  value={filters.dateFilter || ""}
+                  onValueChange={handleDateFilterChange}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select date range" />
+                  </SelectTrigger>
+                  <SelectContent className="z-50 bg-white">
+                    {dateFilterOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            {/* Location */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <MapPinIcon size={16} />
-                Location
-              </label>
-              <Select
-                value={filters.location || "Zandvoort Area"}
-                onValueChange={handleLocationChange}
-                disabled
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select location" />
-                </SelectTrigger>
-                <SelectContent>
-                  {locations.map((location) => (
-                    <SelectItem key={location} value={location}>
-                      {location}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {/* Specific Date */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <CalendarIcon size={16} />
+                  Specific Date
+                </label>
+                <div className="rounded-md border">
+                  <Calendar
+                    mode="single"
+                    selected={filters.date}
+                    onSelect={handleDateChange}
+                    className="rounded-md border-0"
+                    initialFocus
+                  />
+                </div>
+              </div>
+
+              {/* Venues */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <BuildingIcon size={16} />
+                  Venues
+                </label>
+                {venuesLoading ? (
+                  <div className="text-sm text-gray-500">Loading venues...</div>
+                ) : venues.length === 0 ? (
+                  <div className="text-sm text-gray-500">No venues found</div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
+                    {venues.map((venue) => (
+                      <div key={venue.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={venue.id}
+                          checked={filters.venues.includes(venue.id)}
+                          onCheckedChange={(checked) => 
+                            handleVenueChange(venue.id, checked as boolean)
+                          }
+                        />
+                        <label
+                          htmlFor={venue.id}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {venue.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Location */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <MapPinIcon size={16} />
+                  Location
+                </label>
+                <Select
+                  value={filters.location || "Zandvoort Area"}
+                  onValueChange={handleLocationChange}
+                  disabled
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select location" />
+                  </SelectTrigger>
+                  <SelectContent className="z-50 bg-white">
+                    {locations.map((location) => (
+                      <SelectItem key={location} value={location}>
+                        {location}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="flex justify-between pt-2">
