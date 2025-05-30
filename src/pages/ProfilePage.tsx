@@ -4,11 +4,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { ProfileHeaderContainer } from '@/components/profile/ProfileHeaderContainer';
 import { ProfileEventsContainer } from '@/components/profile/ProfileEventsContainer';
+import { useProfileData } from '@/hooks/useProfileData';
 
 const ProfilePage = () => {
   const { user, loading } = useAuth();
+  const { profile, loading: profileLoading, refreshProfile } = useProfileData(user?.id);
 
-  if (loading) {
+  if (loading || profileLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="animate-pulse">
@@ -27,10 +29,34 @@ const ProfilePage = () => {
     return <Navigate to="/login" replace />;
   }
 
+  const handleUpdateFriendship = (status: string) => {
+    console.log('Friendship status updated:', status);
+    refreshProfile();
+  };
+
+  const handleUpdateBlockStatus = (blocked: boolean) => {
+    console.log('Block status updated:', blocked);
+    refreshProfile();
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
-      <ProfileHeaderContainer userId={user.id} />
-      <ProfileEventsContainer userId={user.id} />
+      <ProfileHeaderContainer
+        profile={profile}
+        isOwnProfile={true}
+        user={user}
+        profileId={user.id}
+        refreshProfile={refreshProfile}
+        onUpdateFriendship={handleUpdateFriendship}
+        onUpdateBlockStatus={handleUpdateBlockStatus}
+      />
+      <ProfileEventsContainer
+        profileId={user.id}
+        profile={profile}
+        isLoading={profileLoading}
+        isOwnProfile={true}
+        isBlocked={false}
+      />
     </div>
   );
 };
