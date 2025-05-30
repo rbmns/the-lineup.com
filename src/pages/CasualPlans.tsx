@@ -9,8 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Calendar, MapPin, User, CheckCircle, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { Helmet } from 'react-helmet-async';
-
-
+import { AuthOverlay } from '@/components/auth/AuthOverlay';
 
 const CasualPlans = () => {
   const { user } = useAuth();
@@ -137,20 +136,18 @@ const CasualPlans = () => {
     return isAttending ? 'going' : 'not_going';
   };
 
-  return (
+  const pageContent = (
     <div className="container mx-auto py-8">
-
-    <Helmet>
-      <title>the lineup | Join and create Casual Plans from others nearby</title>
-      <meta name="description" content="Explore the best surf, yoga, and music events in coastal towns. Join the flow with the-lineup.com." />
-      <meta property="og:title" content="the lineup | Join and create Casual Plans with others nearby" />
-      <meta property="og:description" content="Explore the best surf, yoga, and music events in coastal towns. Join the flow with the-lineup.com." />
-      <meta property="og:image" content="https://raw.githubusercontent.com/rbmns/images/refs/heads/main/lineup/marketing/casualevents.jpg" />
-      <meta name="twitter:card" content="summary_large_image" />
-    </Helmet>
-    
-    <h1 className="text-3xl font-semibold mb-6">Casual Plans</h1>
-
+      <Helmet>
+        <title>the lineup | Join and create Casual Plans from others nearby</title>
+        <meta name="description" content="Explore the best surf, yoga, and music events in coastal towns. Join the flow with the-lineup.com." />
+        <meta property="og:title" content="the lineup | Join and create Casual Plans with others nearby" />
+        <meta property="og:description" content="Explore the best surf, yoga, and music events in coastal towns. Join the flow with the-lineup.com." />
+        <meta property="og:image" content="https://raw.githubusercontent.com/rbmns/images/refs/heads/main/lineup/marketing/casualevents.jpg" />
+        <meta name="twitter:card" content="summary_large_image" />
+      </Helmet>
+      
+      <h1 className="text-3xl font-semibold mb-6">Casual Plans</h1>
 
       {loading ? (
         <p>Loading plans...</p>
@@ -219,6 +216,20 @@ const CasualPlans = () => {
       )}
     </div>
   );
+
+  // If user is not authenticated, show the overlay
+  if (!user) {
+    return (
+      <AuthOverlay 
+        title="Join Casual Plans" 
+        description="Sign in to view and join casual plans with other travelers and locals."
+      >
+        {pageContent}
+      </AuthOverlay>
+    );
+  }
+
+  return pageContent;
 };
 
 export default CasualPlans;

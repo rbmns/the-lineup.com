@@ -44,7 +44,27 @@ export const getEventFallbackImage = (category?: string, tags?: string[]): strin
   if (!category) return EVENT_FALLBACK_IMAGES.default;
   
   const normalizedCategory = category.toLowerCase();
-  return EVENT_FALLBACK_IMAGES[normalizedCategory as keyof typeof EVENT_FALLBACK_IMAGES] || EVENT_FALLBACK_IMAGES.default;
+  
+  // Check for direct category match
+  if (EVENT_FALLBACK_IMAGES[normalizedCategory as keyof typeof EVENT_FALLBACK_IMAGES]) {
+    return EVENT_FALLBACK_IMAGES[normalizedCategory as keyof typeof EVENT_FALLBACK_IMAGES];
+  }
+  
+  // Check for partial matches or related categories
+  if (normalizedCategory.includes('yoga')) return EVENT_FALLBACK_IMAGES.yoga;
+  if (normalizedCategory.includes('surf')) return EVENT_FALLBACK_IMAGES.surf;
+  if (normalizedCategory.includes('beach')) return EVENT_FALLBACK_IMAGES.beach;
+  if (normalizedCategory.includes('music') || normalizedCategory.includes('concert')) return EVENT_FALLBACK_IMAGES.music;
+  if (normalizedCategory.includes('food') || normalizedCategory.includes('restaurant')) return EVENT_FALLBACK_IMAGES.food;
+  if (normalizedCategory.includes('sport')) return EVENT_FALLBACK_IMAGES.sports;
+  if (normalizedCategory.includes('art')) return EVENT_FALLBACK_IMAGES.art;
+  if (normalizedCategory.includes('culture')) return EVENT_FALLBACK_IMAGES.culture;
+  if (normalizedCategory.includes('festival')) return EVENT_FALLBACK_IMAGES.festival;
+  if (normalizedCategory.includes('game')) return EVENT_FALLBACK_IMAGES.game;
+  if (normalizedCategory.includes('party')) return EVENT_FALLBACK_IMAGES.party;
+  if (normalizedCategory.includes('kite')) return EVENT_FALLBACK_IMAGES.kite;
+  
+  return EVENT_FALLBACK_IMAGES.default;
 };
 
 export const getEventImage = (event: Event): string => {
@@ -53,8 +73,8 @@ export const getEventImage = (event: Event): string => {
     return event.image_urls[0];
   }
   
-  // Fall back to category-based image
-  return getEventFallbackImage(event.event_type);
+  // Fall back to category-based image using event_category (not event_type)
+  return getEventFallbackImage(event.event_category || event.event_type);
 };
 
 export const getEventImages = (event: Event): string[] => {

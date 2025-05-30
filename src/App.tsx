@@ -12,6 +12,7 @@ import CasualPlansPage from "./pages/CasualPlans";
 import FriendsPage from "./pages/Friends";
 import MapPage from "./pages/map";
 import ProfilePage from "./pages/Profile";
+import ProfileEdit from "./pages/ProfileEdit";
 import LoginPage from "./pages/Login";
 import SignupPage from "./pages/Signup";
 import EventCategoriesStyleGuide from "./components/design-system/EventCategoriesStyleGuide";
@@ -44,6 +45,7 @@ function App() {
               <Route path="/friends" element={<FriendsPage />} />
               <Route path="/map" element={<MapPage />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/profile/edit" element={<ProfileEdit />} />
               <Route path="/profile/:userId" element={<ProfilePage />} />
               
               {/* Design system routes */}
