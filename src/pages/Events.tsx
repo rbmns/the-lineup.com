@@ -1,9 +1,9 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
 import { EventsPageFilters } from '@/components/events/page-components/EventsPageFilters';
 import { CategoryFilteredEventsContent } from '@/components/events/category-filters/CategoryFilteredEventsContent';
+import { PageHeader } from '@/components/ui/page-header';
 
 const Events = () => {
   const { user } = useAuth();
@@ -42,28 +42,11 @@ const Events = () => {
 
   return (
     <div className="w-full">
-      {/* Hero Section with Background Image */}
-      <div className="relative h-[300px] md:h-[400px] overflow-hidden">
-        {/* Background Image */}
-        <img
-          src="/lovable-uploads/7f287109-ef9d-4780-ae28-713458ecf85c.png"
-          alt="Events Header"
-          className="w-full h-full object-cover"
-        />
-        
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/40"></div>
-        
-        {/* Content */}
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-4">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-            Find events and plans that fit your vibe
-          </h1>
-          <p className="text-lg md:text-xl text-white/90 leading-relaxed max-w-2xl">
-            Discover what's happening nearby — from beach parties to chill yoga sessions. Join when you want, connect if you want.
-          </p>
-        </div>
-      </div>
+      {/* Hero Section */}
+      <PageHeader 
+        title="Find events and plans that fit your vibe"
+        subtitle="Discover what's happening nearby — from beach parties to chill yoga sessions. Join when you want, connect if you want."
+      />
 
       {/* Main Content */}
       <div className="px-4 md:px-6 py-6 md:py-8">

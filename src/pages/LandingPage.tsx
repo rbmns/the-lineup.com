@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -15,15 +14,19 @@ import { useEventCategories } from '@/hooks/home/useEventCategories';
 import { formatFeaturedDate, formatEventTime } from '@/utils/date-formatting';
 import { CategoriesBrowseSection } from '@/components/home/CategoriesBrowseSection';
 import { Card, CardContent } from '@/components/ui/card';
+import { useEventVibes } from '@/hooks/useEventVibes';
+import { VibeFilter } from '@/components/home/VibeFilter';
 
 const LandingPage = () => {
   const { isAuthenticated } = useAuth();
   const { data: events, isLoading } = useEvents();
+  const { data: vibes = [], isLoading: vibesLoading } = useEventVibes();
   const eventsContainerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const { getEventImageUrl } = useEventImages();
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
   const { availableCategories } = useEventCategories(events);
   
   // Scroll to top when coming from another page (but not on initial load)
@@ -171,22 +174,13 @@ const LandingPage = () => {
           </div>
           
           {/* Vibe Categories */}
-          <div className="flex gap-2 mb-8 overflow-x-auto">
-            <CategoryPill category="All Vibes" active={true} noBorder={true} />
-            <CategoryPill category="Chill" active={false} noBorder={true} />
-            <CategoryPill category="Active" active={false} noBorder={true} />
-            <CategoryPill category="Adventurous" active={false} noBorder={true} />
-            <CategoryPill category="Wellness" active={false} noBorder={true} />
-            <CategoryPill category="Culture" active={false} noBorder={true} />
-            <CategoryPill category="Creative" active={false} noBorder={true} />
-            <CategoryPill category="Sandy" active={false} noBorder={true} />
-            <CategoryPill category="Music" active={false} noBorder={true} />
-            <CategoryPill category="Surf" active={false} noBorder={true} />
-            <CategoryPill category="Food" active={false} noBorder={true} />
-            <CategoryPill category="Market" active={false} noBorder={true} />
-            <CategoryPill category="Festival" active={false} noBorder={true} />
-            <CategoryPill category="Culture" active={false} noBorder={true} />
-          </div>
+          {!vibesLoading && (
+            <VibeFilter 
+              vibes={vibes}
+              selectedVibe={selectedVibe}
+              onVibeSelect={setSelectedVibe}
+            />
+          )}
         </div>
       </section>
 

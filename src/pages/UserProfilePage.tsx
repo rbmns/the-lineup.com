@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -8,6 +7,7 @@ import { ProfileEventsContainer } from '@/components/profile/ProfileEventsContai
 import { ProfileNotFound } from '@/components/profile/ProfileNotFound';
 import { ProfileLoading } from '@/components/profile/ProfileLoading';
 import { AuthCheck } from '@/components/profile/AuthCheck';
+import { PageHeader } from '@/components/ui/page-header';
 import { UserProfile } from '@/types';
 
 interface UserProfilePageProps {
@@ -51,22 +51,15 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({ hideTitle = false }) 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 text-white py-8 md:py-12">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            {!hideTitle && (
-              <h1 className="text-4xl font-bold tracking-tight mb-2">
-                {isOwnProfile ? displayName : `${displayName}'s Profile`}
-              </h1>
-            )}
-            {isOwnProfile && (
-              <p className="text-xl text-purple-100 leading-relaxed">
-                Manage your profile and see your event activity
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
+      {!hideTitle && (
+        <PageHeader 
+          title={isOwnProfile ? displayName : `${displayName}'s Profile`}
+          subtitle={isOwnProfile 
+            ? "Manage your profile and see your event activity"
+            : "View profile and event activity"
+          }
+        />
+      )}
 
       {/* Profile Content */}
       <div className="container mx-auto px-4 py-6 md:py-8">
