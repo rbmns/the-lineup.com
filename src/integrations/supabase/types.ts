@@ -312,6 +312,13 @@ export type Database = {
             referencedRelation: "venues"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "events_vibe_fkey"
+            columns: ["vibe"]
+            isOneToOne: false
+            referencedRelation: "event_vibe"
+            referencedColumns: ["name"]
+          },
         ]
       }
       friendships: {

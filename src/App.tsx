@@ -4,7 +4,7 @@ import { Toaster } from "sonner";
 import { QueryClient } from "./components/query-client";
 import Layout from "./components/Layout";
 import LandingPage from "./pages/LandingPage";
-import EventsPage from "./pages/EventsPage";
+import Events from "./pages/Events";
 import CreateEvent from "./pages/events/create";
 import EventDetail from "./pages/EventDetail";
 import EditEvent from "./pages/events/[eventId]/edit";
@@ -35,7 +35,7 @@ function App() {
               <Route index element={<LandingPage />} />
               
               {/* Public Events routes */}
-              <Route path="/events" element={<EventsPage />} />
+              <Route path="/events" element={<Events />} />
               <Route path="/events/:id" element={<EventDetail />} />
               
               {/* Auth routes */}

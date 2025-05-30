@@ -31,7 +31,8 @@ const Events = () => {
 
   const handleVibeChange = (vibe: string | null) => {
     setSelectedVibe(vibe);
-    // TODO: Implement vibe filtering logic
+    console.log('Vibe filter changed to:', vibe);
+    // TODO: Implement vibe filtering logic in the data hook
   };
 
   const handleAdvancedFilterChange = (filters: any) => {
