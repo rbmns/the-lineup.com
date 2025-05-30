@@ -1,9 +1,12 @@
+
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
 import { EventsPageFilters } from '@/components/events/page-components/EventsPageFilters';
 import { CategoryFilteredEventsContent } from '@/components/events/category-filters/CategoryFilteredEventsContent';
 import { PageHeader } from '@/components/ui/page-header';
+import VibeFilter from '@/components/polymet/vibe-filter';
+import AdvancedFilters from '@/components/polymet/advanced-filters';
 
 const Events = () => {
   const { user } = useAuth();
@@ -40,6 +43,17 @@ const Events = () => {
     loadingEventId
   } = useEventsPageData();
 
+  const [selectedVibe, setSelectedVibe] = React.useState<string | null>(null);
+
+  const handleVibeChange = (vibe: string | null) => {
+    setSelectedVibe(vibe);
+    // TODO: Implement vibe filtering logic
+  };
+
+  const handleAdvancedFilterChange = (filters: any) => {
+    // TODO: Implement advanced filter logic
+  };
+
   return (
     <div className="w-full">
       {/* Hero Section */}
@@ -56,43 +70,30 @@ const Events = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-semibold tracking-tight">Find your vibe</h2>
-                <button className="text-sm text-gray-600 hover:text-gray-900">
-                  View all →
-                </button>
               </div>
               
-              {/* Category Filters */}
-              <EventsPageFilters
-                allEventTypes={allEventTypes}
-                selectedCategories={selectedCategories}
-                toggleCategory={toggleCategory}
-                selectAll={selectAll}
-                deselectAll={deselectAll}
-                hasActiveFilters={hasActiveFilters}
-                showAdvancedFilters={showAdvancedFilters}
-                toggleAdvancedFilters={toggleAdvancedFilters}
-                dateRange={dateRange}
-                setDateRange={setDateRange}
-                selectedDateFilter={selectedDateFilter}
-                setSelectedDateFilter={setSelectedDateFilter}
-                venues={venues}
-                selectedVenues={selectedVenues}
-                setSelectedVenues={setSelectedVenues}
-                locations={locations}
-                hasAdvancedFilters={hasAdvancedFilters}
-                handleRemoveVenue={handleRemoveVenue}
-                handleClearDateFilter={handleClearDateFilter}
-                resetFilters={resetFilters}
+              {/* Vibe Filters */}
+              <VibeFilter
+                selectedVibe={selectedVibe}
+                onChange={handleVibeChange}
+                size="md"
               />
+            </div>
+
+            {/* Filters Section */}
+            <div className="flex items-center gap-4">
+              <AdvancedFilters
+                onFilterChange={handleAdvancedFilterChange}
+                locations={["All locations", "Zandvoort Area"]}
+                initialFilters={{}}
+              />
+              <span className="text-sm text-gray-600">8 events found</span>
             </div>
 
             {/* Upcoming Events Section */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-semibold tracking-tight">Upcoming Events</h2>
-                <button className="text-sm text-gray-600 hover:text-gray-900">
-                  View all →
-                </button>
+                <h2 className="text-2xl font-semibold tracking-tight">All Events</h2>
               </div>
 
               {/* Events Content */}

@@ -10,6 +10,7 @@ import { Calendar, MapPin, User, CheckCircle, AlertCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { Helmet } from 'react-helmet-async';
 import { AuthOverlay } from '@/components/auth/AuthOverlay';
+import { PageHeader } from '@/components/ui/page-header';
 
 const CasualPlans = () => {
   const { user } = useAuth();
@@ -137,7 +138,7 @@ const CasualPlans = () => {
   };
 
   const pageContent = (
-    <div className="container mx-auto py-8">
+    <div className="w-full">
       <Helmet>
         <title>the lineup | Join and create Casual Plans from others nearby</title>
         <meta name="description" content="Explore the best surf, yoga, and music events in coastal towns. Join the flow with the-lineup.com." />
@@ -147,73 +148,82 @@ const CasualPlans = () => {
         <meta name="twitter:card" content="summary_large_image" />
       </Helmet>
       
-      <h1 className="text-3xl font-semibold mb-6">Casual Plans</h1>
+      {/* Hero Section */}
+      <PageHeader 
+        title="Casual Plans"
+        subtitle="Create and join spontaneous plans with travelers and locals. From beach walks to coffee meetups."
+      />
 
-      {loading ? (
-        <p>Loading plans...</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {plans.map(plan => {
-            const attendanceStatus = getUserAttendanceStatus(plan);
-            const attendeeCount = plan.attendees?.length || 0;
-            
-            return (
-              <Card key={plan.id}>
-                <CardHeader>
-                  <CardTitle>{plan.title}</CardTitle>
-                  <CardDescription>{plan.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Calendar className="h-4 w-4 text-gray-500" />
-                    <span>{format(new Date(plan.date), 'MMMM dd, yyyy')}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <MapPin className="h-4 w-4 text-gray-500" />
-                    <span>{plan.location}</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <User className="h-4 w-4 text-gray-500" />
-                    <span>{attendeeCount} attendee{attendeeCount !== 1 ? 's' : ''}</span>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between">
-                  <div>
-                    {attendanceStatus === 'going' ? (
-                      <div className="flex items-center text-green-500">
-                        <CheckCircle className="h-4 w-4 mr-1" />
-                        Going
+      {/* Main Content */}
+      <div className="px-4 md:px-6 py-6 md:py-8">
+        <div className="max-w-7xl mx-auto">
+          {loading ? (
+            <p>Loading plans...</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {plans.map(plan => {
+                const attendanceStatus = getUserAttendanceStatus(plan);
+                const attendeeCount = plan.attendees?.length || 0;
+                
+                return (
+                  <Card key={plan.id}>
+                    <CardHeader>
+                      <CardTitle>{plan.title}</CardTitle>
+                      <CardDescription>{plan.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <Calendar className="h-4 w-4 text-gray-500" />
+                        <span>{format(new Date(plan.date), 'MMMM dd, yyyy')}</span>
                       </div>
-                    ) : null}
-                  </div>
-                  <div className="space-x-2">
-                    <Button
-                      variant={optimisticUpdates[plan.id] === 'going' || attendanceStatus === 'going' ? 'secondary' : 'outline'}
-                      onClick={() => handleRsvpUpdate(plan.id, 'going')}
-                      disabled={optimisticUpdates[plan.id] && optimisticUpdates[plan.id] !== 'going'}
-                    >
-                      {optimisticUpdates[plan.id] === 'going' ? 'Updating...' : 'Going'}
-                    </Button>
-                    <Button
-                      variant={attendanceStatus === 'not_going' ? 'default' : 'outline'}
-                      onClick={() => handleRsvpUpdate(plan.id, 'not_going')}
-                    >
-                      Not Going
-                    </Button>
-                  </div>
-                </CardFooter>
-              </Card>
-            );
-          })}
+                      <div className="flex items-center space-x-2">
+                        <MapPin className="h-4 w-4 text-gray-500" />
+                        <span>{plan.location}</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <User className="h-4 w-4 text-gray-500" />
+                        <span>{attendeeCount} attendee{attendeeCount !== 1 ? 's' : ''}</span>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="flex justify-between">
+                      <div>
+                        {attendanceStatus === 'going' ? (
+                          <div className="flex items-center text-green-500">
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Going
+                          </div>
+                        ) : null}
+                      </div>
+                      <div className="space-x-2">
+                        <Button
+                          variant={optimisticUpdates[plan.id] === 'going' || attendanceStatus === 'going' ? 'secondary' : 'outline'}
+                          onClick={() => handleRsvpUpdate(plan.id, 'going')}
+                          disabled={optimisticUpdates[plan.id] && optimisticUpdates[plan.id] !== 'going'}
+                        >
+                          {optimisticUpdates[plan.id] === 'going' ? 'Updating...' : 'Going'}
+                        </Button>
+                        <Button
+                          variant={attendanceStatus === 'not_going' ? 'default' : 'outline'}
+                          onClick={() => handleRsvpUpdate(plan.id, 'not_going')}
+                        >
+                          Not Going
+                        </Button>
+                      </div>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+          {user && (
+            <div className="mt-6">
+              <Button asChild>
+                <Link to="/casual-plans/create">Create a New Plan</Link>
+              </Button>
+            </div>
+          )}
         </div>
-      )}
-      {user && (
-        <div className="mt-6">
-          <Button asChild>
-            <Link to="/casual-plans/create">Create a New Plan</Link>
-          </Button>
-        </div>
-      )}
+      </div>
     </div>
   );
 
