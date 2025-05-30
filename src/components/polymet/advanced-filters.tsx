@@ -89,11 +89,14 @@ export default function AdvancedFilters({
         const uniqueVenues = new Map<string, {id: string, name: string}>();
         eventsWithVenues?.forEach(event => {
           if (event.venues && event.venue_id) {
-            const venue = event.venues as {id: string, name: string};
-            uniqueVenues.set(event.venue_id, {
-              id: event.venue_id,
-              name: venue.name
-            });
+            // Handle venues as either array or single object
+            const venueData = Array.isArray(event.venues) ? event.venues[0] : event.venues;
+            if (venueData && venueData.name) {
+              uniqueVenues.set(event.venue_id, {
+                id: event.venue_id,
+                name: venueData.name
+              });
+            }
           }
         });
 
