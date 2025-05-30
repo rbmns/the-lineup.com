@@ -1,13 +1,14 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { FilterStateProvider } from '@/contexts/FilterStateContext';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
 import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayout';
 import { EventsVibeSection } from '@/components/events/page-sections/EventsVibeSection';
 import { EventsAdvancedSection } from '@/components/events/page-sections/EventsAdvancedSection';
 import { EventsResultsSection } from '@/components/events/page-sections/EventsResultsSection';
 
-const Events = () => {
+const EventsContent = () => {
   const { user } = useAuth();
   const {
     filteredEvents,
@@ -91,6 +92,14 @@ const Events = () => {
         />
       </div>
     </EventsPageLayout>
+  );
+};
+
+const Events = () => {
+  return (
+    <FilterStateProvider>
+      <EventsContent />
+    </FilterStateProvider>
   );
 };
 
