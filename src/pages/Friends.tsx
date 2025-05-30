@@ -23,8 +23,6 @@ const Friends: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<UserProfile[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [friendsSearchQuery, setFriendsSearchQuery] = useState('');
-  const [filteredFriends, setFilteredFriends] = useState<UserProfile[]>([]);
 
   // Fetch friend data including current friends list
   const { 
@@ -53,26 +51,25 @@ const Friends: React.FC = () => {
   } = useSuggestedFriends(user?.id);
 
   // Filter friends based on search query - EXCLUDE current user
-  useEffect(() => {
-    if (!friends || !user) return;
+  const filteredFriends = React.useMemo(() => {
+    if (!friends || !user) return [];
     
     // Filter out the current user from friends list
     const friendsWithoutCurrentUser = friends.filter(friend => friend.id !== user.id);
     
-    if (!friendsSearchQuery) {
-      setFilteredFriends(friendsWithoutCurrentUser as UserProfile[]);
-      return;
+    if (!searchQuery) {
+      return friendsWithoutCurrentUser as UserProfile[];
     }
     
-    const query = friendsSearchQuery.toLowerCase();
+    const query = searchQuery.toLowerCase();
     const filtered = friendsWithoutCurrentUser.filter(friend => 
       friend.username?.toLowerCase().includes(query) || 
       friend.location?.toLowerCase().includes(query) ||
       friend.status?.toLowerCase().includes(query)
     );
     
-    setFilteredFriends(filtered as UserProfile[]);
-  }, [friendsSearchQuery, friends, user]);
+    return filtered as UserProfile[];
+  }, [searchQuery, friends, user]);
 
   // Handle search for new people - EXCLUDE current user
   const handleSearch = useCallback(async () => {
@@ -237,8 +234,8 @@ const Friends: React.FC = () => {
             <input
               type="text"
               placeholder="Search friends by name..."
-              value={friendsSearchQuery}
-              onChange={(e) => setFriendsSearchQuery(e.target.value)}
+              value={searchQuery}
+              onChange={handleSearchChange}
               className="w-full pl-12 pr-4 py-3 rounded-lg bg-white border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black/20"
             />
           </div>
