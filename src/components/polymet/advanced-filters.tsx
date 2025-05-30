@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/polymet/button";
@@ -87,10 +86,10 @@ export default function AdvancedFilters({
         }
 
         // Extract unique venues
-        const uniqueVenues = new Map();
+        const uniqueVenues = new Map<string, {id: string, name: string}>();
         eventsWithVenues?.forEach(event => {
           if (event.venues && event.venue_id) {
-            const venue = event.venues as { id: string; name: string };
+            const venue = event.venues as {id: string, name: string};
             uniqueVenues.set(event.venue_id, {
               id: event.venue_id,
               name: venue.name
