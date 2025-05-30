@@ -77,7 +77,10 @@ export const SuggestedFriendsTabContent: React.FC<SuggestedFriendsTabContentProp
             <div className="flex items-start justify-between">
               <div className="flex items-start space-x-4 flex-1">
                 <Avatar className="h-12 w-12">
-                  <AvatarImage src={friend.avatar_url || ''} alt={friend.username || ''} />
+                  <AvatarImage 
+                    src={Array.isArray(friend.avatar_url) ? friend.avatar_url[0] || '' : friend.avatar_url || ''} 
+                    alt={friend.username || ''} 
+                  />
                   <AvatarFallback>
                     {friend.username?.charAt(0)?.toUpperCase() || 'U'}
                   </AvatarFallback>
