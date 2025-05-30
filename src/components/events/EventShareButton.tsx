@@ -1,12 +1,9 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ShareButtons } from './share/ShareButtons';
 import { Share2 } from 'lucide-react';
 import { Event } from '@/types';
-import { nativeShare, isNativeShareAvailable } from '@/utils/sharing/nativeShare';
-import { copyToClipboard } from '@/utils/sharing/clipboardUtils';
+import { EventShareDialog } from './share/EventShareDialog';
 
 interface EventShareButtonProps {
   event: Event;
@@ -30,28 +27,41 @@ const EventShareButton = ({
     return `${window.location.origin}${path}`;
   };
 
-  const handleShare = async () => {
-    try {
-      const eventUrl = getEventUrl();
-      const shared = await nativeShare({
-        url: eventUrl,
-        title: event.title,
-        text: event.description
-      });
-      
-      if (!shared) {
-        // If native sharing fails or isn't available, open the dialog
-        setIsOpen(true);
-      }
-    } catch (error) {
-      // If there's an error, open the dialog as fallback
-      setIsOpen(true);
-    }
+  // Check if we're in Instagram's in-app browser or other social media browsers
+  const isInAppBrowser = () => {
+    const userAgent = navigator.userAgent || '';
+    return userAgent.includes('Instagram') || 
+           userAgent.includes('FBAN') || 
+           userAgent.includes('FBAV') ||
+           userAgent.includes('Twitter') ||
+           userAgent.includes('LinkedInApp');
   };
 
-  const handleCopyLink = async () => {
-    await copyToClipboard(getEventUrl());
-    setIsOpen(false);
+  const handleShare = async () => {
+    // For in-app browsers (like Instagram), always show the dialog
+    if (isInAppBrowser()) {
+      setIsOpen(true);
+      return;
+    }
+
+    // Try native sharing for other browsers
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          url: getEventUrl(),
+          title: event.title,
+          text: event.description
+        });
+      } catch (error) {
+        // User cancelled or share failed, show dialog
+        if (error.name !== 'AbortError') {
+          setIsOpen(true);
+        }
+      }
+    } else {
+      // Native sharing not supported, show dialog
+      setIsOpen(true);
+    }
   };
 
   return (
@@ -61,21 +71,11 @@ const EventShareButton = ({
         {label}
       </Button>
 
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Share {event.title}</DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col gap-4">
-            <ShareButtons 
-              title={event.title} 
-              description={event.description || ""} 
-              url={getEventUrl()}
-              onCopyLink={handleCopyLink}
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
+      <EventShareDialog
+        event={event}
+        isOpen={isOpen}
+        onOpenChange={setIsOpen}
+      />
     </>
   );
 };
