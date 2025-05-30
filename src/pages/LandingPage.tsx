@@ -133,7 +133,7 @@ const LandingPage = () => {
             </Button>
             <Button asChild variant="outline" size="lg" className="border-2 bg-transparent border-white text-white hover:bg-white/10">
               <Link to="/profile">
-                Create Profile
+                Create Your Free Profile
               </Link>
             </Button>
           </div>
