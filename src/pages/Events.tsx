@@ -60,9 +60,10 @@ const Events = () => {
       setSelectedVenues(filters.venues);
     }
     
-    // Handle date filters
-    if (filters.dateRange) {
-      setDateRange(filters.dateRange);
+    // Handle date filters - map from 'date' to 'dateRange'
+    if (filters.date) {
+      const dateRangeValue = { from: filters.date, to: filters.date };
+      setDateRange(dateRangeValue);
     }
     
     if (filters.dateFilter) {
@@ -105,7 +106,7 @@ const Events = () => {
                   location: "Zandvoort Area",
                   eventTypes: selectedEventTypes,
                   venues: selectedVenues,
-                  dateRange: dateRange,
+                  date: dateRange?.from,
                   dateFilter: selectedDateFilter
                 }}
               />
