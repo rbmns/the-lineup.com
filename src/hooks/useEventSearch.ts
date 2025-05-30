@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
@@ -5,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { safeGet } from '@/utils/supabaseTypeUtils';
 
 type EventSearchFilter = {
-  eventType?: string | null;
+  eventCategory?: string | null;
   venues?: string | null;
   startDate?: Date | null;
   endDate?: Date | null;
@@ -19,7 +20,7 @@ export const useEventSearch = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [filters, setFilters] = useState<EventSearchFilter>({
-    eventType: null,
+    eventCategory: null,
     venues: null,
     startDate: null,
     endDate: null,
@@ -46,7 +47,7 @@ export const useEventSearch = () => {
         postal_code: safeGet(event.venue_id, 'postal_code', ''),
       },
       venue_id: safeGet(event.venue_id, 'id', ''),
-      event_type: event.event_type,
+      event_category: event.event_category,
       creator: event.creator,
       image_urls: event.image_urls || [],
       fee: event.fee,
@@ -89,9 +90,9 @@ export const useEventSearch = () => {
   const applyFilters = useCallback((eventsToFilter: Event[], currentFilters: EventSearchFilter) => {
     let filtered = [...eventsToFilter];
 
-    if (currentFilters.eventType) {
+    if (currentFilters.eventCategory) {
       filtered = filtered.filter(event => 
-        event.event_type === currentFilters.eventType
+        event.event_category === currentFilters.eventCategory
       );
     }
 
@@ -162,7 +163,7 @@ export const useEventSearch = () => {
     applyFilters(events, updatedFilters);
   }, [events, filters, applyFilters]);
 
-  const fetchSimilarEvents = useCallback(async (searchQuery: string, eventType?: string, tags?: string[]) => {
+  const fetchSimilarEvents = useCallback(async (searchQuery: string, eventCategory?: string, tags?: string[]) => {
     setLoading(true);
     try {
       // Build the query to find similar events based on various parameters
@@ -170,9 +171,9 @@ export const useEventSearch = () => {
         .from('events')
         .select('*, venue_id(id, name, city, street)');
       
-      // If we have an event type, prioritize events with the same type
-      if (eventType) {
-        query = query.eq('event_type', eventType);
+      // If we have an event category, prioritize events with the same category
+      if (eventCategory) {
+        query = query.eq('event_category', eventCategory);
       }
       
       // If we have tags, try to find events with matching tags

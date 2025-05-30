@@ -1,275 +1,280 @@
-import React, { useEffect, useState, useRef } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEventDetailParams } from '@/hooks/useEventDetailParams';
-import { useEventDetails } from '@/hooks/useEventDetails';
-import { useEventImages } from '@/hooks/useEventImages';
-import { useEventNavigation } from '@/hooks/useEventNavigation';
-import { useEventMetaTags } from '@/hooks/useEventMetaTags';
 import { useAuth } from '@/contexts/AuthContext';
-import { useDeviceDetection } from '@/hooks/useDeviceDetection';
-import { useEventDetailHandlers } from '@/hooks/useEventDetailHandlers';
-import { ChevronLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { EventDetailErrorState } from '@/components/events/EventDetailErrorState';
-import { EventDetailLoadingState } from '@/components/events/EventDetailLoadingState';
-import { ShareDialog } from '@/components/events/share/ShareDialog';
-import { MainEventContent } from '@/components/events/MainEventContent';
-import { SidebarContent } from '@/components/events/SidebarContent';
-import { MobileRsvpFooter } from '@/components/events/MobileRsvpFooter';
-import { RelatedEvents } from '@/components/events/related-events/RelatedEvents';
-import { useQueryClient } from '@tanstack/react-query';
-import '@/styles/rsvp-animations.css';
+import { supabase } from '@/lib/supabase';
+import { Event } from '@/types';
+import { useFetchRelatedEvents } from '@/hooks/events/useFetchRelatedEvents';
+import { EventDetailSkeleton } from '@/components/events/EventDetailSkeleton';
+import { EventDetailContent } from '@/components/events/EventDetailContent';
+import { toast } from '@/hooks/use-toast';
+import { Helmet } from 'react-helmet-async';
 
 const EventDetail = () => {
-  // Use our comprehensive params hook to get all URL parameters
-  const { id, eventId, eventSlug, hasTransitionState } = useEventDetailParams();
+  const { id, slug } = useParams<{ id: string; slug?: string }>();
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const { isAuthenticated, user } = useAuth();
-  const { isMobile } = useDeviceDetection();
-  const queryClient = useQueryClient();
-  const [isRsvpTransitioning, setIsRsvpTransitioning] = useState(false);
-  
-  // Use proper ID for data fetching, prefer explicit ID over slug
-  const effectiveId = id || eventId || '';
-  
-  // Safety check - if no valid ID is available, redirect to events page
-  useEffect(() => {
-    if (!effectiveId) {
-      console.error("Missing event ID in URL parameters");
-      navigate('/events');
-    }
-  }, [effectiveId, navigate]);
+  const [event, setEvent] = useState<Event | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [rsvpLoading, setRsvpLoading] = useState(false);
+  const [attendees, setAttendees] = useState<{ going: any[]; interested: any[] }>({ going: [], interested: [] });
 
-  // Only fetch when we have a valid ID
-  const { 
-    event, 
-    isLoading, 
-    error, 
-    attendees, 
-    friendAttendees, 
-    rsvpLoading,
-    handleRsvp 
-  } = useEventDetails(effectiveId);
+  // Fetch event data
+  useEffect(() => {
+    const fetchEvent = async () => {
+      if (!id) return;
 
-  const { coverImage } = useEventImages(event);
-  const metaTags = useEventMetaTags(event);
-  const { navigateToEvent } = useEventNavigation();
-  const [shareDialogOpen, setShareDialogOpen] = useState(false);
-  
-  // Use the event detail handlers
-  const { 
-    handleBackToEvents,
-    handleEventTypeClick,
-    wrapRsvpWithScrollPreservation
-  } = useEventDetailHandlers();
-  
-  // Set up RSVP transition states
-  useEffect(() => {
-    // Watch for changes in rsvpLoading to manage transition state
-    if (rsvpLoading) {
-      setIsRsvpTransitioning(true);
-      // Add transition class to body
-      document.body.classList.add('rsvp-transition');
-    } else {
-      // Delay removing transition state for smoother visuals
-      setTimeout(() => {
-        setIsRsvpTransitioning(false);
-        document.body.classList.remove('rsvp-transition');
-      }, 600);
-    }
-  }, [rsvpLoading]);
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('events')
+          .select(`
+            *,
+            creator:profiles(id, username, avatar_url, email, location, status, tagline),
+            venues:venue_id(*),
+            event_rsvps(id, user_id, status, profiles(id, username, avatar_url))
+          `)
+          .eq('id', id)
+          .single();
 
-  // Cleanup transitions when unmounting
-  useEffect(() => {
-    return () => {
-      document.body.classList.remove('rsvp-transition');
-      document.body.classList.remove('rsvp-transition-active');
-      document.querySelector('.rsvp-transition-indicator')?.classList.remove('active');
-    };
-  }, []);
-  
-  // When navigating away, make sure to invalidate events to ensure fresh data
-  useEffect(() => {
-    return () => {
-      console.log("EventDetail: Unmounting, invalidating events queries");
-      queryClient.invalidateQueries({ queryKey: ['events'] });
-    };
-  }, [queryClient]);
-  
-  // Enhanced RSVP with scroll preservation
-  const handleRsvpEvent = async (status: 'Going' | 'Interested'): Promise<boolean> => {
-    try {
-      console.log("EventDetail: Handling RSVP with status:", status);
-      console.log("EventDetail: Current event RSVP status:", event?.rsvp_status);
-      console.log("EventDetail: Using effectiveId:", effectiveId);
-      
-      if (!event || !effectiveId) {
-        console.error("Missing event ID for RSVP");
-        return false;
-      }
-      
-      setIsRsvpTransitioning(true);
-      
-      // Apply transition indicator
-      const transitionIndicator = document.querySelector('.rsvp-transition-indicator');
-      if (transitionIndicator) {
-        transitionIndicator.classList.add('active');
-      }
-      
-      // Always pass the event ID when handling RSVPs
-      // Make sure to await and return the boolean result
-      const success = await handleRsvp(status);
-      
-      // Force invalidate all events queries to ensure consistency
-      queryClient.invalidateQueries({ queryKey: ['events'] });
-      
-      // Keep the transition state active briefly for visual polish
-      setTimeout(() => {
-        if (transitionIndicator) {
-          transitionIndicator.classList.remove('active');
+        if (error) {
+          console.error('Error fetching event:', error);
+          toast({
+            title: "Error",
+            description: "Could not load event details",
+            variant: "destructive",
+          });
+          navigate('/events');
+          return;
         }
-      }, 600);
-      
-      return success || false; // Ensure we always return a boolean
+
+        if (data) {
+          // Process creator data
+          const creatorData = data.creator && Array.isArray(data.creator) && data.creator.length > 0 
+            ? data.creator[0] : null;
+
+          // Process venue data
+          const venueData = data.venues && typeof data.venues === 'object' && !Array.isArray(data.venues)
+            ? data.venues : null;
+
+          // Format event data
+          const formattedEvent: Event = {
+            id: data.id,
+            title: data.title,
+            description: data.description,
+            event_category: data.event_category,
+            start_time: data.start_time,
+            end_time: data.end_time,
+            start_date: data.start_date,
+            end_date: data.end_date,
+            created_at: data.created_at,
+            updated_at: data.updated_at,
+            image_urls: data.image_urls || [],
+            venue_id: data.venue_id,
+            fee: data.fee,
+            tags: data.tags || [],
+            vibe: data.vibe,
+            booking_link: data.booking_link,
+            organizer_link: data.organizer_link,
+            organiser_name: data.organiser_name,
+            destination: data.destination,
+            slug: data.slug,
+            creator: creatorData ? {
+              id: creatorData.id,
+              username: creatorData.username,
+              avatar_url: creatorData.avatar_url,
+              email: creatorData.email,
+              location: creatorData.location,
+              status: creatorData.status,
+              tagline: creatorData.tagline,
+              created_at: undefined,
+              updated_at: undefined,
+              location_category: null,
+              onboarded: null,
+              onboarding_data: null,
+              role: null,
+              status_details: null
+            } : null,
+            venues: venueData ? {
+              id: venueData.id || '',
+              name: venueData.name || '',
+              street: venueData.street || '',
+              postal_code: venueData.postal_code || '',
+              city: venueData.city || '',
+              website: venueData.website,
+              google_maps: venueData.google_maps,
+              slug: venueData.slug
+            } : null,
+            extra_info: data['Extra info'],
+            google_maps: venueData?.google_maps || null,
+            attendees: { going: 0, interested: 0 } // This will be calculated below
+          };
+
+          // Set RSVP status for authenticated user
+          if (user && data.event_rsvps) {
+            const userRsvp = data.event_rsvps.find((rsvp: any) => rsvp.user_id === user.id);
+            formattedEvent.rsvp_status = userRsvp?.status as 'Going' | 'Interested' | undefined;
+          }
+
+          // Process attendees
+          const going = data.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Going') || [];
+          const interested = data.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Interested') || [];
+
+          formattedEvent.attendees = {
+            going: going.length,
+            interested: interested.length
+          };
+
+          setEvent(formattedEvent);
+          setAttendees({ going, interested });
+        }
+      } catch (error) {
+        console.error('Error in event fetch:', error);
+        toast({
+          title: "Error",
+          description: "Could not load event details",
+          variant: "destructive",
+        });
+        navigate('/events');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvent();
+  }, [id, user, navigate]);
+
+  // Fetch related events
+  const { relatedEvents, loading: relatedLoading } = useFetchRelatedEvents({
+    eventCategory: event?.event_category || '', // Changed from eventType to eventCategory
+    currentEventId: event?.id || '',
+    userId: user?.id,
+    tags: event?.tags,
+    vibe: event?.vibe,
+    minResults: 3,
+    startDate: event?.start_date
+  });
+
+  // Handle RSVP
+  const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    if (!user || !event) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to RSVP to events",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    try {
+      setRsvpLoading(true);
+
+      // Check if user already has an RSVP
+      const { data: existingRsvp } = await supabase
+        .from('event_rsvps')
+        .select('id, status')
+        .eq('event_id', event.id)
+        .eq('user_id', user.id)
+        .single();
+
+      if (existingRsvp) {
+        if (existingRsvp.status === status) {
+          // Remove RSVP if clicking the same status
+          const { error } = await supabase
+            .from('event_rsvps')
+            .delete()
+            .eq('id', existingRsvp.id);
+
+          if (error) throw error;
+
+          setEvent(prev => prev ? { ...prev, rsvp_status: undefined } : null);
+          toast({
+            title: "RSVP Removed",
+            description: `You are no longer marked as ${status.toLowerCase()} for this event`,
+          });
+        } else {
+          // Update existing RSVP
+          const { error } = await supabase
+            .from('event_rsvps')
+            .update({ status })
+            .eq('id', existingRsvp.id);
+
+          if (error) throw error;
+
+          setEvent(prev => prev ? { ...prev, rsvp_status: status } : null);
+          toast({
+            title: "RSVP Updated",
+            description: `You are now marked as ${status.toLowerCase()} for this event`,
+          });
+        }
+      } else {
+        // Create new RSVP
+        const { error } = await supabase
+          .from('event_rsvps')
+          .insert({
+            event_id: event.id,
+            user_id: user.id,
+            status
+          });
+
+        if (error) throw error;
+
+        setEvent(prev => prev ? { ...prev, rsvp_status: status } : null);
+        toast({
+          title: "RSVP Confirmed",
+          description: `You are now marked as ${status.toLowerCase()} for this event`,
+        });
+      }
+
+      return true;
     } catch (error) {
       console.error('Error handling RSVP:', error);
+      toast({
+        title: "Error",
+        description: "Could not update RSVP. Please try again.",
+        variant: "destructive",
+      });
       return false;
     } finally {
-      // Add delay for smoother transition out
-      setTimeout(() => {
-        setIsRsvpTransitioning(false);
-      }, 800);
+      setRsvpLoading(false);
     }
   };
-  
-  // Format date for display
-  const formattedDate = event?.start_time ? new Date(event.start_time).toLocaleDateString(
-    'en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }
-  ) : null;
-  
-  // Set metadata for SEO
-  useEffect(() => {
-    if (event && metaTags) {
-      metaTags.setMetaTags({
-        title: event.title,
-        description: event.description || '',
-        imageUrl: coverImage || '',
-        path: `/events/${event.slug || event.id}`
-      });
-    }
-  }, [event, coverImage, metaTags]);
 
-  // Show loading state while fetching
-  if (isLoading) {
-    return <EventDetailLoadingState />;
+  if (loading) {
+    return <EventDetailSkeleton />;
   }
 
-  // Show error state if we encounter problems
-  if (error || !event) {
+  if (!event) {
     return (
-      <EventDetailErrorState 
-        error={error ? new Error(error.toString()) : new Error("Event not found")}
-        onBackToEvents={handleBackToEvents}
-      />
+      <div className="container mx-auto px-4 py-8 text-center">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
+        <p className="text-gray-600 mb-6">The event you're looking for doesn't exist or has been removed.</p>
+        <button 
+          onClick={() => navigate('/events')}
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Back to Events
+        </button>
+      </div>
     );
   }
 
-  const shareUrl = `${window.location.origin}/events/${event.slug || event.id}`;
-
-  console.log("EventDetail: Rendering with event RSVP status:", event.rsvp_status);
-
   return (
     <>
-      <div className={`container mx-auto px-4 pt-6 pb-24 transition-opacity duration-300 ${isRsvpTransitioning ? 'opacity-95' : 'opacity-100'}`}>
-        {/* Back button for all screen sizes - Improved styling */}
-        <div className="mb-4">
-          <Button 
-            variant="outline" 
-            onClick={handleBackToEvents}
-            size={isMobile ? "default" : "lg"}
-            className="flex items-center gap-1.5 text-gray-700 border-gray-300 shadow-sm hover:bg-gray-50"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            Back to Events
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Main event content - takes up 8/12 of the screen on desktop */}
-          <div className="lg:col-span-8 order-first">
-            <MainEventContent 
-              event={event}
-              attendees={attendees}
-              isAuthenticated={isAuthenticated}
-              rsvpLoading={rsvpLoading || isRsvpTransitioning}
-              handleRsvp={handleRsvpEvent}
-              isMobile={isMobile}
-              imageUrl={coverImage}
-              formattedDate={formattedDate}
-              shareUrl={shareUrl}
-              handleEventTypeClick={handleEventTypeClick}
-              handleBackToEvents={handleBackToEvents}
-            />
-          </div>
-          
-          {/* Sidebar content - takes up 4/12 of the screen on desktop */}
-          <div className="lg:col-span-4 order-last">
-            <SidebarContent 
-              event={event}
-              attendees={attendees}
-              friendAttendees={friendAttendees}
-              isAuthenticated={isAuthenticated}
-            />
-          </div>
-        </div>
-        
-        {/* Related Events Section */}
-        <div className="mt-12">
-          <RelatedEvents 
-            eventId={event.id} 
-            eventType={event.event_type || ''}
-            startDate={event.start_date || ''}
-            tags={event.tags}
-            vibe={event.vibe}
-          />
-        </div>
-            
-        {/* Bottom back to events button */}
-        <div className="mt-8 mb-4 flex justify-center">
-          <Button 
-            variant="outline" 
-            onClick={handleBackToEvents}
-            className="flex items-center gap-2 shadow-sm hover:shadow-md transition-all"
-            size={isMobile ? "default" : "lg"}
-          >
-            <ChevronLeft className="h-4 w-4" />
-            <span>Back to Events</span>
-          </Button>
-        </div>
-        
-        {/* Mobile RSVP Footer */}
-        {isMobile && isAuthenticated && (
-          <MobileRsvpFooter 
-            eventId={event.id}
-            currentStatus={event.rsvp_status} 
-            onRsvp={handleRsvpEvent}
-            onShare={() => setShareDialogOpen(true)}
-          />
-        )}
-        
-        {/* Share Dialog */}
-        <ShareDialog 
-          title={event.title}
-          description={event.description || ""}
-          eventUrl={shareUrl}
-          open={shareDialogOpen}
-          onOpenChange={setShareDialogOpen}
-        />
-      </div>
+      <Helmet>
+        <title>{event.title} | Event Details</title>
+        <meta name="description" content={event.description?.substring(0, 160) || `Join us for ${event.title}`} />
+      </Helmet>
       
-      {/* Global transition indicator */}
-      <div className="rsvp-transition-indicator"></div>
-      {isRsvpTransitioning && <div className="rsvp-overlay"></div>}
+      <EventDetailContent
+        event={event}
+        attendees={attendees}
+        relatedEvents={relatedEvents}
+        relatedLoading={relatedLoading}
+        isAuthenticated={!!user}
+        rsvpLoading={rsvpLoading}
+        onRsvp={handleRsvp}
+      />
     </>
   );
 };

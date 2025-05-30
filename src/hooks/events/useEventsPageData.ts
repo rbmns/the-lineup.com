@@ -16,7 +16,7 @@ export const useEventsPageData = () => {
   
   // Get all unique event types from events
   const allEventTypes = useMemo(() => {
-    const types = events.map(event => event.event_type).filter(Boolean);
+    const types = events.map(event => event.event_category).filter(Boolean);
     return [...new Set(types)];
   }, [events]);
   

@@ -1,194 +1,184 @@
 
 import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import ExploreMap from '@/components/map/ExploreMap';
-import { Location } from '@/types/location';
-import { Card } from '@/components/ui/card';
 import { Event } from '@/types';
-
-interface EventWithCoordinates extends Event {
-  coordinates?: [number, number]; // This is now part of the Event interface
-}
-
-// Updated profile interface to match the actual structure from Supabase
-interface Profile {
-  id: string;
-  username?: string | null;
-  avatar_url?: string | string[] | null; // Accept both string and string[] to handle different formats
-  location?: string | null;
-  location_category?: string | null;
-  status?: string | null;
-  onboarded?: boolean;
-  onboarding_data?: string;
-  role?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-const processEventData = (event: any): Event => {
-  // Safely check if venues exists and has a valid object structure
-  const hasValidVenues = event.venues && 
-    typeof event.venues === 'object' && 
-    event.venues !== null && 
-    !('error' in event.venues);
-  
-  return {
-    id: event.id,
-    title: event.title,
-    description: event.description || '',
-    // Only include location if it exists
-    ...(event.location && { location: event.location }),
-    start_time: event.start_time,
-    end_time: event.end_time,
-    created_at: event.created_at,
-    updated_at: event.updated_at,
-    event_type: event.event_type,
-    image_urls: event.image_urls || [],
-    venues: hasValidVenues ? event.venues : null,
-    google_maps: hasValidVenues && event.venues.google_maps ? event.venues.google_maps : null,
-    rsvp_status: undefined,
-    area: null,
-    coordinates: event.coordinates || null,
-  } as Event;
-};
+import EventCard from '@/components/EventCard';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Search, Filter } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const Explore = () => {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
   const { user } = useAuth();
-  const [mapLocations, setMapLocations] = useState<Location[]>([]);
-  
-  const { data: events, isLoading: eventsLoading } = useQuery({
-    queryKey: ['explore-events'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('events')
-        .select('*, venues:venue_id(*)');
-
-      if (error) {
-        console.error('Error fetching events:', error);
-        return [];
-      }
-      
-      if (!data) {
-        return [];
-      }
-
-      return data.map(processEventData);
-    },
-  });
-
-  const { data: friendProfiles, isLoading: profilesLoading } = useQuery({
-    queryKey: ['explore-profiles', user?.id],
-    queryFn: async () => {
-      if (!user) return [];
-
-      const { data: friendships, error: friendshipError } = await supabase
-        .from('friendships')
-        .select('friend_id')
-        .eq('user_id', user.id)
-        .eq('status', 'accepted');
-
-      if (friendshipError) {
-        console.error('Error fetching friendships:', friendshipError);
-        return [];
-      }
-
-      if (!friendships.length) return [];
-
-      const friendIds = friendships.map(f => f.friend_id);
-
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*')
-        .in('id', friendIds);
-
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-        return [];
-      }
-
-      return profiles || [];
-    },
-    enabled: !!user,
-  });
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const allLocations: Location[] = [];
+    fetchEvents();
+  }, [user]);
 
-    if (events) {
-      events.forEach(event => {
-        // Safely handle coordinates which is now part of the Event interface
-        const eventCoordinates = event.coordinates || null;
-        
-        if (eventCoordinates && 
-            Array.isArray(eventCoordinates) && 
-            eventCoordinates.length === 2 &&
-            !isNaN(eventCoordinates[0]) && 
-            !isNaN(eventCoordinates[1])) {
-          
-          allLocations.push({
-            id: event.id,
-            name: event.title,
-            type: 'event',
-            coordinates: eventCoordinates as [number, number],
-            category: event.event_type,
-            date: event.start_time,
-            eventTitle: event.title,
-            location_category: 'Event'
-          });
-        } else if (event.venues?.name || event.location) {
-          // Use venues.name or location if coordinates are not available
-          console.log(`Event ${event.id} missing proper coordinates`);
-        }
-      });
-    }
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('events')
+        .select(`
+          *,
+          creator:profiles(id, username, avatar_url, email, location, status, tagline),
+          venues:venue_id(*),
+          event_rsvps(id, user_id, status)
+        `)
+        .order('start_time', { ascending: true });
 
-    if (friendProfiles) {
-      // Use type assertion to treat the profiles as Profile[]
-      (friendProfiles as unknown as Profile[]).forEach((profile) => {
-        if (profile.location) {
-          const locationParts = profile.location.split(',');
-          
-          if (locationParts.length === 2) {
-            const lat = parseFloat(locationParts[0]);
-            const lng = parseFloat(locationParts[1]);
-            
-            if (!isNaN(lat) && !isNaN(lng)) {
-              allLocations.push({
-                id: profile.id,
-                name: profile.username || 'Friend',
-                type: 'friend',
-                coordinates: [lng, lat],
-                username: profile.username,
-                status: profile.status || undefined,
-                avatar_url: profile.avatar_url ? (Array.isArray(profile.avatar_url) ? profile.avatar_url[0] : profile.avatar_url) : null,
-                location_category: profile.location_category || undefined
-              });
-            } else {
-              console.log(`Profile ${profile.id} has invalid coordinates in location string`);
-            }
+      if (error) throw error;
+
+      if (data) {
+        const formattedEvents: Event[] = data.map(item => ({
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          location: item.location,
+          start_time: item.start_time,
+          end_time: item.end_time,
+          created_at: item.created_at,
+          updated_at: item.updated_at,
+          event_category: item.event_category,
+          image_urls: item.image_urls,
+          venues: item.venues,
+          google_maps: item.google_maps,
+          rsvp_status: undefined,
+          area: null,
+          coordinates: item.coordinates,
+          attendees: {
+            going: item.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Going').length || 0,
+            interested: item.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Interested').length || 0
           }
-        }
-      });
+        }));
+
+        setEvents(formattedEvents);
+        setFilteredEvents(formattedEvents);
+      }
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    if (!query.trim()) {
+      setFilteredEvents(events);
+      return;
+    }
+
+    const filtered = events.filter(event =>
+      event.title.toLowerCase().includes(query.toLowerCase()) ||
+      event.description?.toLowerCase().includes(query.toLowerCase()) ||
+      event.venues?.name?.toLowerCase().includes(query.toLowerCase()) ||
+      event.event_category?.toLowerCase().includes(query.toLowerCase())
+    );
     
-    console.log('Map locations prepared:', allLocations);
-    setMapLocations(allLocations);
-  }, [events, friendProfiles]);
+    setFilteredEvents(filtered);
+  };
+
+  const handleEventClick = (event: Event) => {
+    if (event.slug) {
+      navigate(`/events/${event.id}/${event.slug}`);
+    } else {
+      navigate(`/events/${event.id}`);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <Skeleton className="h-8 w-48 mb-4" />
+          <Skeleton className="h-10 w-full max-w-md" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="space-y-3">
+              <Skeleton className="h-48 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container py-8">
-      <h1 className="text-2xl font-bold mb-4">Explore</h1>
-      <Card className="p-4 mb-6">
-        <h2 className="text-lg font-semibold mb-2">Find People & Events</h2>
-        <p className="text-gray-600 mb-2">Discover friends and events on the map</p>
-      </Card>
-      
-      {(eventsLoading || profilesLoading) ? (
-        <div className="h-[70vh] w-full bg-gray-100 animate-pulse rounded-lg" />
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">Explore Events</h1>
+        
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              type="text"
+              placeholder="Search events..."
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          
+          <Button
+            variant="outline"
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-2"
+          >
+            <Filter className="h-4 w-4" />
+            Filters
+          </Button>
+        </div>
+
+        {searchQuery && (
+          <p className="text-sm text-gray-600 mb-4">
+            Showing {filteredEvents.length} result{filteredEvents.length !== 1 ? 's' : ''} for "{searchQuery}"
+          </p>
+        )}
+      </div>
+
+      {filteredEvents.length === 0 ? (
+        <div className="text-center py-12">
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No events found</h3>
+          <p className="text-gray-600">
+            {searchQuery 
+              ? "Try adjusting your search terms or clearing the search to see all events."
+              : "There are no events available at the moment."
+            }
+          </p>
+          {searchQuery && (
+            <Button
+              variant="outline"
+              onClick={() => handleSearch('')}
+              className="mt-4"
+            >
+              Clear Search
+            </Button>
+          )}
+        </div>
       ) : (
-        <ExploreMap locations={mapLocations} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredEvents.map((event) => (
+            <EventCard
+              key={event.id}
+              event={event}
+              onClick={handleEventClick}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
