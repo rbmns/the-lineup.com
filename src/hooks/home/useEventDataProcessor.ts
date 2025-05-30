@@ -30,7 +30,7 @@ export const processEventData = (event: any): Event => {
     title: event.title,
     description: event.description || '',
     location: event.location,
-    event_type: event.event_type,
+    event_category: event.event_category, // Changed from event_type to event_category
     start_time: event.start_time,
     end_time: event.end_time,
     created_at: event.created_at,

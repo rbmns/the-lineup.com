@@ -4,7 +4,7 @@ import { Event } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 
 interface UseFetchRelatedEventsProps {
-  eventType: string;
+  eventCategory: string; // Changed from eventType to eventCategory
   currentEventId: string;
   userId?: string;
   tags?: string[];
@@ -19,7 +19,7 @@ interface RelatedEventsResult {
 }
 
 export const useFetchRelatedEvents = ({ 
-  eventType, 
+  eventCategory, 
   currentEventId,
   userId,
   tags,
@@ -50,7 +50,7 @@ export const useFetchRelatedEvents = ({
             creator:profiles(id, username, avatar_url, email, location, status),
             venues:venue_id(*)
           `)
-          .eq('event_category', eventType)
+          .eq('event_category', eventCategory) // Changed from event_type to event_category
           .neq('id', currentEventId)
           .gte('start_date', today)
           .order('start_time', { ascending: true })
@@ -74,7 +74,7 @@ export const useFetchRelatedEvents = ({
               id: event.id,
               title: event.title || '',
               description: event.description || '',
-              event_type: event.event_category || eventType, // Use event_category from DB
+              event_category: event.event_category || eventCategory, // Use event_category from DB
               start_time: event.start_time,
               end_time: event.end_time,
               start_date: event.start_date,
@@ -141,7 +141,7 @@ export const useFetchRelatedEvents = ({
     } else {
       setLoading(false);
     }
-  }, [eventType, currentEventId, userId, minResults, tags, vibe, startDate]); 
+  }, [eventCategory, currentEventId, userId, minResults, tags, vibe, startDate]); 
   
   return { relatedEvents, loading };
 };

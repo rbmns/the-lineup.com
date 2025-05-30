@@ -101,11 +101,11 @@ const EventCardList: React.FC<EventCardListProps> = ({
           alt={event.title}
           className="h-full w-full object-cover"
         />
-        {/* Event type pill - UPDATED to not show icons */}
-        {event.event_type && (
+        {/* Event category pill - UPDATED to not show icons */}
+        {event.event_category && (
           <div className="absolute top-2 left-2">
             <CategoryPill 
-              category={event.event_type} 
+              category={event.event_category} 
               size="xs" 
               showIcon={false} 
             />

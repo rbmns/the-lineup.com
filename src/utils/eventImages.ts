@@ -75,8 +75,8 @@ export const getEventImage = (event: Event): string => {
     return event.image_urls[0];
   }
   
-  // Fall back to event_type-based image from /img folder
-  return getEventFallbackImage(event.event_type);
+  // Fall back to event_category-based image from /img folder
+  return getEventFallbackImage(event.event_category);
 };
 
 export const getEventImages = (event: Event): string[] => {

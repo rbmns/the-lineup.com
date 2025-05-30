@@ -100,11 +100,11 @@ const EventCard: React.FC<EventCardProps> = ({
           className="h-full w-full object-cover transition-transform group-hover:scale-105 duration-300"
         />
         
-        {/* Event type pill - UPDATED to not show icons */}
-        {event.event_type && (
+        {/* Event category pill - UPDATED to not show icons */}
+        {event.event_category && (
           <div className="absolute top-3 left-3 z-10">
             <CategoryPill 
-              category={event.event_type} 
+              category={event.event_category} 
               size="default" 
               showIcon={false}
             />

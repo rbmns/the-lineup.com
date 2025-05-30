@@ -34,7 +34,7 @@ export interface Event {
   title: string;
   description: string;
   location?: string;  // Adding back the location property as optional
-  event_type?: string;
+  event_category?: string; // Changed from event_type to event_category
   start_time: string | null;
   end_time?: string | null;
   start_date?: string | null;
