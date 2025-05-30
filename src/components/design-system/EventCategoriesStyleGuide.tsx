@@ -122,6 +122,7 @@ export default function EventCategoriesStyleGuide() {
             <VibeFilter
               selectedVibe={selectedVibe}
               onChange={setSelectedVibe}
+              vibes={vibes}
             />
           </section>
         </TabsContent>
