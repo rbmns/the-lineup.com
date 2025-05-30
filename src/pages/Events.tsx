@@ -16,6 +16,8 @@ const Events = () => {
     setSelectedEventTypes,
     selectedVenues,
     setSelectedVenues,
+    selectedVibes,
+    setSelectedVibes,
     dateRange,
     setDateRange,
     selectedDateFilter,
@@ -29,13 +31,6 @@ const Events = () => {
     vibesLoading
   } = useEventsPageData();
 
-  const [selectedVibe, setSelectedVibe] = React.useState<string | null>(null);
-
-  const handleVibeChange = (vibe: string | null) => {
-    setSelectedVibe(vibe);
-    console.log('Vibe filter changed to:', vibe);
-  };
-
   const handleAdvancedFilterChange = (filters: any) => {
     // Handle event category filters
     if (filters.eventTypes) {
@@ -45,6 +40,11 @@ const Events = () => {
     // Handle venue filters
     if (filters.venues) {
       setSelectedVenues(filters.venues);
+    }
+    
+    // Handle vibe filters
+    if (filters.vibes) {
+      setSelectedVibes(filters.vibes);
     }
     
     // Handle date filters - map from 'date' to 'dateRange'
@@ -58,18 +58,12 @@ const Events = () => {
     }
   };
 
-  // Filter events by selected vibe
-  const vibeFilteredEvents = React.useMemo(() => {
-    if (!selectedVibe) return filteredEvents;
-    return filteredEvents.filter(event => event.vibe === selectedVibe);
-  }, [filteredEvents, selectedVibe]);
-
   return (
     <EventsPageLayout>
       <div className="space-y-6 md:space-y-8">
         <EventsVibeSection
-          selectedVibe={selectedVibe}
-          onVibeChange={handleVibeChange}
+          selectedVibes={selectedVibes}
+          onVibeChange={setSelectedVibes}
           vibes={vibes}
           vibesLoading={vibesLoading}
         />
@@ -78,19 +72,17 @@ const Events = () => {
           onFilterChange={handleAdvancedFilterChange}
           selectedEventTypes={selectedEventTypes}
           selectedVenues={selectedVenues}
+          selectedVibes={selectedVibes}
           dateRange={dateRange}
           selectedDateFilter={selectedDateFilter}
-          filteredEventsCount={vibeFilteredEvents.length}
+          filteredEventsCount={filteredEvents.length}
           showLocationFilter={true}
         />
 
         <EventsResultsSection
-          filteredEvents={vibeFilteredEvents}
-          hasActiveFilters={hasActiveFilters || !!selectedVibe}
-          resetFilters={() => {
-            resetFilters();
-            setSelectedVibe(null);
-          }}
+          filteredEvents={filteredEvents}
+          hasActiveFilters={hasActiveFilters}
+          resetFilters={resetFilters}
           eventsLoading={eventsLoading}
           isFilterLoading={isFilterLoading}
           user={user}

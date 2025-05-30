@@ -29,6 +29,8 @@ export const useEventsPageData = () => {
     setSelectedEventTypes,
     selectedVenues,
     setSelectedVenues,
+    selectedVibes,
+    setSelectedVibes,
     dateRange,
     setDateRange,
     selectedDateFilter,
@@ -41,6 +43,7 @@ export const useEventsPageData = () => {
     resetFilters,
     handleRemoveEventType,
     handleRemoveVenue,
+    handleRemoveVibe,
     handleClearDateFilter
   } = useEventFilterState();
   
@@ -122,6 +125,7 @@ export const useEventsPageData = () => {
     selectedCategories,
     allEventTypes,
     selectedVenues,
+    selectedVibes,
     dateRange,
     selectedDateFilter
   });
@@ -149,6 +153,8 @@ export const useEventsPageData = () => {
     setSelectedEventTypes,
     selectedVenues,
     setSelectedVenues,
+    selectedVibes,
+    setSelectedVibes,
     dateRange,
     setDateRange,
     selectedDateFilter,
@@ -161,6 +167,7 @@ export const useEventsPageData = () => {
     resetFilters,
     handleRemoveEventType,
     handleRemoveVenue,
+    handleRemoveVibe,
     handleClearDateFilter,
     enhancedHandleRsvp,
     loadingEventId,

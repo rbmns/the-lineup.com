@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { DateRange } from 'react-day-picker';
 
@@ -5,13 +6,14 @@ import { DateRange } from 'react-day-picker';
 interface FilterState {
   eventTypes: string[];
   venues: string[];
+  vibes: string[];
   dateRange: DateRange | undefined;
   dateFilter: string;
   timestamp: number;
   urlParams?: string;
   scrollPosition?: number;
-  eventId?: string; // Added to support RSVP operations
-  status?: string; // Added to support RSVP operations
+  eventId?: string;
+  status?: string;
 }
 
 // Props for the context
@@ -22,6 +24,7 @@ interface FilterStateContextProps {
   // Methods to update specific parts of the filter state
   setEventTypes: (eventTypes: string[]) => void;
   setVenues: (venues: string[]) => void;
+  setVibes: (vibes: string[]) => void;
   setDateRange: (dateRange: DateRange | undefined) => void;
   setDateFilter: (dateFilter: string) => void;
   
@@ -45,6 +48,7 @@ const FilterStateContext = createContext<FilterStateContextProps | undefined>(un
 // Storage keys
 const FILTER_STATE_KEY = 'global-filter-state';
 const VENUE_FILTERS_KEY = 'event-venue-filters';
+const VIBE_FILTERS_KEY = 'event-vibe-filters';
 const DATE_RANGE_KEY = 'event-date-range';
 const DATE_FILTER_KEY = 'event-date-filter';
 const EVENT_TYPES_KEY = 'event-selected-types';
@@ -53,6 +57,7 @@ const EVENT_TYPES_KEY = 'event-selected-types';
 const defaultFilterState: FilterState = {
   eventTypes: [],
   venues: [],
+  vibes: [],
   dateRange: undefined,
   dateFilter: '',
   timestamp: Date.now(),
@@ -110,6 +115,14 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }));
   }, []);
   
+  const setVibes = useCallback((vibes: string[]) => {
+    setFilterState(prev => ({
+      ...prev,
+      vibes,
+      timestamp: Date.now()
+    }));
+  }, []);
+  
   const setDateRange = useCallback((dateRange: DateRange | undefined) => {
     setFilterState(prev => ({
       ...prev,
@@ -146,6 +159,7 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
         
         // Save individual components for backward compatibility
         sessionStorage.setItem(VENUE_FILTERS_KEY, JSON.stringify(newState.venues));
+        sessionStorage.setItem(VIBE_FILTERS_KEY, JSON.stringify(newState.vibes));
         sessionStorage.setItem(EVENT_TYPES_KEY, JSON.stringify(newState.eventTypes));
         
         if (newState.dateFilter) {
@@ -167,6 +181,7 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
             scrollPosition: window.scrollY,
             timestamp: Date.now(),
             eventTypes: newState.eventTypes,
+            vibes: newState.vibes,
             pathname: window.location.pathname
           };
         }
@@ -194,6 +209,7 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
         newState = {
           eventTypes: rsvpState.eventTypes || [],
           venues: [],
+          vibes: rsvpState.vibes || [],
           dateRange: undefined,
           dateFilter: '',
           timestamp: rsvpState.timestamp,
@@ -201,11 +217,16 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
           scrollPosition: rsvpState.scrollPosition
         };
         
-        // Get venues and date info from sessionStorage
+        // Get additional filter data from sessionStorage
         try {
           const venuesStr = sessionStorage.getItem(VENUE_FILTERS_KEY);
           if (venuesStr) {
             newState.venues = JSON.parse(venuesStr);
+          }
+          
+          const vibesStr = sessionStorage.getItem(VIBE_FILTERS_KEY);
+          if (vibesStr) {
+            newState.vibes = JSON.parse(vibesStr);
           }
           
           const dateRangeStr = sessionStorage.getItem(DATE_RANGE_KEY);
@@ -252,6 +273,7 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
       else if (source === 'url' && typeof window !== 'undefined') {
         const urlParams = new URLSearchParams(window.location.search);
         const eventTypes = urlParams.getAll('type');
+        const vibes = urlParams.getAll('vibe');
         const dateFrom = urlParams.get('dateFrom');
         const dateTo = urlParams.get('dateTo');
         const dateFilter = urlParams.get('dateFilter');
@@ -269,6 +291,7 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
         newState = {
           eventTypes: eventTypes || [],
           venues: venues || [],
+          vibes: vibes || [],
           dateRange,
           dateFilter: dateFilter || '',
           timestamp: Date.now(),
@@ -297,6 +320,7 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
           detail: {
             urlParams: newState.urlParams,
             eventTypes: newState.eventTypes,
+            vibes: newState.vibes,
             timestamp: Date.now(),
             source: 'filter-context'
           }
@@ -327,14 +351,16 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
     try {
       sessionStorage.removeItem(FILTER_STATE_KEY);
       sessionStorage.removeItem(VENUE_FILTERS_KEY);
+      sessionStorage.removeItem(VIBE_FILTERS_KEY);
       sessionStorage.removeItem(DATE_RANGE_KEY);
       sessionStorage.removeItem(DATE_FILTER_KEY);
       sessionStorage.removeItem(EVENT_TYPES_KEY);
       
       // Clear URL parameters related to filters
       const urlParams = new URLSearchParams(window.location.search);
-      urlParams.delete('eventType');
-      urlParams.delete('venues');
+      urlParams.delete('type');
+      urlParams.delete('vibe');
+      urlParams.delete('venue');
       urlParams.delete('dateFrom');
       urlParams.delete('dateTo');
       urlParams.delete('dateFilter');
@@ -353,8 +379,9 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
     if (!isInitialized) {
       const urlParams = new URLSearchParams(window.location.search);
       // Check if we have any filter parameters in URL
-      if (urlParams.has('eventType') || 
-          urlParams.has('venues') || 
+      if (urlParams.has('type') || 
+          urlParams.has('vibe') ||
+          urlParams.has('venue') || 
           urlParams.has('dateFrom') || 
           urlParams.has('dateFilter')) {
         restoreFilterState('url');
@@ -396,6 +423,11 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
             urlParams.append('type', type);
           });
           
+          // Add vibes with standardized name 'vibe'
+          filterState.vibes.forEach(vibe => {
+            urlParams.append('vibe', vibe);
+          });
+          
           // Add venues with standardized name 'venue'
           if (filterState.venues.length > 0) {
             filterState.venues.forEach(venue => {
@@ -433,6 +465,7 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
     filterState,
     setEventTypes,
     setVenues,
+    setVibes,
     setDateRange,
     setDateFilter,
     saveFilterState,

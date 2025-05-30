@@ -9,6 +9,7 @@ export const useGlobalFilterState = () => {
     filterState,
     setEventTypes,
     setVenues,
+    setVibes,
     setDateRange,
     setDateFilter,
     saveFilterState,
@@ -21,6 +22,7 @@ export const useGlobalFilterState = () => {
   // Memoized getters
   const selectedEventTypes = filterState.eventTypes;
   const selectedVenues = filterState.venues;
+  const selectedVibes = filterState.vibes;
   const dateRange = filterState.dateRange;
   const selectedDateFilter = filterState.dateFilter;
   
@@ -43,6 +45,12 @@ export const useGlobalFilterState = () => {
     setVenues(venues);
     handleSaveFilterState();
   }, [setVenues, handleSaveFilterState]);
+
+  // Wrapper for setting vibes that also saves state
+  const setSelectedVibes = useCallback((vibes: string[]) => {
+    setVibes(vibes);
+    handleSaveFilterState();
+  }, [setVibes, handleSaveFilterState]);
 
   // Wrapper for setting date range that also saves state
   const setSelectedDateRange = useCallback((range: DateRange | undefined) => {
@@ -76,6 +84,10 @@ export const useGlobalFilterState = () => {
     setSelectedVenues(selectedVenues.filter(v => v !== venue));
   }, [selectedVenues, setSelectedVenues]);
 
+  const handleRemoveVibe = useCallback((vibe: string) => {
+    setSelectedVibes(selectedVibes.filter(v => v !== vibe));
+  }, [selectedVibes, setSelectedVibes]);
+
   const handleClearDateFilter = useCallback(() => {
     setSelectedDateRange(undefined);
     setSelectedDateFilter('');
@@ -85,11 +97,13 @@ export const useGlobalFilterState = () => {
   const hasActiveFilters = 
     selectedEventTypes.length > 0 ||
     selectedVenues.length > 0 ||
+    selectedVibes.length > 0 ||
     dateRange !== undefined ||
     selectedDateFilter !== '';
 
   const hasAdvancedFilters =
     selectedVenues.length > 0 ||
+    selectedVibes.length > 0 ||
     dateRange !== undefined ||
     selectedDateFilter !== '';
 
@@ -161,6 +175,8 @@ export const useGlobalFilterState = () => {
     setSelectedEventTypes,
     selectedVenues,
     setSelectedVenues,
+    selectedVibes,
+    setSelectedVibes,
     dateRange,
     setDateRange: setSelectedDateRange,
     selectedDateFilter,
@@ -170,6 +186,7 @@ export const useGlobalFilterState = () => {
     resetFilters,
     handleRemoveEventType,
     handleRemoveVenue,
+    handleRemoveVibe,
     handleClearDateFilter,
     hasActiveFilters,
     hasAdvancedFilters,

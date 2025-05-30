@@ -1,16 +1,16 @@
 
 import React from 'react';
-import VibeFilter from '@/components/polymet/vibe-filter';
+import { VibeFilter } from '@/components/events/VibeFilter';
 
 interface EventsVibeSectionProps {
-  selectedVibe: string | null;
-  onVibeChange: (vibe: string | null) => void;
+  selectedVibes: string[];
+  onVibeChange: (vibes: string[]) => void;
   vibes: string[];
   vibesLoading: boolean;
 }
 
 export const EventsVibeSection: React.FC<EventsVibeSectionProps> = ({
-  selectedVibe,
+  selectedVibes,
   onVibeChange,
   vibes,
   vibesLoading,
@@ -40,10 +40,10 @@ export const EventsVibeSection: React.FC<EventsVibeSectionProps> = ({
       
       <div className="w-full">
         <VibeFilter
-          selectedVibe={selectedVibe}
-          onChange={onVibeChange}
+          selectedVibes={selectedVibes}
+          onVibeChange={onVibeChange}
           vibes={vibes}
-          size="md"
+          isLoading={vibesLoading}
           className="w-full"
         />
       </div>
