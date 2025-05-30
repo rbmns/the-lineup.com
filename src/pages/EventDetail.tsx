@@ -6,9 +6,14 @@ import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { useFetchRelatedEvents } from '@/hooks/events/useFetchRelatedEvents';
 import { EventDetailSkeleton } from '@/components/events/EventDetailSkeleton';
-import { EventDetailContent } from '@/components/events/EventDetailContent';
 import { toast } from '@/hooks/use-toast';
 import { Helmet } from 'react-helmet-async';
+import { ArrowLeft, Share, Calendar, MapPin, User, Euro, Globe, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { CategoryPill } from '@/components/ui/category-pill';
+import { formatInTimeZone } from 'date-fns-tz';
+import { AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
+import TeaseLoginSignup from '@/components/events/detail-sections/TeaseLoginSignup';
 
 const EventDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -32,7 +37,6 @@ const EventDetail = () => {
         setLoading(true);
         console.log('Fetching event with ID:', id);
         
-        // First, fetch the basic event data without the problematic join
         const { data, error } = await supabase
           .from('events')
           .select(`
@@ -116,7 +120,7 @@ const EventDetail = () => {
             } : null,
             extra_info: data['Extra info'],
             google_maps: venueData?.google_maps || null,
-            attendees: { going: 0, interested: 0 } // This will be calculated below
+            attendees: { going: 0, interested: 0 }
           };
 
           // Set RSVP status for authenticated user
@@ -154,17 +158,6 @@ const EventDetail = () => {
 
     fetchEvent();
   }, [id, user, navigate]);
-
-  // Fetch related events
-  const { relatedEvents, loading: relatedLoading } = useFetchRelatedEvents({
-    eventCategory: event?.event_category || '',
-    currentEventId: event?.id || '',
-    userId: user?.id,
-    tags: event?.tags,
-    vibe: event?.vibe,
-    minResults: 3,
-    startDate: event?.start_date
-  });
 
   // Handle RSVP
   const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
@@ -251,6 +244,37 @@ const EventDetail = () => {
     }
   };
 
+  // Format date and time
+  const formatDateTime = () => {
+    if (!event?.start_date || !event?.start_time) return null;
+    try {
+      const dateTime = `${event.start_date}T${event.start_time}`;
+      const date = new Date(dateTime);
+      const formattedDate = formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEEE, MMMM d, yyyy");
+      const formattedTime = formatInTimeZone(date, AMSTERDAM_TIMEZONE, "HH:mm");
+      
+      if (event.end_time) {
+        const endDateTime = `${event.start_date}T${event.end_time}`;
+        const endDate = new Date(endDateTime);
+        const formattedEndTime = formatInTimeZone(endDate, AMSTERDAM_TIMEZONE, "HH:mm");
+        return `${formattedDate}, ${formattedTime}-${formattedEndTime}`;
+      }
+      
+      return `${formattedDate}, ${formattedTime}`;
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Date and time not available';
+    }
+  };
+
+  // Get event image
+  const getEventImage = () => {
+    if (event?.image_urls && event.image_urls.length > 0) {
+      return event.image_urls[0];
+    }
+    return '/img/default.jpg';
+  };
+
   if (loading) {
     return <EventDetailSkeleton />;
   }
@@ -260,32 +284,209 @@ const EventDetail = () => {
       <div className="container mx-auto px-4 py-8 text-center">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
         <p className="text-gray-600 mb-6">The event you're looking for doesn't exist or has been removed.</p>
-        <button 
-          onClick={() => navigate('/events')}
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
+        <Button onClick={() => navigate('/events')}>
           Back to Events
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-white">
       <Helmet>
         <title>{event.title} | Event Details</title>
         <meta name="description" content={event.description?.substring(0, 160) || `Join us for ${event.title}`} />
       </Helmet>
       
-      <EventDetailContent
-        event={event}
-        attendees={attendees}
-        relatedEvents={relatedEvents}
-        relatedLoading={relatedLoading}
-        isAuthenticated={!!user}
-        rsvpLoading={rsvpLoading}
-        onRsvp={handleRsvp}
-      />
+      {/* Hero Section */}
+      <div className="relative h-[400px] md:h-[500px] overflow-hidden">
+        <img
+          src={getEventImage()}
+          alt={event.title}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            if (!target.src.includes('/img/default.jpg')) {
+              target.src = '/img/default.jpg';
+            }
+          }}
+        />
+        
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/40"></div>
+        
+        {/* Header Controls */}
+        <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/events')}
+            className="text-white hover:bg-white/20"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Events
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-white hover:bg-white/20"
+          >
+            <Share className="h-4 w-4 mr-2" />
+            Share
+          </Button>
+        </div>
+        
+        {/* Category Badge */}
+        {event.event_category && (
+          <div className="absolute top-16 left-4">
+            <CategoryPill category={event.event_category} size="sm" />
+          </div>
+        )}
+        
+        {/* Event Title and Date */}
+        <div className="absolute bottom-6 left-4 right-4 text-white">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">{event.title}</h1>
+          <div className="flex items-center text-lg">
+            <Calendar className="h-5 w-5 mr-2" />
+            <span>{formatDateTime()}</span>
+          </div>
+        </div>
+      </div>
+      
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8">
+        {/* RSVP Buttons */}
+        {user ? (
+          <div className="flex gap-3 mb-8">
+            <Button
+              variant={event.rsvp_status === 'Going' ? 'default' : 'outline'}
+              onClick={() => handleRsvp('Going')}
+              disabled={rsvpLoading}
+              className="flex items-center gap-2"
+            >
+              <Users className="h-4 w-4" />
+              I'm Going
+            </Button>
+            <Button
+              variant={event.rsvp_status === 'Interested' ? 'default' : 'outline'}
+              onClick={() => handleRsvp('Interested')}
+              disabled={rsvpLoading}
+              className="flex items-center gap-2"
+            >
+              <Users className="h-4 w-4" />
+              I'm Interested
+            </Button>
+          </div>
+        ) : (
+          <div className="mb-8">
+            <TeaseLoginSignup />
+          </div>
+        )}
+        
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2">
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4">About this event</h2>
+              <div className="prose max-w-none">
+                <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {event.description || 'No description provided for this event.'}
+                </p>
+              </div>
+            </div>
+            
+            {/* Organizer Info */}
+            {event.organiser_name && (
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold mb-4">Hosted by</h3>
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                    <User className="h-6 w-6 text-gray-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{event.organiser_name}</p>
+                    <p className="text-sm text-gray-600">Event Organizer</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Location */}
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
+                <MapPin className="h-5 w-5" />
+                Location
+              </h3>
+              <div>
+                <p className="font-medium">{event.venues?.name || 'Venue name'}</p>
+                <p className="text-sm text-gray-600">{event.venues?.city || 'Location'}</p>
+                {event.venues?.google_maps && (
+                  <Button variant="link" className="p-0 h-auto text-sm mt-1">
+                    View on map
+                  </Button>
+                )}
+              </div>
+            </div>
+            
+            {/* Booking Info */}
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="font-semibold mb-3">Booking Info</h3>
+              <div className="space-y-3">
+                {event.fee && (
+                  <div className="flex items-center gap-2">
+                    <Euro className="h-4 w-4 text-gray-600" />
+                    <div>
+                      <p className="text-sm font-medium">Entry fee</p>
+                      <p className="text-sm text-gray-600">€{event.fee}</p>
+                    </div>
+                  </div>
+                )}
+                
+                {event.organizer_link && (
+                  <div className="flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-gray-600" />
+                    <div>
+                      <p className="text-sm font-medium">Organizer website</p>
+                      <a 
+                        href={event.organizer_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:underline"
+                      >
+                        {event.organiser_name || 'Visit website'}
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Attendees */}
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Friends Attending
+              </h3>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium">Going: {attendees.going.length}</p>
+                  <p className="text-sm text-gray-600">Interested: {attendees.interested.length}</p>
+                </div>
+              </div>
+              {attendees.going.length + attendees.interested.length > 0 && (
+                <Button variant="link" className="p-0 h-auto text-sm mt-2">
+                  See all attendees
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
