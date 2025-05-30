@@ -101,28 +101,46 @@ export const useFriendData = (userId: string | undefined) => {
       );
       
       // Create requests with profiles (received requests)
-      const requestsWithProfiles = receivedRequests?.map(req => ({
-        id: req.id,
-        status: req.status.toLowerCase(),
-        created_at: req.created_at,
-        user_id: req.user_id,
-        friend_id: req.friend_id,
-        sender_id: req.user_id,
-        receiver_id: req.friend_id,
-        profile: profiles.find(p => p.id === req.user_id) as UserProfile
-      })).filter(req => req.profile) as FriendRequest[];
+      const requestsWithProfiles: FriendRequest[] = [];
+      
+      if (receivedRequests && profiles) {
+        for (const req of receivedRequests) {
+          const profile = profiles.find(p => p.id === req.user_id);
+          if (profile) {
+            requestsWithProfiles.push({
+              id: req.id,
+              status: req.status.toLowerCase() as 'pending',
+              created_at: req.created_at,
+              user_id: req.user_id,
+              friend_id: req.friend_id,
+              sender_id: req.user_id,
+              receiver_id: req.friend_id,
+              profile: profile as any
+            });
+          }
+        }
+      }
       
       // Create sent requests with profiles
-      const sentRequestsWithProfiles = sentRequests?.map(req => ({
-        id: req.id,
-        status: req.status.toLowerCase(),
-        created_at: req.created_at,
-        user_id: req.user_id,
-        friend_id: req.friend_id,
-        sender_id: req.user_id,
-        receiver_id: req.friend_id,
-        profile: profiles.find(p => p.id === req.friend_id) as UserProfile
-      })).filter(req => req.profile) as FriendRequest[];
+      const sentRequestsWithProfiles: FriendRequest[] = [];
+      
+      if (sentRequests && profiles) {
+        for (const req of sentRequests) {
+          const profile = profiles.find(p => p.id === req.friend_id);
+          if (profile) {
+            sentRequestsWithProfiles.push({
+              id: req.id,
+              status: req.status.toLowerCase() as 'pending',
+              created_at: req.created_at,
+              user_id: req.user_id,
+              friend_id: req.friend_id,
+              sender_id: req.user_id,
+              receiver_id: req.friend_id,
+              profile: profile as any
+            });
+          }
+        }
+      }
       
       setPendingRequests(sentRequestsWithProfiles);
       

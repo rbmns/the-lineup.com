@@ -19,24 +19,7 @@ export const useFriendRequests = (userId: string | undefined) => {
       // Get requests sent to this user
       const { data: friendshipData, error } = await supabase
         .from('friendships')
-        .select(`
-          id,
-          status,
-          created_at,
-          user_id,
-          friend_id,
-          profiles!friendships_user_id_fkey(
-            id,
-            username,
-            avatar_url,
-            email,
-            location,
-            location_category,
-            status,
-            status_details,
-            tagline
-          )
-        `)
+        .select('id, status, created_at, user_id, friend_id')
         .eq('friend_id', userId)
         .eq('status', 'Pending');
         
@@ -47,17 +30,49 @@ export const useFriendRequests = (userId: string | undefined) => {
         return;
       }
       
+      if (!friendshipData || friendshipData.length === 0) {
+        setRequests([]);
+        setLoading(false);
+        return;
+      }
+
+      // Get user IDs of request senders
+      const senderIds = friendshipData.map(req => req.user_id);
+
+      // Fetch profiles for these users
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url, email, location, location_category, status, status_details, tagline')
+        .in('id', senderIds);
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        setRequests([]);
+        setLoading(false);
+        return;
+      }
+
+      // Create a map for quick profile lookup
+      const profileMap = new Map(profiles?.map(profile => [profile.id, profile]) || []);
+      
       // Process the data into the correct format
-      const processedRequests: FriendRequest[] = friendshipData?.map(req => ({
-        id: req.id,
-        status: req.status.toLowerCase() as 'pending',
-        created_at: req.created_at,
-        user_id: req.user_id,
-        friend_id: req.friend_id,
-        sender_id: req.user_id,
-        receiver_id: req.friend_id,
-        profile: req.profiles as any // Cast to avoid type conflicts since profiles is a single object
-      })).filter(req => req.profile) || [];
+      const processedRequests: FriendRequest[] = friendshipData
+        .map(req => {
+          const profile = profileMap.get(req.user_id);
+          if (!profile) return null;
+          
+          return {
+            id: req.id,
+            status: req.status.toLowerCase() as 'pending',
+            created_at: req.created_at,
+            user_id: req.user_id,
+            friend_id: req.friend_id,
+            sender_id: req.user_id,
+            receiver_id: req.friend_id,
+            profile: profile as any
+          };
+        })
+        .filter((req): req is FriendRequest => req !== null);
       
       setRequests(processedRequests);
       
