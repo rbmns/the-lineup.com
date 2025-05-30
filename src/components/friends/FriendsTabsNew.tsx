@@ -2,7 +2,7 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Users, UserPlus, Bell, Calendar } from 'lucide-react';
+import { Users, UserPlus, Bell, Calendar, MapPin } from 'lucide-react';
 
 interface FriendsTabsNewProps {
   activeTab: string;
@@ -13,6 +13,7 @@ interface FriendsTabsNewProps {
   suggestionsContent: React.ReactNode;
   requestsContent: React.ReactNode;
   eventsContent: React.ReactNode;
+  casualPlansContent: React.ReactNode;
 }
 
 export const FriendsTabsNew = ({
@@ -23,11 +24,12 @@ export const FriendsTabsNew = ({
   allFriendsContent,
   suggestionsContent,
   requestsContent,
-  eventsContent
+  eventsContent,
+  casualPlansContent
 }: FriendsTabsNewProps) => {
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-      <TabsList className="grid w-full grid-cols-4">
+      <TabsList className="grid w-full grid-cols-5">
         <TabsTrigger value="all-friends" className="flex items-center gap-2">
           <Users className="h-4 w-4" />
           All Friends
@@ -63,6 +65,11 @@ export const FriendsTabsNew = ({
           <Calendar className="h-4 w-4" />
           Events
         </TabsTrigger>
+
+        <TabsTrigger value="casual-plans" className="flex items-center gap-2">
+          <MapPin className="h-4 w-4" />
+          Casual Plans
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="all-friends" className="space-y-4">
@@ -79,6 +86,10 @@ export const FriendsTabsNew = ({
 
       <TabsContent value="events" className="space-y-4">
         {eventsContent}
+      </TabsContent>
+
+      <TabsContent value="casual-plans" className="space-y-4">
+        {casualPlansContent}
       </TabsContent>
     </Tabs>
   );

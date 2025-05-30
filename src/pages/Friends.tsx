@@ -13,6 +13,7 @@ import { FriendsSearchSection } from '@/components/friends/FriendsSearchSection'
 import { FriendsLoginPrompt } from '@/components/friends/FriendsLoginPrompt';
 import { UserProfile } from '@/types/index';
 import { supabase } from '@/lib/supabase';
+import { FriendsCasualPlansTabContent } from '@/components/friends/FriendsCasualPlansTabContent';
 
 const Friends: React.FC = () => {
   const { user } = useAuth();
@@ -194,6 +195,9 @@ const Friends: React.FC = () => {
               }
               eventsContent={
                 <FriendsEventsTabContent />
+              }
+              casualPlansContent={
+                <FriendsCasualPlansTabContent />
               }
             />
           </div>
