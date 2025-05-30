@@ -58,20 +58,27 @@ export const EventGrid: React.FC<EventGridProps> = ({
     );
   }
   
-  // Otherwise, use the simple grid
+  // Mobile-first responsive grid with better spacing
   return (
     <div 
-      className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5", className)} 
+      className={cn(
+        "grid gap-4 w-full",
+        "grid-cols-1", // Mobile: 1 column
+        "sm:grid-cols-2", // Small screens: 2 columns  
+        "lg:grid-cols-3", // Large screens: 3 columns
+        "xl:grid-cols-3", // Extra large: keep 3 columns
+        className
+      )} 
       style={style}
     >
       {events.map((event) => (
-        <div key={event.id} data-event-id={event.id} className="h-full">
+        <div key={event.id} data-event-id={event.id} className="w-full">
           <EventCard 
             event={event}
             onRsvp={onRsvp}
             showRsvpButtons={showRsvpButtons}
             compact={compact}
-            className="h-full"
+            className="h-full w-full"
             loadingEventId={loadingEventId}
           />
         </div>

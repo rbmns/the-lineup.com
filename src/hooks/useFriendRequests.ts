@@ -39,7 +39,7 @@ export const useFriendRequests = (userId: string | undefined) => {
       // Get user IDs of request senders
       const senderIds = friendshipData.map(req => req.user_id);
 
-      // Fetch profiles for these users
+      // Fetch profiles for these users in a separate query
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('id, username, avatar_url, email, location, location_category, status, status_details, tagline')
@@ -55,13 +55,13 @@ export const useFriendRequests = (userId: string | undefined) => {
       // Create a map for quick profile lookup
       const profileMap = new Map(profiles?.map(profile => [profile.id, profile]) || []);
       
-      // Process the data into the correct format
+      // Process the data into the correct format, filtering out any without profiles
       const processedRequests: FriendRequest[] = friendshipData
         .map(req => {
           const profile = profileMap.get(req.user_id);
           if (!profile) return null;
           
-          return {
+          const friendRequest: FriendRequest = {
             id: req.id,
             status: 'pending' as const,
             created_at: req.created_at,
@@ -71,6 +71,8 @@ export const useFriendRequests = (userId: string | undefined) => {
             receiver_id: req.friend_id,
             profile: profile as any
           };
+          
+          return friendRequest;
         })
         .filter((req): req is FriendRequest => req !== null);
       

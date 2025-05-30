@@ -76,16 +76,18 @@ export const EventsPageFilters: React.FC<EventsPageFiltersProps> = ({
   ]);
 
   return (
-    <>
-      {/* Events category filter bar */}
-      <EventsFilterBar
-        allEventTypes={allEventTypes}
-        selectedCategories={selectedCategories}
-        toggleCategory={toggleCategory}
-        selectAll={selectAll}
-        deselectAll={deselectAll}
-        hasActiveFilters={hasActiveFilters}
-      />
+    <div className="space-y-4">
+      {/* Mobile-optimized filter bar */}
+      <div className="overflow-x-auto">
+        <EventsFilterBar
+          allEventTypes={allEventTypes}
+          selectedCategories={selectedCategories}
+          toggleCategory={toggleCategory}
+          selectAll={selectAll}
+          deselectAll={deselectAll}
+          hasActiveFilters={hasActiveFilters}
+        />
+      </div>
       
       {/* Advanced Filters Panel & Filter Summary */}
       <EventsFilterPanel
@@ -104,6 +106,6 @@ export const EventsPageFilters: React.FC<EventsPageFiltersProps> = ({
         handleClearDateFilter={handleClearDateFilter}
         resetFilters={resetFilters}
       />
-    </>
+    </div>
   );
 };

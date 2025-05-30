@@ -63,37 +63,41 @@ const CategoryFilteredEventsPage = () => {
     !!selectedDateFilter;
 
   return (
-    <div className="w-full px-4 md:px-6 py-8">
+    <div className="w-full px-3 sm:px-4 md:px-6 py-4 md:py-8">
       <div className="max-w-7xl mx-auto">
-        <EventsPageHeader 
-          title="Explore Events" 
-          subtitle="Find the perfect events for you"
-        />
-        
-        <div className="space-y-12">
-          {/* New Filter Section */}
-          <NewFilterSection
-            allEventTypes={eventTypeStrings}
-            selectedEventTypes={selectedEventTypes}
-            onToggleEventType={(type) => {
-              if (selectedEventTypes.includes(type)) {
-                setSelectedEventTypes(selectedEventTypes.filter(t => t !== type));
-              } else {
-                setSelectedEventTypes([...selectedEventTypes, type]);
-              }
-            }}
-            onSelectAllEventTypes={selectAllEventTypes}
-            onDeselectAllEventTypes={deselectAllEventTypes}
-            resetAllFilters={resetFilters}
-            dateRange={dateRange}
-            setDateRange={setDateRange}
-            selectedDateFilter={selectedDateFilter}
-            setSelectedDateFilter={setSelectedDateFilter}
-            selectedVenues={selectedVenues}
-            setSelectedVenues={setSelectedVenues}
-            availableVenues={availableVenues}
-            hasAdvancedFilters={hasAdvancedFilters}
+        <div className="mb-6 md:mb-8">
+          <EventsPageHeader 
+            title="Explore Events" 
+            subtitle="Find the perfect events for you"
           />
+        </div>
+        
+        <div className="space-y-6 md:space-y-12">
+          {/* Mobile-optimized Filter Section */}
+          <div className="space-y-4">
+            <NewFilterSection
+              allEventTypes={eventTypeStrings}
+              selectedEventTypes={selectedEventTypes}
+              onToggleEventType={(type) => {
+                if (selectedEventTypes.includes(type)) {
+                  setSelectedEventTypes(selectedEventTypes.filter(t => t !== type));
+                } else {
+                  setSelectedEventTypes([...selectedEventTypes, type]);
+                }
+              }}
+              onSelectAllEventTypes={selectAllEventTypes}
+              onDeselectAllEventTypes={deselectAllEventTypes}
+              resetAllFilters={resetFilters}
+              dateRange={dateRange}
+              setDateRange={setDateRange}
+              selectedDateFilter={selectedDateFilter}
+              setSelectedDateFilter={setSelectedDateFilter}
+              selectedVenues={selectedVenues}
+              setSelectedVenues={setSelectedVenues}
+              availableVenues={availableVenues}
+              hasAdvancedFilters={hasAdvancedFilters}
+            />
+          </div>
 
           {/* Events Content Section */}
           <CategoryFilteredEventsContent 
