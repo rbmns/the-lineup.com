@@ -3,7 +3,6 @@ import React from 'react';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
 import { FriendsGrid } from './FriendsGrid';
 import { SuggestedFriendsTabContent } from './SuggestedFriendsTabContent';
 import { RequestsGrid } from './RequestsGrid';
@@ -52,10 +51,10 @@ export const FriendsPageLayout = ({
     <div className="space-y-6">
       {/* Search Bar */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
         <Input
           placeholder="Search friends by name..."
-          className="pl-9 bg-white border-gray-200 focus-visible:ring-blue-500 text-gray-900"
+          className="pl-10 bg-white border-gray-200 rounded-lg h-12 text-gray-900 placeholder-gray-500"
           value={searchQuery}
           onChange={onSearchChange}
         />
@@ -63,56 +62,46 @@ export const FriendsPageLayout = ({
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-white border border-gray-200 p-1">
+        <TabsList className="inline-flex h-auto p-1 bg-gray-100 rounded-lg">
           <TabsTrigger 
             value="all-friends" 
-            className="relative data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900"
+            className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600"
           >
             All Friends
-            {friends.length > 0 && (
-              <Badge variant="secondary" className="ml-2 bg-gray-500 text-white text-xs">
-                {friends.length}
-              </Badge>
-            )}
           </TabsTrigger>
           
           <TabsTrigger 
             value="suggestions" 
-            className="relative data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900"
+            className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600"
           >
             Suggestions
-            {suggestedFriends.length > 0 && (
-              <Badge variant="secondary" className="ml-2 bg-blue-500 text-white text-xs">
-                {suggestedFriends.length}
-              </Badge>
-            )}
           </TabsTrigger>
           
           <TabsTrigger 
             value="requests" 
-            className="relative data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900"
+            className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600 relative"
           >
             Requests
             {requests.length > 0 && (
-              <Badge variant="destructive" className="ml-2 text-xs">
+              <span className="ml-2 inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
                 {requests.length}
-              </Badge>
+              </span>
             )}
           </TabsTrigger>
           
           <TabsTrigger 
             value="events" 
-            className="data-[state=active]:bg-gray-100 data-[state=active]:text-gray-900"
+            className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-gray-600"
           >
             Events
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="all-friends" className="space-y-6 mt-6">
+        <TabsContent value="all-friends" className="mt-6">
           <FriendsGrid friends={friends} loading={loading} />
         </TabsContent>
 
-        <TabsContent value="suggestions" className="space-y-6 mt-6">
+        <TabsContent value="suggestions" className="mt-6">
           <SuggestedFriendsTabContent
             suggestedFriends={suggestedFriends}
             loading={loading}
@@ -123,7 +112,7 @@ export const FriendsPageLayout = ({
           />
         </TabsContent>
 
-        <TabsContent value="requests" className="space-y-6 mt-6">
+        <TabsContent value="requests" className="mt-6">
           <RequestsGrid 
             requests={requests} 
             loading={loading}
@@ -132,7 +121,7 @@ export const FriendsPageLayout = ({
           />
         </TabsContent>
 
-        <TabsContent value="events" className="space-y-6 mt-6">
+        <TabsContent value="events" className="mt-6">
           <FriendsEventsTabContent
             friendIds={friendIds}
             currentUserId={currentUserId}

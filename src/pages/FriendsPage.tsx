@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { FriendsHeader } from '@/components/friends/FriendsHeader';
 import { useFriends } from '@/hooks/useFriends';
 import { useFriendRequests } from '@/hooks/useFriendRequests';
 import { useSuggestedFriends } from '@/hooks/useSuggestedFriends';
@@ -28,8 +27,20 @@ const FriendsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <FriendsHeader />
+      <div className="container mx-auto px-6 py-8 max-w-7xl">
+        {/* Header with friend counts */}
+        <div className="mb-8">
+          <div className="flex items-center gap-8 mb-6">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-gray-900">{friends.length}</div>
+              <div className="text-sm text-gray-500">Friends</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-gray-900">{requests.length}</div>
+              <div className="text-sm text-gray-500">Requests</div>
+            </div>
+          </div>
+        </div>
         
         <FriendsPageLayout
           activeTab={activeTab}
