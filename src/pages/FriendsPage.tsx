@@ -19,7 +19,7 @@ const FriendsPage = () => {
 
   const { friends, loading: friendsLoading } = useFriends(user?.id);
   const { requests, loading: requestsLoading, handleAcceptRequest, handleDeclineRequest } = useFriendRequests(user?.id);
-  const { suggestions, loading: suggestionsLoading } = useSuggestedFriends(user?.id);
+  const { suggestedFriends, loading: suggestionsLoading } = useSuggestedFriends(user?.id);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -29,6 +29,9 @@ const FriendsPage = () => {
     friend.username?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Get friend IDs for the events and casual plans tabs
+  const friendIds = friends.map(friend => friend.id);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <FriendsHeader />
@@ -36,7 +39,7 @@ const FriendsPage = () => {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         pendingRequestsCount={requests.length}
-        suggestedFriendsCount={suggestions.length}
+        suggestedFriendsCount={suggestedFriends.length}
         allFriendsContent={
           <FriendsTabContent
             friends={filteredFriends}
@@ -51,8 +54,18 @@ const FriendsPage = () => {
         }
         suggestionsContent={
           <SuggestedFriendsTabContent
-            suggestions={suggestions}
+            suggestedFriends={suggestedFriends}
             loading={suggestionsLoading}
+            onAddFriend={async (friendId: string) => {
+              // TODO: Implement add friend functionality
+              console.log('Add friend:', friendId);
+            }}
+            onDismiss={(friendId: string) => {
+              // TODO: Implement dismiss functionality
+              console.log('Dismiss suggestion:', friendId);
+            }}
+            currentUserId={user?.id}
+            friendIds={friendIds}
           />
         }
         requestsContent={
@@ -66,10 +79,17 @@ const FriendsPage = () => {
           />
         }
         eventsContent={
-          <FriendsEventsTabContent />
+          <FriendsEventsTabContent 
+            friendIds={friendIds}
+            currentUserId={user?.id}
+            friends={friends}
+          />
         }
         casualPlansContent={
-          <FriendsCasualPlansTabContent />
+          <FriendsCasualPlansTabContent 
+            friendIds={friendIds}
+            currentUserId={user?.id}
+          />
         }
       />
     </div>
