@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { formatInTimeZone } from 'date-fns-tz';
 import { AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
+import { useEventImages } from '@/hooks/useEventImages';
 import TeaseLoginSignup from '@/components/events/detail-sections/TeaseLoginSignup';
 
 const EventDetail = () => {
@@ -23,6 +25,9 @@ const EventDetail = () => {
   const [loading, setLoading] = useState(true);
   const [rsvpLoading, setRsvpLoading] = useState(false);
   const [attendees, setAttendees] = useState<{ going: any[]; interested: any[] }>({ going: [], interested: [] });
+
+  // Get event images using the hook
+  const { getEventImageUrl } = useEventImages();
 
   // Scroll to top when navigating to this page (but not during RSVP operations)
   useEffect(() => {
@@ -286,12 +291,10 @@ const EventDetail = () => {
     }
   };
 
-  // Get event image
+  // Get event image using the proper hook
   const getEventImage = () => {
-    if (event?.image_urls && event.image_urls.length > 0) {
-      return event.image_urls[0];
-    }
-    return '/img/default.jpg';
+    if (!event) return '/img/default.jpg';
+    return getEventImageUrl(event) || '/img/default.jpg';
   };
 
   if (loading) {
@@ -326,6 +329,7 @@ const EventDetail = () => {
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (!target.src.includes('/img/default.jpg')) {
+              console.log('Event image failed to load, using default');
               target.src = '/img/default.jpg';
             }
           }}
