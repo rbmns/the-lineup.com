@@ -1,110 +1,129 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase';
 
-export const useCasualPlansQueries = (includePublicData: boolean = true) => {
-  // Fetch casual plans - now available to everyone
-  const { data: rawPlans, isLoading: plansLoading, error: plansError } = useQuery({
-    queryKey: ['casual-plans-raw'],
+export const useCasualPlansQueries = (enabled: boolean = true) => {
+  // Fetch casual plans
+  const { 
+    data: rawPlans, 
+    isLoading: plansLoading, 
+    error: plansError,
+    refetch: refetchPlans
+  } = useQuery({
+    queryKey: ['casual-plans'],
     queryFn: async () => {
-      if (!includePublicData) {
-        return [];
-      }
-
       console.log('Fetching casual plans...');
-      
-      const { data: plansData, error: plansError } = await supabase
+      const { data, error } = await supabase
         .from('casual_plans')
         .select('*')
-        .gte('date', new Date().toISOString().split('T')[0])
-        .order('date', { ascending: true })
-        .order('time', { ascending: true });
-
-      if (plansError) {
-        console.error('Error fetching plans:', plansError);
-        throw plansError;
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching casual plans:', error);
+        throw error;
       }
-
-      console.log('Raw plans data:', plansData);
-      return plansData || [];
+      
+      console.log('Fetched casual plans:', data);
+      return data;
     },
-    enabled: includePublicData,
+    enabled,
   });
 
-  // Fetch casual plan attendees - now available to everyone
-  const { data: rawAttendees, isLoading: attendeesLoading } = useQuery({
+  // Fetch attendees
+  const { 
+    data: rawAttendees, 
+    isLoading: attendeesLoading, 
+    error: attendeesError,
+    refetch: refetchAttendees
+  } = useQuery({
     queryKey: ['casual-plan-attendees'],
     queryFn: async () => {
-      if (!includePublicData || !rawPlans?.length) {
-        return [];
-      }
-
-      console.log('Fetching attendees...');
-      
-      const planIds = rawPlans.map(plan => plan.id);
-      
-      const { data: attendeesData, error: attendeesError } = await supabase
+      console.log('Fetching casual plan attendees...');
+      const { data, error } = await supabase
         .from('casual_plan_attendees')
-        .select('*')
-        .in('plan_id', planIds);
-
-      if (attendeesError) {
-        console.error('Error fetching attendees:', attendeesError);
-        throw attendeesError;
+        .select('*');
+      
+      if (error) {
+        console.error('Error fetching attendees:', error);
+        throw error;
       }
-
-      console.log('Raw attendees data:', attendeesData);
-      return attendeesData || [];
+      
+      console.log('Fetched attendees:', data);
+      return data;
     },
-    enabled: includePublicData && !!rawPlans?.length,
+    enabled,
   });
 
-  // Fetch profiles for all users - now available to everyone
-  const { data: profiles, isLoading: profilesLoading } = useQuery({
-    queryKey: ['casual-plans-profiles', rawPlans, rawAttendees],
+  // Fetch interests
+  const { 
+    data: rawInterests, 
+    isLoading: interestsLoading, 
+    error: interestsError,
+    refetch: refetchInterests
+  } = useQuery({
+    queryKey: ['casual-plan-interests'],
     queryFn: async () => {
-      if (!includePublicData || (!rawPlans?.length && !rawAttendees?.length)) {
-        return [];
-      }
-
-      console.log('Fetching profiles...');
+      console.log('Fetching casual plan interests...');
+      const { data, error } = await supabase
+        .from('casual_plan_interests')
+        .select('*');
       
-      // Get unique user IDs from creators and attendees
-      const userIds = new Set<string>();
-      
-      rawPlans?.forEach(plan => {
-        if (plan.creator_id) userIds.add(plan.creator_id);
-      });
-      
-      rawAttendees?.forEach(attendee => {
-        if (attendee.user_id) userIds.add(attendee.user_id);
-      });
-
-      if (userIds.size === 0) {
-        return [];
+      if (error) {
+        console.error('Error fetching interests:', error);
+        throw error;
       }
-
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, username, avatar_url')
-        .in('id', Array.from(userIds));
-
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-        throw profilesError;
-      }
-
-      console.log('Profiles data:', profilesData);
-      return profilesData || [];
+      
+      console.log('Fetched interests:', data);
+      return data;
     },
-    enabled: includePublicData && (!!rawPlans?.length || !!rawAttendees?.length),
+    enabled,
   });
+
+  // Fetch profiles
+  const { 
+    data: profiles, 
+    isLoading: profilesLoading, 
+    error: profilesError,
+    refetch: refetchProfiles
+  } = useQuery({
+    queryKey: ['profiles'],
+    queryFn: async () => {
+      console.log('Fetching profiles...');
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url');
+      
+      if (error) {
+        console.error('Error fetching profiles:', error);
+        throw error;
+      }
+      
+      console.log('Fetched profiles:', data);
+      return data;
+    },
+    enabled,
+  });
+
+  const isLoading = plansLoading || attendeesLoading || interestsLoading || profilesLoading;
+  const error = plansError || attendeesError || interestsError || profilesError;
+
+  // Combined refetch function
+  const refetch = async () => {
+    await Promise.all([
+      refetchPlans(),
+      refetchAttendees(), 
+      refetchInterests(),
+      refetchProfiles()
+    ]);
+  };
 
   return {
     rawPlans,
     rawAttendees,
+    rawInterests,
     profiles,
-    isLoading: plansLoading || attendeesLoading || profilesLoading,
-    error: plansError,
+    isLoading,
+    error,
+    refetch
   };
 };

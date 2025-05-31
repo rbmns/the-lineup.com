@@ -83,13 +83,13 @@ const CasualPlans = () => {
       await markInterested(planId);
       toast({
         title: "Success",
-        description: "You've marked this plan as interesting!",
+        description: "Updated your interest in this plan!",
       });
     } catch (error) {
-      console.error('Error marking as interested:', error);
+      console.error('Error updating interest:', error);
       toast({
         title: "Error",
-        description: "Failed to mark as interested. Please try again.",
+        description: "Failed to update interest. Please try again.",
         variant: "destructive",
       });
     } finally {
