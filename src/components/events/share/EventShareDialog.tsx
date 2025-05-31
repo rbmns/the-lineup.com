@@ -4,6 +4,7 @@ import { Event } from "@/types";
 import { ShareButtons } from "./ShareButtons";
 import { copyToClipboard } from "@/utils/sharing/clipboardUtils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useEventImages } from "@/hooks/useEventImages";
 
 export interface EventShareDialogProps {
   event: Event;
@@ -13,13 +14,29 @@ export interface EventShareDialogProps {
 
 export function EventShareDialog({ event, isOpen, onOpenChange }: EventShareDialogProps) {
   const isMobile = useIsMobile();
+  const { getEventImageUrl } = useEventImages();
   
   const getEventUrl = () => {
-    const path = event.slug 
-      ? `/events/${event.slug}` 
-      : `/events/${event.id}`;
-    
-    return `${window.location.origin}${path}`;
+    // Always use the event ID for sharing to ensure it works
+    return `${window.location.origin}/events/${event.id}`;
+  };
+
+  const getShareTitle = () => {
+    const location = event.venues?.city || event.destination || 'Zandvoort';
+    return `Check out ${event.title} in ${location}`;
+  };
+
+  const getShareDescription = () => {
+    if (event.description) {
+      // Strip HTML and truncate to 150 characters for better social sharing
+      const plainText = event.description.replace(/<[^>]*>/g, '');
+      return plainText.length > 150 ? plainText.substring(0, 150) + '...' : plainText;
+    }
+    return `Join us for ${event.title}`;
+  };
+
+  const getShareImage = () => {
+    return getEventImageUrl(event) || 'https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg';
   };
 
   const handleCopyLink = async () => {
@@ -40,9 +57,10 @@ export function EventShareDialog({ event, isOpen, onOpenChange }: EventShareDial
         </DialogHeader>
         <div className="flex flex-col gap-4">
           <ShareButtons 
-            title={event.title} 
-            description={event.description || ""} 
+            title={getShareTitle()}
+            description={getShareDescription()}
             url={getEventUrl()}
+            imageUrl={getShareImage()}
             onCopyLink={handleCopyLink}
           />
         </div>

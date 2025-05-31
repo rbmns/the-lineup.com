@@ -9,26 +9,34 @@ export interface ShareButtonsProps {
   title: string;
   description: string;
   url: string;
+  imageUrl?: string;
   onCopyLink?: () => void;
 }
 
-export function ShareButtons({ title, description, url, onCopyLink }: ShareButtonsProps) {
+export function ShareButtons({ title, description, url, imageUrl, onCopyLink }: ShareButtonsProps) {
   const isMobile = useIsMobile();
 
   const handleShare = (platform: string) => {
     try {
+      const shareData = { 
+        title, 
+        text: description, 
+        url,
+        imageUrl 
+      };
+
       switch (platform) {
         case "facebook":
-          shareToFacebook({ title, text: description, url });
+          shareToFacebook(shareData);
           break;
         case "whatsapp":
-          shareToWhatsApp({ title, text: description, url });
+          shareToWhatsApp(shareData);
           break;
         case "snapchat":
-          shareToSnapchat({ title, text: description, url });
+          shareToSnapchat(shareData);
           break;
         case "linkedin":
-          shareToLinkedIn({ title, text: description, url });
+          shareToLinkedIn(shareData);
           break;
         default:
           console.log(`Share to ${platform} not implemented`);

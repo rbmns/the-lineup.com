@@ -19,10 +19,9 @@ const isInAppBrowser = (): boolean => {
 
 // Share to WhatsApp
 export const shareToWhatsApp = (data: SocialShare): void => {
-  const text = data.text ? `${data.title}: ${data.text}` : data.title;
-  const encodedText = encodeURIComponent(text);
-  const encodedUrl = encodeURIComponent(data.url);
-  const whatsappUrl = `https://wa.me/?text=${encodedText}%20${encodedUrl}`;
+  const message = `${data.title}\n\n${data.text || ''}\n\n${data.url}`;
+  const encodedMessage = encodeURIComponent(message);
+  const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
   
   // For in-app browsers, try to open in the same window
   if (isInAppBrowser()) {
@@ -49,7 +48,8 @@ export const shareToTwitter = (data: SocialShare): void => {
 // Share to Facebook
 export const shareToFacebook = (data: SocialShare): void => {
   const encodedUrl = encodeURIComponent(data.url);
-  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+  const encodedTitle = encodeURIComponent(data.title);
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedTitle}`;
   
   if (isInAppBrowser()) {
     window.location.href = facebookUrl;
@@ -74,10 +74,9 @@ export const shareToLinkedIn = (data: SocialShare): void => {
 
 // Share to Telegram
 export const shareToTelegram = (data: SocialShare): void => {
-  const text = data.text ? `${data.title}: ${data.text}` : data.title;
-  const encodedText = encodeURIComponent(text);
-  const encodedUrl = encodeURIComponent(data.url);
-  const telegramUrl = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
+  const message = `${data.title}\n\n${data.text || ''}\n\n${data.url}`;
+  const encodedMessage = encodeURIComponent(message);
+  const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(data.url)}&text=${encodedMessage}`;
   
   if (isInAppBrowser()) {
     window.location.href = telegramUrl;
