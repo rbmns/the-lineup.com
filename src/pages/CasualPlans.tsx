@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -139,7 +140,19 @@ const CasualPlans = () => {
     return isAttending ? 'going' : 'not_going';
   };
 
-  const pageContent = user ? (
+  // If user is not authenticated, show the overlay
+  if (!user) {
+    return (
+      <AuthOverlay 
+        title="Join Casual Plans" 
+        description="Sign in to view and join casual plans with other travelers and locals."
+      >
+        <FakeCasualPlansContent />
+      </AuthOverlay>
+    );
+  }
+
+  return (
     <div className="w-full">
       <Helmet>
         <title>the lineup | Join and create Casual Plans from others nearby</title>
@@ -225,23 +238,7 @@ const CasualPlans = () => {
         </div>
       </div>
     </div>
-  ) : (
-    <FakeCasualPlansContent />
   );
-
-  // If user is not authenticated, show the overlay
-  if (!user) {
-    return (
-      <AuthOverlay 
-        title="Join Casual Plans" 
-        description="Sign in to view and join casual plans with other travelers and locals."
-      >
-        {pageContent}
-      </AuthOverlay>
-    );
-  }
-
-  return pageContent;
 };
 
 export default CasualPlans;

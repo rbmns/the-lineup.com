@@ -1,16 +1,22 @@
 
 import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { FilterStateProvider } from '@/contexts/FilterStateContext';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
-import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayout';
-import { EventsVibeSection } from '@/components/events/page-sections/EventsVibeSection';
-import { EventsAdvancedSection } from '@/components/events/page-sections/EventsAdvancedSection';
-import { EventsResultsSection } from '@/components/events/page-sections/EventsResultsSection';
-import { EventCategoryFilters } from '@/components/events/filters/EventCategoryFilters';
+import { EventsPageHeader } from '@/components/events/EventsPageHeader';
+import { EventsPageMeta } from '@/components/events/EventsPageMeta';
+import { FilterSummary } from '@/components/events/FilterSummary';
+import { EventTypeIcon } from '@/components/ui/EventTypeIcon';
+import { EventsList } from '@/components/events/EventsList';
+import { EventTypesFilter } from '@/components/events/EventTypesFilter';
+import { VenueFilter } from '@/components/events/VenueFilter';
+import { EnhancedVibeFilter } from '@/components/events/EnhancedVibeFilter';
+import { DateRangeFilter } from '@/components/events/DateRangeFilter';
+import { DateFilterPill } from '@/components/events/DateFilterPill';
+import { FilteredEventsList } from '@/components/events/FilteredEventsList';
+import { EventsEmptyState } from '@/components/events/EventsEmptyState';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 
-const EventsContent = () => {
-  const { user } = useAuth();
+const Events = () => {
   const {
     filteredEvents,
     eventsLoading,
@@ -34,138 +40,114 @@ const EventsContent = () => {
     allEventTypes
   } = useEventsPageData();
 
-  const handleAdvancedFilterChange = (filters: any) => {
-    console.log('Handling advanced filter change:', filters);
-    
-    // Handle event category filters
-    if (filters.eventTypes !== undefined) {
-      console.log('Setting event types:', filters.eventTypes);
-      setSelectedEventTypes(filters.eventTypes);
-    }
-    
-    // Handle venue filters
-    if (filters.venues !== undefined) {
-      console.log('Setting venues:', filters.venues);
-      setSelectedVenues(filters.venues);
-    }
-    
-    // Handle vibe filters - updated to use eventVibes
-    if (filters.eventVibes !== undefined) {
-      console.log('Setting vibes:', filters.eventVibes);
-      setSelectedVibes(filters.eventVibes);
-    }
-    
-    // Handle date filters - map from 'date' to 'dateRange'
-    if (filters.date) {
-      console.log('Setting date range:', filters.date);
-      const dateRangeValue = { from: filters.date, to: filters.date };
-      setDateRange(dateRangeValue);
-    }
-    
-    if (filters.dateFilter !== undefined) {
-      console.log('Setting date filter:', filters.dateFilter);
-      setSelectedDateFilter(filters.dateFilter);
-    }
-  };
-
-  const handleSelectAll = () => {
-    setSelectedEventTypes(allEventTypes);
-  };
-
-  const handleDeselectAll = () => {
-    setSelectedEventTypes([]);
-  };
-
-  const handleToggleEventType = (eventType: string) => {
-    const isSelected = selectedEventTypes.includes(eventType);
-    
-    if (isSelected) {
-      // Remove the event type
-      setSelectedEventTypes(selectedEventTypes.filter(type => type !== eventType));
-    } else {
-      // Add the event type
-      setSelectedEventTypes([...selectedEventTypes, eventType]);
-    }
-  };
-
-  // Create a wrapper that ensures the return type is Promise<boolean>
-  const handleRsvpWithCorrectReturnType = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
-    try {
-      await enhancedHandleRsvp(eventId, status);
-      // Since enhancedHandleRsvp returns void, we assume success if no error is thrown
-      return true;
-    } catch (error) {
-      console.error('Error in RSVP handler:', error);
-      return false;
-    }
-  };
-
-  console.log('Current filter state:', {
-    selectedEventTypes,
-    selectedVenues,
-    selectedVibes,
-    filteredEventsCount: filteredEvents.length,
-    allEventTypes
-  });
-
   return (
-    <EventsPageLayout>
-      <div className="space-y-6 md:space-y-8">
-        {/* Main Category Filters */}
-        <div className="space-y-3">
-          <h2 className="text-xl font-semibold">Browse Events</h2>
-          <EventCategoryFilters
-            allEventTypes={allEventTypes}
+    <div className="w-full">
+      <EventsPageMeta />
+      <EventsPageHeader />
+      
+      {/* Filters Section */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6 space-y-4">
+          {/* Date Filters */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm font-medium text-gray-700 mr-2">Date:</span>
+            <DateFilterPill 
+              label="Today" 
+              value="today" 
+              selectedDateFilter={selectedDateFilter}
+              onSelect={setSelectedDateFilter}
+            />
+            <DateFilterPill 
+              label="Tomorrow" 
+              value="tomorrow" 
+              selectedDateFilter={selectedDateFilter}
+              onSelect={setSelectedDateFilter}
+            />
+            <DateFilterPill 
+              label="This Weekend" 
+              value="this-weekend" 
+              selectedDateFilter={selectedDateFilter}
+              onSelect={setSelectedDateFilter}
+            />
+            <DateRangeFilter 
+              dateRange={dateRange}
+              onDateRangeChange={setDateRange}
+            />
+          </div>
+
+          {/* Event Type Filter */}
+          <EventTypesFilter
+            eventTypes={allEventTypes}
             selectedEventTypes={selectedEventTypes}
-            onToggleEventType={handleToggleEventType}
-            onSelectAll={handleSelectAll}
-            onDeselectAll={handleDeselectAll}
-            className="w-full"
+            onEventTypeChange={setSelectedEventTypes}
+            isLoading={eventsLoading}
           />
+
+          {/* Vibe Filter */}
+          <EnhancedVibeFilter
+            vibes={vibes}
+            selectedVibes={selectedVibes}
+            onVibeChange={setSelectedVibes}
+            isLoading={vibesLoading}
+          />
+
+          {/* Venue Filter */}
+          <VenueFilter
+            selectedVenues={selectedVenues}
+            onVenueChange={setSelectedVenues}
+            isLoading={eventsLoading}
+          />
+
+          {/* Filter Summary */}
+          {hasActiveFilters && (
+            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+              <FilterSummary
+                selectedEventTypes={selectedEventTypes}
+                selectedVenues={selectedVenues}
+                selectedVibes={selectedVibes}
+                dateRange={dateRange}
+                selectedDateFilter={selectedDateFilter}
+                onRemoveEventType={(type) => setSelectedEventTypes(prev => prev.filter(t => t !== type))}
+                onRemoveVenue={(venue) => setSelectedVenues(prev => prev.filter(v => v !== venue))}
+                onRemoveVibe={(vibe) => setSelectedVibes(prev => prev.filter(v => v !== vibe))}
+                onRemoveDateRange={() => setDateRange(undefined)}
+                onRemoveDateFilter={() => setSelectedDateFilter('')}
+                allVibes={vibes}
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={resetFilters}
+                className="ml-4 text-xs"
+              >
+                <X className="h-3 w-3 mr-1" />
+                Clear all
+              </Button>
+            </div>
+          )}
         </div>
-
-        <EventsVibeSection
-          selectedVibes={selectedVibes}
-          onVibeChange={(vibes) => {
-            console.log('Vibe section changed:', vibes);
-            setSelectedVibes(vibes);
-          }}
-          vibes={vibes}
-          vibesLoading={vibesLoading}
-        />
-
-        <EventsAdvancedSection
-          onFilterChange={handleAdvancedFilterChange}
-          selectedEventTypes={selectedEventTypes}
-          selectedVenues={selectedVenues}
-          selectedVibes={selectedVibes}
-          dateRange={dateRange}
-          selectedDateFilter={selectedDateFilter}
-          filteredEventsCount={filteredEvents.length}
-          showLocationFilter={true}
-          allEventTypes={allEventTypes}
-        />
-
-        <EventsResultsSection
-          filteredEvents={filteredEvents}
-          hasActiveFilters={hasActiveFilters}
-          resetFilters={resetFilters}
-          eventsLoading={eventsLoading}
-          isFilterLoading={isFilterLoading}
-          user={user}
-          enhancedHandleRsvp={handleRsvpWithCorrectReturnType}
-          loadingEventId={loadingEventId}
-        />
       </div>
-    </EventsPageLayout>
-  );
-};
 
-const Events = () => {
-  return (
-    <FilterStateProvider>
-      <EventsContent />
-    </FilterStateProvider>
+      {/* Events List */}
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
+        {eventsLoading ? (
+          <div className="text-center py-8">
+            <p>Loading events...</p>
+          </div>
+        ) : filteredEvents.length > 0 ? (
+          <FilteredEventsList 
+            events={filteredEvents}
+            onRsvp={enhancedHandleRsvp}
+            loadingEventId={loadingEventId}
+          />
+        ) : (
+          <EventsEmptyState
+            hasActiveFilters={hasActiveFilters}
+            onResetFilters={resetFilters}
+          />
+        )}
+      </div>
+    </div>
   );
 };
 
