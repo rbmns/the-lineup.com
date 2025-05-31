@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -7,7 +8,8 @@ import Events from '@/pages/Events';
 import EventDetail from '@/pages/EventDetail';
 import Profile from '@/pages/Profile';
 import Friends from '@/pages/Friends';
-import Auth from '@/pages/Auth';
+import Login from '@/pages/Login';
+import Signup from '@/pages/Signup';
 import { AuthProvider } from '@/contexts/AuthContext';
 import CasualPlans from '@/pages/CasualPlans';
 import CasualPlanDetail from '@/pages/CasualPlanDetail';
@@ -29,8 +31,8 @@ function App() {
               <Route path="casual-plans/:planId" element={<CasualPlanDetail />} />
               <Route path="profile" element={<Profile />} />
               <Route path="friends" element={<Friends />} />
-              <Route path="login" element={<Auth />} />
-              <Route path="signup" element={<Auth />} />
+              <Route path="login" element={<Login />} />
+              <Route path="signup" element={<Signup />} />
             </Route>
           </Routes>
         </AuthProvider>
