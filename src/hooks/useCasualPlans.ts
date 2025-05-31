@@ -18,10 +18,25 @@ export const useCasualPlans = () => {
     ? transformCasualPlansData(rawPlans, rawAttendees, profiles, user?.id)
     : [];
 
+  // Add placeholder functions for markInterested and unmarkInterested
+  const markInterested = async (planId: string) => {
+    if (!user) throw new Error('User not authenticated');
+    console.log('markInterested not implemented yet for plan:', planId);
+    // TODO: Implement once casual_plan_interests table is created
+  };
+
+  const unmarkInterested = async (planId: string) => {
+    if (!user) throw new Error('User not authenticated');
+    console.log('unmarkInterested not implemented yet for plan:', planId);
+    // TODO: Implement once casual_plan_interests table is created
+  };
+
   return {
     plans,
     isLoading,
     error,
+    markInterested,
+    unmarkInterested,
     ...mutations,
   };
 };
