@@ -13,6 +13,7 @@ import Signup from '@/pages/Signup';
 import { AuthProvider } from '@/contexts/AuthContext';
 import CasualPlans from '@/pages/CasualPlans';
 import CasualPlanDetail from '@/pages/CasualPlanDetail';
+import GoodbyePage from '@/pages/GoodbyePage';
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ function App() {
               <Route path="friends" element={<Friends />} />
               <Route path="login" element={<Login />} />
               <Route path="signup" element={<Signup />} />
+              <Route path="goodbye" element={<GoodbyePage />} />
             </Route>
           </Routes>
         </AuthProvider>
