@@ -55,18 +55,8 @@ const EventCard: React.FC<EventCardProps> = ({
     if (onClick) {
       onClick(event);
     } else {
-      if (event && event.id) {
-        navigateToEvent({
-          ...event,
-          id: event.id,
-          destination: event.destination,
-          slug: event.slug,
-          start_time: event.start_time,
-          title: event.title
-        });
-      } else {
-        console.error("Cannot navigate: Missing event ID", event);
-      }
+      // Always navigate to event detail page
+      navigateToEvent(event);
     }
   };
 
