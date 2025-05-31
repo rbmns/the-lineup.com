@@ -1,96 +1,131 @@
 
 import { useState, useEffect, useMemo } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
-import { useEnhancedRsvp } from '@/hooks/events/useEnhancedRsvp';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRsvpActions } from '@/hooks/event-rsvp/useRsvpActions';
 import { useEventVibes } from '@/hooks/useEventVibes';
-import { supabase } from '@/lib/supabase';
-import { useEventFilterState } from '@/hooks/events/useEventFilterState';
-import { useFilteredEvents } from '@/hooks/events/useFilteredEvents';
+import { Event } from '@/types';
+import { DateRange } from 'react-day-picker';
 
 export const useEventsPageData = () => {
   const { user } = useAuth();
-  const { data: events = [], isLoading: eventsLoading } = useEvents(user?.id);
+  const { data: events, isLoading: eventsLoading } = useEvents(user?.id);
   const { data: vibes = [], isLoading: vibesLoading } = useEventVibes();
-  const [venues, setVenues] = useState<Array<{ value: string, label: string }>>([]);
-  const [isVenuesLoading, setIsVenuesLoading] = useState(true);
+  const { handleRsvp, loading: rsvpLoading } = useRsvpActions(user?.id);
   
-  // Get all unique event types from events
+  // Filter states
+  const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
+  const [selectedVenues, setSelectedVenues] = useState<string[]>([]);
+  const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [selectedDateFilter, setSelectedDateFilter] = useState<string>('');
+  const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
+
+  // Get all unique event types
   const allEventTypes = useMemo(() => {
-    const types = events.map(event => event.event_category).filter(Boolean);
-    return [...new Set(types)];
+    if (!events) return [];
+    return Array.from(new Set(
+      events
+        .filter(event => event.event_category)
+        .map(event => event.event_category as string)
+    )).sort();
   }, [events]);
-  
-  // Event filter state management
-  const {
-    selectedEventTypes,
-    setSelectedEventTypes,
-    selectedVenues,
-    setSelectedVenues,
-    selectedVibes,
-    setSelectedVibes,
-    dateRange,
-    setDateRange,
-    selectedDateFilter,
-    setSelectedDateFilter,
-    isFilterLoading,
-    hasActiveFilters,
-    resetFilters,
-  } = useEventFilterState();
-  
-  // Fetch all venues for the filter
-  useEffect(() => {
-    const fetchVenues = async () => {
-      setIsVenuesLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('venues')
-          .select('id, name')
-          .order('name');
-          
-        if (error) throw error;
-        
-        if (data) {
-          const venueOptions = data.map(venue => ({
-            value: venue.id,
-            label: venue.name
-          }));
-          setVenues(venueOptions);
-        }
-      } catch (err) {
-        console.error('Error fetching venues:', err);
-      } finally {
-        setIsVenuesLoading(false);
+
+  // Filter events based on all selected filters
+  const filteredEvents = useMemo(() => {
+    if (!events) return [];
+    
+    return events.filter((event) => {
+      // Event type filter
+      if (selectedEventTypes.length > 0 && !selectedEventTypes.includes(event.event_category || '')) {
+        return false;
       }
-    };
+      
+      // Venue filter
+      if (selectedVenues.length > 0 && !selectedVenues.includes(event.venue_id || '')) {
+        return false;
+      }
+      
+      // Vibe filter - now working with the vibe column
+      if (selectedVibes.length > 0 && !selectedVibes.includes(event.vibe || '')) {
+        return false;
+      }
+      
+      // Date filter logic
+      if (dateRange?.from) {
+        const eventDate = new Date(event.start_date || '');
+        const fromDate = new Date(dateRange.from);
+        const toDate = dateRange.to ? new Date(dateRange.to) : fromDate;
+        
+        if (eventDate < fromDate || eventDate > toDate) {
+          return false;
+        }
+      }
+      
+      // Quick date filters
+      if (selectedDateFilter) {
+        const today = new Date();
+        const eventDate = new Date(event.start_date || '');
+        
+        switch (selectedDateFilter) {
+          case 'today':
+            if (eventDate.toDateString() !== today.toDateString()) return false;
+            break;
+          case 'tomorrow':
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            if (eventDate.toDateString() !== tomorrow.toDateString()) return false;
+            break;
+          case 'this-weekend':
+            const dayOfWeek = today.getDay();
+            const daysUntilSaturday = (6 - dayOfWeek) % 7;
+            const saturday = new Date(today);
+            saturday.setDate(today.getDate() + daysUntilSaturday);
+            const sunday = new Date(saturday);
+            sunday.setDate(saturday.getDate() + 1);
+            
+            if (eventDate.toDateString() !== saturday.toDateString() && 
+                eventDate.toDateString() !== sunday.toDateString()) return false;
+            break;
+          // Add other date filter cases as needed
+        }
+      }
+      
+      return true;
+    });
+  }, [events, selectedEventTypes, selectedVenues, selectedVibes, dateRange, selectedDateFilter]);
 
-    fetchVenues();
-  }, []);
-  
-  // Use the filtered events hook - pass selectedEventTypes as selectedCategories
-  const filteredEvents = useFilteredEvents({
-    events,
-    selectedCategories: selectedEventTypes,
-    allEventTypes,
-    selectedVenues,
-    selectedVibes,
-    dateRange,
-    selectedDateFilter
-  });
+  // Check if any filters are active
+  const hasActiveFilters = selectedEventTypes.length > 0 || 
+                          selectedVenues.length > 0 || 
+                          selectedVibes.length > 0 || 
+                          !!dateRange || 
+                          !!selectedDateFilter;
 
-  const { 
-    handleRsvp: enhancedHandleRsvp, 
-    loadingEventId
-  } = useEnhancedRsvp(user?.id);
-  
+  // Enhanced RSVP handler
+  const enhancedHandleRsvp = async (eventId: string, status: 'Going' | 'Interested') => {
+    setLoadingEventId(eventId);
+    try {
+      await handleRsvp(eventId, status);
+    } finally {
+      setLoadingEventId(null);
+    }
+  };
+
+  // Reset all filters
+  const resetFilters = () => {
+    setSelectedEventTypes([]);
+    setSelectedVenues([]);
+    setSelectedVibes([]);
+    setDateRange(undefined);
+    setSelectedDateFilter('');
+  };
+
+  const isFilterLoading = vibesLoading;
+
   return {
-    user,
-    events,
-    eventsLoading,
     filteredEvents,
-    venues,
-    isVenuesLoading,
-    allEventTypes,
+    eventsLoading,
     selectedEventTypes,
     setSelectedEventTypes,
     selectedVenues,
@@ -107,6 +142,7 @@ export const useEventsPageData = () => {
     enhancedHandleRsvp,
     loadingEventId,
     vibes,
-    vibesLoading
+    vibesLoading,
+    allEventTypes
   };
 };

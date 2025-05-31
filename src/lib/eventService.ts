@@ -1,7 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { processEventsData } from '@/utils/eventProcessorUtils';
-import { toast } from 'sonner';
 import { AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
 
 /**
@@ -89,7 +88,6 @@ export const updateEventRsvp = async (eventId: string, userId: string, status: '
     }
 
     // If all operations were successful, return true
-    toast.success(`RSVP status updated to ${status}`);
     return true;
 
   } catch (error) {

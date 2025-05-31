@@ -29,7 +29,7 @@ interface AdvancedFiltersProps {
   className?: string;
   locations?: string[];
   initialFilters?: Partial<FilterValues>;
-  eventCategories?: string[]; // Keep prop for compatibility but won't use
+  eventCategories?: string[];
 }
 
 export interface FilterValues {
@@ -46,11 +46,13 @@ export default function AdvancedFilters({
   className,
   locations = ["Zandvoort Area"],
   initialFilters = {},
-  eventCategories = [], // Keep for compatibility
+  eventCategories = [],
 }: AdvancedFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [venues, setVenues] = useState<Array<{id: string, name: string}>>([]);
   const [venuesLoading, setVenuesLoading] = useState(true);
+  const [vibes, setVibes] = useState<Array<{id: string, name: string}>>([]);
+  const [vibesLoading, setVibesLoading] = useState(true);
   
   const [filters, setFilters] = useState<FilterValues>({
     date: initialFilters.date,
@@ -70,7 +72,6 @@ export default function AdvancedFilters({
     const fetchVenues = async () => {
       setVenuesLoading(true);
       try {
-        // Get venues that are actually used in events
         const { data: eventsWithVenues, error } = await supabase
           .from('events')
           .select(`
@@ -85,11 +86,9 @@ export default function AdvancedFilters({
           return;
         }
 
-        // Extract unique venues
         const uniqueVenues = new Map<string, {id: string, name: string}>();
         eventsWithVenues?.forEach(event => {
           if (event.venues && event.venue_id) {
-            // Handle venues as either array or single object
             const venueData = Array.isArray(event.venues) ? event.venues[0] : event.venues;
             if (venueData && venueData.name) {
               uniqueVenues.set(event.venue_id, {
@@ -116,15 +115,47 @@ export default function AdvancedFilters({
     fetchVenues();
   }, []);
 
+  // Fetch vibes from the database
+  useEffect(() => {
+    const fetchVibes = async () => {
+      setVibesLoading(true);
+      try {
+        const { data: vibesData, error } = await supabase
+          .from('event_vibe')
+          .select('id, name')
+          .order('name');
+
+        if (error) {
+          console.error('Error fetching vibes:', error);
+          return;
+        }
+
+        const vibesList = vibesData?.map(vibe => ({
+          id: vibe.id,
+          name: vibe.name
+        })) || [];
+
+        console.log('Loaded vibes for filtering:', vibesList);
+        setVibes(vibesList);
+      } catch (error) {
+        console.error('Error fetching vibes:', error);
+      } finally {
+        setVibesLoading(false);
+      }
+    };
+
+    fetchVibes();
+  }, []);
+
   const handleDateChange = (date: Date | undefined) => {
-    const newFilters = { ...filters, date, dateFilter: undefined }; // Clear dateFilter when setting specific date
+    const newFilters = { ...filters, date, dateFilter: undefined };
     setFilters(newFilters);
     onFilterChange(newFilters);
     updateActiveFiltersCount(newFilters);
   };
 
   const handleDateFilterChange = (dateFilter: string) => {
-    const newFilters = { ...filters, dateFilter, date: undefined }; // Clear specific date when setting dateFilter
+    const newFilters = { ...filters, dateFilter, date: undefined };
     setFilters(newFilters);
     onFilterChange(newFilters);
     updateActiveFiltersCount(newFilters);
@@ -143,6 +174,16 @@ export default function AdvancedFilters({
       ? [...filters.venues, venueId]
       : filters.venues.filter(v => v !== venueId);
     const newFilters = { ...filters, venues: newVenues };
+    setFilters(newFilters);
+    onFilterChange(newFilters);
+    updateActiveFiltersCount(newFilters);
+  };
+
+  const handleVibeChange = (vibeId: string, checked: boolean) => {
+    const newVibes = checked 
+      ? [...filters.eventVibes, vibeId]
+      : filters.eventVibes.filter(v => v !== vibeId);
+    const newFilters = { ...filters, eventVibes: newVibes };
     setFilters(newFilters);
     onFilterChange(newFilters);
     updateActiveFiltersCount(newFilters);
@@ -172,7 +213,6 @@ export default function AdvancedFilters({
     setActiveFiltersCount(0);
   };
 
-  // Date filter options
   const dateFilterOptions = [
     { value: 'today', label: 'Today' },
     { value: 'tomorrow', label: 'Tomorrow' },
@@ -278,6 +318,39 @@ export default function AdvancedFilters({
                 )}
               </div>
 
+              {/* Vibes */}
+              <div className="space-y-2 min-w-[200px]">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <BuildingIcon size={16} />
+                  Vibes
+                </label>
+                {vibesLoading ? (
+                  <div className="text-sm text-gray-500">Loading vibes...</div>
+                ) : vibes.length === 0 ? (
+                  <div className="text-sm text-gray-500">No vibes found</div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
+                    {vibes.map((vibe) => (
+                      <div key={vibe.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={vibe.id}
+                          checked={filters.eventVibes.includes(vibe.name)}
+                          onCheckedChange={(checked) => 
+                            handleVibeChange(vibe.name, checked as boolean)
+                          }
+                        />
+                        <label
+                          htmlFor={vibe.id}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {vibe.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Location */}
               <div className="space-y-2 min-w-[150px]">
                 <label className="text-sm font-medium flex items-center gap-2">
@@ -371,6 +444,39 @@ export default function AdvancedFilters({
                           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                           {venue.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Vibes */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <BuildingIcon size={16} />
+                  Vibes
+                </label>
+                {vibesLoading ? (
+                  <div className="text-sm text-gray-500">Loading vibes...</div>
+                ) : vibes.length === 0 ? (
+                  <div className="text-sm text-gray-500">No vibes found</div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
+                    {vibes.map((vibe) => (
+                      <div key={vibe.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={vibe.id}
+                          checked={filters.eventVibes.includes(vibe.name)}
+                          onCheckedChange={(checked) => 
+                            handleVibeChange(vibe.name, checked as boolean)
+                          }
+                        />
+                        <label
+                          htmlFor={vibe.id}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {vibe.name}
                         </label>
                       </div>
                     ))}
