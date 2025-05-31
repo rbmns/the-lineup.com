@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CasualPlan } from '@/types/casual-plans';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -29,8 +30,12 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
   onLoginPrompt,
 }) => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   
-  const handleJoinLeave = () => {
+  const handleJoinLeave = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (!isAuthenticated) {
       onLoginPrompt();
       return;
@@ -43,11 +48,23 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
     }
   };
 
+  const handleCardClick = () => {
+    navigate(`/casual-plans/${plan.id}`);
+  };
+
   const formattedDate = formatFeaturedDate(plan.date);
   const formattedTime = formatTime(plan.time);
 
+  const attendeeCount = plan.attendee_count || 0;
+  const maxAttendees = plan.max_attendees;
+  const isFull = maxAttendees && attendeeCount >= maxAttendees;
+  const fillPercentage = maxAttendees ? Math.round((attendeeCount / maxAttendees) * 100) : 67;
+
   return (
-    <div className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-sm">
+    <div 
+      className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-sm cursor-pointer"
+      onClick={handleCardClick}
+    >
       <div className="p-4">
         {/* Header with vibe pill and attendee count */}
         <div className="flex items-center justify-between mb-3">
@@ -59,7 +76,7 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
             />
           ) : (
             <div className="bg-gray-200 text-gray-400 px-2 py-1 rounded text-xs">
-              ••••••
+              <span className="bg-gray-300 text-transparent rounded">Sports</span>
             </div>
           )}
           
@@ -67,11 +84,11 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
             <Users className="h-3 w-3 mr-1" />
             {isAuthenticated ? (
               <>
-                <span className="font-medium">{plan.attendee_count || 0}</span>
-                {plan.max_attendees && <span className="text-gray-400">/{plan.max_attendees}</span>}
+                <span className="font-medium">{attendeeCount}</span>
+                {maxAttendees && <span className="text-gray-400">/{maxAttendees}</span>}
               </>
             ) : (
-              <span className="font-medium text-gray-300">•/••</span>
+              <span className="font-medium text-gray-300">8/12</span>
             )}
           </div>
         </div>
@@ -80,13 +97,6 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
         <h3 className="font-semibold text-base mb-2 line-clamp-2 leading-tight text-gray-900">
           {plan.title}
         </h3>
-        
-        {/* Vibe - only show for authenticated users */}
-        {isAuthenticated && (
-          <div className="text-sm text-gray-600 mb-2">
-            <span className="capitalize">{plan.vibe}</span>
-          </div>
-        )}
         
         {/* Date and time - single line */}
         <div className="flex items-center text-sm text-gray-600 mb-1">
@@ -103,12 +113,12 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
           {isAuthenticated ? (
             <span className="text-gray-600 truncate">{plan.location}</span>
           ) : (
-            <span className="text-gray-300 truncate">••••••••••••••••••••••••••</span>
+            <span className="bg-gray-300 text-transparent rounded truncate">Zandvoort Beach, North Section</span>
           )}
         </div>
         
-        {/* Description if available */}
-        {plan.description && (
+        {/* Description if available and authenticated */}
+        {isAuthenticated && plan.description && (
           <p className="text-sm text-gray-600 mb-4 line-clamp-2 leading-relaxed">
             {plan.description}
           </p>
@@ -139,7 +149,7 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
               <>
                 <div className="h-6 w-6 mr-2 flex-shrink-0 bg-gray-200 rounded-full"></div>
                 <div>
-                  <span className="text-sm text-gray-300 truncate">••••••</span>
+                  <span className="text-sm bg-gray-300 text-transparent rounded truncate">Christi</span>
                   <div className="text-xs text-gray-300">Organizer</div>
                 </div>
               </>
@@ -148,29 +158,52 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
           
           {/* Action button */}
           {isAuthenticated ? (
-            <Button
-              onClick={handleJoinLeave}
-              disabled={isJoining || isLeaving}
-              size="sm"
-              variant={plan.user_attending ? "outline" : "default"}
-              className={`
-                flex-shrink-0 ml-3 h-8 px-4 text-xs font-medium
-                ${plan.user_attending 
-                  ? "text-blue-600 border-blue-200 hover:bg-blue-50 bg-blue-50" 
-                  : "bg-green-600 hover:bg-green-700 text-white border-0"
-                }
-              `}
-            >
-              {isJoining || isLeaving 
-                ? "..." 
-                : plan.user_attending 
-                  ? "Going" 
-                  : "Interested"
-              }
-            </Button>
+            <div className="flex gap-1 flex-shrink-0 ml-3">
+              <Button
+                onClick={handleJoinLeave}
+                disabled={isJoining || isLeaving || (isFull && !plan.user_attending)}
+                size="sm"
+                className={`h-8 px-3 text-xs font-medium ${
+                  plan.user_attending 
+                    ? 'bg-green-600 hover:bg-green-700 text-white' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+                variant={plan.user_attending ? "default" : "outline"}
+              >
+                {isJoining || isLeaving ? (
+                  "..."
+                ) : plan.user_attending ? (
+                  <>
+                    <div className="w-2 h-2 mr-1 bg-white rounded-full"></div>
+                    Going
+                  </>
+                ) : isFull ? (
+                  "Full"
+                ) : (
+                  "Going"
+                )}
+              </Button>
+              
+              <Button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                size="sm"
+                variant="outline"
+                className="h-8 px-3 text-xs font-medium border-gray-300 text-gray-700 hover:bg-gray-50"
+                disabled={isJoining || isLeaving}
+              >
+                Interested
+              </Button>
+            </div>
           ) : (
             <Button
-              onClick={onLoginPrompt}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onLoginPrompt();
+              }}
               size="sm"
               variant="outline"
               className="flex-shrink-0 ml-3 h-8 px-4 text-xs font-medium text-gray-400 border-gray-200"

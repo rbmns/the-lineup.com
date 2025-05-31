@@ -1,72 +1,41 @@
-
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Toaster } from "sonner";
-import { QueryClient } from "./components/query-client";
-import Layout from "./components/Layout";
-import LandingPage from "./pages/LandingPage";
-import Events from "./pages/Events";
-import CreateEvent from "./pages/events/create";
-import EventDetail from "./pages/EventDetail";
-import EditEvent from "./pages/events/[eventId]/edit";
-import CasualPlansPage from "./pages/CasualPlans";
-import FriendsPage from "./pages/Friends";
-import MapPage from "./pages/map";
-import ProfilePage from "./pages/Profile";
-import UserProfilePage from "./pages/UserProfilePage";
-import ProfileEdit from "./pages/ProfileEdit";
-import LoginPage from "./pages/Login";
-import SignupPage from "./pages/Signup";
-import GoodbyePage from "./pages/GoodbyePage";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
-import CookiePolicy from "./pages/CookiePolicy";
-import EventCategoriesStyleGuide from "./components/design-system/EventCategoriesStyleGuide";
-import CreateCasualPlanPage from '@/components/casual-plans/CreateCasualPlanPage';
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import Layout from '@/components/Layout';
+import LandingPage from '@/pages/LandingPage';
+import Events from '@/pages/Events';
+import EventDetail from '@/pages/EventDetail';
+import Profile from '@/pages/Profile';
+import Friends from '@/pages/Friends';
+import Auth from '@/pages/Auth';
 import { AuthProvider } from '@/contexts/AuthContext';
+import CasualPlans from '@/pages/CasualPlans';
+import CasualPlanDetail from '@/pages/CasualPlanDetail';
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <QueryClient>
-      <AuthProvider>
-        <Toaster />
-        <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<LandingPage />} />
-              
-              {/* Public Events routes */}
-              <Route path="/events" element={<Events />} />
-              <Route path="/events/:id" element={<EventDetail />} />
-              
-              {/* Auth routes */}
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/goodbye" element={<GoodbyePage />} />
-              
-              {/* Legal pages */}
-              <Route path="/privacy" element={<PrivacyPolicy />} />
-              <Route path="/terms" element={<TermsOfService />} />
-              <Route path="/cookies" element={<CookiePolicy />} />
-              
-              {/* Protected routes (require authentication) */}
-              <Route path="/events/create" element={<CreateEvent />} />
-              <Route path="/events/:eventId/edit" element={<EditEvent />} />
-              <Route path="/casual-plans" element={<CasualPlansPage />} />
-              <Route path="/casual-plans/create" element={<CreateCasualPlanPage />} />
-              <Route path="/friends" element={<FriendsPage />} />
-              <Route path="/map" element={<MapPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/profile/edit" element={<ProfileEdit />} />
-              <Route path="/profile/:username" element={<UserProfilePage />} />
-              <Route path="/user/:userId" element={<UserProfilePage />} />
-              
-              {/* Design system routes */}
-              <Route path="/style-guide" element={<EventCategoriesStyleGuide />} />
+              <Route path="events" element={<Events />} />
+              <Route path="events/:eventId" element={<EventDetail />} />
+              <Route path="events/:destination/:eventSlug" element={<EventDetail />} />
+              <Route path="casual-plans" element={<CasualPlans />} />
+              <Route path="casual-plans/:planId" element={<CasualPlanDetail />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="friends" element={<Friends />} />
+              <Route path="login" element={<Auth />} />
+              <Route path="signup" element={<Auth />} />
             </Route>
           </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </QueryClient>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 
