@@ -44,7 +44,7 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = memo(({
         active={isNoneSelected || isAllSelected}
         onClick={handleAllClick}
         size="default"
-        className="text-sm"
+        className="text-sm border-0"
       />
       
       {allEventTypes.map((eventType) => (
@@ -56,6 +56,7 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = memo(({
           showIcon={false}
           size="default"
           noBorder={true}
+          className="border-0"
         />
       ))}
     </div>

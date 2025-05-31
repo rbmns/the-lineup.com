@@ -27,14 +27,16 @@ export function EventShareDialog({ event, isOpen, onOpenChange }: EventShareDial
     onOpenChange(false);
   };
 
-  // Adjust dialog size for mobile
-  const dialogContentClass = isMobile ? "px-3 py-4" : "sm:max-w-md";
+  // Adjust dialog size for mobile and ensure white background
+  const dialogContentClass = isMobile 
+    ? "px-3 py-4 bg-white border border-gray-200" 
+    : "sm:max-w-md bg-white border border-gray-200";
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className={dialogContentClass}>
         <DialogHeader>
-          <DialogTitle>Share {event.title}</DialogTitle>
+          <DialogTitle className="text-gray-900">Share {event.title}</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-4">
           <ShareButtons 
