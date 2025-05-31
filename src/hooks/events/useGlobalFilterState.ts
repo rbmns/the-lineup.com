@@ -1,3 +1,4 @@
+
 import { useEffect, useCallback } from 'react';
 import { useFilterState } from '@/contexts/FilterStateContext';
 import { DateRange } from 'react-day-picker';
@@ -16,11 +17,11 @@ export const useGlobalFilterState = () => {
     dateRange,
     setDateRange,
     selectedDateFilter,
-    setSelectedDateFilter,
+    setSelectedDateFilter: setDateFilterInternal,
     selectedVenues,
-    setSelectedVenues,
+    setSelectedVenues: setVenuesInternal,
     selectedVibes,
-    setSelectedVibes,
+    setSelectedVibes: setVibesInternal,
     hasAdvancedFilters,
     handleRemoveVenue,
     handleClearDateFilter,
@@ -47,15 +48,15 @@ export const useGlobalFilterState = () => {
 
   // Wrapper for setting venues that also saves state
   const setSelectedVenues = useCallback((venues: string[]) => {
-    setSelectedVenues(venues);
+    setVenuesInternal(venues);
     handleSaveFilterState();
-  }, [setSelectedVenues, handleSaveFilterState]);
+  }, [setVenuesInternal, handleSaveFilterState]);
 
   // Wrapper for setting vibes that also saves state
   const setSelectedVibes = useCallback((vibes: string[]) => {
-    setSelectedVibes(vibes);
+    setVibesInternal(vibes);
     handleSaveFilterState();
-  }, [setSelectedVibes, handleSaveFilterState]);
+  }, [setVibesInternal, handleSaveFilterState]);
 
   // Wrapper for setting date range that also saves state
   const setSelectedDateRange = useCallback((range: DateRange | undefined) => {
@@ -65,9 +66,9 @@ export const useGlobalFilterState = () => {
 
   // Wrapper for setting date filter that also saves state
   const setSelectedDateFilter = useCallback((filter: string) => {
-    setSelectedDateFilter(filter);
+    setDateFilterInternal(filter);
     handleSaveFilterState();
-  }, [setSelectedDateFilter, handleSaveFilterState]);
+  }, [setDateFilterInternal, handleSaveFilterState]);
 
   // Enhanced reset that clears all filters and updates UI
   const resetFiltersEnhanced = useCallback(() => {
