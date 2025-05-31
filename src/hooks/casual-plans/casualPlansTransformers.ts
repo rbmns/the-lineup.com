@@ -23,13 +23,6 @@ interface RawAttendee {
   created_at: string;
 }
 
-interface RawInterest {
-  id: string;
-  plan_id: string;
-  user_id: string;
-  created_at: string;
-}
-
 interface Profile {
   id: string;
   username: string;
@@ -40,10 +33,9 @@ export const transformCasualPlansData = (
   rawPlans: RawPlan[],
   rawAttendees: RawAttendee[],
   profiles: Profile[],
-  userId?: string,
-  rawInterests: RawInterest[] = []
+  userId?: string
 ): CasualPlan[] => {
-  console.log('Transforming data:', { rawPlans, rawAttendees, profiles, userId, rawInterests });
+  console.log('Transforming data:', { rawPlans, rawAttendees, profiles, userId });
 
   // Create lookup maps for efficient data access
   const profileMap = new Map<string, Profile>();
@@ -59,14 +51,6 @@ export const transformCasualPlansData = (
     attendeesByPlan.get(attendee.plan_id)!.push(attendee);
   });
 
-  const interestsByPlan = new Map<string, RawInterest[]>();
-  rawInterests.forEach(interest => {
-    if (!interestsByPlan.has(interest.plan_id)) {
-      interestsByPlan.set(interest.plan_id, []);
-    }
-    interestsByPlan.get(interest.plan_id)!.push(interest);
-  });
-
   // Transform plans
   const transformedPlans: CasualPlan[] = rawPlans.map(plan => {
     console.log('Processing plan:', plan.id, plan.title);
@@ -77,16 +61,21 @@ export const transformCasualPlansData = (
     // Get attendees for this plan
     const planAttendees = attendeesByPlan.get(plan.id) || [];
     
-    // Get interests for this plan
-    const planInterests = interestsByPlan.get(plan.id) || [];
+    // Transform attendees
+    const attendees = planAttendees.map(attendee => ({
+      id: attendee.id,
+      plan_id: attendee.plan_id,
+      user_id: attendee.user_id,
+      created_at: attendee.created_at,
+      user_profile: profileMap.get(attendee.user_id),
+    }));
 
     const transformedPlan: CasualPlan = {
       ...plan,
       creator_profile,
-      attendee_count: planAttendees.length,
-      interested_count: planInterests.length,
-      user_attending: userId ? planAttendees.some(att => att.user_id === userId) : false,
-      user_interested: userId ? planInterests.some(int => int.user_id === userId) : false,
+      attendees,
+      attendee_count: attendees.length,
+      user_attending: userId ? attendees.some(att => att.user_id === userId) : false,
     };
 
     console.log('Transformed plan:', transformedPlan.id, transformedPlan.title);
