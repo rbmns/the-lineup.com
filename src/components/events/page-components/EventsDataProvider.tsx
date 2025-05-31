@@ -114,8 +114,8 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
         return false;
       }
       
-      // Vibe filter - only filter if not all vibes are selected
-      if (selectedVibes && selectedVibes.length > 0 && selectedVibes.length < vibes.length) {
+      // Vibe filter - only filter if vibes are selected (not empty)
+      if (selectedVibes && selectedVibes.length > 0) {
         if (!selectedVibes.includes(event.vibe || '')) {
           return false;
         }
@@ -162,7 +162,7 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
       
       return true;
     });
-  }, [events, selectedCategories, selectedVenues, selectedVibes, vibes.length, dateRange, selectedDateFilter]);
+  }, [events, selectedCategories, selectedVenues, selectedVibes, dateRange, selectedDateFilter]);
 
   // Format venues for the component
   const formattedVenues = venues.map(venue => ({

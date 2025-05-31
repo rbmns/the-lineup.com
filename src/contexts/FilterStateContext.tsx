@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { DateRange } from 'react-day-picker';
 import { useEventVibes } from '@/hooks/useEventVibes';
@@ -41,12 +40,14 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
   
   const { data: vibes = [] } = useEventVibes();
 
-  // Initialize selectedVibes with all vibes when vibes data is loaded
+  // Initialize selectedVibes as empty array (no filters selected by default)
+  // This matches the behavior of event categories
   useEffect(() => {
     if (vibes.length > 0 && selectedVibes.length === 0) {
-      setSelectedVibes(vibes);
+      // Keep vibes empty by default, like categories
+      setSelectedVibes([]);
     }
-  }, [vibes, selectedVibes.length]);
+  }, [vibes.length]);
 
   const toggleCategory = (type: string) => {
     setSelectedCategories(prev => 
@@ -69,7 +70,7 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const hasActiveFilters = selectedCategories.length > 0 || 
                           selectedVenues.length > 0 || 
-                          (selectedVibes.length > 0 && selectedVibes.length < vibes.length) ||
+                          selectedVibes.length > 0 ||
                           !!dateRange || 
                           !!selectedDateFilter;
 
@@ -91,7 +92,7 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const resetFilters = () => {
     setSelectedCategories([]);
     setSelectedVenues([]);
-    setSelectedVibes(vibes); // Reset to all vibes
+    setSelectedVibes([]); // Reset to empty array (no filters)
     setDateRange(undefined);
     setSelectedDateFilter('');
     setShowAdvancedFilters(false);

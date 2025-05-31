@@ -96,8 +96,14 @@ export const EnhancedVibeFilter: React.FC<EnhancedVibeFilterProps> = ({
     }
   };
 
-  const handleSelectAll = () => {
-    onVibeChange(vibes);
+  const handleAllClick = () => {
+    // If all vibes are selected OR no vibes are selected, deselect all
+    // If some vibes are selected, select all
+    if (selectedVibes.length === 0 || selectedVibes.length === vibes.length) {
+      onVibeChange([]);
+    } else {
+      onVibeChange(vibes);
+    }
   };
 
   const handleClearAll = () => {
@@ -105,6 +111,7 @@ export const EnhancedVibeFilter: React.FC<EnhancedVibeFilterProps> = ({
   };
 
   const isAllSelected = selectedVibes.length === vibes.length;
+  const isNoneSelected = selectedVibes.length === 0;
 
   if (isLoading) {
     return (
@@ -144,10 +151,10 @@ export const EnhancedVibeFilter: React.FC<EnhancedVibeFilterProps> = ({
       
       <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
         <button
-          onClick={handleSelectAll}
+          onClick={handleAllClick}
           className={cn(
             "flex-shrink-0 rounded-full text-xs py-1 px-2 font-medium transition-all duration-200 border",
-            isAllSelected 
+            isAllSelected || isNoneSelected
               ? "bg-black text-white border-black shadow-sm" 
               : "bg-white text-gray-600 border-gray-300 hover:border-gray-400 opacity-80"
           )}
