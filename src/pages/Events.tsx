@@ -5,6 +5,7 @@ import { useEventPageMeta } from '@/components/events/EventsPageMeta';
 import { EventsDataProvider } from '@/components/events/page-components/EventsDataProvider';
 import { EventsPageFilters } from '@/components/events/page-components/EventsPageFilters';
 import { EventsResultsDisplay } from '@/components/events/page-components/EventsResultsDisplay';
+import { EventsVibeSection } from '@/components/events/page-sections/EventsVibeSection';
 import { FilterStateProvider } from '@/contexts/FilterStateContext';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -53,9 +54,22 @@ const Events = () => {
                 resetFilters,
                 handleRsvp,
                 showRsvpButtons,
-                loadingEventId
+                loadingEventId,
+                selectedVibes,
+                setSelectedVibes,
+                vibes,
+                vibesLoading
               }) => (
-                <>
+                <div className="space-y-6">
+                  {/* Vibe Filter Section */}
+                  <EventsVibeSection
+                    selectedVibes={selectedVibes || []}
+                    onVibeChange={setSelectedVibes || (() => {})}
+                    vibes={vibes || []}
+                    vibesLoading={vibesLoading || false}
+                  />
+                  
+                  {/* Category and Advanced Filters */}
                   <EventsPageFilters
                     allEventTypes={allEventTypes}
                     selectedCategories={selectedCategories}
@@ -79,6 +93,7 @@ const Events = () => {
                     resetFilters={resetFilters}
                   />
                   
+                  {/* Results Display */}
                   <EventsResultsDisplay
                     filteredEvents={filteredEvents}
                     similarEvents={similarEvents}
@@ -92,7 +107,7 @@ const Events = () => {
                     isNoneSelected={isNoneSelected}
                     selectAll={selectAll}
                   />
-                </>
+                </div>
               )}
             </EventsDataProvider>
           </div>
