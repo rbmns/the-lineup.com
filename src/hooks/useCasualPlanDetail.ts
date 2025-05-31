@@ -11,6 +11,8 @@ export const useCasualPlanDetail = (planId?: string) => {
   const [error, setError] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
+  const [isMarkingInterested, setIsMarkingInterested] = useState(false);
+  const [isUnmarkingInterested, setIsUnmarkingInterested] = useState(false);
 
   const fetchPlanDetail = async () => {
     if (!planId) {
@@ -55,8 +57,15 @@ export const useCasualPlanDetail = (planId?: string) => {
         .select('*', { count: 'exact', head: true })
         .eq('plan_id', planId);
 
-      // Check if current user is attending (if authenticated)
+      // Get interested count
+      const { count: interestedCount } = await supabase
+        .from('casual_plan_interests')
+        .select('*', { count: 'exact', head: true })
+        .eq('plan_id', planId);
+
+      // Check if current user is attending and/or interested (if authenticated)
       let userAttending = false;
+      let userInterested = false;
       if (user) {
         const { data: userAttendeeData } = await supabase
           .from('casual_plan_attendees')
@@ -65,14 +74,24 @@ export const useCasualPlanDetail = (planId?: string) => {
           .eq('user_id', user.id)
           .single();
 
+        const { data: userInterestedData } = await supabase
+          .from('casual_plan_interests')
+          .select('id')
+          .eq('plan_id', planId)
+          .eq('user_id', user.id)
+          .single();
+
         userAttending = !!userAttendeeData;
+        userInterested = !!userInterestedData;
       }
 
       const enhancedPlan: CasualPlan = {
         ...planData,
         creator_profile: creatorProfile || undefined,
         attendee_count: attendeeCount || 0,
-        user_attending: userAttending
+        interested_count: interestedCount || 0,
+        user_attending: userAttending,
+        user_interested: userInterested
       };
 
       setPlan(enhancedPlan);
@@ -131,6 +150,53 @@ export const useCasualPlanDetail = (planId?: string) => {
     }
   };
 
+  const markInterested = async (planId: string) => {
+    if (!user) return;
+
+    setIsMarkingInterested(true);
+    try {
+      const { error } = await supabase
+        .from('casual_plan_interests')
+        .insert({
+          plan_id: planId,
+          user_id: user.id
+        });
+
+      if (error) throw error;
+
+      // Refresh the plan data
+      await fetchPlanDetail();
+    } catch (error) {
+      console.error('Error marking as interested:', error);
+      throw error;
+    } finally {
+      setIsMarkingInterested(false);
+    }
+  };
+
+  const unmarkInterested = async (planId: string) => {
+    if (!user) return;
+
+    setIsUnmarkingInterested(true);
+    try {
+      const { error } = await supabase
+        .from('casual_plan_interests')
+        .delete()
+        .eq('plan_id', planId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      // Refresh the plan data
+      await fetchPlanDetail();
+    } catch (error) {
+      console.error('Error unmarking as interested:', error);
+      throw error;
+    } finally {
+      setIsUnmarkingInterested(false);
+    }
+  };
+
   useEffect(() => {
     fetchPlanDetail();
   }, [planId, user]);
@@ -141,8 +207,12 @@ export const useCasualPlanDetail = (planId?: string) => {
     error,
     joinPlan,
     leavePlan,
+    markInterested,
+    unmarkInterested,
     isJoining,
     isLeaving,
+    isMarkingInterested,
+    isUnmarkingInterested,
     refetch: fetchPlanDetail
   };
 };

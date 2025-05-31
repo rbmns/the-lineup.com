@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,8 +22,12 @@ const CasualPlanDetail = () => {
     error, 
     joinPlan, 
     leavePlan, 
+    markInterested,
+    unmarkInterested,
     isJoining, 
-    isLeaving 
+    isLeaving,
+    isMarkingInterested,
+    isUnmarkingInterested
   } = useCasualPlanDetail(planId);
 
   const handleBack = () => {
@@ -63,6 +66,38 @@ const CasualPlanDetail = () => {
     }
   };
 
+  const handleInterested = async () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    if (!plan) return;
+
+    try {
+      if (plan.user_interested) {
+        await unmarkInterested(plan.id);
+        toast({
+          title: "Unmarked as interested",
+          description: "You're no longer interested in this plan.",
+        });
+      } else {
+        await markInterested(plan.id);
+        toast({
+          title: "Marked as interested!",
+          description: "You're now interested in this plan.",
+        });
+      }
+    } catch (error) {
+      console.error('Error with interested status:', error);
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleLoginPrompt = () => {
     navigate('/login');
   };
@@ -88,6 +123,7 @@ const CasualPlanDetail = () => {
 
   const isCreator = user?.id === plan.creator_id;
   const attendeeCount = plan.attendee_count || 0;
+  const interestedCount = plan.interested_count || 0;
   const maxAttendees = plan.max_attendees;
   const spotsLeft = maxAttendees ? maxAttendees - attendeeCount : null;
   const isFull = maxAttendees && attendeeCount >= maxAttendees;
@@ -262,7 +298,7 @@ const CasualPlanDetail = () => {
                     <h3 className="font-medium">Event Attendees</h3>
                     <div className="flex gap-4 text-sm">
                       <span className="text-gray-500">All</span>
-                      <span className="font-medium">8</span>
+                      <span className="font-medium">{attendeeCount + interestedCount}</span>
                       <span className="text-gray-500">Friends</span>
                       <span className="font-medium">2</span>
                       <span className="text-gray-500">Suggestions</span>
@@ -302,22 +338,23 @@ const CasualPlanDetail = () => {
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <span className="font-medium">Interested</span>
-                      <Badge variant="secondary">2</Badge>
+                      <Badge variant="secondary">{interestedCount}</Badge>
                     </div>
                     
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-                      <div className="text-center">
-                        <Avatar className="h-12 w-12 mx-auto mb-2">
-                          <AvatarFallback>D</AvatarFallback>
-                        </Avatar>
-                        <p className="text-xs font-medium">Deniz</p>
-                      </div>
-                      <div className="text-center">
-                        <Avatar className="h-12 w-12 mx-auto mb-2">
-                          <AvatarFallback>E</AvatarFallback>
-                        </Avatar>
-                        <p className="text-xs font-medium">Emma</p>
-                      </div>
+                      {[
+                        { name: 'Deniz', avatar: null },
+                        { name: 'Emma', avatar: null },
+                        { name: 'Lisa', avatar: null },
+                        { name: 'Tom', avatar: null },
+                      ].slice(0, interestedCount).map((person, index) => (
+                        <div key={index} className="text-center">
+                          <Avatar className="h-12 w-12 mx-auto mb-2">
+                            <AvatarFallback>{person.name[0]}</AvatarFallback>
+                          </Avatar>
+                          <p className="text-xs font-medium">{person.name}</p>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -360,19 +397,39 @@ const CasualPlanDetail = () => {
                       </Button>
                       
                       <Button
-                        variant="outline"
-                        className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-50"
-                        disabled={isJoining || isLeaving}
+                        onClick={handleInterested}
+                        variant={plan.user_interested ? "default" : "outline"}
+                        className={`flex-1 ${
+                          plan.user_interested 
+                            ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                            : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                        }`}
+                        disabled={isMarkingInterested || isUnmarkingInterested}
                       >
-                        Interested
+                        {isMarkingInterested || isUnmarkingInterested ? (
+                          "..."
+                        ) : plan.user_interested ? (
+                          <>
+                            <div className="w-4 h-4 mr-2 bg-white rounded-full flex items-center justify-center">
+                              <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                            </div>
+                            Interested
+                          </>
+                        ) : (
+                          "Interested"
+                        )}
                       </Button>
                     </div>
                     
                     <div className="text-center">
                       <p className="text-sm text-gray-600">
-                        {attendeeCount} of {maxAttendees || 12} spots filled
+                        {attendeeCount} going, {interestedCount} interested
                       </p>
-                      <p className="text-sm font-medium">{fillPercentage}%</p>
+                      {maxAttendees && (
+                        <p className="text-sm text-gray-600">
+                          {attendeeCount} of {maxAttendees} spots filled ({fillPercentage}%)
+                        </p>
+                      )}
                     </div>
                   </div>
                 ) : (

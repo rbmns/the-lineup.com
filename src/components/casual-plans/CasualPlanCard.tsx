@@ -14,8 +14,12 @@ interface CasualPlanCardProps {
   plan: CasualPlan;
   onJoin: (planId: string) => void;
   onLeave: (planId: string) => void;
+  onMarkInterested: (planId: string) => void;
+  onUnmarkInterested: (planId: string) => void;
   isJoining: boolean;
   isLeaving: boolean;
+  isMarkingInterested: boolean;
+  isUnmarkingInterested: boolean;
   isAuthenticated: boolean;
   onLoginPrompt: () => void;
 }
@@ -24,8 +28,12 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
   plan,
   onJoin,
   onLeave,
+  onMarkInterested,
+  onUnmarkInterested,
   isJoining,
   isLeaving,
+  isMarkingInterested,
+  isUnmarkingInterested,
   isAuthenticated,
   onLoginPrompt,
 }) => {
@@ -45,6 +53,22 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
       onLeave(plan.id);
     } else {
       onJoin(plan.id);
+    }
+  };
+
+  const handleInterested = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!isAuthenticated) {
+      onLoginPrompt();
+      return;
+    }
+
+    if (plan.user_interested) {
+      onUnmarkInterested(plan.id);
+    } else {
+      onMarkInterested(plan.id);
     }
   };
 
@@ -185,16 +209,26 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
               </Button>
               
               <Button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
+                onClick={handleInterested}
                 size="sm"
-                variant="outline"
-                className="h-8 px-3 text-xs font-medium border-gray-300 text-gray-700 hover:bg-gray-50"
-                disabled={isJoining || isLeaving}
+                variant={plan.user_interested ? "default" : "outline"}
+                className={`h-8 px-3 text-xs font-medium ${
+                  plan.user_interested 
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+                disabled={isMarkingInterested || isUnmarkingInterested}
               >
-                Interested
+                {isMarkingInterested || isUnmarkingInterested ? (
+                  "..."
+                ) : plan.user_interested ? (
+                  <>
+                    <div className="w-2 h-2 mr-1 bg-white rounded-full"></div>
+                    Interested
+                  </>
+                ) : (
+                  "Interested"
+                )}
               </Button>
             </div>
           ) : (
