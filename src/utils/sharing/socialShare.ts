@@ -96,3 +96,16 @@ export const shareToSnapchat = (data: SocialShare): void => {
     window.open(snapchatUrl, '_blank');
   }
 };
+
+// Share to Signal
+export const shareToSignal = (data: SocialShare): void => {
+  const message = `${data.title}\n\n${data.text || ''}\n\n${data.url}`;
+  const encodedMessage = encodeURIComponent(message);
+  const signalUrl = `https://signal.me/#${encodedMessage}`;
+  
+  if (isInAppBrowser()) {
+    window.location.href = signalUrl;
+  } else {
+    window.open(signalUrl, '_blank');
+  }
+};

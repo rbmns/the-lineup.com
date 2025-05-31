@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Icons } from "./ShareIcons";
-import { shareToFacebook, shareToWhatsApp, shareToSnapchat, shareToLinkedIn } from "@/utils/sharing/socialShare";
+import { shareToFacebook, shareToWhatsApp, shareToSnapchat, shareToLinkedIn, shareToSignal } from "@/utils/sharing/socialShare";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "@/hooks/use-toast";
 
@@ -37,6 +37,9 @@ export function ShareButtons({ title, description, url, imageUrl, onCopyLink }: 
           break;
         case "linkedin":
           shareToLinkedIn(shareData);
+          break;
+        case "signal":
+          shareToSignal(shareData);
           break;
         default:
           console.log(`Share to ${platform} not implemented`);
@@ -88,8 +91,8 @@ export function ShareButtons({ title, description, url, imageUrl, onCopyLink }: 
     }
   };
 
-  // Determine grid columns based on mobile vs desktop
-  const gridClass = isMobile ? "grid-cols-2 gap-4" : "grid-cols-2 gap-3";
+  // Adjust grid columns for more sharing options - 3 columns for 6 items
+  const gridClass = isMobile ? "grid-cols-2 gap-4" : "grid-cols-3 gap-3";
 
   return (
     <div className={`grid ${gridClass}`}>
@@ -116,11 +119,11 @@ export function ShareButtons({ title, description, url, imageUrl, onCopyLink }: 
       <Button
         variant="outline"
         size={isMobile ? "default" : "sm"}
-        className="flex flex-col items-center justify-center h-16 sm:h-20 hover:bg-gray-50"
-        onClick={handleCopyLink}
+        className="flex flex-col items-center justify-center h-16 sm:h-20 hover:bg-blue-50"
+        onClick={() => handleShare("signal")}
       >
-        <Icons.link className="h-6 w-6 mb-1" />
-        <span className="text-xs">Copy Link</span>
+        <Icons.signal className="h-6 w-6 mb-1" />
+        <span className="text-xs">Signal</span>
       </Button>
       
       <Button
@@ -131,6 +134,16 @@ export function ShareButtons({ title, description, url, imageUrl, onCopyLink }: 
       >
         <Icons.linkedin className="h-6 w-6 mb-1" />
         <span className="text-xs">LinkedIn</span>
+      </Button>
+      
+      <Button
+        variant="outline"
+        size={isMobile ? "default" : "sm"}
+        className="flex flex-col items-center justify-center h-16 sm:h-20 hover:bg-gray-50"
+        onClick={handleCopyLink}
+      >
+        <Icons.link className="h-6 w-6 mb-1" />
+        <span className="text-xs">Copy Link</span>
       </Button>
     </div>
   );
