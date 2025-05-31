@@ -49,10 +49,10 @@ const EventsContent = () => {
       setSelectedVenues(filters.venues);
     }
     
-    // Handle vibe filters
-    if (filters.vibes !== undefined) {
-      console.log('Setting vibes:', filters.vibes);
-      setSelectedVibes(filters.vibes);
+    // Handle vibe filters - updated to use eventVibes
+    if (filters.eventVibes !== undefined) {
+      console.log('Setting vibes:', filters.eventVibes);
+      setSelectedVibes(filters.eventVibes);
     }
     
     // Handle date filters - map from 'date' to 'dateRange'
@@ -85,6 +85,18 @@ const EventsContent = () => {
     } else {
       // Add the event type
       setSelectedEventTypes([...selectedEventTypes, eventType]);
+    }
+  };
+
+  // Create a wrapper that ensures the return type is Promise<boolean>
+  const handleRsvpWithCorrectReturnType = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
+    try {
+      const result = await enhancedHandleRsvp(eventId, status);
+      // If enhancedHandleRsvp returns void, we assume success
+      return result !== undefined ? result : true;
+    } catch (error) {
+      console.error('Error in RSVP handler:', error);
+      return false;
     }
   };
 
@@ -141,7 +153,7 @@ const EventsContent = () => {
           eventsLoading={eventsLoading}
           isFilterLoading={isFilterLoading}
           user={user}
-          enhancedHandleRsvp={enhancedHandleRsvp}
+          enhancedHandleRsvp={handleRsvpWithCorrectReturnType}
           loadingEventId={loadingEventId}
         />
       </div>
