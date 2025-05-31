@@ -13,9 +13,10 @@ export const useEventNavigation = () => {
 
     console.log('Navigating to event:', event.id);
     
-    // Use simple ID-based route
+    // Use simple ID-based route - this should match the route in App.tsx
     const eventRoute = `/events/${event.id}`;
     
+    // Navigate to the event detail page
     navigate(eventRoute, {
       state: preserveScroll ? { preserveScroll: true } : undefined
     });

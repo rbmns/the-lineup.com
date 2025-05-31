@@ -80,6 +80,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
             compact={compact}
             className="h-full w-full"
             loadingEventId={loadingEventId}
+            onClick={undefined}
           />
         </div>
       ))}

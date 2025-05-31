@@ -52,6 +52,8 @@ const EventCard: React.FC<EventCardProps> = ({
       return; 
     }
     
+    console.log('EventCard clicked, navigating to event:', event.id);
+    
     if (onClick) {
       onClick(event);
     } else {
