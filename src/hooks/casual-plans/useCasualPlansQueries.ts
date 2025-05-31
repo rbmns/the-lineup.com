@@ -2,12 +2,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
-export const useCasualPlansQueries = (isAuthenticated: boolean) => {
-  // Fetch casual plans without any joins
+export const useCasualPlansQueries = (includePublicData: boolean = true) => {
+  // Fetch casual plans - now available to everyone
   const { data: rawPlans, isLoading: plansLoading, error: plansError } = useQuery({
     queryKey: ['casual-plans-raw'],
     queryFn: async () => {
-      if (!isAuthenticated) {
+      if (!includePublicData) {
         return [];
       }
 
@@ -28,14 +28,14 @@ export const useCasualPlansQueries = (isAuthenticated: boolean) => {
       console.log('Raw plans data:', plansData);
       return plansData || [];
     },
-    enabled: isAuthenticated,
+    enabled: includePublicData,
   });
 
-  // Fetch casual plan attendees
+  // Fetch casual plan attendees - now available to everyone
   const { data: rawAttendees, isLoading: attendeesLoading } = useQuery({
     queryKey: ['casual-plan-attendees'],
     queryFn: async () => {
-      if (!isAuthenticated || !rawPlans?.length) {
+      if (!includePublicData || !rawPlans?.length) {
         return [];
       }
 
@@ -56,14 +56,14 @@ export const useCasualPlansQueries = (isAuthenticated: boolean) => {
       console.log('Raw attendees data:', attendeesData);
       return attendeesData || [];
     },
-    enabled: isAuthenticated && !!rawPlans?.length,
+    enabled: includePublicData && !!rawPlans?.length,
   });
 
-  // Fetch profiles for all users (creators and attendees)
+  // Fetch profiles for all users - now available to everyone
   const { data: profiles, isLoading: profilesLoading } = useQuery({
     queryKey: ['casual-plans-profiles', rawPlans, rawAttendees],
     queryFn: async () => {
-      if (!isAuthenticated || (!rawPlans?.length && !rawAttendees?.length)) {
+      if (!includePublicData || (!rawPlans?.length && !rawAttendees?.length)) {
         return [];
       }
 
@@ -97,7 +97,7 @@ export const useCasualPlansQueries = (isAuthenticated: boolean) => {
       console.log('Profiles data:', profilesData);
       return profilesData || [];
     },
-    enabled: isAuthenticated && (!!rawPlans?.length || !!rawAttendees?.length),
+    enabled: includePublicData && (!!rawPlans?.length || !!rawAttendees?.length),
   });
 
   return {
