@@ -1,52 +1,63 @@
 
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
-import { Lock } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthOverlayProps {
+  title: string;
+  description: string;
   children: React.ReactNode;
-  title?: string;
-  description?: string;
+  browseEventsButton?: boolean;
 }
 
 export const AuthOverlay: React.FC<AuthOverlayProps> = ({ 
-  children, 
-  title = "Sign in required",
-  description = "You need to be logged in to access this page."
+  title, 
+  description, 
+  children,
+  browseEventsButton = false
 }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="relative">
-      {/* Greyed out content */}
+      {/* Background content - greyed out */}
       <div className="opacity-30 pointer-events-none">
         {children}
       </div>
       
-      {/* Overlay with login prompt */}
-      <div className="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm">
-        <Card className="w-full max-w-md mx-4 shadow-xl">
+      {/* Overlay */}
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <Card className="w-full max-w-md mx-auto">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-              <Lock className="w-6 h-6 text-primary" />
-            </div>
-            <CardTitle className="text-2xl font-semibold">{title}</CardTitle>
+            <CardTitle className="text-2xl font-bold">{title}</CardTitle>
             <CardDescription className="text-base">
               {description}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button asChild className="w-full">
-              <Link to="/login">Sign In</Link>
+            <Button 
+              onClick={() => navigate('/signup')} 
+              className="w-full bg-black text-white hover:bg-gray-800"
+            >
+              Sign Up
             </Button>
-            <Button asChild variant="outline" className="w-full">
-              <Link to="/signup">Create Account</Link>
+            <Button 
+              onClick={() => navigate('/login')} 
+              variant="outline"
+              className="w-full"
+            >
+              Log In
             </Button>
-            <div className="text-center">
-              <Button asChild variant="ghost" className="text-sm">
-                <Link to="/events">Just browse events instead</Link>
+            {browseEventsButton && (
+              <Button 
+                onClick={() => navigate('/events')} 
+                variant="ghost"
+                className="w-full text-gray-600 hover:text-gray-800"
+              >
+                Just Browse Events
               </Button>
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { VibeFilter } from '@/components/events/VibeFilter';
+import { EnhancedVibeFilter } from '@/components/events/EnhancedVibeFilter';
 
 interface EventsVibeSectionProps {
   selectedVibes: string[];
@@ -39,7 +39,7 @@ export const EventsVibeSection: React.FC<EventsVibeSectionProps> = ({
       </div>
       
       <div className="w-full">
-        <VibeFilter
+        <EnhancedVibeFilter
           selectedVibes={selectedVibes}
           onVibeChange={onVibeChange}
           vibes={vibes}

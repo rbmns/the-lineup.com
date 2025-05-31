@@ -8,13 +8,12 @@ import { EventsResultsDisplay } from '@/components/events/page-components/Events
 import { EventsVibeSection } from '@/components/events/page-sections/EventsVibeSection';
 import { FilterStateProvider } from '@/contexts/FilterStateContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { AuthOverlay } from '@/components/auth/AuthOverlay';
 
 const Events = () => {
   useEventPageMeta();
   const { isAuthenticated } = useAuth();
   
-  const eventsContent = (
+  return (
     <FilterStateProvider>
       <div className="min-h-screen bg-white">
         <EventsPageHeader 
@@ -116,19 +115,6 @@ const Events = () => {
       </div>
     </FilterStateProvider>
   );
-
-  if (!isAuthenticated) {
-    return (
-      <AuthOverlay
-        title="Join the Community"
-        description="Sign in to discover events, connect with friends, and never miss what's happening in your area."
-      >
-        {eventsContent}
-      </AuthOverlay>
-    );
-  }
-
-  return eventsContent;
 };
 
 export default Events;

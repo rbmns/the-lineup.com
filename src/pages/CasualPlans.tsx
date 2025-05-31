@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -140,12 +139,13 @@ const CasualPlans = () => {
     return isAttending ? 'going' : 'not_going';
   };
 
-  // If user is not authenticated, show the overlay
+  // If user is not authenticated, show the overlay with browse events option
   if (!user) {
     return (
       <AuthOverlay 
         title="Join Casual Plans" 
         description="Sign in to view and join casual plans with other travelers and locals."
+        browseEventsButton={true}
       >
         <FakeCasualPlansContent />
       </AuthOverlay>
