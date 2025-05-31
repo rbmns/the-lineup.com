@@ -37,23 +37,23 @@ export const AuthOverlay: React.FC<AuthOverlayProps> = ({
           </CardHeader>
           <CardContent className="space-y-4">
             <Button 
-              onClick={() => navigate('/signup')} 
-              className="w-full bg-black text-white hover:bg-gray-800"
-            >
-              Sign Up
-            </Button>
-            <Button 
               onClick={() => navigate('/login')} 
-              variant="outline"
-              className="w-full"
+              className="w-full bg-black text-white hover:bg-gray-800 text-base font-semibold py-3"
             >
               Log In
+            </Button>
+            <Button 
+              onClick={() => navigate('/signup')} 
+              variant="outline"
+              className="w-full text-base font-semibold py-3"
+            >
+              Sign Up
             </Button>
             {browseEventsButton && (
               <Button 
                 onClick={() => navigate('/events')} 
                 variant="ghost"
-                className="w-full text-gray-600 hover:text-gray-800"
+                className="w-full text-gray-600 hover:text-gray-800 text-base py-3"
               >
                 Just Browse Events
               </Button>
