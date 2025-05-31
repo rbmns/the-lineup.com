@@ -45,7 +45,7 @@ export const AuthOverlay: React.FC<AuthOverlayProps> = ({
             <Button 
               onClick={() => navigate('/signup')} 
               variant="outline"
-              className="w-full text-base font-semibold py-3"
+              className="w-full text-black border-gray-300 hover:bg-gray-50 text-base font-semibold py-3"
             >
               Sign Up
             </Button>
