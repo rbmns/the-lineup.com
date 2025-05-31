@@ -13,7 +13,7 @@ const Layout = () => {
   const location = useLocation();
 
   // Define which routes should be accessible without authentication
-  const publicRoutes = ['/', '/events', '/login', '/signup'];
+  const publicRoutes = ['/', '/events', '/casual-plans', '/login', '/signup'];
   
   // Check if current route starts with a public route (for dynamic routes like /events/:id)
   const isPublicRoute = publicRoutes.some(route => 
