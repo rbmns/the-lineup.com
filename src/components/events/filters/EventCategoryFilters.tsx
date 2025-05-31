@@ -2,6 +2,7 @@
 import React, { memo } from 'react';
 import { CategoryPill, AllCategoryPill } from '@/components/ui/category-pill';
 import { cn } from '@/lib/utils';
+import { Tag } from 'lucide-react';
 
 interface EventCategoryFiltersProps {
   allEventTypes: string[];
@@ -39,26 +40,36 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = memo(({
   }, [onToggleEventType]);
 
   return (
-    <div className={cn("flex gap-2 flex-wrap", className)}>
-      <AllCategoryPill
-        active={isNoneSelected || isAllSelected}
-        onClick={handleAllClick}
-        size="default"
-        className="text-sm border-0"
-      />
+    <div className={cn("space-y-2", className)}>
+      <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+        <Tag className="h-4 w-4" />
+        <span>Event Category</span>
+        {selectedEventTypes.length > 0 && selectedEventTypes.length < allEventTypes.length && (
+          <span className="text-xs text-gray-500">({selectedEventTypes.length})</span>
+        )}
+      </div>
       
-      {allEventTypes.map((eventType) => (
-        <CategoryPill
-          key={eventType}
-          category={eventType}
-          active={selectedEventTypes.includes(eventType)}
-          onClick={() => handleToggleEventType(eventType)}
-          showIcon={false}
+      <div className="flex gap-2 flex-wrap overflow-x-auto pb-2 no-scrollbar">
+        <AllCategoryPill
+          active={isNoneSelected || isAllSelected}
+          onClick={handleAllClick}
           size="default"
-          noBorder={true}
-          className="border-0"
+          className="text-sm border-0"
         />
-      ))}
+        
+        {allEventTypes.map((eventType) => (
+          <CategoryPill
+            key={eventType}
+            category={eventType}
+            active={selectedEventTypes.includes(eventType)}
+            onClick={() => handleToggleEventType(eventType)}
+            showIcon={false}
+            size="default"
+            noBorder={true}
+            className="border-0"
+          />
+        ))}
+      </div>
     </div>
   );
 });
