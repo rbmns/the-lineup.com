@@ -50,7 +50,7 @@ interface EventsDataProviderProps {
 export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children }) => {
   const { user } = useAuth();
   const { data: events = [], isLoading: eventsLoading } = useEvents(user?.id);
-  const { data: venues = [], isLoading: isVenuesLoading } = useVenues();
+  const { venues = [], isLoading: isVenuesLoading } = useVenues();
   const { data: vibes = [], isLoading: vibesLoading } = useEventVibes();
   const { handleRsvp, loading: rsvpLoading } = useRsvpActions(user?.id);
   
