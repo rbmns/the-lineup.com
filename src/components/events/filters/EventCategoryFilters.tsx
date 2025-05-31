@@ -43,7 +43,7 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = memo(({
     <div className={cn("space-y-2", className)}>
       <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
         <Tag className="h-4 w-4" />
-        <span>Event Category</span>
+        <span>Filter by Category</span>
         {selectedEventTypes.length > 0 && selectedEventTypes.length < allEventTypes.length && (
           <span className="text-xs text-gray-500">({selectedEventTypes.length})</span>
         )}
@@ -54,7 +54,7 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = memo(({
           active={isNoneSelected || isAllSelected}
           onClick={handleAllClick}
           size="default"
-          className="text-sm border-0"
+          className="text-sm !border-0 border-none"
         />
         
         {allEventTypes.map((eventType) => (
@@ -66,7 +66,7 @@ export const EventCategoryFilters: React.FC<EventCategoryFiltersProps> = memo(({
             showIcon={false}
             size="default"
             noBorder={true}
-            className="border-0"
+            className="!border-0 border-none"
           />
         ))}
       </div>
