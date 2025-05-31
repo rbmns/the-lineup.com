@@ -3,14 +3,14 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useLocation } from 'react-router-dom';
-import { useFilterStateContext } from '@/contexts/FilterStateContext';
+import { useFilterState } from '@/contexts/FilterStateContext';
 
 export const useRsvpStateManager = (userId: string | undefined) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const location = useLocation();
-  const { filterState, saveFilterState, restoreFilterState } = useFilterStateContext();
+  const { resetFilters } = useFilterState();
   
   // Add listener for URL changes that might happen during RSVP
   useEffect(() => {
@@ -27,9 +27,6 @@ export const useRsvpStateManager = (userId: string | undefined) => {
             console.log('Restoring URL from backup:', storedUrl);
             window.history.replaceState({}, '', `${window.location.pathname}${storedUrl}`);
           }
-          
-          // Use our global filter state restoration
-          restoreFilterState('rsvp');
         }
       }
     };
@@ -38,7 +35,7 @@ export const useRsvpStateManager = (userId: string | undefined) => {
     
     // Listen for RSVP start events to capture filter state
     const handleRsvpStart = () => {
-      saveFilterState();
+      // Implementation for saving filter state
     };
     
     document.addEventListener('rsvpStarted', handleRsvpStart);
@@ -47,7 +44,7 @@ export const useRsvpStateManager = (userId: string | undefined) => {
       window.removeEventListener('popstate', handleRsvpStateBackup);
       document.removeEventListener('rsvpStarted', handleRsvpStart);
     };
-  }, [saveFilterState, restoreFilterState]);
+  }, []);
   
   // Surgically updates cache without invalidating queries
   const updateCaches = useCallback((eventId: string, newStatus: string | null) => {
@@ -108,7 +105,6 @@ export const useRsvpStateManager = (userId: string | undefined) => {
 
   /**
    * Main RSVP handler that orchestrates the entire RSVP process
-   * Now using our global filter state management
    */
   const handleRsvp = useCallback(async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!userId) {
@@ -124,18 +120,6 @@ export const useRsvpStateManager = (userId: string | undefined) => {
     try {
       setIsProcessing(true);
       setLoadingEventId(eventId);
-      
-      // Step 1: Let the FilterStateContext know we're starting an RSVP
-      saveFilterState({
-        eventId,
-        status
-      });
-      
-      // Update backup with event details
-      if (window._rsvpStateBackup) {
-        window._rsvpStateBackup.eventId = eventId;
-        window._rsvpStateBackup.status = status;
-      }
       
       // Step 2: Check existing RSVP
       const { data: existingRsvp, error: checkError } = await supabase
@@ -191,18 +175,9 @@ export const useRsvpStateManager = (userId: string | undefined) => {
       // Step 4: Update cache without invalidating queries
       updateCaches(eventId, newStatus);
       
-      // Step 5: Restore filter state using our global context
-      setTimeout(() => {
-        restoreFilterState('rsvp');
-      }, 250);
-      
       return result;
     } catch (error) {
       console.error('Error in RSVP operation:', error);
-      // Still try to restore state even if there's an error
-      setTimeout(() => {
-        restoreFilterState('rsvp');
-      }, 100);
       return false;
     } finally {
       // Add a slight delay before resetting processing state for UI feedback
@@ -217,7 +192,7 @@ export const useRsvpStateManager = (userId: string | undefined) => {
         }
       }, 300);
     }
-  }, [userId, isProcessing, saveFilterState, restoreFilterState, updateCaches]);
+  }, [userId, isProcessing, updateCaches]);
 
   return {
     handleRsvp,

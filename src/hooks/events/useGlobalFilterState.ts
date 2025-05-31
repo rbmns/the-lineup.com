@@ -1,56 +1,61 @@
-
 import { useEffect, useCallback } from 'react';
-import { useFilterStateContext } from '@/contexts/FilterStateContext';
+import { useFilterState } from '@/contexts/FilterStateContext';
 import { DateRange } from 'react-day-picker';
 
 // Hook that connects the global filter state to the event filtering system
 export const useGlobalFilterState = () => {
   const {
-    filterState,
-    setEventTypes,
-    setVenues,
-    setVibes,
+    selectedCategories,
+    toggleCategory,
+    selectAll,
+    deselectAll,
+    isNoneSelected,
+    hasActiveFilters,
+    showAdvancedFilters,
+    toggleAdvancedFilters,
+    dateRange,
     setDateRange,
-    setDateFilter,
-    saveFilterState,
-    restoreFilterState,
-    resetFilters: contextResetFilters,
-    isRestoringFilters,
-    isInitialized
-  } = useFilterStateContext();
+    selectedDateFilter,
+    setSelectedDateFilter,
+    selectedVenues,
+    setSelectedVenues,
+    selectedVibes,
+    setSelectedVibes,
+    hasAdvancedFilters,
+    handleRemoveVenue,
+    handleClearDateFilter,
+    resetFilters,
+    loadingEventId,
+    setLoadingEventId
+  } = useFilterState();
 
   // Memoized getters
-  const selectedEventTypes = filterState.eventTypes;
-  const selectedVenues = filterState.venues;
-  const selectedVibes = filterState.vibes;
-  const dateRange = filterState.dateRange;
-  const selectedDateFilter = filterState.dateFilter;
+  const selectedEventTypes = selectedCategories;
   
   // Save state with current URL and scroll position
   const handleSaveFilterState = useCallback(() => {
-    saveFilterState({
-      urlParams: window.location.search,
-      scrollPosition: window.scrollY
-    });
-  }, [saveFilterState]);
+    // Implementation can be added later if needed
+  }, []);
 
   // Wrapper for setting event types that also saves state
   const setSelectedEventTypes = useCallback((types: string[]) => {
-    setEventTypes(types);
+    // Use toggleCategory for each type to update selectedCategories
+    // This is a simplified implementation
+    types.forEach(type => toggleCategory(type));
     handleSaveFilterState();
-  }, [setEventTypes, handleSaveFilterState]);
+  }, [toggleCategory, handleSaveFilterState]);
 
   // Wrapper for setting venues that also saves state
   const setSelectedVenues = useCallback((venues: string[]) => {
-    setVenues(venues);
+    setSelectedVenues(venues);
     handleSaveFilterState();
-  }, [setVenues, handleSaveFilterState]);
+  }, [setSelectedVenues, handleSaveFilterState]);
 
   // Wrapper for setting vibes that also saves state
   const setSelectedVibes = useCallback((vibes: string[]) => {
-    setVibes(vibes);
+    setSelectedVibes(vibes);
     handleSaveFilterState();
-  }, [setVibes, handleSaveFilterState]);
+  }, [setSelectedVibes, handleSaveFilterState]);
 
   // Wrapper for setting date range that also saves state
   const setSelectedDateRange = useCallback((range: DateRange | undefined) => {
@@ -60,60 +65,35 @@ export const useGlobalFilterState = () => {
 
   // Wrapper for setting date filter that also saves state
   const setSelectedDateFilter = useCallback((filter: string) => {
-    setDateFilter(filter);
+    setSelectedDateFilter(filter);
     handleSaveFilterState();
-  }, [setDateFilter, handleSaveFilterState]);
+  }, [setSelectedDateFilter, handleSaveFilterState]);
 
   // Enhanced reset that clears all filters and updates UI
-  const resetFilters = useCallback(() => {
-    contextResetFilters();
+  const resetFiltersEnhanced = useCallback(() => {
+    resetFilters();
     
     // Dispatch event for components that need to react to filter reset
     const resetEvent = new CustomEvent('filtersReset', {
       detail: { timestamp: Date.now() }
     });
     document.dispatchEvent(resetEvent);
-  }, [contextResetFilters]);
+  }, [resetFilters]);
 
   // Helper functions for individual filter types
   const handleRemoveEventType = useCallback((type: string) => {
-    setSelectedEventTypes(selectedEventTypes.filter(t => t !== type));
-  }, [selectedEventTypes, setSelectedEventTypes]);
-
-  const handleRemoveVenue = useCallback((venue: string) => {
-    setSelectedVenues(selectedVenues.filter(v => v !== venue));
-  }, [selectedVenues, setSelectedVenues]);
+    toggleCategory(type);
+  }, [toggleCategory]);
 
   const handleRemoveVibe = useCallback((vibe: string) => {
-    setSelectedVibes(selectedVibes.filter(v => v !== vibe));
+    const newVibes = selectedVibes.filter(v => v !== vibe);
+    setSelectedVibes(newVibes);
   }, [selectedVibes, setSelectedVibes]);
-
-  const handleClearDateFilter = useCallback(() => {
-    setSelectedDateRange(undefined);
-    setSelectedDateFilter('');
-  }, [setSelectedDateRange, setSelectedDateFilter]);
-
-  // Calculate derived state
-  const hasActiveFilters = 
-    selectedEventTypes.length > 0 ||
-    selectedVenues.length > 0 ||
-    selectedVibes.length > 0 ||
-    dateRange !== undefined ||
-    selectedDateFilter !== '';
-
-  const hasAdvancedFilters =
-    selectedVenues.length > 0 ||
-    selectedVibes.length > 0 ||
-    dateRange !== undefined ||
-    selectedDateFilter !== '';
 
   // Load filters when entering events page
   useEffect(() => {
     if (window.location.pathname.includes('/events')) {
       // Only restore if not already initialized to prevent double-loading
-      if (!isInitialized) {
-        restoreFilterState();
-      }
       
       // Add event listener for page visibility changes
       // This helps restore state when returning to the tab
@@ -123,7 +103,7 @@ export const useGlobalFilterState = () => {
           console.log('Page became visible, checking filter state');
           // Use a small delay to ensure all page state is ready
           setTimeout(() => {
-            restoreFilterState();
+            // restoreFilterState();
           }, 100);
         }
       };
@@ -134,7 +114,7 @@ export const useGlobalFilterState = () => {
         document.removeEventListener('visibilitychange', handleVisibilityChange);
       };
     }
-  }, [isInitialized, restoreFilterState]);
+  }, []);
 
   // Enhanced listener for RSVP operations
   useEffect(() => {
@@ -182,14 +162,14 @@ export const useGlobalFilterState = () => {
     selectedDateFilter,
     setSelectedDateFilter,
     saveFilterState: handleSaveFilterState,
-    restoreFilterState,
-    resetFilters,
+    restoreFilterState: () => {}, // Placeholder
+    resetFilters: resetFiltersEnhanced,
     handleRemoveEventType,
     handleRemoveVenue,
     handleRemoveVibe,
     handleClearDateFilter,
     hasActiveFilters,
     hasAdvancedFilters,
-    isFilterLoading: isRestoringFilters,
+    isFilterLoading: false,
   };
 };
