@@ -58,7 +58,7 @@ const EventCard: React.FC<EventCardProps> = ({
     if (onClick) {
       onClick(event);
     } else {
-      // Always navigate to event detail page
+      // Always navigate to event detail page using ID
       navigateToEvent(event);
     }
   };
