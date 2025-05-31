@@ -23,17 +23,10 @@ export const useCasualPlanDetail = (planId?: string) => {
       setIsLoading(true);
       setError(null);
 
-      // Fetch the plan with creator profile
+      // Fetch the plan first
       const { data: planData, error: planError } = await supabase
         .from('casual_plans')
-        .select(`
-          *,
-          creator_profile:profiles!casual_plans_creator_id_fkey (
-            id,
-            username,
-            avatar_url
-          )
-        `)
+        .select('*')
         .eq('id', planId)
         .single();
 
@@ -43,6 +36,17 @@ export const useCasualPlanDetail = (planId?: string) => {
         setError('Plan not found');
         setIsLoading(false);
         return;
+      }
+
+      // Fetch creator profile separately
+      const { data: creatorProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url')
+        .eq('id', planData.creator_id)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching creator profile:', profileError);
       }
 
       // Get attendee count
@@ -66,6 +70,7 @@ export const useCasualPlanDetail = (planId?: string) => {
 
       const enhancedPlan: CasualPlan = {
         ...planData,
+        creator_profile: creatorProfile || undefined,
         attendee_count: attendeeCount || 0,
         user_attending: userAttending
       };
