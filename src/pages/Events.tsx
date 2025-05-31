@@ -91,9 +91,9 @@ const EventsContent = () => {
   // Create a wrapper that ensures the return type is Promise<boolean>
   const handleRsvpWithCorrectReturnType = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     try {
-      const result = await enhancedHandleRsvp(eventId, status);
-      // If enhancedHandleRsvp returns void, we assume success
-      return result !== undefined ? result : true;
+      await enhancedHandleRsvp(eventId, status);
+      // Since enhancedHandleRsvp returns void, we assume success if no error is thrown
+      return true;
     } catch (error) {
       console.error('Error in RSVP handler:', error);
       return false;
