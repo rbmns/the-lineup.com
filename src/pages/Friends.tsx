@@ -19,6 +19,19 @@ import { FakeFriendsContent } from '@/components/fake-content/FakeFriendsContent
 
 const Friends: React.FC = () => {
   const { user } = useAuth();
+
+  // If user is not authenticated, show the overlay with fake content
+  if (!user) {
+    return (
+      <AuthOverlay 
+        title="Connect with Friends" 
+        description="Sign in to connect with travelers and locals in your area."
+      >
+        <FakeFriendsContent />
+      </AuthOverlay>
+    );
+  }
+
   const [activeTab, setActiveTab] = useState('all-friends');
 
   // Fetch friend data including current friends list
@@ -132,17 +145,6 @@ const Friends: React.FC = () => {
     }
     return success;
   };
-
-  if (!user) {
-    return (
-      <AuthOverlay 
-        title="Connect with Friends" 
-        description="Sign in to connect with travelers and locals in your area."
-      >
-        <FakeFriendsContent />
-      </AuthOverlay>
-    );
-  }
 
   const pendingRequestsCount = requests?.length || 0;
   const suggestedFriendsCount = suggestedFriends?.length || 0;

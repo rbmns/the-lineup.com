@@ -20,18 +20,18 @@ export const AuthOverlay: React.FC<AuthOverlayProps> = ({
   const navigate = useNavigate();
 
   return (
-    <div className="relative">
-      {/* Background content - greyed out */}
+    <div className="relative min-h-screen">
+      {/* Background content - greyed out and non-interactive */}
       <div className="opacity-30 pointer-events-none">
         {children}
       </div>
       
       {/* Overlay */}
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <Card className="w-full max-w-md mx-auto">
+        <Card className="w-full max-w-md mx-auto bg-white">
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">{title}</CardTitle>
-            <CardDescription className="text-base">
+            <CardTitle className="text-2xl font-bold text-gray-900">{title}</CardTitle>
+            <CardDescription className="text-base text-gray-600">
               {description}
             </CardDescription>
           </CardHeader>

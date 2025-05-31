@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -33,14 +34,6 @@ const Profile: React.FC = () => {
 
   const { profile, loading } = useProfileData(user?.id);
   const { pastEvents, upcomingEvents, isLoading: eventsLoading } = useUserEvents(user?.id);
-  
-  if (!user) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
-      </div>
-    );
-  }
 
   if (loading) {
     return (
