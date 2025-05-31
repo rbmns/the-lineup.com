@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFriendData } from '@/hooks/useFriendData';
@@ -15,6 +14,8 @@ import { FriendsLoginPrompt } from '@/components/friends/FriendsLoginPrompt';
 import { UserProfile } from '@/types/index';
 import { supabase } from '@/lib/supabase';
 import { FriendsCasualPlansTabContent } from '@/components/friends/FriendsCasualPlansTabContent';
+import { AuthOverlay } from '@/components/auth/AuthOverlay';
+import { FakeFriendsContent } from '@/components/fake-content/FakeFriendsContent';
 
 const Friends: React.FC = () => {
   const { user } = useAuth();
@@ -134,17 +135,12 @@ const Friends: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <FriendsHeader />
-        <div className="px-4">
-          <FriendsSearchSection 
-            searchQuery=""
-            onSearchChange={() => {}}
-            disabled={true}
-          />
-        </div>
-        <FriendsLoginPrompt />
-      </div>
+      <AuthOverlay 
+        title="Connect with Friends" 
+        description="Sign in to connect with travelers and locals in your area."
+      >
+        <FakeFriendsContent />
+      </AuthOverlay>
     );
   }
 

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,6 +10,7 @@ import { format } from 'date-fns';
 import { Helmet } from 'react-helmet-async';
 import { AuthOverlay } from '@/components/auth/AuthOverlay';
 import { PageHeader } from '@/components/ui/page-header';
+import { FakeCasualPlansContent } from '@/components/fake-content/FakeCasualPlansContent';
 
 const CasualPlans = () => {
   const { user } = useAuth();
@@ -19,8 +19,10 @@ const CasualPlans = () => {
   const [optimisticUpdates, setOptimisticUpdates] = useState({});
 
   useEffect(() => {
-    fetchPlans();
-  }, []);
+    if (user) {
+      fetchPlans();
+    }
+  }, [user]);
 
   const fetchPlans = async () => {
     setLoading(true);
@@ -137,7 +139,7 @@ const CasualPlans = () => {
     return isAttending ? 'going' : 'not_going';
   };
 
-  const pageContent = (
+  const pageContent = user ? (
     <div className="w-full">
       <Helmet>
         <title>the lineup | Join and create Casual Plans from others nearby</title>
@@ -215,16 +217,16 @@ const CasualPlans = () => {
               })}
             </div>
           )}
-          {user && (
-            <div className="mt-6">
-              <Button asChild>
-                <Link to="/casual-plans/create">Create a New Plan</Link>
-              </Button>
-            </div>
-          )}
+          <div className="mt-6">
+            <Button asChild>
+              <Link to="/casual-plans/create">Create a New Plan</Link>
+            </Button>
+          </div>
         </div>
       </div>
     </div>
+  ) : (
+    <FakeCasualPlansContent />
   );
 
   // If user is not authenticated, show the overlay

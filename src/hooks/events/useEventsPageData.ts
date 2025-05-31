@@ -21,6 +21,13 @@ export const useEventsPageData = () => {
   const [selectedDateFilter, setSelectedDateFilter] = useState<string>('');
   const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
 
+  // Initialize selectedVibes with all vibes when vibes data is loaded
+  useEffect(() => {
+    if (vibes.length > 0 && selectedVibes.length === 0) {
+      setSelectedVibes(vibes);
+    }
+  }, [vibes, selectedVibes.length]);
+
   // Get all unique event types
   const allEventTypes = useMemo(() => {
     if (!events) return [];
@@ -47,7 +54,7 @@ export const useEventsPageData = () => {
       }
       
       // Vibe filter - now working with the vibe column
-      if (selectedVibes.length > 0 && !selectedVibes.includes(event.vibe || '')) {
+      if (selectedVibes.length > 0 && selectedVibes.length < vibes.length && !selectedVibes.includes(event.vibe || '')) {
         return false;
       }
       
@@ -93,12 +100,12 @@ export const useEventsPageData = () => {
       
       return true;
     });
-  }, [events, selectedEventTypes, selectedVenues, selectedVibes, dateRange, selectedDateFilter]);
+  }, [events, selectedEventTypes, selectedVenues, selectedVibes, dateRange, selectedDateFilter, vibes.length]);
 
   // Check if any filters are active
   const hasActiveFilters = selectedEventTypes.length > 0 || 
                           selectedVenues.length > 0 || 
-                          selectedVibes.length > 0 || 
+                          (selectedVibes.length > 0 && selectedVibes.length < vibes.length) || 
                           !!dateRange || 
                           !!selectedDateFilter;
 
@@ -116,7 +123,7 @@ export const useEventsPageData = () => {
   const resetFilters = () => {
     setSelectedEventTypes([]);
     setSelectedVenues([]);
-    setSelectedVibes([]);
+    setSelectedVibes(vibes); // Reset to all vibes
     setDateRange(undefined);
     setSelectedDateFilter('');
   };

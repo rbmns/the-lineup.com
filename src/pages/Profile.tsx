@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -12,18 +11,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MapPin, Edit3, User, Shield, CalendarDays, Database } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import EventCardList from '@/components/events/EventCardList';
+import { AuthOverlay } from '@/components/auth/AuthOverlay';
+import { FakeProfileContent } from '@/components/fake-content/FakeProfileContent';
 
 const Profile: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('personal');
   
-  // If no user, redirect to login
-  React.useEffect(() => {
-    if (!user) {
-      navigate('/login', { state: { from: '/profile' } });
-    }
-  }, [user, navigate]);
+  // If no user, show fake content with overlay
+  if (!user) {
+    return (
+      <AuthOverlay 
+        title="Create Your Profile" 
+        description="Sign in to view and customize your personal profile and activity."
+      >
+        <FakeProfileContent />
+      </AuthOverlay>
+    );
+  }
 
   const { profile, loading } = useProfileData(user?.id);
   const { pastEvents, upcomingEvents, isLoading: eventsLoading } = useUserEvents(user?.id);

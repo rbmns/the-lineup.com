@@ -28,9 +28,15 @@ export const VibeFilter: React.FC<VibeFilterProps> = ({
     }
   };
 
+  const handleSelectAll = () => {
+    onVibeChange(vibes);
+  };
+
   const handleClearAll = () => {
     onVibeChange([]);
   };
+
+  const isAllSelected = selectedVibes.length === vibes.length;
 
   if (isLoading) {
     return (
@@ -54,7 +60,7 @@ export const VibeFilter: React.FC<VibeFilterProps> = ({
         <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
           <Sparkles className="h-4 w-4" />
           <span>Vibe</span>
-          {selectedVibes.length > 0 && (
+          {selectedVibes.length > 0 && selectedVibes.length < vibes.length && (
             <span className="text-xs text-gray-500">({selectedVibes.length})</span>
           )}
         </div>
@@ -69,6 +75,13 @@ export const VibeFilter: React.FC<VibeFilterProps> = ({
       </div>
       
       <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+        <CategoryPill 
+          category="All" 
+          active={isAllSelected} 
+          noBorder={true} 
+          onClick={handleSelectAll}
+          size="sm"
+        />
         {vibes.map((vibe) => (
           <CategoryPill 
             key={vibe}

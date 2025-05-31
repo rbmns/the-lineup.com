@@ -42,6 +42,11 @@ export const AuthOverlay: React.FC<AuthOverlayProps> = ({
             <Button asChild variant="outline" className="w-full">
               <Link to="/signup">Create Account</Link>
             </Button>
+            <div className="text-center">
+              <Button asChild variant="ghost" className="text-sm">
+                <Link to="/events">Just browse events instead</Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
