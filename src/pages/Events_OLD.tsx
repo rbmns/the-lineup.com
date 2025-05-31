@@ -85,8 +85,9 @@ const Events = () => {
           {/* Event Type Filter */}
           <EventTypesFilter
             eventTypes={allEventTypes.map(type => ({ value: type, label: type }))}
-            selectedEventTypes={selectedEventTypes.map(type => ({ value: type, label: type }))}
-            onEventTypeChange={(types) => setSelectedEventTypes(types.map(t => t.value))}
+            selectedEventTypes={selectedEventTypes}
+            onEventTypeChange={setSelectedEventTypes}
+            onReset={() => setSelectedEventTypes([])}
           />
 
           {/* Vibe Filter */}
@@ -99,8 +100,10 @@ const Events = () => {
 
           {/* Venue Filter */}
           <VenueFilter
+            venues={[]}
             selectedVenues={selectedVenues}
             onVenueChange={setSelectedVenues}
+            onReset={() => setSelectedVenues([])}
           />
 
           {/* Filter Summary */}
