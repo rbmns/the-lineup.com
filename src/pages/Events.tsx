@@ -111,10 +111,14 @@ const Events = () => {
                 selectedVenues={selectedVenues}
                 dateRange={dateRange}
                 selectedDateFilter={selectedDateFilter}
+                eventTypeOptions={allEventTypes.map(type => ({ value: type, label: type }))}
+                venueOptions={[]}
                 onRemoveEventType={(type) => setSelectedEventTypes(prev => prev.filter(t => t !== type))}
                 onRemoveVenue={(venue) => setSelectedVenues(prev => prev.filter(v => v !== venue))}
-                onRemoveDateRange={() => setDateRange(undefined)}
-                onRemoveDateFilter={() => setSelectedDateFilter('')}
+                onClearDateFilter={() => {
+                  setDateRange(undefined);
+                  setSelectedDateFilter('');
+                }}
               />
               <Button
                 variant="outline"
