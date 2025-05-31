@@ -8,19 +8,20 @@ import { EventsResultsDisplay } from '@/components/events/page-components/Events
 import { FilterStateProvider } from '@/contexts/FilterStateContext';
 import { useAuth } from '@/contexts/AuthContext';
 
-const EventsPageRefactored = () => {
+const Events = () => {
   useEventPageMeta();
   const { isAuthenticated } = useAuth();
   
   return (
     <FilterStateProvider>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         <EventsPageHeader 
           title="What's Happening?" 
           subtitle="Discover events in the Zandvoort area"
+          showBackground={true}
         />
         
-        <div className="w-full px-4 md:px-6 py-4 md:py-8">
+        <div className="w-full px-4 md:px-6 py-6 md:py-8">
           <div className="max-w-7xl mx-auto">
             <EventsDataProvider>
               {({
@@ -101,4 +102,4 @@ const EventsPageRefactored = () => {
   );
 };
 
-export default EventsPageRefactored;
+export default Events;

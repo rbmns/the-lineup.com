@@ -19,7 +19,7 @@ export const EventsPageHeader: React.FC<EventsPageHeaderProps> = ({
 
   if (showBackground) {
     return (
-      <div className="relative h-[300px] md:h-[400px] overflow-hidden">
+      <div className="relative h-[200px] md:h-[250px] overflow-hidden">
         {/* Background Image */}
         <img
           src={backgroundImage}
@@ -32,12 +32,14 @@ export const EventsPageHeader: React.FC<EventsPageHeaderProps> = ({
         
         {/* Content */}
         <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white px-4">
-          <h1 className={`font-bold tracking-tight mb-4 ${isMobile ? 'text-3xl' : 'text-4xl md:text-5xl'}`}>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
             {title}
           </h1>
-          <p className={`text-white/90 leading-relaxed max-w-2xl ${isMobile ? 'text-base' : 'text-lg md:text-xl'}`}>
-            {subtitle}
-          </p>
+          {!isMobile && (
+            <p className="text-lg md:text-xl text-white/90 leading-relaxed max-w-2xl">
+              {subtitle}
+            </p>
+          )}
         </div>
       </div>
     );
