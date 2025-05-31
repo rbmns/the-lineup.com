@@ -51,29 +51,42 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
       <div className="p-4">
         {/* Header with vibe pill and attendee count */}
         <div className="flex items-center justify-between mb-3">
-          <CategoryPill 
-            category={plan.vibe} 
-            size="sm"
-            className="capitalize text-xs px-2 py-1"
-          />
           {isAuthenticated ? (
-            <div className="flex items-center text-sm text-gray-500 bg-gray-50 px-2 py-1 rounded">
-              <Users className="h-3 w-3 mr-1" />
-              <span className="font-medium">{plan.attendee_count || 0}</span>
-              {plan.max_attendees && <span className="text-gray-400">/{plan.max_attendees}</span>}
-            </div>
+            <CategoryPill 
+              category={plan.vibe} 
+              size="sm"
+              className="capitalize text-xs px-2 py-1"
+            />
           ) : (
-            <div className="flex items-center text-sm text-gray-300 bg-gray-100 px-2 py-1 rounded">
-              <Users className="h-3 w-3 mr-1" />
-              <span className="font-medium">•••</span>
+            <div className="bg-gray-200 text-gray-400 px-2 py-1 rounded text-xs">
+              ••••••
             </div>
           )}
+          
+          <div className="flex items-center text-sm text-gray-500 bg-gray-50 px-2 py-1 rounded">
+            <Users className="h-3 w-3 mr-1" />
+            {isAuthenticated ? (
+              <>
+                <span className="font-medium">{plan.attendee_count || 0}</span>
+                {plan.max_attendees && <span className="text-gray-400">/{plan.max_attendees}</span>}
+              </>
+            ) : (
+              <span className="font-medium text-gray-300">•/••</span>
+            )}
+          </div>
         </div>
         
         {/* Title */}
         <h3 className="font-semibold text-base mb-2 line-clamp-2 leading-tight text-gray-900">
           {plan.title}
         </h3>
+        
+        {/* Vibe - only show for authenticated users */}
+        {isAuthenticated && (
+          <div className="text-sm text-gray-600 mb-2">
+            <span className="capitalize">{plan.vibe}</span>
+          </div>
+        )}
         
         {/* Date and time - single line */}
         <div className="flex items-center text-sm text-gray-600 mb-1">
@@ -90,7 +103,7 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
           {isAuthenticated ? (
             <span className="text-gray-600 truncate">{plan.location}</span>
           ) : (
-            <span className="text-gray-300 truncate">•••••••••••</span>
+            <span className="text-gray-300 truncate">••••••••••••••••••••••••••</span>
           )}
         </div>
         
@@ -115,14 +128,20 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
                     {plan.creator_profile?.username?.[0]?.toUpperCase() || 'U'}
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-sm text-gray-600 truncate">
-                  {plan.creator_profile?.username || 'Anonymous'}
-                </span>
+                <div>
+                  <span className="text-sm text-gray-600 truncate">
+                    {plan.creator_profile?.username || 'Anonymous'}
+                  </span>
+                  <div className="text-xs text-gray-400">Organizer</div>
+                </div>
               </>
             ) : (
               <>
                 <div className="h-6 w-6 mr-2 flex-shrink-0 bg-gray-200 rounded-full"></div>
-                <span className="text-sm text-gray-300 truncate">••••••••</span>
+                <div>
+                  <span className="text-sm text-gray-300 truncate">••••••</span>
+                  <div className="text-xs text-gray-300">Organizer</div>
+                </div>
               </>
             )}
           </div>
@@ -156,7 +175,7 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
               variant="outline"
               className="flex-shrink-0 ml-3 h-8 px-4 text-xs font-medium text-gray-400 border-gray-200"
             >
-              Sign up to join
+              Sign in to RSVP
             </Button>
           )}
         </div>
@@ -167,7 +186,7 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
             <p className="text-xs text-gray-500 mb-2">
               <Link to="/login" className="text-blue-600 hover:text-blue-800 underline">
                 Sign in
-              </Link> to see location, creator details, and join plans
+              </Link> to see location and organizer details
             </p>
           </div>
         )}
