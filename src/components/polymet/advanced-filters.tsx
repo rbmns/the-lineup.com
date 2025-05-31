@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/polymet/button";
@@ -51,7 +52,7 @@ export default function AdvancedFilters({
   const [isOpen, setIsOpen] = useState(false);
   const [venues, setVenues] = useState<Array<{id: string, name: string}>>([]);
   const [venuesLoading, setVenuesLoading] = useState(true);
-  const [vibes, setVibes] = useState<Array<{id: string, name: string}>>([]);
+  const [vibes, setVibes] = useState<Array<string>>([]);
   const [vibesLoading, setVibesLoading] = useState(true);
   
   const [filters, setFilters] = useState<FilterValues>({
@@ -115,28 +116,29 @@ export default function AdvancedFilters({
     fetchVenues();
   }, []);
 
-  // Fetch vibes from the database
+  // Fetch vibes from the events table
   useEffect(() => {
     const fetchVibes = async () => {
       setVibesLoading(true);
       try {
-        const { data: vibesData, error } = await supabase
-          .from('event_vibe')
-          .select('id, name')
-          .order('name');
+        const { data: eventsData, error } = await supabase
+          .from('events')
+          .select('vibe')
+          .not('vibe', 'is', null)
+          .not('vibe', 'eq', '');
 
         if (error) {
           console.error('Error fetching vibes:', error);
           return;
         }
 
-        const vibesList = vibesData?.map(vibe => ({
-          id: vibe.id,
-          name: vibe.name
-        })) || [];
+        // Get unique vibes and filter out empty/null values
+        const uniqueVibes = Array.from(new Set(
+          eventsData?.map(event => event.vibe).filter(Boolean)
+        )).sort();
 
-        console.log('Loaded vibes for filtering:', vibesList);
-        setVibes(vibesList);
+        console.log('Loaded vibes for filtering:', uniqueVibes);
+        setVibes(uniqueVibes);
       } catch (error) {
         console.error('Error fetching vibes:', error);
       } finally {
@@ -179,10 +181,10 @@ export default function AdvancedFilters({
     updateActiveFiltersCount(newFilters);
   };
 
-  const handleVibeChange = (vibeId: string, checked: boolean) => {
+  const handleVibeChange = (vibe: string, checked: boolean) => {
     const newVibes = checked 
-      ? [...filters.eventVibes, vibeId]
-      : filters.eventVibes.filter(v => v !== vibeId);
+      ? [...filters.eventVibes, vibe]
+      : filters.eventVibes.filter(v => v !== vibe);
     const newFilters = { ...filters, eventVibes: newVibes };
     setFilters(newFilters);
     onFilterChange(newFilters);
@@ -331,19 +333,19 @@ export default function AdvancedFilters({
                 ) : (
                   <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
                     {vibes.map((vibe) => (
-                      <div key={vibe.id} className="flex items-center space-x-2">
+                      <div key={vibe} className="flex items-center space-x-2">
                         <Checkbox
-                          id={vibe.id}
-                          checked={filters.eventVibes.includes(vibe.name)}
+                          id={vibe}
+                          checked={filters.eventVibes.includes(vibe)}
                           onCheckedChange={(checked) => 
-                            handleVibeChange(vibe.name, checked as boolean)
+                            handleVibeChange(vibe, checked as boolean)
                           }
                         />
                         <label
-                          htmlFor={vibe.id}
+                          htmlFor={vibe}
                           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
-                          {vibe.name}
+                          {vibe}
                         </label>
                       </div>
                     ))}
@@ -464,19 +466,19 @@ export default function AdvancedFilters({
                 ) : (
                   <div className="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
                     {vibes.map((vibe) => (
-                      <div key={vibe.id} className="flex items-center space-x-2">
+                      <div key={vibe} className="flex items-center space-x-2">
                         <Checkbox
-                          id={vibe.id}
-                          checked={filters.eventVibes.includes(vibe.name)}
+                          id={vibe}
+                          checked={filters.eventVibes.includes(vibe)}
                           onCheckedChange={(checked) => 
-                            handleVibeChange(vibe.name, checked as boolean)
+                            handleVibeChange(vibe, checked as boolean)
                           }
                         />
                         <label
-                          htmlFor={vibe.id}
+                          htmlFor={vibe}
                           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
-                          {vibe.name}
+                          {vibe}
                         </label>
                       </div>
                     ))}

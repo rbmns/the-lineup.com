@@ -7,12 +7,19 @@ export const useEventVibes = () => {
     queryKey: ['event-vibes'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('event_vibe')
-        .select('name')
-        .order('name');
+        .from('events')
+        .select('vibe')
+        .not('vibe', 'is', null)
+        .not('vibe', 'eq', '');
       
       if (error) throw error;
-      return data?.map(vibe => vibe.name).filter(Boolean) || [];
+      
+      // Get unique vibes and filter out empty/null values
+      const uniqueVibes = Array.from(new Set(
+        data?.map(event => event.vibe).filter(Boolean)
+      )).sort();
+      
+      return uniqueVibes || [];
     }
   });
 };
