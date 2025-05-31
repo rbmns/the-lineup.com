@@ -2,7 +2,7 @@
 import React from 'react';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
 import { EventsPageHeader } from '@/components/events/EventsPageHeader';
-import { EventsPageMeta } from '@/components/events/EventsPageMeta';
+import { useEventPageMeta } from '@/components/events/EventsPageMeta';
 import { FilterSummary } from '@/components/events/FilterSummary';
 import { EventTypeIcon } from '@/components/ui/EventTypeIcon';
 import { EventsList } from '@/components/events/EventsList';
@@ -17,6 +17,8 @@ import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
 const Events = () => {
+  useEventPageMeta();
+  
   const {
     filteredEvents,
     eventsLoading,
@@ -42,8 +44,10 @@ const Events = () => {
 
   return (
     <div className="w-full">
-      <EventsPageMeta />
-      <EventsPageHeader />
+      <EventsPageHeader 
+        title="Discover Events"
+        subtitle="Find surf, yoga, music and other coastal events happening near you"
+      />
       
       {/* Filters Section */}
       <div className="bg-white border-b border-gray-200">
@@ -53,34 +57,36 @@ const Events = () => {
             <span className="text-sm font-medium text-gray-700 mr-2">Date:</span>
             <DateFilterPill 
               label="Today" 
-              value="today" 
-              selectedDateFilter={selectedDateFilter}
-              onSelect={setSelectedDateFilter}
+              active={selectedDateFilter === "today"}
+              onClick={() => setSelectedDateFilter(selectedDateFilter === "today" ? "" : "today")}
             />
             <DateFilterPill 
               label="Tomorrow" 
-              value="tomorrow" 
-              selectedDateFilter={selectedDateFilter}
-              onSelect={setSelectedDateFilter}
+              active={selectedDateFilter === "tomorrow"}
+              onClick={() => setSelectedDateFilter(selectedDateFilter === "tomorrow" ? "" : "tomorrow")}
             />
             <DateFilterPill 
               label="This Weekend" 
-              value="this-weekend" 
-              selectedDateFilter={selectedDateFilter}
-              onSelect={setSelectedDateFilter}
+              active={selectedDateFilter === "this-weekend"}
+              onClick={() => setSelectedDateFilter(selectedDateFilter === "this-weekend" ? "" : "this-weekend")}
             />
             <DateRangeFilter 
               dateRange={dateRange}
               onDateRangeChange={setDateRange}
+              onReset={() => {
+                setDateRange(undefined);
+                setSelectedDateFilter('');
+              }}
+              selectedDateFilter={selectedDateFilter}
+              onDateFilterChange={setSelectedDateFilter}
             />
           </div>
 
           {/* Event Type Filter */}
           <EventTypesFilter
-            eventTypes={allEventTypes}
-            selectedEventTypes={selectedEventTypes}
-            onEventTypeChange={setSelectedEventTypes}
-            isLoading={eventsLoading}
+            eventTypes={allEventTypes.map(type => ({ value: type, label: type }))}
+            selectedEventTypes={selectedEventTypes.map(type => ({ value: type, label: type }))}
+            onEventTypeChange={(types) => setSelectedEventTypes(types.map(t => t.value))}
           />
 
           {/* Vibe Filter */}
@@ -95,7 +101,6 @@ const Events = () => {
           <VenueFilter
             selectedVenues={selectedVenues}
             onVenueChange={setSelectedVenues}
-            isLoading={eventsLoading}
           />
 
           {/* Filter Summary */}
@@ -104,15 +109,12 @@ const Events = () => {
               <FilterSummary
                 selectedEventTypes={selectedEventTypes}
                 selectedVenues={selectedVenues}
-                selectedVibes={selectedVibes}
                 dateRange={dateRange}
                 selectedDateFilter={selectedDateFilter}
                 onRemoveEventType={(type) => setSelectedEventTypes(prev => prev.filter(t => t !== type))}
                 onRemoveVenue={(venue) => setSelectedVenues(prev => prev.filter(v => v !== venue))}
-                onRemoveVibe={(vibe) => setSelectedVibes(prev => prev.filter(v => v !== vibe))}
                 onRemoveDateRange={() => setDateRange(undefined)}
                 onRemoveDateFilter={() => setSelectedDateFilter('')}
-                allVibes={vibes}
               />
               <Button
                 variant="outline"
@@ -135,7 +137,7 @@ const Events = () => {
             <p>Loading events...</p>
           </div>
         ) : filteredEvents.length > 0 ? (
-          <FilteredEventsList 
+          <EventsList 
             events={filteredEvents}
             onRsvp={enhancedHandleRsvp}
             loadingEventId={loadingEventId}
