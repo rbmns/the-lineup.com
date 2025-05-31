@@ -35,3 +35,26 @@ export interface CreateCasualPlanData {
   vibe: string;
   max_attendees?: number;
 }
+
+export const CASUAL_PLAN_VIBES = [
+  'beach',
+  'surf',
+  'yoga',
+  'food',
+  'drinks',
+  'music',
+  'sports',
+  'culture',
+  'nature',
+  'adventure',
+  'social',
+  'wellness',
+  'art',
+  'photography',
+  'games',
+  'fitness',
+  'coffee',
+  'shopping',
+  'nightlife',
+  'festival'
+];

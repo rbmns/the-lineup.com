@@ -60,22 +60,12 @@ export const transformCasualPlansData = (
 
     // Get attendees for this plan
     const planAttendees = attendeesByPlan.get(plan.id) || [];
-    
-    // Transform attendees
-    const attendees = planAttendees.map(attendee => ({
-      id: attendee.id,
-      plan_id: attendee.plan_id,
-      user_id: attendee.user_id,
-      created_at: attendee.created_at,
-      user_profile: profileMap.get(attendee.user_id),
-    }));
 
     const transformedPlan: CasualPlan = {
       ...plan,
       creator_profile,
-      attendees,
-      attendee_count: attendees.length,
-      user_attending: userId ? attendees.some(att => att.user_id === userId) : false,
+      attendee_count: planAttendees.length,
+      user_attending: userId ? planAttendees.some(att => att.user_id === userId) : false,
     };
 
     console.log('Transformed plan:', transformedPlan.id, transformedPlan.title);
