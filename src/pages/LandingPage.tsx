@@ -15,7 +15,6 @@ import { Event } from '@/types';
 import { useEventCategories } from '@/hooks/home/useEventCategories';
 import { formatFeaturedDate, formatEventTime } from '@/utils/date-formatting';
 import { CasualPlansHomeSection } from '@/components/home/CasualPlansHomeSection';
-import { useEventNavigation } from '@/hooks/useEventNavigation';
 
 const LandingPage = () => {
   const { isAuthenticated } = useAuth();
@@ -24,7 +23,6 @@ const LandingPage = () => {
   const isMobile = useIsMobile();
   const { getEventImageUrl } = useEventImages();
   const navigate = useNavigate();
-  const { navigateToEvent } = useEventNavigation();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { availableCategories } = useEventCategories(events);
   
@@ -109,9 +107,9 @@ const LandingPage = () => {
 
   const handleEventClick = useCallback((event: Event) => {
     if (event.id) {
-      navigateToEvent(event);
+      navigate(`/events/${event.id}`);
     }
-  }, [navigateToEvent]);
+  }, [navigate]);
 
   return (
     <div>

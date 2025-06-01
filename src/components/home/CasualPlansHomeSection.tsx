@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -102,7 +103,7 @@ export const CasualPlansHomeSection = () => {
                               />
                             ) : (
                               <div className="bg-gray-200 text-gray-400 px-2 py-1 rounded text-xs flex-shrink-0">
-                                <span className="bg-gray-300 text-transparent rounded">Sports</span>
+                                ••••••
                               </div>
                             )}
                             <h4 className="font-medium text-gray-900 text-sm truncate">{plan.title}</h4>
@@ -122,7 +123,7 @@ export const CasualPlansHomeSection = () => {
                             {isAuthenticated ? (
                               <span className="truncate">{plan.location}</span>
                             ) : (
-                              <span className="bg-gray-300 text-transparent rounded truncate">Zandvoort Beach, North Section</span>
+                              <span className="text-gray-300">••••••••••••••••</span>
                             )}
                           </div>
                           <div className="flex items-center gap-1">
@@ -130,12 +131,12 @@ export const CasualPlansHomeSection = () => {
                             {isAuthenticated ? (
                               <span>{plan.attendee_count || 0} interested</span>
                             ) : (
-                              <span className="bg-gray-300 text-transparent rounded">8 interested</span>
+                              <span className="text-gray-300">••• interested</span>
                             )}
                           </div>
                         </div>
                         
-                        {/* Don't show description for non-authenticated users */}
+                        {/* Only show description for authenticated users */}
                         {isAuthenticated && plan.description && (
                           <p className="text-sm text-gray-600 line-clamp-1">{plan.description}</p>
                         )}

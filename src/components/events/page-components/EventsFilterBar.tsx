@@ -22,8 +22,7 @@ export const EventsFilterBar: React.FC<EventsFilterBarProps> = ({
   isAllSelected = false
 }) => {
   return (
-    <div className="w-full bg-white rounded-lg p-4">
-      <h2 className="text-lg font-medium mb-4">Filter Events</h2>
+    <div className="w-full bg-white rounded-lg border border-gray-200 p-4">
       <EventFilterBar
         allEventTypes={allEventTypes}
         selectedEventTypes={selectedCategories}

@@ -11,12 +11,11 @@ export const useEventNavigation = () => {
       return;
     }
 
-    console.log('Navigating to event detail:', event.id);
+    console.log('Navigating to event:', event.id);
     
-    // Always use simple ID-based route for event detail
+    // Use simple ID-based route
     const eventRoute = `/events/${event.id}`;
     
-    // Navigate to the event detail page
     navigate(eventRoute, {
       state: preserveScroll ? { preserveScroll: true } : undefined
     });

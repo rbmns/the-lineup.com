@@ -32,6 +32,9 @@ const EventCard: React.FC<EventCardProps> = ({
   const { navigateToEvent } = useEventNavigation();
   const imageUrl = getEventImageUrl(event);
   
+  // For debugging
+  console.log(`EventCard rendering for ${event.id} with rsvp_status:`, event.rsvp_status);
+
   // Format date for display
   const formattedDate = event.start_date ? formatDate(event.start_date) : 
                         (event.start_time ? formatDate(event.start_time) : '');
@@ -49,10 +52,22 @@ const EventCard: React.FC<EventCardProps> = ({
       return; 
     }
     
-    console.log('EventCard clicked - navigating to event detail:', event.id);
-    
-    // Always use the navigation hook to go to event detail, ignore any custom onClick
-    navigateToEvent(event);
+    if (onClick) {
+      onClick(event);
+    } else {
+      if (event && event.id) {
+        navigateToEvent({
+          ...event,
+          id: event.id,
+          destination: event.destination,
+          slug: event.slug,
+          start_time: event.start_time,
+          title: event.title
+        });
+      } else {
+        console.error("Cannot navigate: Missing event ID", event);
+      }
+    }
   };
 
   // Enhanced RSVP handler that ensures the return value is always a Promise<boolean>

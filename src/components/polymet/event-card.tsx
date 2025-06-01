@@ -1,8 +1,6 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/polymet/button";
 import CategoryBadge from "@/components/polymet/category-badge";
-import { useEventNavigation } from "@/hooks/useEventNavigation";
 
 interface EventVibeLabel {
   vibe: string;
@@ -66,8 +64,6 @@ export default function EventCard({
   href,
   className,
 }: EventCardProps) {
-  const { navigateToEvent } = useEventNavigation();
-
   const handleRsvpGoing = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -80,33 +76,12 @@ export default function EventCard({
     if (onRsvpInterested) onRsvpInterested(id);
   };
 
-  const handleCardClick = (e: React.MouseEvent) => {
-    // Check if click originated from RSVP buttons
-    if ((e.target as HTMLElement).closest('button')) {
-      return;
-    }
-    
-    e.preventDefault();
-    
-    console.log('Polymet EventCard clicked - navigating to event detail:', id);
-    
-    // Create a basic event object for navigation - always go to event detail
-    const event = {
-      id: String(id),
-      title,
-      image_urls: [image],
-      event_category: category,
-      location,
-      start_date: date,
-      start_time: time
-    };
-    navigateToEvent(event as any);
-  };
+  const eventUrl = href || `/events/${id}`;
 
   return (
-    <div
-      onClick={handleCardClick}
-      className={`group flex h-full flex-col overflow-hidden rounded-lg border border-secondary-50 bg-white shadow-sm transition-shadow hover:shadow-md cursor-pointer ${className}`}
+    <Link
+      to={eventUrl}
+      className={`group flex h-full flex-col overflow-hidden rounded-lg border border-secondary-50 bg-white shadow-sm transition-shadow hover:shadow-md ${className}`}
     >
       {/* Image */}
       <div className="relative aspect-[16/9] w-full overflow-hidden">
@@ -197,6 +172,6 @@ export default function EventCard({
           </div>
         )}
       </div>
-    </div>
+    </Link>
   );
 }
