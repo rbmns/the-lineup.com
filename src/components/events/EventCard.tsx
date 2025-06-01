@@ -55,12 +55,10 @@ const EventCard: React.FC<EventCardProps> = ({
       return;
     }
     
-    if (onClick) {
-      onClick(event);
-    } else {
-      // Always navigate to event detail page using ID
-      navigateToEvent(event);
-    }
+    console.log('Events EventCard clicked - navigating to event detail:', event.id);
+    
+    // Always use the navigation hook to go to event detail, ignore any custom onClick
+    navigateToEvent(event);
   };
 
   // Enhanced RSVP handler with better isolation from card click events

@@ -11,9 +11,9 @@ export const useEventNavigation = () => {
       return;
     }
 
-    console.log('Navigating to event:', event.id);
+    console.log('Navigating to event detail:', event.id);
     
-    // Use simple ID-based route - this should match the route in App.tsx
+    // Always use simple ID-based route for event detail
     const eventRoute = `/events/${event.id}`;
     
     // Navigate to the event detail page

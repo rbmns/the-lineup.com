@@ -88,25 +88,20 @@ export default function EventCard({
     
     e.preventDefault();
     
-    // Use the navigation hook to go to event detail
-    if (href) {
-      window.location.href = href;
-    } else {
-      // Create a basic event object for navigation
-      const event = {
-        id: String(id),
-        title,
-        image_urls: [image],
-        event_category: category,
-        location,
-        start_date: date,
-        start_time: time
-      };
-      navigateToEvent(event as any);
-    }
+    console.log('Polymet EventCard clicked - navigating to event detail:', id);
+    
+    // Create a basic event object for navigation - always go to event detail
+    const event = {
+      id: String(id),
+      title,
+      image_urls: [image],
+      event_category: category,
+      location,
+      start_date: date,
+      start_time: time
+    };
+    navigateToEvent(event as any);
   };
-
-  const eventUrl = href || `/events/${id}`;
 
   return (
     <div
