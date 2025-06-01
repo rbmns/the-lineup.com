@@ -1,102 +1,78 @@
-
-export interface UserProfile {
+export interface Profile {
   id: string;
-  username: string | null;
-  email: string | null;
-  avatar_url: string[] | null; // Must be string[] to match DB structure
-  location: string | null;
-  status: string | null;
-  tagline: string | null;
-  status_details?: string | null;
+  username: string;
+  avatar_url?: string[];
+  email?: string;
+  location?: string;
+  location_category?: string;
+  location_coordinates?: string;
+  location_lat?: number;
+  location_long?: number;
+  status?: string;
+  status_details?: string;
+  tagline?: string;
   created_at?: string;
   updated_at?: string;
-  location_category?: string | null;
-  onboarded?: boolean | null;
-  onboarding_data?: string | null;
-  role?: string | null;
 }
 
 export interface Venue {
   id: string;
-  name: string;
-  street: string;
-  postal_code: string;
-  city: string;
-  website?: string | null;
-  google_maps?: string | null;
-  region?: string | null;
-  tags?: string[] | null;
-  slug?: string | null; // Added missing property
+  name?: string;
+  street?: string;
+  postal_code?: string;
+  city?: string;
+  website?: string;
+  google_maps?: string;
+  slug?: string;
+  created_at?: string;
 }
 
 export interface Event {
   id: string;
   title: string;
-  description: string;
-  location?: string;  // Adding back the location property as optional
-  event_category?: string; // Changed from event_type to event_category
-  start_time: string | null;
-  end_time?: string | null;
-  start_date?: string | null;
-  end_date?: string | null; // Added end_date property for multi-day events
-  created_at?: string;
-  updated_at?: string;
-  image_urls?: string[];
-  attendees?: {
-    going: number;
-    interested: number;
-  };
-  rsvp_status?: 'Going' | 'Interested' | null;
-  area?: {
-    longitude: number;
-    latitude: number;
-  } | null;
-  google_maps?: string | null;
-  organizer_link?: string | null;
-  organiser_name?: string | null;
-  booking_link?: string | null;
-  creator?: UserProfile | null;
-  venues?: Venue | null;
+  description?: string;
+  start_date?: string;
+  start_time?: string;
+  end_date?: string;
+  end_time?: string;
+  location?: string;
   venue_id?: string;
+  venues?: Venue;
+  creator?: string;
+  creator_profile?: Profile;
+  event_category?: string;
+  tags?: string;
+  image_urls?: string[];
+  booking_link?: string;
+  organizer_link?: string;
   fee?: number;
-  extra_info?: string | null;
-  tags?: string[];
-  coordinates?: [number, number]; 
-  created_by?: string; 
-  vibe?: string | null;
-  unique_id?: string;
-  slug?: string;
+  vibe?: string;
   destination?: string;
-  recurring_count?: number;
-  isExactMatch?: boolean;
-  cover_image?: string | null;
-  share_image?: string | null;
-  user_rsvp_status?: 'Going' | 'Interested' | null;
-  
-  // Adding the missing properties related to RSVP counts
+  organiser_name?: string;
+  rsvp_status?: 'Going' | 'Interested' | null;
+  rsvp_count?: number;
   going_count?: number;
   interested_count?: number;
-  
-  // Add formatted date and time properties to the Event interface
-  formattedDate?: string;
-  formattedTime?: string;
+  created_at?: string;
+  updated_at?: string;
+  fixed_start_time?: boolean; // New field for tracking fixed start times
 }
 
-export interface EventImage {
+export interface EventRsvp {
   id: string;
-  url: string;
-  alt?: string;
-  type: 'cover' | 'gallery' | 'share';
-}
-
-export interface FriendRequest {
-  id: string;
-  created_at: string;
+  event_id: string;
   user_id: string;
-  friend_id: string;
-  status: 'Pending' | 'Accepted' | 'Rejected';
-  profile?: UserProfile;
+  status: 'Going' | 'Interested' | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
-// Adding a Profile type to fix the import issues
-export type Profile = UserProfile;
+export interface SearchTracking {
+  id: string;
+  query: string;
+  result_id: string | null;
+  result_type: string | null;
+  timestamp: string;
+  user_id: string | null;
+  clicked: boolean | null;
+}

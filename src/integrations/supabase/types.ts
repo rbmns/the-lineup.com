@@ -65,6 +65,35 @@ export type Database = {
           },
         ]
       }
+      casual_plan_interests: {
+        Row: {
+          created_at: string
+          id: string
+          plan_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          plan_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          plan_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_casual_plan_interests_plan_id"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "casual_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       casual_plans: {
         Row: {
           created_at: string
@@ -229,6 +258,7 @@ export type Database = {
           event_category: string | null
           "Extra info": string | null
           fee: number | null
+          fixed_start_time: boolean
           id: string
           image_urls: string[] | null
           organiser_name: string | null
@@ -253,6 +283,7 @@ export type Database = {
           event_category?: string | null
           "Extra info"?: string | null
           fee?: number | null
+          fixed_start_time?: boolean
           id?: string
           image_urls?: string[] | null
           organiser_name?: string | null
@@ -277,6 +308,7 @@ export type Database = {
           event_category?: string | null
           "Extra info"?: string | null
           fee?: number | null
+          fixed_start_time?: boolean
           id?: string
           image_urls?: string[] | null
           organiser_name?: string | null

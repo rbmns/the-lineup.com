@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { filterPastEvents, sortEventsByDate } from '@/utils/date-filtering';
 import { processEventsData } from '@/utils/eventProcessorUtils';
+import { filterEventsByTime } from '@/utils/eventTimeFiltering';
 import { Event } from '@/types';
 
 interface UseUserEventsResult {
@@ -43,9 +44,16 @@ export const useUserEvents = (userId: string | undefined): UseUserEventsResult =
         }
 
         const allEvents = processEventsData(eventsData, userId);
-        const pastEvents = filterPastEvents(allEvents);
+        
+        // Apply time-based filtering to get currently visible events
+        const visibleEvents = filterEventsByTime(allEvents);
+        
+        // Separate past and upcoming events from the visible events
+        const pastEvents = filterPastEvents(allEvents); // Keep past events for history
         const sortedPastEvents = sortEventsByDate(pastEvents);
-        const upcomingEvents = allEvents.filter(event => !pastEvents.includes(event));
+        
+        // Upcoming events are those that are visible and not in the past
+        const upcomingEvents = visibleEvents.filter(event => !pastEvents.includes(event));
 
         return { pastEvents: sortedPastEvents, upcomingEvents };
       } catch (err) {

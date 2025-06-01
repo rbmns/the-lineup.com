@@ -1,7 +1,9 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { processEventsData } from '@/utils/eventProcessorUtils';
+import { filterEventsByTime } from '@/utils/eventTimeFiltering';
 
 export interface UseEventsResult {
   data: Event[];
@@ -40,25 +42,13 @@ export const useEvents = (userId: string | undefined = undefined): UseEventsResu
           return [];
         }
         
-        // Process the events and filter out those that are more than 30 minutes past their start time
+        // Process the events data
         const processedEvents = processEventsData(data, userId);
         
-        const now = new Date();
-        const filteredEvents = processedEvents.filter(event => {
-          // If no start_date or start_time, keep the event
-          if (!event.start_date || !event.start_time) return true;
-          
-          // Create the event start datetime
-          const eventStartDateTime = new Date(`${event.start_date}T${event.start_time}`);
-          
-          // Add 30 minutes to the start time
-          const cutoffTime = new Date(eventStartDateTime.getTime() + 30 * 60 * 1000);
-          
-          // Keep the event if current time is before the cutoff time
-          return now < cutoffTime;
-        });
+        // Apply time-based filtering using the new logic
+        const filteredEvents = filterEventsByTime(processedEvents);
         
-        console.log(`Filtered ${processedEvents.length - filteredEvents.length} events that are past their 30-minute cutoff`);
+        console.log(`Filtered ${processedEvents.length - filteredEvents.length} events based on timing rules`);
         
         return filteredEvents;
       } catch (error) {

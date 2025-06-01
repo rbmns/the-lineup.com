@@ -1,6 +1,8 @@
+
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { processEventsData } from '@/utils/eventProcessorUtils';
+import { filterEventsByTime, shouldShowEvent } from '@/utils/eventTimeFiltering';
 import { AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
 
 /**
@@ -32,7 +34,15 @@ export const fetchEventById = async (eventId: string, userId: string | undefined
     
     // Process the event data to include user's RSVP status
     const processedEvents = processEventsData([data], userId);
-    return processedEvents[0] || null;
+    const event = processedEvents[0] || null;
+    
+    // Check if event should still be visible based on timing rules
+    if (event && !shouldShowEvent(event)) {
+      console.log(`Event ${eventId} is no longer visible due to timing rules`);
+      return null;
+    }
+    
+    return event;
 
   } catch (error) {
     console.error("Unexpected error fetching event by ID:", error);
@@ -159,9 +169,11 @@ export const fetchSimilarEvents = async (
       return [];
     }
 
-    // Process events data to include user's RSVP status and limit the results
+    // Process events data and apply time-based filtering
     const processedEvents = processEventsData(data, userId);
-    return processedEvents.slice(0, minResults);
+    const filteredEvents = filterEventsByTime(processedEvents);
+    
+    return filteredEvents.slice(0, minResults);
 
   } catch (error) {
     console.error("Unexpected error fetching similar events:", error);
