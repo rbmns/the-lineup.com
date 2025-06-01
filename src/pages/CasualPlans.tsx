@@ -16,9 +16,11 @@ import { CasualPlanCard } from '@/components/casual-plans/CasualPlanCard';
 const CasualPlans = () => {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const { plans, isLoading, joinPlan, leavePlan } = useCasualPlans();
+  const { plans, isLoading, joinPlan, leavePlan, markInterested, unmarkInterested } = useCasualPlans();
   const [joiningPlanId, setJoiningPlanId] = useState<string | null>(null);
   const [leavingPlanId, setLeavingPlanId] = useState<string | null>(null);
+  const [markingInterestedPlanId, setMarkingInterestedPlanId] = useState<string | null>(null);
+  const [unmarkingInterestedPlanId, setUnmarkingInterestedPlanId] = useState<string | null>(null);
 
   const handleJoinPlan = async (planId: string) => {
     if (!isAuthenticated) {
@@ -67,6 +69,56 @@ const CasualPlans = () => {
       });
     } finally {
       setLeavingPlanId(null);
+    }
+  };
+
+  const handleMarkInterested = async (planId: string) => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    setMarkingInterestedPlanId(planId);
+    try {
+      await markInterested(planId);
+      toast({
+        title: "Success",
+        description: "Updated your interest in this plan!",
+      });
+    } catch (error) {
+      console.error('Error updating interest:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update interest. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setMarkingInterestedPlanId(null);
+    }
+  };
+
+  const handleUnmarkInterested = async (planId: string) => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    setUnmarkingInterestedPlanId(planId);
+    try {
+      await unmarkInterested(planId);
+      toast({
+        title: "Success",
+        description: "You've unmarked this plan as interesting.",
+      });
+    } catch (error) {
+      console.error('Error unmarking as interested:', error);
+      toast({
+        title: "Error",
+        description: "Failed to unmark as interested. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUnmarkingInterestedPlanId(null);
     }
   };
 
@@ -121,8 +173,12 @@ const CasualPlans = () => {
                   plan={plan}
                   onJoin={handleJoinPlan}
                   onLeave={handleLeavePlan}
+                  onMarkInterested={handleMarkInterested}
+                  onUnmarkInterested={handleUnmarkInterested}
                   isJoining={joiningPlanId === plan.id}
                   isLeaving={leavingPlanId === plan.id}
+                  isMarkingInterested={markingInterestedPlanId === plan.id}
+                  isUnmarkingInterested={unmarkingInterestedPlanId === plan.id}
                   isAuthenticated={isAuthenticated}
                   onLoginPrompt={handleLoginPrompt}
                 />
