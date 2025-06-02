@@ -1,5 +1,5 @@
 
-import { CasualPlan, CasualPlanRsvp } from '@/types/casual-plans';
+import { CasualPlan, RawCasualPlanRsvp, CasualPlanRsvp } from '@/types/casual-plans';
 
 interface RawPlan {
   id: string;
@@ -22,13 +22,24 @@ interface Profile {
   avatar_url?: string[];
 }
 
+// Helper function to transform raw RSVP data to typed RSVP data
+const transformRawRsvps = (rawRsvps: RawCasualPlanRsvp[]): CasualPlanRsvp[] => {
+  return rawRsvps.map(rsvp => ({
+    ...rsvp,
+    status: (rsvp.status === 'Going' || rsvp.status === 'Interested') ? rsvp.status : null
+  }));
+};
+
 export const transformCasualPlansData = (
   rawPlans: RawPlan[],
-  rawRsvps: CasualPlanRsvp[],
+  rawRsvps: RawCasualPlanRsvp[],
   profiles: Profile[],
   userId?: string
 ): CasualPlan[] => {
   console.log('Transforming data:', { rawPlans, rawRsvps, profiles, userId });
+
+  // Transform raw RSVPs to typed RSVPs
+  const typedRsvps = transformRawRsvps(rawRsvps);
 
   // Create lookup maps for efficient data access
   const profileMap = new Map<string, Profile>();
@@ -37,7 +48,7 @@ export const transformCasualPlansData = (
   });
 
   const rsvpsByPlan = new Map<string, CasualPlanRsvp[]>();
-  rawRsvps.forEach(rsvp => {
+  typedRsvps.forEach(rsvp => {
     if (!rsvpsByPlan.has(rsvp.plan_id)) {
       rsvpsByPlan.set(rsvp.plan_id, []);
     }

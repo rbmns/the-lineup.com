@@ -47,6 +47,16 @@ export interface CasualPlanRsvp {
   updated_at?: string;
 }
 
+// Raw database interface to handle the string status from Supabase
+export interface RawCasualPlanRsvp {
+  id: string;
+  plan_id: string;
+  user_id: string;
+  status: string | null;
+  created_at: string;
+  updated_at?: string;
+}
+
 export interface CreateCasualPlanData {
   title: string;
   description?: string;

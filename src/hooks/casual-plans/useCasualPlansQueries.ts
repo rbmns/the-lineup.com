@@ -2,6 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { RawCasualPlanRsvp } from '@/types/casual-plans';
 
 export const useCasualPlansQueries = (includePublicData: boolean = true) => {
   const { user } = useAuth();
@@ -37,7 +38,7 @@ export const useCasualPlansQueries = (includePublicData: boolean = true) => {
   // Fetch casual plan RSVPs - now available to everyone
   const { data: rawRsvps, isLoading: rsvpsLoading } = useQuery({
     queryKey: ['casual-plan-rsvps'],
-    queryFn: async () => {
+    queryFn: async (): Promise<RawCasualPlanRsvp[]> => {
       if (!includePublicData || !rawPlans?.length) {
         return [];
       }

@@ -39,7 +39,7 @@ export const DataManagement: React.FC = () => {
             title,
             start_date,
             start_time,
-            event_type,
+            event_category,
             location: venues (name, city)
           )
         `)
@@ -50,8 +50,8 @@ export const DataManagement: React.FC = () => {
         .select('*')
         .eq('creator_id', user.id);
 
-      const { data: casualPlanAttendees } = await supabase
-        .from('casual_plan_attendees')
+      const { data: casualPlanRsvps } = await supabase
+        .from('casual_plan_rsvps')
         .select(`
           *,
           casual_plans (
@@ -87,7 +87,7 @@ export const DataManagement: React.FC = () => {
         eventsOrganized: events || [],
         eventRsvps: rsvps || [],
         casualPlansCreated: casualPlans || [],
-        casualPlansAttended: casualPlanAttendees || [],
+        casualPlanRsvps: casualPlanRsvps || [],
         friendships: friendships || [],
         privacySettings: privacySettings
       };
@@ -131,7 +131,7 @@ export const DataManagement: React.FC = () => {
       // to ensure proper cleanup and handle foreign key constraints
       
       // Delete user data in the correct order (respecting foreign keys)
-      await supabase.from('casual_plan_attendees').delete().eq('user_id', user.id);
+      await supabase.from('casual_plan_rsvps').delete().eq('user_id', user.id);
       await supabase.from('casual_plans').delete().eq('creator_id', user.id);
       await supabase.from('event_rsvps').delete().eq('user_id', user.id);
       await supabase.from('events').delete().eq('creator', user.id);
