@@ -1,3 +1,4 @@
+
 export interface Profile {
   id: string;
   username: string;
@@ -14,6 +15,9 @@ export interface Profile {
   created_at?: string;
   updated_at?: string;
 }
+
+// Export UserProfile as an alias for Profile to maintain compatibility
+export type UserProfile = Profile;
 
 export interface Venue {
   id: string;
