@@ -70,6 +70,7 @@ export interface Event {
   interested_count?: number;
   formattedDate?: string; // Add the missing property
   formattedTime?: string; // Add the missing property
+  fixed_start_time?: boolean; // Add the missing property
 }
 
 export interface EventsResponse {
