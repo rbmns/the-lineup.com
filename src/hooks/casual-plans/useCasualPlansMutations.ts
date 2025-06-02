@@ -4,13 +4,13 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
 import { CreateCasualPlanData } from '@/types/casual-plans';
-import { useCasualPlanRsvp } from './useCasualPlanRsvp';
+import { useCasualPlanRsvpHandler } from './useCasualPlanRsvpHandler';
 
 export const useCasualPlansMutations = () => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [isCreating, setIsCreating] = useState(false);
-  const { handleJoinPlan, handleLeavePlan, loadingPlanId } = useCasualPlanRsvp();
+  const { handleRsvp, loadingPlanId } = useCasualPlanRsvpHandler();
 
   const createPlan = async (planData: CreateCasualPlanData) => {
     if (!user) throw new Error('User not authenticated');
@@ -46,11 +46,12 @@ export const useCasualPlansMutations = () => {
     }
 
     console.log(`Attempting to join plan: ${planId}`);
-    const success = await handleJoinPlan(planId, user.id);
+    const success = await handleRsvp(planId, 'Going');
     
     if (success) {
       // Invalidate queries to refresh the plans list
       queryClient.invalidateQueries({ queryKey: ['casual-plans'] });
+      queryClient.invalidateQueries({ queryKey: ['casual-plan-rsvps'] });
     }
     
     return success;
@@ -63,11 +64,30 @@ export const useCasualPlansMutations = () => {
     }
 
     console.log(`Attempting to leave plan: ${planId}`);
-    const success = await handleLeavePlan(planId, user.id);
+    const success = await handleRsvp(planId, null);
     
     if (success) {
       // Invalidate queries to refresh the plans list
       queryClient.invalidateQueries({ queryKey: ['casual-plans'] });
+      queryClient.invalidateQueries({ queryKey: ['casual-plan-rsvps'] });
+    }
+    
+    return success;
+  };
+
+  const rsvpToPlan = async (planId: string, status: 'Going' | 'Interested' | null) => {
+    if (!user) {
+      console.log('User not authenticated for RSVP');
+      return false;
+    }
+
+    console.log(`Attempting to RSVP to plan: ${planId} with status: ${status}`);
+    const success = await handleRsvp(planId, status);
+    
+    if (success) {
+      // Invalidate queries to refresh the plans list
+      queryClient.invalidateQueries({ queryKey: ['casual-plans'] });
+      queryClient.invalidateQueries({ queryKey: ['casual-plan-rsvps'] });
     }
     
     return success;
@@ -77,8 +97,10 @@ export const useCasualPlansMutations = () => {
     createPlan,
     joinPlan,
     leavePlan,
+    rsvpToPlan,
     isCreating,
     isJoining: loadingPlanId,
-    isLeaving: loadingPlanId
+    isLeaving: loadingPlanId,
+    loadingPlanId
   };
 };

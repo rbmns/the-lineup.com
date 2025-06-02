@@ -1,8 +1,11 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const useCasualPlansQueries = (includePublicData: boolean = true) => {
+  const { user } = useAuth();
+
   // Fetch casual plans - now available to everyone
   const { data: rawPlans, isLoading: plansLoading, error: plansError } = useQuery({
     queryKey: ['casual-plans-raw'],
@@ -31,53 +34,53 @@ export const useCasualPlansQueries = (includePublicData: boolean = true) => {
     enabled: includePublicData,
   });
 
-  // Fetch casual plan attendees - now available to everyone
-  const { data: rawAttendees, isLoading: attendeesLoading } = useQuery({
-    queryKey: ['casual-plan-attendees'],
+  // Fetch casual plan RSVPs - now available to everyone
+  const { data: rawRsvps, isLoading: rsvpsLoading } = useQuery({
+    queryKey: ['casual-plan-rsvps'],
     queryFn: async () => {
       if (!includePublicData || !rawPlans?.length) {
         return [];
       }
 
-      console.log('Fetching attendees...');
+      console.log('Fetching RSVPs...');
       
       const planIds = rawPlans.map(plan => plan.id);
       
-      const { data: attendeesData, error: attendeesError } = await supabase
-        .from('casual_plan_attendees')
+      const { data: rsvpsData, error: rsvpsError } = await supabase
+        .from('casual_plan_rsvps')
         .select('*')
         .in('plan_id', planIds);
 
-      if (attendeesError) {
-        console.error('Error fetching attendees:', attendeesError);
-        throw attendeesError;
+      if (rsvpsError) {
+        console.error('Error fetching RSVPs:', rsvpsError);
+        throw rsvpsError;
       }
 
-      console.log('Raw attendees data:', attendeesData);
-      return attendeesData || [];
+      console.log('Raw RSVPs data:', rsvpsData);
+      return rsvpsData || [];
     },
     enabled: includePublicData && !!rawPlans?.length,
   });
 
   // Fetch profiles for all users - now available to everyone
   const { data: profiles, isLoading: profilesLoading } = useQuery({
-    queryKey: ['casual-plans-profiles', rawPlans, rawAttendees],
+    queryKey: ['casual-plans-profiles', rawPlans, rawRsvps],
     queryFn: async () => {
-      if (!includePublicData || (!rawPlans?.length && !rawAttendees?.length)) {
+      if (!includePublicData || (!rawPlans?.length && !rawRsvps?.length)) {
         return [];
       }
 
       console.log('Fetching profiles...');
       
-      // Get unique user IDs from creators and attendees
+      // Get unique user IDs from creators and RSVP users
       const userIds = new Set<string>();
       
       rawPlans?.forEach(plan => {
         if (plan.creator_id) userIds.add(plan.creator_id);
       });
       
-      rawAttendees?.forEach(attendee => {
-        if (attendee.user_id) userIds.add(attendee.user_id);
+      rawRsvps?.forEach(rsvp => {
+        if (rsvp.user_id) userIds.add(rsvp.user_id);
       });
 
       if (userIds.size === 0) {
@@ -97,14 +100,14 @@ export const useCasualPlansQueries = (includePublicData: boolean = true) => {
       console.log('Profiles data:', profilesData);
       return profilesData || [];
     },
-    enabled: includePublicData && (!!rawPlans?.length || !!rawAttendees?.length),
+    enabled: includePublicData && (!!rawPlans?.length || !!rawRsvps?.length),
   });
 
   return {
     rawPlans,
-    rawAttendees,
+    rawRsvps,
     profiles,
-    isLoading: plansLoading || attendeesLoading || profilesLoading,
+    isLoading: plansLoading || rsvpsLoading || profilesLoading,
     error: plansError,
   };
 };

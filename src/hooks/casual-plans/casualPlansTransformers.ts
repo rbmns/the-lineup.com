@@ -1,5 +1,5 @@
 
-import { CasualPlan } from '@/types/casual-plans';
+import { CasualPlan, CasualPlanRsvp } from '@/types/casual-plans';
 
 interface RawPlan {
   id: string;
@@ -16,13 +16,6 @@ interface RawPlan {
   updated_at: string;
 }
 
-interface RawAttendee {
-  id: string;
-  plan_id: string;
-  user_id: string;
-  created_at: string;
-}
-
 interface Profile {
   id: string;
   username: string;
@@ -31,11 +24,11 @@ interface Profile {
 
 export const transformCasualPlansData = (
   rawPlans: RawPlan[],
-  rawAttendees: RawAttendee[],
+  rawRsvps: CasualPlanRsvp[],
   profiles: Profile[],
   userId?: string
 ): CasualPlan[] => {
-  console.log('Transforming data:', { rawPlans, rawAttendees, profiles, userId });
+  console.log('Transforming data:', { rawPlans, rawRsvps, profiles, userId });
 
   // Create lookup maps for efficient data access
   const profileMap = new Map<string, Profile>();
@@ -43,12 +36,12 @@ export const transformCasualPlansData = (
     profileMap.set(profile.id, profile);
   });
 
-  const attendeesByPlan = new Map<string, RawAttendee[]>();
-  rawAttendees.forEach(attendee => {
-    if (!attendeesByPlan.has(attendee.plan_id)) {
-      attendeesByPlan.set(attendee.plan_id, []);
+  const rsvpsByPlan = new Map<string, CasualPlanRsvp[]>();
+  rawRsvps.forEach(rsvp => {
+    if (!rsvpsByPlan.has(rsvp.plan_id)) {
+      rsvpsByPlan.set(rsvp.plan_id, []);
     }
-    attendeesByPlan.get(attendee.plan_id)!.push(attendee);
+    rsvpsByPlan.get(rsvp.plan_id)!.push(rsvp);
   });
 
   // Transform plans
@@ -58,24 +51,38 @@ export const transformCasualPlansData = (
     // Get creator profile
     const creator_profile = profileMap.get(plan.creator_id);
 
-    // Get attendees for this plan
-    const planAttendees = attendeesByPlan.get(plan.id) || [];
+    // Get RSVPs for this plan
+    const planRsvps = rsvpsByPlan.get(plan.id) || [];
     
-    // Transform attendees
-    const attendees = planAttendees.map(attendee => ({
-      id: attendee.id,
-      plan_id: attendee.plan_id,
-      user_id: attendee.user_id,
-      created_at: attendee.created_at,
-      user_profile: profileMap.get(attendee.user_id),
-    }));
+    // Calculate counts
+    const goingCount = planRsvps.filter(rsvp => rsvp.status === 'Going').length;
+    const interestedCount = planRsvps.filter(rsvp => rsvp.status === 'Interested').length;
+    
+    // Get user's RSVP status
+    const userRsvp = userId ? planRsvps.find(rsvp => rsvp.user_id === userId) : null;
+    const rsvp_status = userRsvp?.status || null;
+    
+    // For backward compatibility, create attendees from "Going" RSVPs
+    const attendees = planRsvps
+      .filter(rsvp => rsvp.status === 'Going')
+      .map(rsvp => ({
+        id: rsvp.id,
+        plan_id: rsvp.plan_id,
+        user_id: rsvp.user_id,
+        created_at: rsvp.created_at,
+        user_profile: profileMap.get(rsvp.user_id),
+      }));
 
     const transformedPlan: CasualPlan = {
       ...plan,
       creator_profile,
       attendees,
-      attendee_count: attendees.length,
-      user_attending: userId ? attendees.some(att => att.user_id === userId) : false,
+      attendee_count: goingCount, // Only count "Going" for backward compatibility
+      user_attending: rsvp_status === 'Going', // For backward compatibility
+      // New RSVP fields
+      rsvp_status,
+      going_count: goingCount,
+      interested_count: interestedCount,
     };
 
     console.log('Transformed plan:', transformedPlan.id, transformedPlan.title);

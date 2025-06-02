@@ -8,14 +8,14 @@ export const useCasualPlans = () => {
   const { user, isAuthenticated } = useAuth();
 
   // Fetch raw data - now works for both authenticated and non-authenticated users
-  const { rawPlans, rawAttendees, profiles, isLoading, error } = useCasualPlansQueries(true);
+  const { rawPlans, rawRsvps, profiles, isLoading, error } = useCasualPlansQueries(true);
 
   // Get mutation functions (only work for authenticated users)
   const mutations = useCasualPlansMutations();
 
   // Transform data when all queries are complete
-  const plans = rawPlans && rawAttendees && profiles 
-    ? transformCasualPlansData(rawPlans, rawAttendees, profiles, user?.id)
+  const plans = rawPlans && rawRsvps && profiles 
+    ? transformCasualPlansData(rawPlans, rawRsvps, profiles, user?.id)
     : [];
 
   return {

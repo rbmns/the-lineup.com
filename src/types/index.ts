@@ -1,5 +1,4 @@
 
-
 export interface Profile {
   id: string;
   username: string;
@@ -60,7 +59,7 @@ export interface Event {
   interested_count?: number;
   created_at?: string;
   updated_at?: string;
-  fixed_start_time?: boolean; // New field for tracking fixed start times
+  fixed_start_time?: boolean; // Add the missing property
 }
 
 export interface EventRsvp {

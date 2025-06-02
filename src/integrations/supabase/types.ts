@@ -36,35 +36,6 @@ export type Database = {
         }
         Relationships: []
       }
-      casual_plan_attendees: {
-        Row: {
-          created_at: string
-          id: string
-          plan_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          plan_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          plan_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "casual_plan_attendees_plan_id_fkey"
-            columns: ["plan_id"]
-            isOneToOne: false
-            referencedRelation: "casual_plans"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       casual_plan_interests: {
         Row: {
           created_at: string
@@ -87,6 +58,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "fk_casual_plan_interests_plan_id"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "casual_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      casual_plan_rsvps: {
+        Row: {
+          created_at: string
+          id: string
+          plan_id: string
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          plan_id: string
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          plan_id?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "casual_plan_attendees_plan_id_fkey"
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "casual_plans"

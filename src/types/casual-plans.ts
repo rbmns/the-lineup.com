@@ -20,6 +20,10 @@ export interface CasualPlan {
   attendees?: CasualPlanAttendee[];
   attendee_count?: number;
   user_attending?: boolean;
+  // New RSVP fields to match events pattern
+  rsvp_status?: 'Going' | 'Interested' | null;
+  going_count?: number;
+  interested_count?: number;
 }
 
 export interface CasualPlanAttendee {
@@ -32,6 +36,15 @@ export interface CasualPlanAttendee {
     username: string;
     avatar_url?: string[];
   };
+}
+
+export interface CasualPlanRsvp {
+  id: string;
+  plan_id: string;
+  user_id: string;
+  status: 'Going' | 'Interested' | null;
+  created_at: string;
+  updated_at?: string;
 }
 
 export interface CreateCasualPlanData {
