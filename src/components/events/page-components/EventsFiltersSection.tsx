@@ -87,6 +87,11 @@ export const EventsFiltersSection: React.FC<EventsFiltersSectionProps> = ({
           onVenueChange={setSelectedVenues}
           locations={locations}
           className="mb-6"
+          allEventTypes={allEventTypes}
+          selectedCategories={selectedCategories}
+          toggleCategory={toggleCategory}
+          selectAll={selectAll}
+          deselectAll={deselectAll}
         />
       )}
       
