@@ -46,7 +46,7 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
         going: 8,
         interested: 4
       },
-      creator: user?.id || '',
+      creator_profile: profile,
       venue_id: null,
       vibe: 'Active',
       tags: 'volleyball,beach,sports',
@@ -68,7 +68,7 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
         going: 5,
         interested: 3
       },
-      creator: user?.id || '',
+      creator_profile: profile,
       venue_id: null,
       vibe: 'Peaceful',
       tags: 'yoga,wellness,sunset',
