@@ -23,7 +23,7 @@ export const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
     xl: 'h-24 w-24'
   };
   
-  // Use processImageUrls to handle both array and string formats
+  // Use processImageUrls to handle both array and string formats - ensures avatar_url is always treated as array
   const avatarUrls = processImageUrls(profile?.avatar_url);
   const avatarUrl = !imageError && avatarUrls.length > 0 ? avatarUrls[0] : '';
   

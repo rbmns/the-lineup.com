@@ -22,7 +22,7 @@ export const useAvatarState = () => {
     }
   }, [preview, profile, refreshProfile]);
 
-  // Get avatar URL from profile - ensure we handle array format
+  // Get avatar URL from profile - ensure we handle array format correctly
   const getAvatarUrl = () => {
     if (preview) {
       console.log('Using preview URL:', preview);
@@ -34,7 +34,7 @@ export const useAvatarState = () => {
       return null;
     }
     
-    // Ensure we're working with arrays
+    // Ensure we're working with arrays - this is critical for maintaining compatibility
     const urls = processImageUrls(profile.avatar_url);
     const avatarUrl = urls.length > 0 ? urls[0] : null;
     console.log('Processed avatar URLs:', urls, 'Using:', avatarUrl);
