@@ -42,7 +42,10 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
       event_category: 'Sports',
       image_urls: ['/api/placeholder/300/200'],
       rsvp_status: 'Going' as const,
-      attendees: 12,
+      attendees: {
+        going: 8,
+        interested: 4
+      },
       creator: user?.id || '',
       venue_id: null,
       vibe: 'Active',
@@ -61,7 +64,10 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
       event_category: 'Wellness',
       image_urls: ['/api/placeholder/300/200'],
       rsvp_status: 'Interested' as const,
-      attendees: 8,
+      attendees: {
+        going: 5,
+        interested: 3
+      },
       creator: user?.id || '',
       venue_id: null,
       vibe: 'Peaceful',
