@@ -12,6 +12,7 @@ import CasualPlansPage from "./pages/CasualPlans";
 import FriendsPage from "./pages/Friends";
 import MapPage from "./pages/map";
 import UserProfilePage from "./pages/UserProfilePage";
+import ProfilePage from "./pages/ProfilePage";
 import ProfileEdit from "./pages/ProfileEdit";
 import LoginPage from "./pages/Login";
 import SignupPage from "./pages/Signup";
@@ -22,19 +23,6 @@ import CookiePolicy from "./pages/CookiePolicy";
 import EventCategoriesStyleGuide from "./components/design-system/EventCategoriesStyleGuide";
 import CreateCasualPlanPage from '@/components/casual-plans/CreateCasualPlanPage';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { Navigate } from 'react-router-dom';
-
-// Component to handle the /profile route for authenticated users
-const ProfileRedirect = () => {
-  const { user } = useAuth();
-  
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  return <Navigate to={`/user/${user.id}`} replace />;
-};
 
 function App() {
   return (
@@ -67,7 +55,7 @@ function App() {
               <Route path="/casual-plans/create" element={<CreateCasualPlanPage />} />
               <Route path="/friends" element={<FriendsPage />} />
               <Route path="/map" element={<MapPage />} />
-              <Route path="/profile" element={<ProfileRedirect />} />
+              <Route path="/profile" element={<ProfilePage />} />
               <Route path="/profile/edit" element={<ProfileEdit />} />
               <Route path="/profile/:username" element={<UserProfilePage />} />
               <Route path="/user/:userId" element={<UserProfilePage />} />
