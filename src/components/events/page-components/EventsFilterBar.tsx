@@ -28,17 +28,17 @@ export const EventsFilterBar: React.FC<EventsFilterBarProps> = ({
   return (
     <div className="flex items-center justify-between gap-4 mb-6">
       <div className="flex items-center gap-3">
-        {/* Location indicator */}
-        <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg border">
-          <MapPin className="h-4 w-4 text-gray-500" />
-          <span className="text-sm font-medium text-gray-700">Zandvoort area</span>
-        </div>
-        
         {/* Advanced Filters Toggle */}
         <AdvancedFiltersToggle 
           showAdvancedFilters={showAdvancedFilters}
           toggleAdvancedFilters={toggleAdvancedFilters}
         />
+        
+        {/* Location indicator */}
+        <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg border">
+          <MapPin className="h-4 w-4 text-gray-500" />
+          <span className="text-sm font-medium text-gray-700">Zandvoort area</span>
+        </div>
       </div>
 
       {/* Reset button */}
