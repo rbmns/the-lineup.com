@@ -4,9 +4,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { UserProfile } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Settings, Calendar, Users, MapPin, Edit } from 'lucide-react';
-import { PrivacySettings } from './PrivacySettings';
+import { SettingsPanel } from './SettingsPanel';
 import { ProfileAvatar } from './ProfileAvatar';
 import { useNavigate } from 'react-router-dom';
+import { useRsvpActions } from '@/hooks/useRsvpActions';
+import EventCard from '@/components/EventCard';
 
 interface ProfilePageLayoutProps {
   profile: UserProfile | null;
@@ -23,8 +25,39 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
 }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { handleRsvp } = useRsvpActions();
 
   const displayName = profile?.username || user?.email?.split('@')[0] || 'User';
+
+  // Mock events data - replace with actual data fetching
+  const mockEvents = [
+    {
+      id: '1',
+      title: 'Beach Volleyball Tournament',
+      start_date: '2024-06-16',
+      start_time: '14:00',
+      end_time: '18:00',
+      location: 'Zandvoort Beach, North Section',
+      event_category: 'Sports',
+      image_urls: ['/api/placeholder/300/200'],
+      rsvp_status: 'Going' as const
+    },
+    {
+      id: '2', 
+      title: 'Sunset Yoga Session',
+      start_date: '2024-06-19',
+      start_time: '19:30',
+      end_time: '20:30',
+      location: 'Zandvoort Beach, South Section',
+      event_category: 'Wellness',
+      image_urls: ['/api/placeholder/300/200'],
+      rsvp_status: 'Interested' as const
+    }
+  ];
+
+  const handleEditProfile = () => {
+    navigate('/profile/edit');
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -62,7 +95,7 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      onClick={() => navigate('/profile/edit')}
+                      onClick={handleEditProfile}
                       className="flex items-center gap-2"
                     >
                       <Edit className="h-4 w-4" />
@@ -73,9 +106,13 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
 
                 {/* Action Buttons */}
                 <div className="space-y-3">
-                  <Button variant="outline" className="w-full flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="w-full flex items-center gap-2"
+                    onClick={() => navigate('/events')}
+                  >
                     <Calendar className="h-4 w-4" />
-                    Events
+                    Browse Events
                   </Button>
                   
                   {isOwnProfile && (
@@ -94,66 +131,39 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
 
             {/* Main Content */}
             <div className="col-span-2 space-y-6">
-              {/* About Section */}
-              <div className="bg-white rounded-lg p-6 shadow-sm">
-                <h2 className="text-xl font-semibold mb-4">About</h2>
-                <p className="text-gray-600">
-                  {profile?.tagline || "Explorer and local enthusiast. Love discovering new places and meeting new people."}
-                </p>
-              </div>
-
-              {/* Events Section */}
-              <div className="bg-white rounded-lg p-6 shadow-sm">
-                <h2 className="text-xl font-semibold mb-4">My Events</h2>
-                
-                {/* Event Tabs */}
-                <div className="flex gap-4 mb-6">
-                  <Button variant="ghost" className="flex items-center gap-2 bg-gray-100">
-                    <Calendar className="h-4 w-4" />
-                    Upcoming
-                  </Button>
-                  <Button variant="ghost" className="flex items-center gap-2 text-gray-500">
-                    <Calendar className="h-4 w-4" />
-                    Past
-                  </Button>
-                </div>
-
-                {/* Events List */}
-                <div className="space-y-4">
-                  <EventCard
-                    title="Beach Volleyball Tournament"
-                    date="Sat, 16 June"
-                    time="14:00-18:00"
-                    location="Zandvoort Beach, North Section"
-                    attendees={12}
-                    image="/api/placeholder/60/60"
-                  />
-                  
-                  <EventCard
-                    title="Sunset Yoga Session"
-                    date="Wed, 19 June"
-                    time="19:30-20:30"
-                    location="Zandvoort Beach, South Section"
-                    attendees={8}
-                    image="/api/placeholder/60/60"
-                  />
-                  
-                  <EventCard
-                    title="Local Food Festival"
-                    date="Sat, 22 June"
-                    time="12:00-20:00"
-                    location="Central Market Square"
-                    attendees={45}
-                    image="/api/placeholder/60/60"
-                  />
-                </div>
-              </div>
-
               {/* Settings Panel */}
-              {showSettings && isOwnProfile && (
-                <div className="bg-white rounded-lg p-6 shadow-sm">
-                  <PrivacySettings userId={user?.id} />
-                </div>
+              {showSettings && isOwnProfile && user && (
+                <SettingsPanel userId={user.id} />
+              )}
+
+              {/* About Section */}
+              {!showSettings && (
+                <>
+                  <div className="bg-white rounded-lg p-6 shadow-sm">
+                    <h2 className="text-xl font-semibold mb-4">About</h2>
+                    <p className="text-gray-600">
+                      {profile?.tagline || "Explorer and local enthusiast. Love discovering new places and meeting new people."}
+                    </p>
+                  </div>
+
+                  {/* Events Section */}
+                  <div className="bg-white rounded-lg p-6 shadow-sm">
+                    <h2 className="text-xl font-semibold mb-4">My Events</h2>
+                    
+                    {/* Events List */}
+                    <div className="space-y-4">
+                      {mockEvents.map(event => (
+                        <EventCard
+                          key={event.id}
+                          event={event}
+                          showRsvpButtons={isOwnProfile}
+                          onRsvp={handleRsvp}
+                          className="border border-gray-200 hover:shadow-md transition-shadow"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -187,7 +197,23 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
 
             {/* Action Buttons */}
             <div className="flex gap-3 mb-6">
-              <Button variant="outline" className="flex-1 flex items-center gap-2">
+              {isOwnProfile && (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleEditProfile}
+                  className="flex items-center gap-2"
+                >
+                  <Edit className="h-4 w-4" />
+                  Edit
+                </Button>
+              )}
+              
+              <Button 
+                variant="outline" 
+                className="flex-1 flex items-center gap-2"
+                onClick={() => navigate('/events')}
+              >
                 <Calendar className="h-4 w-4" />
                 Events
               </Button>
@@ -203,108 +229,42 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
                 </Button>
               )}
             </div>
-
-            {/* About Section */}
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold mb-2">About</h2>
-              <p className="text-gray-600">
-                {profile?.tagline || "Explorer and local enthusiast. Love discovering new places and meeting new people."}
-              </p>
-            </div>
-
-            {/* Events Section */}
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold mb-4">My Events</h2>
-              
-              {/* Event Tabs */}
-              <div className="flex gap-4 mb-4">
-                <Button variant="ghost" className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Upcoming
-                </Button>
-                <Button variant="ghost" className="flex items-center gap-2 text-gray-500">
-                  <Calendar className="h-4 w-4" />
-                  Past
-                </Button>
-              </div>
-
-              {/* Events List */}
-              <div className="space-y-4">
-                <EventCard
-                  title="Beach Volleyball Tournament"
-                  date="Sat, 16 June"
-                  time="14:00-18:00"
-                  location="Zandvoort Beach, North Section"
-                  attendees={12}
-                  image="/api/placeholder/60/60"
-                />
-                
-                <EventCard
-                  title="Sunset Yoga Session"
-                  date="Wed, 19 June"
-                  time="19:30-20:30"
-                  location="Zandvoort Beach, South Section"
-                  attendees={8}
-                  image="/api/placeholder/60/60"
-                />
-                
-                <EventCard
-                  title="Local Food Festival"
-                  date="Sat, 22 June"
-                  time="12:00-20:00"
-                  location="Central Market Square"
-                  attendees={45}
-                  image="/api/placeholder/60/60"
-                />
-              </div>
-            </div>
           </div>
 
           {/* Settings Panel */}
-          {showSettings && isOwnProfile && (
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <PrivacySettings userId={user?.id} />
-            </div>
+          {showSettings && isOwnProfile && user && (
+            <SettingsPanel userId={user.id} />
+          )}
+
+          {/* About and Events - Mobile */}
+          {!showSettings && (
+            <>
+              <div className="bg-white rounded-lg p-6 mb-6 shadow-sm">
+                <h2 className="text-xl font-semibold mb-2">About</h2>
+                <p className="text-gray-600">
+                  {profile?.tagline || "Explorer and local enthusiast. Love discovering new places and meeting new people."}
+                </p>
+              </div>
+
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <h2 className="text-xl font-semibold mb-4">My Events</h2>
+                
+                <div className="space-y-4">
+                  {mockEvents.map(event => (
+                    <EventCard
+                      key={event.id}
+                      event={event}
+                      showRsvpButtons={isOwnProfile}
+                      onRsvp={handleRsvp}
+                      className="border border-gray-200"
+                    />
+                  ))}
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>
-    </div>
-  );
-};
-
-interface EventCardProps {
-  title: string;
-  date: string;
-  time: string;
-  location: string;
-  attendees: number;
-  image: string;
-}
-
-const EventCard: React.FC<EventCardProps> = ({
-  title,
-  date,
-  time,
-  location,
-  attendees,
-  image
-}) => {
-  return (
-    <div className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-      <img 
-        src={image} 
-        alt={title}
-        className="w-12 h-12 rounded-lg object-cover"
-      />
-      <div className="flex-1 min-w-0">
-        <h3 className="font-medium text-gray-900 mb-1">{title}</h3>
-        <p className="text-sm text-gray-600 mb-1">{date} {time}</p>
-        <p className="text-sm text-gray-600 mb-1">{location}</p>
-        <p className="text-sm text-gray-500">{attendees} attendees</p>
-      </div>
-      <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
-        View
-      </Button>
     </div>
   );
 };
