@@ -49,7 +49,7 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
       creator_profile: profile,
       venue_id: null,
       vibe: 'Active',
-      tags: 'volleyball,beach,sports',
+      tags: ['volleyball', 'beach', 'sports'],
       created_at: '2024-06-01T10:00:00Z',
       updated_at: '2024-06-01T10:00:00Z'
     },
@@ -71,7 +71,7 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
       creator_profile: profile,
       venue_id: null,
       vibe: 'Peaceful',
-      tags: 'yoga,wellness,sunset',
+      tags: ['yoga', 'wellness', 'sunset'],
       created_at: '2024-06-02T10:00:00Z',
       updated_at: '2024-06-02T10:00:00Z'
     }
