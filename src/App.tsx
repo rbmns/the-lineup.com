@@ -11,7 +11,6 @@ import EditEvent from "./pages/events/[eventId]/edit";
 import CasualPlansPage from "./pages/CasualPlans";
 import FriendsPage from "./pages/Friends";
 import MapPage from "./pages/map";
-import ProfilePage from "./pages/Profile";
 import UserProfilePage from "./pages/UserProfilePage";
 import ProfileEdit from "./pages/ProfileEdit";
 import LoginPage from "./pages/Login";
@@ -55,7 +54,7 @@ function App() {
               <Route path="/casual-plans/create" element={<CreateCasualPlanPage />} />
               <Route path="/friends" element={<FriendsPage />} />
               <Route path="/map" element={<MapPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/profile" element={<UserProfilePage />} />
               <Route path="/profile/edit" element={<ProfileEdit />} />
               <Route path="/profile/:username" element={<UserProfilePage />} />
               <Route path="/user/:userId" element={<UserProfilePage />} />
