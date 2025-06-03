@@ -37,18 +37,12 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({
     // No toast message here - removed as requested
   };
 
-  const handleEditUsername = () => {
-    // This would open a username edit dialog - placeholder for now
-    console.log('Edit username clicked');
-  };
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <UsernameSection 
           form={form} 
           showRequiredFields={showRequiredFields}
-          onEditUsername={handleEditUsername}
         />
         
         <LocationSection 
