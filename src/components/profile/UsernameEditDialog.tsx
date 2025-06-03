@@ -124,19 +124,20 @@ export const UsernameEditDialog: React.FC<UsernameEditDialogProps> = ({
           <Edit size={16} /> Edit
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-white border border-gray-200 text-black shadow-xl">
         <DialogHeader>
-          <DialogTitle>Edit Username</DialogTitle>
+          <DialogTitle className="text-black">Edit Username</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 pt-4">
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username" className="text-black">Username</Label>
             <Input
               id="username"
               value={newUsername}
               onChange={(e) => setNewUsername(e.target.value)}
               placeholder="Enter new username"
               disabled={isLoading}
+              className="bg-white border-gray-300 text-black"
             />
             {error && (
               <p className="text-sm text-red-500">{error}</p>
@@ -148,6 +149,7 @@ export const UsernameEditDialog: React.FC<UsernameEditDialogProps> = ({
               variant="outline"
               onClick={handleCancel}
               disabled={isLoading}
+              className="bg-white border-gray-300 text-black hover:bg-gray-50"
             >
               Cancel
             </Button>
@@ -155,6 +157,7 @@ export const UsernameEditDialog: React.FC<UsernameEditDialogProps> = ({
               type="button"
               onClick={handleSave}
               disabled={isLoading || newUsername === currentUsername}
+              className="bg-blue-600 text-white hover:bg-blue-700"
             >
               {isLoading ? 'Saving...' : 'Save'}
             </Button>
