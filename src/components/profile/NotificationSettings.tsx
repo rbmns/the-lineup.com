@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bell, Save } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { toast } from '@/components/ui/toast';
+import { toast } from 'sonner';
 
 interface NotificationSettingsType {
   id?: string;
@@ -108,21 +108,14 @@ export const NotificationSettings: React.FC<NotificationSettingsProps> = ({ user
 
       if (error) {
         console.error('Error saving notification settings:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to save notification settings',
-          variant: 'destructive',
-        });
+        toast.error('Failed to save notification settings');
       } else {
         setHasChanges(false);
-        toast({
-          title: 'Settings saved',
-          description: 'Your notification preferences have been updated',
-          variant: 'success',
-        });
+        toast.success('Your notification preferences have been updated');
       }
     } catch (error) {
       console.error('Error in handleSave:', error);
+      toast.error('Failed to save notification settings');
     } finally {
       setIsSaving(false);
     }

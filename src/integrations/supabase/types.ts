@@ -611,6 +611,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_notification_settings: {
+        Row: {
+          created_at: string
+          event_invitations: boolean
+          event_reminders: boolean
+          event_updates: boolean
+          friend_requests: boolean
+          id: string
+          new_messages: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_invitations?: boolean
+          event_reminders?: boolean
+          event_updates?: boolean
+          friend_requests?: boolean
+          id?: string
+          new_messages?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_invitations?: boolean
+          event_reminders?: boolean
+          event_updates?: boolean
+          friend_requests?: boolean
+          id?: string
+          new_messages?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_privacy_settings: {
         Row: {
           allow_tagging: boolean | null

@@ -29,29 +29,45 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
 
   const displayName = profile?.username || user?.email?.split('@')[0] || 'User';
 
-  // Mock events data - replace with actual data fetching
+  // Mock events data with proper Event type structure
   const mockEvents = [
     {
       id: '1',
       title: 'Beach Volleyball Tournament',
+      description: 'Join us for an exciting beach volleyball tournament with prizes and refreshments.',
       start_date: '2024-06-16',
       start_time: '14:00',
       end_time: '18:00',
       location: 'Zandvoort Beach, North Section',
       event_category: 'Sports',
       image_urls: ['/api/placeholder/300/200'],
-      rsvp_status: 'Going' as const
+      rsvp_status: 'Going' as const,
+      attendees: 12,
+      creator: user?.id || '',
+      venue_id: null,
+      vibe: 'Active',
+      tags: 'volleyball,beach,sports',
+      created_at: '2024-06-01T10:00:00Z',
+      updated_at: '2024-06-01T10:00:00Z'
     },
     {
       id: '2', 
       title: 'Sunset Yoga Session',
+      description: 'Relax and unwind with a peaceful yoga session as the sun sets over the beach.',
       start_date: '2024-06-19',
       start_time: '19:30',
       end_time: '20:30',
       location: 'Zandvoort Beach, South Section',
       event_category: 'Wellness',
       image_urls: ['/api/placeholder/300/200'],
-      rsvp_status: 'Interested' as const
+      rsvp_status: 'Interested' as const,
+      attendees: 8,
+      creator: user?.id || '',
+      venue_id: null,
+      vibe: 'Peaceful',
+      tags: 'yoga,wellness,sunset',
+      created_at: '2024-06-02T10:00:00Z',
+      updated_at: '2024-06-02T10:00:00Z'
     }
   ];
 
