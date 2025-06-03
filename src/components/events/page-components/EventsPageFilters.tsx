@@ -77,7 +77,7 @@ export const EventsPageFilters: React.FC<EventsPageFiltersProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Main category filter bar - prominently displayed */}
+      {/* Main filter bar with location and advanced filter toggle */}
       <div className="w-full">
         <EventsFilterBar
           allEventTypes={allEventTypes}
@@ -86,6 +86,8 @@ export const EventsPageFilters: React.FC<EventsPageFiltersProps> = ({
           selectAll={selectAll}
           deselectAll={deselectAll}
           hasActiveFilters={hasActiveFilters}
+          showAdvancedFilters={showAdvancedFilters}
+          toggleAdvancedFilters={toggleAdvancedFilters}
         />
       </div>
       
@@ -105,6 +107,11 @@ export const EventsPageFilters: React.FC<EventsPageFiltersProps> = ({
         handleRemoveVenue={handleRemoveVenue}
         handleClearDateFilter={handleClearDateFilter}
         resetFilters={resetFilters}
+        allEventTypes={allEventTypes}
+        selectedCategories={selectedCategories}
+        toggleCategory={toggleCategory}
+        selectAll={selectAll}
+        deselectAll={deselectAll}
       />
     </div>
   );

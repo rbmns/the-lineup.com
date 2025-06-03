@@ -20,6 +20,12 @@ interface EventsFilterPanelProps {
   handleRemoveVenue: (venue: string) => void;
   handleClearDateFilter: () => void;
   resetFilters: () => void;
+  // Event category props
+  allEventTypes: string[];
+  selectedCategories: string[];
+  toggleCategory: (type: string) => void;
+  selectAll: () => void;
+  deselectAll: () => void;
 }
 
 export const EventsFilterPanel: React.FC<EventsFilterPanelProps> = ({
@@ -36,18 +42,15 @@ export const EventsFilterPanel: React.FC<EventsFilterPanelProps> = ({
   hasAdvancedFilters,
   handleRemoveVenue,
   handleClearDateFilter,
-  resetFilters
+  resetFilters,
+  allEventTypes,
+  selectedCategories,
+  toggleCategory,
+  selectAll,
+  deselectAll
 }) => {
   return (
     <>
-      {/* Advanced Filters Toggle */}
-      <div className="mb-4">
-        <AdvancedFiltersToggle 
-          showAdvancedFilters={showAdvancedFilters}
-          toggleAdvancedFilters={toggleAdvancedFilters}
-        />
-      </div>
-      
       {/* Advanced Filters Panel */}
       {showAdvancedFilters && (
         <AdvancedFiltersPanel
@@ -62,6 +65,11 @@ export const EventsFilterPanel: React.FC<EventsFilterPanelProps> = ({
           onVenueChange={setSelectedVenues}
           locations={locations}
           className="mb-8"
+          allEventTypes={allEventTypes}
+          selectedCategories={selectedCategories}
+          toggleCategory={toggleCategory}
+          selectAll={selectAll}
+          deselectAll={deselectAll}
         />
       )}
       

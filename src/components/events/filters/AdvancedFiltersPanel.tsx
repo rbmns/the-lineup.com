@@ -2,10 +2,11 @@
 import React from 'react';
 import { DateRangeFilter } from '@/components/events/DateRangeFilter';
 import { VenueFilter } from '@/components/events/VenueFilter';
+import { EventCategoryFilters } from '@/components/events/filters/EventCategoryFilters';
 import { DateRange } from 'react-day-picker';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ChevronDown, ChevronUp, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface AdvancedFiltersPanelProps {
@@ -20,6 +21,12 @@ interface AdvancedFiltersPanelProps {
   onVenueChange: (venues: string[]) => void;
   locations?: Array<{value: string, label: string}>;
   className?: string;
+  // Event category props
+  allEventTypes: string[];
+  selectedCategories: string[];
+  toggleCategory: (type: string) => void;
+  selectAll: () => void;
+  deselectAll: () => void;
 }
 
 export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
@@ -33,27 +40,46 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
   selectedVenues,
   onVenueChange,
   locations = [],
-  className
+  className,
+  allEventTypes,
+  selectedCategories,
+  toggleCategory,
+  selectAll,
+  deselectAll
 }) => {
   if (!isOpen) return null;
 
   return (
-    <div className={cn("border rounded-lg p-4 bg-white shadow-sm relative", className)}>
+    <div className={cn("border rounded-lg p-6 bg-white shadow-sm relative", className)}>
       {/* Close button */}
       <Button 
         variant="ghost" 
         size="sm" 
         onClick={onClose}
-        className="absolute top-2 right-2 h-8 w-8 p-0"
+        className="absolute top-4 right-4 h-8 w-8 p-0"
       >
         <X className="h-4 w-4" />
         <span className="sr-only">Close advanced filters</span>
       </Button>
       
-      <h2 className="font-medium mb-4 text-lg">Advanced Filters</h2>
+      <h2 className="font-medium mb-6 text-lg">Advanced Filters</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="space-y-2">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="space-y-3">
+          <h3 className="text-sm font-medium">Event Categories</h3>
+          <div className="border rounded-md p-3">
+            <EventCategoryFilters
+              allEventTypes={allEventTypes}
+              selectedEventTypes={selectedCategories}
+              onToggleEventType={toggleCategory}
+              onSelectAll={selectAll}
+              onDeselectAll={deselectAll}
+              className="space-y-2"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-3">
           <h3 className="text-sm font-medium">Date Range</h3>
           <DateRangeFilter
             dateRange={dateRange}
@@ -64,13 +90,9 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           <h3 className="text-sm font-medium">Venue</h3>
           <div className="border rounded-md p-1 relative">
-            <div className="flex flex-col items-center mb-1 px-1">
-              <ChevronUp className="h-3 w-3 text-gray-400" />
-              <ChevronDown className="h-3 w-3 text-gray-400" />
-            </div>
             <ScrollArea className="h-[180px] pr-3">
               <VenueFilter
                 venues={venues}
@@ -82,9 +104,9 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
           </div>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           <h3 className="text-sm font-medium">Location</h3>
-          <div className="flex items-center border rounded-md p-2 bg-gray-100 text-gray-500 cursor-not-allowed">
+          <div className="flex items-center border rounded-md p-3 bg-gray-50 text-gray-600">
             <span className="text-sm">Zandvoort Area</span>
           </div>
         </div>

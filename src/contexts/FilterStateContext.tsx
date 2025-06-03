@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { DateRange } from 'react-day-picker';
 import { useEventVibes } from '@/hooks/useEventVibes';
@@ -35,7 +36,7 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [selectedDateFilter, setSelectedDateFilter] = useState<string>('');
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false); // Closed by default
   const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
   
   const { data: vibes = [] } = useEventVibes();
@@ -95,7 +96,7 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setSelectedVibes([]); // Reset to empty array (no filters)
     setDateRange(undefined);
     setSelectedDateFilter('');
-    setShowAdvancedFilters(false);
+    setShowAdvancedFilters(false); // Close advanced filters when resetting
   };
 
   const value: FilterState = {
