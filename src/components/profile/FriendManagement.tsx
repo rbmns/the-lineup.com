@@ -45,47 +45,59 @@ export const FriendManagement: React.FC<FriendManagementProps> = ({
 
   const checkFriendshipStatus = async (userId: string, profileId: string) => {
     try {
-      // Check for existing friendship in both directions
-      const { data: friendship, error } = await supabase
-        .from('friendships')
-        .select('status, user_id, friend_id')
-        .or(`and(user_id.eq.${userId},friend_id.eq.${profileId}),and(user_id.eq.${profileId},friend_id.eq.${userId})`)
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-      if (error) {
-        console.error('Error checking friendship status:', error);
-        return;
+      // Check if a friend request has been sent by the current user
+      const { data: sentRequest, error: sentError } = await supabase
+        .from('friend_requests')
+        .select('*')
+        .eq('sender_id', userId)
+        .eq('receiver_id', profileId)
+        .single();
+      
+      if (sentError && sentError.code !== 'PGRST116') {
+        console.error('Error checking sent friend request:', sentError);
+      } else if (sentRequest) {
+        setFriendshipStatus('pending');
+        if (onUpdateFriendship) onUpdateFriendship('requested');
       }
-
-      if (friendship && friendship.length > 0) {
-        const status = friendship[0].status.toLowerCase();
-        
-        if (status === 'accepted') {
+      
+      // Check if a friend request has been received by the current user
+      const { data: receivedRequest, error: receivedError } = await supabase
+        .from('friend_requests')
+        .select('*')
+        .eq('sender_id', profileId)
+        .eq('receiver_id', userId)
+        .single();
+      
+      if (receivedError && receivedError.code !== 'PGRST116') {
+        console.error('Error checking received friend request:', receivedError);
+      } else if (receivedRequest) {
+        setFriendshipStatus('pending');
+        if (onUpdateFriendship) onUpdateFriendship('pending');
+      }
+      
+      // Check if the users are already friends
+      const { data: friendship, error: friendshipError } = await supabase
+        .from('friends')
+        .select('*')
+        .or(`user_id.eq.${userId}, friend_id.eq.${userId}`)
+        .or(`user_id.eq.${profileId}, friend_id.eq.${profileId}`);
+      
+      if (friendshipError) {
+        console.error('Error checking friendship:', friendshipError);
+      } else {
+        const areFriends = friendship && friendship.some(record =>
+          (record.user_id === userId && record.friend_id === profileId) ||
+          (record.user_id === profileId && record.friend_id === userId)
+        );
+        if (areFriends) {
           setFriendshipStatus('accepted');
           if (onUpdateFriendship) onUpdateFriendship('accepted');
-        } else if (status === 'pending') {
-          setFriendshipStatus('pending');
-          // Determine if current user sent or received the request
-          if (friendship[0].user_id === userId) {
-            if (onUpdateFriendship) onUpdateFriendship('requested');
-          } else {
-            if (onUpdateFriendship) onUpdateFriendship('pending');
-          }
         }
-      } else {
-        setFriendshipStatus('none');
-        if (onUpdateFriendship) onUpdateFriendship('none');
       }
     } catch (error) {
       console.error('Error checking friendship status:', error);
     }
   };
-
-  // Don't show any buttons if this is the current user's own profile
-  if (!currentUserId || !profile?.id || currentUserId === profile.id) {
-    return null;
-  }
 
   const handleAddFriend = async () => {
     if (!currentUserId || !profile?.id) {
