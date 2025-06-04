@@ -7,8 +7,8 @@ import { Settings, Calendar, Users, MapPin, Edit } from 'lucide-react';
 import { SettingsPanel } from './SettingsPanel';
 import { ProfileAvatar } from './ProfileAvatar';
 import { useNavigate } from 'react-router-dom';
-import { useRsvpActions } from '@/hooks/useRsvpActions';
-import EventCard from '@/components/EventCard';
+import { useUserEvents } from '@/hooks/useUserEvents';
+import { ProfileEventsContainer } from './ProfileEventsContainer';
 
 interface ProfilePageLayoutProps {
   profile: UserProfile | null;
@@ -25,57 +25,11 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
 }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { handleRsvp } = useRsvpActions();
-
+  
   const displayName = profile?.username || user?.email?.split('@')[0] || 'User';
 
-  // Mock events data with proper Event type structure
-  const mockEvents = [
-    {
-      id: '1',
-      title: 'Beach Volleyball Tournament',
-      description: 'Join us for an exciting beach volleyball tournament with prizes and refreshments.',
-      start_date: '2024-06-16',
-      start_time: '14:00',
-      end_time: '18:00',
-      location: 'Zandvoort Beach, North Section',
-      event_category: 'Sports',
-      image_urls: ['/api/placeholder/300/200'],
-      rsvp_status: 'Going' as const,
-      attendees: {
-        going: 8,
-        interested: 4
-      },
-      creator_profile: profile,
-      venue_id: null,
-      vibe: 'Active',
-      tags: ['volleyball', 'beach', 'sports'],
-      created_at: '2024-06-01T10:00:00Z',
-      updated_at: '2024-06-01T10:00:00Z'
-    },
-    {
-      id: '2', 
-      title: 'Sunset Yoga Session',
-      description: 'Relax and unwind with a peaceful yoga session as the sun sets over the beach.',
-      start_date: '2024-06-19',
-      start_time: '19:30',
-      end_time: '20:30',
-      location: 'Zandvoort Beach, South Section',
-      event_category: 'Wellness',
-      image_urls: ['/api/placeholder/300/200'],
-      rsvp_status: 'Interested' as const,
-      attendees: {
-        going: 5,
-        interested: 3
-      },
-      creator_profile: profile,
-      venue_id: null,
-      vibe: 'Peaceful',
-      tags: ['yoga', 'wellness', 'sunset'],
-      created_at: '2024-06-02T10:00:00Z',
-      updated_at: '2024-06-02T10:00:00Z'
-    }
-  ];
+  // Fetch user's events using the real hook
+  const { pastEvents, upcomingEvents, isLoading: eventsLoading } = useUserEvents(user?.id);
 
   const handleEditProfile = () => {
     navigate('/profile/edit');
@@ -169,22 +123,12 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
                   </div>
 
                   {/* Events Section */}
-                  <div className="bg-white rounded-lg p-6 shadow-sm">
-                    <h2 className="text-xl font-semibold mb-4">My Events</h2>
-                    
-                    {/* Events List */}
-                    <div className="space-y-4">
-                      {mockEvents.map(event => (
-                        <EventCard
-                          key={event.id}
-                          event={event}
-                          showRsvpButtons={isOwnProfile}
-                          onRsvp={handleRsvp}
-                          className="border border-gray-200 hover:shadow-md transition-shadow"
-                        />
-                      ))}
-                    </div>
-                  </div>
+                  <ProfileEventsContainer
+                    profileId={user?.id}
+                    profile={profile}
+                    isLoading={eventsLoading}
+                    isOwnProfile={isOwnProfile}
+                  />
                 </>
               )}
             </div>
@@ -268,21 +212,12 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
                 </p>
               </div>
 
-              <div className="bg-white rounded-lg p-6 shadow-sm">
-                <h2 className="text-xl font-semibold mb-4">My Events</h2>
-                
-                <div className="space-y-4">
-                  {mockEvents.map(event => (
-                    <EventCard
-                      key={event.id}
-                      event={event}
-                      showRsvpButtons={isOwnProfile}
-                      onRsvp={handleRsvp}
-                      className="border border-gray-200"
-                    />
-                  ))}
-                </div>
-              </div>
+              <ProfileEventsContainer
+                profileId={user?.id}
+                profile={profile}
+                isLoading={eventsLoading}
+                isOwnProfile={isOwnProfile}
+              />
             </>
           )}
         </div>
