@@ -2,96 +2,85 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { RsvpButtonContent } from './RsvpButtonContent';
-import { RsvpStatus, RsvpHandler } from '@/components/events/rsvp/types';
+import { Check, Star, Loader2 } from 'lucide-react';
+
+export type RsvpStatus = 'Going' | 'Interested' | null;
+export type RsvpHandler = (status: 'Going' | 'Interested') => Promise<boolean>;
 
 interface DefaultRsvpButtonsProps {
   currentStatus: RsvpStatus;
   onRsvp: RsvpHandler;
   isLoading?: boolean;
-  disabled?: boolean;
   className?: string;
-  size?: 'sm' | 'default' | 'lg' | 'xl';
-  activeButton: 'Going' | 'Interested' | null;
-  eventId?: string;
+  activeButton?: 'Going' | 'Interested' | null;
+  size?: 'sm' | 'default' | 'lg';
 }
 
 export const DefaultRsvpButtons: React.FC<DefaultRsvpButtonsProps> = ({
   currentStatus,
   onRsvp,
   isLoading = false,
-  disabled = false,
-  className = '',
-  size = 'default',
+  className,
   activeButton,
-  eventId = 'default-event'
+  size = 'default'
 }) => {
   const isGoing = currentStatus === 'Going';
   const isInterested = currentStatus === 'Interested';
+  const goingLoading = isLoading && activeButton === 'Going';
+  const interestedLoading = isLoading && activeButton === 'Interested';
 
-  // Map size to button classes
-  const buttonSizeClasses = {
-    sm: 'h-7 text-xs py-1 px-2.5',
-    default: 'h-8 text-sm py-1.5 px-3',
-    lg: 'h-9 text-sm py-2 px-3.5',
-    xl: 'h-10 text-base py-2 px-4'
+  const handleRsvp = async (status: 'Going' | 'Interested', e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    await onRsvp(status);
   };
 
-  // Get button styles based on active state - updated to match the reference image
-  const getButtonStyle = (active: boolean, status: 'Going' | 'Interested') => {
-    if (active) {
-      return status === 'Going' ? 
-        'bg-green-500 text-white border-green-600 hover:bg-green-600' : 
-        'bg-blue-500 text-white border-blue-600 hover:bg-blue-600';
-    }
-    
-    return 'bg-gray-100 border-gray-200 hover:bg-gray-200 text-gray-700';
-  };
+  const buttonSizeClass = size === 'sm' ? 'px-3 py-1.5 text-sm' : size === 'lg' ? 'px-6 py-3 text-base' : 'px-4 py-2 text-sm';
 
   return (
-    <div className={cn('flex items-center gap-2', className)}>
+    <div className={cn("flex gap-2", className)} data-no-navigation="true">
+      {/* Going Button */}
       <Button
-        type="button"
-        variant="outline"
+        variant={isGoing ? "default" : "outline"}
         className={cn(
-          buttonSizeClasses[size],
-          'font-medium rounded-md transition-all duration-200',
-          getButtonStyle(isGoing, 'Going'),
-          (disabled || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
+          buttonSizeClass,
+          "flex items-center gap-2 transition-all duration-200",
+          isGoing 
+            ? "bg-green-600 hover:bg-green-700 text-white border-green-600" 
+            : "border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300"
         )}
-        disabled={disabled || isLoading}
-        onClick={() => onRsvp('Going')}
-        data-rsvp-button="true"
-        data-status="Going"
-        data-event-button="true"
-        data-event-id={eventId}
+        onClick={(e) => handleRsvp('Going', e)}
+        disabled={isLoading}
+        data-no-navigation="true"
       >
-        <RsvpButtonContent 
-          status="Going" 
-          isLoading={isLoading && activeButton === 'Going'} 
-        />
+        {goingLoading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Check className="h-4 w-4" />
+        )}
+        Going
       </Button>
-      
+
+      {/* Interested Button */}
       <Button
-        type="button"
-        variant="outline"
+        variant={isInterested ? "default" : "outline"}
         className={cn(
-          buttonSizeClasses[size],
-          'font-medium rounded-md transition-all duration-200',
-          getButtonStyle(isInterested, 'Interested'),
-          (disabled || isLoading) ? 'opacity-50 cursor-not-allowed' : ''
+          buttonSizeClass,
+          "flex items-center gap-2 transition-all duration-200",
+          isInterested 
+            ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600" 
+            : "border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300"
         )}
-        disabled={disabled || isLoading}
-        onClick={() => onRsvp('Interested')}
-        data-rsvp-button="true"
-        data-status="Interested"
-        data-event-button="true"
-        data-event-id={eventId}
+        onClick={(e) => handleRsvp('Interested', e)}
+        disabled={isLoading}
+        data-no-navigation="true"
       >
-        <RsvpButtonContent 
-          status="Interested" 
-          isLoading={isLoading && activeButton === 'Interested'} 
-        />
+        {interestedLoading ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Star className="h-4 w-4" />
+        )}
+        Interested
       </Button>
     </div>
   );

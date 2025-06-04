@@ -61,7 +61,8 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({ userId }) => {
         settings.public_profile !== localSettings.public_profile ||
         settings.show_event_attendance !== localSettings.show_event_attendance ||
         settings.share_activity_with_friends !== localSettings.share_activity_with_friends ||
-        settings.allow_tagging !== localSettings.allow_tagging;
+        settings.allow_tagging !== localSettings.allow_tagging ||
+        settings.show_rsvp_status !== localSettings.show_rsvp_status;
       
       setHasChanges(hasUnsavedChanges);
     }
@@ -93,6 +94,9 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({ userId }) => {
         }
         if (settings.allow_tagging !== localSettings.allow_tagging) {
           updates.push(updateSetting('allow_tagging', localSettings.allow_tagging));
+        }
+        if (settings.show_rsvp_status !== localSettings.show_rsvp_status) {
+          updates.push(updateSetting('show_rsvp_status', localSettings.show_rsvp_status));
         }
 
         await Promise.all(updates);
@@ -148,6 +152,12 @@ export const PrivacySettings: React.FC<PrivacySettingsProps> = ({ userId }) => {
           description="Share with friends which events you are attending"
           checked={localSettings.show_event_attendance}
           onCheckedChange={(checked) => handleLocalChange('show_event_attendance', checked)}
+        />
+        <PrivacySettingItem
+          title="Show RSVP Status"
+          description="Allow friends to see your RSVP status on events"
+          checked={localSettings.show_rsvp_status}
+          onCheckedChange={(checked) => handleLocalChange('show_rsvp_status', checked)}
         />
         <PrivacySettingItem
           title="Activity Sharing"

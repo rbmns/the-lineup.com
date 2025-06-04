@@ -10,11 +10,13 @@ import { EventTagsSection } from './detail-sections/EventTagsSection';
 import { EventRsvpSection } from './detail-sections/EventRsvpSection';
 import { EventAttendeesSummary } from './detail-sections/EventAttendeesSummary';
 import { EventExternalLink } from './detail-sections/EventExternalLink';
+import { EventFriendRsvps } from './EventFriendRsvps';
 import { extractEventCoordinates } from './detail-sections/EventCoordinatesExtractor';
 
 interface EventDetailContentProps {
   event: Event;
   attendees?: { going: any[]; interested: any[] };
+  friendAttendees?: { going: any[]; interested: any[] };
   relatedEvents?: Event[];
   relatedLoading?: boolean;
   isAuthenticated?: boolean;
@@ -27,6 +29,7 @@ interface EventDetailContentProps {
 const EventDetailContent = ({
   event,
   attendees,
+  friendAttendees,
   onRsvp,
   isRsvpLoading = false,
   rsvpLoading = false,
@@ -104,6 +107,16 @@ const EventDetailContent = ({
           goingCount={attendees?.going?.length || event.attendees?.going || 0}
           interestedCount={attendees?.interested?.length || event.attendees?.interested || 0}
         />
+        
+        {/* Friends attending section */}
+        {friendAttendees && (friendAttendees.going.length > 0 || friendAttendees.interested.length > 0) && (
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <EventFriendRsvps 
+              going={friendAttendees.going}
+              interested={friendAttendees.interested}
+            />
+          </div>
+        )}
         
         {/* External link if available */}
         {bookingLink && <EventExternalLink url={bookingLink} />}

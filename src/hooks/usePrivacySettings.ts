@@ -9,6 +9,7 @@ export interface PrivacySettings {
   show_event_attendance: boolean;
   share_activity_with_friends: boolean;
   allow_tagging: boolean;
+  show_rsvp_status: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -48,7 +49,8 @@ export function usePrivacySettings(userId?: string | null) {
                 public_profile: true,
                 show_event_attendance: true,
                 share_activity_with_friends: false,
-                allow_tagging: true
+                allow_tagging: true,
+                show_rsvp_status: true
               })
               .select()
               .single();

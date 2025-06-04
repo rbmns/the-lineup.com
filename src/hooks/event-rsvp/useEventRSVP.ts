@@ -150,21 +150,29 @@ export const useEventRSVP = () => {
       
       console.log('[DEBUG] Friend RSVPs - Going:', goingFriendIds.length, 'Interested:', interestedFriendIds.length);
       
-      // Fetch profile data for going friends
+      // Fetch profile data for going friends with privacy settings
       const { data: goingProfiles, error: goingProfilesError } = await supabase
         .from('profiles')
-        .select('*')
-        .in('id', goingFriendIds);
+        .select(`
+          *,
+          privacy_settings:user_privacy_settings!inner(show_rsvp_status)
+        `)
+        .in('id', goingFriendIds)
+        .eq('privacy_settings.show_rsvp_status', true);
       
       if (goingProfilesError) {
         console.error('[DEBUG] Error fetching Going friends profiles:', goingProfilesError);
       }
       
-      // Fetch profile data for interested friends
+      // Fetch profile data for interested friends with privacy settings
       const { data: interestedProfiles, error: interestedProfilesError } = await supabase
         .from('profiles')
-        .select('*')
-        .in('id', interestedFriendIds);
+        .select(`
+          *,
+          privacy_settings:user_privacy_settings!inner(show_rsvp_status)
+        `)
+        .in('id', interestedFriendIds)
+        .eq('privacy_settings.show_rsvp_status', true);
       
       if (interestedProfilesError) {
         console.error('[DEBUG] Error fetching Interested friends profiles:', interestedProfilesError);

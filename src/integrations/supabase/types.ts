@@ -655,6 +655,7 @@ export type Database = {
           public_profile: boolean | null
           share_activity_with_friends: boolean | null
           show_event_attendance: boolean | null
+          show_rsvp_status: boolean | null
           updated_at: string
           user_id: string
         }
@@ -665,6 +666,7 @@ export type Database = {
           public_profile?: boolean | null
           share_activity_with_friends?: boolean | null
           show_event_attendance?: boolean | null
+          show_rsvp_status?: boolean | null
           updated_at?: string
           user_id: string
         }
@@ -675,6 +677,7 @@ export type Database = {
           public_profile?: boolean | null
           share_activity_with_friends?: boolean | null
           show_event_attendance?: boolean | null
+          show_rsvp_status?: boolean | null
           updated_at?: string
           user_id?: string
         }
