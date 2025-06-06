@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Event } from '@/types';
-import { EventCard } from '@/components/events/EventCard';
+import EventCard from '@/components/EventCard';
 import { Search as SearchIcon } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 
@@ -87,7 +87,7 @@ const Search: React.FC = () => {
         area: null,
         google_maps: event.venues?.google_maps || null,
         organizer_link: event.organizer_link || null,
-        creator: event.creator && event.creator.length > 0 ? event.creator[0] : null,
+        creator: event.creator && Array.isArray(event.creator) && event.creator.length > 0 ? event.creator[0] : null,
         venues: event.venues,
         extra_info: event["Extra info"] || null,
         fee: event.fee,
