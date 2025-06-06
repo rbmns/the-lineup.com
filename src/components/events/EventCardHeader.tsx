@@ -4,6 +4,7 @@ import { Event } from '@/types';
 import { cn } from '@/lib/utils';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { useEventImages } from '@/hooks/useEventImages';
+import { LineupImage } from '@/components/ui/lineup-image';
 
 interface EventCardHeaderProps {
   event: Event;
@@ -19,30 +20,23 @@ export const EventCardHeader: React.FC<EventCardHeaderProps> = ({
 
   return (
     <div className="relative">
-      <div className={cn(
-        "relative w-full overflow-hidden", 
-        compact ? "h-28" : "h-40",
-        "bg-gray-200"
-      )}>
-        <img
-          src={imageUrl}
-          alt={event.title || "Event image"}
-          className="w-full h-full object-cover"
-          loading="lazy"
-          onError={(e) => {
-            // Handle image load errors by setting a default
-            const target = e.target as HTMLImageElement;
-            if (!target.src.includes('/img/default.jpg')) {
-              console.log('Image failed to load, using default');
-              target.src = "/img/default.jpg";
-            }
-          }}
-        />
-        <div className="absolute top-0 left-0 w-full h-full bg-black/10"></div>
-      </div>
+      <LineupImage
+        src={imageUrl}
+        alt={event.title || "Event image"}
+        aspectRatio="video"
+        overlayVariant="ocean"
+        className={cn(compact && "h-28")}
+        onError={(e) => {
+          const target = e.target as HTMLImageElement;
+          if (!target.src.includes('/img/default.jpg')) {
+            console.log('Image failed to load, using default');
+            target.src = "/img/default.jpg";
+          }
+        }}
+      />
       
       {event.event_category && (
-        <div className="absolute top-3 left-3">
+        <div className="absolute top-3 left-3 z-30">
           <CategoryPill 
             category={event.event_category}
             size="sm"

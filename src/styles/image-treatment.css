@@ -1,0 +1,98 @@
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* Base image treatment styles */
+.lineup-image-style {
+  @apply relative overflow-hidden rounded-2xl;
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.lineup-image-style img {
+  @apply w-full h-full object-cover transition-transform duration-300;
+}
+
+.lineup-image-style:hover img {
+  @apply scale-105;
+}
+
+/* Overlay gradient variants */
+.lineup-image-style::before {
+  content: '';
+  @apply absolute inset-0 z-10 pointer-events-none;
+  background: linear-gradient(to top, rgba(0, 95, 115, 0.35) 0%, transparent 60%);
+}
+
+.lineup-image-style.sunset-overlay::before {
+  background: linear-gradient(to top, rgba(255, 153, 51, 0.35) 0%, transparent 60%);
+}
+
+.lineup-image-style.ocean-overlay::before {
+  background: linear-gradient(to top, rgba(0, 95, 115, 0.35) 0%, transparent 60%);
+}
+
+/* Text overlay positioning */
+.lineup-image-overlay {
+  @apply absolute z-20 font-mono text-sm;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.lineup-image-overlay.bottom-left {
+  @apply bottom-3 left-3;
+}
+
+.lineup-image-overlay.bottom-right {
+  @apply bottom-3 right-3;
+}
+
+.lineup-image-overlay.top-left {
+  @apply top-3 left-3;
+}
+
+.lineup-image-overlay.top-right {
+  @apply top-3 right-3;
+}
+
+/* Text overlay background styles */
+.lineup-overlay-text {
+  @apply px-2 py-1 rounded text-white text-xs font-medium;
+  background-color: rgba(244, 231, 211, 0.75);
+  color: #005F73;
+  backdrop-filter: blur(4px);
+}
+
+.lineup-overlay-text.white-text {
+  @apply text-white;
+  background-color: rgba(0, 95, 115, 0.75);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .lineup-image-style {
+    @apply rounded-xl;
+  }
+  
+  .lineup-image-overlay {
+    @apply text-xs;
+  }
+  
+  .lineup-overlay-text {
+    @apply px-1.5 py-0.5;
+  }
+}
+
+/* Specific container styles */
+.event-image,
+.cover-image,
+.event-card img {
+  @apply lineup-image-style;
+}
+
+/* Event card specific adjustments */
+.event-card .lineup-image-style {
+  @apply aspect-video;
+}
+
+/* Hero/header image adjustments */
+.cover-image.lineup-image-style {
+  @apply aspect-[21/9] md:aspect-[16/9];
+}
