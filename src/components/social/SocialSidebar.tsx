@@ -119,29 +119,35 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
                         </Badge>
                       </div>
                       <div className="space-y-2">
-                        {attendees.going.slice(0, 3).map((attendee, index) => (
-                          <div key={attendee.id || index} className="flex items-center gap-2">
-                            <Avatar className="w-6 h-6">
-                              <AvatarImage 
-                                src={attendee.avatar_url?.[0]} 
-                                alt={attendee.username || 'User'} 
-                              />
-                              <AvatarFallback className="bg-seafoam-green text-white text-xs">
-                                {(attendee.username || 'U').charAt(0).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-ocean-deep truncate">
-                                {attendee.username || 'Anonymous'}
-                              </p>
-                              {attendee.tagline && (
-                                <p className="text-xs text-gray-500 truncate">
-                                  {attendee.tagline}
+                        {attendees.going.slice(0, 3).map((attendeeData: any, index: number) => {
+                          // Handle the case where attendeeData might be an array or object
+                          const attendee = Array.isArray(attendeeData) ? attendeeData[0] : attendeeData;
+                          if (!attendee) return null;
+                          
+                          return (
+                            <div key={attendee.id || index} className="flex items-center gap-2">
+                              <Avatar className="w-6 h-6">
+                                <AvatarImage 
+                                  src={attendee.avatar_url?.[0]} 
+                                  alt={attendee.username || 'User'} 
+                                />
+                                <AvatarFallback className="bg-seafoam-green text-white text-xs">
+                                  {(attendee.username || 'U').charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-ocean-deep truncate">
+                                  {attendee.username || 'Anonymous'}
                                 </p>
-                              )}
+                                {attendee.tagline && (
+                                  <p className="text-xs text-gray-500 truncate">
+                                    {attendee.tagline}
+                                  </p>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                         {attendees.going.length > 3 && (
                           <p className="text-xs text-gray-500 mt-1">
                             +{attendees.going.length - 3} more going
@@ -159,29 +165,35 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
                         </Badge>
                       </div>
                       <div className="space-y-2">
-                        {attendees.interested.slice(0, 2).map((attendee, index) => (
-                          <div key={attendee.id || index} className="flex items-center gap-2">
-                            <Avatar className="w-6 h-6">
-                              <AvatarImage 
-                                src={attendee.avatar_url?.[0]} 
-                                alt={attendee.username || 'User'} 
-                              />
-                              <AvatarFallback className="bg-sky-blue text-white text-xs">
-                                {(attendee.username || 'U').charAt(0).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-ocean-deep truncate">
-                                {attendee.username || 'Anonymous'}
-                              </p>
-                              {attendee.tagline && (
-                                <p className="text-xs text-gray-500 truncate">
-                                  {attendee.tagline}
+                        {attendees.interested.slice(0, 2).map((attendeeData: any, index: number) => {
+                          // Handle the case where attendeeData might be an array or object
+                          const attendee = Array.isArray(attendeeData) ? attendeeData[0] : attendeeData;
+                          if (!attendee) return null;
+                          
+                          return (
+                            <div key={attendee.id || index} className="flex items-center gap-2">
+                              <Avatar className="w-6 h-6">
+                                <AvatarImage 
+                                  src={attendee.avatar_url?.[0]} 
+                                  alt={attendee.username || 'User'} 
+                                />
+                                <AvatarFallback className="bg-sky-blue text-white text-xs">
+                                  {(attendee.username || 'U').charAt(0).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-ocean-deep truncate">
+                                  {attendee.username || 'Anonymous'}
                                 </p>
-                              )}
+                                {attendee.tagline && (
+                                  <p className="text-xs text-gray-500 truncate">
+                                    {attendee.tagline}
+                                  </p>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                         {attendees.interested.length > 2 && (
                           <p className="text-xs text-gray-500 mt-1">
                             +{attendees.interested.length - 2} more interested
