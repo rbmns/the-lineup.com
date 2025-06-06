@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import MainNav from "@/components/MainNav";
 import LeftSidebar from "@/components/nav/LeftSidebar";
@@ -134,7 +133,6 @@ const Layout = () => {
         {!isMobile && (
           <div className="fixed right-0 top-16 bottom-0 w-64 z-30">
             <SocialSidebar 
-              selectedEventId={location.pathname === '/events' ? selectedEventId : undefined}
               visible={socialSidebarVisible}
               onToggleVisibility={() => setSocialSidebarVisible(!socialSidebarVisible)}
             />
