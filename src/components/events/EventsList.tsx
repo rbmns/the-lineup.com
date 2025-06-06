@@ -3,6 +3,7 @@ import React from 'react';
 import { Event } from '@/types';
 import { LazyEventsList } from '@/components/events/LazyEventsList';
 import EventCardList from '@/components/events/EventCardList';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface EventsListProps {
   events: Event[];
@@ -23,7 +24,7 @@ interface EventsListProps {
 export const EventsList = React.memo(({
   events,
   onRsvp,
-  showRsvpButtons = true,
+  showRsvpButtons = false,
   compact = false,
   className,
   style,
@@ -35,6 +36,10 @@ export const EventsList = React.memo(({
   selectedEventId,
   isOverlayMode = false
 }: EventsListProps) => {
+  const { isAuthenticated } = useAuth();
+  
+  // Only show RSVP functionality if user is authenticated AND showRsvpButtons is true
+  const shouldShowRsvp = isAuthenticated && showRsvpButtons;
   
   // Handle event click for overlay mode
   const handleEventClick = (event: Event) => {
@@ -55,8 +60,8 @@ export const EventsList = React.memo(({
             <EventCardList
               key={event.id}
               event={event}
-              onRsvp={onRsvp}
-              showRsvpButtons={showRsvpButtons}
+              onRsvp={shouldShowRsvp ? onRsvp : undefined}
+              showRsvpButtons={shouldShowRsvp}
               onClick={handleEventClick}
               className={selectedEventId === event.id ? 'ring-2 ring-blue-500' : ''}
             />
@@ -72,8 +77,8 @@ export const EventsList = React.memo(({
       mainEvents={events}
       relatedEvents={similarEvents}
       isLoading={isLoading}
-      onRsvp={onRsvp}
-      showRsvpButtons={showRsvpButtons}
+      onRsvp={shouldShowRsvp ? onRsvp : undefined}
+      showRsvpButtons={shouldShowRsvp}
       hasActiveFilters={hasActiveFilters}
       compact={compact}
       loadingEventId={loadingEventId}

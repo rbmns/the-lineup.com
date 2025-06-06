@@ -25,7 +25,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   relatedEvents,
   isLoading,
   onRsvp,
-  showRsvpButtons = true,
+  showRsvpButtons = false, // Default to false for safety
   hasActiveFilters = false,
   loadingEventId,
   compact = false,
@@ -33,8 +33,11 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
 }) => {
   const { isAuthenticated } = useAuth();
   
+  // Only show RSVP buttons if user is authenticated AND showRsvpButtons is true
+  const shouldShowRsvp = isAuthenticated && showRsvpButtons;
+  
   // Create a wrapper function that adapts onRsvp to the expected type
-  const handleRsvp = onRsvp 
+  const handleRsvp = (shouldShowRsvp && onRsvp) 
     ? async (eventId: string, status: 'Going' | 'Interested'): Promise<void> => {
         await onRsvp(eventId, status);
       }
@@ -47,7 +50,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
         events={mainEvents}
         isLoading={isLoading}
         onRsvp={handleRsvp}
-        showRsvpButtons={showRsvpButtons}
+        showRsvpButtons={shouldShowRsvp}
         loadingEventId={loadingEventId}
         hideCount={hideCount}
         compact={compact}
@@ -64,7 +67,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
             events={relatedEvents}
             isLoading={isLoading}
             onRsvp={handleRsvp}
-            showRsvpButtons={showRsvpButtons}
+            showRsvpButtons={shouldShowRsvp}
             loadingEventId={loadingEventId}
             compact={compact}
           />

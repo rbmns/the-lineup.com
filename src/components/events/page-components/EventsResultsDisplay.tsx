@@ -54,11 +54,11 @@ export const EventsResultsDisplay: React.FC<EventsResultsDisplayProps> = ({
     return <NoResultsFound resetFilters={selectAll} />;
   }
 
-  // Show events list
+  // Show events list - only pass RSVP functionality if showRsvpButtons is true
   return (
     <EventsList
       events={filteredEvents}
-      onRsvp={handleRsvp}
+      onRsvp={showRsvpButtons ? handleRsvp : undefined}
       showRsvpButtons={showRsvpButtons}
       loadingEventId={loadingEventId}
       hasActiveFilters={hasActiveFilters}

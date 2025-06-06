@@ -10,6 +10,7 @@ import { CategoryPill } from '@/components/ui/category-pill';
 import { toast } from '@/hooks/use-toast';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
 import { LineupImage } from '@/components/ui/lineup-image';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface EventCardListProps {
   event: Event;
@@ -30,9 +31,13 @@ const EventCardList: React.FC<EventCardListProps> = ({
   className,
   onClick,
 }) => {
+  const { isAuthenticated } = useAuth();
   const { navigateToEvent } = useEventNavigation();
   const { getEventImageUrl } = useEventImages();
   const imageUrl = getEventImageUrl(event);
+
+  // Only show RSVP functionality if user is authenticated AND showRsvpButtons is true
+  const shouldShowRsvp = isAuthenticated && showRsvpButtons;
 
   const handleClick = (e: React.MouseEvent) => {
     // More thorough check for RSVP-related elements
@@ -74,7 +79,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
 
   // Handle RSVP and ensure we always return a Promise<boolean>
   const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
-    if (!onRsvp) return false;
+    if (!onRsvp || !shouldShowRsvp) return false;
     
     try {
       const result = await onRsvp(event.id, status);
@@ -155,8 +160,8 @@ const EventCardList: React.FC<EventCardListProps> = ({
             </span>
           </div>
           
-          {/* RSVP Buttons - now on the bottom right */}
-          {(showRsvpButtons || showRsvpStatus) && onRsvp && (
+          {/* RSVP Buttons - now on the bottom right - only show if authenticated */}
+          {(shouldShowRsvp || showRsvpStatus) && onRsvp && shouldShowRsvp && (
             <div 
               className="flex-shrink-0" 
               data-rsvp-container="true" 
@@ -166,7 +171,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
                 currentStatus={event.rsvp_status || null}
                 onRsvp={handleRsvp}
                 size="default"
-                showStatusOnly={!showRsvpButtons && showRsvpStatus}
+                showStatusOnly={!shouldShowRsvp && showRsvpStatus}
               />
             </div>
           )}
