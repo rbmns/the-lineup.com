@@ -3,9 +3,11 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Calendar, Users, Coffee, Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const LeftSidebar: React.FC = () => {
   const location = useLocation();
+  const isMobile = useIsMobile();
 
   const navItems = [
     {
@@ -30,6 +32,43 @@ const LeftSidebar: React.FC = () => {
     },
   ];
 
+  if (isMobile) {
+    // Mobile horizontal layout at bottom
+    return (
+      <div className="flex items-center justify-around py-2 px-1 bg-white">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = location.pathname === item.path;
+          
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={cn(
+                "flex flex-col items-center p-2 min-w-0 flex-1 transition-colors",
+                isActive 
+                  ? "text-blue-600" 
+                  : "text-gray-600 hover:text-gray-800"
+              )}
+            >
+              <Icon className={cn(
+                "h-5 w-5 mb-1",
+                isActive ? "text-blue-600" : "text-gray-600"
+              )} />
+              <span className={cn(
+                "text-xs font-medium truncate",
+                isActive ? "text-blue-600" : "text-gray-600"
+              )}>
+                {item.label}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+    );
+  }
+
+  // Desktop vertical layout
   return (
     <div className="h-full flex flex-col items-center py-6 space-y-4">
       {navItems.map((item) => {

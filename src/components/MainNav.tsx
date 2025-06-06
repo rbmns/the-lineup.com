@@ -37,35 +37,38 @@ const MainNav = () => {
     <header className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-200 ${
       isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-white'
     } border-b border-gray-200`}>
-      <div className="w-full px-4 lg:px-6">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center flex-shrink-0">
-            <BrandLogo showText={true} />
-          </div>
+      <div className={cn(
+        "w-full h-16 flex items-center justify-between",
+        isMobile ? "px-4" : "px-6 lg:px-8"
+      )}>
+        {/* Left side - Logo aligned to left */}
+        <div className="flex items-center flex-shrink-0">
+          <BrandLogo showText={true} />
+        </div>
 
-          <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0">
-            {isAuthenticated && user ? (
-              <UserMenu user={user} profile={profile} handleSignOut={signOut} />
-            ) : (
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleSignInClick}
-                  className="text-sm font-medium"
-                >
-                  Sign in
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleRegisterClick}
-                  className="text-sm font-medium"
-                >
-                  Sign up
-                </Button>
-              </div>
-            )}
-          </div>
+        {/* Right side - User menu or auth buttons */}
+        <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0">
+          {isAuthenticated && user ? (
+            <UserMenu user={user} profile={profile} handleSignOut={signOut} />
+          ) : (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size={isMobile ? "sm" : "sm"}
+                onClick={handleSignInClick}
+                className="text-sm font-medium"
+              >
+                Sign in
+              </Button>
+              <Button
+                size={isMobile ? "sm" : "sm"}
+                onClick={handleRegisterClick}
+                className="text-sm font-medium"
+              >
+                Sign up
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </header>

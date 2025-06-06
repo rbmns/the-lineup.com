@@ -9,8 +9,6 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { SocialSidebar } from "@/components/social/SocialSidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Calendar, Coffee, Users } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { EventDetailContent } from "@/components/events/EventDetailContent";
 import { EventDetailHeader } from "@/components/events/EventDetailHeader";
 import { useQuery } from '@tanstack/react-query';
@@ -279,47 +277,10 @@ const Layout = () => {
         </div>
       )}
 
-      {/* Mobile Navigation - updated to include Home */}
+      {/* Mobile Navigation - Fixed to bottom, always visible */}
       {isMobile && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 safe-area-pb">
-          <div className="flex items-center justify-around py-2 px-1">
-            <Link
-              to="/"
-              className={`flex flex-col items-center p-2 min-w-0 flex-1 ${
-                location.pathname === '/' ? 'text-blue-600' : 'text-gray-600'
-              }`}
-            >
-              <Calendar className="h-5 w-5 mb-1" />
-              <span className="text-xs font-medium truncate">Home</span>
-            </Link>
-            <Link
-              to="/events"
-              className={`flex flex-col items-center p-2 min-w-0 flex-1 ${
-                location.pathname === '/events' ? 'text-blue-600' : 'text-gray-600'
-              }`}
-            >
-              <Calendar className="h-5 w-5 mb-1" />
-              <span className="text-xs font-medium truncate">Events</span>
-            </Link>
-            <Link
-              to="/casual-plans"
-              className={`flex flex-col items-center p-2 min-w-0 flex-1 ${
-                location.pathname === '/casual-plans' ? 'text-blue-600' : 'text-gray-600'
-              }`}
-            >
-              <Coffee className="h-5 w-5 mb-1" />
-              <span className="text-xs font-medium truncate">Plans</span>
-            </Link>
-            <Link
-              to="/friends"
-              className={`flex flex-col items-center p-2 min-w-0 flex-1 ${
-                location.pathname === '/friends' ? 'text-blue-600' : 'text-gray-600'
-              }`}
-            >
-              <Users className="h-5 w-5 mb-1" />
-              <span className="text-xs font-medium truncate">Friends</span>
-            </Link>
-          </div>
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-pb">
+          <LeftSidebar />
         </div>
       )}
 

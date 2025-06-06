@@ -10,6 +10,8 @@ import Events from '@/pages/Events';
 import EventDetail from '@/pages/EventDetail';
 import CasualPlans from '@/pages/CasualPlans';
 import Friends from '@/pages/Friends';
+import ProfilePage from '@/pages/ProfilePage';
+import ProfileEdit from '@/pages/ProfileEdit';
 import Login from '@/pages/Login';
 import Signup from '@/pages/Signup';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -41,6 +43,8 @@ function App() {
                 <Route path="events/:id" element={<EventDetail />} />
                 <Route path="casual-plans" element={<CasualPlans />} />
                 <Route path="friends" element={<Friends />} />
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="profile/edit" element={<ProfileEdit />} />
                 <Route path="privacy" element={<PrivacyPolicy />} />
                 <Route path="terms" element={<TermsOfService />} />
                 <Route path="cookies" element={<CookiePolicy />} />
