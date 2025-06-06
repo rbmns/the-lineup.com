@@ -10,6 +10,7 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { EventSidePanel } from "@/components/events/EventSidePanel";
 import { SocialSidebar } from "@/components/social/SocialSidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import EventDetail from "@/pages/EventDetail";
 
 const Layout = () => {
   const { user, loading } = useAuth();
@@ -74,7 +75,7 @@ const Layout = () => {
         if (location.pathname === '/events') {
           handleEventSelect(eventId);
         } else {
-          // For other pages, use the global overlay
+          // For other pages, use the global overlay instead of URL navigation
           setGlobalEventOverlay(eventId);
         }
       }
@@ -126,8 +127,8 @@ const Layout = () => {
         <SocialSidebar selectedEventId={location.pathname === '/events' ? selectedEventId : undefined} />
       </div>
 
-      {/* Global Event Detail Overlay - only for pages other than /events */}
-      {globalEventOverlay && location.pathname !== '/events' && (
+      {/* Global Event Detail Overlay - only for pages other than /events and NOT for URL-based event pages */}
+      {globalEventOverlay && location.pathname !== '/events' && !isEventDetailPage && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
           <div className={`flex h-full ${isMobile ? '' : 'pl-20 pr-80'}`}>
             {/* Main overlay content */}
@@ -146,11 +147,7 @@ const Layout = () => {
                   </svg>
                 </button>
                 <div className="h-full overflow-y-auto">
-                  <iframe 
-                    src={`/events/${globalEventOverlay}`} 
-                    className="w-full h-full border-0"
-                    title="Event Details"
-                  />
+                  <EventDetail />
                 </div>
               </div>
             </div>
@@ -158,8 +155,8 @@ const Layout = () => {
         </div>
       )}
 
-      {/* URL-based Event Detail Overlay - only show if NOT on /events page */}
-      {isEventDetailPage && location.pathname !== '/events' && (
+      {/* URL-based Event Detail Overlay - only show if we're on an event detail URL and NOT on /events page */}
+      {isEventDetailPage && location.pathname !== '/events' && !globalEventOverlay && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
           <div className={`flex h-full ${isMobile ? '' : 'pl-20 pr-80'}`}>
             {/* Main overlay content */}
@@ -170,7 +167,7 @@ const Layout = () => {
                   : 'w-[95%] h-[90vh]'
               } overflow-hidden relative shadow-2xl`}>
                 <button
-                  onClick={() => navigate('/events')}
+                  onClick={() => navigate(-1)}
                   className="absolute top-6 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

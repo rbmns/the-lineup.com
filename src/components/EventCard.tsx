@@ -9,6 +9,7 @@ import { EventCardMeta } from '@/components/events/EventCardMeta';
 import { EventCardDescription } from '@/components/events/EventCardDescription';
 import { EventCardActions } from '@/components/events/EventCardActions';
 import { cn } from '@/lib/utils';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface EventCardProps {
   event: Event;
@@ -31,16 +32,26 @@ const EventCard: React.FC<EventCardProps> = ({
 }) => {
   const { isAuthenticated } = useAuth();
   const [imageError, setImageError] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const handleCardClick = () => {
     if (onClick) {
       onClick(event);
     } else {
-      // Dispatch global event for overlay
-      const customEvent = new CustomEvent('eventCardClicked', {
-        detail: { eventId: event.id }
-      });
-      window.dispatchEvent(customEvent);
+      // If we're on the /events page, dispatch event for side panel
+      if (location.pathname === '/events') {
+        const customEvent = new CustomEvent('eventCardClicked', {
+          detail: { eventId: event.id }
+        });
+        window.dispatchEvent(customEvent);
+      } else {
+        // For other pages, use global overlay instead of navigation
+        const customEvent = new CustomEvent('eventCardClicked', {
+          detail: { eventId: event.id }
+        });
+        window.dispatchEvent(customEvent);
+      }
     }
   };
 
