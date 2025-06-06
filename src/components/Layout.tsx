@@ -349,7 +349,7 @@ const EventDetailOverlay: React.FC<{ eventId: string }> = ({ eventId }) => {
     <div className="w-full">
       <EventDetailHeader 
         event={event}
-        eventType={event.event_category || event.event_type}
+        eventType={event.event_category || ''}
         title={event.title}
         showTitleOverlay={false}
       />
