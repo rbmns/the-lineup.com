@@ -31,7 +31,7 @@ const LeftSidebar: React.FC = () => {
   ];
 
   return (
-    <div className="hidden md:flex w-20 bg-white border-r border-gray-200 flex-col items-center py-6 space-y-6">
+    <div className="h-full flex flex-col items-center py-6 space-y-6">
       {navItems.map((item) => {
         const Icon = item.icon;
         const isActive = location.pathname === item.path;

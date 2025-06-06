@@ -230,20 +230,22 @@ const EventDetail: React.FC<EventDetailProps> = ({
           )}
         </div>
 
-        {/* RSVP Section with enhanced feedback */}
-        <div className="mb-8">
-          <div className={`transition-all duration-300 ${rsvpFeedback ? 'scale-105' : ''} ${
-            rsvpFeedback === 'going' ? 'ring-2 ring-green-200' : 
-            rsvpFeedback === 'interested' ? 'ring-2 ring-blue-200' : ''
-          }`}>
-            <EventRsvpSection
-              isOwner={isOwner}
-              onRsvp={handleRsvpWithFeedback}
-              isRsvpLoading={rsvpLoading}
-              currentStatus={event.rsvp_status}
-            />
+        {/* RSVP Section - only show for authenticated users */}
+        {user && (
+          <div className="mb-8">
+            <div className={`transition-all duration-300 ${rsvpFeedback ? 'scale-105' : ''} ${
+              rsvpFeedback === 'going' ? 'ring-2 ring-green-200' : 
+              rsvpFeedback === 'interested' ? 'ring-2 ring-blue-200' : ''
+            }`}>
+              <EventRsvpSection
+                isOwner={isOwner}
+                onRsvp={handleRsvpWithFeedback}
+                isRsvpLoading={rsvpLoading}
+                currentStatus={event.rsvp_status}
+              />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Mobile attendees info - only show on mobile when no social sidebar */}
         {isMobile && (

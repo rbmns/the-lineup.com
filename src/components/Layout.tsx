@@ -103,33 +103,24 @@ const Layout = () => {
     }
   }, [user, loading, navigate, location, isPublicRoute]);
 
-  // Calculate main content width based on sidebar visibility
-  const getMainContentStyle = (): CSSProperties => {
-    if (isMobile) {
-      return {};
-    }
-    
-    const leftSidebarWidth = 80; // 20rem = 80 in width units
-    const socialSidebarWidth = socialSidebarVisible ? 280 : 0; // Reduced from 320 to 280
-    
-    return {
-      marginLeft: `${leftSidebarWidth}px`,
-      marginRight: `${socialSidebarWidth}px`,
-      width: `calc(100vw - ${leftSidebarWidth + socialSidebarWidth}px)`
-    };
-  };
-
   return (
     <div className="min-h-screen bg-white">
       <MainNav />
       <div className="flex">
-        {/* Left sidebar - hidden on mobile */}
-        {!isMobile && <LeftSidebar />}
+        {/* Left sidebar - fixed, no scrolling, hidden on mobile */}
+        {!isMobile && (
+          <div className="fixed left-0 top-16 bottom-0 w-20 bg-white border-r border-gray-200 z-30">
+            <LeftSidebar />
+          </div>
+        )}
         
         {/* Main content area */}
         <div 
-          className={isMobile ? "flex-1 relative min-h-screen" : "relative min-h-screen"}
-          style={getMainContentStyle()}
+          className={`flex-1 relative min-h-screen ${
+            isMobile ? '' : 'ml-20'
+          } ${
+            !isMobile && socialSidebarVisible ? 'mr-64' : ''
+          }`}
         >
           <main className="bg-white min-h-screen">
             <Outlet context={{ onEventSelect: handleEventSelect, selectedEventId }} />
@@ -139,9 +130,9 @@ const Layout = () => {
           <Footer />
         </div>
         
-        {/* Social sidebar - always on the far right, hidden on mobile */}
+        {/* Social sidebar - fixed on the right, hidden on mobile */}
         {!isMobile && (
-          <div className="relative">
+          <div className="fixed right-0 top-16 bottom-0 w-64 z-30">
             <SocialSidebar 
               selectedEventId={location.pathname === '/events' ? selectedEventId : undefined}
               visible={socialSidebarVisible}
@@ -159,11 +150,11 @@ const Layout = () => {
             top: '64px',
             bottom: '0',
             left: '80px',
-            right: socialSidebarVisible ? '280px' : '0'
+            right: socialSidebarVisible ? '256px' : '0'
           }}
         >
           <div className="w-full h-full flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl w-full h-[95%] overflow-hidden relative shadow-2xl">
+            <div className="bg-white rounded-xl w-full max-w-4xl h-[95%] overflow-hidden relative shadow-2xl">
               <button
                 onClick={() => handleEventSelect(null)}
                 className="absolute top-6 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
@@ -188,11 +179,11 @@ const Layout = () => {
             top: '64px',
             bottom: '0',
             left: isMobile ? '0' : '80px',
-            right: isMobile ? '0' : (socialSidebarVisible ? '280px' : '0')
+            right: isMobile ? '0' : (socialSidebarVisible ? '256px' : '0')
           }}
         >
           <div className="w-full h-full flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl w-full h-[95%] overflow-hidden relative shadow-2xl">
+            <div className="bg-white rounded-xl w-full max-w-4xl h-[95%] overflow-hidden relative shadow-2xl">
               <button
                 onClick={handleCloseGlobalOverlay}
                 className="absolute top-6 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
@@ -239,11 +230,11 @@ const Layout = () => {
             top: '64px',
             bottom: '0',
             left: isMobile ? '0' : '80px',
-            right: isMobile ? '0' : (socialSidebarVisible ? '280px' : '0')
+            right: isMobile ? '0' : (socialSidebarVisible ? '256px' : '0')
           }}
         >
           <div className="w-full h-full flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl w-full h-[95%] overflow-hidden relative shadow-2xl">
+            <div className="bg-white rounded-xl w-full max-w-4xl h-[95%] overflow-hidden relative shadow-2xl">
               <button
                 onClick={() => navigate(-1)}
                 className="absolute top-6 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"

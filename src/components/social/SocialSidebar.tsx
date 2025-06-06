@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Users, Calendar, ChevronRight, ChevronLeft, UserPlus } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface SocialSidebarProps {
   selectedEventId?: string;
@@ -22,6 +22,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   onToggleVisibility 
 }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const { data: attendees, isLoading } = useQuery({
     queryKey: ['event-attendees', selectedEventId],
@@ -29,9 +30,13 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
     enabled: !!selectedEventId,
   });
 
+  const handleSignUpClick = () => {
+    navigate('/login', { state: { initialMode: 'register' } });
+  };
+
   if (!visible) {
     return (
-      <div className="fixed right-0 top-1/2 transform -translate-y-1/2 z-40">
+      <div className="absolute -left-8 top-1/2 transform -translate-y-1/2">
         <Button
           variant="ghost"
           size="sm"
@@ -45,7 +50,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   }
 
   return (
-    <div className="fixed right-0 top-16 bottom-0 w-72 bg-white border-l border-sand shadow-lg z-40 overflow-y-auto">
+    <div className="h-full w-full bg-white border-l border-sand shadow-lg overflow-y-auto">
       {/* Toggle button */}
       <div className="absolute -left-8 top-1/2 transform -translate-y-1/2">
         <Button
@@ -58,7 +63,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
         </Button>
       </div>
 
-      <div className="p-5 space-y-5">
+      <div className="p-4 space-y-4">
         <div className="flex items-center gap-2">
           <Users className="h-5 w-5 text-seafoam-green" />
           <h2 className="text-lg font-semibold text-ocean-deep">Social</h2>
@@ -71,8 +76,12 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
               <div className="text-center">
                 <UserPlus className="h-8 w-8 text-seafoam-green mx-auto mb-2" />
                 <p className="text-sm text-ocean-deep mb-3">Join the community!</p>
-                <Button asChild size="sm" className="w-full">
-                  <Link to="/login">Sign Up</Link>
+                <Button 
+                  size="sm" 
+                  className="w-full"
+                  onClick={handleSignUpClick}
+                >
+                  Sign Up
                 </Button>
               </div>
             </CardContent>
@@ -92,7 +101,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
                 <div className="space-y-3">
                   {[...Array(3)].map((_, i) => (
                     <div key={i} className="flex items-center gap-3">
-                      <div className="w-7 h-7 bg-sand rounded-full animate-pulse" />
+                      <div className="w-6 h-6 bg-sand rounded-full animate-pulse" />
                       <div className="flex-1 space-y-1">
                         <div className="h-3 bg-sand rounded animate-pulse" />
                         <div className="h-2 bg-sand rounded w-2/3 animate-pulse" />
@@ -110,9 +119,9 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
                         </Badge>
                       </div>
                       <div className="space-y-2">
-                        {attendees.going.slice(0, 4).map((attendee: any) => (
+                        {attendees.going.slice(0, 3).map((attendee) => (
                           <div key={attendee.id} className="flex items-center gap-2">
-                            <Avatar className="w-7 h-7">
+                            <Avatar className="w-6 h-6">
                               <AvatarImage 
                                 src={attendee.avatar_url?.[0]} 
                                 alt={attendee.username || 'User'} 
@@ -133,9 +142,9 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
                             </div>
                           </div>
                         ))}
-                        {attendees.going.length > 4 && (
+                        {attendees.going.length > 3 && (
                           <p className="text-xs text-gray-500 mt-1">
-                            +{attendees.going.length - 4} more going
+                            +{attendees.going.length - 3} more going
                           </p>
                         )}
                       </div>
@@ -150,9 +159,9 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
                         </Badge>
                       </div>
                       <div className="space-y-2">
-                        {attendees.interested.slice(0, 3).map((attendee: any) => (
+                        {attendees.interested.slice(0, 2).map((attendee) => (
                           <div key={attendee.id} className="flex items-center gap-2">
-                            <Avatar className="w-7 h-7">
+                            <Avatar className="w-6 h-6">
                               <AvatarImage 
                                 src={attendee.avatar_url?.[0]} 
                                 alt={attendee.username || 'User'} 
@@ -173,9 +182,9 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
                             </div>
                           </div>
                         ))}
-                        {attendees.interested.length > 3 && (
+                        {attendees.interested.length > 2 && (
                           <p className="text-xs text-gray-500 mt-1">
-                            +{attendees.interested.length - 3} more interested
+                            +{attendees.interested.length - 2} more interested
                           </p>
                         )}
                       </div>
