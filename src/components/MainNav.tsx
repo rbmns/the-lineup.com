@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -41,8 +42,15 @@ const MainNav = () => {
         "w-full h-16 flex items-center justify-between",
         isMobile ? "px-4" : "px-6 lg:px-8"
       )}>
-        {/* Left side - Logo aligned to left */}
-        <div className="flex items-center flex-shrink-0">
+        {/* Left side - Logo + Brand aligned to left */}
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <Link to="/" className="flex items-center">
+            <img 
+              src="/lovable-uploads/272de8da-6e0c-40fd-a1b7-9f82414ed290.png" 
+              alt="TheLineup Logo" 
+              className="w-8 h-8"
+            />
+          </Link>
           <BrandLogo showText={true} />
         </div>
 

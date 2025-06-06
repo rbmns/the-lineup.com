@@ -91,13 +91,6 @@ const Layout = () => {
     setGlobalEventOverlay(null);
   };
 
-  // Query for event details when overlay is open
-  const { data: overlayEvent } = useQuery({
-    queryKey: ['event', globalEventOverlay],
-    queryFn: () => fetchEventById(globalEventOverlay!),
-    enabled: !!globalEventOverlay,
-  });
-
   return (
     <div className="min-h-screen bg-white w-full overflow-x-hidden">
       {/* Full-width top navigation - ALWAYS VISIBLE */}
@@ -130,7 +123,7 @@ const Layout = () => {
         </div>
       </div>
 
-      {/* Event Side Panel - ONLY for /events page on desktop with improved responsive design */}
+      {/* Event Side Panel - ONLY for /events page on desktop */}
       {selectedEventId && location.pathname === '/events' && !isMobile && (
         <div 
           className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
@@ -163,7 +156,7 @@ const Layout = () => {
         </div>
       )}
 
-      {/* Global Event Detail Overlay - for pages OTHER than /events with improved responsive design */}
+      {/* Global Event Detail Overlay - for pages OTHER than /events and event detail pages */}
       {globalEventOverlay && location.pathname !== '/events' && !isEventDetailPage && (
         <div 
           className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm ${
@@ -202,7 +195,7 @@ const Layout = () => {
         </div>
       )}
 
-      {/* Mobile Event Detail Overlay for /events page with improved layout */}
+      {/* Mobile Event Detail Overlay for /events page */}
       {selectedEventId && location.pathname === '/events' && isMobile && (
         <div className="fixed inset-0 z-50 bg-white" style={{ top: '64px', bottom: '80px' }}>
           <div className="h-full flex flex-col">
@@ -274,7 +267,7 @@ const Layout = () => {
   );
 };
 
-// Component for event detail overlay with improved responsive layout
+// Component for event detail overlay - consistent across all pages
 const EventDetailOverlay: React.FC<{ eventId: string }> = ({ eventId }) => {
   const { data: event, isLoading } = useQuery({
     queryKey: ['event', eventId],
@@ -287,7 +280,7 @@ const EventDetailOverlay: React.FC<{ eventId: string }> = ({ eventId }) => {
       <div className="w-full">
         <div className="animate-pulse">
           <div className="h-48 md:h-64 bg-gray-200 rounded mb-6"></div>
-          <div className="px-4 md:px-6 pb-6">
+          <div className="px-4 md:px-6 pb-6 text-left">
             <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
             <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
             <div className="h-4 bg-gray-200 rounded w-1/3"></div>
@@ -307,7 +300,7 @@ const EventDetailOverlay: React.FC<{ eventId: string }> = ({ eventId }) => {
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full text-left">
       <EventDetailHeader 
         event={event}
         eventType={event.event_category || ''}
