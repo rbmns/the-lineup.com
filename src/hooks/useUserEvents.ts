@@ -23,6 +23,25 @@ export const useUserEvents = (userId: string | undefined): UseUserEventsResult =
       }
 
       try {
+        // First get the user's RSVPs
+        const { data: rsvpData, error: rsvpError } = await supabase
+          .from('event_rsvps')
+          .select('event_id, status')
+          .eq('user_id', userId);
+
+        if (rsvpError) {
+          console.error('Error fetching user RSVPs:', rsvpError);
+          throw rsvpError;
+        }
+
+        if (!rsvpData || rsvpData.length === 0) {
+          return { pastEvents: [], upcomingEvents: [] };
+        }
+
+        // Get the event IDs the user has RSVPed to
+        const eventIds = rsvpData.map(rsvp => rsvp.event_id);
+
+        // Fetch the events the user has RSVPed to
         const { data: eventsData, error: eventsError } = await supabase
           .from('events')
           .select(`
@@ -31,6 +50,7 @@ export const useUserEvents = (userId: string | undefined): UseUserEventsResult =
             venues:venue_id(*),
             event_rsvps(id, user_id, status)
           `)
+          .in('id', eventIds)
           .order('start_date', { ascending: true })
           .order('start_time', { ascending: true });
 
@@ -48,8 +68,8 @@ export const useUserEvents = (userId: string | undefined): UseUserEventsResult =
         // Apply time-based filtering to get currently visible events
         const visibleEvents = filterEventsByTime(allEvents);
         
-        // Separate past and upcoming events from the visible events
-        const pastEvents = filterPastEvents(allEvents); // Keep past events for history
+        // Separate past and upcoming events from all events (not just visible ones)
+        const pastEvents = filterPastEvents(allEvents);
         const sortedPastEvents = sortEventsByDate(pastEvents);
         
         // Upcoming events are those that are visible and not in the past

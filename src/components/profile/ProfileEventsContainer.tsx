@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { useUserEventQueries } from '@/hooks/useUserEventQueries';
 import { useAuth } from '@/contexts/AuthContext';
 import { ProfileEventsSection } from './ProfileEventsSection';
 import { UserProfile } from '@/types';
+import { useUserEvents } from '@/hooks/useUserEvents';
 
 interface ProfileEventsContainerProps {
   profileId?: string | null;
@@ -22,30 +22,19 @@ export const ProfileEventsContainer: React.FC<ProfileEventsContainerProps> = ({
 }) => {
   const { user } = useAuth();
   
+  // Use the profileId if provided, otherwise fall back to current user
+  const userIdToFetch = profileId || user?.id;
+  
   // For now, we'll assume friendship status is 'accepted' for own profile
   // and 'none' for others (you can enhance this with real friendship logic later)
   const friendshipStatus = isOwnProfile ? 'accepted' : 'none';
   
-  // Fetch user events where they have RSVPed
+  // Fetch user events using the hook
   const { 
-    userEvents, 
-    isLoading: eventsLoading, 
-    error 
-  } = useUserEventQueries(profileId, user?.id, friendshipStatus);
-
-  // Separate upcoming and past events
-  const now = new Date();
-  const upcomingEvents = userEvents.filter(event => {
-    if (!event.start_date) return false;
-    const eventDate = new Date(event.start_date);
-    return eventDate >= now;
-  });
-  
-  const pastEvents = userEvents.filter(event => {
-    if (!event.start_date) return false;
-    const eventDate = new Date(event.start_date);
-    return eventDate < now;
-  });
+    pastEvents, 
+    upcomingEvents, 
+    isLoading: eventsLoading 
+  } = useUserEvents(userIdToFetch);
 
   const handleAddFriend = () => {
     // Friend request logic would go here

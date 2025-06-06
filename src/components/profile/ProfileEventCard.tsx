@@ -1,97 +1,75 @@
 
 import React from 'react';
 import { Event } from '@/types';
-import { formatDate, formatEventTime } from '@/utils/date-formatting';
-import { useEventNavigation } from '@/hooks/useEventNavigation';
-import { useEventImages } from '@/hooks/useEventImages';
+import { Calendar, MapPin, Users } from 'lucide-react';
+import { formatEventDate, formatEventTime } from '@/utils/date-formatting';
 
 interface ProfileEventCardProps {
   event: Event;
 }
 
 export const ProfileEventCard: React.FC<ProfileEventCardProps> = ({ event }) => {
-  const { navigateToEvent } = useEventNavigation();
-  const { getEventImageUrl } = useEventImages();
-  
-  const imageUrl = getEventImageUrl(event);
-  const formattedDate = event.start_date ? formatDate(event.start_date) : '';
-  const timeDisplay = event.start_time ? 
-    formatEventTime(event.start_time, event.end_time) : '';
-
   const handleClick = () => {
-    navigateToEvent(event);
+    // Dispatch custom event to trigger global overlay
+    const customEvent = new CustomEvent('eventCardClicked', {
+      detail: { eventId: event.id }
+    });
+    window.dispatchEvent(customEvent);
   };
-
-  // Count attendees going and interested
-  const goingCount = event.attendees?.going || 0;
-  const interestedCount = event.attendees?.interested || 0;
-  const totalAttendees = goingCount + interestedCount;
 
   return (
     <div 
-      className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+      className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
       onClick={handleClick}
     >
-      <div className="flex items-center gap-4">
-        {/* Event Image */}
-        <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-          <img 
-            src={imageUrl} 
+      <div className="flex items-start space-x-4">
+        {event.image_url && (
+          <img
+            src={event.image_url}
             alt={event.title}
-            className="w-full h-full object-cover"
+            className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
           />
-        </div>
+        )}
         
-        {/* Event Details */}
-        <div className="flex-1">
-          <h3 className="font-semibold text-gray-900 text-base mb-1">
+        <div className="flex-1 min-w-0">
+          <h3 className="font-semibold text-gray-900 truncate mb-1">
             {event.title}
           </h3>
           
-          <div className="text-sm text-gray-600 mb-1">
-            {formattedDate && timeDisplay ? (
-              <>
-                {formattedDate} {timeDisplay}
-              </>
-            ) : (
-              formattedDate || 'Date not set'
-            )}
+          <div className="flex items-center text-sm text-gray-600 mb-2">
+            <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
+            <span className="mr-4">
+              {formatEventDate(event.start_date)} at {formatEventTime(event.start_time)}
+            </span>
           </div>
           
-          <div className="text-sm text-gray-500">
-            {event.venues?.name || event.location || 'No location'}
-          </div>
+          {event.location && (
+            <div className="flex items-center text-sm text-gray-600 mb-2">
+              <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="truncate">{event.location}</span>
+            </div>
+          )}
           
-          {/* Attendees */}
-          {totalAttendees > 0 && (
-            <div className="flex items-center gap-1 mt-2">
-              <div className="flex -space-x-1">
-                {/* Mock avatars for now - you can enhance this later */}
-                {Array.from({ length: Math.min(3, totalAttendees) }).map((_, i) => (
-                  <div 
-                    key={i}
-                    className="w-5 h-5 rounded-full bg-gray-300 border-2 border-white"
-                  />
-                ))}
-              </div>
-              <span className="text-xs text-gray-500 ml-1">
-                {totalAttendees} attendee{totalAttendees !== 1 ? 's' : ''}
-              </span>
+          {event.attendees_count !== undefined && (
+            <div className="flex items-center text-sm text-gray-600">
+              <Users className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span>{event.attendees_count} attending</span>
             </div>
           )}
         </div>
+        
+        {event.user_rsvp_status && (
+          <div className="flex-shrink-0">
+            <span className={`px-2 py-1 text-xs rounded-full ${
+              event.user_rsvp_status === 'Going' 
+                ? 'bg-green-100 text-green-800' 
+                : 'bg-blue-100 text-blue-800'
+            }`}>
+              {event.user_rsvp_status}
+            </span>
+          </div>
+        )}
       </div>
-      
-      {/* View Button */}
-      <button 
-        className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-        onClick={(e) => {
-          e.stopPropagation();
-          handleClick();
-        }}
-      >
-        View
-      </button>
     </div>
   );
 };

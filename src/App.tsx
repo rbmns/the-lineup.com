@@ -32,14 +32,14 @@ function App() {
           <TooltipProvider>
             <Router>
               <Routes>
-                {/* Auth pages - no layout */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
+                {/* Goodbye page - no layout */}
                 <Route path="/goodbye" element={<GoodbyePage />} />
                 
-                {/* All other routes use Layout - including legal pages */}
+                {/* All routes use Layout - including auth pages */}
                 <Route path="/" element={<Layout />}>
                   <Route index element={<LandingPage />} />
+                  <Route path="login" element={<Login />} />
+                  <Route path="signup" element={<Signup />} />
                   <Route path="events" element={<Events />} />
                   <Route path="events/:id" element={<EventDetail />} />
                   <Route path="search" element={<Search />} />
@@ -48,7 +48,7 @@ function App() {
                   <Route path="profile" element={<ProfilePage />} />
                   <Route path="profile/edit" element={<ProfileEdit />} />
                   
-                  {/* Legal pages now use layout */}
+                  {/* Legal pages */}
                   <Route path="privacy" element={<PrivacyPolicy />} />
                   <Route path="terms" element={<TermsOfService />} />
                   <Route path="cookies" element={<CookiePolicy />} />
