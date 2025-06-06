@@ -96,10 +96,10 @@ const Layout = () => {
         <SocialSidebar selectedEventId={location.pathname === '/events' ? selectedEventId : undefined} />
       </div>
 
-      {/* Event Detail Overlay - much larger and no background overlay */}
+      {/* Event Detail Overlay - larger and properly positioned */}
       {isEventDetailPage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2">
-          <div className="bg-white rounded-lg w-[95vw] h-[95vh] overflow-hidden relative shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-4 pb-4">
+          <div className="bg-white rounded-lg w-[calc(100vw-32px)] max-w-6xl h-[calc(100vh-32px)] overflow-hidden relative shadow-2xl mx-4">
             <button
               onClick={() => navigate('/events')}
               className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
