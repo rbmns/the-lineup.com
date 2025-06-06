@@ -8,8 +8,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { HelmetProvider } from 'react-helmet-async';
 import Layout from '@/components/Layout';
 
-// Lazy load pages
-const Index = lazy(() => import("./pages/Index"));
+// Lazy load pages - using existing page names
 const Events = lazy(() => import("./pages/Events"));
 const CasualPlans = lazy(() => import("./pages/CasualPlans"));
 const Friends = lazy(() => import("./pages/Friends"));
@@ -29,7 +28,7 @@ function App() {
                 <Suspense fallback={<div>Loading...</div>}>
                   <Routes>
                     <Route path="/" element={<Layout />}>
-                      <Route index element={<Index />} />
+                      <Route index element={<Events />} />
                       <Route path="events" element={<Events />} />
                       <Route path="casual-plans" element={<CasualPlans />} />
                       <Route path="friends" element={<Friends />} />

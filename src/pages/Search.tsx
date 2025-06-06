@@ -60,7 +60,18 @@ const Search: React.FC = () => {
         .select('*')
         .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%`);
 
-      setEvents(eventsData || []);
+      // Transform events data to match Event type
+      const transformedEvents: Event[] = (eventsData || []).map(event => ({
+        ...event,
+        attendees: {
+          going: event.going_count || 0,
+          interested: event.interested_count || 0,
+        },
+        image_urls: event.image_urls || [],
+        tags: event.tags ? (Array.isArray(event.tags) ? event.tags : event.tags.split(',').map(tag => tag.trim())) : []
+      }));
+
+      setEvents(transformedEvents);
       setVenues(venuesData || []);
       setCasualPlans(casualPlansData || []);
     } catch (error) {
