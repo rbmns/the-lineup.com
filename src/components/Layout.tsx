@@ -9,11 +9,13 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { EventSidePanel } from "@/components/events/EventSidePanel";
 import { SocialSidebar } from "@/components/social/SocialSidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Layout = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobile = useIsMobile();
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
   // Define which routes should be accessible without authentication
@@ -60,7 +62,7 @@ const Layout = () => {
     navigate(newUrl, { replace: true });
   };
 
-  // Global event overlay handler for all pages
+  // Global event overlay handler - only for pages other than /events
   const [globalEventOverlay, setGlobalEventOverlay] = useState<string | null>(null);
 
   // Listen for global event clicks
@@ -68,7 +70,13 @@ const Layout = () => {
     const handleEventCardClick = (event: CustomEvent) => {
       const eventId = event.detail.eventId;
       if (eventId) {
-        setGlobalEventOverlay(eventId);
+        // If we're on the /events page, use the side panel instead of global overlay
+        if (location.pathname === '/events') {
+          handleEventSelect(eventId);
+        } else {
+          // For other pages, use the global overlay
+          setGlobalEventOverlay(eventId);
+        }
       }
     };
 
@@ -77,7 +85,7 @@ const Layout = () => {
     return () => {
       window.removeEventListener('eventCardClicked', handleEventCardClick as EventListener);
     };
-  }, []);
+  }, [location.pathname]);
 
   // Close global overlay
   const handleCloseGlobalOverlay = () => {
@@ -118,16 +126,17 @@ const Layout = () => {
         <SocialSidebar selectedEventId={location.pathname === '/events' ? selectedEventId : undefined} />
       </div>
 
-      {/* Global Event Detail Overlay - covers 95% of main content area */}
-      {globalEventOverlay && (
+      {/* Global Event Detail Overlay - only for pages other than /events */}
+      {globalEventOverlay && location.pathname !== '/events' && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
-          <div className="flex h-full">
-            {/* Left sidebar space */}
-            <div className="w-20" />
-            
-            {/* Main overlay content - 95% of remaining space */}
+          <div className={`flex h-full ${isMobile ? '' : 'pl-20 pr-80'}`}>
+            {/* Main overlay content */}
             <div className="flex-1 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl w-[95%] h-[90vh] overflow-hidden relative shadow-2xl">
+              <div className={`bg-white rounded-xl ${
+                isMobile 
+                  ? 'w-full h-full' 
+                  : 'w-[95%] h-[90vh]'
+              } overflow-hidden relative shadow-2xl`}>
                 <button
                   onClick={handleCloseGlobalOverlay}
                   className="absolute top-6 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
@@ -145,23 +154,21 @@ const Layout = () => {
                 </div>
               </div>
             </div>
-            
-            {/* Social sidebar space */}
-            <div className="w-80" />
           </div>
         </div>
       )}
 
-      {/* Event Detail Overlay for URL-based navigation */}
-      {isEventDetailPage && (
+      {/* URL-based Event Detail Overlay - only show if NOT on /events page */}
+      {isEventDetailPage && location.pathname !== '/events' && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
-          <div className="flex h-full">
-            {/* Left sidebar space */}
-            <div className="w-20" />
-            
-            {/* Main overlay content - 95% of remaining space */}
+          <div className={`flex h-full ${isMobile ? '' : 'pl-20 pr-80'}`}>
+            {/* Main overlay content */}
             <div className="flex-1 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl w-[95%] h-[90vh] overflow-hidden relative shadow-2xl">
+              <div className={`bg-white rounded-xl ${
+                isMobile 
+                  ? 'w-full h-full' 
+                  : 'w-[95%] h-[90vh]'
+              } overflow-hidden relative shadow-2xl`}>
                 <button
                   onClick={() => navigate('/events')}
                   className="absolute top-6 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
@@ -175,9 +182,6 @@ const Layout = () => {
                 </div>
               </div>
             </div>
-            
-            {/* Social sidebar space */}
-            <div className="w-80" />
           </div>
         </div>
       )}
