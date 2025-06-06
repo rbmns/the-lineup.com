@@ -26,9 +26,6 @@ const Layout = () => {
     (route === '/search' && location.pathname.startsWith('/search'))
   );
 
-  // Always show the side panel layout for consistency
-  const showSidePanelLayout = true;
-
   // Check if we're on an event detail page
   const isEventDetailPage = location.pathname.startsWith('/events/') && location.pathname !== '/events';
 
@@ -70,73 +67,54 @@ const Layout = () => {
     }
   }, [user, loading, navigate, location, isPublicRoute]);
 
-  if (showSidePanelLayout) {
-    return (
-      <div className="min-h-screen bg-background">
-        <MainNav />
-        <div className="flex h-[calc(100vh-64px)]">
-          {/* Left sidebar */}
-          <LeftSidebar />
-          
-          {/* Main content area - adjusts width when overlay is open */}
-          <div className={`flex-1 overflow-hidden relative transition-all duration-300 ${
-            selectedEventId && location.pathname === '/events' ? 'mr-[800px]' : ''
-          }`}>
-            <main className="h-full overflow-y-auto">
-              <Outlet context={{ onEventSelect: handleEventSelect, selectedEventId }} />
-            </main>
-          </div>
-          
-          {/* Event side panel - positioned on the right */}
-          {selectedEventId && location.pathname === '/events' && (
-            <EventSidePanel
-              eventId={selectedEventId}
-              isOpen={!!selectedEventId}
-              onClose={() => handleEventSelect(null)}
-            />
-          )}
-          
-          {/* Social sidebar - always on the far right */}
-          <SocialSidebar selectedEventId={location.pathname === '/events' ? selectedEventId : undefined} />
-        </div>
-
-        {/* Event Detail Overlay - almost full screen */}
-        {isEventDetailPage && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg w-full h-full max-w-6xl max-h-[95vh] overflow-hidden relative">
-              <button
-                onClick={() => navigate('/events')}
-                className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <div className="h-full overflow-y-auto">
-                <Outlet />
-              </div>
-            </div>
-          </div>
-        )}
-
-        <Footer />
-        <Toaster />
-        <CookieConsent />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <MainNav />
-      <div className="flex">
+      <div className="flex h-[calc(100vh-64px)]">
+        {/* Left sidebar */}
         <LeftSidebar />
-        <main className="flex-1">
-          <Outlet />
-        </main>
-        {/* Social sidebar on all pages */}
-        <SocialSidebar />
+        
+        {/* Main content area - adjusts width when overlay is open */}
+        <div className={`flex-1 overflow-hidden relative transition-all duration-300 ${
+          selectedEventId && location.pathname === '/events' ? 'mr-[800px]' : ''
+        }`}>
+          <main className="h-full overflow-y-auto">
+            <Outlet context={{ onEventSelect: handleEventSelect, selectedEventId }} />
+          </main>
+        </div>
+        
+        {/* Event side panel - positioned on the right */}
+        {selectedEventId && location.pathname === '/events' && (
+          <EventSidePanel
+            eventId={selectedEventId}
+            isOpen={!!selectedEventId}
+            onClose={() => handleEventSelect(null)}
+          />
+        )}
+        
+        {/* Social sidebar - always on the far right */}
+        <SocialSidebar selectedEventId={location.pathname === '/events' ? selectedEventId : undefined} />
       </div>
+
+      {/* Event Detail Overlay - much larger and no background overlay */}
+      {isEventDetailPage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2">
+          <div className="bg-white rounded-lg w-[95vw] h-[95vh] overflow-hidden relative shadow-2xl">
+            <button
+              onClick={() => navigate('/events')}
+              className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="h-full overflow-y-auto">
+              <Outlet />
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
       <Toaster />
       <CookieConsent />

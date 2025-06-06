@@ -1,21 +1,43 @@
 
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchEventById } from '@/lib/eventService';
 import { ArrowLeft, Calendar, MapPin, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Helmet } from 'react-helmet-async';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
+import { useEventRsvpHandler } from '@/hooks/events/useEventRsvpHandler';
+import { EventRsvpSection } from '@/components/events/detail-sections/EventRsvpSection';
+import { useAuth } from '@/contexts/AuthContext';
 
 const EventDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   
   const { data: event, isLoading, error } = useQuery({
     queryKey: ['event', id],
     queryFn: () => fetchEventById(id!),
     enabled: !!id,
   });
+
+  const { handleRsvp, rsvpLoading } = useEventRsvpHandler(id!);
+
+  // Enhanced RSVP handler with cache updates
+  const handleRsvpWithCacheUpdate = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    const result = await handleRsvp(status);
+    
+    if (result) {
+      // Update the event detail cache
+      queryClient.invalidateQueries({ queryKey: ['event', id] });
+      // Update the events list cache to reflect RSVP changes
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      queryClient.invalidateQueries({ queryKey: ['events', user?.id] });
+    }
+    
+    return result;
+  };
 
   if (isLoading) {
     return (
@@ -57,8 +79,10 @@ const EventDetail: React.FC = () => {
     `${event.venues.name}${event.venues.city ? `, ${event.venues.city}` : ''}` : 
     event.location || 'Location TBD';
 
+  const isOwner = user?.id === event.creator?.id;
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white event-detail-card">
       <Helmet>
         <title>{event.title} | the lineup</title>
         <meta name="description" content={event.description || `Join us for ${event.title}`} />
@@ -109,6 +133,16 @@ const EventDetail: React.FC = () => {
               {event.event_category}
             </span>
           )}
+        </div>
+
+        {/* RSVP Section */}
+        <div className="mb-8">
+          <EventRsvpSection
+            isOwner={isOwner}
+            onRsvp={handleRsvpWithCacheUpdate}
+            isRsvpLoading={rsvpLoading}
+            currentStatus={event.rsvp_status}
+          />
         </div>
 
         {/* Event Description */}
