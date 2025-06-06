@@ -1,72 +1,50 @@
 
+import { Suspense, lazy } from 'react';
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Toaster } from "sonner";
-import { QueryClient } from "./components/query-client";
-import Layout from "./components/Layout";
-import LandingPage from "./pages/LandingPage";
-import Events from "./pages/Events";
-import CreateEvent from "./pages/events/create";
-import EventDetail from "./pages/EventDetail";
-import EditEvent from "./pages/events/[eventId]/edit";
-import CasualPlansPage from "./pages/CasualPlans";
-import FriendsPage from "./pages/Friends";
-import MapPage from "./pages/map";
-import UserProfilePage from "./pages/UserProfilePage";
-import ProfilePage from "./pages/ProfilePage";
-import ProfileEdit from "./pages/ProfileEdit";
-import LoginPage from "./pages/Login";
-import SignupPage from "./pages/Signup";
-import GoodbyePage from "./pages/GoodbyePage";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
-import CookiePolicy from "./pages/CookiePolicy";
-import EventCategoriesStyleGuide from "./components/design-system/EventCategoriesStyleGuide";
-import CreateCasualPlanPage from '@/components/casual-plans/CreateCasualPlanPage';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { HelmetProvider } from 'react-helmet-async';
+import Layout from '@/components/Layout';
+
+// Lazy load pages
+const Index = lazy(() => import("./pages/Index"));
+const Events = lazy(() => import("./pages/Events"));
+const CasualPlans = lazy(() => import("./pages/CasualPlans"));
+const Friends = lazy(() => import("./pages/Friends"));
+const Search = lazy(() => import("./pages/Search"));
+const Login = lazy(() => import("./pages/Login"));
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <QueryClient>
-      <AuthProvider>
-        <Toaster />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<LandingPage />} />
-              
-              {/* Public Events routes */}
-              <Route path="/events" element={<Events />} />
-              <Route path="/events/:id" element={<EventDetail />} />
-              
-              {/* Auth routes */}
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/goodbye" element={<GoodbyePage />} />
-              
-              {/* Legal pages */}
-              <Route path="/privacy" element={<PrivacyPolicy />} />
-              <Route path="/terms" element={<TermsOfService />} />
-              <Route path="/cookies" element={<CookiePolicy />} />
-              
-              {/* Protected routes (require authentication) */}
-              <Route path="/events/create" element={<CreateEvent />} />
-              <Route path="/events/:eventId/edit" element={<EditEvent />} />
-              <Route path="/casual-plans" element={<CasualPlansPage />} />
-              <Route path="/casual-plans/create" element={<CreateCasualPlanPage />} />
-              <Route path="/friends" element={<FriendsPage />} />
-              <Route path="/map" element={<MapPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/profile/edit" element={<ProfileEdit />} />
-              <Route path="/profile/:username" element={<UserProfilePage />} />
-              <Route path="/user/:userId" element={<UserProfilePage />} />
-              
-              {/* Design system routes */}
-              <Route path="/style-guide" element={<EventCategoriesStyleGuide />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </QueryClient>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <AuthProvider>
+            <BrowserRouter>
+              <div className="min-h-screen bg-background font-sans antialiased">
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Routes>
+                    <Route path="/" element={<Layout />}>
+                      <Route index element={<Index />} />
+                      <Route path="events" element={<Events />} />
+                      <Route path="casual-plans" element={<CasualPlans />} />
+                      <Route path="friends" element={<Friends />} />
+                      <Route path="search" element={<Search />} />
+                      <Route path="login" element={<Login />} />
+                    </Route>
+                  </Routes>
+                </Suspense>
+                <Toaster />
+              </div>
+            </BrowserRouter>
+          </AuthProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
   );
 }
 

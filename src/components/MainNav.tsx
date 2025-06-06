@@ -3,9 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { NavItems } from '@/components/nav/NavItems';
 import { BrandLogo } from '@/components/ui/brand-logo';
 import UserMenu from '@/components/nav/UserMenu';
+import SearchBar from '@/components/nav/SearchBar';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const MainNav = () => {
@@ -39,21 +39,14 @@ const MainNav = () => {
       isScrolled ? 'bg-white/90 backdrop-blur-md shadow-sm' : 'bg-white'
     }`}>
       <div className="container mx-auto px-2 md:px-4">
-        <div className="flex h-16 items-center justify-between gap-2">
+        <div className="flex h-16 items-center justify-between gap-4">
           <div className="flex items-center">
             <BrandLogo showText={!isMobile} />
           </div>
           
-          {/* Center the navigation items */}
-          <div className="flex-1 flex justify-center">
-            <div className="hidden md:block">
-              <NavItems className="text-sm font-medium" />
-            </div>
-            
-            {/* Mobile NavItems */}
-            <div className="md:hidden flex justify-center">
-              <NavItems showIconsOnly={true} />
-            </div>
+          {/* Center search bar */}
+          <div className="flex-1 max-w-2xl">
+            <SearchBar />
           </div>
 
           <div className="flex items-center gap-2">

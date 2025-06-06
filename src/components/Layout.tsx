@@ -1,6 +1,7 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import MainNav from "@/components/MainNav";
+import LeftSidebar from "@/components/nav/LeftSidebar";
 import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/toaster";
 import { CookieConsent } from "@/components/CookieConsent";
@@ -16,16 +17,17 @@ const Layout = () => {
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
   // Define which routes should be accessible without authentication
-  const publicRoutes = ['/', '/events', '/casual-plans', '/login', '/signup'];
+  const publicRoutes = ['/', '/events', '/casual-plans', '/login', '/signup', '/search'];
   
   // Check if current route starts with a public route (for dynamic routes like /events/:id)
   const isPublicRoute = publicRoutes.some(route => 
     location.pathname === route || 
-    (route === '/events' && location.pathname.startsWith('/events/'))
+    (route === '/events' && location.pathname.startsWith('/events/')) ||
+    (route === '/search' && location.pathname.startsWith('/search'))
   );
 
-  // Check if we should show the side panel layout (on events and home pages)
-  const showSidePanelLayout = location.pathname === '/' || location.pathname === '/events' || location.pathname === '/friends';
+  // Check if we should show the side panel layout (on events, home, casual-plans, and friends pages)
+  const showSidePanelLayout = ['/', '/events', '/friends', '/casual-plans'].includes(location.pathname);
 
   // Handle URL parameters for selected event on /events page
   useEffect(() => {
@@ -70,6 +72,9 @@ const Layout = () => {
       <div className="min-h-screen bg-background">
         <MainNav />
         <div className="flex h-[calc(100vh-64px)]">
+          {/* Left sidebar */}
+          <LeftSidebar />
+          
           {/* Main content area - adjusts width when overlay is open */}
           <div className={`flex-1 overflow-hidden relative transition-all duration-300 ${
             selectedEventId && location.pathname === '/events' ? 'mr-[800px]' : ''
@@ -101,9 +106,13 @@ const Layout = () => {
   return (
     <div className="min-h-screen bg-background">
       <MainNav />
-      <main className="flex-1">
-        <Outlet />
-      </main>
+      <div className="flex">
+        {/* Show left sidebar on search page too */}
+        {location.pathname.startsWith('/search') && <LeftSidebar />}
+        <main className="flex-1">
+          <Outlet />
+        </main>
+      </div>
       <Footer />
       <Toaster />
       <CookieConsent />
