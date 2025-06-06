@@ -102,6 +102,11 @@ const Layout = () => {
     }
   }, [user, loading, navigate, location, isPublicRoute]);
 
+  // Calculate layout dimensions
+  const topNavHeight = isMobile ? 'h-[104px]' : 'h-16'; // Mobile has 2 rows
+  const leftSidebarWidth = isMobile ? 'w-0' : 'w-20';
+  const socialSidebarWidth = !isMobile && socialSidebarVisible ? 'w-64' : 'w-0';
+
   return (
     <div className="min-h-screen bg-white w-full">
       {/* Full-width top navigation */}
@@ -112,20 +117,23 @@ const Layout = () => {
       <div className="flex w-full">
         {/* Left sidebar - fixed, always visible on desktop */}
         {!isMobile && (
-          <div className="fixed left-0 top-16 bottom-0 w-20 bg-white border-r border-gray-200 z-30">
+          <div className={`fixed left-0 top-16 bottom-0 ${leftSidebarWidth} bg-white border-r border-gray-200 z-30`}>
             <LeftSidebar />
           </div>
         )}
         
-        {/* Main content area - reduced padding for more content width */}
+        {/* Main content area - properly spaced between sidebars */}
         <div 
           className={`flex-1 relative min-h-screen ${
             isMobile ? '' : 'ml-20'
           } ${
             !isMobile && socialSidebarVisible ? 'mr-64' : ''
           }`}
+          style={{ 
+            minHeight: `calc(100vh - ${isMobile ? '104px' : '64px'})` 
+          }}
         >
-          <main className="bg-white min-h-screen w-full">
+          <main className="bg-white min-h-full w-full">
             <Outlet context={{ onEventSelect: handleEventSelect, selectedEventId }} />
           </main>
           
@@ -133,9 +141,9 @@ const Layout = () => {
           <Footer />
         </div>
         
-        {/* Social sidebar - fixed on the right, collapsible */}
+        {/* Social sidebar - fixed on the right, positioned below top nav */}
         {!isMobile && (
-          <div className="fixed right-0 top-16 bottom-0 w-64 z-30">
+          <div className={`fixed right-0 top-16 bottom-0 ${socialSidebarWidth} z-30`}>
             <SocialSidebar 
               visible={socialSidebarVisible}
               onToggleVisibility={() => setSocialSidebarVisible(!socialSidebarVisible)}
@@ -204,7 +212,7 @@ const Layout = () => {
 
       {/* Mobile Event Detail Overlay for /events page */}
       {selectedEventId && location.pathname === '/events' && isMobile && (
-        <div className="fixed inset-0 z-50 bg-white" style={{ top: '64px', bottom: '80px' }}>
+        <div className="fixed inset-0 z-50 bg-white" style={{ top: '104px', bottom: '80px' }}>
           <div className="h-full flex flex-col">
             <div className="flex items-center justify-between p-4 border-b bg-white">
               <h2 className="font-semibold text-lg">Event Details</h2>

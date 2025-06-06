@@ -37,7 +37,7 @@ const MainNav = () => {
   return (
     <header className={`sticky top-0 z-50 w-full transition-all duration-200 ${
       isScrolled ? 'bg-white/90 backdrop-blur-md shadow-sm' : 'bg-white'
-    }`}>
+    } border-b border-gray-200`}>
       {/* Mobile: Two row layout */}
       {isMobile ? (
         <div className="w-full px-2">
@@ -79,18 +79,18 @@ const MainNav = () => {
         </div>
       ) : (
         /* Desktop: Single row layout - full width */
-        <div className="w-full px-2 md:px-4">
-          <div className="flex h-16 items-center justify-between gap-4">
-            <div className="flex items-center">
+        <div className="w-full px-4">
+          <div className="flex h-16 items-center justify-between gap-6">
+            <div className="flex items-center flex-shrink-0">
               <BrandLogo showText={true} />
             </div>
             
             {/* Center search bar */}
-            <div className="flex-1 max-w-2xl">
+            <div className="flex-1 max-w-2xl mx-6">
               <SearchBar />
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3 flex-shrink-0">
               {isAuthenticated && user ? (
                 <UserMenu user={user} profile={profile} handleSignOut={signOut} />
               ) : (
