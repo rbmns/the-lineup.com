@@ -26,8 +26,8 @@ const Layout = () => {
     (route === '/search' && location.pathname.startsWith('/search'))
   );
 
-  // Check if we should show the side panel layout (on events, home, casual-plans, and friends pages)
-  const showSidePanelLayout = ['/', '/events', '/friends', '/casual-plans'].includes(location.pathname);
+  // Always show the side panel layout for consistency
+  const showSidePanelLayout = true;
 
   // Handle URL parameters for selected event on /events page
   useEffect(() => {
@@ -107,11 +107,12 @@ const Layout = () => {
     <div className="min-h-screen bg-background">
       <MainNav />
       <div className="flex">
-        {/* Show left sidebar on search page too */}
-        {location.pathname.startsWith('/search') && <LeftSidebar />}
+        <LeftSidebar />
         <main className="flex-1">
           <Outlet />
         </main>
+        {/* Social sidebar on all pages */}
+        <SocialSidebar />
       </div>
       <Footer />
       <Toaster />
