@@ -40,7 +40,7 @@ const MainNav = () => {
     }`}>
       {/* Mobile: Two row layout */}
       {isMobile ? (
-        <div className="container mx-auto px-2">
+        <div className="w-full px-2">
           {/* First row: Logo and Auth buttons */}
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
@@ -78,8 +78,8 @@ const MainNav = () => {
           </div>
         </div>
       ) : (
-        /* Desktop: Single row layout */
-        <div className="container mx-auto px-2 md:px-4">
+        /* Desktop: Single row layout - full width */
+        <div className="w-full px-2 md:px-4">
           <div className="flex h-16 items-center justify-between gap-4">
             <div className="flex items-center">
               <BrandLogo showText={true} />

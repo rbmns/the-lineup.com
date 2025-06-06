@@ -6,13 +6,12 @@ import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/toaster";
 import { CookieConsent } from "@/components/CookieConsent";
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation, Outlet, Link } from 'react-router-dom';
-import { EventSidePanel } from "@/components/events/EventSidePanel";
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { SocialSidebar } from "@/components/social/SocialSidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Search, Calendar, Coffee, Users } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import EventDetail from "@/pages/EventDetail";
-import type { CSSProperties } from 'react';
 
 const Layout = () => {
   const { user, loading } = useAuth();
@@ -23,7 +22,7 @@ const Layout = () => {
   const [socialSidebarVisible, setSocialSidebarVisible] = useState(true);
 
   // Define which routes should be accessible without authentication
-  const publicRoutes = ['/', '/events', '/casual-plans', '/login', '/signup', '/search'];
+  const publicRoutes = ['/', '/events', '/casual-plans', '/search', '/privacy', '/terms', '/cookies'];
   
   // Check if current route starts with a public route (for dynamic routes like /events/:id)
   const isPublicRoute = publicRoutes.some(route => 
@@ -104,17 +103,21 @@ const Layout = () => {
   }, [user, loading, navigate, location, isPublicRoute]);
 
   return (
-    <div className="min-h-screen bg-white">
-      <MainNav />
-      <div className="flex">
-        {/* Left sidebar - fixed, no scrolling, hidden on mobile */}
+    <div className="min-h-screen bg-white w-full">
+      {/* Full-width top navigation */}
+      <div className="w-full">
+        <MainNav />
+      </div>
+      
+      <div className="flex w-full">
+        {/* Left sidebar - fixed, always visible on desktop */}
         {!isMobile && (
           <div className="fixed left-0 top-16 bottom-0 w-20 bg-white border-r border-gray-200 z-30">
             <LeftSidebar />
           </div>
         )}
         
-        {/* Main content area */}
+        {/* Main content area - reduced padding for more content width */}
         <div 
           className={`flex-1 relative min-h-screen ${
             isMobile ? '' : 'ml-20'
@@ -122,15 +125,15 @@ const Layout = () => {
             !isMobile && socialSidebarVisible ? 'mr-64' : ''
           }`}
         >
-          <main className="bg-white min-h-screen">
+          <main className="bg-white min-h-screen w-full">
             <Outlet context={{ onEventSelect: handleEventSelect, selectedEventId }} />
           </main>
           
-          {/* Non-sticky Footer */}
+          {/* Footer */}
           <Footer />
         </div>
         
-        {/* Social sidebar - fixed on the right, hidden on mobile, positioned under top nav */}
+        {/* Social sidebar - fixed on the right, collapsible */}
         {!isMobile && (
           <div className="fixed right-0 top-16 bottom-0 w-64 z-30">
             <SocialSidebar 
@@ -252,12 +255,12 @@ const Layout = () => {
 
       {/* Mobile Navigation - sticky bottom navigation */}
       {isMobile && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-sand z-40">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40">
           <div className="flex items-center justify-around py-2">
             <Link
               to="/search"
               className={`flex flex-col items-center p-2 ${
-                location.pathname === '/search' ? 'text-seafoam-green' : 'text-ocean-deep'
+                location.pathname === '/search' ? 'text-blue-600' : 'text-gray-600'
               }`}
             >
               <Search className="h-5 w-5" />
@@ -266,7 +269,7 @@ const Layout = () => {
             <Link
               to="/events"
               className={`flex flex-col items-center p-2 ${
-                location.pathname === '/events' ? 'text-seafoam-green' : 'text-ocean-deep'
+                location.pathname === '/events' ? 'text-blue-600' : 'text-gray-600'
               }`}
             >
               <Calendar className="h-5 w-5" />
@@ -275,7 +278,7 @@ const Layout = () => {
             <Link
               to="/casual-plans"
               className={`flex flex-col items-center p-2 ${
-                location.pathname === '/casual-plans' ? 'text-seafoam-green' : 'text-ocean-deep'
+                location.pathname === '/casual-plans' ? 'text-blue-600' : 'text-gray-600'
               }`}
             >
               <Coffee className="h-5 w-5" />
@@ -284,7 +287,7 @@ const Layout = () => {
             <Link
               to="/friends"
               className={`flex flex-col items-center p-2 ${
-                location.pathname === '/friends' ? 'text-seafoam-green' : 'text-ocean-deep'
+                location.pathname === '/friends' ? 'text-blue-600' : 'text-gray-600'
               }`}
             >
               <Users className="h-5 w-5" />

@@ -1,33 +1,23 @@
 
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
 
 const CookiePolicy: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="w-full bg-gray-50">
       <Helmet>
         <title>Cookie Policy | the lineup</title>
         <meta name="description" content="Cookie Policy for the lineup" />
       </Helmet>
       
-      {/* Simple header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4 py-4">
-          <Link 
-            to="/" 
-            className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
-          </Link>
+      {/* Full-width header section */}
+      <div className="w-full bg-white border-b border-gray-200">
+        <div className="container mx-auto px-4 py-16">
+          <h1 className="text-4xl font-bold tracking-tight text-center">Cookie Policy</h1>
         </div>
-      </header>
+      </div>
 
       <div className="container mx-auto py-8 px-4 max-w-4xl">
-        <h1 className="text-4xl font-bold tracking-tight mb-8">Cookie Policy</h1>
-        
         <div className="prose prose-lg max-w-none bg-white rounded-lg p-8 shadow-sm">
           <p className="text-xl text-muted-foreground leading-relaxed mb-6">
             This Cookie Policy explains how we use cookies and similar technologies to recognize you when you visit our platform.
