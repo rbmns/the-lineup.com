@@ -8,10 +8,18 @@ import { EventsResultsDisplay } from '@/components/events/page-components/Events
 import { EventsVibeSection } from '@/components/events/page-sections/EventsVibeSection';
 import { FilterStateProvider } from '@/contexts/FilterStateContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useOutletContext } from 'react-router-dom';
+
+interface OutletContext {
+  onEventSelect?: (eventId: string | null) => void;
+  selectedEventId?: string | null;
+}
 
 const Events = () => {
   useEventPageMeta();
   const { isAuthenticated } = useAuth();
+  const context = useOutletContext<OutletContext>();
+  const { selectedEventId } = context || {};
   
   return (
     <FilterStateProvider>

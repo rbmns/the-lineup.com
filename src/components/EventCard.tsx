@@ -5,10 +5,10 @@ import { MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { useEventImages } from '@/hooks/useEventImages';
-import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
 import { LineupImage } from '@/components/ui/lineup-image';
+import { useOutletContext } from 'react-router-dom';
 
 export interface EventCardProps {
   event: Event;
@@ -20,9 +20,14 @@ export interface EventCardProps {
   loadingEventId?: string | null;
 }
 
+interface OutletContext {
+  onEventSelect?: (eventId: string | null) => void;
+  selectedEventId?: string | null;
+}
+
 const EventCard: React.FC<EventCardProps> = ({
   event,
-  compact = true, // Default to compact for events page
+  compact = true,
   showRsvpButtons = false,
   onRsvp,
   className,
@@ -30,7 +35,9 @@ const EventCard: React.FC<EventCardProps> = ({
   loadingEventId
 }) => {
   const { getEventImageUrl } = useEventImages();
-  const { navigateToEvent } = useEventNavigation();
+  const context = useOutletContext<OutletContext>();
+  const { onEventSelect } = context || {};
+  
   const imageUrl = getEventImageUrl(event);
   
   // Format date for display - European format (DD-MM-YYYY)
@@ -40,7 +47,7 @@ const EventCard: React.FC<EventCardProps> = ({
   const timeDisplay = event.start_time ? 
     formatEventTime(event.start_time, event.end_time) : '';
 
-  // Enhanced click handler with better event target checking
+  // Enhanced click handler
   const handleClick = (e: React.MouseEvent) => {
     // More thorough check for RSVP-related elements
     const target = e.target as HTMLElement;
@@ -58,8 +65,12 @@ const EventCard: React.FC<EventCardProps> = ({
     
     if (onClick) {
       onClick(event);
+    } else if (onEventSelect) {
+      // Use side panel if available
+      onEventSelect(event.id);
     } else {
-      navigateToEvent(event);
+      // Fallback to navigation for non-panel layouts
+      window.location.href = `/events/${event.id}`;
     }
   };
 
