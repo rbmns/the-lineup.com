@@ -22,7 +22,7 @@ export interface EventCardProps {
 
 const EventCard: React.FC<EventCardProps> = ({
   event,
-  compact = false,
+  compact = true, // Default to compact for events page
   showRsvpButtons = false,
   onRsvp,
   className,
@@ -33,51 +33,41 @@ const EventCard: React.FC<EventCardProps> = ({
   const { navigateToEvent } = useEventNavigation();
   const imageUrl = getEventImageUrl(event);
   
-  // For debugging
-  console.log(`EventCard rendering for ${event.id} with rsvp_status:`, event.rsvp_status);
-
-  // Format date for display
-  const formattedDate = event.start_date ? formatDate(event.start_date) : 
-                        (event.start_time ? formatDate(event.start_time) : '');
+  // Format date for display - European format (DD-MM-YYYY)
+  const formattedDate = event.start_date ? formatDate(event.start_date) : '';
   
-  // Format time using the 24-hour time format
+  // Format time range using the 24-hour time format
   const timeDisplay = event.start_time ? 
     formatEventTime(event.start_time, event.end_time) : '';
 
+  // Enhanced click handler with better event target checking
   const handleClick = (e: React.MouseEvent) => {
-    // Check if click originated from RSVP buttons or container
-    if ((e.target as HTMLElement).closest('[data-rsvp-container="true"]') || 
-        (e.target as HTMLElement).closest('[data-rsvp-button="true"]')) {
+    // More thorough check for RSVP-related elements
+    const target = e.target as HTMLElement;
+    const isRsvpElement = 
+      target.closest('[data-rsvp-container="true"]') || 
+      target.closest('[data-rsvp-button="true"]') ||
+      target.hasAttribute('data-rsvp-button') ||
+      target.closest('button[data-status]');
+    
+    if (isRsvpElement) {
       e.stopPropagation();
       e.preventDefault();
-      return; 
+      return;
     }
     
     if (onClick) {
       onClick(event);
     } else {
-      if (event && event.id) {
-        navigateToEvent({
-          ...event,
-          id: event.id,
-          destination: event.destination,
-          slug: event.slug,
-          start_time: event.start_time,
-          title: event.title
-        });
-      } else {
-        console.error("Cannot navigate: Missing event ID", event);
-      }
+      navigateToEvent(event);
     }
   };
 
-  // Enhanced RSVP handler that ensures the return value is always a Promise<boolean>
-  // and properly stops event propagation
+  // Enhanced RSVP handler with better isolation from card click events
   const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp) return false;
     
     try {
-      console.log(`EventCard: Handling RSVP for event ${event.id}, status: ${status}`);
       const result = await onRsvp(event.id, status);
       // Convert any result (including void) to a boolean
       return result === undefined ? true : !!result;
@@ -90,11 +80,8 @@ const EventCard: React.FC<EventCardProps> = ({
   // Determine if this specific event is loading
   const isLoading = loadingEventId === event.id;
   
-  // Determine card height
+  // Determine card height - make it smaller by default
   const cardHeightClass = compact ? "max-h-[320px]" : "";
-
-  // Get location from venue or fallback to event location
-  const displayLocation = event.venues?.name || event.location || 'No location';
 
   return (
     <div
@@ -106,6 +93,7 @@ const EventCard: React.FC<EventCardProps> = ({
       onClick={handleClick}
       data-event-id={event.id}
     >
+      {/* Image container with event type label positioned on top - smaller image */}
       <div className="relative">
         <LineupImage
           src={imageUrl}
@@ -121,26 +109,30 @@ const EventCard: React.FC<EventCardProps> = ({
           }}
         />
         
+        {/* Event category pill */}
         {event.event_category && (
           <div className="absolute top-3 left-3 z-30">
             <CategoryPill 
               category={event.event_category} 
-              size="default"
+              size="default" 
               showIcon={false}
             />
           </div>
         )}
       </div>
 
-      <div className="p-4 flex flex-col flex-grow space-y-2">
+      {/* Content Section - more compact */}
+      <div className="p-3 flex flex-col flex-grow space-y-1">
+        {/* Title - First */}
         <h3 className={cn(
           "font-semibold text-gray-900",
-          compact ? "text-base line-clamp-2" : "text-xl line-clamp-2"
+          compact ? "text-sm line-clamp-2" : "text-xl line-clamp-2"
         )}>
           {event.title}
         </h3>
         
-        <div className="text-sm text-gray-600 font-medium">
+        {/* Date & Time */}
+        <div className="text-xs text-gray-600 font-medium">
           {formattedDate && timeDisplay ? (
             <>
               {formattedDate} • {timeDisplay}
@@ -150,23 +142,29 @@ const EventCard: React.FC<EventCardProps> = ({
           )}
         </div>
         
-        <div className="flex items-center text-sm text-gray-500">
-          <MapPin className="h-3.5 w-3.5 mr-1 flex-shrink-0" />
-          <span className="truncate">{displayLocation}</span>
+        {/* Venue/Location */}
+        <div className="flex items-center text-xs text-gray-500">
+          <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+          <span className="truncate">{event.venues?.name || event.location || 'No location'}</span>
         </div>
         
-        <div className="flex-grow min-h-[8px]"></div>
+        {/* Spacer to push RSVP buttons to bottom */}
+        <div className="flex-grow min-h-[4px]"></div>
         
+        {/* RSVP Buttons - smaller size for compact cards */}
         {showRsvpButtons && (
           <div 
-            className="mt-2" 
+            className="mt-1" 
             data-rsvp-container="true"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
           >
             <EventRsvpButtons
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
-              size="sm"
+              size={compact ? "sm" : "default"}
               isLoading={isLoading}
             />
           </div>
