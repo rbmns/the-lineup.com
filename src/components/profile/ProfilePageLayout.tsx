@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserProfile } from '@/types';
@@ -10,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserEvents } from '@/hooks/useUserEvents';
 import { ProfileEventsContainer } from './ProfileEventsContainer';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
 interface ProfilePageLayoutProps {
   profile: UserProfile | null;
@@ -118,7 +118,7 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
             {/* About and Events - Mobile */}
             {!showSettings && (
               <>
-                <div className="bg-white rounded-lg p-4 mb-6 shadow-sm">
+                <div className="bg-white rounded-lg p-4 mb-6 shadow-sm text-left">
                   <h2 className="text-lg font-semibold mb-2">About</h2>
                   <p className="text-gray-600 text-sm">
                     {profile?.tagline || "Explorer and local enthusiast. Love discovering new places and meeting new people."}
@@ -142,7 +142,7 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
             <div className="grid grid-cols-3 gap-8">
               {/* Left Sidebar - Profile Info */}
               <div className="col-span-1">
-                <div className="bg-white rounded-lg p-6 shadow-sm sticky top-6">
+                <div className="bg-white rounded-lg p-6 shadow-sm sticky top-6 text-left">
                   <div className="mb-6">
                     <ProfileAvatar 
                       profile={profile} 
@@ -207,7 +207,7 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
               </div>
 
               {/* Main Content */}
-              <div className="col-span-2 space-y-6">
+              <div className="col-span-2 space-y-6 text-left">
                 {/* Settings Panel */}
                 {showSettings && isOwnProfile && user && (
                   <SettingsPanel userId={user.id} />
