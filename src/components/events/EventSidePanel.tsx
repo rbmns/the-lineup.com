@@ -12,6 +12,7 @@ import { LineupImage } from '@/components/ui/lineup-image';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface EventSidePanelProps {
   eventId: string | null;
@@ -27,11 +28,18 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
   const { isAuthenticated, user } = useAuth();
   const { data: event, isLoading, error } = useEventDetails(eventId);
   const { handleRsvp, loading: rsvpLoading } = useRsvpActions(user?.id);
+  const queryClient = useQueryClient();
 
   const handleRsvpClick = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!event) return false;
     try {
       const result = await handleRsvp(event.id, status);
+      if (result) {
+        // Invalidate and refetch the event details to update the UI
+        queryClient.invalidateQueries({
+          queryKey: ['event-details', event.id]
+        });
+      }
       return result;
     } catch (error) {
       console.error('Error handling RSVP:', error);
@@ -54,11 +62,11 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
         onClick={onClose}
       />
       
-      {/* Side panel - overlay positioned over main content */}
+      {/* Side panel - positioned directly next to social sidebar with larger width */}
       <div
         className={cn(
-          "absolute right-4 top-4 bottom-4 w-full max-w-lg bg-white shadow-2xl z-50 transition-transform duration-300 overflow-y-auto rounded-lg border",
-          "lg:right-[330px]", // Account for social sidebar width
+          "absolute right-80 top-4 bottom-4 w-full max-w-2xl bg-white shadow-2xl z-50 transition-transform duration-300 overflow-y-auto rounded-lg border",
+          "xl:right-80", // Account for social sidebar width (320px)
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
@@ -100,7 +108,7 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
                   alt={event.title}
                   aspectRatio="video"
                   overlayVariant="ocean"
-                  className="w-full h-48"
+                  className="w-full h-56"
                 />
                 {event.event_category && (
                   <div className="absolute top-3 left-3">
@@ -114,7 +122,7 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
 
               {/* Event Info */}
               <div className="space-y-4">
-                <h1 className="text-xl font-bold text-gray-900">{event.title}</h1>
+                <h1 className="text-2xl font-bold text-gray-900">{event.title}</h1>
                 
                 {/* Date & Time */}
                 <div className="flex items-center gap-2 text-sm text-gray-600">

@@ -70,7 +70,7 @@ const Layout = () => {
               <Outlet context={{ onEventSelect: handleEventSelect, selectedEventId }} />
             </main>
             
-            {/* Event side panel - overlay positioned over main content */}
+            {/* Event side panel - positioned directly next to social sidebar */}
             {selectedEventId && (
               <EventSidePanel
                 eventId={selectedEventId}
@@ -80,7 +80,7 @@ const Layout = () => {
             )}
           </div>
           
-          {/* Social sidebar - always on the far right, contextual based on selected event */}
+          {/* Social sidebar - always on the far right */}
           <SocialSidebar selectedEventId={selectedEventId} />
         </div>
         <Footer />
