@@ -27,15 +27,21 @@ const Layout = () => {
   // Check if we should show the side panel layout (on events and home pages)
   const showSidePanelLayout = location.pathname === '/' || location.pathname === '/events' || location.pathname === '/friends';
 
-  // Handle URL parameters for selected event
+  // Handle URL parameters for selected event on /events page
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const eventId = searchParams.get('selected');
-    setSelectedEventId(eventId);
-  }, [location.search]);
+    if (location.pathname === '/events') {
+      const searchParams = new URLSearchParams(location.search);
+      const eventId = searchParams.get('selected');
+      setSelectedEventId(eventId);
+    } else {
+      setSelectedEventId(null);
+    }
+  }, [location.search, location.pathname]);
 
-  // Update URL when event is selected
+  // Update URL when event is selected on /events page
   const handleEventSelect = (eventId: string | null) => {
+    if (location.pathname !== '/events') return;
+    
     setSelectedEventId(eventId);
     const searchParams = new URLSearchParams(location.search);
     
@@ -64,24 +70,26 @@ const Layout = () => {
       <div className="min-h-screen bg-background">
         <MainNav />
         <div className="flex h-[calc(100vh-64px)]">
-          {/* Main content area - full width */}
-          <div className="flex-1 overflow-hidden relative">
+          {/* Main content area - adjusts width when overlay is open */}
+          <div className={`flex-1 overflow-hidden relative transition-all duration-300 ${
+            selectedEventId && location.pathname === '/events' ? 'mr-[800px]' : ''
+          }`}>
             <main className="h-full overflow-y-auto">
               <Outlet context={{ onEventSelect: handleEventSelect, selectedEventId }} />
             </main>
-            
-            {/* Event side panel - positioned directly next to social sidebar */}
-            {selectedEventId && (
-              <EventSidePanel
-                eventId={selectedEventId}
-                isOpen={!!selectedEventId}
-                onClose={() => handleEventSelect(null)}
-              />
-            )}
           </div>
           
+          {/* Event side panel - positioned on the right */}
+          {selectedEventId && location.pathname === '/events' && (
+            <EventSidePanel
+              eventId={selectedEventId}
+              isOpen={!!selectedEventId}
+              onClose={() => handleEventSelect(null)}
+            />
+          )}
+          
           {/* Social sidebar - always on the far right */}
-          <SocialSidebar selectedEventId={selectedEventId} />
+          <SocialSidebar selectedEventId={location.pathname === '/events' ? selectedEventId : undefined} />
         </div>
         <Footer />
         <Toaster />

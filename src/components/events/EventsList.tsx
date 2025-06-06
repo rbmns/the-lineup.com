@@ -2,6 +2,7 @@
 import React from 'react';
 import { Event } from '@/types';
 import { LazyEventsList } from '@/components/events/LazyEventsList';
+import EventCardList from '@/components/events/EventCardList';
 
 interface EventsListProps {
   events: Event[];
@@ -14,6 +15,9 @@ interface EventsListProps {
   isLoading?: boolean;
   hasActiveFilters?: boolean;
   similarEvents?: Event[];
+  onEventSelect?: (eventId: string | null) => void;
+  selectedEventId?: string | null;
+  isOverlayMode?: boolean;
 }
 
 export const EventsList = React.memo(({
@@ -26,9 +30,43 @@ export const EventsList = React.memo(({
   loadingEventId,
   isLoading = false,
   hasActiveFilters = false,
-  similarEvents = []
+  similarEvents = [],
+  onEventSelect,
+  selectedEventId,
+  isOverlayMode = false
 }: EventsListProps) => {
-  // Use the enhanced LazyEventsList for a unified approach to event listing
+  
+  // Handle event click for overlay mode
+  const handleEventClick = (event: Event) => {
+    if (onEventSelect) {
+      onEventSelect(event.id);
+    }
+  };
+
+  // If in overlay mode, show vertical list
+  if (isOverlayMode) {
+    return (
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium text-gray-900">
+          {events.length} {events.length === 1 ? 'event' : 'events'}
+        </h3>
+        <div className="space-y-3 max-h-[calc(100vh-300px)] overflow-y-auto">
+          {events.map((event) => (
+            <EventCardList
+              key={event.id}
+              event={event}
+              onRsvp={onRsvp}
+              showRsvpButtons={showRsvpButtons}
+              onClick={handleEventClick}
+              className={selectedEventId === event.id ? 'ring-2 ring-blue-500' : ''}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Use the enhanced LazyEventsList for the normal grid view
   return (
     <LazyEventsList
       mainEvents={events}

@@ -1,8 +1,10 @@
 
 import React from 'react';
 import { Event } from '@/types';
-import { EventCountDisplay } from '@/components/events/EventCountDisplay';
-import { LazyEventsList } from '@/components/events/LazyEventsList';
+import { EventsList } from '@/components/events/EventsList';
+import { EventsEmptyState } from '@/components/events/list-components/EventsEmptyState';
+import { EventsLoadingState } from '@/components/events/list-components/EventsLoadingState';
+import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
 
 interface EventsResultsDisplayProps {
   filteredEvents: Event[];
@@ -11,11 +13,14 @@ interface EventsResultsDisplayProps {
   isVenuesLoading: boolean;
   isFilterLoading: boolean;
   hasActiveFilters: boolean;
-  handleRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
+  handleRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<void>;
   showRsvpButtons: boolean;
-  loadingEventId?: string | null;
+  loadingEventId: string | null;
   isNoneSelected: boolean;
   selectAll: () => void;
+  onEventSelect?: (eventId: string | null) => void;
+  selectedEventId?: string | null;
+  isOverlayMode?: boolean;
 }
 
 export const EventsResultsDisplay: React.FC<EventsResultsDisplayProps> = ({
@@ -29,27 +34,38 @@ export const EventsResultsDisplay: React.FC<EventsResultsDisplayProps> = ({
   showRsvpButtons,
   loadingEventId,
   isNoneSelected,
-  selectAll
+  selectAll,
+  onEventSelect,
+  selectedEventId,
+  isOverlayMode = false
 }) => {
-  // Update events count for display
-  const eventsCount = filteredEvents.length;
+  // Show loading state
+  if (isLoading || isVenuesLoading || isFilterLoading) {
+    return <EventsLoadingState />;
+  }
 
+  // Show empty state when no filters are selected
+  if (isNoneSelected) {
+    return <EventsEmptyState onSelectAll={selectAll} />;
+  }
+
+  // Show no results state when filters are active but no events match
+  if (hasActiveFilters && filteredEvents.length === 0) {
+    return <NoResultsFound />;
+  }
+
+  // Show events list
   return (
-    <div className="space-y-8">
-      {/* Hide the EventCountDisplay */}
-      <EventCountDisplay count={eventsCount} hidden={true} />
-
-      {/* Show LazyEventsList in all cases */}
-      <LazyEventsList 
-        mainEvents={filteredEvents}
-        relatedEvents={similarEvents} 
-        isLoading={isLoading || isVenuesLoading || isFilterLoading}
-        onRsvp={handleRsvp}
-        showRsvpButtons={showRsvpButtons}
-        hasActiveFilters={hasActiveFilters}
-        loadingEventId={loadingEventId}
-        hideCount={true}
-      />
-    </div>
+    <EventsList
+      events={filteredEvents}
+      onRsvp={handleRsvp}
+      showRsvpButtons={showRsvpButtons}
+      loadingEventId={loadingEventId}
+      hasActiveFilters={hasActiveFilters}
+      similarEvents={similarEvents}
+      onEventSelect={onEventSelect}
+      selectedEventId={selectedEventId}
+      isOverlayMode={isOverlayMode}
+    />
   );
 };
