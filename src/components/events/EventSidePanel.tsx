@@ -3,13 +3,14 @@ import React from 'react';
 import { useEventDetails } from '@/hooks/useEventDetails';
 import { useRsvpActions } from '@/hooks/useRsvpActions';
 import { useAuth } from '@/contexts/AuthContext';
-import { X, Calendar, MapPin, Users } from 'lucide-react';
+import { X, Calendar, MapPin, Users, Ticket, Globe, CalendarClock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { LineupImage } from '@/components/ui/lineup-image';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
+import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 
 interface EventSidePanelProps {
@@ -53,11 +54,11 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
         onClick={onClose}
       />
       
-      {/* Side panel */}
+      {/* Side panel - positioned as a middle column */}
       <div
         className={cn(
           "fixed right-0 top-16 bottom-0 w-full max-w-md bg-white shadow-xl z-50 transition-transform duration-300 overflow-y-auto",
-          "lg:relative lg:top-0 lg:shadow-lg lg:border-l",
+          "lg:relative lg:top-0 lg:shadow-lg lg:border-l lg:border-r",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
@@ -152,34 +153,139 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
                   </div>
                 )}
 
-                {/* Social Section */}
+                {/* Location Details */}
+                {event.venues && (
+                  <Card className="bg-gray-50">
+                    <CardContent className="p-4">
+                      <h3 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                        <MapPin className="h-4 w-4" />
+                        Location
+                      </h3>
+                      <div className="space-y-2">
+                        <p className="font-medium">{event.venues.name}</p>
+                        {(event.venues.street || event.venues.city || event.venues.postal_code) && (
+                          <p className="text-sm text-gray-600">
+                            {[event.venues.street, event.venues.city, event.venues.postal_code]
+                              .filter(Boolean)
+                              .join(', ')}
+                          </p>
+                        )}
+                        {(event.venues.website || event.venues.google_maps) && (
+                          <div className="flex gap-4 mt-2">
+                            {event.venues.website && (
+                              <a
+                                href={event.venues.website}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                              >
+                                Website
+                              </a>
+                            )}
+                            {event.venues.google_maps && (
+                              <a
+                                href={event.venues.google_maps}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                              >
+                                Maps
+                              </a>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Booking Information */}
+                {(event.fee || event.booking_link || event.organizer_link || event.extra_info) && (
+                  <Card className="bg-gray-50">
+                    <CardContent className="p-4">
+                      <h3 className="font-medium text-gray-900 mb-3">Booking Info</h3>
+                      
+                      <div className="space-y-3">
+                        {typeof event.fee === 'number' && event.fee > 0 && (
+                          <div className="flex items-start gap-2">
+                            <Ticket className="h-4 w-4 text-gray-500 mt-1" />
+                            <div>
+                              <p className="text-sm font-medium">Entry fee</p>
+                              <p className="text-sm">€{event.fee.toFixed(2)}</p>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {event.booking_link && (
+                          <div className="flex items-start gap-2">
+                            <CalendarClock className="h-4 w-4 text-gray-500 mt-1" />
+                            <div>
+                              <p className="text-sm font-medium">Booking required</p>
+                              <a 
+                                href={event.booking_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-1 inline-block"
+                              >
+                                Book Now
+                              </a>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {event.organizer_link && (
+                          <div className="flex items-start gap-2">
+                            <Globe className="h-4 w-4 text-gray-500 mt-1" />
+                            <div>
+                              <p className="text-sm font-medium">Organizer website</p>
+                              <a 
+                                href={event.organizer_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-1 inline-block"
+                              >
+                                {new URL(event.organizer_link).hostname.replace('www.', '')}
+                              </a>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {event.extra_info && (
+                          <>
+                            {(event.fee || event.booking_link || event.organizer_link) && (
+                              <Separator className="my-2" />
+                            )}
+                            <div>
+                              <p className="text-sm font-medium mb-1">Additional information</p>
+                              <p className="text-sm text-gray-600">{event.extra_info}</p>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Attendees Info */}
                 <Card className="bg-gray-50">
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <Users className="h-4 w-4" />
-                      <span className="font-medium text-sm">Who's Going</span>
+                      <span className="font-medium text-sm">Attendees</span>
                     </div>
                     
-                    {isAuthenticated ? (
-                      <div className="space-y-2">
-                        <p className="text-sm text-gray-600">
-                          See who from your network is attending
-                        </p>
-                        {/* This will be enhanced with real attendee data */}
-                        <div className="text-xs text-gray-500">
-                          Friend activity coming soon...
-                        </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-4 text-sm">
+                        <span className="font-medium">Going: {event.attendees?.going || 0}</span>
+                        <span className="font-medium">Interested: {event.attendees?.interested || 0}</span>
                       </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <p className="text-sm text-gray-600">
+                      
+                      {!isAuthenticated && (
+                        <p className="text-xs text-gray-500 mt-2">
                           Sign up to see who's attending and connect with other attendees
                         </p>
-                        <Button size="sm" className="w-full">
-                          Sign Up to See Social Info
-                        </Button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               </div>

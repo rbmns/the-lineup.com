@@ -64,22 +64,24 @@ const Layout = () => {
       <div className="min-h-screen bg-background">
         <MainNav />
         <div className="flex h-[calc(100vh-64px)]">
-          {/* Main content area */}
+          {/* Main content area - takes remaining space */}
           <div className="flex-1 overflow-hidden">
             <main className="h-full overflow-y-auto">
               <Outlet context={{ onEventSelect: handleEventSelect, selectedEventId }} />
             </main>
           </div>
           
-          {/* Social sidebar - always visible */}
-          <SocialSidebar />
+          {/* Event side panel - conditional, positioned between main content and social sidebar */}
+          {selectedEventId && (
+            <EventSidePanel
+              eventId={selectedEventId}
+              isOpen={!!selectedEventId}
+              onClose={() => handleEventSelect(null)}
+            />
+          )}
           
-          {/* Event side panel - conditional */}
-          <EventSidePanel
-            eventId={selectedEventId}
-            isOpen={!!selectedEventId}
-            onClose={() => handleEventSelect(null)}
-          />
+          {/* Social sidebar - always on the far right */}
+          <SocialSidebar />
         </div>
         <Footer />
         <Toaster />
