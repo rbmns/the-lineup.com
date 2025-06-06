@@ -18,6 +18,9 @@ import Friends from '@/pages/Friends';
 import Profile from '@/pages/Profile';
 import ProfilePage from '@/pages/ProfilePage';
 import ProfileEdit from '@/pages/ProfileEdit';
+import PrivacyPolicy from '@/pages/PrivacyPolicy';
+import TermsOfService from '@/pages/TermsOfService';
+import CookiePolicy from '@/pages/CookiePolicy';
 import GoodbyePage from '@/pages/GoodbyePage';
 import NotFound from '@/pages/NotFound';
 import './App.css';
@@ -30,6 +33,17 @@ function App() {
           <TooltipProvider>
             <Router>
               <Routes>
+                {/* Public legal pages - no authentication required */}
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/terms" element={<TermsOfService />} />
+                <Route path="/cookies" element={<CookiePolicy />} />
+                
+                {/* Auth pages - no layout */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/goodbye" element={<GoodbyePage />} />
+                
+                {/* Main app routes with Layout */}
                 <Route path="/" element={<Layout />}>
                   <Route index element={<LandingPage />} />
                   <Route path="events" element={<Events />} />
@@ -41,9 +55,6 @@ function App() {
                   <Route path="profile/edit" element={<ProfileEdit />} />
                   <Route path="*" element={<NotFound />} />
                 </Route>
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/goodbye" element={<GoodbyePage />} />
               </Routes>
               <Toaster />
             </Router>
