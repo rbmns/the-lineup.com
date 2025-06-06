@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -300,23 +301,13 @@ const EventDetail: React.FC<EventDetailProps> = ({
           </div>
         )}
 
-        {/* Creator Info */}
-        {event.creator && (
+        {/* Organizer Info - only show if organiser_name exists */}
+        {event.organiser_name && (
           <div className="bg-gray-50 rounded-lg p-6">
             <h2 className="text-2xl font-semibold mb-4">Organized by</h2>
             <div className="flex items-center gap-3">
-              {event.creator.avatar_url && event.creator.avatar_url.length > 0 && (
-                <img 
-                  src={event.creator.avatar_url[0]} 
-                  alt={event.creator.username || 'Organizer'}
-                  className="w-12 h-12 rounded-full"
-                />
-              )}
               <div>
-                <p className="font-medium">{event.organiser_name || event.creator.username}</p>
-                {event.creator.tagline && (
-                  <p className="text-gray-600 text-sm">{event.creator.tagline}</p>
-                )}
+                <p className="font-medium">{event.organiser_name}</p>
                 {event.organizer_link && (
                   <a 
                     href={event.organizer_link} 
