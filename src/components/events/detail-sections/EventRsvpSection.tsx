@@ -1,8 +1,6 @@
-
 import { Button } from '@/components/ui/button';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
-import { Share2, Loader2 } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import '@/styles/rsvp-animations.css';
 
@@ -52,28 +50,6 @@ export const EventRsvpSection = ({
       document.body.classList.remove('rsvp-transition-active');
     };
   }, [overlay]);
-
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: "Event",
-        text: "Check out this event",
-        url: window.location.href
-      }).catch(error => {
-        copyToClipboard();
-      });
-    } else {
-      copyToClipboard();
-    }
-  };
-
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href);
-    toast({
-      title: "Link copied to clipboard",
-      description: "You can now paste it anywhere you want."
-    });
-  };
 
   const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp) return false;
@@ -138,18 +114,6 @@ export const EventRsvpSection = ({
               <p className="text-sm text-blue-700">You created this event</p>
             </div>
           )}
-          
-          <div className="pt-2">
-            <Button 
-              variant="outline"
-              className="w-full flex items-center justify-center gap-2" 
-              onClick={handleShare}
-              disabled={animating}
-            >
-              <Share2 className="h-4 w-4" />
-              Share this event
-            </Button>
-          </div>
         </div>
         
         {animating && <div className="absolute inset-0 rsvp-shimmer rounded-lg overflow-hidden"></div>}
