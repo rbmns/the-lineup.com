@@ -116,7 +116,8 @@ const EventCard: React.FC<EventCardProps> = ({
         {/* Actions */}
         {showRsvpButtons && isAuthenticated && (
           <EventCardActions
-            event={event}
+            eventId={event.id}
+            currentRsvpStatus={event.rsvp_status}
             onRsvp={onRsvp}
             isLoading={loadingEventId === event.id}
             compact={compact}

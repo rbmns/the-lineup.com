@@ -3,6 +3,7 @@ import React from 'react';
 import { CalendarIcon, MapPin } from 'lucide-react';
 import { formatInTimeZone } from 'date-fns-tz';
 import { AMSTERDAM_TIMEZONE, formatTime } from '@/utils/date-formatting';
+import { cn } from '@/lib/utils';
 
 interface EventCardMetaProps {
   event: { 
@@ -10,9 +11,15 @@ interface EventCardMetaProps {
     start_time?: string | null;
     venues?: { name: string } | null;
   };
+  compact?: boolean;
+  className?: string;
 }
 
-export const EventCardMeta: React.FC<EventCardMetaProps> = ({ event }) => {
+export const EventCardMeta: React.FC<EventCardMetaProps> = ({ 
+  event, 
+  compact = false,
+  className 
+}) => {
   // Format date for display in Amsterdam timezone
   const formatEventDate = (event: any): string => {
     try {
@@ -32,21 +39,23 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({ event }) => {
     return formatTime(event.start_time);
   };
 
+  const textSize = compact ? 'text-xs' : 'text-sm';
+
   return (
-    <>
+    <div className={cn("space-y-1", className)}>
       <div className="flex items-center text-gray-600">
         <CalendarIcon className="h-4 w-4 mr-2" />
-        <span className="font-inter leading-7 text-sm">
+        <span className={cn("font-inter leading-7", textSize)}>
           {formatEventDate(event)} at {getEventTimeDisplay(event)}
         </span>
       </div>
 
       <div className="flex items-center text-gray-600">
         <MapPin className="h-4 w-4 mr-2" />
-        <span className="font-inter leading-7 text-sm">
+        <span className={cn("font-inter leading-7", textSize)}>
           {event.venues?.name || 'No Venue'}
         </span>
       </div>
-    </>
+    </div>
   );
 };
