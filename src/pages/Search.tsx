@@ -66,34 +66,41 @@ const Search: React.FC = () => {
         .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%`);
 
       // Transform events data to match Event type
-      const transformedEvents: Event[] = (eventsData || []).map(event => ({
-        id: event.id,
-        title: event.title,
-        description: event.description || '',
-        location: event.location,
-        event_category: event.event_category,
-        start_time: event.start_time,
-        end_time: event.end_time,
-        start_date: event.start_date,
-        end_date: event.end_date,
-        created_at: event.created_at,
-        updated_at: event.updated_at,
-        image_urls: event.image_urls || [],
-        attendees: {
-          going: event.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Going').length || 0,
-          interested: event.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Interested').length || 0,
-        },
-        rsvp_status: undefined,
-        area: null,
-        google_maps: event.venues?.google_maps || null,
-        organizer_link: event.organizer_link || null,
-        creator: event.creator && Array.isArray(event.creator) && event.creator.length > 0 ? event.creator[0] : null,
-        venues: event.venues,
-        extra_info: event["Extra info"] || null,
-        fee: event.fee,
-        venue_id: event.venue_id,
-        tags: event.tags ? (Array.isArray(event.tags) ? event.tags : event.tags.split(',').map((tag: string) => tag.trim())) : []
-      }));
+      const transformedEvents: Event[] = (eventsData || []).map(event => {
+        // Get location from venue if available, otherwise use destination or empty string
+        const eventLocation = event.venues?.name ? 
+          `${event.venues.name}${event.venues.city ? `, ${event.venues.city}` : ''}` : 
+          event.destination || '';
+
+        return {
+          id: event.id,
+          title: event.title,
+          description: event.description || '',
+          location: eventLocation,
+          event_category: event.event_category,
+          start_time: event.start_time,
+          end_time: event.end_time,
+          start_date: event.start_date,
+          end_date: event.end_date,
+          created_at: event.created_at,
+          updated_at: event.updated_at,
+          image_urls: event.image_urls || [],
+          attendees: {
+            going: event.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Going').length || 0,
+            interested: event.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Interested').length || 0,
+          },
+          rsvp_status: undefined,
+          area: null,
+          google_maps: event.venues?.google_maps || null,
+          organizer_link: event.organizer_link || null,
+          creator: event.creator && Array.isArray(event.creator) && event.creator.length > 0 ? event.creator[0] : null,
+          venues: event.venues,
+          extra_info: event["Extra info"] || null,
+          fee: event.fee,
+          venue_id: event.venue_id,
+          tags: event.tags ? (Array.isArray(event.tags) ? event.tags : event.tags.split(',').map((tag: string) => tag.trim())) : []
+        };
+      });
 
       setEvents(transformedEvents);
       setVenues(venuesData || []);
