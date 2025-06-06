@@ -16,6 +16,7 @@ import Login from '@/pages/Login';
 import Signup from '@/pages/Signup';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
+import GoodbyePage from '@/pages/GoodbyePage';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import TermsOfService from '@/pages/TermsOfService';
 import CookiePolicy from '@/pages/CookiePolicy';
@@ -30,13 +31,7 @@ function App() {
         <AuthProvider>
           <BrowserRouter>
             <Routes>
-              {/* Auth routes - standalone without Layout */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              
-              {/* Main app routes with Layout */}
+              {/* All routes now use Layout with sticky navigation */}
               <Route path="/" element={<Layout />}>
                 <Route index element={<Home />} />
                 <Route path="events" element={<Events />} />
@@ -45,6 +40,11 @@ function App() {
                 <Route path="friends" element={<Friends />} />
                 <Route path="profile" element={<ProfilePage />} />
                 <Route path="profile/edit" element={<ProfileEdit />} />
+                <Route path="login" element={<Login />} />
+                <Route path="signup" element={<Signup />} />
+                <Route path="forgot-password" element={<ForgotPassword />} />
+                <Route path="reset-password" element={<ResetPassword />} />
+                <Route path="goodbye" element={<GoodbyePage />} />
                 <Route path="privacy" element={<PrivacyPolicy />} />
                 <Route path="terms" element={<TermsOfService />} />
                 <Route path="cookies" element={<CookiePolicy />} />

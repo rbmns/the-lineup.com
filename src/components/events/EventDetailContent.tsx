@@ -63,17 +63,19 @@ const EventDetailContent = ({
   }, [onRsvp, event.rsvp_status]);
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-left">
       {/* Event title and basic info */}
-      <div>
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4">{event.title}</h1>
+      <div className="text-left">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-left">{event.title}</h1>
         
         {/* Date and time info - without duration */}
-        <EventDateTimeSection startTime={event.start_time} endTime={null} />
+        <div className="text-left">
+          <EventDateTimeSection startTime={event.start_time} endTime={null} />
+        </div>
       </div>
       
       {/* RSVP Section - prominently placed and responsive */}
-      <div className="bg-gray-50 rounded-lg p-4">
+      <div className="bg-gray-50 rounded-lg p-4 text-left">
         <EventRsvpSection 
           isOwner={isOwner}
           onRsvp={handleRsvp}
@@ -86,26 +88,32 @@ const EventDetailContent = ({
       
       {/* Location section */}
       {(event.venue_id || event.location || coordinates) && (
-        <EventLocationSection 
-          venue={event.venues} 
-          location={event.location}
-          coordinates={coordinates}
-          title={event.title}
-        />
+        <div className="text-left">
+          <EventLocationSection 
+            venue={event.venues} 
+            location={event.location}
+            coordinates={coordinates}
+            title={event.title}
+          />
+        </div>
       )}
       
       {/* Description */}
-      <EventDescriptionSection description={event.description || ''} />
+      <div className="text-left">
+        <EventDescriptionSection description={event.description || ''} />
+      </div>
       
       {/* Attendees summary */}
-      <EventAttendeesSummary 
-        goingCount={attendees?.going?.length || event.attendees?.going || 0}
-        interestedCount={attendees?.interested?.length || event.attendees?.interested || 0}
-      />
+      <div className="text-left">
+        <EventAttendeesSummary 
+          goingCount={attendees?.going?.length || event.attendees?.going || 0}
+          interestedCount={attendees?.interested?.length || event.attendees?.interested || 0}
+        />
+      </div>
       
       {/* Friends attending section */}
       {friendAttendees && (friendAttendees.going.length > 0 || friendAttendees.interested.length > 0) && (
-        <div className="bg-gray-50 p-4 rounded-lg">
+        <div className="bg-gray-50 p-4 rounded-lg text-left">
           <EventFriendRsvps 
             going={friendAttendees.going}
             interested={friendAttendees.interested}
@@ -114,10 +122,16 @@ const EventDetailContent = ({
       )}
       
       {/* External link if available */}
-      {bookingLink && <EventExternalLink url={bookingLink} />}
+      {bookingLink && (
+        <div className="text-left">
+          <EventExternalLink url={bookingLink} />
+        </div>
+      )}
       
       {/* Tags */}
-      <EventTagsSection tags={event.tags} />
+      <div className="text-left">
+        <EventTagsSection tags={event.tags} />
+      </div>
     </div>
   );
 };

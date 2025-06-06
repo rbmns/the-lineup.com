@@ -27,15 +27,6 @@ const Layout = () => {
     setSocialSidebarVisible(!isMobile);
   }, [isMobile]);
 
-  // Define which routes should be accessible without authentication
-  const publicRoutes = ['/', '/events', '/casual-plans', '/privacy', '/terms', '/cookies'];
-  
-  // Check if current route starts with a public route (for dynamic routes like /events/:id)
-  const isPublicRoute = publicRoutes.some(route => 
-    location.pathname === route || 
-    (route === '/events' && location.pathname.startsWith('/events/'))
-  );
-
   // Check if we're on an event detail page
   const isEventDetailPage = location.pathname.startsWith('/events/') && location.pathname !== '/events';
 
@@ -99,13 +90,6 @@ const Layout = () => {
   const handleCloseGlobalOverlay = () => {
     setGlobalEventOverlay(null);
   };
-  
-  useEffect(() => {
-    // Only redirect to login if user is not authenticated AND trying to access a protected route
-    if (!loading && !user && !isPublicRoute) {
-      navigate('/login');
-    }
-  }, [user, loading, navigate, location, isPublicRoute]);
 
   // Query for event details when overlay is open
   const { data: overlayEvent } = useQuery({
@@ -116,7 +100,7 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-white w-full overflow-x-hidden">
-      {/* Full-width top navigation */}
+      {/* Full-width top navigation - ALWAYS VISIBLE */}
       <div className="w-full">
         <MainNav />
       </div>
