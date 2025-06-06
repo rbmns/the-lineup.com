@@ -1,50 +1,54 @@
 
-import { Suspense, lazy } from 'react';
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { Toaster } from '@/components/ui/toaster';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { HelmetProvider } from 'react-helmet-async';
+import { queryClient } from '@/lib/queryClient';
 import Layout from '@/components/Layout';
-
-// Lazy load pages
-const LandingPage = lazy(() => import("./pages/LandingPage"));
-const Events = lazy(() => import("./pages/Events"));
-const CasualPlans = lazy(() => import("./pages/CasualPlans"));
-const Friends = lazy(() => import("./pages/Friends"));
-const Search = lazy(() => import("./pages/Search"));
-const Login = lazy(() => import("./pages/Login"));
-const EventDetail = lazy(() => import("./pages/EventDetail"));
-
-const queryClient = new QueryClient();
+import LandingPage from '@/pages/LandingPage';
+import Events from '@/pages/Events';
+import EventDetail from '@/pages/EventDetail';
+import Login from '@/pages/Login';
+import Signup from '@/pages/Signup';
+import Search from '@/pages/Search';
+import CasualPlans from '@/pages/CasualPlans';
+import Friends from '@/pages/Friends';
+import Profile from '@/pages/Profile';
+import ProfilePage from '@/pages/ProfilePage';
+import ProfileEdit from '@/pages/ProfileEdit';
+import GoodbyePage from '@/pages/GoodbyePage';
+import NotFound from '@/pages/NotFound';
+import './App.css';
 
 function App() {
   return (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <AuthProvider>
-            <BrowserRouter>
-              <div className="min-h-screen bg-background font-sans antialiased">
-                <Suspense fallback={<div>Loading...</div>}>
-                  <Routes>
-                    <Route path="/" element={<Layout />}>
-                      <Route index element={<LandingPage />} />
-                      <Route path="events" element={<Events />} />
-                      <Route path="events/:id" element={<EventDetail />} />
-                      <Route path="casual-plans" element={<CasualPlans />} />
-                      <Route path="friends" element={<Friends />} />
-                      <Route path="search" element={<Search />} />
-                      <Route path="login" element={<Login />} />
-                    </Route>
-                  </Routes>
-                </Suspense>
-                <Toaster />
-              </div>
-            </BrowserRouter>
-          </AuthProvider>
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Router>
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<LandingPage />} />
+                  <Route path="events" element={<Events />} />
+                  <Route path="events/:id" element={<EventDetail />} />
+                  <Route path="search" element={<Search />} />
+                  <Route path="casual-plans" element={<CasualPlans />} />
+                  <Route path="friends" element={<Friends />} />
+                  <Route path="profile" element={<ProfilePage />} />
+                  <Route path="profile/edit" element={<ProfileEdit />} />
+                  <Route path="*" element={<NotFound />} />
+                </Route>
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/goodbye" element={<GoodbyePage />} />
+              </Routes>
+              <Toaster />
+            </Router>
+          </TooltipProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </HelmetProvider>
   );

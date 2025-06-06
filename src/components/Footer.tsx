@@ -36,7 +36,7 @@ export const Footer = () => {
               className="hover:opacity-80 transition-opacity"
             >
               <img 
-                src="https://res.cloudinary.com/dita7stkt/image/upload/v1747993915/MadeByHS_kry9in.png" 
+                src="https://raw.githubusercontent.com/rbmns/images/refs/heads/main/hs/promo/byHumbleStudioi.ai.png" 
                 alt="Made by HumbleStudio.ai" 
                 className="h-12"
               />

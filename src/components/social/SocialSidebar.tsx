@@ -36,12 +36,12 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
 
   if (!visible) {
     return (
-      <div className="absolute -left-8 top-1/2 transform -translate-y-1/2">
+      <div className="fixed right-0 top-1/2 transform -translate-y-1/2 z-30">
         <Button
           variant="ghost"
           size="sm"
           onClick={onToggleVisibility}
-          className="bg-white shadow-lg border border-sand hover:bg-sand rounded-l-lg rounded-r-none px-2"
+          className="bg-white shadow-lg border border-sand hover:bg-sand rounded-r-lg rounded-l-none px-2"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
