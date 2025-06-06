@@ -1,11 +1,12 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { DateRange } from 'react-day-picker';
-import { useEventVibes } from '@/hooks/useEventVibes';
+import { useEvents } from '@/hooks/useEvents';
+import { useAuth } from '@/contexts/AuthContext';
 
-interface FilterState {
+interface FilterStateContextType {
   selectedCategories: string[];
-  toggleCategory: (type: string) => void;
+  toggleCategory: (category: string) => void;
   selectAll: () => void;
   deselectAll: () => void;
   isNoneSelected: boolean;
@@ -28,57 +29,56 @@ interface FilterState {
   setLoadingEventId: (id: string | null) => void;
 }
 
-const FilterStateContext = createContext<FilterState | undefined>(undefined);
+const FilterStateContext = createContext<FilterStateContextType | undefined>(undefined);
 
 export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
+  const { data: events = [] } = useEvents(user?.id);
+  
+  // Get all unique event categories
+  const allCategories = React.useMemo(() => {
+    if (!events) return [];
+    return Array.from(new Set(
+      events
+        .filter(event => event.event_category)
+        .map(event => event.event_category as string)
+    )).sort();
+  }, [events]);
+
+  // Initialize with all categories selected by default
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedVenues, setSelectedVenues] = useState<string[]>([]);
-  const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [selectedDateFilter, setSelectedDateFilter] = useState<string>('');
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false); // Closed by default
+  const [selectedVenues, setSelectedVenues] = useState<string[]>([]);
+  const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
-  
-  const { data: vibes = [] } = useEventVibes();
 
-  // Initialize selectedVibes as empty array (no filters selected by default)
-  // This matches the behavior of event categories
+  // Set all categories as selected when they're loaded
   useEffect(() => {
-    if (vibes.length > 0 && selectedVibes.length === 0) {
-      // Keep vibes empty by default, like categories
-      setSelectedVibes([]);
+    if (allCategories.length > 0 && selectedCategories.length === 0) {
+      setSelectedCategories(allCategories);
     }
-  }, [vibes.length]);
+  }, [allCategories, selectedCategories.length]);
 
-  const toggleCategory = (type: string) => {
+  const toggleCategory = (category: string) => {
     setSelectedCategories(prev => 
-      prev.includes(type) 
-        ? prev.filter(t => t !== type)
-        : [...prev, type]
+      prev.includes(category)
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
     );
   };
 
   const selectAll = () => {
-    // This will be set by the EventsDataProvider based on available event types
-    setSelectedCategories([]);
+    setSelectedCategories(allCategories);
   };
 
   const deselectAll = () => {
     setSelectedCategories([]);
   };
 
-  const isNoneSelected = selectedCategories.length === 0;
-
-  const hasActiveFilters = selectedCategories.length > 0 || 
-                          selectedVenues.length > 0 || 
-                          selectedVibes.length > 0 ||
-                          !!dateRange || 
-                          !!selectedDateFilter;
-
-  const hasAdvancedFilters = selectedVenues.length > 0 || !!dateRange || !!selectedDateFilter;
-
   const toggleAdvancedFilters = () => {
-    setShowAdvancedFilters(!showAdvancedFilters);
+    setShowAdvancedFilters(prev => !prev);
   };
 
   const handleRemoveVenue = (venue: string) => {
@@ -86,46 +86,47 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const handleClearDateFilter = () => {
-    setDateRange(undefined);
     setSelectedDateFilter('');
+    setDateRange(undefined);
   };
 
   const resetFilters = () => {
-    setSelectedCategories([]);
+    setSelectedCategories(allCategories); // Reset to all categories, not empty
     setSelectedVenues([]);
-    setSelectedVibes([]); // Reset to empty array (no filters)
+    setSelectedVibes([]);
     setDateRange(undefined);
     setSelectedDateFilter('');
-    setShowAdvancedFilters(false); // Close advanced filters when resetting
   };
 
-  const value: FilterState = {
-    selectedCategories,
-    toggleCategory,
-    selectAll,
-    deselectAll,
-    isNoneSelected,
-    hasActiveFilters,
-    showAdvancedFilters,
-    toggleAdvancedFilters,
-    dateRange,
-    setDateRange,
-    selectedDateFilter,
-    setSelectedDateFilter,
-    selectedVenues,
-    setSelectedVenues,
-    selectedVibes,
-    setSelectedVibes,
-    hasAdvancedFilters,
-    handleRemoveVenue,
-    handleClearDateFilter,
-    resetFilters,
-    loadingEventId,
-    setLoadingEventId
-  };
+  const isNoneSelected = selectedCategories.length === 0;
+  const hasAdvancedFilters = selectedVenues.length > 0 || !!dateRange || !!selectedDateFilter || selectedVibes.length > 0;
+  const hasActiveFilters = selectedCategories.length !== allCategories.length || hasAdvancedFilters;
 
   return (
-    <FilterStateContext.Provider value={value}>
+    <FilterStateContext.Provider value={{
+      selectedCategories,
+      toggleCategory,
+      selectAll,
+      deselectAll,
+      isNoneSelected,
+      hasActiveFilters,
+      showAdvancedFilters,
+      toggleAdvancedFilters,
+      dateRange,
+      setDateRange,
+      selectedDateFilter,
+      setSelectedDateFilter,
+      selectedVenues,
+      setSelectedVenues,
+      selectedVibes,
+      setSelectedVibes,
+      hasAdvancedFilters,
+      handleRemoveVenue,
+      handleClearDateFilter,
+      resetFilters,
+      loadingEventId,
+      setLoadingEventId
+    }}>
       {children}
     </FilterStateContext.Provider>
   );
