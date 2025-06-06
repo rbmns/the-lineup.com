@@ -1,193 +1,207 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useEventDetails } from '@/hooks/useEventDetails';
-import { useEventAttendees } from '@/hooks/event-rsvp/useEventAttendees';
-import { useSuggestedFriends } from '@/hooks/useSuggestedFriends';
+import { useQuery } from '@tanstack/react-query';
+import { fetchEventAttendees } from '@/lib/eventService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Users, Calendar, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Users, UserPlus, Calendar, TrendingUp } from 'lucide-react';
-import { EventAttendeesList } from '@/components/events/EventAttendeesList';
-import { useEffect, useState } from 'react';
 
 interface SocialSidebarProps {
-  selectedEventId?: string | null;
+  selectedEventId?: string;
+  visible?: boolean;
+  onToggleVisibility?: () => void;
 }
 
-export const SocialSidebar: React.FC<SocialSidebarProps> = ({ selectedEventId }) => {
-  const { isAuthenticated, user } = useAuth();
-  const { data: selectedEvent } = useEventDetails(selectedEventId);
-  const { getAttendeesForEvent } = useEventAttendees();
-  const { suggestedFriends, loading: suggestedLoading } = useSuggestedFriends(user?.id);
-  const [eventAttendees, setEventAttendees] = useState<{ going: any[], interested: any[] }>({ going: [], interested: [] });
+export const SocialSidebar: React.FC<SocialSidebarProps> = ({ 
+  selectedEventId, 
+  visible = true,
+  onToggleVisibility 
+}) => {
+  const { user } = useAuth();
 
-  // Fetch attendees when event is selected
-  useEffect(() => {
-    if (selectedEventId && isAuthenticated) {
-      getAttendeesForEvent(selectedEventId).then(attendees => {
-        setEventAttendees(attendees);
-      });
-    } else {
-      setEventAttendees({ going: [], interested: [] });
-    }
-  }, [selectedEventId, isAuthenticated, getAttendeesForEvent]);
+  const { data: attendees, isLoading } = useQuery({
+    queryKey: ['event-attendees', selectedEventId],
+    queryFn: () => fetchEventAttendees(selectedEventId!),
+    enabled: !!selectedEventId,
+  });
+
+  if (!visible) {
+    return (
+      <div className="fixed right-0 top-1/2 transform -translate-y-1/2 z-40">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onToggleVisibility}
+          className="bg-white shadow-lg border border-sand hover:bg-sand rounded-l-lg rounded-r-none px-2"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  }
 
   return (
-    <div className="hidden xl:block w-80 bg-gray-50 border-l overflow-y-auto">
-      <div className="p-4 space-y-4">
-        {/* Header */}
+    <div className="fixed right-0 top-16 bottom-16 w-80 bg-white border-l border-sand shadow-lg z-40 overflow-y-auto">
+      {/* Toggle button */}
+      <div className="absolute -left-8 top-1/2 transform -translate-y-1/2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onToggleVisibility}
+          className="bg-white shadow-lg border border-sand hover:bg-sand rounded-l-lg rounded-r-none px-2"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="p-6 space-y-6">
         <div className="flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          <h2 className="font-semibold">Social</h2>
+          <Users className="h-5 w-5 text-seafoam-green" />
+          <h2 className="text-lg font-semibold text-ocean-deep">Social</h2>
         </div>
 
-        {isAuthenticated ? (
-          <>
-            {/* Event-specific attendees (only show when event is selected) */}
-            {selectedEventId && selectedEvent && (
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    Event Attendees
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center space-x-4 text-sm">
-                    <div className="text-center">
-                      <div className="font-bold text-lg">{eventAttendees.going.length}</div>
-                      <div className="text-gray-600">Going</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="font-bold text-lg">{eventAttendees.interested.length}</div>
-                      <div className="text-gray-600">Interested</div>
-                    </div>
-                  </div>
-                  
-                  {/* Show attendees list */}
-                  <EventAttendeesList 
-                    going={eventAttendees.going}
-                    interested={eventAttendees.interested}
-                  />
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Suggested Friends */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <UserPlus className="h-4 w-4" />
-                  Suggested Friends
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {suggestedLoading ? (
-                  <div className="text-sm text-gray-600">Loading suggestions...</div>
-                ) : suggestedFriends.length > 0 ? (
-                  <div className="space-y-2">
-                    {suggestedFriends.slice(0, 3).map((friend) => (
-                      <div key={friend.id} className="flex items-center gap-2 p-2 bg-white rounded-lg">
-                        <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                          {friend.username?.[0]?.toUpperCase() || 'U'}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{friend.username}</p>
-                          <p className="text-xs text-gray-500 truncate">{friend.connectionReason}</p>
-                        </div>
+        {selectedEventId ? (
+          <Card className="border-sand">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Calendar className="h-4 w-4 text-seafoam-green" />
+                Event Attendees
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {isLoading ? (
+                <div className="space-y-3">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-sand rounded-full animate-pulse" />
+                      <div className="flex-1 space-y-1">
+                        <div className="h-3 bg-sand rounded animate-pulse" />
+                        <div className="h-2 bg-sand rounded w-2/3 animate-pulse" />
                       </div>
-                    ))}
-                    {suggestedFriends.length > 3 && (
-                      <p className="text-xs text-gray-500 text-center">
-                        +{suggestedFriends.length - 3} more suggestions
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-sm text-gray-600">
-                    No friend suggestions available
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                    </div>
+                  ))}
+                </div>
+              ) : attendees && (attendees.going.length > 0 || attendees.interested.length > 0) ? (
+                <div className="space-y-4">
+                  {attendees.going.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                          Going ({attendees.going.length})
+                        </Badge>
+                      </div>
+                      <div className="space-y-2">
+                        {attendees.going.slice(0, 5).map((attendee) => (
+                          <div key={attendee.id} className="flex items-center gap-3">
+                            <Avatar className="w-8 h-8">
+                              <AvatarImage 
+                                src={attendee.avatar_url?.[0]} 
+                                alt={attendee.username || 'User'} 
+                              />
+                              <AvatarFallback className="bg-seafoam-green text-white text-xs">
+                                {(attendee.username || 'U').charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-ocean-deep truncate">
+                                {attendee.username || 'Anonymous'}
+                              </p>
+                              {attendee.tagline && (
+                                <p className="text-xs text-gray-500 truncate">
+                                  {attendee.tagline}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                        {attendees.going.length > 5 && (
+                          <p className="text-xs text-gray-500 mt-2">
+                            +{attendees.going.length - 5} more going
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
-            {/* Friends' Upcoming Events */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  Friends' Events
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="text-sm text-gray-600">
-                  See what events your friends are attending
+                  {attendees.interested.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                          Interested ({attendees.interested.length})
+                        </Badge>
+                      </div>
+                      <div className="space-y-2">
+                        {attendees.interested.slice(0, 3).map((attendee) => (
+                          <div key={attendee.id} className="flex items-center gap-3">
+                            <Avatar className="w-8 h-8">
+                              <AvatarImage 
+                                src={attendee.avatar_url?.[0]} 
+                                alt={attendee.username || 'User'} 
+                              />
+                              <AvatarFallback className="bg-sky-blue text-white text-xs">
+                                {(attendee.username || 'U').charAt(0).toUpperCase()}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-ocean-deep truncate">
+                                {attendee.username || 'Anonymous'}
+                              </p>
+                              {attendee.tagline && (
+                                <p className="text-xs text-gray-500 truncate">
+                                  {attendee.tagline}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                        {attendees.interested.length > 3 && (
+                          <p className="text-xs text-gray-500 mt-2">
+                            +{attendees.interested.length - 3} more interested
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <div className="text-xs text-gray-500">
-                  Coming soon...
+              ) : (
+                <div className="text-center py-6">
+                  <Users className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                  <p className="text-sm text-gray-500">No attendees yet</p>
+                  <p className="text-xs text-gray-400 mt-1">Be the first to RSVP!</p>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Friends' Casual Plans */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  Casual Plans
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="text-sm text-gray-600">
-                  Friends' upcoming casual plans
-                </div>
-                <div className="text-xs text-gray-500">
-                  Coming soon...
-                </div>
-              </CardContent>
-            </Card>
-          </>
+              )}
+            </CardContent>
+          </Card>
         ) : (
-          <>
-            {/* Sign Up Teaser */}
-            <Card className="bg-blue-50 border-blue-200">
-              <CardContent className="p-4 space-y-3">
-                <h3 className="font-medium text-blue-900">
-                  Join the Community
-                </h3>
-                <p className="text-sm text-blue-700">
-                  Sign up to see who's attending events, connect with friends, and get personalized recommendations.
-                </p>
-                <Button size="sm" className="w-full">
-                  Sign Up Free
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Preview Content */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">What You'll Get</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Users className="h-4 w-4 text-gray-400" />
-                    <span className="text-gray-600">See event attendees</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <UserPlus className="h-4 w-4 text-gray-400" />
-                    <span className="text-gray-600">Get friend suggestions</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="h-4 w-4 text-gray-400" />
-                    <span className="text-gray-600">Friends' event activity</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </>
+          <Card className="border-sand">
+            <CardContent className="pt-6">
+              <div className="text-center py-6">
+                <Calendar className="h-8 w-8 text-gray-300 mx-auto mb-2" />
+                <p className="text-sm text-gray-500">Select an event</p>
+                <p className="text-xs text-gray-400 mt-1">to see who's attending</p>
+              </div>
+            </CardContent>
+          </Card>
         )}
+
+        {/* Community section placeholder */}
+        <Card className="border-sand">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Users className="h-4 w-4 text-seafoam-green" />
+              Community
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-4">
+              <p className="text-sm text-gray-500">Coming soon...</p>
+              <p className="text-xs text-gray-400 mt-1">Connect with locals</p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
