@@ -35,7 +35,7 @@ const MainNav = () => {
   };
 
   return (
-    <header className={`sticky top-0 z-50 w-full transition-all duration-200 ${
+    <header className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-200 ${
       isScrolled ? 'bg-white/90 backdrop-blur-md shadow-sm' : 'bg-white'
     } border-b border-gray-200`}>
       {/* Mobile: Two row layout */}
@@ -79,16 +79,18 @@ const MainNav = () => {
         </div>
       ) : (
         /* Desktop: Single row layout - full width */
-        <div className="w-full px-4">
-          <div className="flex h-16 items-center justify-between gap-6">
+        <div className="w-full px-6">
+          <div className="flex h-16 items-center justify-between gap-8">
             <div className="flex items-center flex-shrink-0">
               <BrandLogo showText={true} />
             </div>
             
-            {/* Center search bar */}
-            <div className="flex-1 max-w-2xl mx-6">
-              <SearchBar />
-            </div>
+            {/* Center search bar - only show on non-search pages */}
+            {location.pathname !== '/search' && (
+              <div className="flex-1 max-w-md">
+                <SearchBar />
+              </div>
+            )}
 
             <div className="flex items-center gap-3 flex-shrink-0">
               {isAuthenticated && user ? (

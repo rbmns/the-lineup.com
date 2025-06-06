@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 
 const PrivacyPolicy: React.FC = () => {
   return (
-    <div className="w-full bg-gray-50 min-h-screen">
+    <div className="w-full bg-gray-50">
       <Helmet>
         <title>Privacy Policy | the lineup</title>
         <meta name="description" content="Privacy Policy for the lineup" />
@@ -12,14 +12,14 @@ const PrivacyPolicy: React.FC = () => {
       
       {/* Full-width header section */}
       <div className="w-full bg-white border-b border-gray-200">
-        <div className="w-full px-4 py-16">
+        <div className="w-full px-6 py-16">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-4xl font-bold tracking-tight text-center">Privacy Policy</h1>
           </div>
         </div>
       </div>
 
-      <div className="w-full py-8 px-4">
+      <div className="w-full py-8 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="prose prose-lg max-w-none bg-white rounded-lg p-8 shadow-sm">
             <p className="text-xl text-muted-foreground leading-relaxed mb-6">

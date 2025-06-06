@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import MainNav from "@/components/MainNav";
 import LeftSidebar from "@/components/nav/LeftSidebar";
@@ -117,23 +116,20 @@ const Layout = () => {
       <div className="flex w-full">
         {/* Left sidebar - fixed, always visible on desktop */}
         {!isMobile && (
-          <div className={`fixed left-0 top-16 bottom-0 ${leftSidebarWidth} bg-white border-r border-gray-200 z-30`}>
+          <div className={`fixed left-0 top-16 bottom-0 w-20 bg-white border-r border-gray-200 z-30`}>
             <LeftSidebar />
           </div>
         )}
         
-        {/* Main content area - properly spaced between sidebars */}
+        {/* Main content area - full width between sidebars */}
         <div 
-          className={`flex-1 relative min-h-screen ${
-            isMobile ? '' : 'ml-20'
+          className={`flex-1 w-full ${
+            isMobile ? 'pt-[104px]' : 'pt-16 ml-20'
           } ${
             !isMobile && socialSidebarVisible ? 'mr-64' : ''
           }`}
-          style={{ 
-            minHeight: `calc(100vh - ${isMobile ? '104px' : '64px'})` 
-          }}
         >
-          <main className="bg-white min-h-full w-full">
+          <main className="bg-white w-full">
             <Outlet context={{ onEventSelect: handleEventSelect, selectedEventId }} />
           </main>
           
@@ -143,7 +139,7 @@ const Layout = () => {
         
         {/* Social sidebar - fixed on the right, positioned below top nav */}
         {!isMobile && (
-          <div className={`fixed right-0 top-16 bottom-0 ${socialSidebarWidth} z-30`}>
+          <div className={`fixed right-0 top-16 bottom-0 ${socialSidebarVisible ? 'w-64' : 'w-0'} z-30`}>
             <SocialSidebar 
               visible={socialSidebarVisible}
               onToggleVisibility={() => setSocialSidebarVisible(!socialSidebarVisible)}

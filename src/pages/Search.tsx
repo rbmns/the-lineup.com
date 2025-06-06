@@ -9,12 +9,17 @@ import { searchEvents } from '@/lib/eventService';
 import EventCardList from '@/components/events/EventCardList';
 import { EventsLoadingState } from '@/components/events/list-components/EventsLoadingState';
 import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
+import { supabase } from '@/lib/supabase';
+import { Event } from '@/types';
+import { processEventsData } from '@/utils/eventProcessorUtils';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Search: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [submittedQuery, setSubmittedQuery] = useState(searchParams.get('q') || '');
+  const { user } = useAuth();
 
   // Update search query when URL params change
   useEffect(() => {
@@ -23,10 +28,56 @@ const Search: React.FC = () => {
     setSubmittedQuery(query);
   }, [searchParams]);
 
-  // Search events query
+  // Enhanced search that includes events, venues, and casual plans
   const { data: searchResults, isLoading, error } = useQuery({
-    queryKey: ['search-events', submittedQuery],
-    queryFn: () => searchEvents(submittedQuery),
+    queryKey: ['enhanced-search', submittedQuery],
+    queryFn: async () => {
+      if (!submittedQuery.trim()) return { events: [], similarEvents: [] };
+
+      try {
+        // Search events with venue data
+        const { data: eventsData, error: eventsError } = await supabase
+          .from('events')
+          .select(`
+            *,
+            creator:profiles(id, username, avatar_url, email, location, status, tagline),
+            venues:venue_id(*),
+            event_rsvps(id, user_id, status)
+          `)
+          .or(`title.ilike.%${submittedQuery}%,description.ilike.%${submittedQuery}%,location.ilike.%${submittedQuery}%,event_category.ilike.%${submittedQuery}%`)
+          .order('start_date', { ascending: true })
+          .order('start_time', { ascending: true });
+
+        if (eventsError) throw eventsError;
+
+        const events = eventsData ? processEventsData(eventsData, user?.id) : [];
+
+        // If no exact matches, get similar results
+        let similarEvents: Event[] = [];
+        if (events.length === 0) {
+          const { data: similarData, error: similarError } = await supabase
+            .from('events')
+            .select(`
+              *,
+              creator:profiles(id, username, avatar_url, email, location, status, tagline),
+              venues:venue_id(*),
+              event_rsvps(id, user_id, status)
+            `)
+            .or(`title.ilike.%${submittedQuery.substring(0, 3)}%,event_category.ilike.%${submittedQuery.substring(0, 3)}%`)
+            .order('start_date', { ascending: true })
+            .limit(6);
+
+          if (!similarError && similarData) {
+            similarEvents = processEventsData(similarData, user?.id);
+          }
+        }
+
+        return { events, similarEvents };
+      } catch (err) {
+        console.error('Search error:', err);
+        return { events: [], similarEvents: [] };
+      }
+    },
     enabled: !!submittedQuery && submittedQuery.trim().length > 0,
   });
 
@@ -48,11 +99,13 @@ const Search: React.FC = () => {
     setSearchParams({});
   };
 
+  const totalResults = (searchResults?.events?.length || 0) + (searchResults?.similarEvents?.length || 0);
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Search Section */}
-      <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-16">
+    <div className="w-full bg-gray-50">
+      {/* Full-width Hero Search Section */}
+      <div className="w-full bg-white border-b">
+        <div className="w-full px-6 py-16">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">
               Discover Amazing Events
@@ -82,7 +135,7 @@ const Search: React.FC = () => {
               </div>
             </form>
 
-            {/* Search suggestions or popular searches could go here */}
+            {/* Search suggestions */}
             {!submittedQuery && (
               <div className="mt-8 text-sm text-gray-500">
                 <p>Try searching for "yoga", "music", "beach", or "festival"</p>
@@ -94,7 +147,7 @@ const Search: React.FC = () => {
 
       {/* Search Results Section */}
       {submittedQuery && (
-        <div className="container mx-auto px-4 py-8">
+        <div className="w-full px-6 py-8">
           <div className="max-w-6xl mx-auto">
             <div className="mb-6">
               <h2 className="text-2xl font-semibold text-gray-900">
@@ -102,7 +155,7 @@ const Search: React.FC = () => {
               </h2>
               {searchResults && (
                 <p className="text-gray-600 mt-1">
-                  {searchResults.length} {searchResults.length === 1 ? 'result' : 'results'} found
+                  {totalResults} {totalResults === 1 ? 'result' : 'results'} found
                 </p>
               )}
             </div>
@@ -119,22 +172,44 @@ const Search: React.FC = () => {
               </div>
             )}
 
-            {/* Results */}
-            {searchResults && searchResults.length > 0 && (
-              <div className="grid gap-4">
-                {searchResults.map((event) => (
-                  <EventCardList
-                    key={event.id}
-                    event={event}
-                    compact={true}
-                    showRsvpButtons={false}
-                  />
-                ))}
+            {/* Exact Results */}
+            {searchResults?.events && searchResults.events.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Exact Matches</h3>
+                <div className="grid gap-4">
+                  {searchResults.events.map((event) => (
+                    <EventCardList
+                      key={event.id}
+                      event={event}
+                      compact={true}
+                      showRsvpButtons={false}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Similar Results */}
+            {searchResults?.similarEvents && searchResults.similarEvents.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                  {searchResults.events?.length > 0 ? 'Similar Events' : 'Similar Results'}
+                </h3>
+                <div className="grid gap-4">
+                  {searchResults.similarEvents.map((event) => (
+                    <EventCardList
+                      key={event.id}
+                      event={event}
+                      compact={true}
+                      showRsvpButtons={false}
+                    />
+                  ))}
+                </div>
               </div>
             )}
 
             {/* No Results */}
-            {searchResults && searchResults.length === 0 && !isLoading && (
+            {searchResults && totalResults === 0 && !isLoading && (
               <NoResultsFound 
                 searchQuery={submittedQuery}
                 resetFilters={resetFilters}
