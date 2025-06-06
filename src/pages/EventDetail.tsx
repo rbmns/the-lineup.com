@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchEventById } from '@/lib/eventService';
@@ -10,11 +10,14 @@ import { formatDate, formatEventTime } from '@/utils/date-formatting';
 import { useEventRsvpHandler } from '@/hooks/events/useEventRsvpHandler';
 import { EventRsvpSection } from '@/components/events/detail-sections/EventRsvpSection';
 import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/hooks/use-toast';
 
 const EventDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [rsvpLoading, setRsvpLoading] = useState(false);
+  const [rsvpFeedback, setRsvpFeedback] = useState<'going' | 'interested' | null>(null);
   
   const { data: event, isLoading, error } = useQuery({
     queryKey: ['event', id],
@@ -22,27 +25,96 @@ const EventDetail: React.FC = () => {
     enabled: !!id,
   });
 
-  const { handleRsvp, rsvpLoading } = useEventRsvpHandler(id!);
+  const { handleRsvp } = useEventRsvpHandler(id!);
 
-  // Enhanced RSVP handler with cache updates
-  const handleRsvpWithCacheUpdate = async (status: 'Going' | 'Interested'): Promise<boolean> => {
-    const result = await handleRsvp(status);
-    
-    if (result) {
-      // Update the event detail cache
-      queryClient.invalidateQueries({ queryKey: ['event', id] });
-      // Update the events list cache to reflect RSVP changes
-      queryClient.invalidateQueries({ queryKey: ['events'] });
-      queryClient.invalidateQueries({ queryKey: ['events', user?.id] });
+  // Enhanced RSVP handler with visual feedback and cache updates
+  const handleRsvpWithFeedback = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to RSVP to events",
+        variant: "destructive"
+      });
+      return false;
     }
-    
-    return result;
+
+    setRsvpLoading(true);
+    setRsvpFeedback(status.toLowerCase() as 'going' | 'interested');
+
+    try {
+      const result = await handleRsvp(status);
+      
+      if (result) {
+        // Update the event detail cache immediately
+        queryClient.setQueryData(['event', id], (oldData: any) => {
+          if (!oldData) return oldData;
+          
+          const newStatus = oldData.rsvp_status === status ? null : status;
+          const updatedEvent = { ...oldData, rsvp_status: newStatus };
+          
+          // Update attendee counts
+          if (oldData.attendees) {
+            const attendees = { ...oldData.attendees };
+            
+            // Remove from previous status
+            if (oldData.rsvp_status === 'Going') {
+              attendees.going = Math.max(0, attendees.going - 1);
+            } else if (oldData.rsvp_status === 'Interested') {
+              attendees.interested = Math.max(0, attendees.interested - 1);
+            }
+            
+            // Add to new status (if not removing)
+            if (newStatus === 'Going') {
+              attendees.going += 1;
+            } else if (newStatus === 'Interested') {
+              attendees.interested += 1;
+            }
+            
+            updatedEvent.attendees = attendees;
+          }
+          
+          return updatedEvent;
+        });
+        
+        // Update the events list cache to reflect RSVP changes
+        queryClient.invalidateQueries({ queryKey: ['events'] });
+        queryClient.invalidateQueries({ queryKey: ['events', user?.id] });
+        
+        // Show success feedback
+        toast({
+          title: "RSVP updated",
+          description: `You are now ${event?.rsvp_status === status ? 'not ' : ''}${status.toLowerCase()} to this event`,
+        });
+        
+        // Clear feedback after animation
+        setTimeout(() => setRsvpFeedback(null), 1000);
+        
+        return true;
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to update RSVP. Please try again.",
+          variant: "destructive"
+        });
+        return false;
+      }
+    } catch (error) {
+      console.error('RSVP error:', error);
+      toast({
+        title: "Error", 
+        description: "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+      return false;
+    } finally {
+      setRsvpLoading(false);
+    }
   };
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
             <div className="h-64 bg-gray-200 rounded mb-6"></div>
@@ -58,7 +130,7 @@ const EventDetail: React.FC = () => {
   if (error || !event) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto px-6 py-8">
           <Link to="/events" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Events
@@ -88,7 +160,7 @@ const EventDetail: React.FC = () => {
         <meta name="description" content={event.description || `Join us for ${event.title}`} />
       </Helmet>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-6 py-8">
         <Link to="/events" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Events
@@ -135,14 +207,19 @@ const EventDetail: React.FC = () => {
           )}
         </div>
 
-        {/* RSVP Section */}
+        {/* RSVP Section with enhanced feedback */}
         <div className="mb-8">
-          <EventRsvpSection
-            isOwner={isOwner}
-            onRsvp={handleRsvpWithCacheUpdate}
-            isRsvpLoading={rsvpLoading}
-            currentStatus={event.rsvp_status}
-          />
+          <div className={`transition-all duration-300 ${rsvpFeedback ? 'scale-105' : ''} ${
+            rsvpFeedback === 'going' ? 'ring-2 ring-green-200' : 
+            rsvpFeedback === 'interested' ? 'ring-2 ring-blue-200' : ''
+          }`}>
+            <EventRsvpSection
+              isOwner={isOwner}
+              onRsvp={handleRsvpWithFeedback}
+              isRsvpLoading={rsvpLoading}
+              currentStatus={event.rsvp_status}
+            />
+          </div>
         </div>
 
         {/* Event Description */}

@@ -96,20 +96,22 @@ const Layout = () => {
         <SocialSidebar selectedEventId={location.pathname === '/events' ? selectedEventId : undefined} />
       </div>
 
-      {/* Event Detail Overlay - larger and properly positioned */}
+      {/* Event Detail Overlay - improved design and positioning */}
       {isEventDetailPage && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-4 pb-4">
-          <div className="bg-white rounded-lg w-[calc(100vw-32px)] max-w-6xl h-[calc(100vh-32px)] overflow-hidden relative shadow-2xl mx-4">
-            <button
-              onClick={() => navigate('/events')}
-              className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <div className="h-full overflow-y-auto">
-              <Outlet />
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
+          <div className="flex items-center justify-center min-h-full p-4">
+            <div className="bg-white rounded-xl w-full max-w-5xl max-h-[90vh] overflow-hidden relative shadow-2xl">
+              <button
+                onClick={() => navigate('/events')}
+                className="absolute top-6 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <div className="h-full overflow-y-auto">
+                <Outlet />
+              </div>
             </div>
           </div>
         </div>
