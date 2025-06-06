@@ -38,24 +38,63 @@ const MainNav = () => {
     <header className={`sticky top-0 z-50 w-full transition-all duration-200 ${
       isScrolled ? 'bg-white/90 backdrop-blur-md shadow-sm' : 'bg-white'
     }`}>
-      <div className="container mx-auto px-2 md:px-4">
-        <div className="flex h-16 items-center justify-between gap-4">
-          <div className="flex items-center">
-            <BrandLogo showText={!isMobile} />
+      {/* Mobile: Two row layout */}
+      {isMobile ? (
+        <div className="container mx-auto px-2">
+          {/* First row: Logo and Auth buttons */}
+          <div className="flex h-16 items-center justify-between">
+            <div className="flex items-center">
+              <BrandLogo showText={true} />
+            </div>
+            
+            <div className="flex items-center gap-2">
+              {isAuthenticated && user ? (
+                <UserMenu user={user} profile={profile} handleSignOut={signOut} />
+              ) : (
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleSignInClick}
+                    className="text-xs px-2"
+                  >
+                    Sign in
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleRegisterClick}
+                    className="text-xs px-2"
+                  >
+                    Sign up
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
           
-          {/* Center search bar */}
-          <div className="flex-1 max-w-2xl">
+          {/* Second row: Search */}
+          <div className="pb-4">
             <SearchBar />
           </div>
+        </div>
+      ) : (
+        /* Desktop: Single row layout */
+        <div className="container mx-auto px-2 md:px-4">
+          <div className="flex h-16 items-center justify-between gap-4">
+            <div className="flex items-center">
+              <BrandLogo showText={true} />
+            </div>
+            
+            {/* Center search bar */}
+            <div className="flex-1 max-w-2xl">
+              <SearchBar />
+            </div>
 
-          <div className="flex items-center gap-2">
-            {isAuthenticated && user ? (
-              <UserMenu user={user} profile={profile} handleSignOut={signOut} />
-            ) : (
-              <div className="flex items-center gap-2">
-                {/* Desktop buttons */}
-                <div className="hidden sm:flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              {isAuthenticated && user ? (
+                <UserMenu user={user} profile={profile} handleSignOut={signOut} />
+              ) : (
+                <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -72,30 +111,11 @@ const MainNav = () => {
                     Sign up
                   </Button>
                 </div>
-                
-                {/* Mobile buttons */}
-                <div className="sm:hidden flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleSignInClick}
-                    className="text-xs px-2"
-                  >
-                    Sign in
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleRegisterClick}
-                    className="text-xs px-2"
-                  >
-                    Sign up
-                  </Button>
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </header>
   );
 };

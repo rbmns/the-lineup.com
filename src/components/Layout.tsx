@@ -6,10 +6,11 @@ import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/toaster";
 import { CookieConsent } from "@/components/CookieConsent";
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet, Link } from 'react-router-dom';
 import { EventSidePanel } from "@/components/events/EventSidePanel";
 import { SocialSidebar } from "@/components/social/SocialSidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Search, Calendar, Coffee, Users } from 'lucide-react';
 import EventDetail from "@/pages/EventDetail";
 
 const Layout = () => {
@@ -104,8 +105,8 @@ const Layout = () => {
     <div className="min-h-screen bg-background">
       <MainNav />
       <div className="flex h-[calc(100vh-64px)]">
-        {/* Left sidebar */}
-        <LeftSidebar />
+        {/* Left sidebar - hidden on mobile */}
+        {!isMobile && <LeftSidebar />}
         
         {/* Main content area */}
         <div className="flex-1 overflow-hidden relative">
@@ -114,8 +115,8 @@ const Layout = () => {
           </main>
         </div>
         
-        {/* Event side panel - positioned on the right for /events page */}
-        {selectedEventId && location.pathname === '/events' && (
+        {/* Event side panel - positioned on the right for /events page, hidden on mobile */}
+        {selectedEventId && location.pathname === '/events' && !isMobile && (
           <EventSidePanel
             eventId={selectedEventId}
             isOpen={!!selectedEventId}
@@ -123,8 +124,10 @@ const Layout = () => {
           />
         )}
         
-        {/* Social sidebar - always on the far right */}
-        <SocialSidebar selectedEventId={location.pathname === '/events' ? selectedEventId : undefined} />
+        {/* Social sidebar - always on the far right, hidden on mobile */}
+        {!isMobile && (
+          <SocialSidebar selectedEventId={location.pathname === '/events' ? selectedEventId : undefined} />
+        )}
       </div>
 
       {/* Global Event Detail Overlay - only for pages other than /events and NOT for URL-based event pages */}
@@ -147,9 +150,31 @@ const Layout = () => {
                   </svg>
                 </button>
                 <div className="h-full overflow-y-auto">
-                  <EventDetail />
+                  <EventDetail eventId={globalEventOverlay} showBackButton={false} />
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Event Detail Overlay for /events page */}
+      {selectedEventId && location.pathname === '/events' && isMobile && (
+        <div className="fixed inset-0 z-50 bg-white">
+          <div className="h-full flex flex-col">
+            <div className="flex items-center justify-between p-4 border-b bg-white">
+              <h2 className="font-semibold text-lg">Event Details</h2>
+              <button
+                onClick={() => handleEventSelect(null)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              <EventDetail eventId={selectedEventId} showBackButton={false} />
             </div>
           </div>
         </div>
@@ -179,6 +204,50 @@ const Layout = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Navigation - sticky bottom navigation */}
+      {isMobile && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40">
+          <div className="flex items-center justify-around py-2">
+            <Link
+              to="/search"
+              className={`flex flex-col items-center p-2 ${
+                location.pathname === '/search' ? 'text-blue-600' : 'text-gray-500'
+              }`}
+            >
+              <Search className="h-5 w-5" />
+              <span className="text-xs mt-1">Search</span>
+            </Link>
+            <Link
+              to="/events"
+              className={`flex flex-col items-center p-2 ${
+                location.pathname === '/events' ? 'text-blue-600' : 'text-gray-500'
+              }`}
+            >
+              <Calendar className="h-5 w-5" />
+              <span className="text-xs mt-1">Events</span>
+            </Link>
+            <Link
+              to="/casual-plans"
+              className={`flex flex-col items-center p-2 ${
+                location.pathname === '/casual-plans' ? 'text-blue-600' : 'text-gray-500'
+              }`}
+            >
+              <Coffee className="h-5 w-5" />
+              <span className="text-xs mt-1">Plans</span>
+            </Link>
+            <Link
+              to="/friends"
+              className={`flex flex-col items-center p-2 ${
+                location.pathname === '/friends' ? 'text-blue-600' : 'text-gray-500'
+              }`}
+            >
+              <Users className="h-5 w-5" />
+              <span className="text-xs mt-1">Friends</span>
+            </Link>
           </div>
         </div>
       )}

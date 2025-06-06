@@ -11,21 +11,33 @@ import { useEventRsvpHandler } from '@/hooks/events/useEventRsvpHandler';
 import { EventRsvpSection } from '@/components/events/detail-sections/EventRsvpSection';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { getEventImage } from '@/utils/eventImages';
+import { useIsMobile } from '@/hooks/use-mobile';
 
-const EventDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+interface EventDetailProps {
+  eventId?: string;
+  showBackButton?: boolean;
+}
+
+const EventDetail: React.FC<EventDetailProps> = ({ 
+  eventId: propEventId, 
+  showBackButton = true 
+}) => {
+  const { id: paramId } = useParams<{ id: string }>();
+  const eventId = propEventId || paramId;
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
   const [rsvpLoading, setRsvpLoading] = useState(false);
   const [rsvpFeedback, setRsvpFeedback] = useState<'going' | 'interested' | null>(null);
   
   const { data: event, isLoading, error } = useQuery({
-    queryKey: ['event', id],
-    queryFn: () => fetchEventById(id!),
-    enabled: !!id,
+    queryKey: ['event', eventId],
+    queryFn: () => fetchEventById(eventId!),
+    enabled: !!eventId,
   });
 
-  const { handleRsvp } = useEventRsvpHandler(id!);
+  const { handleRsvp } = useEventRsvpHandler(eventId!);
 
   // Enhanced RSVP handler with visual feedback and cache updates
   const handleRsvpWithFeedback = async (status: 'Going' | 'Interested'): Promise<boolean> => {
@@ -46,7 +58,7 @@ const EventDetail: React.FC = () => {
       
       if (result) {
         // Update the event detail cache immediately
-        queryClient.setQueryData(['event', id], (oldData: any) => {
+        queryClient.setQueryData(['event', eventId], (oldData: any) => {
           if (!oldData) return oldData;
           
           const newStatus = oldData.rsvp_status === status ? null : status;
@@ -131,10 +143,12 @@ const EventDetail: React.FC = () => {
     return (
       <div className="min-h-screen bg-white">
         <div className="max-w-4xl mx-auto px-6 py-8">
-          <Link to="/events" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Events
-          </Link>
+          {showBackButton && (
+            <Link to="/events" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Events
+            </Link>
+          )}
           <div className="text-center py-12">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
             <p className="text-gray-600 mb-6">The event you're looking for doesn't exist or has been removed.</p>
@@ -152,6 +166,9 @@ const EventDetail: React.FC = () => {
     event.location || 'Location TBD';
 
   const isOwner = user?.id === event.creator?.id;
+  
+  // Get event image with fallback
+  const eventImage = getEventImage(event);
 
   return (
     <div className="min-h-screen bg-white event-detail-card">
@@ -161,20 +178,26 @@ const EventDetail: React.FC = () => {
       </Helmet>
 
       <div className="max-w-4xl mx-auto px-6 py-8">
-        <Link to="/events" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Events
-        </Link>
+        {showBackButton && (
+          <Link to="/events" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Events
+          </Link>
+        )}
 
         {/* Event Header */}
         <div className="mb-8">
-          {event.image_urls && event.image_urls.length > 0 && (
-            <img 
-              src={event.image_urls[0]} 
-              alt={event.title}
-              className="w-full h-64 object-cover rounded-lg mb-6"
-            />
-          )}
+          <img 
+            src={eventImage} 
+            alt={event.title}
+            className="w-full h-64 object-cover rounded-lg mb-6"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              if (!target.src.includes('default.jpg')) {
+                target.src = 'https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg';
+              }
+            }}
+          />
           
           <h1 className="text-4xl font-bold mb-4">{event.title}</h1>
           
@@ -221,6 +244,23 @@ const EventDetail: React.FC = () => {
             />
           </div>
         </div>
+
+        {/* Mobile attendees info - only show on mobile when no social sidebar */}
+        {isMobile && (
+          <div className="mb-8 bg-gray-50 rounded-lg p-6">
+            <h2 className="text-2xl font-semibold mb-4">Who's Going</h2>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600">Going</span>
+                <span className="font-medium">{event.attendees?.going || 0}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600">Interested</span>
+                <span className="font-medium">{event.attendees?.interested || 0}</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Event Description */}
         {event.description && (
