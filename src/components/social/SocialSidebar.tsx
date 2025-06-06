@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Users, Calendar, ChevronRight, ChevronLeft, UserPlus } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface SocialSidebarProps {
   selectedEventId?: string;
@@ -31,7 +31,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   });
 
   const handleSignUpClick = () => {
-    navigate('/login', { state: { initialMode: 'register' } });
+    navigate('/signup');
   };
 
   if (!visible) {
@@ -66,7 +66,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
       <div className="p-4 space-y-4">
         <div className="flex items-center gap-2">
           <Users className="h-5 w-5 text-seafoam-green" />
-          <h2 className="text-lg font-semibold text-ocean-deep">Social</h2>
+          <h2 className="text-lg font-medium text-ocean-deep">Social</h2>
         </div>
 
         {/* Sign up prompt for non-authenticated users */}
