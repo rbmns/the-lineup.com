@@ -110,7 +110,7 @@ const Layout = () => {
     }
     
     const leftSidebarWidth = 80; // 20rem = 80 in width units
-    const socialSidebarWidth = socialSidebarVisible ? 320 : 0; // 80rem = 320 in width units
+    const socialSidebarWidth = socialSidebarVisible ? 280 : 0; // Reduced from 320 to 280
     
     return {
       marginLeft: `${leftSidebarWidth}px`,
@@ -120,20 +120,23 @@ const Layout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-sand">
+    <div className="min-h-screen bg-white">
       <MainNav />
-      <div className="flex h-[calc(100vh-64px)]">
+      <div className="flex">
         {/* Left sidebar - hidden on mobile */}
         {!isMobile && <LeftSidebar />}
         
         {/* Main content area */}
         <div 
-          className={isMobile ? "flex-1 overflow-hidden relative" : "overflow-hidden relative"}
+          className={isMobile ? "flex-1 relative min-h-screen" : "relative min-h-screen"}
           style={getMainContentStyle()}
         >
-          <main className="h-full overflow-y-auto bg-white">
+          <main className="bg-white min-h-screen">
             <Outlet context={{ onEventSelect: handleEventSelect, selectedEventId }} />
           </main>
+          
+          {/* Non-sticky Footer */}
+          <Footer />
         </div>
         
         {/* Social sidebar - always on the far right, hidden on mobile */}
@@ -154,13 +157,13 @@ const Layout = () => {
           className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
           style={{ 
             top: '64px',
-            bottom: '64px',
+            bottom: '0',
             left: '80px',
-            right: socialSidebarVisible ? '320px' : '0'
+            right: socialSidebarVisible ? '280px' : '0'
           }}
         >
-          <div className="w-full h-full flex items-center justify-center p-6">
-            <div className="bg-white rounded-xl w-full h-full overflow-hidden relative shadow-2xl">
+          <div className="w-full h-full flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl w-full h-[95%] overflow-hidden relative shadow-2xl">
               <button
                 onClick={() => handleEventSelect(null)}
                 className="absolute top-6 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
@@ -183,13 +186,13 @@ const Layout = () => {
           className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
           style={{ 
             top: '64px',
-            bottom: isMobile ? '80px' : '64px',
+            bottom: '0',
             left: isMobile ? '0' : '80px',
-            right: isMobile ? '0' : (socialSidebarVisible ? '320px' : '0')
+            right: isMobile ? '0' : (socialSidebarVisible ? '280px' : '0')
           }}
         >
-          <div className="w-full h-full flex items-center justify-center p-6">
-            <div className="bg-white rounded-xl w-full h-full overflow-hidden relative shadow-2xl">
+          <div className="w-full h-full flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl w-full h-[95%] overflow-hidden relative shadow-2xl">
               <button
                 onClick={handleCloseGlobalOverlay}
                 className="absolute top-6 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
@@ -234,13 +237,13 @@ const Layout = () => {
           className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
           style={{ 
             top: '64px',
-            bottom: isMobile ? '80px' : '64px',
+            bottom: '0',
             left: isMobile ? '0' : '80px',
-            right: isMobile ? '0' : (socialSidebarVisible ? '320px' : '0')
+            right: isMobile ? '0' : (socialSidebarVisible ? '280px' : '0')
           }}
         >
-          <div className="w-full h-full flex items-center justify-center p-6">
-            <div className="bg-white rounded-xl w-full h-full overflow-hidden relative shadow-2xl">
+          <div className="w-full h-full flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl w-full h-[95%] overflow-hidden relative shadow-2xl">
               <button
                 onClick={() => navigate(-1)}
                 className="absolute top-6 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
@@ -300,11 +303,6 @@ const Layout = () => {
           </div>
         </div>
       )}
-
-      {/* Sticky Footer */}
-      <div className="fixed bottom-0 left-0 right-0 z-30">
-        <Footer />
-      </div>
 
       <Toaster />
       <CookieConsent />

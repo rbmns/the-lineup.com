@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchEventById } from '@/lib/eventService';
-import { ArrowLeft, Calendar, MapPin, Users } from 'lucide-react';
+import { ArrowLeft, Calendar, MapPin, Users, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Helmet } from 'react-helmet-async';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
@@ -91,6 +90,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
         // Update the events list cache to reflect RSVP changes
         queryClient.invalidateQueries({ queryKey: ['events'] });
         queryClient.invalidateQueries({ queryKey: ['events', user?.id] });
+        queryClient.invalidateQueries({ queryKey: ['event-attendees', eventId] });
         
         // Show success feedback
         toast({
@@ -289,9 +289,10 @@ const EventDetail: React.FC<EventDetailProps> = ({
         {/* Organizer Link */}
         {event.organizer_link && (
           <div className="mb-8">
-            <Button asChild>
+            <Button asChild className="inline-flex items-center gap-2">
               <a href={event.organizer_link} target="_blank" rel="noopener noreferrer">
                 Get Tickets / More Info
+                <ExternalLink className="h-4 w-4" />
               </a>
             </Button>
           </div>
@@ -310,9 +311,20 @@ const EventDetail: React.FC<EventDetailProps> = ({
                 />
               )}
               <div>
-                <p className="font-medium">{event.creator.username}</p>
+                <p className="font-medium">{event.organizer_name || event.creator.username}</p>
                 {event.creator.tagline && (
                   <p className="text-gray-600 text-sm">{event.creator.tagline}</p>
+                )}
+                {event.organizer_link && (
+                  <a 
+                    href={event.organizer_link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 text-sm inline-flex items-center gap-1 mt-1"
+                  >
+                    Visit organizer page
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
                 )}
               </div>
             </div>
