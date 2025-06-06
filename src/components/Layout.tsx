@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { SocialSidebar } from "@/components/social/SocialSidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Search, Calendar, Coffee, Users } from 'lucide-react';
+import { Calendar, Coffee, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { EventDetailContent } from "@/components/events/EventDetailContent";
 import { EventDetailHeader } from "@/components/events/EventDetailHeader";
@@ -30,13 +30,12 @@ const Layout = () => {
   }, [isMobile]);
 
   // Define which routes should be accessible without authentication
-  const publicRoutes = ['/', '/events', '/casual-plans', '/search', '/privacy', '/terms', '/cookies'];
+  const publicRoutes = ['/', '/events', '/casual-plans', '/privacy', '/terms', '/cookies'];
   
   // Check if current route starts with a public route (for dynamic routes like /events/:id)
   const isPublicRoute = publicRoutes.some(route => 
     location.pathname === route || 
-    (route === '/events' && location.pathname.startsWith('/events/')) ||
-    (route === '/search' && location.pathname.startsWith('/search'))
+    (route === '/events' && location.pathname.startsWith('/events/'))
   );
 
   // Check if we're on an event detail page
@@ -85,7 +84,7 @@ const Layout = () => {
         if (location.pathname === '/events') {
           handleEventSelect(eventId);
         } else {
-          // For other pages (home, search, etc.), use the global overlay
+          // For other pages (home, etc.), use the global overlay
           setGlobalEventOverlay(eventId);
         }
       }
@@ -119,7 +118,7 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-white w-full overflow-x-hidden">
-      {/* Full-width top navigation - responsive height */}
+      {/* Full-width top navigation */}
       <div className="w-full">
         <MainNav />
       </div>
@@ -132,11 +131,11 @@ const Layout = () => {
           </div>
         )}
         
-        {/* Main content area - responsive margins and padding */}
+        {/* Main content area - full width responsive */}
         <div 
           className={`flex-1 w-full min-h-screen ${
             isMobile 
-              ? 'pt-[104px] pb-20' // Mobile: account for nav + bottom nav
+              ? 'pt-16 pb-20' // Mobile: account for nav + bottom nav
               : 'pt-16 ml-20' // Desktop: account for top nav + left sidebar
           } ${
             !isMobile && socialSidebarVisible ? 'mr-64' : ''
@@ -173,14 +172,14 @@ const Layout = () => {
           }}
           onClick={() => handleEventSelect(null)}
         >
-          <div className="w-full h-full flex items-center justify-center p-4 md:p-6">
+          <div className="w-full h-full flex items-center justify-center p-6">
             <div 
-              className="bg-white rounded-xl w-full max-w-4xl h-[85vh] md:h-[90vh] overflow-hidden relative shadow-2xl"
+              className="bg-white rounded-xl w-full max-w-5xl h-[90vh] overflow-hidden relative shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => handleEventSelect(null)}
-                className="absolute top-3 right-3 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white transition-colors"
+                className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white transition-colors"
               >
                 <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -198,10 +197,10 @@ const Layout = () => {
       {globalEventOverlay && location.pathname !== '/events' && !isEventDetailPage && (
         <div 
           className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm ${
-            isMobile ? 'p-2' : 'p-6'
+            isMobile ? 'p-4' : 'p-6'
           }`}
           style={{ 
-            top: isMobile ? '104px' : '64px',
+            top: isMobile ? '64px' : '64px',
             bottom: isMobile ? '80px' : '0',
             left: isMobile ? '0' : '80px',
             right: isMobile ? '0' : (socialSidebarVisible ? '256px' : '0')
@@ -213,13 +212,13 @@ const Layout = () => {
               className={`bg-white rounded-xl w-full overflow-hidden relative shadow-2xl ${
                 isMobile 
                   ? 'h-full max-w-full rounded-lg' 
-                  : 'max-w-4xl h-[85vh] md:h-[90vh]'
+                  : 'max-w-5xl h-[90vh]'
               }`}
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={handleCloseGlobalOverlay}
-                className="absolute top-3 right-3 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white transition-colors"
+                className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white transition-colors"
               >
                 <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -235,7 +234,7 @@ const Layout = () => {
 
       {/* Mobile Event Detail Overlay for /events page */}
       {selectedEventId && location.pathname === '/events' && isMobile && (
-        <div className="fixed inset-0 z-50 bg-white" style={{ top: '104px', bottom: '80px' }}>
+        <div className="fixed inset-0 z-50 bg-white" style={{ top: '64px', bottom: '80px' }}>
           <div className="h-full flex flex-col">
             <div className="flex items-center justify-between p-4 border-b bg-white sticky top-0 z-10">
               <h2 className="font-semibold text-lg">Event Details</h2>
@@ -259,10 +258,10 @@ const Layout = () => {
       {isEventDetailPage && location.pathname !== '/events' && !globalEventOverlay && (
         <div 
           className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm ${
-            isMobile ? 'p-2' : 'p-6'
+            isMobile ? 'p-4' : 'p-6'
           }`}
           style={{ 
-            top: isMobile ? '104px' : '64px',
+            top: isMobile ? '64px' : '64px',
             bottom: isMobile ? '80px' : '0',
             left: isMobile ? '0' : '80px',
             right: isMobile ? '0' : (socialSidebarVisible ? '256px' : '0')
@@ -273,12 +272,12 @@ const Layout = () => {
               className={`bg-white rounded-xl w-full overflow-hidden relative shadow-2xl ${
                 isMobile 
                   ? 'h-full max-w-full rounded-lg' 
-                  : 'max-w-4xl h-[85vh] md:h-[90vh]'
+                  : 'max-w-5xl h-[90vh]'
               }`}
             >
               <button
                 onClick={() => navigate(-1)}
-                className="absolute top-3 right-3 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white transition-colors"
+                className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white transition-colors"
               >
                 <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -292,19 +291,10 @@ const Layout = () => {
         </div>
       )}
 
-      {/* Mobile Navigation - responsive positioning */}
+      {/* Mobile Navigation - no search link */}
       {isMobile && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 safe-area-pb">
           <div className="flex items-center justify-around py-2 px-1">
-            <Link
-              to="/search"
-              className={`flex flex-col items-center p-2 min-w-0 flex-1 ${
-                location.pathname === '/search' ? 'text-blue-600' : 'text-gray-600'
-              }`}
-            >
-              <Search className="h-5 w-5 mb-1" />
-              <span className="text-xs font-medium truncate">Search</span>
-            </Link>
             <Link
               to="/events"
               className={`flex flex-col items-center p-2 min-w-0 flex-1 ${
@@ -342,7 +332,7 @@ const Layout = () => {
   );
 };
 
-// Component for event detail overlay
+// Component for event detail overlay with left-aligned content
 const EventDetailOverlay: React.FC<{ eventId: string }> = ({ eventId }) => {
   const { data: event, isLoading } = useQuery({
     queryKey: ['event', eventId],
@@ -352,12 +342,14 @@ const EventDetailOverlay: React.FC<{ eventId: string }> = ({ eventId }) => {
 
   if (isLoading) {
     return (
-      <div className="p-4 md:p-6">
+      <div className="w-full">
         <div className="animate-pulse">
           <div className="h-48 md:h-64 bg-gray-200 rounded mb-6"></div>
-          <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+          <div className="px-6 pb-6">
+            <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+          </div>
         </div>
       </div>
     );
@@ -365,7 +357,7 @@ const EventDetailOverlay: React.FC<{ eventId: string }> = ({ eventId }) => {
 
   if (!event) {
     return (
-      <div className="p-4 md:p-6 text-center">
+      <div className="w-full text-left px-6 py-8">
         <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
         <p className="text-gray-600 text-sm md:text-base">The event you're looking for doesn't exist or has been removed.</p>
       </div>
@@ -380,7 +372,7 @@ const EventDetailOverlay: React.FC<{ eventId: string }> = ({ eventId }) => {
         title={event.title}
         showTitleOverlay={false}
       />
-      <div className="p-4 md:p-6">
+      <div className="w-full text-left px-6 py-6">
         <EventDetailContent 
           event={event}
           isOwner={false}
