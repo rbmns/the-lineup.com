@@ -46,12 +46,12 @@ export const EventsResultsDisplay: React.FC<EventsResultsDisplayProps> = ({
 
   // Show empty state when no filters are selected
   if (isNoneSelected) {
-    return <EventsEmptyState onSelectAll={selectAll} />;
+    return <EventsEmptyState onResetFilters={selectAll} hasActiveFilters={false} />;
   }
 
   // Show no results state when filters are active but no events match
   if (hasActiveFilters && filteredEvents.length === 0) {
-    return <NoResultsFound />;
+    return <NoResultsFound resetFilters={selectAll} />;
   }
 
   // Show events list

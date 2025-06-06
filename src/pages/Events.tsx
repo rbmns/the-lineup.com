@@ -68,59 +68,66 @@ const Events = () => {
               setSelectedVibes,
               vibes,
               vibesLoading
-            }) => (
-              <div className="space-y-6">
-                {/* Vibe Filter Section */}
-                <EventsVibeSection
-                  selectedVibes={selectedVibes || []}
-                  onVibeChange={setSelectedVibes || (() => {})}
-                  vibes={vibes || []}
-                  vibesLoading={vibesLoading || false}
-                />
-                
-                {/* Category and Advanced Filters */}
-                <EventsPageFilters
-                  allEventTypes={allEventTypes}
-                  selectedCategories={selectedCategories}
-                  toggleCategory={toggleCategory}
-                  selectAll={selectAll}
-                  deselectAll={deselectAll}
-                  hasActiveFilters={hasActiveFilters}
-                  showAdvancedFilters={showAdvancedFilters}
-                  toggleAdvancedFilters={toggleAdvancedFilters}
-                  dateRange={dateRange}
-                  setDateRange={setDateRange}
-                  selectedDateFilter={selectedDateFilter}
-                  setSelectedDateFilter={setSelectedDateFilter}
-                  venues={venues}
-                  selectedVenues={selectedVenues}
-                  setSelectedVenues={setSelectedVenues}
-                  locations={locations}
-                  hasAdvancedFilters={hasAdvancedFilters}
-                  handleRemoveVenue={handleRemoveVenue}
-                  handleClearDateFilter={handleClearDateFilter}
-                  resetFilters={resetFilters}
-                />
-                
-                {/* Results Display */}
-                <EventsResultsDisplay
-                  filteredEvents={filteredEvents}
-                  similarEvents={similarEvents}
-                  isLoading={eventsLoading}
-                  isVenuesLoading={isVenuesLoading}
-                  isFilterLoading={isFilterLoading}
-                  hasActiveFilters={hasActiveFilters}
-                  handleRsvp={handleRsvp}
-                  showRsvpButtons={showRsvpButtons}
-                  loadingEventId={loadingEventId}
-                  isNoneSelected={isNoneSelected}
-                  selectAll={selectAll}
-                  onEventSelect={onEventSelect}
-                  selectedEventId={selectedEventId}
-                  isOverlayMode={!!selectedEventId}
-                />
-              </div>
-            )}
+            }) => {
+              // Wrap the handleRsvp to convert Promise<boolean> to Promise<void>
+              const wrappedHandleRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<void> => {
+                await handleRsvp(eventId, status);
+              };
+
+              return (
+                <div className="space-y-6">
+                  {/* Vibe Filter Section */}
+                  <EventsVibeSection
+                    selectedVibes={selectedVibes || []}
+                    onVibeChange={setSelectedVibes || (() => {})}
+                    vibes={vibes || []}
+                    vibesLoading={vibesLoading || false}
+                  />
+                  
+                  {/* Category and Advanced Filters */}
+                  <EventsPageFilters
+                    allEventTypes={allEventTypes}
+                    selectedCategories={selectedCategories}
+                    toggleCategory={toggleCategory}
+                    selectAll={selectAll}
+                    deselectAll={deselectAll}
+                    hasActiveFilters={hasActiveFilters}
+                    showAdvancedFilters={showAdvancedFilters}
+                    toggleAdvancedFilters={toggleAdvancedFilters}
+                    dateRange={dateRange}
+                    setDateRange={setDateRange}
+                    selectedDateFilter={selectedDateFilter}
+                    setSelectedDateFilter={setSelectedDateFilter}
+                    venues={venues}
+                    selectedVenues={selectedVenues}
+                    setSelectedVenues={setSelectedVenues}
+                    locations={locations}
+                    hasAdvancedFilters={hasAdvancedFilters}
+                    handleRemoveVenue={handleRemoveVenue}
+                    handleClearDateFilter={handleClearDateFilter}
+                    resetFilters={resetFilters}
+                  />
+                  
+                  {/* Results Display */}
+                  <EventsResultsDisplay
+                    filteredEvents={filteredEvents}
+                    similarEvents={similarEvents}
+                    isLoading={eventsLoading}
+                    isVenuesLoading={isVenuesLoading}
+                    isFilterLoading={isFilterLoading}
+                    hasActiveFilters={hasActiveFilters}
+                    handleRsvp={wrappedHandleRsvp}
+                    showRsvpButtons={showRsvpButtons}
+                    loadingEventId={loadingEventId}
+                    isNoneSelected={isNoneSelected}
+                    selectAll={selectAll}
+                    onEventSelect={onEventSelect}
+                    selectedEventId={selectedEventId}
+                    isOverlayMode={!!selectedEventId}
+                  />
+                </div>
+              );
+            }}
           </EventsDataProvider>
         </div>
       </div>
