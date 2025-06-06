@@ -5,11 +5,10 @@ import { Search as SearchIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
-import { searchEvents } from '@/lib/eventService';
+import { supabase } from '@/lib/supabase';
 import EventCardList from '@/components/events/EventCardList';
 import { EventsLoadingState } from '@/components/events/list-components/EventsLoadingState';
 import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
-import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { processEventsData } from '@/utils/eventProcessorUtils';
 import { useAuth } from '@/contexts/AuthContext';
@@ -35,7 +34,7 @@ const Search: React.FC = () => {
       if (!submittedQuery.trim()) return { events: [], similarEvents: [] };
 
       try {
-        // Search events with venue data
+        // Search events with venue data - search in multiple fields including event_type
         const { data: eventsData, error: eventsError } = await supabase
           .from('events')
           .select(`
@@ -44,7 +43,7 @@ const Search: React.FC = () => {
             venues:venue_id(*),
             event_rsvps(id, user_id, status)
           `)
-          .or(`title.ilike.%${submittedQuery}%,description.ilike.%${submittedQuery}%,location.ilike.%${submittedQuery}%,event_category.ilike.%${submittedQuery}%`)
+          .or(`title.ilike.%${submittedQuery}%,description.ilike.%${submittedQuery}%,location.ilike.%${submittedQuery}%,event_category.ilike.%${submittedQuery}%,event_type.ilike.%${submittedQuery}%`)
           .order('start_date', { ascending: true })
           .order('start_time', { ascending: true });
 
@@ -63,7 +62,7 @@ const Search: React.FC = () => {
               venues:venue_id(*),
               event_rsvps(id, user_id, status)
             `)
-            .or(`title.ilike.%${submittedQuery.substring(0, 3)}%,event_category.ilike.%${submittedQuery.substring(0, 3)}%`)
+            .or(`title.ilike.%${submittedQuery.substring(0, 3)}%,event_category.ilike.%${submittedQuery.substring(0, 3)}%,event_type.ilike.%${submittedQuery.substring(0, 3)}%`)
             .order('start_date', { ascending: true })
             .limit(6);
 
@@ -102,11 +101,11 @@ const Search: React.FC = () => {
   const totalResults = (searchResults?.events?.length || 0) + (searchResults?.similarEvents?.length || 0);
 
   return (
-    <div className="w-full bg-gray-50">
+    <div className="w-full bg-gray-50 min-h-screen">
       {/* Full-width Hero Search Section */}
       <div className="w-full bg-white border-b">
-        <div className="w-full px-6 py-16">
-          <div className="max-w-4xl mx-auto text-center">
+        <div className="w-full px-0">
+          <div className="max-w-4xl mx-auto px-6 py-16 text-center">
             <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">
               Discover Amazing Events
             </h1>
@@ -147,8 +146,8 @@ const Search: React.FC = () => {
 
       {/* Search Results Section */}
       {submittedQuery && (
-        <div className="w-full px-6 py-8">
-          <div className="max-w-6xl mx-auto">
+        <div className="w-full px-0">
+          <div className="max-w-6xl mx-auto px-6 py-8">
             <div className="mb-6">
               <h2 className="text-2xl font-semibold text-gray-900">
                 Search Results for "{submittedQuery}"

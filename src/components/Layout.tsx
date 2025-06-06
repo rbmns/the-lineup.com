@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import MainNav from "@/components/MainNav";
 import LeftSidebar from "@/components/nav/LeftSidebar";
@@ -10,7 +11,10 @@ import { SocialSidebar } from "@/components/social/SocialSidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Search, Calendar, Coffee, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import EventDetail from "@/pages/EventDetail";
+import { EventDetailContent } from "@/components/events/EventDetailContent";
+import { EventDetailHeader } from "@/components/events/EventDetailHeader";
+import { useQuery } from '@tanstack/react-query';
+import { fetchEventById } from '@/lib/eventService';
 
 const Layout = () => {
   const { user, loading } = useAuth();
@@ -101,10 +105,12 @@ const Layout = () => {
     }
   }, [user, loading, navigate, location, isPublicRoute]);
 
-  // Calculate layout dimensions
-  const topNavHeight = isMobile ? 'h-[104px]' : 'h-16'; // Mobile has 2 rows
-  const leftSidebarWidth = isMobile ? 'w-0' : 'w-20';
-  const socialSidebarWidth = !isMobile && socialSidebarVisible ? 'w-64' : 'w-0';
+  // Query for event details when overlay is open
+  const { data: overlayEvent } = useQuery({
+    queryKey: ['event', globalEventOverlay],
+    queryFn: () => fetchEventById(globalEventOverlay!),
+    enabled: !!globalEventOverlay,
+  });
 
   return (
     <div className="min-h-screen bg-white w-full">
@@ -116,12 +122,12 @@ const Layout = () => {
       <div className="flex w-full">
         {/* Left sidebar - fixed, always visible on desktop */}
         {!isMobile && (
-          <div className={`fixed left-0 top-16 bottom-0 w-20 bg-white border-r border-gray-200 z-30`}>
+          <div className="fixed left-0 top-16 bottom-0 w-20 bg-white border-r border-gray-200 z-30">
             <LeftSidebar />
           </div>
         )}
         
-        {/* Main content area - full width between sidebars */}
+        {/* Main content area - full width between sidebars, no padding */}
         <div 
           className={`flex-1 w-full ${
             isMobile ? 'pt-[104px]' : 'pt-16 ml-20'
@@ -170,7 +176,8 @@ const Layout = () => {
                 </svg>
               </button>
               <div className="h-full overflow-y-auto">
-                <EventDetail eventId={selectedEventId} showBackButton={false} />
+                {/* Use proper event detail components */}
+                <EventDetailOverlay eventId={selectedEventId} />
               </div>
             </div>
           </div>
@@ -199,7 +206,8 @@ const Layout = () => {
                 </svg>
               </button>
               <div className="h-full overflow-y-auto">
-                <EventDetail eventId={globalEventOverlay} showBackButton={false} />
+                {/* Use proper event detail components */}
+                <EventDetailOverlay eventId={globalEventOverlay} />
               </div>
             </div>
           </div>
@@ -222,7 +230,7 @@ const Layout = () => {
               </button>
             </div>
             <div className="flex-1 overflow-y-auto">
-              <EventDetail eventId={selectedEventId} showBackButton={false} />
+              <EventDetailOverlay eventId={selectedEventId} />
             </div>
           </div>
         </div>
@@ -303,6 +311,54 @@ const Layout = () => {
 
       <Toaster />
       <CookieConsent />
+    </div>
+  );
+};
+
+// Component for event detail overlay
+const EventDetailOverlay: React.FC<{ eventId: string }> = ({ eventId }) => {
+  const { data: event, isLoading } = useQuery({
+    queryKey: ['event', eventId],
+    queryFn: () => fetchEventById(eventId),
+    enabled: !!eventId,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="p-6">
+        <div className="animate-pulse">
+          <div className="h-64 bg-gray-200 rounded mb-6"></div>
+          <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!event) {
+    return (
+      <div className="p-6 text-center">
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
+        <p className="text-gray-600">The event you're looking for doesn't exist or has been removed.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full">
+      <EventDetailHeader 
+        event={event}
+        eventType={event.event_category || event.event_type}
+        title={event.title}
+        showTitleOverlay={false}
+      />
+      <div className="p-6">
+        <EventDetailContent 
+          event={event}
+          isOwner={false}
+        />
+      </div>
     </div>
   );
 };

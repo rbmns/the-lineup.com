@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
@@ -12,15 +11,15 @@ const CookiePolicy: React.FC = () => {
       
       {/* Full-width header section */}
       <div className="w-full bg-white border-b border-gray-200">
-        <div className="w-full px-6 py-16">
-          <div className="max-w-4xl mx-auto">
+        <div className="w-full py-16">
+          <div className="max-w-4xl mx-auto px-6">
             <h1 className="text-4xl font-bold tracking-tight text-center">Cookie Policy</h1>
           </div>
         </div>
       </div>
 
-      <div className="w-full py-8 px-6">
-        <div className="max-w-4xl mx-auto">
+      <div className="w-full py-8">
+        <div className="max-w-4xl mx-auto px-6">
           <div className="prose prose-lg max-w-none bg-white rounded-lg p-8 shadow-sm">
             <p className="text-xl text-muted-foreground leading-relaxed mb-6">
               This Cookie Policy explains how we use cookies and similar technologies to recognize you when you visit our platform.

@@ -78,19 +78,17 @@ const MainNav = () => {
           </div>
         </div>
       ) : (
-        /* Desktop: Single row layout - full width */
+        /* Desktop: Single row layout */
         <div className="w-full px-6">
           <div className="flex h-16 items-center justify-between gap-8">
             <div className="flex items-center flex-shrink-0">
               <BrandLogo showText={true} />
             </div>
             
-            {/* Center search bar - only show on non-search pages */}
-            {location.pathname !== '/search' && (
-              <div className="flex-1 max-w-md">
-                <SearchBar />
-              </div>
-            )}
+            {/* Center search bar - show on all pages */}
+            <div className="flex-1 max-w-md">
+              <SearchBar />
+            </div>
 
             <div className="flex items-center gap-3 flex-shrink-0">
               {isAuthenticated && user ? (

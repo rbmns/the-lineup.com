@@ -18,11 +18,6 @@ const SearchBar: React.FC = () => {
     }
   };
 
-  // Don't show search bar on the search page itself (in mobile navigation)
-  if (location.pathname === '/search') {
-    return null;
-  }
-
   return (
     <form onSubmit={handleSearch} className="flex items-center w-full">
       <div className="relative flex-1">
