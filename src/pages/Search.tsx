@@ -12,6 +12,7 @@ import { NoResultsFound } from '@/components/events/list-components/NoResultsFou
 import { Event } from '@/types';
 import { processEventsData } from '@/utils/eventProcessorUtils';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Search: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,6 +20,7 @@ const Search: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [submittedQuery, setSubmittedQuery] = useState(searchParams.get('q') || '');
   const { user } = useAuth();
+  const isMobile = useIsMobile();
 
   // Update search query when URL params change
   useEffect(() => {
@@ -102,32 +104,48 @@ const Search: React.FC = () => {
 
   return (
     <div className="w-full bg-gray-50 min-h-screen">
-      {/* Full-width Hero Search Section */}
+      {/* Full-width Hero Search Section - responsive */}
       <div className="w-full bg-white border-b">
-        <div className="w-full px-0">
-          <div className="max-w-4xl mx-auto px-6 py-16 text-center">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">
+        <div className="w-full">
+          <div className={`max-w-4xl mx-auto text-center ${
+            isMobile ? 'px-4 py-8' : 'px-6 py-16'
+          }`}>
+            <h1 className={`font-bold tracking-tight text-gray-900 mb-4 ${
+              isMobile ? 'text-2xl' : 'text-4xl'
+            }`}>
               Discover Amazing Events
             </h1>
-            <p className="text-xl text-gray-600 mb-8">
+            <p className={`text-gray-600 mb-6 ${
+              isMobile ? 'text-base mb-6' : 'text-xl mb-8'
+            }`}>
               Search for events, venues, and experiences in your area
             </p>
             
-            {/* Large Search Form */}
+            {/* Large Search Form - responsive */}
             <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
               <div className="relative">
-                <SearchIcon className="absolute left-6 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
+                <SearchIcon className={`absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 ${
+                  isMobile ? 'h-5 w-5 left-3' : 'h-6 w-6 left-6'
+                }`} />
                 <Input
                   type="text"
                   placeholder="Search events, venues, plans..."
                   value={searchQuery}
                   onChange={handleInputChange}
-                  className="pl-16 pr-32 py-6 text-lg rounded-full border-2 border-gray-200 focus:border-blue-500 shadow-lg"
+                  className={`border-2 border-gray-200 focus:border-blue-500 shadow-lg ${
+                    isMobile 
+                      ? 'pl-10 pr-20 py-3 text-base rounded-lg' 
+                      : 'pl-16 pr-32 py-6 text-lg rounded-full'
+                  }`}
                 />
                 <Button 
                   type="submit" 
-                  size="lg"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full px-8"
+                  size={isMobile ? "default" : "lg"}
+                  className={`absolute top-1/2 transform -translate-y-1/2 ${
+                    isMobile 
+                      ? 'right-1 rounded-md px-4' 
+                      : 'right-2 rounded-full px-8'
+                  }`}
                 >
                   Search
                 </Button>
@@ -136,7 +154,9 @@ const Search: React.FC = () => {
 
             {/* Search suggestions */}
             {!submittedQuery && (
-              <div className="mt-8 text-sm text-gray-500">
+              <div className={`text-gray-500 ${
+                isMobile ? 'mt-4 text-sm' : 'mt-8 text-sm'
+              }`}>
                 <p>Try searching for "yoga", "music", "beach", or "festival"</p>
               </div>
             )}
@@ -144,16 +164,22 @@ const Search: React.FC = () => {
         </div>
       </div>
 
-      {/* Search Results Section */}
+      {/* Search Results Section - responsive */}
       {submittedQuery && (
-        <div className="w-full px-0">
-          <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className="w-full">
+          <div className={`max-w-6xl mx-auto ${
+            isMobile ? 'px-4 py-6' : 'px-6 py-8'
+          }`}>
             <div className="mb-6">
-              <h2 className="text-2xl font-semibold text-gray-900">
+              <h2 className={`font-semibold text-gray-900 ${
+                isMobile ? 'text-xl' : 'text-2xl'
+              }`}>
                 Search Results for "{submittedQuery}"
               </h2>
               {searchResults && (
-                <p className="text-gray-600 mt-1">
+                <p className={`text-gray-600 mt-1 ${
+                  isMobile ? 'text-sm' : 'text-base'
+                }`}>
                   {totalResults} {totalResults === 1 ? 'result' : 'results'} found
                 </p>
               )}
@@ -164,7 +190,7 @@ const Search: React.FC = () => {
 
             {/* Error State */}
             {error && (
-              <div className="text-center py-12">
+              <div className={`text-center ${isMobile ? 'py-8' : 'py-12'}`}>
                 <p className="text-red-600">
                   Something went wrong while searching. Please try again.
                 </p>
@@ -174,8 +200,14 @@ const Search: React.FC = () => {
             {/* Exact Results */}
             {searchResults?.events && searchResults.events.length > 0 && (
               <div className="mb-8">
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">Exact Matches</h3>
-                <div className="grid gap-4">
+                <h3 className={`font-semibold text-gray-900 mb-4 ${
+                  isMobile ? 'text-lg' : 'text-xl'
+                }`}>
+                  Exact Matches
+                </h3>
+                <div className={`grid gap-4 ${
+                  isMobile ? 'grid-cols-1' : 'grid-cols-1'
+                }`}>
                   {searchResults.events.map((event) => (
                     <EventCardList
                       key={event.id}
@@ -191,10 +223,14 @@ const Search: React.FC = () => {
             {/* Similar Results */}
             {searchResults?.similarEvents && searchResults.similarEvents.length > 0 && (
               <div className="mb-8">
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                <h3 className={`font-semibold text-gray-900 mb-4 ${
+                  isMobile ? 'text-lg' : 'text-xl'
+                }`}>
                   {searchResults.events?.length > 0 ? 'Similar Events' : 'Similar Results'}
                 </h3>
-                <div className="grid gap-4">
+                <div className={`grid gap-4 ${
+                  isMobile ? 'grid-cols-1' : 'grid-cols-1'
+                }`}>
                   {searchResults.similarEvents.map((event) => (
                     <EventCardList
                       key={event.id}

@@ -22,7 +22,12 @@ const Layout = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
-  const [socialSidebarVisible, setSocialSidebarVisible] = useState(true);
+  const [socialSidebarVisible, setSocialSidebarVisible] = useState(!isMobile);
+
+  // Update social sidebar visibility based on mobile state
+  useEffect(() => {
+    setSocialSidebarVisible(!isMobile);
+  }, [isMobile]);
 
   // Define which routes should be accessible without authentication
   const publicRoutes = ['/', '/events', '/casual-plans', '/search', '/privacy', '/terms', '/cookies'];
@@ -113,39 +118,41 @@ const Layout = () => {
   });
 
   return (
-    <div className="min-h-screen bg-white w-full">
-      {/* Full-width top navigation */}
+    <div className="min-h-screen bg-white w-full overflow-x-hidden">
+      {/* Full-width top navigation - responsive height */}
       <div className="w-full">
         <MainNav />
       </div>
       
-      <div className="flex w-full">
-        {/* Left sidebar - fixed, always visible on desktop */}
+      <div className="flex w-full min-h-screen">
+        {/* Left sidebar - hidden on mobile, fixed on desktop */}
         {!isMobile && (
           <div className="fixed left-0 top-16 bottom-0 w-20 bg-white border-r border-gray-200 z-30">
             <LeftSidebar />
           </div>
         )}
         
-        {/* Main content area - properly positioned between sidebars */}
+        {/* Main content area - responsive margins and padding */}
         <div 
-          className={`flex-1 w-full ${
-            isMobile ? 'pt-[104px]' : 'pt-16 ml-20'
+          className={`flex-1 w-full min-h-screen ${
+            isMobile 
+              ? 'pt-[104px] pb-20' // Mobile: account for nav + bottom nav
+              : 'pt-16 ml-20' // Desktop: account for top nav + left sidebar
           } ${
             !isMobile && socialSidebarVisible ? 'mr-64' : ''
           }`}
         >
-          <main className="bg-white w-full min-h-screen">
+          <main className="bg-white w-full min-h-full">
             <Outlet context={{ onEventSelect: handleEventSelect, selectedEventId }} />
           </main>
           
-          {/* Footer */}
-          <Footer />
+          {/* Footer - only on desktop */}
+          {!isMobile && <Footer />}
         </div>
         
-        {/* Social sidebar - fixed on the right, positioned below top nav */}
+        {/* Social sidebar - desktop only */}
         {!isMobile && (
-          <div className={`fixed right-0 top-16 bottom-0 ${socialSidebarVisible ? 'w-64' : 'w-0'} z-30 transition-all duration-300`}>
+          <div className={`fixed right-0 top-16 bottom-0 ${socialSidebarVisible ? 'w-64' : 'w-0'} z-30 transition-all duration-300 overflow-hidden`}>
             <SocialSidebar 
               visible={socialSidebarVisible}
               onToggleVisibility={() => setSocialSidebarVisible(!socialSidebarVisible)}
@@ -157,21 +164,25 @@ const Layout = () => {
       {/* Event Side Panel - ONLY for /events page on desktop */}
       {selectedEventId && location.pathname === '/events' && !isMobile && (
         <div 
-          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
           style={{ 
             top: '64px',
             bottom: '0',
             left: '80px',
             right: socialSidebarVisible ? '256px' : '0'
           }}
+          onClick={() => handleEventSelect(null)}
         >
-          <div className="w-full h-full flex items-center justify-center p-6">
-            <div className="bg-white rounded-xl w-full max-w-5xl h-[90%] overflow-hidden relative shadow-2xl">
+          <div className="w-full h-full flex items-center justify-center p-4 md:p-6">
+            <div 
+              className="bg-white rounded-xl w-full max-w-4xl h-[85vh] md:h-[90vh] overflow-hidden relative shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
               <button
                 onClick={() => handleEventSelect(null)}
-                className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-white transition-colors"
+                className="absolute top-3 right-3 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white transition-colors"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -186,21 +197,31 @@ const Layout = () => {
       {/* Global Event Detail Overlay - for pages OTHER than /events and NOT for URL-based event pages */}
       {globalEventOverlay && location.pathname !== '/events' && !isEventDetailPage && (
         <div 
-          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+          className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm ${
+            isMobile ? 'p-2' : 'p-6'
+          }`}
           style={{ 
-            top: '64px',
-            bottom: '0',
+            top: isMobile ? '104px' : '64px',
+            bottom: isMobile ? '80px' : '0',
             left: isMobile ? '0' : '80px',
             right: isMobile ? '0' : (socialSidebarVisible ? '256px' : '0')
           }}
+          onClick={handleCloseGlobalOverlay}
         >
-          <div className="w-full h-full flex items-center justify-center p-6">
-            <div className="bg-white rounded-xl w-full max-w-5xl h-[90%] overflow-hidden relative shadow-2xl">
+          <div className="w-full h-full flex items-center justify-center">
+            <div 
+              className={`bg-white rounded-xl w-full overflow-hidden relative shadow-2xl ${
+                isMobile 
+                  ? 'h-full max-w-full rounded-lg' 
+                  : 'max-w-4xl h-[85vh] md:h-[90vh]'
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
               <button
                 onClick={handleCloseGlobalOverlay}
-                className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-white transition-colors"
+                className="absolute top-3 right-3 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white transition-colors"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -216,7 +237,7 @@ const Layout = () => {
       {selectedEventId && location.pathname === '/events' && isMobile && (
         <div className="fixed inset-0 z-50 bg-white" style={{ top: '104px', bottom: '80px' }}>
           <div className="h-full flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b bg-white">
+            <div className="flex items-center justify-between p-4 border-b bg-white sticky top-0 z-10">
               <h2 className="font-semibold text-lg">Event Details</h2>
               <button
                 onClick={() => handleEventSelect(null)}
@@ -237,21 +258,29 @@ const Layout = () => {
       {/* URL-based Event Detail Overlay - only show if we're on an event detail URL and NOT on /events page */}
       {isEventDetailPage && location.pathname !== '/events' && !globalEventOverlay && (
         <div 
-          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+          className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm ${
+            isMobile ? 'p-2' : 'p-6'
+          }`}
           style={{ 
-            top: '64px',
-            bottom: '0',
+            top: isMobile ? '104px' : '64px',
+            bottom: isMobile ? '80px' : '0',
             left: isMobile ? '0' : '80px',
             right: isMobile ? '0' : (socialSidebarVisible ? '256px' : '0')
           }}
         >
-          <div className="w-full h-full flex items-center justify-center p-6">
-            <div className="bg-white rounded-xl w-full max-w-5xl h-[90%] overflow-hidden relative shadow-2xl">
+          <div className="w-full h-full flex items-center justify-center">
+            <div 
+              className={`bg-white rounded-xl w-full overflow-hidden relative shadow-2xl ${
+                isMobile 
+                  ? 'h-full max-w-full rounded-lg' 
+                  : 'max-w-4xl h-[85vh] md:h-[90vh]'
+              }`}
+            >
               <button
                 onClick={() => navigate(-1)}
-                className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-white transition-colors"
+                className="absolute top-3 right-3 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white transition-colors"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -263,45 +292,45 @@ const Layout = () => {
         </div>
       )}
 
-      {/* Mobile Navigation - sticky bottom navigation */}
+      {/* Mobile Navigation - responsive positioning */}
       {isMobile && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40">
-          <div className="flex items-center justify-around py-2">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40 safe-area-pb">
+          <div className="flex items-center justify-around py-2 px-1">
             <Link
               to="/search"
-              className={`flex flex-col items-center p-2 ${
+              className={`flex flex-col items-center p-2 min-w-0 flex-1 ${
                 location.pathname === '/search' ? 'text-blue-600' : 'text-gray-600'
               }`}
             >
-              <Search className="h-5 w-5" />
-              <span className="text-xs mt-1">Search</span>
+              <Search className="h-5 w-5 mb-1" />
+              <span className="text-xs font-medium truncate">Search</span>
             </Link>
             <Link
               to="/events"
-              className={`flex flex-col items-center p-2 ${
+              className={`flex flex-col items-center p-2 min-w-0 flex-1 ${
                 location.pathname === '/events' ? 'text-blue-600' : 'text-gray-600'
               }`}
             >
-              <Calendar className="h-5 w-5" />
-              <span className="text-xs mt-1">Events</span>
+              <Calendar className="h-5 w-5 mb-1" />
+              <span className="text-xs font-medium truncate">Events</span>
             </Link>
             <Link
               to="/casual-plans"
-              className={`flex flex-col items-center p-2 ${
+              className={`flex flex-col items-center p-2 min-w-0 flex-1 ${
                 location.pathname === '/casual-plans' ? 'text-blue-600' : 'text-gray-600'
               }`}
             >
-              <Coffee className="h-5 w-5" />
-              <span className="text-xs mt-1">Plans</span>
+              <Coffee className="h-5 w-5 mb-1" />
+              <span className="text-xs font-medium truncate">Plans</span>
             </Link>
             <Link
               to="/friends"
-              className={`flex flex-col items-center p-2 ${
+              className={`flex flex-col items-center p-2 min-w-0 flex-1 ${
                 location.pathname === '/friends' ? 'text-blue-600' : 'text-gray-600'
               }`}
             >
-              <Users className="h-5 w-5" />
-              <span className="text-xs mt-1">Friends</span>
+              <Users className="h-5 w-5 mb-1" />
+              <span className="text-xs font-medium truncate">Friends</span>
             </Link>
           </div>
         </div>
@@ -323,9 +352,9 @@ const EventDetailOverlay: React.FC<{ eventId: string }> = ({ eventId }) => {
 
   if (isLoading) {
     return (
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         <div className="animate-pulse">
-          <div className="h-64 bg-gray-200 rounded mb-6"></div>
+          <div className="h-48 md:h-64 bg-gray-200 rounded mb-6"></div>
           <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
           <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
           <div className="h-4 bg-gray-200 rounded w-1/3"></div>
@@ -336,9 +365,9 @@ const EventDetailOverlay: React.FC<{ eventId: string }> = ({ eventId }) => {
 
   if (!event) {
     return (
-      <div className="p-6 text-center">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
-        <p className="text-gray-600">The event you're looking for doesn't exist or has been removed.</p>
+      <div className="p-4 md:p-6 text-center">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
+        <p className="text-gray-600 text-sm md:text-base">The event you're looking for doesn't exist or has been removed.</p>
       </div>
     );
   }
@@ -351,7 +380,7 @@ const EventDetailOverlay: React.FC<{ eventId: string }> = ({ eventId }) => {
         title={event.title}
         showTitleOverlay={false}
       />
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         <EventDetailContent 
           event={event}
           isOwner={false}
