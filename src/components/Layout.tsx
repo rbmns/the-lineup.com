@@ -7,7 +7,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { CookieConsent } from "@/components/CookieConsent";
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { SocialSidebar } from "@/components/social/SocialSidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { EventDetailContent } from "@/components/events/EventDetailContent";
 import { EventDetailHeader } from "@/components/events/EventDetailHeader";
@@ -20,12 +19,6 @@ const Layout = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
-  const [socialSidebarVisible, setSocialSidebarVisible] = useState(!isMobile);
-
-  // Update social sidebar visibility based on mobile state
-  useEffect(() => {
-    setSocialSidebarVisible(!isMobile);
-  }, [isMobile]);
 
   // Check if we're on an event detail page
   const isEventDetailPage = location.pathname.startsWith('/events/') && location.pathname !== '/events';
@@ -93,20 +86,19 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-white w-full overflow-x-hidden">
-      {/* Full-width top navigation - ALWAYS VISIBLE */}
-      <div className="w-full">
-        <MainNav />
-      </div>
+      {/* Fixed Navigation - Always at top */}
+      <MainNav />
       
+      {/* Main Layout Container */}
       <div className="flex w-full min-h-screen">
-        {/* Left sidebar - hidden on mobile, fixed on desktop */}
+        {/* Left sidebar - Desktop only */}
         {!isMobile && (
           <div className="fixed left-0 top-16 bottom-0 w-20 bg-white border-r border-gray-200 z-30">
             <LeftSidebar />
           </div>
         )}
         
-        {/* Main content area - full width responsive */}
+        {/* Main Content Area - Always in middle */}
         <div 
           className={`flex-1 w-full min-h-screen ${
             isMobile 
@@ -118,143 +110,46 @@ const Layout = () => {
             <Outlet context={{ onEventSelect: handleEventSelect, selectedEventId }} />
           </main>
           
-          {/* Footer - only on desktop */}
+          {/* Footer - Desktop only */}
           {!isMobile && <Footer />}
         </div>
       </div>
 
+      {/* Event Overlays */}
       {/* Event Side Panel - ONLY for /events page on desktop */}
       {selectedEventId && location.pathname === '/events' && !isMobile && (
-        <div 
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
-          style={{ 
-            top: '64px',
-            bottom: '0',
-            left: '80px',
-            right: '0'
-          }}
-          onClick={() => handleEventSelect(null)}
-        >
-          <div className="w-full h-full flex items-center justify-center p-6">
-            <div 
-              className="bg-white rounded-xl w-full max-w-4xl h-[90vh] overflow-hidden relative shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={() => handleEventSelect(null)}
-                className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white transition-colors"
-              >
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <div className="h-full overflow-y-auto">
-                <EventDetailOverlay eventId={selectedEventId} />
-              </div>
-            </div>
-          </div>
-        </div>
+        <EventSidePanel 
+          eventId={selectedEventId}
+          onClose={() => handleEventSelect(null)}
+        />
       )}
 
       {/* Global Event Detail Overlay - for pages OTHER than /events and event detail pages */}
       {globalEventOverlay && location.pathname !== '/events' && !isEventDetailPage && (
-        <div 
-          className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm ${
-            isMobile ? 'p-2' : 'p-6'
-          }`}
-          style={{ 
-            top: isMobile ? '64px' : '64px',
-            bottom: isMobile ? '80px' : '0',
-            left: isMobile ? '0' : '80px',
-            right: '0'
-          }}
-          onClick={handleCloseGlobalOverlay}
-        >
-          <div className="w-full h-full flex items-center justify-center">
-            <div 
-              className={`bg-white rounded-xl w-full overflow-hidden relative shadow-2xl ${
-                isMobile 
-                  ? 'h-full max-w-full rounded-lg' 
-                  : 'max-w-4xl h-[90vh]'
-              }`}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={handleCloseGlobalOverlay}
-                className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white transition-colors"
-              >
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <div className="h-full overflow-y-auto">
-                <EventDetailOverlay eventId={globalEventOverlay} />
-              </div>
-            </div>
-          </div>
-        </div>
+        <GlobalEventOverlay 
+          eventId={globalEventOverlay}
+          onClose={handleCloseGlobalOverlay}
+          isMobile={isMobile}
+        />
       )}
 
       {/* Mobile Event Detail Overlay for /events page */}
       {selectedEventId && location.pathname === '/events' && isMobile && (
-        <div className="fixed inset-0 z-50 bg-white" style={{ top: '64px', bottom: '80px' }}>
-          <div className="h-full flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b bg-white sticky top-0 z-10">
-              <h2 className="font-semibold text-lg">Event Details</h2>
-              <button
-                onClick={() => handleEventSelect(null)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto">
-              <EventDetailOverlay eventId={selectedEventId} />
-            </div>
-          </div>
-        </div>
+        <MobileEventOverlay 
+          eventId={selectedEventId}
+          onClose={() => handleEventSelect(null)}
+        />
       )}
 
       {/* URL-based Event Detail Overlay - only show if we're on an event detail URL */}
       {isEventDetailPage && location.pathname !== '/events' && !globalEventOverlay && (
-        <div 
-          className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm ${
-            isMobile ? 'p-2' : 'p-6'
-          }`}
-          style={{ 
-            top: isMobile ? '64px' : '64px',
-            bottom: isMobile ? '80px' : '0',
-            left: isMobile ? '0' : '80px',
-            right: '0'
-          }}
-        >
-          <div className="w-full h-full flex items-center justify-center">
-            <div 
-              className={`bg-white rounded-xl w-full overflow-hidden relative shadow-2xl ${
-                isMobile 
-                  ? 'h-full max-w-full rounded-lg' 
-                  : 'max-w-4xl h-[90vh]'
-              }`}
-            >
-              <button
-                onClick={() => navigate(-1)}
-                className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white transition-colors"
-              >
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <div className="h-full overflow-y-auto">
-                <Outlet />
-              </div>
-            </div>
-          </div>
-        </div>
+        <URLEventOverlay 
+          onClose={() => navigate(-1)}
+          isMobile={isMobile}
+        />
       )}
 
-      {/* Mobile Navigation - Fixed to bottom, always visible */}
+      {/* Mobile Navigation - Fixed to bottom */}
       {isMobile && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-pb">
           <LeftSidebar />
@@ -266,6 +161,137 @@ const Layout = () => {
     </div>
   );
 };
+
+// Event Side Panel Component for /events page on desktop
+const EventSidePanel: React.FC<{ eventId: string; onClose: () => void }> = ({ eventId, onClose }) => (
+  <div 
+    className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+    style={{ 
+      top: '64px',
+      bottom: '0',
+      left: '80px',
+      right: '0'
+    }}
+    onClick={onClose}
+  >
+    <div className="w-full h-full flex items-center justify-center p-6">
+      <div 
+        className="bg-white rounded-xl w-full max-w-4xl h-[90vh] overflow-hidden relative shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white transition-colors"
+        >
+          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <div className="h-full overflow-y-auto">
+          <EventDetailOverlay eventId={eventId} />
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Global Event Overlay Component for other pages
+const GlobalEventOverlay: React.FC<{ eventId: string; onClose: () => void; isMobile: boolean }> = ({ eventId, onClose, isMobile }) => (
+  <div 
+    className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm ${
+      isMobile ? 'p-2' : 'p-6'
+    }`}
+    style={{ 
+      top: isMobile ? '64px' : '64px',
+      bottom: isMobile ? '80px' : '0',
+      left: isMobile ? '0' : '80px',
+      right: '0'
+    }}
+    onClick={onClose}
+  >
+    <div className="w-full h-full flex items-center justify-center">
+      <div 
+        className={`bg-white rounded-xl w-full overflow-hidden relative shadow-2xl ${
+          isMobile 
+            ? 'h-full max-w-full rounded-lg' 
+            : 'max-w-4xl h-[90vh]'
+        }`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white transition-colors"
+        >
+          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <div className="h-full overflow-y-auto">
+          <EventDetailOverlay eventId={eventId} />
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Mobile Event Overlay Component for /events page
+const MobileEventOverlay: React.FC<{ eventId: string; onClose: () => void }> = ({ eventId, onClose }) => (
+  <div className="fixed inset-0 z-50 bg-white" style={{ top: '64px', bottom: '80px' }}>
+    <div className="h-full flex flex-col">
+      <div className="flex items-center justify-between p-4 border-b bg-white sticky top-0 z-10">
+        <h2 className="font-semibold text-lg">Event Details</h2>
+        <button
+          onClick={onClose}
+          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div className="flex-1 overflow-y-auto">
+        <EventDetailOverlay eventId={eventId} />
+      </div>
+    </div>
+  </div>
+);
+
+// URL Event Overlay Component for event detail URLs
+const URLEventOverlay: React.FC<{ onClose: () => void; isMobile: boolean }> = ({ onClose, isMobile }) => (
+  <div 
+    className={`fixed inset-0 z-40 bg-black/50 backdrop-blur-sm ${
+      isMobile ? 'p-2' : 'p-6'
+    }`}
+    style={{ 
+      top: isMobile ? '64px' : '64px',
+      bottom: isMobile ? '80px' : '0',
+      left: isMobile ? '0' : '80px',
+      right: '0'
+    }}
+  >
+    <div className="w-full h-full flex items-center justify-center">
+      <div 
+        className={`bg-white rounded-xl w-full overflow-hidden relative shadow-2xl ${
+          isMobile 
+            ? 'h-full max-w-full rounded-lg' 
+            : 'max-w-4xl h-[90vh]'
+        }`}
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-white transition-colors"
+        >
+          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <div className="h-full overflow-y-auto">
+          <Outlet />
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 // Component for event detail overlay - consistent across all pages
 const EventDetailOverlay: React.FC<{ eventId: string }> = ({ eventId }) => {
