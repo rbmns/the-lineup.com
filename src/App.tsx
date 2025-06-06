@@ -15,6 +15,7 @@ const CasualPlans = lazy(() => import("./pages/CasualPlans"));
 const Friends = lazy(() => import("./pages/Friends"));
 const Search = lazy(() => import("./pages/Search"));
 const Login = lazy(() => import("./pages/Login"));
+const EventDetail = lazy(() => import("./pages/EventDetail"));
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ function App() {
                     <Route path="/" element={<Layout />}>
                       <Route index element={<LandingPage />} />
                       <Route path="events" element={<Events />} />
+                      <Route path="events/:id" element={<EventDetail />} />
                       <Route path="casual-plans" element={<CasualPlans />} />
                       <Route path="friends" element={<Friends />} />
                       <Route path="search" element={<Search />} />
