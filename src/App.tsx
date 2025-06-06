@@ -1,5 +1,5 @@
 
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { HelmetProvider } from 'react-helmet-async';
@@ -26,28 +26,30 @@ function App() {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <Routes>
-            {/* Auth routes - standalone without Layout */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            
-            {/* Main app routes with Layout */}
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="events" element={<Events />} />
-              <Route path="events/:id" element={<EventDetail />} />
-              <Route path="casual-plans" element={<CasualPlans />} />
-              <Route path="friends" element={<Friends />} />
-              <Route path="privacy" element={<PrivacyPolicy />} />
-              <Route path="terms" element={<TermsOfService />} />
-              <Route path="cookies" element={<CookiePolicy />} />
-            </Route>
-            
-            {/* Redirect any unknown routes to home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          <BrowserRouter>
+            <Routes>
+              {/* Auth routes - standalone without Layout */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              
+              {/* Main app routes with Layout */}
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Home />} />
+                <Route path="events" element={<Events />} />
+                <Route path="events/:id" element={<EventDetail />} />
+                <Route path="casual-plans" element={<CasualPlans />} />
+                <Route path="friends" element={<Friends />} />
+                <Route path="privacy" element={<PrivacyPolicy />} />
+                <Route path="terms" element={<TermsOfService />} />
+                <Route path="cookies" element={<CookiePolicy />} />
+              </Route>
+              
+              {/* Redirect any unknown routes to home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </BrowserRouter>
           <Toaster />
         </AuthProvider>
       </QueryClientProvider>
