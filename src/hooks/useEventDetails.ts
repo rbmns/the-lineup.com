@@ -54,6 +54,8 @@ export const useEventDetails = (eventId: string | null) => {
         ...data,
         // Map creator profile properly
         creator: data.profiles || null,
+        // Transform tags from string to string array
+        tags: data.tags ? data.tags.split(',').map(tag => tag.trim()).filter(Boolean) : [],
         // Calculate attendees from event_rsvps
         attendees: {
           going: data.event_rsvps?.filter(rsvp => rsvp.status === 'Going').length || 0,
