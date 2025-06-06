@@ -127,7 +127,7 @@ const Layout = () => {
           </div>
         )}
         
-        {/* Main content area - full width between sidebars, no padding */}
+        {/* Main content area - properly positioned between sidebars */}
         <div 
           className={`flex-1 w-full ${
             isMobile ? 'pt-[104px]' : 'pt-16 ml-20'
@@ -135,7 +135,7 @@ const Layout = () => {
             !isMobile && socialSidebarVisible ? 'mr-64' : ''
           }`}
         >
-          <main className="bg-white w-full">
+          <main className="bg-white w-full min-h-screen">
             <Outlet context={{ onEventSelect: handleEventSelect, selectedEventId }} />
           </main>
           
@@ -145,7 +145,7 @@ const Layout = () => {
         
         {/* Social sidebar - fixed on the right, positioned below top nav */}
         {!isMobile && (
-          <div className={`fixed right-0 top-16 bottom-0 ${socialSidebarVisible ? 'w-64' : 'w-0'} z-30`}>
+          <div className={`fixed right-0 top-16 bottom-0 ${socialSidebarVisible ? 'w-64' : 'w-0'} z-30 transition-all duration-300`}>
             <SocialSidebar 
               visible={socialSidebarVisible}
               onToggleVisibility={() => setSocialSidebarVisible(!socialSidebarVisible)}
@@ -165,18 +165,17 @@ const Layout = () => {
             right: socialSidebarVisible ? '256px' : '0'
           }}
         >
-          <div className="w-full h-full flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl w-full max-w-4xl h-[95%] overflow-hidden relative shadow-2xl">
+          <div className="w-full h-full flex items-center justify-center p-6">
+            <div className="bg-white rounded-xl w-full max-w-5xl h-[90%] overflow-hidden relative shadow-2xl">
               <button
                 onClick={() => handleEventSelect(null)}
-                className="absolute top-6 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
+                className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-white transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
               <div className="h-full overflow-y-auto">
-                {/* Use proper event detail components */}
                 <EventDetailOverlay eventId={selectedEventId} />
               </div>
             </div>
@@ -195,18 +194,17 @@ const Layout = () => {
             right: isMobile ? '0' : (socialSidebarVisible ? '256px' : '0')
           }}
         >
-          <div className="w-full h-full flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl w-full max-w-4xl h-[95%] overflow-hidden relative shadow-2xl">
+          <div className="w-full h-full flex items-center justify-center p-6">
+            <div className="bg-white rounded-xl w-full max-w-5xl h-[90%] overflow-hidden relative shadow-2xl">
               <button
                 onClick={handleCloseGlobalOverlay}
-                className="absolute top-6 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
+                className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-white transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
               <div className="h-full overflow-y-auto">
-                {/* Use proper event detail components */}
                 <EventDetailOverlay eventId={globalEventOverlay} />
               </div>
             </div>
@@ -247,11 +245,11 @@ const Layout = () => {
             right: isMobile ? '0' : (socialSidebarVisible ? '256px' : '0')
           }}
         >
-          <div className="w-full h-full flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl w-full max-w-4xl h-[95%] overflow-hidden relative shadow-2xl">
+          <div className="w-full h-full flex items-center justify-center p-6">
+            <div className="bg-white rounded-xl w-full max-w-5xl h-[90%] overflow-hidden relative shadow-2xl">
               <button
                 onClick={() => navigate(-1)}
-                className="absolute top-6 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
+                className="absolute top-4 right-4 z-50 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg hover:bg-white transition-colors"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
