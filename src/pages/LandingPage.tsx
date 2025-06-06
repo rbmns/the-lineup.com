@@ -15,6 +15,7 @@ import { Event } from '@/types';
 import { useEventCategories } from '@/hooks/home/useEventCategories';
 import { formatFeaturedDate, formatEventTime } from '@/utils/date-formatting';
 import { CasualPlansHomeSection } from '@/components/home/CasualPlansHomeSection';
+import { LineupImage } from '@/components/ui/lineup-image';
 
 const LandingPage = () => {
   const { isAuthenticated } = useAuth();
@@ -185,13 +186,15 @@ const LandingPage = () => {
                 >
                   <Card className="overflow-hidden hover:shadow-lg transition-shadow">
                     <div className="relative">
-                      <img 
-                        src={event.image_urls && event.image_urls.length > 0 ? event.image_urls[0] : getEventImageUrl(event)} 
-                        alt={event.title} 
-                        className="w-full h-48 object-cover" 
+                      <LineupImage
+                        src={event.image_urls && event.image_urls.length > 0 ? event.image_urls[0] : getEventImageUrl(event)}
+                        alt={event.title}
+                        aspectRatio="video"
+                        overlayVariant="ocean"
+                        className="h-48"
                       />
                       {event.event_category && (
-                        <div className="absolute top-3 left-3">
+                        <div className="absolute top-3 left-3 z-30">
                           <CategoryPill 
                             category={event.event_category} 
                             active={true}

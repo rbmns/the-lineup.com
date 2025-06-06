@@ -9,6 +9,7 @@ import { useEventImages } from '@/hooks/useEventImages';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { toast } from '@/hooks/use-toast';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
+import { LineupImage } from '@/components/ui/lineup-image';
 
 interface EventCardListProps {
   event: Event;
@@ -96,14 +97,24 @@ const EventCardList: React.FC<EventCardListProps> = ({
     >
       {/* Image with event type pill */}
       <div className="relative h-[100px] sm:h-auto sm:w-[120px] overflow-hidden bg-gray-100 flex-shrink-0">
-        <img 
-          src={imageUrl} 
+        <LineupImage
+          src={imageUrl}
           alt={event.title}
-          className="h-full w-full object-cover"
+          aspectRatio="square"
+          overlayVariant="ocean"
+          className="h-full w-full"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            if (!target.src.includes('/img/default.jpg')) {
+              console.log('Image failed to load, using default');
+              target.src = "/img/default.jpg";
+            }
+          }}
         />
+        
         {/* Event category pill - UPDATED to not show icons */}
         {event.event_category && (
-          <div className="absolute top-2 left-2">
+          <div className="absolute top-2 left-2 z-30">
             <CategoryPill 
               category={event.event_category} 
               size="xs" 

@@ -8,6 +8,7 @@ import { useEventImages } from '@/hooks/useEventImages';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { formatDate, formatEventTime, AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
+import { LineupImage } from '@/components/ui/lineup-image';
 
 export interface EventCardProps {
   event: Event;
@@ -93,16 +94,24 @@ const EventCard: React.FC<EventCardProps> = ({
       data-event-id={event.id}
     >
       {/* Image container with event type label positioned on top - smaller image */}
-      <div className="aspect-[16/10] relative overflow-hidden">
-        <img
+      <div className="relative">
+        <LineupImage
           src={imageUrl}
           alt={event.title}
-          className="h-full w-full object-cover transition-transform group-hover:scale-105 duration-300"
+          aspectRatio="video"
+          overlayVariant="ocean"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            if (!target.src.includes('/img/default.jpg')) {
+              console.log('Image failed to load, using default');
+              target.src = "/img/default.jpg";
+            }
+          }}
         />
         
         {/* Event category pill - UPDATED to not show icons */}
         {event.event_category && (
-          <div className="absolute top-3 left-3 z-10">
+          <div className="absolute top-3 left-3 z-30">
             <CategoryPill 
               category={event.event_category} 
               size="default" 
