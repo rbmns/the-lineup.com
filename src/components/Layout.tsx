@@ -12,6 +12,7 @@ import { SocialSidebar } from "@/components/social/SocialSidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Search, Calendar, Coffee, Users } from 'lucide-react';
 import EventDetail from "@/pages/EventDetail";
+import type { CSSProperties } from 'react';
 
 const Layout = () => {
   const { user, loading } = useAuth();
@@ -103,9 +104,9 @@ const Layout = () => {
   }, [user, loading, navigate, location, isPublicRoute]);
 
   // Calculate main content width based on sidebar visibility
-  const getMainContentStyle = () => {
+  const getMainContentStyle = (): CSSProperties => {
     if (isMobile) {
-      return "flex-1";
+      return {};
     }
     
     const leftSidebarWidth = 80; // 20rem = 80 in width units
@@ -128,7 +129,7 @@ const Layout = () => {
         {/* Main content area */}
         <div 
           className={isMobile ? "flex-1 overflow-hidden relative" : "overflow-hidden relative"}
-          style={!isMobile ? getMainContentStyle() : undefined}
+          style={getMainContentStyle()}
         >
           <main className="h-full overflow-y-auto bg-white">
             <Outlet context={{ onEventSelect: handleEventSelect, selectedEventId }} />
