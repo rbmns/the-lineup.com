@@ -94,7 +94,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
                         </Badge>
                       </div>
                       <div className="space-y-2">
-                        {attendees.going.slice(0, 5).map((attendee) => (
+                        {attendees.going.slice(0, 5).map((attendee: any) => (
                           <div key={attendee.id} className="flex items-center gap-3">
                             <Avatar className="w-8 h-8">
                               <AvatarImage 
@@ -134,7 +134,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
                         </Badge>
                       </div>
                       <div className="space-y-2">
-                        {attendees.interested.slice(0, 3).map((attendee) => (
+                        {attendees.interested.slice(0, 3).map((attendee: any) => (
                           <div key={attendee.id} className="flex items-center gap-3">
                             <Avatar className="w-8 h-8">
                               <AvatarImage 
