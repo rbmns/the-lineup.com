@@ -3,7 +3,7 @@ import React from 'react';
 import { useEventDetails } from '@/hooks/useEventDetails';
 import { useRsvpActions } from '@/hooks/useRsvpActions';
 import { useAuth } from '@/contexts/AuthContext';
-import { X, Calendar, MapPin, Users, Ticket, Globe, CalendarClock } from 'lucide-react';
+import { X, Calendar, MapPin, Ticket, Globe, CalendarClock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CategoryPill } from '@/components/ui/category-pill';
@@ -54,16 +54,16 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
         onClick={onClose}
       />
       
-      {/* Side panel - positioned as a middle column */}
+      {/* Side panel - overlay positioned over main content */}
       <div
         className={cn(
-          "fixed right-0 top-16 bottom-0 w-full max-w-md bg-white shadow-xl z-50 transition-transform duration-300 overflow-y-auto",
-          "lg:relative lg:top-0 lg:shadow-lg lg:border-l lg:border-r",
+          "absolute right-4 top-4 bottom-4 w-full max-w-lg bg-white shadow-2xl z-50 transition-transform duration-300 overflow-y-auto rounded-lg border",
+          "lg:right-[330px]", // Account for social sidebar width
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b px-4 py-3 flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between z-10 rounded-t-lg">
           <h2 className="font-semibold text-lg">Event Details</h2>
           <Button
             variant="ghost"
@@ -76,7 +76,7 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
         </div>
 
         {/* Content */}
-        <div className="p-4 space-y-4">
+        <div className="p-6 space-y-6">
           {isLoading ? (
             <div className="space-y-4">
               <div className="h-48 bg-gray-200 rounded-lg animate-pulse" />
@@ -113,7 +113,7 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
               </div>
 
               {/* Event Info */}
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <h1 className="text-xl font-bold text-gray-900">{event.title}</h1>
                 
                 {/* Date & Time */}
@@ -265,29 +265,6 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
                     </CardContent>
                   </Card>
                 )}
-
-                {/* Attendees Info */}
-                <Card className="bg-gray-50">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Users className="h-4 w-4" />
-                      <span className="font-medium text-sm">Attendees</span>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-4 text-sm">
-                        <span className="font-medium">Going: {event.attendees?.going || 0}</span>
-                        <span className="font-medium">Interested: {event.attendees?.interested || 0}</span>
-                      </div>
-                      
-                      {!isAuthenticated && (
-                        <p className="text-xs text-gray-500 mt-2">
-                          Sign up to see who's attending and connect with other attendees
-                        </p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
             </>
           ) : null}

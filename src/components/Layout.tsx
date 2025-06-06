@@ -25,7 +25,7 @@ const Layout = () => {
   );
 
   // Check if we should show the side panel layout (on events and home pages)
-  const showSidePanelLayout = location.pathname === '/' || location.pathname === '/events';
+  const showSidePanelLayout = location.pathname === '/' || location.pathname === '/events' || location.pathname === '/friends';
 
   // Handle URL parameters for selected event
   useEffect(() => {
@@ -64,24 +64,24 @@ const Layout = () => {
       <div className="min-h-screen bg-background">
         <MainNav />
         <div className="flex h-[calc(100vh-64px)]">
-          {/* Main content area - takes remaining space */}
-          <div className="flex-1 overflow-hidden">
+          {/* Main content area - full width */}
+          <div className="flex-1 overflow-hidden relative">
             <main className="h-full overflow-y-auto">
               <Outlet context={{ onEventSelect: handleEventSelect, selectedEventId }} />
             </main>
+            
+            {/* Event side panel - overlay positioned over main content */}
+            {selectedEventId && (
+              <EventSidePanel
+                eventId={selectedEventId}
+                isOpen={!!selectedEventId}
+                onClose={() => handleEventSelect(null)}
+              />
+            )}
           </div>
           
-          {/* Event side panel - conditional, positioned between main content and social sidebar */}
-          {selectedEventId && (
-            <EventSidePanel
-              eventId={selectedEventId}
-              isOpen={!!selectedEventId}
-              onClose={() => handleEventSelect(null)}
-            />
-          )}
-          
-          {/* Social sidebar - always on the far right */}
-          <SocialSidebar />
+          {/* Social sidebar - always on the far right, contextual based on selected event */}
+          <SocialSidebar selectedEventId={selectedEventId} />
         </div>
         <Footer />
         <Toaster />
