@@ -32,7 +32,22 @@ export const useEventDetails = (eventId: string | null) => {
         throw error;
       }
 
-      return data;
+      if (!data) return null;
+
+      // Transform the data to match the Event type
+      const transformedEvent: Event = {
+        ...data,
+        // Calculate attendees from event_rsvps
+        attendees: {
+          going: data.event_rsvps?.filter(rsvp => rsvp.status === 'Going').length || 0,
+          interested: data.event_rsvps?.filter(rsvp => rsvp.status === 'Interested').length || 0,
+        },
+        // Map other required fields
+        going_count: data.event_rsvps?.filter(rsvp => rsvp.status === 'Going').length || 0,
+        interested_count: data.event_rsvps?.filter(rsvp => rsvp.status === 'Interested').length || 0,
+      };
+
+      return transformedEvent;
     },
     enabled: !!eventId,
     staleTime: 5 * 60 * 1000, // 5 minutes

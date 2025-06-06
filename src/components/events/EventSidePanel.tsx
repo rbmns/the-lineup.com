@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useEventDetails } from '@/hooks/useEventDetails';
-import { useEventRSVP } from '@/hooks/useEventRSVP';
+import { useRsvpActions } from '@/hooks/useRsvpActions';
 import { useAuth } from '@/contexts/AuthContext';
 import { X, Calendar, MapPin, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,15 +23,15 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
   isOpen,
   onClose
 }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { data: event, isLoading, error } = useEventDetails(eventId);
-  const { handleRsvp, isLoading: rsvpLoading } = useEventRSVP();
+  const { handleRsvp, loading: rsvpLoading } = useRsvpActions(user?.id);
 
   const handleRsvpClick = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!event) return false;
     try {
-      await handleRsvp(event.id, status);
-      return true;
+      const result = await handleRsvp(event.id, status);
+      return result;
     } catch (error) {
       console.error('Error handling RSVP:', error);
       return false;
