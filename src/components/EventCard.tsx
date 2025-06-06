@@ -1,187 +1,130 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Event } from '@/types';
-import { MapPin } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { Card, CardContent } from '@/components/ui/card';
 import { CategoryPill } from '@/components/ui/category-pill';
-import { useEventImages } from '@/hooks/useEventImages';
-import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
-import { formatDate, formatEventTime } from '@/utils/date-formatting';
 import { LineupImage } from '@/components/ui/lineup-image';
-import { useOutletContext } from 'react-router-dom';
+import { EventCardMeta } from '@/components/events/EventCardMeta';
+import { EventCardDescription } from '@/components/events/EventCardDescription';
+import { EventCardActions } from '@/components/events/EventCardActions';
+import { cn } from '@/lib/utils';
 
-export interface EventCardProps {
+interface EventCardProps {
   event: Event;
-  compact?: boolean;
-  showRsvpButtons?: boolean;
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
+  showRsvpButtons?: boolean;
+  compact?: boolean;
   className?: string;
-  onClick?: (event: Event) => void;
   loadingEventId?: string | null;
-}
-
-interface OutletContext {
-  onEventSelect?: (eventId: string | null) => void;
-  selectedEventId?: string | null;
+  onClick?: (event: Event) => void;
 }
 
 const EventCard: React.FC<EventCardProps> = ({
   event,
-  compact = true,
-  showRsvpButtons = false,
   onRsvp,
+  showRsvpButtons = true,
+  compact = false,
   className,
-  onClick,
-  loadingEventId
+  loadingEventId,
+  onClick
 }) => {
-  const { getEventImageUrl } = useEventImages();
-  const context = useOutletContext<OutletContext>();
-  const { onEventSelect } = context || {};
-  
-  const imageUrl = getEventImageUrl(event);
-  
-  // Format date for display - European format (DD-MM-YYYY)
-  const formattedDate = event.start_date ? formatDate(event.start_date) : '';
-  
-  // Format time range using the 24-hour time format
-  const timeDisplay = event.start_time ? 
-    formatEventTime(event.start_time, event.end_time) : '';
+  const { isAuthenticated } = useAuth();
+  const [imageError, setImageError] = useState(false);
 
-  // Enhanced click handler
-  const handleClick = (e: React.MouseEvent) => {
-    // More thorough check for RSVP-related elements
-    const target = e.target as HTMLElement;
-    const isRsvpElement = 
-      target.closest('[data-rsvp-container="true"]') || 
-      target.closest('[data-rsvp-button="true"]') ||
-      target.hasAttribute('data-rsvp-button') ||
-      target.closest('button[data-status]');
-    
-    if (isRsvpElement) {
-      e.stopPropagation();
-      e.preventDefault();
-      return;
-    }
-    
+  const handleCardClick = () => {
     if (onClick) {
       onClick(event);
-    } else if (onEventSelect) {
-      // Use side panel if available
-      onEventSelect(event.id);
     } else {
-      // Fallback to navigation for non-panel layouts
-      window.location.href = `/events/${event.id}`;
+      // Dispatch global event for overlay
+      const customEvent = new CustomEvent('eventCardClicked', {
+        detail: { eventId: event.id }
+      });
+      window.dispatchEvent(customEvent);
     }
   };
 
-  // Enhanced RSVP handler with better isolation from card click events
-  const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
-    if (!onRsvp) return false;
-    
-    try {
-      const result = await onRsvp(event.id, status);
-      // Convert any result (including void) to a boolean
-      return result === undefined ? true : !!result;
-    } catch (error) {
-      console.error('Error in EventCard RSVP handler:', error);
-      return false;
-    }
+  const handleImageError = () => {
+    setImageError(true);
   };
 
-  // Determine if this specific event is loading
-  const isLoading = loadingEventId === event.id;
-  
-  // Determine card height - make it smaller by default
-  const cardHeightClass = compact ? "max-h-[320px]" : "";
+  const eventLocation = event.venues?.name ? 
+    `${event.venues.name}${event.venues.city ? `, ${event.venues.city}` : ''}` : 
+    event.location || 'Location TBD';
 
   return (
-    <div
+    <Card 
       className={cn(
-        "group relative rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer bg-white flex flex-col h-full",
-        cardHeightClass,
+        "group overflow-hidden transition-all duration-200 hover:shadow-lg cursor-pointer h-full flex flex-col",
+        "bg-white border border-gray-200 hover:border-gray-300",
         className
       )}
-      onClick={handleClick}
-      data-event-id={event.id}
+      onClick={handleCardClick}
     >
-      {/* Image container with event type label positioned on top - smaller image */}
-      <div className="relative">
+      {/* Image Section */}
+      <div className={cn(
+        "relative overflow-hidden",
+        compact ? "h-32" : "h-48"
+      )}>
         <LineupImage
-          src={imageUrl}
+          src={!imageError && event.image_urls?.[0] ? event.image_urls[0] : "/img/default.jpg"}
           alt={event.title}
           aspectRatio="video"
           overlayVariant="ocean"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            if (!target.src.includes('/img/default.jpg')) {
-              console.log('Image failed to load, using default');
-              target.src = "/img/default.jpg";
-            }
-          }}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          onError={handleImageError}
         />
         
-        {/* Event category pill */}
+        {/* Category Pill */}
         {event.event_category && (
-          <div className="absolute top-3 left-3 z-30">
+          <div className="absolute top-3 left-3">
             <CategoryPill 
               category={event.event_category} 
-              size="default" 
-              showIcon={false}
+              size={compact ? "sm" : "default"}
             />
           </div>
         )}
       </div>
 
-      {/* Content Section - more compact */}
-      <div className="p-3 flex flex-col flex-grow space-y-1">
-        {/* Title - First */}
+      {/* Content Section */}
+      <CardContent className={cn(
+        "flex-1 flex flex-col",
+        compact ? "p-3" : "p-4"
+      )}>
+        {/* Title */}
         <h3 className={cn(
-          "font-semibold text-gray-900",
-          compact ? "text-sm line-clamp-2" : "text-xl line-clamp-2"
+          "font-semibold text-gray-900 line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors",
+          compact ? "text-sm" : "text-base"
         )}>
           {event.title}
         </h3>
-        
-        {/* Date & Time */}
-        <div className="text-xs text-gray-600 font-medium">
-          {formattedDate && timeDisplay ? (
-            <>
-              {formattedDate} • {timeDisplay}
-            </>
-          ) : (
-            formattedDate || 'Date not set'
-          )}
-        </div>
-        
-        {/* Venue/Location */}
-        <div className="flex items-center text-xs text-gray-500">
-          <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
-          <span className="truncate">{event.venues?.name || event.location || 'No location'}</span>
-        </div>
-        
-        {/* Spacer to push RSVP buttons to bottom */}
-        <div className="flex-grow min-h-[4px]"></div>
-        
-        {/* RSVP Buttons - smaller size for compact cards */}
-        {showRsvpButtons && (
-          <div 
-            className="mt-1" 
-            data-rsvp-container="true"
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-            }}
-          >
-            <EventRsvpButtons
-              currentStatus={event.rsvp_status || null}
-              onRsvp={handleRsvp}
-              size={compact ? "sm" : "default"}
-              isLoading={isLoading}
-            />
-          </div>
+
+        {/* Meta Information */}
+        <EventCardMeta 
+          event={event} 
+          compact={compact}
+          className="mb-3"
+        />
+
+        {/* Description */}
+        <EventCardDescription 
+          description={event.description}
+          compact={compact}
+          className="mb-4 flex-1"
+        />
+
+        {/* Actions */}
+        {showRsvpButtons && isAuthenticated && (
+          <EventCardActions
+            event={event}
+            onRsvp={onRsvp}
+            isLoading={loadingEventId === event.id}
+            compact={compact}
+            onClick={(e) => e.stopPropagation()} // Prevent card click when clicking RSVP buttons
+          />
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

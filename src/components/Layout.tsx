@@ -59,6 +59,30 @@ const Layout = () => {
     
     navigate(newUrl, { replace: true });
   };
+
+  // Global event overlay handler for all pages
+  const [globalEventOverlay, setGlobalEventOverlay] = useState<string | null>(null);
+
+  // Listen for global event clicks
+  useEffect(() => {
+    const handleEventCardClick = (event: CustomEvent) => {
+      const eventId = event.detail.eventId;
+      if (eventId) {
+        setGlobalEventOverlay(eventId);
+      }
+    };
+
+    window.addEventListener('eventCardClicked', handleEventCardClick as EventListener);
+    
+    return () => {
+      window.removeEventListener('eventCardClicked', handleEventCardClick as EventListener);
+    };
+  }, []);
+
+  // Close global overlay
+  const handleCloseGlobalOverlay = () => {
+    setGlobalEventOverlay(null);
+  };
   
   useEffect(() => {
     // Only redirect to login if user is not authenticated AND trying to access a protected route
@@ -74,16 +98,14 @@ const Layout = () => {
         {/* Left sidebar */}
         <LeftSidebar />
         
-        {/* Main content area - adjusts width when overlay is open */}
-        <div className={`flex-1 overflow-hidden relative transition-all duration-300 ${
-          selectedEventId && location.pathname === '/events' ? 'mr-[800px]' : ''
-        }`}>
+        {/* Main content area */}
+        <div className="flex-1 overflow-hidden relative">
           <main className="h-full overflow-y-auto">
             <Outlet context={{ onEventSelect: handleEventSelect, selectedEventId }} />
           </main>
         </div>
         
-        {/* Event side panel - positioned on the right */}
+        {/* Event side panel - positioned on the right for /events page */}
         {selectedEventId && location.pathname === '/events' && (
           <EventSidePanel
             eventId={selectedEventId}
@@ -96,23 +118,66 @@ const Layout = () => {
         <SocialSidebar selectedEventId={location.pathname === '/events' ? selectedEventId : undefined} />
       </div>
 
-      {/* Event Detail Overlay - improved design and positioning */}
-      {isEventDetailPage && (
+      {/* Global Event Detail Overlay - covers 95% of main content area */}
+      {globalEventOverlay && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
-          <div className="flex items-center justify-center min-h-full p-4">
-            <div className="bg-white rounded-xl w-full max-w-5xl max-h-[90vh] overflow-hidden relative shadow-2xl">
-              <button
-                onClick={() => navigate('/events')}
-                className="absolute top-6 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-              <div className="h-full overflow-y-auto">
-                <Outlet />
+          <div className="flex h-full">
+            {/* Left sidebar space */}
+            <div className="w-20" />
+            
+            {/* Main overlay content - 95% of remaining space */}
+            <div className="flex-1 flex items-center justify-center p-4">
+              <div className="bg-white rounded-xl w-[95%] h-[90vh] overflow-hidden relative shadow-2xl">
+                <button
+                  onClick={handleCloseGlobalOverlay}
+                  className="absolute top-6 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                <div className="h-full overflow-y-auto">
+                  <iframe 
+                    src={`/events/${globalEventOverlay}`} 
+                    className="w-full h-full border-0"
+                    title="Event Details"
+                  />
+                </div>
               </div>
             </div>
+            
+            {/* Social sidebar space */}
+            <div className="w-80" />
+          </div>
+        </div>
+      )}
+
+      {/* Event Detail Overlay for URL-based navigation */}
+      {isEventDetailPage && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
+          <div className="flex h-full">
+            {/* Left sidebar space */}
+            <div className="w-20" />
+            
+            {/* Main overlay content - 95% of remaining space */}
+            <div className="flex-1 flex items-center justify-center p-4">
+              <div className="bg-white rounded-xl w-[95%] h-[90vh] overflow-hidden relative shadow-2xl">
+                <button
+                  onClick={() => navigate('/events')}
+                  className="absolute top-6 right-6 z-10 bg-white/90 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                <div className="h-full overflow-y-auto">
+                  <Outlet />
+                </div>
+              </div>
+            </div>
+            
+            {/* Social sidebar space */}
+            <div className="w-80" />
           </div>
         </div>
       )}
