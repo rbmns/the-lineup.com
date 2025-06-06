@@ -16,6 +16,8 @@ interface EventCardActionsProps {
   extraContent?: React.ReactNode;
   compact?: boolean;
   useSmallButtons?: boolean;
+  isLoading?: boolean;
+  onClick?: (e: any) => any;
 }
 
 export const EventCardActions: React.FC<EventCardActionsProps> = ({
@@ -28,10 +30,15 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
   onRsvp,
   extraContent,
   compact = false,
-  useSmallButtons = false
+  useSmallButtons = false,
+  isLoading = false,
+  onClick
 }) => {
   const [localRsvpStatus, setLocalRsvpStatus] = useState<'Going' | 'Interested' | undefined>(currentRsvpStatus);
-  const [isLoading, setIsLoading] = useState(false);
+  const [localIsLoading, setLocalIsLoading] = useState(false);
+
+  // Use the passed isLoading or local loading state
+  const buttonIsLoading = isLoading || localIsLoading;
 
   // If we don't need to show any actions, return null
   if (!showRsvpButtons && !showRsvpStatus && !showFriendRsvp) {
@@ -43,7 +50,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
     
     try {
       console.log('EventCardActions - Handling RSVP for event:', eventId, status);
-      setIsLoading(true);
+      setLocalIsLoading(true);
       
       // Store current scroll and URL state for recovery
       const scrollPosition = window.scrollY;
@@ -98,7 +105,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       setLocalRsvpStatus(currentRsvpStatus); // Revert on error
       return false;
     } finally {
-      setTimeout(() => setIsLoading(false), 300); // Small delay to prevent rapid clicks
+      setTimeout(() => setLocalIsLoading(false), 300); // Small delay to prevent rapid clicks
     }
   };
 
@@ -114,7 +121,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
       )}
       data-no-navigation="true"
       data-rsvp-container="true"
-      onClick={(e) => e.stopPropagation()}
+      onClick={onClick}
     >
       {/* RSVP Buttons */}
       {showRsvpButtons && onRsvp && (
@@ -129,7 +136,7 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
             onRsvp={handleRsvp}
             size={buttonSize}
             className="w-full"
-            isLoading={isLoading}
+            isLoading={buttonIsLoading}
           />
         </div>
       )}
