@@ -41,7 +41,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
           variant="ghost"
           size="sm"
           onClick={onToggleVisibility}
-          className="bg-white shadow-lg border border-sand hover:bg-sand rounded-r-lg rounded-l-none px-2"
+          className="bg-white shadow-lg border border-sand hover:bg-sand rounded-l-lg rounded-r-none px-2"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
