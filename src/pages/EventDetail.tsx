@@ -9,7 +9,6 @@ import { Helmet } from 'react-helmet-async';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
 import { useEventRsvpHandler } from '@/hooks/events/useEventRsvpHandler';
 import { EventRsvpSection } from '@/components/events/detail-sections/EventRsvpSection';
-import { EventSocialInfo } from '@/components/events/EventSocialInfo';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { getEventImage } from '@/utils/eventImages';
@@ -179,161 +178,132 @@ const EventDetail: React.FC<EventDetailProps> = ({
         <meta name="description" content={event.description || `Join us for ${event.title}`} />
       </Helmet>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Main content - takes up 3/4 of the space */}
-        <div className="lg:col-span-3">
-          <div className="max-w-4xl mx-auto px-6 py-8">
-            {showBackButton && (
-              <Link to="/events" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Events
-              </Link>
-            )}
+      <div className="max-w-4xl mx-auto px-6 py-8">
+        {showBackButton && (
+          <Link to="/events" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Events
+          </Link>
+        )}
 
-            {/* Event Header */}
-            <div className="mb-8">
-              <img 
-                src={eventImage} 
-                alt={event.title}
-                className="w-full h-64 object-cover rounded-lg mb-6"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  if (!target.src.includes('default.jpg')) {
-                    target.src = 'https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg';
-                  }
-                }}
-              />
-              
-              <h1 className="text-4xl font-bold mb-4">{event.title}</h1>
-              
-              <div className="flex flex-wrap gap-4 text-gray-600 mb-6">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5" />
-                  <span>
-                    {event.start_date && formatDate(event.start_date)}
-                    {event.start_time && ` • ${formatEventTime(event.start_time, event.end_time)}`}
-                  </span>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5" />
-                  <span>{eventLocation}</span>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  <span>
-                    {event.attendees?.going || 0} going, {event.attendees?.interested || 0} interested
-                  </span>
-                </div>
-              </div>
-
-              {event.event_category && (
-                <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full mb-6">
-                  {event.event_category}
-                </span>
-              )}
+        {/* Event Header */}
+        <div className="mb-8">
+          <img 
+            src={eventImage} 
+            alt={event.title}
+            className="w-full h-64 object-cover rounded-lg mb-6"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              if (!target.src.includes('default.jpg')) {
+                target.src = 'https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg';
+              }
+            }}
+          />
+          
+          <h1 className="text-4xl font-bold mb-4">{event.title}</h1>
+          
+          <div className="flex flex-wrap gap-4 text-gray-600 mb-6">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              <span>
+                {event.start_date && formatDate(event.start_date)}
+                {event.start_time && ` • ${formatEventTime(event.start_time, event.end_time)}`}
+              </span>
             </div>
-
-            {/* RSVP Section - only show for authenticated users */}
-            {user && (
-              <div className="mb-8">
-                <div className={`transition-all duration-300 ${rsvpFeedback ? 'scale-105' : ''} ${
-                  rsvpFeedback === 'going' ? 'ring-2 ring-green-200' : 
-                  rsvpFeedback === 'interested' ? 'ring-2 ring-blue-200' : ''
-                }`}>
-                  <EventRsvpSection
-                    isOwner={isOwner}
-                    onRsvp={handleRsvpWithFeedback}
-                    isRsvpLoading={rsvpLoading}
-                    currentStatus={event.rsvp_status}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Mobile attendees info - only show on mobile when no social sidebar */}
-            {isMobile && (
-              <div className="mb-8 bg-gray-50 rounded-lg p-6">
-                <h2 className="text-2xl font-semibold mb-4">Who's Going</h2>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Going</span>
-                    <span className="font-medium">{event.attendees?.going || 0}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600">Interested</span>
-                    <span className="font-medium">{event.attendees?.interested || 0}</span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Event Description */}
-            {event.description && (
-              <div className="mb-8">
-                <h2 className="text-2xl font-semibold mb-4">About This Event</h2>
-                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{event.description}</p>
-              </div>
-            )}
-
-            {/* Additional Info */}
-            {event.extra_info && (
-              <div className="mb-8">
-                <h2 className="text-2xl font-semibold mb-4">Additional Information</h2>
-                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{event.extra_info}</p>
-              </div>
-            )}
-
-            {/* Fee Information */}
-            {event.fee && (
-              <div className="mb-8">
-                <h2 className="text-2xl font-semibold mb-4">Cost</h2>
-                <p className="text-gray-700">€{event.fee}</p>
-              </div>
-            )}
-
-            {/* Organizer Link */}
-            {event.organizer_link && (
-              <div className="mb-8">
-                <Button asChild className="inline-flex items-center gap-2">
-                  <a href={event.organizer_link} target="_blank" rel="noopener noreferrer">
-                    Get Tickets / More Info
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                </Button>
-              </div>
-            )}
-
-            {/* Organizer Info - only show if organiser_name exists */}
-            {event.organiser_name && (
-              <div className="bg-gray-50 rounded-lg p-6">
-                <h2 className="text-2xl font-semibold mb-4">Organized by</h2>
-                <div className="flex items-center gap-3">
-                  <div>
-                    <p className="font-medium">{event.organiser_name}</p>
-                    {event.organizer_link && (
-                      <a 
-                        href={event.organizer_link} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 text-sm inline-flex items-center gap-1 mt-1"
-                      >
-                        Visit organizer page
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
+            
+            <div className="flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              <span>{eventLocation}</span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              <span>
+                {event.attendees?.going || 0} going, {event.attendees?.interested || 0} interested
+              </span>
+            </div>
           </div>
+
+          {event.event_category && (
+            <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full mb-6">
+              {event.event_category}
+            </span>
+          )}
         </div>
 
-        {/* Social sidebar - takes up 1/4 of the space on desktop */}
-        {!isMobile && eventId && (
-          <div className="lg:col-span-1 p-4">
-            <EventSocialInfo eventId={eventId} />
+        {/* RSVP Section - only show for authenticated users */}
+        {user && (
+          <div className="mb-8">
+            <div className={`transition-all duration-300 ${rsvpFeedback ? 'scale-105' : ''} ${
+              rsvpFeedback === 'going' ? 'ring-2 ring-green-200' : 
+              rsvpFeedback === 'interested' ? 'ring-2 ring-blue-200' : ''
+            }`}>
+              <EventRsvpSection
+                isOwner={isOwner}
+                onRsvp={handleRsvpWithFeedback}
+                isRsvpLoading={rsvpLoading}
+                currentStatus={event.rsvp_status}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Event Description */}
+        {event.description && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold mb-4">About This Event</h2>
+            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{event.description}</p>
+          </div>
+        )}
+
+        {/* Additional Info */}
+        {event.extra_info && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold mb-4">Additional Information</h2>
+            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{event.extra_info}</p>
+          </div>
+        )}
+
+        {/* Fee Information */}
+        {event.fee && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold mb-4">Cost</h2>
+            <p className="text-gray-700">€{event.fee}</p>
+          </div>
+        )}
+
+        {/* Organizer Link */}
+        {event.organizer_link && (
+          <div className="mb-8">
+            <Button asChild className="inline-flex items-center gap-2">
+              <a href={event.organizer_link} target="_blank" rel="noopener noreferrer">
+                Get Tickets / More Info
+                <ExternalLink className="h-4 w-4" />
+              </a>
+            </Button>
+          </div>
+        )}
+
+        {/* Organizer Info - only show if organiser_name exists */}
+        {event.organiser_name && (
+          <div className="bg-gray-50 rounded-lg p-6">
+            <h2 className="text-2xl font-semibold mb-4">Organized by</h2>
+            <div className="flex items-center gap-3">
+              <div>
+                <p className="font-medium">{event.organiser_name}</p>
+                {event.organizer_link && (
+                  <a 
+                    href={event.organizer_link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 text-sm inline-flex items-center gap-1 mt-1"
+                  >
+                    Visit organizer page
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>

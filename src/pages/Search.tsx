@@ -1,224 +1,137 @@
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { Event } from '@/types';
-import EventCard from '@/components/EventCard';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Search as SearchIcon } from 'lucide-react';
-import { Helmet } from 'react-helmet-async';
-
-interface Venue {
-  id: string;
-  name: string;
-  city: string;
-  street?: string;
-  postal_code?: string;
-}
-
-interface CasualPlan {
-  id: string;
-  title: string;
-  location: string;
-  date: string;
-  time: string;
-  vibe: string;
-}
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { useQuery } from '@tanstack/react-query';
+import { searchEvents } from '@/lib/eventService';
+import { EventCardList } from '@/components/events/EventCardList';
+import { EventsLoadingState } from '@/components/events/list-components/EventsLoadingState';
+import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
 
 const Search: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const query = searchParams.get('q') || '';
-  const [events, setEvents] = useState<Event[]>([]);
-  const [venues, setVenues] = useState<Venue[]>([]);
-  const [casualPlans, setCasualPlans] = useState<CasualPlan[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [submittedQuery, setSubmittedQuery] = useState(searchParams.get('q') || '');
 
+  // Update search query when URL params change
   useEffect(() => {
-    if (query) {
-      searchData(query);
-    }
-  }, [query]);
+    const query = searchParams.get('q') || '';
+    setSearchQuery(query);
+    setSubmittedQuery(query);
+  }, [searchParams]);
 
-  const searchData = async (searchQuery: string) => {
-    setIsLoading(true);
-    
-    try {
-      // Search events
-      const { data: eventsData } = await supabase
-        .from('events')
-        .select(`
-          *,
-          venues(*),
-          creator:profiles(id, username, avatar_url, email, location, status, tagline),
-          event_rsvps(id, user_id, status)
-        `)
-        .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,event_category.ilike.%${searchQuery}%`);
+  // Search events query
+  const { data: searchResults, isLoading, error } = useQuery({
+    queryKey: ['search-events', submittedQuery],
+    queryFn: () => searchEvents(submittedQuery),
+    enabled: !!submittedQuery && submittedQuery.trim().length > 0,
+  });
 
-      // Search venues
-      const { data: venuesData } = await supabase
-        .from('venues')
-        .select('*')
-        .or(`name.ilike.%${searchQuery}%,city.ilike.%${searchQuery}%`);
-
-      // Search casual plans
-      const { data: casualPlansData } = await supabase
-        .from('casual_plans')
-        .select('*')
-        .or(`title.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%`);
-
-      // Transform events data to match Event type
-      const transformedEvents: Event[] = (eventsData || []).map(event => {
-        // Get location from venue if available, otherwise use destination or empty string
-        const eventLocation = event.venues?.name ? 
-          `${event.venues.name}${event.venues.city ? `, ${event.venues.city}` : ''}` : 
-          event.destination || '';
-
-        return {
-          id: event.id,
-          title: event.title,
-          description: event.description || '',
-          location: eventLocation,
-          event_category: event.event_category,
-          start_time: event.start_time,
-          end_time: event.end_time,
-          start_date: event.start_date,
-          end_date: event.end_date,
-          created_at: event.created_at,
-          updated_at: event.updated_at,
-          image_urls: event.image_urls || [],
-          attendees: {
-            going: event.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Going').length || 0,
-            interested: event.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Interested').length || 0,
-          },
-          rsvp_status: undefined,
-          area: null,
-          google_maps: event.venues?.google_maps || null,
-          organizer_link: event.organizer_link || null,
-          creator: event.creator && Array.isArray(event.creator) && event.creator.length > 0 ? event.creator[0] : null,
-          venues: event.venues,
-          extra_info: event["Extra info"] || null,
-          fee: event.fee,
-          venue_id: event.venue_id,
-          tags: event.tags ? (Array.isArray(event.tags) ? event.tags : event.tags.split(',').map((tag: string) => tag.trim())) : []
-        };
-      });
-
-      setEvents(transformedEvents);
-      setVenues(venuesData || []);
-      setCasualPlans(casualPlansData || []);
-    } catch (error) {
-      console.error('Search error:', error);
-    } finally {
-      setIsLoading(false);
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      setSubmittedQuery(searchQuery.trim());
+      setSearchParams({ q: searchQuery.trim() });
     }
   };
 
-  const totalResults = events.length + venues.length + casualPlans.length;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
 
   return (
-    <div className="min-h-screen bg-white">
-      <Helmet>
-        <title>Search Results - {query} | the lineup</title>
-        <meta name="description" content={`Search results for "${query}" - Find events, venues, and casual plans`} />
-      </Helmet>
-
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-8">
-        <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <SearchIcon className="h-6 w-6 text-gray-500" />
-            <h1 className="text-3xl font-bold">Search Results</h1>
-          </div>
-          
-          {query && (
-            <p className="text-lg text-gray-600">
-              {isLoading ? 'Searching...' : `${totalResults} results for "${query}"`}
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Search Section */}
+      <div className="bg-white border-b">
+        <div className="container mx-auto px-4 py-16">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900 mb-4">
+              Discover Amazing Events
+            </h1>
+            <p className="text-xl text-gray-600 mb-8">
+              Search for events, venues, and experiences in your area
             </p>
-          )}
-        </div>
-
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="bg-gray-200 rounded-lg h-48"></div>
+            
+            {/* Large Search Form */}
+            <form onSubmit={handleSearch} className="max-w-2xl mx-auto">
+              <div className="relative">
+                <SearchIcon className="absolute left-6 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Search events, venues, plans..."
+                  value={searchQuery}
+                  onChange={handleInputChange}
+                  className="pl-16 pr-32 py-6 text-lg rounded-full border-2 border-gray-200 focus:border-blue-500 shadow-lg"
+                />
+                <Button 
+                  type="submit" 
+                  size="lg"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full px-8"
+                >
+                  Search
+                </Button>
               </div>
-            ))}
+            </form>
+
+            {/* Search suggestions or popular searches could go here */}
+            {!submittedQuery && (
+              <div className="mt-8 text-sm text-gray-500">
+                <p>Try searching for "yoga", "music", "beach", or "festival"</p>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="space-y-8">
-            {/* Events Section */}
-            {events.length > 0 && (
-              <section>
-                <h2 className="text-2xl font-semibold mb-4">Events ({events.length})</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {events.map((event) => (
-                    <EventCard
-                      key={event.id}
-                      event={event}
-                      showRsvpButtons={false}
-                    />
-                  ))}
-                </div>
-              </section>
-            )}
+        </div>
+      </div>
 
-            {/* Venues Section */}
-            {venues.length > 0 && (
-              <section>
-                <h2 className="text-2xl font-semibold mb-4">Venues ({venues.length})</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {venues.map((venue) => (
-                    <div key={venue.id} className="bg-white rounded-lg shadow-md overflow-hidden border">
-                      <div className="h-48 bg-gradient-to-br from-blue-400 to-blue-600"></div>
-                      <div className="p-4">
-                        <h3 className="font-semibold text-lg mb-1">{venue.name}</h3>
-                        <p className="text-gray-600">{venue.city}</p>
-                        {venue.street && (
-                          <p className="text-sm text-gray-500 mt-1">{venue.street}</p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
+      {/* Search Results Section */}
+      {submittedQuery && (
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="mb-6">
+              <h2 className="text-2xl font-semibold text-gray-900">
+                Search Results for "{submittedQuery}"
+              </h2>
+              {searchResults && (
+                <p className="text-gray-600 mt-1">
+                  {searchResults.length} {searchResults.length === 1 ? 'result' : 'results'} found
+                </p>
+              )}
+            </div>
 
-            {/* Casual Plans Section */}
-            {casualPlans.length > 0 && (
-              <section>
-                <h2 className="text-2xl font-semibold mb-4">Casual Plans ({casualPlans.length})</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {casualPlans.map((plan) => (
-                    <div key={plan.id} className="bg-white rounded-lg shadow-md overflow-hidden border">
-                      <div className="h-48 bg-gradient-to-br from-green-400 to-green-600"></div>
-                      <div className="p-4">
-                        <h3 className="font-semibold text-lg mb-1">{plan.title}</h3>
-                        <p className="text-gray-600">{plan.location}</p>
-                        <p className="text-sm text-gray-500 mt-1">
-                          {plan.date} at {plan.time}
-                        </p>
-                        <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full mt-2">
-                          {plan.vibe}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
+            {/* Loading State */}
+            {isLoading && <EventsLoadingState />}
 
-            {/* No Results */}
-            {!isLoading && totalResults === 0 && query && (
+            {/* Error State */}
+            {error && (
               <div className="text-center py-12">
-                <SearchIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No results found</h3>
-                <p className="text-gray-600">
-                  Try adjusting your search terms or browse our events, venues, and plans.
+                <p className="text-red-600">
+                  Something went wrong while searching. Please try again.
                 </p>
               </div>
             )}
+
+            {/* Results */}
+            {searchResults && searchResults.length > 0 && (
+              <EventCardList events={searchResults} />
+            )}
+
+            {/* No Results */}
+            {searchResults && searchResults.length === 0 && !isLoading && (
+              <NoResultsFound 
+                searchQuery={submittedQuery}
+                onClearSearch={() => {
+                  setSearchQuery('');
+                  setSubmittedQuery('');
+                  setSearchParams({});
+                }}
+              />
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

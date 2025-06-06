@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import MainNav from "@/components/MainNav";
 import LeftSidebar from "@/components/nav/LeftSidebar";
@@ -129,7 +130,7 @@ const Layout = () => {
           <Footer />
         </div>
         
-        {/* Social sidebar - fixed on the right, hidden on mobile */}
+        {/* Social sidebar - fixed on the right, hidden on mobile, positioned under top nav */}
         {!isMobile && (
           <div className="fixed right-0 top-16 bottom-0 w-64 z-30">
             <SocialSidebar 

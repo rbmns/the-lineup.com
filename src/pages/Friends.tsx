@@ -1,25 +1,30 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { AuthOverlay } from '@/components/auth/AuthOverlay';
-import { FakeFriendsContent } from '@/components/fake-content/FakeFriendsContent';
+import { FriendsLoginPrompt } from '@/components/friends/FriendsLoginPrompt';
 import { FriendsMainContent } from '@/components/friends/FriendsMainContent';
 
 const Friends: React.FC = () => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
-  // If user is not authenticated, show the overlay with fake content
-  if (!user) {
+  // Show loading state while checking authentication
+  if (loading) {
     return (
-      <AuthOverlay 
-        title="Connect with Friends" 
-        description="Sign in to connect with travelers and locals in your area."
-      >
-        <FakeFriendsContent />
-      </AuthOverlay>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
     );
   }
 
+  // If user is not authenticated, show the login prompt
+  if (!user) {
+    return <FriendsLoginPrompt />;
+  }
+
+  // If user is authenticated, show the main friends content
   return <FriendsMainContent />;
 };
 
