@@ -90,14 +90,15 @@ const EventCard: React.FC<EventCardProps> = ({
       className={cn(
         "group overflow-hidden transition-all duration-200 hover:shadow-lg cursor-pointer h-full flex flex-col",
         "bg-white border border-sand hover:border-seafoam-green",
+        "w-full max-w-full", // Ensure card doesn't exceed container width
         className
       )}
       onClick={handleCardClick}
     >
       {/* Image Section */}
       <div className={cn(
-        "relative overflow-hidden",
-        compact ? "h-32" : "h-48"
+        "relative overflow-hidden w-full flex-shrink-0",
+        compact ? "h-32" : "h-40 sm:h-48" // Responsive height
       )}>
         <LineupImage
           src={getEventImage()}
@@ -110,7 +111,7 @@ const EventCard: React.FC<EventCardProps> = ({
         
         {/* Category Pill */}
         {event.event_category && (
-          <div className="absolute top-3 left-3">
+          <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
             <CategoryPill 
               category={event.event_category} 
               size={compact ? "sm" : "default"}
@@ -121,13 +122,14 @@ const EventCard: React.FC<EventCardProps> = ({
 
       {/* Content Section */}
       <CardContent className={cn(
-        "flex-1 flex flex-col",
-        compact ? "p-3" : "p-4"
+        "flex-1 flex flex-col w-full min-w-0", // min-w-0 prevents overflow
+        compact ? "p-2 sm:p-3" : "p-3 sm:p-4" // Responsive padding
       )}>
         {/* Title */}
         <h3 className={cn(
           "font-semibold text-ocean-deep line-clamp-2 mb-2 group-hover:text-seafoam-green transition-colors",
-          compact ? "text-sm" : "text-base"
+          "break-words", // Allow word breaking for long titles
+          compact ? "text-sm" : "text-sm sm:text-base" // Responsive text size
         )}>
           {event.title}
         </h3>
