@@ -16,9 +16,24 @@ export const useEventDetails = (eventId: string | null) => {
           venues (
             id,
             name,
-            address,
-            latitude,
-            longitude
+            street,
+            postal_code,
+            city,
+            website,
+            google_maps
+          ),
+          profiles:creator (
+            id,
+            username,
+            avatar_url,
+            email,
+            location,
+            location_category,
+            status,
+            status_details,
+            tagline,
+            created_at,
+            updated_at
           ),
           event_rsvps!left (
             status
@@ -37,6 +52,8 @@ export const useEventDetails = (eventId: string | null) => {
       // Transform the data to match the Event type
       const transformedEvent: Event = {
         ...data,
+        // Map creator profile properly
+        creator: data.profiles || null,
         // Calculate attendees from event_rsvps
         attendees: {
           going: data.event_rsvps?.filter(rsvp => rsvp.status === 'Going').length || 0,
