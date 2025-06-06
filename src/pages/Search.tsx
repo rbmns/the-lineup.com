@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { searchEvents } from '@/lib/eventService';
-import { EventCardList } from '@/components/events/EventCardList';
+import EventCardList from '@/components/events/EventCardList';
 import { EventsLoadingState } from '@/components/events/list-components/EventsLoadingState';
 import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
 
@@ -40,6 +40,12 @@ const Search: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+  };
+
+  const resetFilters = () => {
+    setSearchQuery('');
+    setSubmittedQuery('');
+    setSearchParams({});
   };
 
   return (
@@ -115,18 +121,23 @@ const Search: React.FC = () => {
 
             {/* Results */}
             {searchResults && searchResults.length > 0 && (
-              <EventCardList events={searchResults} />
+              <div className="grid gap-4">
+                {searchResults.map((event) => (
+                  <EventCardList
+                    key={event.id}
+                    event={event}
+                    compact={true}
+                    showRsvpButtons={false}
+                  />
+                ))}
+              </div>
             )}
 
             {/* No Results */}
             {searchResults && searchResults.length === 0 && !isLoading && (
               <NoResultsFound 
                 searchQuery={submittedQuery}
-                onClearSearch={() => {
-                  setSearchQuery('');
-                  setSubmittedQuery('');
-                  setSearchParams({});
-                }}
+                resetFilters={resetFilters}
               />
             )}
           </div>

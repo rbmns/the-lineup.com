@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { processEventsData } from '@/utils/eventProcessorUtils';
@@ -236,6 +235,53 @@ export const fetchSimilarEvents = async (
 
   } catch (error) {
     console.error("Unexpected error fetching similar events:", error);
+    return [];
+  }
+};
+
+/**
+ * Searches events based on a query string
+ */
+export const searchEvents = async (query: string, userId: string | undefined = undefined): Promise<Event[]> => {
+  try {
+    if (!query || query.trim().length === 0) {
+      return [];
+    }
+
+    const searchTerm = query.trim();
+    
+    // Search events by title, description, location, or tags
+    const { data, error } = await supabase
+      .from('events')
+      .select(`
+        *,
+        creator:profiles(id, username, avatar_url, email, location, status, tagline),
+        venues:venue_id(*),
+        event_rsvps(id, user_id, status)
+      `)
+      .or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,location.ilike.%${searchTerm}%,tags.ilike.%${searchTerm}%`)
+      .order('start_date', { ascending: true })
+      .order('start_time', { ascending: true });
+
+    if (error) {
+      console.error("Error searching events:", error);
+      return [];
+    }
+
+    if (!data) {
+      return [];
+    }
+
+    // Process the event data to include user's RSVP status
+    const processedEvents = processEventsData(data, userId);
+    
+    // Apply time-based filtering to show only relevant events
+    const filteredEvents = filterEventsByTime(processedEvents);
+    
+    return filteredEvents;
+
+  } catch (error) {
+    console.error("Unexpected error searching events:", error);
     return [];
   }
 };
