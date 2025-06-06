@@ -39,24 +39,46 @@ const EventCard: React.FC<EventCardProps> = ({
     if (onClick) {
       onClick(event);
     } else {
-      // If we're on the /events page, dispatch event for side panel
-      if (location.pathname === '/events') {
-        const customEvent = new CustomEvent('eventCardClicked', {
-          detail: { eventId: event.id }
-        });
-        window.dispatchEvent(customEvent);
-      } else {
-        // For other pages, use global overlay instead of navigation
-        const customEvent = new CustomEvent('eventCardClicked', {
-          detail: { eventId: event.id }
-        });
-        window.dispatchEvent(customEvent);
-      }
+      // Dispatch event for overlay handling
+      const customEvent = new CustomEvent('eventCardClicked', {
+        detail: { eventId: event.id }
+      });
+      window.dispatchEvent(customEvent);
     }
   };
 
   const handleImageError = () => {
     setImageError(true);
+  };
+
+  // Enhanced fallback image logic
+  const getEventImage = () => {
+    if (!imageError && event.image_urls?.[0]) {
+      return event.image_urls[0];
+    }
+    
+    // Use category-specific fallback images from the GitHub repository
+    const categoryImageMap: { [key: string]: string } = {
+      'music': 'music.jpg',
+      'sport': 'sports.jpg',
+      'sports': 'sports.jpg',
+      'yoga': 'yoga.jpg',
+      'surf': 'surf.jpg',
+      'beach': 'beach.jpg',
+      'food': 'food.jpg',
+      'culture': 'culture.jpg',
+      'festival': 'festival.jpg',
+      'game': 'game.jpg',
+      'kite': 'kite.jpg',
+      'party': 'beachparty.jpg',
+      'community': 'festival.jpg',
+      'market': 'shopping.jpg'
+    };
+
+    const categoryKey = event.event_category?.toLowerCase() || 'default';
+    const fallbackImage = categoryImageMap[categoryKey] || 'default.jpg';
+    
+    return `https://raw.githubusercontent.com/rbmns/images/main/lineup/${fallbackImage}`;
   };
 
   const eventLocation = event.venues?.name ? 
@@ -67,7 +89,7 @@ const EventCard: React.FC<EventCardProps> = ({
     <Card 
       className={cn(
         "group overflow-hidden transition-all duration-200 hover:shadow-lg cursor-pointer h-full flex flex-col",
-        "bg-white border border-gray-200 hover:border-gray-300",
+        "bg-white border border-sand hover:border-seafoam-green",
         className
       )}
       onClick={handleCardClick}
@@ -78,7 +100,7 @@ const EventCard: React.FC<EventCardProps> = ({
         compact ? "h-32" : "h-48"
       )}>
         <LineupImage
-          src={!imageError && event.image_urls?.[0] ? event.image_urls[0] : "/img/default.jpg"}
+          src={getEventImage()}
           alt={event.title}
           aspectRatio="video"
           overlayVariant="ocean"
@@ -104,7 +126,7 @@ const EventCard: React.FC<EventCardProps> = ({
       )}>
         {/* Title */}
         <h3 className={cn(
-          "font-semibold text-gray-900 line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors",
+          "font-semibold text-ocean-deep line-clamp-2 mb-2 group-hover:text-seafoam-green transition-colors",
           compact ? "text-sm" : "text-base"
         )}>
           {event.title}
@@ -117,7 +139,7 @@ const EventCard: React.FC<EventCardProps> = ({
           className="mb-3"
         />
 
-        {/* Description */}
+        {/* Description - Hidden by component update */}
         <EventCardDescription 
           description={event.description}
           compact={compact}

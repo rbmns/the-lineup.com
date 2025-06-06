@@ -13,11 +13,6 @@ export const EventCardDescription: React.FC<EventCardDescriptionProps> = ({
   compact = false,
   className 
 }) => {
-  if (compact || !description) return null;
-  
-  return (
-    <p className={cn("text-gray-700 line-clamp-2 font-inter leading-7", className)}>
-      {description}
-    </p>
-  );
+  // Always return null to hide descriptions on event cards
+  return null;
 };

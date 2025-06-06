@@ -64,7 +64,7 @@ const Layout = () => {
     navigate(newUrl, { replace: true });
   };
 
-  // Global event overlay handler - only for pages other than /events
+  // Global event overlay handler - for pages other than /events
   const [globalEventOverlay, setGlobalEventOverlay] = useState<string | null>(null);
 
   // Listen for global event clicks
@@ -72,11 +72,11 @@ const Layout = () => {
     const handleEventCardClick = (event: CustomEvent) => {
       const eventId = event.detail.eventId;
       if (eventId) {
-        // If we're on the /events page, use the side panel instead of global overlay
+        // If we're on the /events page, use the side panel
         if (location.pathname === '/events') {
           handleEventSelect(eventId);
         } else {
-          // For other pages, use the global overlay instead of URL navigation
+          // For other pages (home, search, etc.), use the global overlay
           setGlobalEventOverlay(eventId);
         }
       }
@@ -115,7 +115,7 @@ const Layout = () => {
           </main>
         </div>
         
-        {/* Event side panel - positioned on the right for /events page, hidden on mobile */}
+        {/* Event side panel - ONLY for /events page, positioned on the right, hidden on mobile */}
         {selectedEventId && location.pathname === '/events' && !isMobile && (
           <EventSidePanel
             eventId={selectedEventId}
@@ -130,7 +130,7 @@ const Layout = () => {
         )}
       </div>
 
-      {/* Global Event Detail Overlay - only for pages other than /events and NOT for URL-based event pages */}
+      {/* Global Event Detail Overlay - for pages OTHER than /events and NOT for URL-based event pages */}
       {globalEventOverlay && location.pathname !== '/events' && !isEventDetailPage && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
           <div className={`flex h-full ${isMobile ? '' : 'pl-20 pr-80'}`}>
@@ -215,7 +215,7 @@ const Layout = () => {
             <Link
               to="/search"
               className={`flex flex-col items-center p-2 ${
-                location.pathname === '/search' ? 'text-blue-600' : 'text-gray-500'
+                location.pathname === '/search' ? 'text-seafoam-green' : 'text-gray-500'
               }`}
             >
               <Search className="h-5 w-5" />
@@ -224,7 +224,7 @@ const Layout = () => {
             <Link
               to="/events"
               className={`flex flex-col items-center p-2 ${
-                location.pathname === '/events' ? 'text-blue-600' : 'text-gray-500'
+                location.pathname === '/events' ? 'text-seafoam-green' : 'text-gray-500'
               }`}
             >
               <Calendar className="h-5 w-5" />
@@ -233,7 +233,7 @@ const Layout = () => {
             <Link
               to="/casual-plans"
               className={`flex flex-col items-center p-2 ${
-                location.pathname === '/casual-plans' ? 'text-blue-600' : 'text-gray-500'
+                location.pathname === '/casual-plans' ? 'text-seafoam-green' : 'text-gray-500'
               }`}
             >
               <Coffee className="h-5 w-5" />
@@ -242,7 +242,7 @@ const Layout = () => {
             <Link
               to="/friends"
               className={`flex flex-col items-center p-2 ${
-                location.pathname === '/friends' ? 'text-blue-600' : 'text-gray-500'
+                location.pathname === '/friends' ? 'text-seafoam-green' : 'text-gray-500'
               }`}
             >
               <Users className="h-5 w-5" />

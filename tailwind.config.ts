@@ -56,11 +56,23 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Brand colors
+        'ocean-deep': '#005F73',
+        'seafoam-green': '#2A9D8F',
+        'sky-blue': '#00B4DB',
+        'sunset-yellow': '#EDC46A',
+        'sand': '#F4E7D3',
+        'clay-earth': '#A97155',
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      fontFamily: {
+        'inter': ['Inter', 'sans-serif'],
+        'serif': ['Georgia', 'serif'],
+        'handwritten': ['Comic Sans MS', 'cursive'],
       },
       keyframes: {
         "accordion-down": {

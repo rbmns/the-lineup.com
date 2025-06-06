@@ -1,44 +1,70 @@
 
-/* Nature-Inspired Color Palette */
+/* Updated Brand Color Palette - Beach/Surf Lifestyle */
 
 :root {
-  /* Ocean Theme */
+  /* Primary Brand Colors */
   --ocean-deep: #005F73;
-  --ocean-medium: #0099CC;
-  --ocean-light: #94D2BD;
-  --ocean-foam: #E9F5F5;
-  --teal: #00CCCC;
+  --seafoam-green: #2A9D8F;
+  --sky-blue: #00B4DB;
+  --sunset-yellow: #EDC46A;
+  --sand: #F4E7D3;
+  --clay-earth: #A97155;
 
-  /* Earth Theme */
-  --sand: #FFCC99;
-  --sunset: #FF9933;
-  --coral: #FF6666;
-  --amber: #EE9B00;
-  --sandstone: #CA6702;
+  /* Legacy Ocean Theme (keeping for compatibility) */
+  --ocean-medium: #00B4DB;
+  --ocean-light: #2A9D8F;
+  --ocean-foam: #F4E7D3;
+  --teal: #2A9D8F;
 
-  /* Forest Theme */
-  --leaf: #66CC66;
-  --lime: #99CC33;
-  --jungle: #2D6A4F;
-  --palm: #40916C;
-  --moss: #74C69D;
+  /* Legacy Earth Theme */
+  --sunset: #EDC46A;
+  --coral: #A97155;
+  --amber: #EDC46A;
+  --sandstone: #A97155;
 
-  /* Sky Theme */
-  --dawn: #FFADAD;
-  --dusk: #9966FF;
-  --daylight: #AED9E0;
-  --twilight: #5E60CE;
-  --night: #3A0CA3;
+  /* Legacy Forest Theme */
+  --leaf: #2A9D8F;
+  --lime: #2A9D8F;
+  --jungle: #005F73;
+  --palm: #2A9D8F;
+  --moss: #2A9D8F;
+
+  /* Legacy Sky Theme */
+  --dawn: #F4E7D3;
+  --dusk: #005F73;
+  --daylight: #00B4DB;
+  --twilight: #005F73;
+  --night: #005F73;
 }
 
-/* Use classes to quickly apply colors */
+/* New Brand Color Classes */
 .bg-ocean-deep { background-color: var(--ocean-deep); }
+.bg-seafoam-green { background-color: var(--seafoam-green); }
+.bg-sky-blue { background-color: var(--sky-blue); }
+.bg-sunset-yellow { background-color: var(--sunset-yellow); }
+.bg-sand { background-color: var(--sand); }
+.bg-clay-earth { background-color: var(--clay-earth); }
+
+.text-ocean-deep { color: var(--ocean-deep); }
+.text-seafoam-green { color: var(--seafoam-green); }
+.text-sky-blue { color: var(--sky-blue); }
+.text-sunset-yellow { color: var(--sunset-yellow); }
+.text-sand { color: var(--sand); }
+.text-clay-earth { color: var(--clay-earth); }
+
+.border-ocean-deep { border-color: var(--ocean-deep); }
+.border-seafoam-green { border-color: var(--seafoam-green); }
+.border-sky-blue { border-color: var(--sky-blue); }
+.border-sunset-yellow { border-color: var(--sunset-yellow); }
+.border-sand { border-color: var(--sand); }
+.border-clay-earth { border-color: var(--clay-earth); }
+
+/* Keep existing color classes for compatibility */
 .bg-ocean-medium { background-color: var(--ocean-medium); }
 .bg-ocean-light { background-color: var(--ocean-light); }
 .bg-ocean-foam { background-color: var(--ocean-foam); }
 .bg-teal { background-color: var(--teal); }
 
-.bg-sand { background-color: var(--sand); }
 .bg-sunset { background-color: var(--sunset); }
 .bg-coral { background-color: var(--coral); }
 .bg-amber { background-color: var(--amber); }
@@ -57,13 +83,11 @@
 .bg-night { background-color: var(--night); }
 
 /* Text colors */
-.text-ocean-deep { color: var(--ocean-deep); }
 .text-ocean-medium { color: var(--ocean-medium); }
 .text-ocean-light { color: var(--ocean-light); }
 .text-ocean-foam { color: var(--ocean-foam); }
 .text-teal { color: var(--teal); }
 
-.text-sand { color: var(--sand); }
 .text-sunset { color: var(--sunset); }
 .text-coral { color: var(--coral); }
 .text-amber { color: var(--amber); }
@@ -82,13 +106,11 @@
 .text-night { color: var(--night); }
 
 /* Border colors */
-.border-ocean-deep { border-color: var(--ocean-deep); }
 .border-ocean-medium { border-color: var(--ocean-medium); }
 .border-ocean-light { border-color: var(--ocean-light); }
 .border-ocean-foam { border-color: var(--ocean-foam); }
 .border-teal { border-color: var(--teal); }
 
-.border-sand { border-color: var(--sand); }
 .border-sunset { border-color: var(--sunset); }
 .border-coral { border-color: var(--coral); }
 .border-amber { border-color: var(--amber); }
@@ -106,35 +128,36 @@
 .border-twilight { border-color: var(--twilight); }
 .border-night { border-color: var(--night); }
 
-/* Button styles based on our nature theme */
+/* Button styles based on our surf/beach theme */
 .btn-ocean {
-  background-color: var(--ocean-medium);
-  color: white;
+  background-color: var(--ocean-deep);
+  color: var(--sand);
 }
 .btn-ocean:hover {
+  background-color: var(--seafoam-green);
+}
+
+.btn-beach {
+  background-color: var(--seafoam-green);
+  color: white;
+}
+.btn-beach:hover {
   background-color: var(--ocean-deep);
 }
 
-.btn-forest {
-  background-color: var(--palm);
-  color: white;
+.btn-sunset {
+  background-color: var(--sunset-yellow);
+  color: var(--ocean-deep);
 }
-.btn-forest:hover {
-  background-color: var(--jungle);
-}
-
-.btn-earth {
-  background-color: var(--sunset);
-  color: white;
-}
-.btn-earth:hover {
-  background-color: var(--sandstone);
+.btn-sunset:hover {
+  background-color: var(--clay-earth);
+  color: var(--sand);
 }
 
 .btn-sky {
-  background-color: var(--twilight);
+  background-color: var(--sky-blue);
   color: white;
 }
 .btn-sky:hover {
-  background-color: var(--night);
+  background-color: var(--ocean-deep);
 }
