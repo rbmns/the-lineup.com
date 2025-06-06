@@ -311,7 +311,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
                 />
               )}
               <div>
-                <p className="font-medium">{event.organizer_name || event.creator.username}</p>
+                <p className="font-medium">{event.organiser_name || event.creator.username}</p>
                 {event.creator.tagline && (
                   <p className="text-gray-600 text-sm">{event.creator.tagline}</p>
                 )}
