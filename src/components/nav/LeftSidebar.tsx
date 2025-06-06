@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Calendar, Users, Coffee, Search } from 'lucide-react';
+import { Calendar, Users, Coffee, Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const LeftSidebar: React.FC = () => {
@@ -9,9 +9,9 @@ const LeftSidebar: React.FC = () => {
 
   const navItems = [
     {
-      path: '/search',
-      icon: Search,
-      label: 'Search',
+      path: '/',
+      icon: Home,
+      label: 'Home',
     },
     {
       path: '/events',

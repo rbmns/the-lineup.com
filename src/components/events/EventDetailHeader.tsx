@@ -81,8 +81,8 @@ export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({
         </div>
       )}
       
-      {/* Share button - Always visible */}
-      <div className="absolute top-4 right-4 z-30">
+      {/* Share button - Moved to bottom right of image */}
+      <div className="absolute bottom-4 right-4 z-30">
         <EventShareButton 
           event={event} 
           variant="outline" 

@@ -63,64 +63,61 @@ const EventDetailContent = ({
   }, [onRsvp, event.rsvp_status]);
   
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-12">
-      {/* Event details - takes up 2/3 of the space on desktop */}
-      <div className="lg:col-span-2 space-y-8">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold mb-4">{event.title}</h1>
-          
-          {/* Date and time info */}
-          <EventDateTimeSection startTime={event.start_time} endTime={event.end_time} />
-        </div>
+    <div className="space-y-6">
+      {/* Event title and basic info */}
+      <div>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4">{event.title}</h1>
         
-        <Separator />
-        
-        {/* Location section */}
-        {(event.venue_id || event.location || coordinates) && (
-          <EventLocationSection 
-            venue={event.venues} 
-            location={event.location}
-            coordinates={coordinates}
-            title={event.title}
-          />
-        )}
-        
-        {/* Description */}
-        <EventDescriptionSection description={event.description || ''} />
-        
-        {/* Tags */}
-        <EventTagsSection tags={event.tags} />
+        {/* Date and time info - without duration */}
+        <EventDateTimeSection startTime={event.start_time} endTime={null} />
       </div>
       
-      {/* Sidebar - takes up 1/3 of the space on desktop */}
-      <div className="space-y-8">
-        {/* RSVP actions */}
+      {/* RSVP Section - prominently placed and responsive */}
+      <div className="bg-gray-50 rounded-lg p-4">
         <EventRsvpSection 
           isOwner={isOwner}
           onRsvp={handleRsvp}
           isRsvpLoading={isRsvpLoading || rsvpLoading}
           currentStatus={event.rsvp_status || null}
         />
-        
-        {/* Attendees summary */}
-        <EventAttendeesSummary 
-          goingCount={attendees?.going?.length || event.attendees?.going || 0}
-          interestedCount={attendees?.interested?.length || event.attendees?.interested || 0}
-        />
-        
-        {/* Friends attending section */}
-        {friendAttendees && (friendAttendees.going.length > 0 || friendAttendees.interested.length > 0) && (
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <EventFriendRsvps 
-              going={friendAttendees.going}
-              interested={friendAttendees.interested}
-            />
-          </div>
-        )}
-        
-        {/* External link if available */}
-        {bookingLink && <EventExternalLink url={bookingLink} />}
       </div>
+      
+      <Separator />
+      
+      {/* Location section */}
+      {(event.venue_id || event.location || coordinates) && (
+        <EventLocationSection 
+          venue={event.venues} 
+          location={event.location}
+          coordinates={coordinates}
+          title={event.title}
+        />
+      )}
+      
+      {/* Description */}
+      <EventDescriptionSection description={event.description || ''} />
+      
+      {/* Attendees summary */}
+      <EventAttendeesSummary 
+        goingCount={attendees?.going?.length || event.attendees?.going || 0}
+        interestedCount={attendees?.interested?.length || event.attendees?.interested || 0}
+      />
+      
+      {/* Friends attending section */}
+      {friendAttendees && (friendAttendees.going.length > 0 || friendAttendees.interested.length > 0) && (
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <EventFriendRsvps 
+            going={friendAttendees.going}
+            interested={friendAttendees.interested}
+          />
+        </div>
+      )}
+      
+      {/* External link if available */}
+      {bookingLink && <EventExternalLink url={bookingLink} />}
+      
+      {/* Tags */}
+      <EventTagsSection tags={event.tags} />
     </div>
   );
 };
