@@ -109,7 +109,7 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
         </div>
         
         {/* Description if available */}
-        {plan.description && <p className="text-sm text-gray-600 mb-4 line-clamp-2 leading-relaxed">
+        {plan.description && <p className="text-sm text-gray-600 mb-4 line-clamp-2 leading-relaxed text-left">
             {plan.description}
           </p>}
         
