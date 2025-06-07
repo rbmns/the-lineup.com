@@ -98,7 +98,7 @@ const Layout = () => {
           </div>
         )}
         
-        {/* Main Content Area - Reduced padding and margins */}
+        {/* Main Content Area - No padding */}
         <div 
           className={`flex-1 w-full min-h-screen ${
             isMobile 

@@ -110,8 +110,8 @@ export const PublicHome: React.FC<PublicHomeProps> = ({
   };
 
   return (
-    <div className="container py-12 max-w-6xl">
-      <div className="mx-auto space-y-24">
+    <div className="w-full">
+      <div className="w-full space-y-24">
         {showSearch && (
           <div className="mb-24">
             <SearchSection
