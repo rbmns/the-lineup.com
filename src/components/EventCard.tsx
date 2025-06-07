@@ -120,35 +120,35 @@ const EventCard: React.FC<EventCardProps> = ({
         )}
       </div>
 
-      {/* Content Section */}
+      {/* Content Section - Left aligned */}
       <CardContent className={cn(
-        "flex-1 flex flex-col w-full min-w-0", // min-w-0 prevents overflow
+        "flex-1 flex flex-col w-full min-w-0 text-left", // Added text-left
         compact ? "p-2 sm:p-3" : "p-3 sm:p-4" // Responsive padding
       )}>
-        {/* Title */}
+        {/* Title - Left aligned */}
         <h3 className={cn(
-          "font-semibold text-ocean-deep line-clamp-2 mb-2 group-hover:text-seafoam-green transition-colors",
+          "font-semibold text-ocean-deep line-clamp-2 mb-2 group-hover:text-seafoam-green transition-colors text-left",
           "break-words", // Allow word breaking for long titles
           compact ? "text-sm" : "text-sm sm:text-base" // Responsive text size
         )}>
           {event.title}
         </h3>
 
-        {/* Meta Information */}
+        {/* Meta Information - Left aligned */}
         <EventCardMeta 
           event={event} 
           compact={compact}
-          className="mb-3"
+          className="mb-3 text-left"
         />
 
-        {/* Description - Hidden by component update */}
+        {/* Description - Left aligned */}
         <EventCardDescription 
           description={event.description}
           compact={compact}
-          className="mb-4 flex-1"
+          className="mb-4 flex-1 text-left"
         />
 
-        {/* Actions */}
+        {/* Actions - Only show if authenticated */}
         {showRsvpButtons && isAuthenticated && (
           <EventCardActions
             eventId={event.id}

@@ -98,7 +98,7 @@ const Layout = () => {
           </div>
         )}
         
-        {/* Main Content Area - Always in middle */}
+        {/* Main Content Area - Reduced padding and margins */}
         <div 
           className={`flex-1 w-full min-h-screen ${
             isMobile 

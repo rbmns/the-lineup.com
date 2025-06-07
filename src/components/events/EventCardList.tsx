@@ -94,7 +94,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
   return (
     <div 
       className={cn(
-        "flex flex-col sm:flex-row gap-4 sm:h-24 bg-white rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden",
+        "flex flex-col sm:flex-row gap-4 sm:h-24 bg-white rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden text-left",
         className
       )}
       onClick={handleClick}
@@ -129,15 +129,15 @@ const EventCardList: React.FC<EventCardListProps> = ({
         )}
       </div>
       
-      {/* Content - More compact layout */}
-      <div className="flex flex-col flex-1 p-3 py-2 justify-between">
-        {/* Title */}
-        <h3 className="font-semibold text-gray-900 text-base line-clamp-1">
+      {/* Content - Left aligned */}
+      <div className="flex flex-col flex-1 p-3 py-2 justify-between text-left">
+        {/* Title - Left aligned */}
+        <h3 className="font-semibold text-gray-900 text-base line-clamp-1 text-left">
           {event.title}
         </h3>
           
-        {/* Date and Time */}
-        <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+        {/* Date and Time - Left aligned */}
+        <div className="flex items-center gap-1 text-xs text-gray-500 mt-1 text-left">
           <Calendar className="h-3 w-3" />
           <span>
             {formattedDate && timeDisplay ? (
@@ -150,10 +150,10 @@ const EventCardList: React.FC<EventCardListProps> = ({
           </span>
         </div>
         
-        {/* Bottom row with location and RSVP buttons */}
+        {/* Bottom row with location and RSVP buttons - Left aligned */}
         <div className="flex items-center justify-between mt-1">
-          {/* Location */}
-          <div className="flex items-center gap-1 text-xs text-gray-500">
+          {/* Location - Left aligned */}
+          <div className="flex items-center gap-1 text-xs text-gray-500 text-left">
             <MapPin className="h-3 w-3" />
             <span className="truncate max-w-[200px]">
               {event.venues?.name || event.location || 'No location'}
