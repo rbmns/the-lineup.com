@@ -5,10 +5,13 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchEventById } from '@/lib/eventService';
 import { ArrowLeft, Calendar, MapPin, Users, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Helmet } from 'react-helmet-async';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
 import { useEventRsvpHandler } from '@/hooks/events/useEventRsvpHandler';
 import { EventRsvpSection } from '@/components/events/detail-sections/EventRsvpSection';
+import { EventDescriptionSection } from '@/components/events/detail-sections/EventDescriptionSection';
+import { EventAttendeesSummary } from '@/components/events/detail-sections/EventAttendeesSummary';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { getEventImage } from '@/utils/eventImages';
@@ -200,28 +203,53 @@ const EventDetail: React.FC<EventDetailProps> = ({
             }}
           />
           
-          <h1 className="text-4xl font-bold mb-4">{event.title}</h1>
+          <h1 className="text-4xl font-bold mb-6">{event.title}</h1>
           
-          <div className="flex flex-wrap gap-4 text-gray-600 mb-6">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              <span>
-                {event.start_date && formatDate(event.start_date)}
-                {event.start_time && ` • ${formatEventTime(event.start_time, event.end_time)}`}
-              </span>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
-              <span>{eventLocation}</span>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              <span>
-                {event.attendees?.going || 0} going, {event.attendees?.interested || 0} interested
-              </span>
-            </div>
+          {/* Event Details Cards */}
+          <div className="grid gap-4 mb-6">
+            {/* Date & Time Card */}
+            <Card className="bg-gray-50">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-5 w-5 text-gray-600" />
+                  <div>
+                    <h3 className="font-medium text-gray-900">Date & Time</h3>
+                    <p className="text-sm text-gray-600">
+                      {event.start_date && formatDate(event.start_date)}
+                      {event.start_time && ` • ${formatEventTime(event.start_time, event.end_time)}`}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Location Card */}
+            <Card className="bg-gray-50">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <MapPin className="h-5 w-5 text-gray-600" />
+                  <div>
+                    <h3 className="font-medium text-gray-900">Venue</h3>
+                    <p className="text-sm text-gray-600">{eventLocation}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Attendees Card */}
+            <Card className="bg-gray-50">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <Users className="h-5 w-5 text-gray-600" />
+                  <div>
+                    <h3 className="font-medium text-gray-900">Who's going</h3>
+                    <p className="text-sm text-gray-600">
+                      {event.attendees?.going || 0} going, {event.attendees?.interested || 0} interested
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {event.event_category && (
@@ -251,8 +279,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
         {/* Event Description */}
         {event.description && (
           <div className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">About This Event</h2>
-            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{event.description}</p>
+            <EventDescriptionSection description={event.description} />
           </div>
         )}
 

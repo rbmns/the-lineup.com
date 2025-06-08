@@ -93,7 +93,7 @@ const Layout = () => {
       <div className="flex w-full min-h-screen">
         {/* Left sidebar - Desktop only */}
         {!isMobile && (
-          <div className="fixed left-0 top-16 bottom-0 w-20 bg-white border-r border-gray-200 z-30">
+          <div className="fixed left-0 top-16 bottom-0 w-20 bg-white z-30">
             <LeftSidebar />
           </div>
         )}
@@ -151,7 +151,7 @@ const Layout = () => {
 
       {/* Mobile Navigation - Fixed to bottom */}
       {isMobile && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-pb">
+        <div className="fixed bottom-0 left-0 right-0 bg-white z-50 safe-area-pb">
           <LeftSidebar />
         </div>
       )}

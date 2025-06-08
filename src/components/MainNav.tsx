@@ -37,7 +37,7 @@ const MainNav = () => {
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-200 ${
       isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-white'
-    } border-b border-gray-200`}>
+    }`}>
       <div className={cn(
         "w-full h-16 flex items-center justify-between",
         isMobile ? "px-4" : "px-6 lg:px-8"

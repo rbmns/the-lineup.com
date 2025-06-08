@@ -12,6 +12,9 @@ import { EventAttendeesSummary } from './detail-sections/EventAttendeesSummary';
 import { EventExternalLink } from './detail-sections/EventExternalLink';
 import { EventFriendRsvps } from './EventFriendRsvps';
 import { extractEventCoordinates } from './detail-sections/EventCoordinatesExtractor';
+import { Card, CardContent } from '@/components/ui/card';
+import { Calendar, MapPin, Clock } from 'lucide-react';
+import { formatDate, formatEventTime } from '@/utils/date-formatting';
 
 interface EventDetailContentProps {
   event: Event;
@@ -61,17 +64,49 @@ const EventDetailContent = ({
       return false;
     }
   }, [onRsvp, event.rsvp_status]);
+
+  // Format event location
+  const eventLocation = event.venues?.name ? 
+    `${event.venues.name}${event.venues.city ? `, ${event.venues.city}` : ''}` : 
+    event.location || 'Location TBD';
   
   return (
     <div className="space-y-6 text-left">
-      {/* Event title and basic info */}
+      {/* Event title */}
       <div className="text-left">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-left">{event.title}</h1>
-        
-        {/* Date and time info - without duration */}
-        <div className="text-left">
-          <EventDateTimeSection startTime={event.start_time} endTime={null} />
-        </div>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-left">{event.title}</h1>
+      </div>
+      
+      {/* Event Details Cards */}
+      <div className="grid gap-4">
+        {/* Date & Time Card */}
+        <Card className="bg-gray-50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <Calendar className="h-5 w-5 text-gray-600" />
+              <div>
+                <h3 className="font-medium text-gray-900">Date & Time</h3>
+                <p className="text-sm text-gray-600">
+                  {event.start_date && formatDate(event.start_date)}
+                  {event.start_time && ` • ${formatEventTime(event.start_time, event.end_time)}`}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Location Card */}
+        <Card className="bg-gray-50">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <MapPin className="h-5 w-5 text-gray-600" />
+              <div>
+                <h3 className="font-medium text-gray-900">Venue</h3>
+                <p className="text-sm text-gray-600">{eventLocation}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
       
       {/* RSVP Section - prominently placed and responsive */}
@@ -85,18 +120,6 @@ const EventDetailContent = ({
       </div>
       
       <Separator />
-      
-      {/* Location section */}
-      {(event.venue_id || event.location || coordinates) && (
-        <div className="text-left">
-          <EventLocationSection 
-            venue={event.venues} 
-            location={event.location}
-            coordinates={coordinates}
-            title={event.title}
-          />
-        </div>
-      )}
       
       {/* Description */}
       <div className="text-left">
