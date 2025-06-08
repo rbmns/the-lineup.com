@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import MainNav from "@/components/MainNav";
 import LeftSidebar from "@/components/nav/LeftSidebar";
@@ -176,7 +175,7 @@ const EventSidePanel: React.FC<{ eventId: string; onClose: () => void }> = ({ ev
   >
     <div className="w-full h-full flex items-center justify-center p-6">
       <div 
-        className="bg-white rounded-xl w-full max-w-4xl h-[90vh] overflow-hidden relative shadow-2xl"
+        className="bg-white rounded-lg w-full max-w-4xl h-[90vh] overflow-hidden relative shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -211,10 +210,10 @@ const GlobalEventOverlay: React.FC<{ eventId: string; onClose: () => void; isMob
   >
     <div className="w-full h-full flex items-center justify-center">
       <div 
-        className={`bg-white rounded-xl w-full overflow-hidden relative shadow-2xl ${
+        className={`bg-white w-full overflow-hidden relative shadow-2xl ${
           isMobile 
             ? 'h-full max-w-full rounded-lg' 
-            : 'max-w-4xl h-[90vh]'
+            : 'max-w-4xl h-[90vh] rounded-lg'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -271,10 +270,10 @@ const URLEventOverlay: React.FC<{ onClose: () => void; isMobile: boolean }> = ({
   >
     <div className="w-full h-full flex items-center justify-center">
       <div 
-        className={`bg-white rounded-xl w-full overflow-hidden relative shadow-2xl ${
+        className={`bg-white w-full overflow-hidden relative shadow-2xl ${
           isMobile 
             ? 'h-full max-w-full rounded-lg' 
-            : 'max-w-4xl h-[90vh]'
+            : 'max-w-4xl h-[90vh] rounded-lg'
         }`}
       >
         <button
@@ -327,18 +326,10 @@ const EventDetailOverlay: React.FC<{ eventId: string }> = ({ eventId }) => {
 
   return (
     <div className="w-full text-left">
-      <EventDetailHeader 
+      <EventDetailContent 
         event={event}
-        eventType={event.event_category || ''}
-        title={event.title}
-        showTitleOverlay={false}
+        isOwner={false}
       />
-      <div className="w-full text-left px-4 md:px-6 py-4 md:py-6">
-        <EventDetailContent 
-          event={event}
-          isOwner={false}
-        />
-      </div>
     </div>
   );
 };

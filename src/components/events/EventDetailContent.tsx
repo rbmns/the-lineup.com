@@ -13,8 +13,11 @@ import { EventExternalLink } from './detail-sections/EventExternalLink';
 import { EventFriendRsvps } from './EventFriendRsvps';
 import { extractEventCoordinates } from './detail-sections/EventCoordinatesExtractor';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, MapPin, Clock } from 'lucide-react';
+import { Calendar, MapPin, Clock, Euro } from 'lucide-react';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
+import { CategoryPill } from '@/components/ui/category-pill';
+import { useEventImages } from '@/hooks/useEventImages';
+import { LineupImage } from '@/components/ui/lineup-image';
 
 interface EventDetailContentProps {
   event: Event;
@@ -38,6 +41,8 @@ const EventDetailContent = ({
   rsvpLoading = false,
   isOwner = false,
 }: EventDetailContentProps) => {
+  const { getEventImageUrl } = useEventImages();
+  
   // Get coordinates in a standardized format - memoized
   const coordinates = useMemo(() => 
     extractEventCoordinates(event.coordinates), 
@@ -70,91 +75,134 @@ const EventDetailContent = ({
     `${event.venues.name}${event.venues.city ? `, ${event.venues.city}` : ''}` : 
     event.location || 'Location TBD';
   
-  return (
-    <div className="w-full max-w-2xl mx-auto px-4 md:px-6 py-6">
-      <div className="space-y-6 text-left">
-        {/* Event title */}
-        <div className="text-left">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-left">{event.title}</h1>
-        </div>
-        
-        {/* Event Details Cards */}
-        <div className="grid gap-4">
-          {/* Date & Time Card */}
-          <Card className="bg-gray-50">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Calendar className="h-5 w-5 text-gray-600" />
-                <div>
-                  <h3 className="font-medium text-gray-900">Date & Time</h3>
-                  <p className="text-sm text-gray-600">
-                    {event.start_date && formatDate(event.start_date)}
-                    {event.start_time && ` • ${formatEventTime(event.start_time, event.end_time)}`}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+  const imageUrl = getEventImageUrl(event);
 
-          {/* Location Card */}
-          <Card className="bg-gray-50">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <MapPin className="h-5 w-5 text-gray-600" />
-                <div>
-                  <h3 className="font-medium text-gray-900">Venue</h3>
-                  <p className="text-sm text-gray-600">{eventLocation}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+  return (
+    <div className="w-full">
+      {/* Full width image header with category pill on top */}
+      <div className="relative w-full">
+        <LineupImage
+          src={imageUrl}
+          alt={event.title}
+          aspectRatio="hero"
+          overlayVariant="sunset"
+          className="w-full"
+          loading="eager"
+        />
         
-        {/* RSVP Section - prominently placed and responsive */}
-        <div className="bg-gray-50 rounded-lg p-4 text-left">
-          <EventRsvpSection 
-            isOwner={isOwner}
-            onRsvp={handleRsvp}
-            isRsvpLoading={isRsvpLoading || rsvpLoading}
-            currentStatus={event.rsvp_status || null}
-          />
-        </div>
-        
-        <Separator />
-        
-        {/* Description */}
-        <div className="text-left">
-          <EventDescriptionSection description={event.description || ''} />
-        </div>
-        
-        {/* Attendees summary */}
-        <div className="text-left">
-          <EventAttendeesSummary 
-            goingCount={attendees?.going?.length || event.attendees?.going || 0}
-            interestedCount={attendees?.interested?.length || event.attendees?.interested || 0}
-          />
-        </div>
-        
-        {/* Friends attending section */}
-        {friendAttendees && (friendAttendees.going.length > 0 || friendAttendees.interested.length > 0) && (
-          <div className="bg-gray-50 p-4 rounded-lg text-left">
-            <EventFriendRsvps 
-              going={friendAttendees.going}
-              interested={friendAttendees.interested}
+        {/* Category pill on top of image */}
+        {event.event_category && (
+          <div className="absolute top-4 left-4 z-30">
+            <CategoryPill 
+              category={event.event_category}
+              size="sm"
+              showIcon={true}
             />
           </div>
         )}
-        
-        {/* External link if available */}
-        {bookingLink && (
+      </div>
+
+      {/* Content area with full width */}
+      <div className="w-full px-6 py-6">
+        <div className="space-y-6 text-left">
+          {/* Event title - left aligned */}
           <div className="text-left">
-            <EventExternalLink url={bookingLink} />
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-left">{event.title}</h1>
           </div>
-        )}
-        
-        {/* Tags */}
-        <div className="text-left">
-          <EventTagsSection tags={event.tags} />
+          
+          {/* Event Details Cards */}
+          <div className="grid gap-4">
+            {/* Date & Time Card */}
+            <Card className="bg-gray-50">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-5 w-5 text-gray-600" />
+                  <div>
+                    <h3 className="font-medium text-gray-900">Date & Time</h3>
+                    <p className="text-sm text-gray-600">
+                      {event.start_date && formatDate(event.start_date)}
+                      {event.start_time && ` • ${formatEventTime(event.start_time, event.end_time)}`}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Location Card */}
+            <Card className="bg-gray-50">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <MapPin className="h-5 w-5 text-gray-600" />
+                  <div>
+                    <h3 className="font-medium text-gray-900">Venue</h3>
+                    <p className="text-sm text-gray-600">{eventLocation}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Entrance Fee Card - only show if fee exists */}
+            {event.fee && (
+              <Card className="bg-gray-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <Euro className="h-5 w-5 text-gray-600" />
+                    <div>
+                      <h3 className="font-medium text-gray-900">Entrance Fee</h3>
+                      <p className="text-sm text-gray-600">€{event.fee}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+          
+          {/* RSVP Section - prominently placed and responsive */}
+          <div className="bg-gray-50 rounded-lg p-4 text-left">
+            <EventRsvpSection 
+              isOwner={isOwner}
+              onRsvp={handleRsvp}
+              isRsvpLoading={isRsvpLoading || rsvpLoading}
+              currentStatus={event.rsvp_status || null}
+            />
+          </div>
+          
+          <Separator />
+          
+          {/* Description */}
+          <div className="text-left">
+            <EventDescriptionSection description={event.description || ''} />
+          </div>
+          
+          {/* Attendees summary */}
+          <div className="text-left">
+            <EventAttendeesSummary 
+              goingCount={attendees?.going?.length || event.attendees?.going || 0}
+              interestedCount={attendees?.interested?.length || event.attendees?.interested || 0}
+            />
+          </div>
+          
+          {/* Friends attending section */}
+          {friendAttendees && (friendAttendees.going.length > 0 || friendAttendees.interested.length > 0) && (
+            <div className="bg-gray-50 p-4 rounded-lg text-left">
+              <EventFriendRsvps 
+                going={friendAttendees.going}
+                interested={friendAttendees.interested}
+              />
+            </div>
+          )}
+          
+          {/* External link if available */}
+          {bookingLink && (
+            <div className="text-left">
+              <EventExternalLink url={bookingLink} />
+            </div>
+          )}
+          
+          {/* Tags */}
+          <div className="text-left">
+            <EventTagsSection tags={event.tags} />
+          </div>
         </div>
       </div>
     </div>
