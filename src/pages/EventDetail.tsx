@@ -130,7 +130,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="max-w-4xl mx-auto px-6 py-8">
+        <div className="max-w-2xl mx-auto px-4 md:px-6 py-8">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
             <div className="h-64 bg-gray-200 rounded mb-6"></div>
@@ -146,7 +146,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
   if (error || !event) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="max-w-4xl mx-auto px-6 py-8">
+        <div className="max-w-2xl mx-auto px-4 md:px-6 py-8">
           {showBackButton && (
             <Link to="/events" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -181,7 +181,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
         <meta name="description" content={event.description || `Join us for ${event.title}`} />
       </Helmet>
 
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="max-w-2xl mx-auto px-4 md:px-6 py-8">
         {showBackButton && (
           <Link to="/events" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6">
             <ArrowLeft className="h-4 w-4 mr-2" />
