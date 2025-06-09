@@ -92,7 +92,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
 
   // Render event card helper function
   const renderEventCard = (event: Event) => (
-    <div key={event.id} className="h-full min-w-0">
+    <div key={event.id} className="h-full min-w-0 w-full">
       <EventCard 
         key={event.id} 
         event={event}
@@ -107,16 +107,15 @@ export const EventGrid: React.FC<EventGridProps> = ({
 
   return (
     <React.Fragment>
-      {/* Grid with improved responsive layout */}
+      {/* Grid with improved responsive layout - better breakpoints to prevent narrow cards */}
       <div className={cn(
-        "grid gap-3 w-full",
-        "grid-cols-1", // Mobile: 1 column
-        "xs:grid-cols-1", // Extra small: 1 column 
-        "sm:grid-cols-2", // Small: 2 columns (576px+)
-        "md:grid-cols-2", // Medium: 2 columns (768px+)
-        "lg:grid-cols-3", // Large: 3 columns (1024px+)
-        "xl:grid-cols-3", // XL: 3 columns (1280px+)
-        "2xl:grid-cols-4", // 2XL: 4 columns for very wide screens
+        "grid gap-4 w-full auto-rows-fr",
+        // Improved responsive grid - cards won't become too narrow
+        "grid-cols-1", // Mobile: 1 column (up to 640px)
+        "min-[640px]:grid-cols-2", // Small tablets: 2 columns (640px+)
+        "min-[900px]:grid-cols-3", // Medium: 3 columns (900px+)  
+        "min-[1200px]:grid-cols-3", // Large: 3 columns (1200px+)
+        "min-[1600px]:grid-cols-4", // Very large: 4 columns (1600px+)
         className
       )} style={style}>
         {/* If using teaser, render events before teaser */}
@@ -136,14 +135,12 @@ export const EventGrid: React.FC<EventGridProps> = ({
       {/* Events after teaser if any */}
       {showSignupTeaser && eventsAfterTeaser.length > 0 && (
         <div className={cn(
-          "grid gap-3 w-full",
-          "grid-cols-1", // Mobile: 1 column
-          "xs:grid-cols-1", // Extra small: 1 column
-          "sm:grid-cols-2", // Small: 2 columns (576px+)
-          "md:grid-cols-2", // Medium: 2 columns (768px+)
-          "lg:grid-cols-3", // Large: 3 columns (1024px+)
-          "xl:grid-cols-3", // XL: 3 columns (1280px+)
-          "2xl:grid-cols-4", // 2XL: 4 columns for very wide screens
+          "grid gap-4 w-full auto-rows-fr",
+          "grid-cols-1",
+          "min-[640px]:grid-cols-2",
+          "min-[900px]:grid-cols-3",
+          "min-[1200px]:grid-cols-3",
+          "min-[1600px]:grid-cols-4",
           className
         )}>
           {eventsAfterTeaser.map(renderEventCard)}
