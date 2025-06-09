@@ -124,11 +124,10 @@ const Home = () => {
         <meta name="description" content="Discover and join events in your area" />
       </Helmet>
       
-      {/* Hero Section with Updated Background - Made more compact for mobile */}
+      {/* Hero Section with Updated Background - Fixed height for desktop */}
       <section className="relative bg-cover bg-center w-full" style={{
         backgroundImage: "url('/lovable-uploads/68eaf77e-c1bd-4326-bfdc-72328318f27d.png')",
-        height: isMobile ? '70vh' : 'auto',
-        minHeight: isMobile ? '70vh' : '500px'
+        height: isMobile ? '80vh' : '600px' // Fixed height for desktop, responsive for mobile
       }}>
         <div className="absolute inset-0 bg-black/50"></div>
         <div className="relative w-full px-4 text-center text-white h-full flex items-center">
@@ -209,7 +208,7 @@ const Home = () => {
               </div>
             )}
             
-            {/* Events Grid */}
+            {/* Events Grid with consistent heights */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {isLoading ? (
                 <div className="flex justify-center w-full py-8 col-span-3">
@@ -219,10 +218,10 @@ const Home = () => {
                 filteredEvents.slice(0, 3).map((event) => (
                   <div 
                     key={event.id}
-                    className="cursor-pointer"
+                    className="cursor-pointer h-full" // Ensure consistent heights
                     onClick={() => handleEventClick(event)}
                   >
-                    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
                       <div className="relative">
                         <LineupImage
                           src={event.image_urls && event.image_urls.length > 0 ? event.image_urls[0] : getEventImageUrl(event)}
@@ -241,12 +240,12 @@ const Home = () => {
                           </div>
                         )}
                       </div>
-                      <CardContent className="p-4">
-                        <h3 className="font-semibold mb-2">{event.title}</h3>
+                      <CardContent className="p-4 flex-1 flex flex-col">
+                        <h3 className="font-semibold mb-2 line-clamp-2">{event.title}</h3>
                         <p className="text-sm text-gray-600 mb-1">
                           {formatFeaturedDate(event.start_date)} • {formatEventTime(event.start_time, event.end_time)}
                         </p>
-                        <p className="text-sm text-gray-600">{event.venues?.name || event.location}</p>
+                        <p className="text-sm text-gray-600 flex-1">{event.venues?.name || event.location}</p>
                       </CardContent>
                     </Card>
                   </div>

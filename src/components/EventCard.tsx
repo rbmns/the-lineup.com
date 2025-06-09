@@ -91,10 +91,10 @@ const EventCard: React.FC<EventCardProps> = ({
       )}
       onClick={handleCardClick}
     >
-      {/* Image Section - Improved mobile sizing */}
+      {/* Image Section - Consistent sizing */}
       <div className={cn(
         "relative overflow-hidden w-full flex-shrink-0",
-        compact ? "h-32" : "h-40 sm:h-48 md:h-52" // Better responsive height progression
+        compact ? "h-32" : "h-48" // Fixed height for consistency
       )}>
         <LineupImage
           src={getEventImage()}
@@ -116,35 +116,39 @@ const EventCard: React.FC<EventCardProps> = ({
         )}
       </div>
 
-      {/* Content Section - Improved mobile padding and text wrapping */}
+      {/* Content Section - Flex layout for consistent heights */}
       <CardContent className={cn(
         "flex-1 flex flex-col w-full min-w-0 text-left",
-        compact ? "p-3" : "p-3 sm:p-4" // Consistent smaller padding
+        compact ? "p-3" : "p-3 sm:p-4"
       )}>
-        {/* Title - Better text wrapping */}
+        {/* Title - Fixed height with line clamping */}
         <h3 className={cn(
           "font-semibold text-ocean-deep line-clamp-2 mb-2 group-hover:text-seafoam-green transition-colors text-left",
-          "break-words hyphens-auto overflow-wrap-anywhere", // Better text wrapping
+          "break-words hyphens-auto overflow-wrap-anywhere min-h-[2.5rem]", // Fixed minimum height
           compact ? "text-sm leading-tight" : "text-sm sm:text-base leading-tight"
         )}>
           {event.title}
         </h3>
 
-        {/* Meta Information - Compact on mobile */}
-        <EventCardMeta 
-          event={event} 
-          compact={compact}
-          className="mb-2 text-left" // Reduced margin
-        />
+        {/* Meta Information - Fixed height */}
+        <div className="min-h-[1.25rem] mb-2">
+          <EventCardMeta 
+            event={event} 
+            compact={compact}
+            className="text-left"
+          />
+        </div>
 
-        {/* Description - Better mobile spacing */}
-        <EventCardDescription 
-          description={event.description}
-          compact={compact}
-          className="mb-3 flex-1 text-left" // Reduced margin
-        />
+        {/* Description - Flex-grow to fill space */}
+        <div className="flex-1 mb-3">
+          <EventCardDescription 
+            description={event.description}
+            compact={compact}
+            className="text-left"
+          />
+        </div>
 
-        {/* Actions - Only show if authenticated, better mobile layout */}
+        {/* Actions - Always at bottom */}
         {showRsvpButtons && isAuthenticated && (
           <div className="mt-auto">
             <EventCardActions

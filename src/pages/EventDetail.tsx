@@ -10,7 +10,6 @@ import { Helmet } from 'react-helmet-async';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
 import { useEventRsvpHandler } from '@/hooks/events/useEventRsvpHandler';
 import { EventRsvpSection } from '@/components/events/detail-sections/EventRsvpSection';
-import { EventDescriptionSection } from '@/components/events/detail-sections/EventDescriptionSection';
 import { EventAttendeesList } from '@/components/events/EventAttendeesList';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { useAuth } from '@/contexts/AuthContext';
@@ -230,7 +229,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
         
         {/* Event title overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">{event.title}</h1>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2 text-left">{event.title}</h1>
           <div className="flex items-center text-white/90 text-sm">
             <Calendar className="h-4 w-4 mr-2" />
             <span>
@@ -247,7 +246,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* RSVP Section - only show if authenticated */}
-            {user && (
+            {isAuthenticated && (
               <div className={`transition-all duration-300 ${rsvpFeedback ? 'scale-105' : ''} ${
                 rsvpFeedback === 'going' ? 'ring-2 ring-green-200' : 
                 rsvpFeedback === 'interested' ? 'ring-2 ring-blue-200' : ''
@@ -262,34 +261,73 @@ const EventDetail: React.FC<EventDetailProps> = ({
             )}
 
             {/* About this event */}
-            <div>
-              <h2 className="text-xl font-semibold mb-4">About this event</h2>
-              <EventDescriptionSection description={event.description || ''} />
+            <div className="text-left">
+              <h2 className="text-xl font-semibold mb-4 text-left">About this event</h2>
+              <div className="prose prose-sm max-w-none text-left">
+                <p className="whitespace-pre-line text-left">{event.description || ''}</p>
+              </div>
             </div>
 
             {/* Additional Info */}
             {event.extra_info && (
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Additional Information</h2>
-                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{event.extra_info}</p>
+              <div className="text-left">
+                <h2 className="text-xl font-semibold mb-4 text-left">Additional Information</h2>
+                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap text-left">{event.extra_info}</p>
               </div>
             )}
 
             {/* Attendees - only show if authenticated */}
             {isAuthenticated && attendees && (attendees.going.length > 0 || attendees.interested.length > 0) && (
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Who's attending</h2>
-                <EventAttendeesList 
-                  going={attendees.going}
-                  interested={attendees.interested}
-                />
+              <div className="text-left">
+                <h2 className="text-xl font-semibold mb-4 text-left">Friends Attending</h2>
+                <div className="space-y-4">
+                  {attendees.going.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-600 mb-2 text-left">Going: {attendees.going.length}</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {attendees.going.map((attendee) => (
+                          <Link 
+                            key={attendee.id} 
+                            to={`/profile/${attendee.id}`}
+                            className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1 hover:bg-gray-200 transition-colors"
+                          >
+                            <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-xs">
+                              {attendee.username?.charAt(0).toUpperCase()}
+                            </div>
+                            <span className="text-sm">{attendee.username}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {attendees.interested.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-600 mb-2 text-left">Interested: {attendees.interested.length}</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {attendees.interested.map((attendee) => (
+                          <Link 
+                            key={attendee.id} 
+                            to={`/profile/${attendee.id}`}
+                            className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1 hover:bg-gray-200 transition-colors"
+                          >
+                            <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-xs">
+                              {attendee.username?.charAt(0).toUpperCase()}
+                            </div>
+                            <span className="text-sm">{attendee.username}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
             {/* Hosted by */}
             {event.organiser_name && (
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Hosted by</h2>
+              <div className="text-left">
+                <h2 className="text-xl font-semibold mb-4 text-left">Hosted by</h2>
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
                     <span className="text-lg font-medium text-gray-600">
@@ -297,8 +335,8 @@ const EventDetail: React.FC<EventDetailProps> = ({
                     </span>
                   </div>
                   <div>
-                    <p className="font-medium">{event.organiser_name}</p>
-                    <p className="text-sm text-gray-600">Event Organizer</p>
+                    <p className="font-medium text-left">{event.organiser_name}</p>
+                    <p className="text-sm text-gray-600 text-left">Event Organizer</p>
                   </div>
                 </div>
               </div>
@@ -312,9 +350,9 @@ const EventDetail: React.FC<EventDetailProps> = ({
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-gray-600 mt-0.5" />
-                  <div>
-                    <h3 className="font-medium text-gray-900 mb-1">Location</h3>
-                    <p className="text-sm text-gray-600">{eventLocation}</p>
+                  <div className="text-left">
+                    <h3 className="font-medium text-gray-900 mb-1 text-left">Location</h3>
+                    <p className="text-sm text-gray-600 text-left">{eventLocation}</p>
                     <Button variant="link" className="p-0 h-auto text-sm text-blue-600">
                       View on map
                     </Button>
@@ -329,10 +367,10 @@ const EventDetail: React.FC<EventDetailProps> = ({
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
                     <Euro className="h-5 w-5 text-gray-600 mt-0.5" />
-                    <div>
-                      <h3 className="font-medium text-gray-900 mb-1">Booking Info</h3>
-                      <p className="text-sm text-gray-600 mb-2">Entry fee</p>
-                      <p className="font-medium">€{event.fee}</p>
+                    <div className="text-left">
+                      <h3 className="font-medium text-gray-900 mb-1 text-left">Booking Info</h3>
+                      <p className="text-sm text-gray-600 mb-2 text-left">Entry fee</p>
+                      <p className="font-medium text-left">€{event.fee}</p>
                       {event.organizer_link && (
                         <Button variant="link" className="p-0 h-auto text-sm text-blue-600 mt-2" asChild>
                           <a href={event.organizer_link} target="_blank" rel="noopener noreferrer">
@@ -346,14 +384,14 @@ const EventDetail: React.FC<EventDetailProps> = ({
               </Card>
             )}
 
-            {/* Attendee Summary - only show counts if authenticated */}
+            {/* Attendee Summary - only show if authenticated */}
             {isAuthenticated && (
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
                     <Users className="h-5 w-5 text-gray-600 mt-0.5" />
-                    <div className="w-full">
-                      <h3 className="font-medium text-gray-900 mb-3">Attendees</h3>
+                    <div className="w-full text-left">
+                      <h3 className="font-medium text-gray-900 mb-3 text-left">Attendees</h3>
                       
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
