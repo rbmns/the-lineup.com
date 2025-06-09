@@ -3,7 +3,7 @@ import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, Users, Search, Map, ChevronLeft, ChevronRight, Edit, UserCircle, Sparkles, Coffee, MapPin, Clock } from 'lucide-react';
+import { Calendar, Users, Search, Map, ChevronLeft, ChevronRight, Edit, UserCircle, Sparkles, Coffee, MapPin, Clock, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { EventCategoryIcon } from '@/components/ui/event-category-icon';
 import { useEvents } from '@/hooks/useEvents';
@@ -25,8 +25,7 @@ const Home = () => {
   const isMobile = useIsMobile();
   const { getEventImageUrl } = useEventImages();
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const { availableCategories } = useEventCategories(events);
+  const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
   
   // Scroll to top when coming from another page (but not on initial load)
   useEffect(() => {
@@ -78,25 +77,30 @@ const Home = () => {
     return featured;
   }, [events]);
 
-  // Filter events by selected category
-  const filteredEvents = React.useMemo(() => {
-    if (!selectedCategory) return upcomingEvents;
-    return upcomingEvents.filter(event => event.event_category === selectedCategory);
-  }, [upcomingEvents, selectedCategory]);
-
-  // Get categories that exist in upcoming events
-  const availableCategoriesInUpcoming = React.useMemo(() => {
+  // Get available vibes from upcoming events
+  const availableVibes = React.useMemo(() => {
     if (!upcomingEvents || upcomingEvents.length === 0) return [];
     
-    return Array.from(new Set(
-      upcomingEvents
-        .filter(event => event.event_category)
-        .map(event => event.event_category as string)
-    )).sort();
+    const vibes = new Set<string>();
+    upcomingEvents.forEach(event => {
+      if (event.tags && Array.isArray(event.tags)) {
+        event.tags.forEach(tag => vibes.add(tag));
+      }
+    });
+    
+    return Array.from(vibes).sort();
   }, [upcomingEvents]);
 
-  const handleCategoryClick = (category: string) => {
-    setSelectedCategory(prevCategory => prevCategory === category ? null : category);
+  // Filter events by selected vibe
+  const filteredEvents = React.useMemo(() => {
+    if (!selectedVibe) return upcomingEvents;
+    return upcomingEvents.filter(event => 
+      event.tags && Array.isArray(event.tags) && event.tags.includes(selectedVibe)
+    );
+  }, [upcomingEvents, selectedVibe]);
+
+  const handleVibeClick = (vibe: string) => {
+    setSelectedVibe(prevVibe => prevVibe === vibe ? null : vibe);
   };
 
   const scrollEvents = (direction: 'left' | 'right') => {
@@ -120,27 +124,33 @@ const Home = () => {
         <meta name="description" content="Discover and join events in your area" />
       </Helmet>
       
-      {/* Hero Section with Updated Background */}
-      <section className="relative bg-cover bg-center py-20 w-full" style={{
-        backgroundImage: "url('/lovable-uploads/68eaf77e-c1bd-4326-bfdc-72328318f27d.png')"
+      {/* Hero Section with Updated Background - Made more compact for mobile */}
+      <section className="relative bg-cover bg-center w-full" style={{
+        backgroundImage: "url('/lovable-uploads/68eaf77e-c1bd-4326-bfdc-72328318f27d.png')",
+        height: isMobile ? '70vh' : 'auto',
+        minHeight: isMobile ? '70vh' : '500px'
       }}>
         <div className="absolute inset-0 bg-black/50"></div>
-        <div className="relative w-full px-4 text-center text-white">
+        <div className="relative w-full px-4 text-center text-white h-full flex items-center">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
+            <h1 className={`font-bold tracking-tight mb-4 ${
+              isMobile ? 'text-3xl' : 'text-5xl md:text-6xl'
+            }`}>
               See what's on in Zandvoort
             </h1>
-            <p className="text-xl leading-relaxed mb-8">
-              Discover local events and casual plans that fit your vibe. Explore what's happening nearby - music, surf, art, community, and more. Join events or post your own casual plans. Or, just browse events.
+            <p className={`leading-relaxed mb-6 ${
+              isMobile ? 'text-base' : 'text-xl'
+            }`}>
+              Discover local events and casual plans that fit your vibe. Explore what's happening nearby - music, surf, art, community, and more.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
-              <Button asChild variant="outline" size="lg" className="border-2 bg-transparent border-white text-white hover:bg-white/10">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button asChild variant="outline" size={isMobile ? "default" : "lg"} className="border-2 bg-transparent border-white text-white hover:bg-white/10">
                 <Link to="/events">
                   Explore Events
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="border-2 bg-transparent border-white text-white hover:bg-white/10">
+              <Button asChild variant="outline" size={isMobile ? "default" : "lg"} className="border-2 bg-transparent border-white text-white hover:bg-white/10">
                 <Link to="/profile">
                   Create Your Free Profile
                 </Link>
@@ -148,6 +158,13 @@ const Home = () => {
             </div>
           </div>
         </div>
+        
+        {/* Scroll indicator arrow - only on mobile */}
+        {isMobile && (
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <ChevronDown className="h-6 w-6 text-white/80" />
+          </div>
+        )}
       </section>
 
       {/* Upcoming Events Section */}
@@ -161,24 +178,36 @@ const Home = () => {
               </Link>
             </div>
             
-            {/* Category Filter Pills */}
-            <div className="flex gap-2 mb-8 overflow-x-auto">
-              <CategoryPill 
-                category="All categories" 
-                active={!selectedCategory} 
-                noBorder={true} 
-                onClick={() => setSelectedCategory(null)} 
-              />
-              {availableCategoriesInUpcoming.map((category) => (
-                <CategoryPill 
-                  key={category}
-                  category={category} 
-                  active={selectedCategory === category} 
-                  noBorder={true} 
-                  onClick={() => handleCategoryClick(category)}
-                />
-              ))}
-            </div>
+            {/* Vibe Filter Pills - single row, grow wider */}
+            {availableVibes.length > 0 && (
+              <div className="mb-8">
+                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                  <button
+                    onClick={() => setSelectedVibe(null)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 ${
+                      !selectedVibe 
+                        ? 'bg-black text-white' 
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    All vibes
+                  </button>
+                  {availableVibes.map((vibe) => (
+                    <button
+                      key={vibe}
+                      onClick={() => handleVibeClick(vibe)}
+                      className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 ${
+                        selectedVibe === vibe 
+                          ? 'bg-black text-white' 
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                    >
+                      {vibe}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             
             {/* Events Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -7,7 +7,13 @@ interface EventAttendee extends UserProfile {
   rsvp_status: 'Going' | 'Interested';
 }
 
-export const useEventAttendees = (eventId: string) => {
+interface UseEventAttendeesOptions {
+  enabled?: boolean;
+}
+
+export const useEventAttendees = (eventId: string, options: UseEventAttendeesOptions = {}) => {
+  const { enabled = true } = options;
+  
   const [attendees, setAttendees] = useState<{
     going: EventAttendee[];
     interested: EventAttendee[];
@@ -19,7 +25,7 @@ export const useEventAttendees = (eventId: string) => {
 
   useEffect(() => {
     const fetchAttendees = async () => {
-      if (!eventId) {
+      if (!eventId || !enabled) {
         setLoading(false);
         return;
       }
@@ -144,7 +150,7 @@ export const useEventAttendees = (eventId: string) => {
     };
 
     fetchAttendees();
-  }, [eventId]);
+  }, [eventId, enabled]);
 
   return { attendees, loading };
 };

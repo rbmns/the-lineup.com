@@ -11,12 +11,13 @@ import { formatDate, formatEventTime } from '@/utils/date-formatting';
 import { useEventRsvpHandler } from '@/hooks/events/useEventRsvpHandler';
 import { EventRsvpSection } from '@/components/events/detail-sections/EventRsvpSection';
 import { EventDescriptionSection } from '@/components/events/detail-sections/EventDescriptionSection';
-import { EventAttendeesSummary } from '@/components/events/detail-sections/EventAttendeesSummary';
+import { EventAttendeesList } from '@/components/events/EventAttendeesList';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { getEventImage } from '@/utils/eventImages';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useEventAttendees } from '@/hooks/useEventAttendees';
 
 interface EventDetailProps {
   eventId?: string;
@@ -29,7 +30,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
 }) => {
   const { id: paramId } = useParams<{ id: string }>();
   const eventId = propEventId || paramId;
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
   const isMobile = useIsMobile();
   const [rsvpLoading, setRsvpLoading] = useState(false);
@@ -40,6 +41,9 @@ const EventDetail: React.FC<EventDetailProps> = ({
     queryFn: () => fetchEventById(eventId!),
     enabled: !!eventId,
   });
+
+  // Fetch attendees only if user is authenticated
+  const { attendees, loading: attendeesLoading } = useEventAttendees(eventId!, { enabled: isAuthenticated });
 
   const { handleRsvp } = useEventRsvpHandler(eventId!);
 
@@ -271,6 +275,17 @@ const EventDetail: React.FC<EventDetailProps> = ({
               </div>
             )}
 
+            {/* Attendees - only show if authenticated */}
+            {isAuthenticated && attendees && (attendees.going.length > 0 || attendees.interested.length > 0) && (
+              <div>
+                <h2 className="text-xl font-semibold mb-4">Who's attending</h2>
+                <EventAttendeesList 
+                  going={attendees.going}
+                  interested={attendees.interested}
+                />
+              </div>
+            )}
+
             {/* Hosted by */}
             {event.organiser_name && (
               <div>
@@ -328,42 +343,34 @@ const EventDetail: React.FC<EventDetailProps> = ({
                     </div>
                   </div>
                 </CardContent>
-            </Card>
+              </Card>
             )}
 
-            {/* Friends Attending */}
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <Users className="h-5 w-5 text-gray-600 mt-0.5" />
-                  <div className="w-full">
-                    <h3 className="font-medium text-gray-900 mb-3">Friends Attending</h3>
-                    
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Going</span>
-                        <span className="text-sm font-medium">3</span>
-                      </div>
+            {/* Attendee Summary - only show counts if authenticated */}
+            {isAuthenticated && (
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <Users className="h-5 w-5 text-gray-600 mt-0.5" />
+                    <div className="w-full">
+                      <h3 className="font-medium text-gray-900 mb-3">Attendees</h3>
                       
-                      <div className="flex -space-x-2">
-                        <div className="w-8 h-8 bg-gray-300 rounded-full border-2 border-white"></div>
-                        <div className="w-8 h-8 bg-gray-300 rounded-full border-2 border-white"></div>
-                        <div className="w-8 h-8 bg-gray-300 rounded-full border-2 border-white"></div>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">Going</span>
+                          <span className="text-sm font-medium">{attendees?.going?.length || 0}</span>
+                        </div>
+                        
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">Interested</span>
+                          <span className="text-sm font-medium">{attendees?.interested?.length || 0}</span>
+                        </div>
                       </div>
-                      
-                      <div className="text-xs text-gray-500">
-                        <p>Going: 3</p>
-                        <p>Interested: 0</p>
-                      </div>
-                      
-                      <Button variant="outline" size="sm" className="w-full text-sm">
-                        See all attendees
-                      </Button>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </div>
