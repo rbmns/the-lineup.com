@@ -9,7 +9,7 @@ import { EventCardMeta } from '@/components/events/EventCardMeta';
 import { EventCardDescription } from '@/components/events/EventCardDescription';
 import { EventCardActions } from '@/components/events/EventCardActions';
 import { cn } from '@/lib/utils';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface EventCardProps {
   event: Event;
@@ -32,18 +32,14 @@ const EventCard: React.FC<EventCardProps> = ({
 }) => {
   const { isAuthenticated } = useAuth();
   const [imageError, setImageError] = useState(false);
-  const location = useLocation();
   const navigate = useNavigate();
 
   const handleCardClick = () => {
     if (onClick) {
       onClick(event);
     } else {
-      // Dispatch event for overlay handling
-      const customEvent = new CustomEvent('eventCardClicked', {
-        detail: { eventId: event.id }
-      });
-      window.dispatchEvent(customEvent);
+      // Navigate to full-page event detail
+      navigate(`/events/${event.id}`);
     }
   };
 

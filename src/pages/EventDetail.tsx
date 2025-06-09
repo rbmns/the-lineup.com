@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchEventById } from '@/lib/eventService';
-import { ArrowLeft, Calendar, MapPin, Users, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Calendar, MapPin, Users, ExternalLink, Euro } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Helmet } from 'react-helmet-async';
@@ -12,6 +12,7 @@ import { useEventRsvpHandler } from '@/hooks/events/useEventRsvpHandler';
 import { EventRsvpSection } from '@/components/events/detail-sections/EventRsvpSection';
 import { EventDescriptionSection } from '@/components/events/detail-sections/EventDescriptionSection';
 import { EventAttendeesSummary } from '@/components/events/detail-sections/EventAttendeesSummary';
+import { CategoryPill } from '@/components/ui/category-pill';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { getEventImage } from '@/utils/eventImages';
@@ -130,7 +131,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="max-w-2xl mx-auto px-4 md:px-6 py-8">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
             <div className="h-64 bg-gray-200 rounded mb-6"></div>
@@ -146,7 +147,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
   if (error || !event) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="max-w-2xl mx-auto px-4 md:px-6 py-8">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
           {showBackButton && (
             <Link to="/events" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -181,7 +182,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
         <meta name="description" content={event.description || `Join us for ${event.title}`} />
       </Helmet>
 
-      <div className="max-w-2xl mx-auto px-4 md:px-6 py-8">
+      <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
         {showBackButton && (
           <Link to="/events" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -190,20 +191,33 @@ const EventDetail: React.FC<EventDetailProps> = ({
         )}
 
         {/* Event Header */}
-        <div className="mb-8">
-          <img 
-            src={eventImage} 
-            alt={event.title}
-            className="w-full h-64 object-cover rounded-lg mb-6"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              if (!target.src.includes('default.jpg')) {
-                target.src = 'https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg';
-              }
-            }}
-          />
+        <div className="mb-8 relative">
+          <div className="relative">
+            <img 
+              src={eventImage} 
+              alt={event.title}
+              className="w-full h-64 object-cover rounded-lg mb-6"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                if (!target.src.includes('default.jpg')) {
+                  target.src = 'https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg';
+                }
+              }}
+            />
+            
+            {/* Category pill on top of image */}
+            {event.event_category && (
+              <div className="absolute top-4 left-4">
+                <CategoryPill 
+                  category={event.event_category}
+                  size="sm"
+                  showIcon={true}
+                />
+              </div>
+            )}
+          </div>
           
-          <h1 className="text-4xl font-bold mb-6">{event.title}</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-6 text-left">{event.title}</h1>
           
           {/* Event Details Cards */}
           <div className="grid gap-4 mb-6">
@@ -236,6 +250,21 @@ const EventDetail: React.FC<EventDetailProps> = ({
               </CardContent>
             </Card>
 
+            {/* Entrance Fee Card - only show if fee exists */}
+            {event.fee && (
+              <Card className="bg-gray-50">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <Euro className="h-5 w-5 text-gray-600" />
+                    <div>
+                      <h3 className="font-medium text-gray-900">Entrance Fee</h3>
+                      <p className="text-sm text-gray-600">€{event.fee}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Attendees Card */}
             <Card className="bg-gray-50">
               <CardContent className="p-4">
@@ -251,12 +280,6 @@ const EventDetail: React.FC<EventDetailProps> = ({
               </CardContent>
             </Card>
           </div>
-
-          {event.event_category && (
-            <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full mb-6">
-              {event.event_category}
-            </span>
-          )}
         </div>
 
         {/* RSVP Section - only show for authenticated users */}
@@ -288,14 +311,6 @@ const EventDetail: React.FC<EventDetailProps> = ({
           <div className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">Additional Information</h2>
             <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{event.extra_info}</p>
-          </div>
-        )}
-
-        {/* Fee Information */}
-        {event.fee && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">Cost</h2>
-            <p className="text-gray-700">€{event.fee}</p>
           </div>
         )}
 
