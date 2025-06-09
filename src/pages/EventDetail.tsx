@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -17,6 +16,7 @@ import { toast } from '@/hooks/use-toast';
 import { getEventImage } from '@/utils/eventImages';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEventAttendees } from '@/hooks/useEventAttendees';
+import EventShareButton from '@/components/events/EventShareButton';
 
 interface EventDetailProps {
   eventId?: string;
@@ -151,12 +151,6 @@ const EventDetail: React.FC<EventDetailProps> = ({
     return (
       <div className="min-h-screen bg-white">
         <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
-          {showBackButton && (
-            <Link to="/events" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Events
-            </Link>
-          )}
           <div className="text-center py-12">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
             <p className="text-gray-600 mb-6">The event you're looking for doesn't exist or has been removed.</p>
@@ -202,23 +196,9 @@ const EventDetail: React.FC<EventDetailProps> = ({
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
         
-        {/* Top navigation overlay */}
-        <div className="absolute top-0 left-0 right-0 p-4 sm:p-6 flex items-center justify-between">
-          {showBackButton && (
-            <Link to="/events" className="inline-flex items-center text-white hover:text-gray-200 bg-black/20 backdrop-blur-sm rounded-full px-3 py-2">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Events
-            </Link>
-          )}
-          <Button variant="ghost" size="sm" className="text-white hover:text-gray-200 bg-black/20 backdrop-blur-sm">
-            <Share className="h-4 w-4 mr-2" />
-            Share
-          </Button>
-        </div>
-        
         {/* Category pill on image */}
         {event.event_category && (
-          <div className="absolute top-20 left-4 sm:left-6">
+          <div className="absolute top-4 left-4">
             <CategoryPill 
               category={event.event_category}
               size="sm"
@@ -226,6 +206,14 @@ const EventDetail: React.FC<EventDetailProps> = ({
             />
           </div>
         )}
+        
+        {/* Share button - Top right */}
+        <div className="absolute top-4 right-4">
+          <EventShareButton 
+            event={event} 
+            variant="outline" 
+          />
+        </div>
         
         {/* Event title overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
@@ -411,6 +399,16 @@ const EventDetail: React.FC<EventDetailProps> = ({
             )}
           </div>
         </div>
+
+        {/* Back to Events button at bottom */}
+        {showBackButton && (
+          <div className="mt-12 pt-8 border-t border-gray-200">
+            <Link to="/events" className="inline-flex items-center text-blue-600 hover:text-blue-800">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Events
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

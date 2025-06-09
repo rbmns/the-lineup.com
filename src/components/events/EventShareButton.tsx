@@ -17,14 +17,30 @@ const EventShareButton = ({
   label = 'Share'
 }: EventShareButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  
-  const getEventUrl = () => {
-    // Use event slug if available, otherwise use ID
-    const path = event.slug 
-      ? `/events/${event.slug}` 
-      : `/events/${event.id}`;
+
+  const handleShare = async () => {
+    const eventUrl = `${window.location.origin}/events/${event.id}`;
     
-    return `${window.location.origin}${path}`;
+    // Try native sharing first
+    if (navigator.share && !isInAppBrowser()) {
+      try {
+        await navigator.share({
+          title: event.title,
+          text: event.description || `Check out ${event.title}`,
+          url: eventUrl
+        });
+        return;
+      } catch (error) {
+        // User cancelled or share failed, show dialog
+        if (error.name !== 'AbortError') {
+          setIsOpen(true);
+        }
+        return;
+      }
+    }
+    
+    // Fallback to custom share dialog
+    setIsOpen(true);
   };
 
   // Check if we're in Instagram's in-app browser or other social media browsers
@@ -35,33 +51,6 @@ const EventShareButton = ({
            userAgent.includes('FBAV') ||
            userAgent.includes('Twitter') ||
            userAgent.includes('LinkedInApp');
-  };
-
-  const handleShare = async () => {
-    // For in-app browsers (like Instagram), always show the dialog
-    if (isInAppBrowser()) {
-      setIsOpen(true);
-      return;
-    }
-
-    // Try native sharing for other browsers
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          url: getEventUrl(),
-          title: event.title,
-          text: event.description
-        });
-      } catch (error) {
-        // User cancelled or share failed, show dialog
-        if (error.name !== 'AbortError') {
-          setIsOpen(true);
-        }
-      }
-    } else {
-      // Native sharing not supported, show dialog
-      setIsOpen(true);
-    }
   };
 
   return (

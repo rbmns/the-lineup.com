@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { Event } from '@/types';
 import EventCard from '@/components/EventCard';
@@ -107,10 +106,11 @@ export const EventGrid: React.FC<EventGridProps> = ({
 
   return (
     <React.Fragment>
-      {/* Grid with improved responsive layout - better breakpoints to prevent narrow cards */}
+      {/* Grid with improved responsive layout - reduced gap on mobile */}
       <div className={cn(
-        "grid gap-4 w-full auto-rows-fr",
-        // Improved responsive grid - cards won't become too narrow
+        "grid w-full auto-rows-fr",
+        // Improved responsive grid with smaller gaps on mobile
+        "gap-2 sm:gap-4", // Reduced gap on mobile
         "grid-cols-1", // Mobile: 1 column (up to 640px)
         "min-[640px]:grid-cols-2", // Small tablets: 2 columns (640px+)
         "min-[900px]:grid-cols-3", // Medium: 3 columns (900px+)  
@@ -135,7 +135,8 @@ export const EventGrid: React.FC<EventGridProps> = ({
       {/* Events after teaser if any */}
       {showSignupTeaser && eventsAfterTeaser.length > 0 && (
         <div className={cn(
-          "grid gap-4 w-full auto-rows-fr",
+          "grid w-full auto-rows-fr",
+          "gap-2 sm:gap-4",
           "grid-cols-1",
           "min-[640px]:grid-cols-2",
           "min-[900px]:grid-cols-3",
