@@ -1,9 +1,9 @@
 
 import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from '@/components/ui/toaster';
+import { QueryClient } from '@/components/query-client';
 import Layout from '@/components/Layout';
 import Home from '@/pages/Home';
 import Events from '@/pages/Events';
@@ -22,12 +22,10 @@ import TermsOfService from '@/pages/TermsOfService';
 import CookiePolicy from '@/pages/CookiePolicy';
 import './App.css';
 
-const queryClient = new QueryClient();
-
 function App() {
   return (
     <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
+      <QueryClient>
         <AuthProvider>
           <BrowserRouter>
             <Routes>
@@ -56,7 +54,7 @@ function App() {
           </BrowserRouter>
           <Toaster />
         </AuthProvider>
-      </QueryClientProvider>
+      </QueryClient>
     </HelmetProvider>
   );
 }
