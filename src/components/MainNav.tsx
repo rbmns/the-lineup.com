@@ -43,12 +43,12 @@ const MainNav = () => {
         isMobile ? "px-4" : "px-6 lg:px-8"
       )}>
         {/* Left side - Logo + Brand aligned to left */}
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="flex items-center gap-2 flex-shrink-0"> {/* Reduced gap from gap-3 to gap-2 */}
           <Link to="/" className="flex items-center">
             <img 
               src="/lovable-uploads/272de8da-6e0c-40fd-a1b7-9f82414ed290.png" 
               alt="TheLineup Logo" 
-              className="w-8 h-8"
+              className="w-10 h-10" // Increased from w-8 h-8 to w-10 h-10
             />
           </Link>
           <BrandLogo showText={true} />

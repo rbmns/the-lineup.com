@@ -41,11 +41,11 @@ const Layout = () => {
             isMobile 
               ? 'pt-16 pb-20' // Mobile: account for nav + bottom nav
               : rightSidebarVisible 
-                ? 'pt-16 ml-20 mr-80' // Desktop with right sidebar
-                : 'pt-16 ml-20' // Desktop without right sidebar
+                ? 'pt-16 pl-20 pr-64' // Desktop with narrower right sidebar (was pr-80)
+                : 'pt-16 pl-20' // Desktop without right sidebar
           }`}
         >
-          <main className="bg-white w-full min-h-full">
+          <main className="bg-white w-full min-h-full p-0 m-0"> {/* Remove any default padding/margin */}
             <Outlet />
           </main>
           
@@ -55,7 +55,7 @@ const Layout = () => {
 
         {/* Right Social Sidebar - Desktop only */}
         {!isMobile && (
-          <div className="fixed right-0 top-16 bottom-0 w-80 z-30">
+          <div className="fixed right-0 top-16 bottom-0 w-64 z-30"> {/* Reduced width from w-80 to w-64 */}
             <SocialSidebar 
               visible={rightSidebarVisible}
               onToggleVisibility={toggleRightSidebar}
