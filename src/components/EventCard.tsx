@@ -86,15 +86,15 @@ const EventCard: React.FC<EventCardProps> = ({
       className={cn(
         "group overflow-hidden transition-all duration-200 hover:shadow-lg cursor-pointer h-full flex flex-col",
         "bg-white border border-sand hover:border-seafoam-green",
-        "w-full max-w-full", // Ensure card doesn't exceed container width
+        "w-full max-w-full min-w-0", // Ensure card fits container and handles overflow
         className
       )}
       onClick={handleCardClick}
     >
-      {/* Image Section */}
+      {/* Image Section - Improved mobile sizing */}
       <div className={cn(
         "relative overflow-hidden w-full flex-shrink-0",
-        compact ? "h-32" : "h-40 sm:h-48" // Responsive height
+        compact ? "h-32" : "h-40 sm:h-48 md:h-52" // Better responsive height progression
       )}>
         <LineupImage
           src={getEventImage()}
@@ -105,9 +105,9 @@ const EventCard: React.FC<EventCardProps> = ({
           onError={handleImageError}
         />
         
-        {/* Category Pill */}
+        {/* Category Pill - Better mobile positioning */}
         {event.event_category && (
-          <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
+          <div className="absolute top-2 left-2">
             <CategoryPill 
               category={event.event_category} 
               size={compact ? "sm" : "default"}
@@ -116,44 +116,46 @@ const EventCard: React.FC<EventCardProps> = ({
         )}
       </div>
 
-      {/* Content Section - Left aligned */}
+      {/* Content Section - Improved mobile padding and text wrapping */}
       <CardContent className={cn(
-        "flex-1 flex flex-col w-full min-w-0 text-left", // Added text-left
-        compact ? "p-2 sm:p-3" : "p-3 sm:p-4" // Responsive padding
+        "flex-1 flex flex-col w-full min-w-0 text-left",
+        compact ? "p-3" : "p-3 sm:p-4" // Consistent smaller padding
       )}>
-        {/* Title - Left aligned */}
+        {/* Title - Better text wrapping */}
         <h3 className={cn(
           "font-semibold text-ocean-deep line-clamp-2 mb-2 group-hover:text-seafoam-green transition-colors text-left",
-          "break-words", // Allow word breaking for long titles
-          compact ? "text-sm" : "text-sm sm:text-base" // Responsive text size
+          "break-words hyphens-auto overflow-wrap-anywhere", // Better text wrapping
+          compact ? "text-sm leading-tight" : "text-sm sm:text-base leading-tight"
         )}>
           {event.title}
         </h3>
 
-        {/* Meta Information - Left aligned */}
+        {/* Meta Information - Compact on mobile */}
         <EventCardMeta 
           event={event} 
           compact={compact}
-          className="mb-3 text-left"
+          className="mb-2 text-left" // Reduced margin
         />
 
-        {/* Description - Left aligned */}
+        {/* Description - Better mobile spacing */}
         <EventCardDescription 
           description={event.description}
           compact={compact}
-          className="mb-4 flex-1 text-left"
+          className="mb-3 flex-1 text-left" // Reduced margin
         />
 
-        {/* Actions - Only show if authenticated */}
+        {/* Actions - Only show if authenticated, better mobile layout */}
         {showRsvpButtons && isAuthenticated && (
-          <EventCardActions
-            eventId={event.id}
-            currentRsvpStatus={event.rsvp_status}
-            onRsvp={onRsvp}
-            isLoading={loadingEventId === event.id}
-            compact={compact}
-            onClick={(e) => e.stopPropagation()} // Prevent card click when clicking RSVP buttons
-          />
+          <div className="mt-auto">
+            <EventCardActions
+              eventId={event.id}
+              currentRsvpStatus={event.rsvp_status}
+              onRsvp={onRsvp}
+              isLoading={loadingEventId === event.id}
+              compact={compact}
+              onClick={(e) => e.stopPropagation()} // Prevent card click when clicking RSVP buttons
+            />
+          </div>
         )}
       </CardContent>
     </Card>

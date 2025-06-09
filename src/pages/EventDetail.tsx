@@ -182,7 +182,8 @@ const EventDetail: React.FC<EventDetailProps> = ({
         <meta name="description" content={event.description || `Join us for ${event.title}`} />
       </Helmet>
 
-      <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
+      {/* Full width container with proper mobile padding */}
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto">
         {showBackButton && (
           <Link to="/events" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -196,7 +197,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
             <img 
               src={eventImage} 
               alt={event.title}
-              className="w-full h-64 object-cover rounded-lg mb-6"
+              className="w-full h-48 sm:h-64 lg:h-80 object-cover rounded-lg mb-6"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
                 if (!target.src.includes('default.jpg')) {
@@ -207,7 +208,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
             
             {/* Category pill on top of image */}
             {event.event_category && (
-              <div className="absolute top-4 left-4">
+              <div className="absolute top-3 left-3 sm:top-4 sm:left-4">
                 <CategoryPill 
                   category={event.event_category}
                   size="sm"
@@ -217,18 +218,18 @@ const EventDetail: React.FC<EventDetailProps> = ({
             )}
           </div>
           
-          <h1 className="text-2xl md:text-3xl font-bold mb-6 text-left">{event.title}</h1>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-6 text-left break-words">{event.title}</h1>
           
-          {/* Event Details Cards */}
-          <div className="grid gap-4 mb-6">
+          {/* Event Details Cards - Responsive grid */}
+          <div className="grid gap-3 sm:gap-4 mb-6">
             {/* Date & Time Card */}
             <Card className="bg-gray-50">
-              <CardContent className="p-4">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-gray-600" />
-                  <div>
-                    <h3 className="font-medium text-gray-900">Date & Time</h3>
-                    <p className="text-sm text-gray-600">
+                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <h3 className="font-medium text-gray-900 text-sm sm:text-base">Date & Time</h3>
+                    <p className="text-xs sm:text-sm text-gray-600 break-words">
                       {event.start_date && formatDate(event.start_date)}
                       {event.start_time && ` • ${formatEventTime(event.start_time, event.end_time)}`}
                     </p>
@@ -239,12 +240,12 @@ const EventDetail: React.FC<EventDetailProps> = ({
 
             {/* Location Card */}
             <Card className="bg-gray-50">
-              <CardContent className="p-4">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center gap-3">
-                  <MapPin className="h-5 w-5 text-gray-600" />
-                  <div>
-                    <h3 className="font-medium text-gray-900">Venue</h3>
-                    <p className="text-sm text-gray-600">{eventLocation}</p>
+                  <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <h3 className="font-medium text-gray-900 text-sm sm:text-base">Venue</h3>
+                    <p className="text-xs sm:text-sm text-gray-600 break-words">{eventLocation}</p>
                   </div>
                 </div>
               </CardContent>
@@ -253,12 +254,12 @@ const EventDetail: React.FC<EventDetailProps> = ({
             {/* Entrance Fee Card - only show if fee exists */}
             {event.fee && (
               <Card className="bg-gray-50">
-                <CardContent className="p-4">
+                <CardContent className="p-3 sm:p-4">
                   <div className="flex items-center gap-3">
-                    <Euro className="h-5 w-5 text-gray-600" />
-                    <div>
-                      <h3 className="font-medium text-gray-900">Entrance Fee</h3>
-                      <p className="text-sm text-gray-600">€{event.fee}</p>
+                    <Euro className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 flex-shrink-0" />
+                    <div className="min-w-0">
+                      <h3 className="font-medium text-gray-900 text-sm sm:text-base">Entrance Fee</h3>
+                      <p className="text-xs sm:text-sm text-gray-600">€{event.fee}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -267,12 +268,12 @@ const EventDetail: React.FC<EventDetailProps> = ({
 
             {/* Attendees Card */}
             <Card className="bg-gray-50">
-              <CardContent className="p-4">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center gap-3">
-                  <Users className="h-5 w-5 text-gray-600" />
-                  <div>
-                    <h3 className="font-medium text-gray-900">Who's going</h3>
-                    <p className="text-sm text-gray-600">
+                  <Users className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <h3 className="font-medium text-gray-900 text-sm sm:text-base">Who's going</h3>
+                    <p className="text-xs sm:text-sm text-gray-600">
                       {event.attendees?.going || 0} going, {event.attendees?.interested || 0} interested
                     </p>
                   </div>
@@ -309,8 +310,8 @@ const EventDetail: React.FC<EventDetailProps> = ({
         {/* Additional Info */}
         {event.extra_info && (
           <div className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">Additional Information</h2>
-            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">{event.extra_info}</p>
+            <h2 className="text-xl sm:text-2xl font-semibold mb-4">Additional Information</h2>
+            <p className="text-gray-700 leading-relaxed whitespace-pre-wrap break-words">{event.extra_info}</p>
           </div>
         )}
 
@@ -328,20 +329,20 @@ const EventDetail: React.FC<EventDetailProps> = ({
 
         {/* Organizer Info - only show if organiser_name exists */}
         {event.organiser_name && (
-          <div className="bg-gray-50 rounded-lg p-6">
-            <h2 className="text-2xl font-semibold mb-4">Organized by</h2>
+          <div className="bg-gray-50 rounded-lg p-4 sm:p-6">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-4">Organized by</h2>
             <div className="flex items-center gap-3">
-              <div>
-                <p className="font-medium">{event.organiser_name}</p>
+              <div className="min-w-0">
+                <p className="font-medium break-words">{event.organiser_name}</p>
                 {event.organizer_link && (
                   <a 
                     href={event.organizer_link} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 text-sm inline-flex items-center gap-1 mt-1"
+                    className="text-blue-600 hover:text-blue-800 text-sm inline-flex items-center gap-1 mt-1 break-all"
                   >
                     Visit organizer page
-                    <ExternalLink className="h-3 w-3" />
+                    <ExternalLink className="h-3 w-3 flex-shrink-0" />
                   </a>
                 )}
               </div>

@@ -35,17 +35,17 @@ const Layout = () => {
           </div>
         )}
         
-        {/* Main Content Area */}
+        {/* Main Content Area - Remove all padding */}
         <div 
           className={`flex-1 w-full min-h-screen ${
             isMobile 
-              ? 'pt-16 pb-20' // Mobile: account for nav + bottom nav
+              ? 'pt-16 pb-20' // Mobile: only nav spacing
               : rightSidebarVisible 
-                ? 'pt-16 pl-20 pr-64' // Desktop with narrower right sidebar (was pr-80)
+                ? 'pt-16 pl-20 pr-56' // Desktop with narrower right sidebar
                 : 'pt-16 pl-20' // Desktop without right sidebar
           }`}
         >
-          <main className="bg-white w-full min-h-full p-0 m-0"> {/* Remove any default padding/margin */}
+          <main className="bg-white w-full min-h-full"> {/* Completely remove padding/margin */}
             <Outlet />
           </main>
           
@@ -53,9 +53,9 @@ const Layout = () => {
           {!isMobile && <Footer />}
         </div>
 
-        {/* Right Social Sidebar - Desktop only */}
+        {/* Right Social Sidebar - Desktop only, made even narrower */}
         {!isMobile && (
-          <div className="fixed right-0 top-16 bottom-0 w-64 z-30"> {/* Reduced width from w-80 to w-64 */}
+          <div className="fixed right-0 top-16 bottom-0 w-56 z-30"> {/* Further reduced from w-64 to w-56 */}
             <SocialSidebar 
               visible={rightSidebarVisible}
               onToggleVisibility={toggleRightSidebar}
