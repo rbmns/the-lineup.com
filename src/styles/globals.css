@@ -3,7 +3,91 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ... keep existing code */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Caveat:wght@400;600&display=swap');
+
+@layer base {
+  :root {
+    /* Brand Colors */
+    --ocean-deep: 13 95 115;
+    --seafoam-green: 42 157 143;
+    --sky-blue: 0 180 219;
+    --sunset-yellow: 237 196 106;
+    --sand: 244 231 211;
+    --clay-earth: 169 113 85;
+    --driftwood-grey: 184 184 170;
+    
+    /* Semantic color mappings */
+    --background: var(--sand);
+    --foreground: var(--ocean-deep);
+    --card: 255 255 255;
+    --card-foreground: var(--ocean-deep);
+    --popover: 255 255 255;
+    --popover-foreground: var(--ocean-deep);
+    --primary: var(--seafoam-green);
+    --primary-foreground: 255 255 255;
+    --secondary: var(--sand);
+    --secondary-foreground: var(--ocean-deep);
+    --muted: var(--driftwood-grey);
+    --muted-foreground: var(--clay-earth);
+    --accent: var(--sunset-yellow);
+    --accent-foreground: var(--ocean-deep);
+    --destructive: 239 68 68;
+    --destructive-foreground: 248 250 252;
+    --border: var(--driftwood-grey);
+    --input: var(--driftwood-grey);
+    --ring: var(--seafoam-green);
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-inter;
+    background: linear-gradient(135deg, hsl(var(--sand)) 0%, rgb(250 250 250) 100%);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  /* Brand gradients */
+  .gradient-ocean {
+    background: linear-gradient(135deg, hsl(var(--ocean-deep)) 0%, hsl(var(--seafoam-green)) 100%);
+  }
+  
+  .gradient-sunset {
+    background: linear-gradient(135deg, hsl(var(--sunset-yellow)) 0%, hsl(var(--clay-earth)) 100%);
+  }
+  
+  .gradient-sky {
+    background: linear-gradient(135deg, hsl(var(--sky-blue)) 0%, hsl(var(--seafoam-green)) 100%);
+  }
+
+  /* Card styles with coastal feeling */
+  .card-coastal {
+    @apply bg-white/80 backdrop-blur-sm border border-white/50 shadow-lg rounded-xl;
+    box-shadow: 0 8px 32px rgba(13, 95, 115, 0.1);
+  }
+
+  /* Button variants */
+  .btn-ocean {
+    background: linear-gradient(135deg, hsl(var(--ocean-deep)) 0%, hsl(var(--seafoam-green)) 100%);
+    @apply text-white border-0 shadow-md hover:shadow-lg transition-all duration-300;
+  }
+  
+  .btn-sunset {
+    background: linear-gradient(135deg, hsl(var(--sunset-yellow)) 0%, hsl(var(--clay-earth)) 100%);
+    @apply text-white border-0 shadow-md hover:shadow-lg transition-all duration-300;
+  }
+
+  /* Text styles */
+  .text-handwritten {
+    font-family: 'Caveat', cursive;
+    @apply text-lg;
+  }
+}
 
 /* Enhanced RSVP Button Animations */
 @keyframes buttonClickPulse {
@@ -34,15 +118,14 @@
   animation: rsvpInterestedPulse 0.3s ease-out;
 }
 
-/* Hide scrollbar but keep functionality */
 @layer utilities {
-  .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
   
-  .no-scrollbar::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera*/
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 
   /* Safe area padding for mobile devices */
@@ -94,5 +177,3 @@
     @apply py-4 sm:py-6 md:py-8;
   }
 }
-
-/* ... keep existing code */

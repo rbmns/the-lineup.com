@@ -8,16 +8,22 @@ interface EventsPageLayoutProps {
 
 export const EventsPageLayout: React.FC<EventsPageLayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section - Full width */}
-      <PageHeader 
-        title="Find events and plans that fit your vibe"
-        subtitle="Discover what's happening nearby — from beach parties to chill yoga sessions. Join when you want, connect if you want."
-      />
+    <div className="min-h-screen">
+      {/* Hero Section - Full width with coastal gradient */}
+      <div className="w-full gradient-sky py-16 md:py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+            Find events that fit your <span className="text-handwritten text-sunset-yellow">vibe</span>
+          </h1>
+          <p className="text-xl text-white/90 leading-relaxed max-w-2xl mx-auto">
+            Discover what's happening nearby — from beach parties to chill yoga sessions. Join when you want, connect if you want.
+          </p>
+        </div>
+      </div>
 
-      {/* Main Content - Reduced padding on mobile */}
-      <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8">
-        <div className="space-y-4 md:space-y-6 max-w-7xl mx-auto">
+      {/* Main Content - Optimized spacing */}
+      <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8 py-6 md:py-8">
+        <div className="space-y-6 max-w-7xl mx-auto">
           {children}
         </div>
       </div>

@@ -118,40 +118,49 @@ const Home = () => {
   }, [navigate]);
 
   return (
-    <div className="w-full bg-gray-50">
+    <div className="w-full min-h-screen">
       <Helmet>
         <title>the lineup</title>
         <meta name="description" content="Discover and join events in your area" />
       </Helmet>
       
-      {/* Hero Section with Updated Background - Fixed height for desktop */}
-      <section className="relative bg-cover bg-center w-full" style={{
-        backgroundImage: "url('/lovable-uploads/68eaf77e-c1bd-4326-bfdc-72328318f27d.png')",
-        height: isMobile ? '80vh' : '600px' // Fixed height for desktop, responsive for mobile
+      {/* Hero Section with Ocean Gradient */}
+      <section className="relative w-full gradient-ocean" style={{
+        height: isMobile ? '90vh' : '70vh'
       }}>
-        <div className="absolute inset-0 bg-black/50"></div>
-        <div className="relative w-full px-4 text-center text-white h-full flex items-center">
+        <div className="absolute inset-0">
+          <img 
+            src="/lovable-uploads/68eaf77e-c1bd-4326-bfdc-72328318f27d.png" 
+            alt="Zandvoort Beach" 
+            className="w-full h-full object-cover opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-ocean-deep/60 to-seafoam-green/40"></div>
+        </div>
+        
+        <div className="relative w-full px-4 sm:px-6 lg:px-8 text-center text-white h-full flex items-center">
           <div className="max-w-4xl mx-auto">
-            <h1 className={`font-bold tracking-tight mb-4 ${
+            <h1 className={`font-bold tracking-tight mb-6 text-white ${
               isMobile ? 'text-3xl' : 'text-5xl md:text-6xl'
             }`}>
-              See what's on in Zandvoort
+              See what's on in <span className="text-handwritten text-sunset-yellow">Zandvoort</span>
             </h1>
-            <p className={`leading-relaxed mb-6 ${
+            <p className={`leading-relaxed mb-8 text-white/90 ${
               isMobile ? 'text-base' : 'text-xl'
             }`}>
               Discover local events and casual plans that fit your vibe. Explore what's happening nearby - music, surf, art, community, and more.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button asChild variant="outline" size={isMobile ? "default" : "lg"} className="border-2 bg-transparent border-white text-white hover:bg-white/10">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button asChild size={isMobile ? "default" : "lg"} className="btn-sunset text-white font-medium">
                 <Link to="/events">
+                  <Search className="mr-2 h-4 w-4" />
                   Explore Events
                 </Link>
               </Button>
-              <Button asChild variant="outline" size={isMobile ? "default" : "lg"} className="border-2 bg-transparent border-white text-white hover:bg-white/10">
+              <Button asChild variant="outline" size={isMobile ? "default" : "lg"} className="border-2 border-white/50 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20">
                 <Link to="/profile">
-                  Create Your Free Profile
+                  <UserCircle className="mr-2 h-4 w-4" />
+                  Create Your Profile
                 </Link>
               </Button>
             </div>
@@ -160,33 +169,39 @@ const Home = () => {
         
         {/* Scroll indicator arrow - only on mobile */}
         {isMobile && (
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 animate-bounce">
             <ChevronDown className="h-6 w-6 text-white/80" />
           </div>
         )}
       </section>
 
       {/* Upcoming Events Section */}
-      <section className="py-8 bg-gray-50 w-full">
-        <div className="w-full px-4">
+      <section className="py-12 w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-3xl font-semibold tracking-tight">Upcoming Events</h2>
-              <Link to="/events" className="text-blue-600 hover:text-blue-800 font-medium">
+            <div className="flex justify-between items-center mb-8">
+              <div>
+                <h2 className="text-3xl font-bold tracking-tight text-ocean-deep mb-2">Upcoming Events</h2>
+                <p className="text-clay-earth">Discover what's happening in your area</p>
+              </div>
+              <Link 
+                to="/events" 
+                className="text-seafoam-green hover:text-ocean-deep font-medium transition-colors"
+              >
                 View all →
               </Link>
             </div>
             
-            {/* Vibe Filter Pills - single row, grow wider */}
+            {/* Vibe Filter Pills */}
             {availableVibes.length > 0 && (
               <div className="mb-8">
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                   <button
                     onClick={() => setSelectedVibe(null)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 ${
+                    className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${
                       !selectedVibe 
-                        ? 'bg-black text-white' 
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        ? 'btn-ocean text-white shadow-md' 
+                        : 'bg-white/80 text-clay-earth hover:bg-white border border-driftwood-grey'
                     }`}
                   >
                     All vibes
@@ -195,10 +210,10 @@ const Home = () => {
                     <button
                       key={vibe}
                       onClick={() => handleVibeClick(vibe)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 ${
+                      className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${
                         selectedVibe === vibe 
-                          ? 'bg-black text-white' 
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                          ? 'btn-sunset text-white shadow-md' 
+                          : 'bg-white/80 text-clay-earth hover:bg-white border border-driftwood-grey'
                       }`}
                     >
                       {vibe}
@@ -208,20 +223,27 @@ const Home = () => {
               </div>
             )}
             
-            {/* Events Grid with consistent heights */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Events Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {isLoading ? (
-                <div className="flex justify-center w-full py-8 col-span-3">
-                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-black"></div>
-                </div>
+                Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="card-coastal animate-pulse">
+                    <div className="h-48 bg-driftwood-grey/30 rounded-t-xl"></div>
+                    <div className="p-6 space-y-3">
+                      <div className="h-4 bg-driftwood-grey/30 rounded w-3/4"></div>
+                      <div className="h-3 bg-driftwood-grey/30 rounded w-1/2"></div>
+                      <div className="h-3 bg-driftwood-grey/30 rounded w-2/3"></div>
+                    </div>
+                  </div>
+                ))
               ) : filteredEvents.length > 0 ? (
                 filteredEvents.slice(0, 3).map((event) => (
                   <div 
                     key={event.id}
-                    className="cursor-pointer h-full" // Ensure consistent heights
+                    className="cursor-pointer h-full transform hover:scale-105 transition-all duration-300" 
                     onClick={() => handleEventClick(event)}
                   >
-                    <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
+                    <div className="card-coastal overflow-hidden h-full flex flex-col">
                       <div className="relative">
                         <LineupImage
                           src={event.image_urls && event.image_urls.length > 0 ? event.image_urls[0] : getEventImageUrl(event)}
@@ -240,19 +262,26 @@ const Home = () => {
                           </div>
                         )}
                       </div>
-                      <CardContent className="p-4 flex-1 flex flex-col">
-                        <h3 className="font-semibold mb-2 line-clamp-2">{event.title}</h3>
-                        <p className="text-sm text-gray-600 mb-1">
-                          {formatFeaturedDate(event.start_date)} • {formatEventTime(event.start_time, event.end_time)}
-                        </p>
-                        <p className="text-sm text-gray-600 flex-1">{event.venues?.name || event.location}</p>
+                      <CardContent className="p-6 flex-1 flex flex-col">
+                        <h3 className="font-semibold mb-3 line-clamp-2 text-ocean-deep">{event.title}</h3>
+                        <div className="flex items-center text-sm text-clay-earth mb-2">
+                          <Calendar className="mr-2 h-4 w-4" />
+                          <span>
+                            {formatFeaturedDate(event.start_date)} • {formatEventTime(event.start_time, event.end_time)}
+                          </span>
+                        </div>
+                        <div className="flex items-center text-sm text-clay-earth flex-1">
+                          <MapPin className="mr-2 h-4 w-4 flex-shrink-0" />
+                          <span className="line-clamp-1">{event.venues?.name || event.location}</span>
+                        </div>
                       </CardContent>
-                    </Card>
+                    </div>
                   </div>
                 ))
               ) : (
-                <div className="col-span-3 text-center py-8 text-gray-500">
-                  No events available
+                <div className="col-span-3 text-center py-12 text-clay-earth">
+                  <Sparkles className="h-12 w-12 mx-auto mb-4 text-driftwood-grey" />
+                  <p>No events match your selected vibe</p>
                 </div>
               )}
             </div>
@@ -261,43 +290,45 @@ const Home = () => {
       </section>
 
       {/* How The Lineup Works Section */}
-      <section className="py-16 bg-white w-full">
-        <div className="w-full px-4">
+      <section className="py-16 bg-white/50 w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-semibold tracking-tight mb-4">How The Lineup Works</h2>
-              <p className="text-lg text-gray-600">
+              <h2 className="text-3xl font-bold tracking-tight text-ocean-deep mb-4">
+                How <span className="text-handwritten text-seafoam-green">The Lineup</span> Works
+              </h2>
+              <p className="text-lg text-clay-earth">
                 Discover, connect, and experience amazing events in your area with just a few taps.
               </p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Search className="h-8 w-8 text-blue-600" />
+              <div className="text-center group">
+                <div className="w-20 h-20 gradient-sky rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Search className="h-10 w-10 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Discover Events</h3>
-                <p className="text-gray-600">
+                <h3 className="text-xl font-semibold mb-3 text-ocean-deep">Discover Events</h3>
+                <p className="text-clay-earth">
                   Browse events happening near you, from yoga sessions to beach parties and everything in between.
                 </p>
               </div>
               
-              <div className="text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Calendar className="h-8 w-8 text-green-600" />
+              <div className="text-center group">
+                <div className="w-20 h-20 gradient-sunset rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Calendar className="h-10 w-10 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">RSVP & Plan</h3>
-                <p className="text-gray-600">
+                <h3 className="text-xl font-semibold mb-3 text-ocean-deep">RSVP & Plan</h3>
+                <p className="text-clay-earth">
                   Show interest or commit to going. Keep track of your plans and never miss out on what matters to you.
                 </p>
               </div>
               
-              <div className="text-center">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="h-8 w-8 text-purple-600" />
+              <div className="text-center group">
+                <div className="w-20 h-20 gradient-ocean rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <Users className="h-10 w-10 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Connect & Enjoy</h3>
-                <p className="text-gray-600">
+                <h3 className="text-xl font-semibold mb-3 text-ocean-deep">Connect & Enjoy</h3>
+                <p className="text-clay-earth">
                   Meet like-minded people at events and build meaningful connections in your community.
                 </p>
               </div>
@@ -310,22 +341,26 @@ const Home = () => {
       <CasualPlansHomeSection />
 
       {/* CTA Section */}
-      <section className="py-16 bg-white w-full">
-        <div className="w-full px-4 text-center">
+      <section className="py-16 gradient-ocean w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-semibold tracking-tight mb-4">Ready to Find Your Next Adventure?</h2>
-            <p className="text-xl mb-8">
+            <h2 className="text-3xl font-bold tracking-tight text-white mb-4">
+              Ready to Find Your Next <span className="text-handwritten text-sunset-yellow">Adventure?</span>
+            </h2>
+            <p className="text-xl mb-8 text-white/90">
               Join our community and start discovering events that match your interests and vibe.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild variant="default" size="lg">
+              <Button asChild size="lg" className="btn-sunset text-white font-medium">
                 <Link to="/events">
+                  <Search className="mr-2 h-4 w-4" />
                   Explore Events
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg">
+              <Button asChild variant="outline" size="lg" className="border-2 border-white/50 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20">
                 <Link to="/profile">
+                  <UserCircle className="mr-2 h-4 w-4" />
                   Create Profile
                 </Link>
               </Button>
