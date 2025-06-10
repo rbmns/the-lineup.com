@@ -41,7 +41,7 @@ const MainNav = () => {
         {/* Left side - Logo + Brand aligned to left */}
         <div className="flex items-center gap-2 flex-shrink-0"> {/* Reduced gap from gap-3 to gap-2 */}
           <Link to="/" className="flex items-center">
-            <img src="/lovable-uploads/272de8da-6e0c-40fd-a1b7-9f82414ed290.png" alt="TheLineup Logo" className="w-15 h-15" />
+            <img src="/lovable-uploads/272de8da-6e0c-40fd-a1b7-9f82414ed290.png" alt="TheLineup Logo" className="w-12 h-12" />
           </Link>
           <BrandLogo showText={true} />
         </div>
