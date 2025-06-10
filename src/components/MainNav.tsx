@@ -39,7 +39,7 @@ const MainNav = () => {
   return <header className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-200 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-white'}`}>
       <div className={cn("w-full h-16 flex items-center justify-between", isMobile ? "px-4" : "px-6 lg:px-8")}>
         {/* Left side - Logo + Brand aligned to left */}
-        <div className="flex items-center gap-0.1 flex-shrink-0"> {/* Reduced gap from gap-3 to gap-2 */}
+        <div className="flex items-center gap-1 flex-shrink-0"> {/* Reduced gap from gap-3 to gap-2 */}
           <Link to="/" className="flex items-center">
             <img src="/lovable-uploads/272de8da-6e0c-40fd-a1b7-9f82414ed290.png" alt="TheLineup Logo" className="w-12 h-12" />
           </Link>
