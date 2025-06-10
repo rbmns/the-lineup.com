@@ -52,7 +52,7 @@ const MainNav = () => {
               <Button variant="ghost" size={isMobile ? "sm" : "sm"} onClick={handleSignInClick} className="text-sm font-medium">
                 Sign in
               </Button>
-              <Button size={isMobile ? "sm" : "sm"} onClick={handleRegisterClick} className="text-sm font-medium">
+              <Button size={isMobile ? "sm" : "sm"} onClick={handleRegisterClick} className="text-sm font-medium rounded-sm">
                 Sign up
               </Button>
             </div>}
