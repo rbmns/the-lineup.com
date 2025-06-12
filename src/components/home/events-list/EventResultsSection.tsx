@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Event } from '@/types';
-import EventCard from '@/components/EventCard';
+import { EventCard } from '@/components/EventCard';
 
 interface EventResultsSectionProps {
   events: Event[];
