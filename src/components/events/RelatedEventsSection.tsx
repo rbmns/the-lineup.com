@@ -1,7 +1,7 @@
 import React from 'react';
 import { Event } from '@/types';
 import { CardContent, Card } from '@/components/ui/card';
-import EventCard from '@/components/EventCard';
+import { EventCard } from '@/components/EventCard';
 
 export interface RelatedEventsSectionProps {
   events: Event[];

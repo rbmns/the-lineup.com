@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Event } from '@/types';
-import EventCard from '@/components/EventCard';
+import { EventCard } from '@/components/EventCard';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { EventsSignupTeaser } from '@/components/events/list-components/EventsSignupTeaser';

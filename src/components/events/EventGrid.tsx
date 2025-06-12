@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Event } from '@/types';
-import EventCard from '@/components/EventCard';
+import { EventCard } from '@/components/EventCard';
 import { cn } from '@/lib/utils';
 import { EventGrid as InfiniteEventGrid } from './list-components/EventGrid';
 
