@@ -63,6 +63,10 @@ const config = {
         'brand-text-secondary': '#6B7280',
         'brand-online-green': '#22C55E',
         'brand-away-orange': '#F97316',
+        'ocean-deep': '#0C3B5C',
+        'sunset-yellow': '#FFCB6B',
+        'seafoam-green': '#80D8DA',
+        'clay-earth': '#A17C6B',
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -73,6 +77,7 @@ const config = {
       fontFamily: {
         'inter': ['Inter', 'sans-serif'],
         'caveat': ['Caveat', 'cursive'],
+        'handwritten': ['Caveat', 'cursive'],
       },
       keyframes: {
         "accordion-down": {

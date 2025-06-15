@@ -1,5 +1,5 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat&display=swap');
 
 @layer base {
   :root {
@@ -47,6 +47,21 @@
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold uppercase;
+  }
+}
+
+@layer components {
+  .btn-sunset {
+    @apply bg-gradient-to-r from-sunset-yellow to-brand-coral-red text-white font-semibold;
+  }
+  .gradient-sky {
+    @apply bg-gradient-to-br from-cyan-200 to-blue-200;
+  }
+  .gradient-sunset {
+    @apply bg-gradient-to-br from-sunset-yellow to-brand-coral-red;
+  }
+  .gradient-ocean {
+    @apply bg-gradient-to-br from-primary to-ocean-deep;
   }
 }
 
