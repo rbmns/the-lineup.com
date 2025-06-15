@@ -50,7 +50,7 @@ const MainNav = () => {
     }`}>
       <div className={cn(
         "w-full h-16 flex items-center justify-between",
-        isMobile ? "px-4" : "px-6 lg:px-8"
+        isMobile ? "px-4" : "pl-0 pr-6 lg:pr-8" // remove left padding, keep right padding
       )}>
         {/* Left side - Icon flush left + wordmark (no gap before icon) */}
         <div className="flex items-center h-16 flex-shrink-0">
