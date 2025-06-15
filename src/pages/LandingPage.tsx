@@ -1,17 +1,16 @@
+
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useEventImages } from '@/hooks/useEventImages';
-import { getCategoryColorState } from '@/components/ui/category/category-color-mapping';
 import { Event } from '@/types';
-import { useEventCategories } from '@/hooks/home/useEventCategories';
-import { formatFeaturedDate, formatEventTime } from '@/utils/date-formatting';
 import { CasualPlansHomeSection } from '@/components/home/CasualPlansHomeSection';
 import { UpcomingEventsSection } from '@/components/home/UpcomingEventsSection';
 import { HowItWorksSection } from '@/components/home/HowItWorksSection';
 import { LandingCtaSection } from '@/components/home/LandingCtaSection';
+
 const LandingPage = () => {
   const {
     isAuthenticated
@@ -25,10 +24,8 @@ const LandingPage = () => {
     getEventImageUrl
   } = useEventImages();
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const {
-    availableCategories
-  } = useEventCategories(events);
+  const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
+
   useEffect(() => {
     const scrollToTop = () => {
       window.scrollTo({
@@ -40,6 +37,7 @@ const LandingPage = () => {
       scrollToTop();
     }
   }, []);
+
   const upcomingEvents = React.useMemo(() => {
     if (!events || events.length === 0) return [];
     const oneWeekFromNow = new Date();
@@ -62,22 +60,48 @@ const LandingPage = () => {
     }
     return featured;
   }, [events]);
-  const filteredEvents = React.useMemo(() => {
-    if (!selectedCategory) return upcomingEvents;
-    return upcomingEvents.filter(event => event.event_category === selectedCategory);
-  }, [upcomingEvents, selectedCategory]);
-  const availableCategoriesInUpcoming = React.useMemo(() => {
+
+  const availableVibes = React.useMemo(() => {
     if (!upcomingEvents || upcomingEvents.length === 0) return [];
-    return Array.from(new Set(upcomingEvents.filter(event => event.event_category).map(event => event.event_category as string))).sort();
+    const vibes = new Set<string>();
+    upcomingEvents.forEach(event => {
+      const eventTags = event.tags;
+      if (Array.isArray(eventTags)) {
+        eventTags.forEach(tag => tag && vibes.add(tag));
+      } else if (typeof eventTags === 'string' && eventTags) {
+        eventTags.split(',').forEach(tag => {
+          const trimmedTag = tag.trim();
+          if (trimmedTag) vibes.add(trimmedTag);
+        });
+      }
+    });
+    return Array.from(vibes).sort();
   }, [upcomingEvents]);
-  const handleCategoryClick = (category: string) => {
-    setSelectedCategory(prevCategory => prevCategory === category ? null : category);
+
+  const filteredEvents = React.useMemo(() => {
+    if (!selectedVibe) return upcomingEvents;
+    return upcomingEvents.filter(event => {
+      const eventTags = event.tags;
+      if (Array.isArray(eventTags)) {
+        return eventTags.includes(selectedVibe);
+      }
+      if (typeof eventTags === 'string') {
+        return eventTags.split(',').map(t => t.trim()).includes(selectedVibe);
+      }
+      return false;
+    });
+  }, [upcomingEvents, selectedVibe]);
+
+  const handleVibeClick = (vibe: string) => {
+    setSelectedVibe(prevVibe => prevVibe === vibe ? null : vibe);
   };
+
   const handleEventClick = useCallback((event: Event) => {
     if (event.id) {
       navigate(`/events/${event.id}`);
     }
   }, [navigate]);
+
   return <div className="w-full px-[20px] py-[20px]">
       {/* HEADER HERO */}
       <section className="w-full border-b pt-0 mt-0 bg-transparent">
@@ -92,7 +116,16 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <UpcomingEventsSection isLoading={isLoading} filteredEvents={filteredEvents} availableCategoriesInUpcoming={availableCategoriesInUpcoming} selectedCategory={selectedCategory} handleCategoryClick={handleCategoryClick} setSelectedCategory={setSelectedCategory} getEventImageUrl={getEventImageUrl} handleEventClick={handleEventClick} />
+      <UpcomingEventsSection
+        isLoading={isLoading}
+        filteredEvents={filteredEvents}
+        availableVibes={availableVibes}
+        selectedVibe={selectedVibe}
+        handleVibeClick={handleVibeClick}
+        setSelectedVibe={setSelectedVibe}
+        getEventImageUrl={getEventImageUrl}
+        handleEventClick={handleEventClick}
+      />
 
       <HowItWorksSection />
       <CasualPlansHomeSection />
