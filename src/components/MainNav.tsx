@@ -52,17 +52,17 @@ const MainNav = () => {
         "w-full h-16 flex items-center justify-between",
         isMobile ? "px-4" : "px-6 lg:px-8"
       )}>
-        {/* Left side - Logo symbol vertically aligned with LeftSidebar icons */}
+        {/* Left side - Symbol icon column + Brand wordmark */}
         <div className="flex items-center gap-2 flex-shrink-0 h-16">
-          {/* Icon column: mimic the same w-16 as LeftSidebar icon column */}
+          {/* Symbol icon should perfectly align with sidebar icon cell */}
           <Link to="/" className="flex items-center justify-center w-16 h-16">
             <img 
-              src="/lovable-uploads/272de8da-6e0c-40fd-a1b7-9f82414ed290.png" 
-              alt="TheLineup Icon" 
-              className="w-8 h-8" // Match the LeftSidebar icons (h-6/w-6 or h-8/w-8 for more presence)
+              src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" 
+              alt="thelineup Symbol"
+              className="w-8 h-8"
+              style={{ display: 'block' }}
             />
           </Link>
-          {/* Brand wordmark stays as before */}
           <BrandLogo showText={true} className="ml-0" />
         </div>
         {/* Right side - User menu or auth buttons */}
@@ -95,4 +95,3 @@ const MainNav = () => {
 };
 
 export default MainNav;
-
