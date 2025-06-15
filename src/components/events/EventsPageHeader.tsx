@@ -40,8 +40,8 @@ export const EventsPageHeader: React.FC<EventsPageHeaderProps> = ({
   }
 
   return (
-    <div className="border-b bg-card">
-      <div className="px-4 md:px-6 lg:px-8 py-6 md:py-8 text-left">
+    <div className="border-b bg-card m-0 p-0">
+      <div className="px-4 md:px-6 lg:px-8 py-6 md:py-8 text-left m-0 p-0">
         <h1 className={`${typography.h1} mb-2 text-left`}>
           {title}
         </h1>

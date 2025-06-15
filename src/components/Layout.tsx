@@ -56,10 +56,8 @@ const Layout = () => {
           style={
             !isMobile
               ? {
-                  paddingTop:
-                    location.pathname === '/'
-                      ? 0
-                      : TOP_NAV_HEIGHT + 24,
+                  // Always only the height of the nav so content isn't behind it, nothing extra
+                  paddingTop: TOP_NAV_HEIGHT,
                   paddingLeft: LEFT_SIDEBAR_WIDTH + 16,
                   paddingRight: rightSidebarVisible ? (RIGHT_SIDEBAR_WIDTH + 16) : 16,
                   minHeight: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
