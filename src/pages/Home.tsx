@@ -18,7 +18,7 @@ import { LineupImage } from '@/components/ui/lineup-image';
 import { Helmet } from 'react-helmet-async';
 import PolymetEventCard from '@/components/polymet/event-card';
 import { HomeUpcomingEventsSection } from "@/components/home/HomeUpcomingEventsSection";
-import HomeHeaderSection from '@/components/home/HomeHeaderSection';
+import HomePageHeaderSection from '@/components/home/HomePageHeaderSection';
 import HomeHowItWorksSection from '@/components/home/HomeHowItWorksSection';
 import HomeCtaSection from '@/components/home/HomeCtaSection';
 const Home = () => {
@@ -125,8 +125,8 @@ const Home = () => {
         <meta name="description" content="Discover and join events in your area" />
       </Helmet>
 
-      {/* Standardized Page Header */}
-      <HomeHeaderSection />
+      {/* Wide modern header */}
+      <HomePageHeaderSection />
 
       {/* Upcoming Events Section */}
       <HomeUpcomingEventsSection
