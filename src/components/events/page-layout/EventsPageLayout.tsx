@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { PageHeader } from '@/components/ui/page-header';
 import { typography } from '@/components/polymet/brand-typography';
@@ -21,8 +22,8 @@ export const EventsPageLayout: React.FC<EventsPageLayoutProps> = ({ children }) 
         </div>
       </div>
 
-      {/* Main Content - Remove excessive padding, keep horizontal spacing tight */}
-      <div className="w-full px-4">
+      {/* Remove px-4 for flush edges */}
+      <div className="w-full">
         <div className="space-y-6 max-w-7xl mx-auto">
           {children}
         </div>

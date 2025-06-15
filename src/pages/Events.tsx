@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { EventsPageHeader } from '@/components/events/EventsPageHeader';
 import { useEventPageMeta } from '@/components/events/EventsPageMeta';
@@ -30,7 +29,8 @@ const Events = () => {
           showBackground={true}
         />
         
-        <div className={`w-full px-4 md:px-6 py-6 md:py-8 transition-all duration-300 ${
+        {/* Remove unnecessary px-4/md:px-6 for flush left/right */}
+        <div className={`w-full py-6 md:py-8 transition-all duration-300 ${
           selectedEventId ? 'max-w-4xl' : 'max-w-7xl'
         } mx-auto`}>
           <EventsDataProvider>
