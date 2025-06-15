@@ -17,7 +17,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
 }) => {
   const { user } = useAuth();
 
-  // When NOT visible, render the toggle button to re-open sidebar (fixed to right)
+  // Closed state: show right arrow fixed on the far right
   if (!visible) {
     return (
       <div className="fixed right-0 top-1/2 transform -translate-y-1/2 z-50">
@@ -26,20 +26,21 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
     );
   }
 
+  // Open state: show sidebar AND the close (left) arrow, fixed just to the left of sidebar
   return (
-    <div className="h-full w-56 bg-white border-l border-gray-200 shadow-lg overflow-y-auto relative">
-      {/* Toggle to collapse: always visible when sidebar is open, on the left edge */}
-      <div className="absolute -left-8 top-1/2 transform -translate-y-1/2 z-50">
+    <>
+      {/* Close arrow -- fixed to the left of the sidebar (outside the sidebar, so not affected by overflow) */}
+      <div className="fixed right-[224px] top-1/2 transform -translate-y-1/2 z-50">
         <SidebarToggle visible={true} onToggle={onToggleVisibility} />
       </div>
-
-      <div className="p-4 space-y-4">
-        <SocialHeader />
-
-        {!user && <SignUpPrompt />}
-
-        <CommunitySection />
+      {/* Sidebar content */}
+      <div className="h-full w-56 bg-white border-l border-gray-200 shadow-lg overflow-y-auto">
+        <div className="p-4 space-y-4">
+          <SocialHeader />
+          {!user && <SignUpPrompt />}
+          <CommunitySection />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
