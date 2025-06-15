@@ -64,21 +64,21 @@ export const EventCard: React.FC<EventCardProps> = ({
         )}
       </div>
       
-      <CardContent className={`${compact ? 'p-3' : 'p-5'} flex-1 flex flex-col items-start text-left`}>
+      <CardContent className={`${compact ? 'p-3' : 'p-5'} flex-1 flex flex-col items-start text-left font-inter`}>
         {/* Title */}
-        <h3 className={`font-semibold text-ocean-deep group-hover:text-seafoam-green transition-colors ${compact ? 'text-base mb-1 mt-1' : 'text-xl mb-2 mt-1'} line-clamp-2 text-left w-full`}>
+        <h3 className={`font-semibold text-ocean-deep group-hover:text-seafoam-green transition-colors ${compact ? 'text-base mb-1 mt-1' : 'text-lg mb-2 mt-1'} line-clamp-2 text-left w-full font-inter`}>
           {event.title}
         </h3>
         
         {/* Date & Time - Prominent and lined up */}
         {event.start_date && (
-          <div className="flex items-center text-slate-800 font-medium gap-2 mb-1 mt-0.5 w-full text-left">
+          <div className="flex items-center text-ocean-deep-700 font-medium gap-2 mb-1 mt-0.5 w-full text-left font-inter">
             <Calendar className={`flex-shrink-0 ${compact ? 'h-4 w-4' : 'h-5 w-5'}`} />
             <span className={`${compact ? 'text-xs' : 'text-base'} font-medium`}>
               {formatDate(event.start_date)}
               {event.start_time && (
                 <>
-                  <span className="mx-1 text-slate-400 font-normal">•</span>
+                  <span className="mx-1 text-ocean-deep-300 font-normal">•</span>
                   {formatEventTime(event.start_time, event.end_time)}
                 </>
               )}
@@ -88,7 +88,7 @@ export const EventCard: React.FC<EventCardProps> = ({
 
         {/* Location */}
         {(event.venues?.name || event.location) && (
-          <div className="flex items-center text-slate-600 gap-2 mb-2 mt-1 w-full text-left">
+          <div className="flex items-center text-ocean-deep-600 gap-2 mb-2 mt-1 w-full text-left font-inter">
             <MapPin className={`flex-shrink-0 ${compact ? 'h-4 w-4' : 'h-5 w-5'}`} />
             <span className={`truncate ${compact ? 'text-xs' : 'text-sm'} font-normal`}>
               {event.venues?.name || event.location}
@@ -106,7 +106,7 @@ export const EventCard: React.FC<EventCardProps> = ({
                 onRsvp(event.id, 'Going');
               }}
               disabled={loadingEventId === event.id}
-              className={`flex-1 px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+              className={`flex-1 px-3 py-1.5 text-xs font-semibold rounded-md transition-colors font-inter ${
                 event.rsvp_status === 'Going'
                   ? 'bg-seafoam-green text-white'
                   : 'bg-sand text-ocean-deep hover:bg-seafoam-green hover:text-white'
@@ -121,7 +121,7 @@ export const EventCard: React.FC<EventCardProps> = ({
                 onRsvp(event.id, 'Interested');
               }}
               disabled={loadingEventId === event.id}
-              className={`flex-1 px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+              className={`flex-1 px-3 py-1.5 text-xs font-semibold rounded-md transition-colors font-inter ${
                 event.rsvp_status === 'Interested'
                   ? 'bg-sky-blue text-white'
                   : 'bg-sand text-ocean-deep hover:bg-sky-blue hover:text-white'

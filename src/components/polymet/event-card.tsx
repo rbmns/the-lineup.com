@@ -81,7 +81,7 @@ export default function EventCard({
   return (
     <Link
       to={eventUrl}
-      className={`group flex h-full flex-col overflow-hidden rounded-lg border border-secondary-50 bg-white shadow-sm transition-shadow hover:shadow-md ${className}`}
+      className={`group flex h-full flex-col overflow-hidden rounded-lg border border-secondary-50 bg-white shadow-sm transition-shadow hover:shadow-md font-inter ${className}`}
     >
       {/* Image */}
       <div className="relative aspect-[16/9] w-full overflow-hidden">
@@ -107,16 +107,16 @@ export default function EventCard({
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 flex-col p-4">
-        <h3 className="mb-1 font-semibold text-primary line-clamp-2 font-inter">
+      <div className="flex flex-1 flex-col p-4 items-start text-left font-inter">
+        <h3 className="mb-1 font-semibold text-primary line-clamp-2 font-inter text-left w-full">
           {title}
         </h3>
 
         {/* Host info */}
-        {host && <p className="mb-2 text-sm text-neutral-75">By {host.name}</p>}
+        {host && <p className="mb-2 text-sm text-neutral-75 font-inter text-left w-full">By {host.name}</p>}
 
         {/* Date and time */}
-        <div className="mb-2 flex items-center text-sm text-neutral-75">
+        <div className="mb-2 flex items-center text-sm text-neutral-75 font-inter text-left w-full">
           <span>
             {date}
             {time && ` • ${time}`}
@@ -125,14 +125,14 @@ export default function EventCard({
 
         {/* Location */}
         {location && (
-          <p className="mb-2 text-sm text-neutral-75 line-clamp-1">
+          <p className="mb-2 text-sm text-neutral-75 line-clamp-1 font-inter text-left w-full">
             {location}
           </p>
         )}
 
         {/* Attendees */}
         {attendees && (
-          <div className="mt-auto flex items-center pt-2">
+          <div className="mt-auto flex items-center pt-2 text-left w-full">
             <div className="flex -space-x-2">
               {attendees.avatars?.slice(0, 3).map((avatar, index) => (
                 <img
@@ -143,7 +143,7 @@ export default function EventCard({
                 />
               ))}
             </div>
-            <span className="ml-2 text-xs text-neutral-75">
+            <span className="ml-2 text-xs text-neutral-75 font-inter">
               {attendees.count}{" "}
               {attendees.count === 1 ? "attendee" : "attendees"}
             </span>
@@ -152,11 +152,11 @@ export default function EventCard({
 
         {/* RSVP buttons */}
         {showRsvp && (
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 flex gap-2 w-full">
             <Button
               variant="default"
               size="sm"
-              className="flex-1"
+              className="flex-1 font-inter"
               onClick={handleRsvpGoing}
             >
               Going
@@ -164,7 +164,7 @@ export default function EventCard({
             <Button
               variant="outline"
               size="sm"
-              className="flex-1"
+              className="flex-1 font-inter"
               onClick={handleRsvpInterested}
             >
               Interested

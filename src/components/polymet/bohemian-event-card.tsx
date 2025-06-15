@@ -85,7 +85,7 @@ export default function BohemianEventCard({
       <Link
         to={`/events/${id}`}
         className={cn(
-          "group block rounded-lg overflow-hidden shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md",
+          "group block rounded-lg overflow-hidden shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md font-inter",
           className
         )}
       >
@@ -94,7 +94,7 @@ export default function BohemianEventCard({
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
 
-          <div className="absolute bottom-0 left-0 p-3">
+          <div className="absolute bottom-0 left-0 p-3 font-inter text-left">
             <span
               className={categoryBadgeVariants({
                 category: getCategoryVariant(category),
@@ -103,7 +103,7 @@ export default function BohemianEventCard({
             >
               {category}
             </span>
-            <h3 className="mt-1 text-sm font-medium text-white line-clamp-2">
+            <h3 className="mt-1 text-sm font-medium text-white line-clamp-2 font-inter text-left">
               {title}
             </h3>
           </div>
@@ -117,7 +117,7 @@ export default function BohemianEventCard({
       <Link
         to={`/events/${id}`}
         className={cn(
-          "group block rounded-lg overflow-hidden border border-secondary-medium bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md",
+          "group block rounded-lg overflow-hidden border border-secondary-medium bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md font-inter",
           className
         )}
       >
@@ -139,32 +139,29 @@ export default function BohemianEventCard({
               </span>
             </div>
           </div>
-          <div className="flex-1 p-4 md:p-6">
-            <h3 className="text-xl font-semibold text-primary mb-2 group-hover:text-accent-teal transition-colors">
+          <div className="flex-1 p-4 md:p-6 font-inter text-left">
+            <h3 className="text-xl font-semibold text-primary mb-2 group-hover:text-accent-teal transition-colors font-inter text-left w-full">
               {title}
             </h3>
 
-            <div className="space-y-2 mb-4">
-              <div className="flex items-center text-primary-light">
+            <div className="space-y-2 mb-4 w-full">
+              <div className="flex items-center text-primary-light font-inter text-left">
                 <CalendarIcon size={16} className="mr-2 flex-shrink-0" />
-
                 <span className="text-sm">
                   {date} {time && `• ${time}`}
                 </span>
               </div>
 
               {location && (
-                <div className="flex items-center text-primary-light">
+                <div className="flex items-center text-primary-light font-inter text-left w-full">
                   <MapPinIcon size={16} className="mr-2 flex-shrink-0" />
-
                   <span className="text-sm">{location}</span>
                 </div>
               )}
 
               {attendees && (
-                <div className="flex items-center text-primary-light">
+                <div className="flex items-center text-primary-light font-inter text-left w-full">
                   <UserIcon size={16} className="mr-2 flex-shrink-0" />
-
                   <span className="text-sm">
                     {attendees.count}{" "}
                     {attendees.max ? `/ ${attendees.max}` : ""} attending
@@ -174,12 +171,13 @@ export default function BohemianEventCard({
             </div>
 
             {showRsvp && (
-              <div className="flex gap-2 mt-4">
+              <div className="flex gap-2 mt-4 w-full">
                 <BohemianButton
                   variant="teal"
                   size="sm"
                   rounded="full"
                   onClick={handleRsvpGoing}
+                  className="font-inter"
                 >
                   Going
                 </BohemianButton>
@@ -188,6 +186,7 @@ export default function BohemianEventCard({
                   size="sm"
                   rounded="full"
                   onClick={handleRsvpInterested}
+                  className="font-inter"
                 >
                   Interested
                 </BohemianButton>
@@ -204,7 +203,7 @@ export default function BohemianEventCard({
     <Link
       to={`/events/${id}`}
       className={cn(
-        "group block rounded-lg overflow-hidden border border-secondary-medium bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md",
+        "group block rounded-lg overflow-hidden border border-secondary-medium bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md font-inter",
         className
       )}
     >
@@ -221,31 +220,27 @@ export default function BohemianEventCard({
           </span>
         </div>
       </div>
-      <div className="p-4">
-        <h3 className="text-lg font-semibold text-primary mb-2 group-hover:text-accent-teal transition-colors">
+      <div className="p-4 font-inter text-left">
+        <h3 className="text-lg font-semibold text-primary mb-2 group-hover:text-accent-teal transition-colors font-inter text-left w-full">
           {title}
         </h3>
 
-        <div className="space-y-2 mb-3">
-          <div className="flex items-center text-primary-light">
+        <div className="space-y-2 mb-3 w-full">
+          <div className="flex items-center text-primary-light font-inter text-left">
             <CalendarIcon size={16} className="mr-2 flex-shrink-0" />
-
             <span className="text-sm">
               {date} {time && `• ${time}`}
             </span>
           </div>
-
           {location && (
-            <div className="flex items-center text-primary-light">
+            <div className="flex items-center text-primary-light font-inter text-left w-full">
               <MapPinIcon size={16} className="mr-2 flex-shrink-0" />
-
               <span className="text-sm">{location}</span>
             </div>
           )}
         </div>
-
         {host && (
-          <div className="flex items-center mt-3">
+          <div className="flex items-center mt-3 font-inter text-left w-full">
             {host.avatar ? (
               <img
                 src={host.avatar}
@@ -262,14 +257,14 @@ export default function BohemianEventCard({
             <span className="text-sm text-primary-medium">{host.name}</span>
           </div>
         )}
-
         {showRsvp && (
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-2 mt-4 w-full">
             <BohemianButton
               variant="teal"
               size="sm"
               rounded="full"
               onClick={handleRsvpGoing}
+              className="font-inter"
             >
               Going
             </BohemianButton>
@@ -278,6 +273,7 @@ export default function BohemianEventCard({
               size="sm"
               rounded="full"
               onClick={handleRsvpInterested}
+              className="font-inter"
             >
               Interested
             </BohemianButton>

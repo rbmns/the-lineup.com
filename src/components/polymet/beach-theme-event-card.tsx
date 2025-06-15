@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils";
 import { BeachThemeCategoryBadge } from "@/components/polymet/beach-theme-category-badge";
 import { BeachThemeButton } from "@/components/polymet/beach-theme-button";
@@ -48,7 +47,6 @@ export default function BeachThemeEventCard({
   className,
   variant = "default",
 }: BeachThemeEventCardProps) {
-  // Handle RSVP actions
   const handleRsvpGoing = (e: React.MouseEvent) => {
     e.preventDefault();
     onRsvpGoing?.(id);
@@ -59,13 +57,11 @@ export default function BeachThemeEventCard({
     onRsvpInterested?.(id);
   };
 
-  // Determine if the card is featured (horizontal layout)
   const isFeatured = variant === "featured";
   const isCompact = variant === "compact";
 
-  // Generate vibe badge if provided
   const vibeBadge = vibe && (
-    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white">
+    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white font-inter">
       {vibe}
     </span>
   );
@@ -74,7 +70,7 @@ export default function BeachThemeEventCard({
     <Link
       to={`/events/${id}`}
       className={cn(
-        "group block overflow-hidden rounded-lg transition-all duration-300 hover:shadow-md",
+        "group block overflow-hidden rounded-lg transition-all duration-300 hover:shadow-md font-inter",
         isFeatured ? "bg-white" : "",
         className
       )}
@@ -110,27 +106,22 @@ export default function BeachThemeEventCard({
               gradient="vibrant"
             />
           </div>
-
           {/* Vibe Badge - Top Right (if provided) */}
           {vibe && (
             <div className="absolute top-2 right-2 z-10">{vibeBadge}</div>
           )}
-
           {/* Title on image for compact variant */}
           {isCompact && (
-            <div className="absolute bottom-2 left-2 right-2 z-10">
-              <h3 className="text-sm font-semibold text-white line-clamp-1">
-                {title}
-              </h3>
+            <div className="absolute bottom-2 left-2 right-2 z-10 font-inter text-left">
+              <h3 className="text-sm font-semibold text-white line-clamp-1 font-inter text-left">{title}</h3>
             </div>
           )}
         </div>
-
         {/* Content Container */}
         {!isCompact && (
           <div
             className={cn(
-              "flex flex-col",
+              "flex flex-col items-start text-left font-inter",
               isFeatured ? "flex-1 p-4" : "p-3",
               "bg-white"
             )}
@@ -138,7 +129,7 @@ export default function BeachThemeEventCard({
             {/* Title */}
             <h3
               className={cn(
-                "font-semibold text-[#0891B2] line-clamp-2",
+                "font-semibold text-[#0891B2] line-clamp-2 font-inter text-left w-full",
                 isFeatured ? "text-xl mb-2" : "text-base mb-1"
               )}
             >
@@ -147,7 +138,7 @@ export default function BeachThemeEventCard({
 
             {/* Host Info */}
             {host && (
-              <p className="text-sm text-gray-600 mb-2">
+              <p className="text-sm text-gray-600 mb-2 font-inter text-left w-full">
                 by{" "}
                 <span className="font-medium">
                   {host.id ? (
@@ -166,47 +157,41 @@ export default function BeachThemeEventCard({
             )}
 
             {/* Event Details */}
-            <div className="mt-auto space-y-1.5">
+            <div className="mt-auto space-y-1.5 w-full">
               {/* Location */}
               {location && (
-                <div className="flex items-center text-sm text-gray-600">
+                <div className="flex items-center text-sm text-gray-600 font-inter text-left w-full">
                   <MapPinIcon size={14} className="mr-1 text-[#F59E0B]" />
-
                   <span className="truncate">{location}</span>
                 </div>
               )}
-
               {/* Date & Time */}
-              <div className="flex items-center text-sm text-gray-600">
+              <div className="flex items-center text-sm text-gray-600 font-inter text-left w-full">
                 <CalendarIcon size={14} className="mr-1 text-[#F59E0B]" />
-
                 <span>
                   {date}
                   {time && ` • ${time}`}
                 </span>
               </div>
-
               {/* Attendees */}
               {attendees && (
-                <div className="flex items-center text-sm text-gray-600">
+                <div className="flex items-center text-sm text-gray-600 font-inter text-left w-full">
                   <UserIcon size={14} className="mr-1 text-[#F59E0B]" />
-
                   <span>
                     {attendees.count} {attendees.max && `/ ${attendees.max}`}{" "}
                     attending
                   </span>
                 </div>
               )}
-
               {/* RSVP Buttons */}
               {showRsvp && (
-                <div className="flex gap-2 mt-3">
+                <div className="flex gap-2 mt-3 w-full">
                   <BeachThemeButton
                     variant="ocean"
                     size="sm"
                     rounded="full"
                     onClick={handleRsvpGoing}
-                    className="flex-1"
+                    className="flex-1 font-inter"
                   >
                     Going
                   </BeachThemeButton>
@@ -215,7 +200,7 @@ export default function BeachThemeEventCard({
                     size="sm"
                     rounded="full"
                     onClick={handleRsvpInterested}
-                    className="flex-1 border-[#0891B2] text-[#0891B2]"
+                    className="flex-1 border-[#0891B2] text-[#0891B2] font-inter"
                   >
                     Interested
                   </BeachThemeButton>
