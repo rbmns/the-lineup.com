@@ -7,6 +7,11 @@ interface CreatorRequestDetails {
   contact_phone?: string;
 }
 
+interface UserProfileDetails {
+  username: string;
+  email: string;
+}
+
 export const CreatorRequestService = {
   async requestCreatorAccess(userId: string, details: CreatorRequestDetails): Promise<{ data: any; error: any }> {
     const { data, error } = await supabase
@@ -42,4 +47,24 @@ export const CreatorRequestService = {
 
     return { data, error: null };
   },
+
+  async notifyAdminOfCreatorRequest(userId: string, requestDetails: CreatorRequestDetails, userProfile: UserProfileDetails): Promise<{ error: any }> {
+    const { error } = await supabase
+      .from('admin_notifications')
+      .insert({
+        notification_type: 'creator_request',
+        data: {
+          user_id: userId,
+          username: userProfile.username,
+          user_email: userProfile.email,
+          ...requestDetails,
+        }
+      });
+
+    if (error) {
+      console.error('Error creating admin notification for creator request:', error);
+    }
+    
+    return { error };
+  }
 };

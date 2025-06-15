@@ -133,24 +133,28 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
       toast.success("Your request has been submitted!");
       setCreatorRequestStatus('pending');
 
-      // Fetch user profile for email details
+      // Fetch user profile for notification details
       const { data: profile } = await supabase
         .from('profiles')
         .select('username, email')
         .eq('id', user.id)
         .single();
       
-      // Trigger email notification to admin
-      await supabase.functions.invoke('send-creator-request-email', {
-        body: { 
-          request: {
-            ...formData,
-            user_id: user.id,
-            username: profile?.username || 'N/A',
-            user_email: profile?.email || user.email,
+      // Trigger DB notification to admin
+      if (profile) {
+        const { error: notificationError } = await CreatorRequestService.notifyAdminOfCreatorRequest(
+          user.id, 
+          formData, 
+          {
+            username: profile.username || 'N/A',
+            email: profile.email || user.email || 'N/A',
           }
-        },
-      });
+        );
+
+        if(notificationError){
+            console.error("Failed to create admin notification", notificationError);
+        }
+      }
     }
   };
 
