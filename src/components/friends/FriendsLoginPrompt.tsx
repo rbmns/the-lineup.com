@@ -24,7 +24,7 @@ export const FriendsLoginPrompt: React.FC = () => {
             </Button>
             <Button 
               onClick={() => navigate('/login')} 
-              variant="outline"
+              variant="default"
               className="w-full"
             >
               Log In

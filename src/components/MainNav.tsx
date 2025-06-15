@@ -68,7 +68,7 @@ const MainNav = () => {
           ) : (
             <div className="flex items-center gap-2">
               <Button
-                variant="ghost"
+                variant="default"
                 size={isMobile ? "sm" : "sm"}
                 onClick={handleSignInClick}
               >
