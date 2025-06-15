@@ -29,17 +29,17 @@ const HomeHowItWorksSection = () => (
     <div className="w-full px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className={\`\${typography.h2} text-white mb-4\`}>
+          <h2 className={`${typography.h2} text-white mb-4`}>
             How <span className="font-handwritten text-primary">The Lineup</span> Works
           </h2>
-          <p className={\`\${typography.body} text-cyan-100\`}>
+          <p className={`${typography.body} text-cyan-100`}>
             Discover, connect, and experience amazing events in your area with just a few taps.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {steps.map((step) => (
             <div className="text-center group" key={step.label}>
-              <div className={\`w-20 h-20 \${step.bg} rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-105 transition-transform duration-300\`}>
+              <div className={`w-20 h-20 ${step.bg} rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-105 transition-transform duration-300`}>
                 {step.icon}
               </div>
               <h3 className="text-xl font-semibold mb-3 text-white">{step.label}</h3>
