@@ -61,7 +61,8 @@ const Layout = () => {
         >
           {/* ENSURE FULL WIDTH and REMOVE max-w-3xl restriction */}
           <main className="main-feed-gradient w-full flex-1 flex flex-col">
-            <div className="flex-1 flex flex-col justify-start">
+            {/* Add uniform padding for all pages here */}
+            <div className="flex-1 flex flex-col justify-start pt-[20px] px-[20px]">
               <Outlet />
             </div>
           </main>
