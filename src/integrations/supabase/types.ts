@@ -581,6 +581,27 @@ export type Database = {
         }
         Relationships: []
       }
+      towns: {
+        Row: {
+          country: string
+          created_at: string
+          id: number
+          name: string
+        }
+        Insert: {
+          country: string
+          created_at?: string
+          id?: number
+          name: string
+        }
+        Update: {
+          country?: string
+          created_at?: string
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
       user_activity: {
         Row: {
           anonymous_id: string | null
