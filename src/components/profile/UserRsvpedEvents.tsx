@@ -6,16 +6,16 @@ import { Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { navigateToEvent } from '@/utils/navigationUtils';
 import EventCardList from '@/components/events/EventCardList';
+import { useUserEvents } from '@/hooks/useUserEvents';
 
 interface UserRsvpedEventsProps {
-  events: Event[];
-  loading?: boolean;
+  events?: Event[];
   isCurrentUser?: boolean;
   username?: string;
   showFriendRsvp?: boolean;
   friendUsername?: string;
   isLoading?: boolean;
-  userId?: string;
+  userId: string;
   currentUserId?: string;
   matchingRsvps?: Event[];
   title?: string;
@@ -23,13 +23,12 @@ interface UserRsvpedEventsProps {
 }
 
 export const UserRsvpedEvents: React.FC<UserRsvpedEventsProps> = ({ 
-  events, 
-  loading, 
+  events: propEvents, 
   isCurrentUser, 
   username = 'User',
   showFriendRsvp = false,
   friendUsername,
-  isLoading = false,
+  isLoading: propIsLoading = false,
   userId,
   currentUserId,
   matchingRsvps = [],
@@ -38,17 +37,22 @@ export const UserRsvpedEvents: React.FC<UserRsvpedEventsProps> = ({
 }) => {
   const navigate = useNavigate();
   
+  const { upcomingEvents, pastEvents, isLoading: hookIsLoading } = useUserEvents(userId);
+  
+  const eventsToDisplay = propEvents !== undefined ? propEvents : [...upcomingEvents, ...pastEvents];
+  const isLoading = propIsLoading || hookIsLoading;
+
   // Filter out matching RSVPs to avoid duplicate display
   const regularEvents = matchingRsvps.length > 0 
-    ? events.filter(event => !matchingRsvps.some(matchEvent => matchEvent.id === event.id))
-    : events;
+    ? eventsToDisplay.filter(event => !matchingRsvps.some(matchEvent => matchEvent.id === event.id))
+    : eventsToDisplay;
 
   // Direct event navigation using utility
   const handleEventClick = useCallback((eventId: string) => {
     navigateToEvent(eventId, navigate);
   }, [navigate]);
 
-  if (isLoading || loading) {
+  if (isLoading) {
     return (
       <div className="mt-4 sm:mt-6">
         <h2 className="text-lg font-semibold mb-2 sm:mb-3 flex items-center">

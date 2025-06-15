@@ -88,7 +88,7 @@ const ProfilePage: React.FC = () => {
             </nav>
         </div>
         <div className="mt-8">
-            {activeTab === 'rsvps' && <UserRsvpedEvents userId={user.id} />}
+            {activeTab === 'rsvps' && <UserRsvpedEvents userId={user.id} isCurrentUser />}
             {activeTab === 'created' && isCreator && <UserCreatedEvents />}
         </div>
       </div>
