@@ -1,3 +1,4 @@
+
 import { Event } from "@/types";
 
 const EVENT_FALLBACK_IMAGES = {
@@ -44,7 +45,7 @@ export const getEventFallbackImage = (category?: string, tags?: string[]): strin
   const fallbackDefault = EVENT_FALLBACK_IMAGES.default;
 
   if (!category) {
-    console.log("getEventFallbackImage: No category provided, using default:", fallbackDefault);
+    console.log("[FallbackLogic] No category provided, using default image:", fallbackDefault);
     return fallbackDefault;
   }
   
@@ -87,7 +88,7 @@ export const getEventFallbackImage = (category?: string, tags?: string[]): strin
 
   // Debug logging for troubleshooting category issues
   console.log(
-    `getEventFallbackImage: category="${category}" (normalized: "${normalizedCategory}") -> "${selected}"`
+    `[FallbackLogic] Input category: "${category}" (Normalized: "${normalizedCategory}") -> Resolved Image: "${selected}"`
   );
   
   return selected;

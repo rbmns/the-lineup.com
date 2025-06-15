@@ -17,7 +17,7 @@ interface EventImageResult {
   galleryImages: EventImage[];
   isLoading: boolean;
   error: Error | null;
-  getEventImageUrl: (event: Event) => string | null;
+  getEventImageUrl: (event: Event) => string;
 }
 
 export const useEventImages = (event?: Event | null): EventImageResult => {
@@ -28,14 +28,19 @@ export const useEventImages = (event?: Event | null): EventImageResult => {
   const [error, setError] = useState<Error | null>(null);
 
   // Function to get image URL for any event (useful when rendering lists)
-  const getEventImageUrl = (eventData: Event): string | null => {
+  const getEventImageUrl = (eventData: Event): string => {
+    console.log(`[EventImage] Getting image for: "${eventData.title}" (ID: ${eventData.id})`);
     // Check for image_urls array first
-    if (eventData.image_urls && eventData.image_urls.length > 0) {
+    if (eventData.image_urls && eventData.image_urls.length > 0 && eventData.image_urls[0]) {
+      console.log(`[EventImage] Found DB image: ${eventData.image_urls[0]}`);
       return eventData.image_urls[0];
     }
     
     // Use fallback based on event category
-    return getEventFallbackImage(eventData.event_category);
+    console.log(`[EventImage] No DB image. Falling back on category: "${eventData.event_category}"`);
+    const fallbackImage = getEventFallbackImage(eventData.event_category);
+    console.log(`[EventImage] Fallback image is: ${fallbackImage}`);
+    return fallbackImage;
   };
 
   useEffect(() => {

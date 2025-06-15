@@ -48,6 +48,13 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
           alt={event.title}
           aspectRatio="video"
           className="h-40"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            if (!target.src.includes('/img/default.jpg')) {
+              console.log(`[UpcomingEventCard] Image failed to load: ${target.src}. Falling back to default.`);
+              target.src = "/img/default.jpg";
+            }
+          }}
         />
         {showCategory && event.event_category && (
           <div className="absolute top-3 left-3">
