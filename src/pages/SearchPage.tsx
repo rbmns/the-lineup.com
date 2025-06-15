@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useSearch } from '@/contexts/SearchContext';
@@ -10,6 +11,8 @@ import { navigateToEvent } from '@/utils/navigationUtils';
 import { EventCard } from '@/components/EventCard';
 import { CasualPlanCard } from '@/components/casual-plans/CasualPlanCard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCasualPlansMutations } from '@/hooks/casual-plans/useCasualPlansMutations';
 
 const VenueResultCard = ({ result, navigate }: { result: any; navigate: ReturnType<typeof useNavigate> }) => (
     <Card 
@@ -31,6 +34,13 @@ const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { searchResults, isSearching, performSearch, setSearchResults } = useSearch();
+  const { isAuthenticated } = useAuth();
+  const { 
+    joinPlan, 
+    leavePlan, 
+    rsvpToPlan,
+    loadingPlanId,
+  } = useCasualPlansMutations();
   const query = searchParams.get('q') || '';
 
   useEffect(() => {
@@ -47,6 +57,10 @@ const SearchPage: React.FC = () => {
       setSearchResults([]);
     };
   }, [setSearchResults]);
+
+  const handleLoginPrompt = () => {
+    navigate('/login');
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -70,7 +84,21 @@ const SearchPage: React.FC = () => {
               return <EventCard key={result.id} event={result as unknown as Event} onClick={(event) => navigateToEvent(event.id, navigate)} />;
             }
             if (result.type === 'casual_plan') {
-              return <CasualPlanCard key={result.id} plan={result as unknown as CasualPlan} />;
+              const plan = result as unknown as CasualPlan;
+              return (
+                <CasualPlanCard 
+                  key={plan.id} 
+                  plan={plan}
+                  onJoin={joinPlan}
+                  onLeave={leavePlan}
+                  onRsvp={rsvpToPlan}
+                  isJoining={loadingPlanId === plan.id}
+                  isLeaving={loadingPlanId === plan.id}
+                  isAuthenticated={isAuthenticated}
+                  onLoginPrompt={handleLoginPrompt}
+                  loadingPlanId={loadingPlanId}
+                />
+              );
             }
             if (result.type === 'venue') {
               return <VenueResultCard key={result.id} result={result} navigate={navigate} />;
