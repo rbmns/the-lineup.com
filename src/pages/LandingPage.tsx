@@ -1,13 +1,11 @@
-
-import React, { useRef, useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEvents } from '@/hooks/useEvents';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useEventImages } from '@/hooks/useEventImages';
 import { Event } from '@/types';
 import { CasualPlansHomeSection } from '@/components/home/CasualPlansHomeSection';
-import { UpcomingEventsSection } from '@/components/home/UpcomingEventsSection';
+import { HomeUpcomingEventsSection } from '@/components/home/HomeUpcomingEventsSection';
 import { HowItWorksSection } from '@/components/home/HowItWorksSection';
 import { LandingCtaSection } from '@/components/home/LandingCtaSection';
 import { startOfDay } from 'date-fns';
@@ -20,7 +18,6 @@ const LandingPage = () => {
     data: events,
     isLoading
   } = useEvents();
-  const isMobile = useIsMobile();
   const {
     getEventImageUrl
   } = useEventImages();
@@ -83,10 +80,6 @@ const LandingPage = () => {
     return upcomingEvents.filter(event => event.vibe === selectedVibe);
   }, [upcomingEvents, selectedVibe]);
 
-  const handleVibeClick = (vibe: string) => {
-    setSelectedVibe(prevVibe => prevVibe === vibe ? null : vibe);
-  };
-
   const handleEventClick = useCallback((event: Event) => {
     if (event.id) {
       navigate(`/events/${event.id}`);
@@ -106,12 +99,11 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <UpcomingEventsSection
+      <HomeUpcomingEventsSection
         isLoading={isLoading}
         filteredEvents={filteredEvents}
         availableVibes={availableVibes}
         selectedVibe={selectedVibe}
-        handleVibeClick={handleVibeClick}
         setSelectedVibe={setSelectedVibe}
         getEventImageUrl={getEventImageUrl}
         handleEventClick={handleEventClick}
