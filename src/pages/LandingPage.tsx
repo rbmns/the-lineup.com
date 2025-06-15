@@ -115,7 +115,7 @@ const LandingPage = () => {
     <div>
       {/* Upcoming Events Section */}
       <section className="py-8 bg-gray-50">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-2 sm:px-4">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-3xl font-semibold tracking-tight">Upcoming Events</h2>
             <Link to="/events" className="text-blue-600 hover:text-blue-800 font-medium">
@@ -195,7 +195,7 @@ const LandingPage = () => {
 
       {/* How The Lineup Works Section */}
       <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-2 sm:px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-semibold tracking-tight mb-4">How The Lineup Works</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -242,7 +242,7 @@ const LandingPage = () => {
 
       {/* CTA Section */}
       <section className="py-16 gradient-ocean">
-        <div className="container mx-auto px-4 text-center">
+        <div className="container mx-auto px-2 sm:px-4 text-center">
           <h2 className="text-3xl font-semibold tracking-tight mb-4 text-white">
             Ready to Find Your Next <span className="text-handwritten text-sunset-yellow">Adventure?</span>
           </h2>
