@@ -125,10 +125,18 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     // New location filter
     if (userLocation && userLocation.latitude && userLocation.longitude) {
       tempFilteredEvents = tempFilteredEvents.filter(event => {
-        if (!event.venues?.latitude || !event.venues?.longitude) return false;
+        if (!event.coordinates) {
+          return false;
+        }
+
+        const [longitude, latitude] = event.coordinates;
+        if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+          return false;
+        }
+        
         return isEventNearby(
-          { latitude: event.venues.latitude, longitude: event.venues.longitude },
-          { latitude: userLocation.latitude!, longitude: userLocation.longitude! },
+          { latitude, longitude },
+          { latitude: userLocation.latitude, longitude: userLocation.longitude },
           50 // 50km radius
         );
       });
