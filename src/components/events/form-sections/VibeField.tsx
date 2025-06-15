@@ -12,6 +12,8 @@ interface VibeFieldProps {
   control: Control<FormValues>;
 }
 
+const NO_VIBE_VALUE = '__NO_VIBE__';
+
 export const VibeField: React.FC<VibeFieldProps> = ({ control }) => {
   const { data: vibes, isLoading } = useEventVibes();
 
@@ -31,14 +33,17 @@ export const VibeField: React.FC<VibeFieldProps> = ({ control }) => {
       render={({ field }) => (
         <FormItem>
           <Label htmlFor="vibe">Vibe</Label>
-          <Select onValueChange={field.onChange} value={field.value ?? ''}>
+          <Select 
+            onValueChange={(value) => field.onChange(value === NO_VIBE_VALUE ? null : value)} 
+            value={field.value ?? ''}
+          >
             <FormControl>
               <SelectTrigger id="vibe">
                 <SelectValue placeholder="Select a vibe for your event" />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              <SelectItem value="">
+              <SelectItem value={NO_VIBE_VALUE}>
                 <span className="text-muted-foreground">-- No Vibe --</span>
               </SelectItem>
               {(vibes || []).map((vibe) => (
