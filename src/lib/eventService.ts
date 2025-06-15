@@ -285,3 +285,27 @@ export const searchEvents = async (query: string, userId: string | undefined = u
     return [];
   }
 };
+
+/**
+ * Creates a new event.
+ */
+export const createEvent = async (eventData: Partial<Event>): Promise<{ data: Event | null; error: any }> => {
+  const dataToInsert: { [key: string]: any } = { ...eventData };
+
+  if (dataToInsert.extra_info) {
+    dataToInsert['Extra info'] = dataToInsert.extra_info;
+    delete dataToInsert.extra_info;
+  }
+  
+  const { data, error } = await supabase
+    .from('events')
+    .insert(dataToInsert)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating event:', error);
+  }
+
+  return { data, error };
+};

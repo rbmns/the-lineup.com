@@ -59,8 +59,10 @@ export const processFormData = (data: any, userId: string): SafeEventData => {
   const startTime = format(startDateTime, 'HH:mm:ss');
   
   // Format end time if available
+  let endDate = null;
   let endTime = null;
-  if (endDateTime) {
+  if (endDateTime && isValid(endDateTime)) {
+    endDate = format(endDateTime, 'yyyy-MM-dd');
     endTime = format(endDateTime, 'HH:mm:ss');
   }
   
@@ -69,8 +71,9 @@ export const processFormData = (data: any, userId: string): SafeEventData => {
     title: data.title,
     description: data.description,
     event_category: data.event_category,
-    start_date: startDate,  // This is now a valid property in SafeEventData
+    start_date: startDate,
     start_time: startTime,
+    end_date: endDate,
     end_time: endTime,
     venue_id: data.venue_id || null,
     organizer_link: data.organizer_link,
@@ -78,8 +81,9 @@ export const processFormData = (data: any, userId: string): SafeEventData => {
     booking_link: data.booking_link,
     extra_info: data.extra_info,
     tags: tagsArray,
-    created_by: userId,
-    slug: slug // Include the generated slug
+    creator: userId,
+    slug: slug, // Include the generated slug
+    vibe: data.vibe,
   };
 };
 
@@ -95,8 +99,9 @@ export const extractEventValues = (event: any): SafeEventData => {
       title: event.title || '',
       description: event.description || '',
       event_category: event.event_category || event.event_type || 'other',
-      start_date: event.start_date,  // This is now a valid property in SafeEventData
+      start_date: event.start_date,
       start_time: event.start_time,
+      end_date: event.end_date,
       end_time: event.end_time,
       venue_id: event.venue_id || '',
       organizer_link: event.organizer_link || '',
@@ -104,7 +109,8 @@ export const extractEventValues = (event: any): SafeEventData => {
       booking_link: event.booking_link || '',
       extra_info: event.extra_info || event['Extra info'] || '',
       tags: Array.isArray(event.tags) ? event.tags : (typeof event.tags === 'string' ? event.tags.split(',') : []),
-      slug: event.slug
+      slug: event.slug,
+      creator: event.creator,
     };
   } catch (error) {
     console.error('Error extracting event values:', error);

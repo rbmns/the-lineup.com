@@ -1,4 +1,3 @@
-
 import { Event } from '@/types';
 import { EVENT_CATEGORIES, EVENT_VIBES } from '@/utils/categorySystem';
 
@@ -25,15 +24,16 @@ export type SafeEventData = {
   description?: string;
   event_category?: string; // Updated from event_type
   start_time?: string;
-  end_time?: string;
+  end_time?: string | null;
   start_date?: string;
+  end_date?: string | null;
   venue_id?: string;
   organizer_link?: string;
   fee?: number;
   booking_link?: string;
   extra_info?: string;
   tags?: string[] | string;
-  created_by?: string;
+  creator?: string;
   slug?: string;
   vibe?: string;
 };

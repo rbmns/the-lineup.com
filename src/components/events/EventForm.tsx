@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Event, Venue } from '@/types';
-import { FormValues, SafeEventData, EVENT_CATEGORIES } from '@/components/events/form/EventFormTypes';
+import { FormValues } from '@/components/events/form/EventFormTypes';
 import { EventSchema } from '@/components/events/form/EventFormSchema';
+import { processFormData } from '@/components/events/form/EventFormUtils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -15,7 +16,7 @@ import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { VenueSelect } from '@/components/events/VenueSelect';
-import { fetchEventById, updateEventRsvp, fetchSimilarEvents } from '@/lib/eventService';
+import { fetchEventById, createEvent } from '@/lib/eventService';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -102,50 +103,17 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
     };
   }, [eventData, isEditMode]);
 
-  // Convert form values to event data
-  const convertFormToEventData = (data: FormValues, userId: string | undefined): SafeEventData => {
-    const [startHours, startMinutes] = data.start_time.split(':').map(Number);
-    const [endHours, endMinutes] = data.end_time.split(':').map(Number);
-
-    const startDateTime = new Date(data.start_date);
-    startDateTime.setHours(startHours, startMinutes, 0, 0);
-
-    const endDateTime = new Date(data.end_date);
-    endDateTime.setHours(endHours, endMinutes, 0, 0);
-
-    return {
-      title: data.title,
-      description: data.description,
-      event_category: data.event_category,
-      start_time: startDateTime.toISOString(),
-      end_time: endDateTime.toISOString(),
-      venue_id: data.venue_id,
-      organizer_link: data.organizer_link,
-      fee: parseFloat(data.fee),
-      booking_link: data.booking_link,
-      extra_info: data.extra_info,
-      tags: data.tags.split(',').map(tag => tag.trim()),
-      created_by: userId,
-    };
-  };
-
   // Fix the EventForm submission handler with proper type conversions
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    if (!user) {
+      toast.error("You must be logged in to create an event.");
+      return;
+    }
     setIsSubmitting(true);
     
     try {
-      // Convert form data to event data
-      const eventData = convertFormToEventData(data, user?.id);
-      
-      // Ensure eventData meets the Event type requirements
-      const safeEventData: Partial<Event> = {
-        ...eventData,
-        fee: typeof eventData.fee === 'string' ? parseFloat(eventData.fee) : (eventData.fee || 0),
-        // Ensure tags is always an array, never a string
-        tags: Array.isArray(eventData.tags) 
-          ? eventData.tags 
-          : (typeof eventData.tags === 'string' ? eventData.tags.split(',') : [])
-      };
+      // Convert form data to event data using the utility
+      const eventData = processFormData(data, user.id);
       
       if (isEditMode && eventId) {
         // Update existing event
@@ -155,10 +123,12 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
         return;
       } else {
         // Create new event
-        // For now, just show a success message since we don't have the createEvent function
+        const { data: newEvent, error } = await createEvent(eventData as Partial<Event>);
+        if (error) {
+          throw error;
+        }
         toast.success('Event created successfully!');
-        navigate('/events');
-        return;
+        navigate(`/events/${newEvent?.id}`);
       }
     } catch (error) {
       console.error("Form submission error", error);
