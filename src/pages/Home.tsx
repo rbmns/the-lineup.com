@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -122,7 +123,19 @@ const Home = () => {
         <title>the lineup</title>
         <meta name="description" content="Discover and join events in your area" />
       </Helmet>
-      
+
+      {/* Simple Page Header */}
+      <section className="w-full border-b bg-white pt-10 pb-8 px-4 sm:px-8">
+        <div className="max-w-4xl mx-auto text-left">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-ocean-deep mb-2">
+            Find events that fit your <span className="text-handwritten text-sunset-yellow">vibe</span>
+          </h1>
+          <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
+            Discover what's happening nearby — from beach parties to yoga, music, and more. Join when you want, connect if you want.
+          </p>
+        </div>
+      </section>
+
       {/* Upcoming Events Section */}
       <section className="py-12 w-full">
         <div className="w-full px-4 sm:px-6 lg:px-8">
@@ -321,3 +334,4 @@ const Home = () => {
 };
 
 export default Home;
+
