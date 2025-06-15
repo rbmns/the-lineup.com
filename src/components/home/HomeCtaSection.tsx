@@ -13,7 +13,7 @@ const HomeCtaSection = () => (
           Ready to Find Your Next <span className="font-handwritten text-sunset-yellow">Adventure?</span>
         </h2>
         <p className={`${typography.lead} text-white/90 mb-8`}>
-          Vibe with others and maybe connect back after.
+          Join our community and start discovering events that match your interests and vibe.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">

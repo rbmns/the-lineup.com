@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -99,7 +98,7 @@ const LandingPage = () => {
             Find events that fit your <span className="font-handwritten text-primary">vibe</span>
           </h1>
           <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
-            Discover what's happening nearby — from beach parties to yoga, music, and more. Join when you want, connect if you want.
+            Vibe with others and maybe connect back after. Discover what's happening nearby — from beach parties to yoga, music, and more.
           </p>
         </div>
       </section>
