@@ -1,4 +1,3 @@
-
 import React, { useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Sparkles } from "lucide-react";
@@ -58,7 +57,7 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
                   <button
                     key={vibe}
                     onClick={() =>
-                      setSelectedVibe((prev) => (prev === vibe ? null : vibe))
+                      setSelectedVibe(selectedVibe === vibe ? null : vibe)
                     }
                     className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${
                       selectedVibe === vibe
