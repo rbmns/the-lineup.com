@@ -4,16 +4,10 @@ import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
+import { Profile } from '@/types';
 
 interface ProfileHeaderProps {
-  profile: {
-    id: string;
-    username: string;
-    avatar_url: string[] | string | null;
-    tagline: string | null;
-    location: string | null;
-    status: string | null;
-  } | null;
+  profile: Profile | null;
   viewingOwnProfile?: boolean;
   friendStatus?: 'none' | 'pending' | 'accepted';
   onAddFriend?: () => void;
