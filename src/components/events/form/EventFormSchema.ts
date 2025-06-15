@@ -1,6 +1,6 @@
 
 import { z } from "zod";
-import { EVENT_CATEGORIES, EVENT_VIBES } from "@/utils/categorySystem";
+import { EVENT_CATEGORIES } from "@/utils/categorySystem";
 
 export const EventSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters long"),
@@ -18,7 +18,7 @@ export const EventSchema = z.object({
   booking_link: z.string().url("Please enter a valid URL").or(z.string().length(0)),
   extra_info: z.string().optional(),
   tags: z.string().optional(),
-  vibe: z.enum(EVENT_VIBES).optional().or(z.literal('')),
+  vibe: z.string().optional().or(z.literal('')),
 });
 
 export type EventFormValues = z.infer<typeof EventSchema>;
