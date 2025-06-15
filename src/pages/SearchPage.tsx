@@ -1,13 +1,31 @@
-
 import React, { useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useSearch } from '@/contexts/SearchContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, MapPin } from 'lucide-react';
 import { Event } from '@/types';
+import { CasualPlan } from '@/types/casual-plans';
 import { Skeleton } from '@/components/ui/skeleton';
 import { navigateToEvent } from '@/utils/navigationUtils';
 import { EventCard } from '@/components/EventCard';
+import { CasualPlanCard } from '@/components/casual-plans/CasualPlanCard';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+const VenueResultCard = ({ result, navigate }: { result: any; navigate: ReturnType<typeof useNavigate> }) => (
+    <Card 
+        className="cursor-pointer hover:shadow-lg transition-shadow h-full"
+        onClick={() => navigate(`/venues/${result.slug || result.id}`)}
+    >
+        <CardHeader>
+            <CardTitle className="line-clamp-2">{result.title}</CardTitle>
+            {result.location && <CardDescription>{result.location}</CardDescription>}
+        </CardHeader>
+        <CardContent>
+            <p className="text-sm text-muted-foreground flex items-center"><MapPin className="h-4 w-4 mr-2" />Venue</p>
+        </CardContent>
+    </Card>
+);
+
 
 const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -21,7 +39,7 @@ const SearchPage: React.FC = () => {
     } else {
         setSearchResults([]);
     }
-  }, [query]);
+  }, [query, performSearch, setSearchResults]);
 
   // Cleanup search results on unmount
   useEffect(() => {
@@ -50,6 +68,12 @@ const SearchPage: React.FC = () => {
           {searchResults.map((result) => {
             if (result.type === 'event') {
               return <EventCard key={result.id} event={result as unknown as Event} onClick={(event) => navigateToEvent(event.id, navigate)} />;
+            }
+            if (result.type === 'casual_plan') {
+              return <CasualPlanCard key={result.id} plan={result as unknown as CasualPlan} />;
+            }
+            if (result.type === 'venue') {
+              return <VenueResultCard key={result.id} result={result} navigate={navigate} />;
             }
             return null;
           })}

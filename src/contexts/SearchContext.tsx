@@ -1,6 +1,6 @@
-
 import React, { createContext, useState, useContext, useCallback } from 'react';
-import { Event, UserProfile } from '@/types';
+import { Event, UserProfile, Venue } from '@/types';
+import { CasualPlan } from '@/types/casual-plans';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { 
@@ -14,7 +14,7 @@ import {
 
 interface SearchResult {
   id: string;
-  type: 'event' | 'profile' | 'location';
+  type: 'event' | 'profile' | 'location' | 'venue' | 'casual_plan';
   title?: string;
   username?: string;
   event_category?: string;
@@ -104,21 +104,50 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       await trackSearch(term);
       
-      // Search events by title, description, event_category, or destination
-      const { data: eventData, error: eventError } = await supabase
+      const eventSearch = supabase
         .from('events')
         .select('*, venue_id(*)')
-        .or(`title.ilike.%${term}%,description.ilike.%${term}%,event_category.ilike.%${term}%,destination.ilike.%${term}%`)
+        .or(`title.ilike.%${term}%,description.ilike.%${term}%,event_category.ilike.%${term}%,destination.ilike.%${term}%,tags.ilike.%${term}%,vibe.ilike.%${term}%`)
         .order('start_date', { ascending: true });
-        
-      if (eventError) throw eventError;
+
+      const venueSearch = supabase
+        .from('venues')
+        .select('*')
+        .or(`name.ilike.%${term}%,city.ilike.%${term}%`);
+
+      const casualPlanSearch = supabase
+        .from('casual_plans')
+        .select('*, creator_profile:profiles(id, username, avatar_url)')
+        .or(`title.ilike.%${term}%,description.ilike.%${term}%,vibe.ilike.%${term}%,location.ilike.%${term}%`);
+
+      const [eventResponse, venueResponse, casualPlanResponse] = await Promise.all([
+        eventSearch,
+        venueSearch,
+        casualPlanSearch,
+      ]);
+
+      if (eventResponse.error) throw eventResponse.error;
+      if (venueResponse.error) throw venueResponse.error;
+      if (casualPlanResponse.error) throw casualPlanResponse.error;
       
-      const results = (eventData || []).map(event => {
-        return {
+      const eventResults = (eventResponse.data || []).map(event => ({
           ...event,
           type: 'event' as const,
-        };
-      });
+      }));
+
+      const venueResults = (venueResponse.data || []).map(venue => ({
+          ...venue,
+          type: 'venue' as const,
+          title: venue.name,
+          location: venue.city,
+      }));
+
+      const casualPlanResults = (casualPlanResponse.data || []).map(plan => ({
+          ...plan,
+          type: 'casual_plan' as const,
+      }));
+      
+      const results: SearchResult[] = [...eventResults, ...venueResults, ...casualPlanResults];
       
       console.log('Search results found:', results.length);
       setSearchResults(results);
