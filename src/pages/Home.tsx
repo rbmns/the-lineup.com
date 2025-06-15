@@ -184,16 +184,16 @@ const Home = () => {
               </div>
             )}
             
-            {/* Events Grid */}
+            {/* Events Grid - ONLY Polymet Card, SQUARE corners */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {isLoading ? (
                 Array.from({ length: 3 }).map((_, i) => (
                   <div key={i} className="card-coastal animate-pulse">
-                    <div className="h-48 bg-driftwood-grey/30 rounded-t-xl"></div>
+                    <div className="h-48 bg-driftwood-grey/30"></div>
                     <div className="p-6 space-y-3">
-                      <div className="h-4 bg-driftwood-grey/30 rounded w-3/4"></div>
-                      <div className="h-3 bg-driftwood-grey/30 rounded w-1/2"></div>
-                      <div className="h-3 bg-driftwood-grey/30 rounded w-2/3"></div>
+                      <div className="h-4 bg-driftwood-grey/30 w-3/4"></div>
+                      <div className="h-3 bg-driftwood-grey/30 w-1/2"></div>
+                      <div className="h-3 bg-driftwood-grey/30 w-2/3"></div>
                     </div>
                   </div>
                 ))
@@ -202,77 +202,37 @@ const Home = () => {
                   <div 
                     key={event.id}
                     className="cursor-pointer h-full transform hover:scale-105 transition-all duration-300" 
+                    onClick={() => handleEventClick(event)}
                   >
-                    {/* Original card */}
-                    <div onClick={() => handleEventClick(event)}>
-                      <div className="text-xs text-gray-400 mb-1">Original Design</div>
-                      <div className="card-coastal overflow-hidden h-full flex flex-col">
-                        <div className="relative">
-                          <LineupImage
-                            src={event.image_urls && event.image_urls.length > 0 ? event.image_urls[0] : getEventImageUrl(event)}
-                            alt={event.title}
-                            aspectRatio="video"
-                            overlayVariant="ocean"
-                            className="h-48"
-                          />
-                          {event.event_category && (
-                            <div className="absolute top-3 left-3 z-30">
-                              <CategoryPill 
-                                category={event.event_category} 
-                                active={true}
-                                noBorder={true}
-                              />
-                            </div>
-                          )}
-                        </div>
-                        <CardContent className="p-6 flex-1 flex flex-col">
-                          <h3 className="font-semibold mb-3 line-clamp-2 text-ocean-deep">{event.title}</h3>
-                          <div className="flex items-center text-sm text-clay-earth mb-2">
-                            <Calendar className="mr-2 h-4 w-4" />
-                            <span>
-                              {formatFeaturedDate(event.start_date)} • {formatEventTime(event.start_time, event.end_time)}
-                            </span>
-                          </div>
-                          <div className="flex items-center text-sm text-clay-earth flex-1">
-                            <MapPin className="mr-2 h-4 w-4 flex-shrink-0" />
-                            <span className="line-clamp-1">{event.venues?.name || event.location}</span>
-                          </div>
-                        </CardContent>
-                      </div>
-                    </div>
-                    {/* Polymet preview card */}
-                    <div className="mt-5">
-                      <div className="text-xs text-purple-700 font-bold mb-1">Preview: Polymet Design</div>
-                      <PolymetEventCard
-                        id={event.id}
-                        title={event.title}
-                        image={event.image_urls?.[0] || "/img/default.jpg"}
-                        category={event.event_category || "Other"}
-                        vibe={event.tags && event.tags.length > 0 ? event.tags[0] : undefined}
-                        host={event.creator 
-                          ? {
-                              id: event.creator.id,
-                              name: event.creator.username || event.creator.email || "Host",
-                              avatar: Array.isArray(event.creator.avatar_url)
-                                ? event.creator.avatar_url[0]
-                                : event.creator.avatar_url,
-                            }
-                          : undefined
-                        }
-                        location={event.venues?.name || event.location || ""}
-                        date={formatFeaturedDate(event.start_date || "")}
-                        time={event.start_time || undefined}
-                        attendees={event.going_count || event.interested_count
-                          ? {
-                              count: (event.going_count ?? 0) + (event.interested_count ?? 0),
-                              avatars: [],
-                            }
-                          : undefined
-                        }
-                        showRsvp={false}
-                        className="h-full w-full"
-                      />
-                    </div>
+                    <PolymetEventCard
+                      id={event.id}
+                      title={event.title}
+                      image={event.image_urls?.[0] || "/img/default.jpg"}
+                      category={event.event_category || "Other"}
+                      vibe={event.tags && event.tags.length > 0 ? event.tags[0] : undefined}
+                      host={event.creator 
+                        ? {
+                            id: event.creator.id,
+                            name: event.creator.username || event.creator.email || "Host",
+                            avatar: Array.isArray(event.creator.avatar_url)
+                              ? event.creator.avatar_url[0]
+                              : event.creator.avatar_url,
+                          }
+                        : undefined
+                      }
+                      location={event.venues?.name || event.location || ""}
+                      date={formatFeaturedDate(event.start_date || "")}
+                      time={event.start_time || undefined}
+                      attendees={event.going_count || event.interested_count
+                        ? {
+                            count: (event.going_count ?? 0) + (event.interested_count ?? 0),
+                            avatars: [],
+                          }
+                        : undefined
+                      }
+                      showRsvp={false}
+                      className="h-full w-full rounded-none"
+                    />
                   </div>
                 ))
               ) : (
