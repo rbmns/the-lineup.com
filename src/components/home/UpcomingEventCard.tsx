@@ -1,0 +1,102 @@
+
+import React from "react";
+import { Calendar, MapPin, ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { CategoryPill } from "@/components/ui/category-pill";
+import { LineupImage } from "@/components/ui/lineup-image";
+import { formatFeaturedDate, formatEventTime } from "@/utils/date-formatting";
+import { Event } from "@/types";
+
+interface UpcomingEventCardProps {
+  event: Event;
+  onClick?: (event: Event) => void;
+  className?: string;
+  showCategory?: boolean;
+}
+
+export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
+  event,
+  onClick,
+  className = "",
+  showCategory = true,
+}) => {
+  const handleClick = (e: React.MouseEvent) => {
+    if (onClick) {
+      e.preventDefault();
+      onClick(event);
+    }
+  };
+
+  return (
+    <div
+      className={cn(
+        "group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col max-w-xs w-[265px] cursor-pointer",
+        className
+      )}
+      onClick={handleClick}
+      tabIndex={0}
+      role="button"
+    >
+      <div className="relative w-full h-40 rounded-t-xl overflow-hidden">
+        <LineupImage
+          src={event.image_urls?.[0] || "/img/default.jpg"}
+          alt={event.title}
+          aspectRatio="video"
+          className="h-40"
+        />
+        {showCategory && event.event_category && (
+          <div className="absolute top-3 left-3">
+            <CategoryPill category={event.event_category} active={true} noBorder={true} />
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-2 pt-3 pb-4 px-4 w-full text-left">
+        <h3 className="text-base font-bold leading-tight line-clamp-2 mb-1 text-ocean-deep-900 font-inter">
+          {event.title}
+        </h3>
+        <div className="flex items-center gap-1 text-xs text-ocean-deep-700 font-inter">
+          <Calendar size={15} className="mr-1" />
+          <span>
+            {formatFeaturedDate(event.start_date)}
+            {event.start_time && (
+              <>
+                {" "}
+                <span className="text-ocean-deep-300">•</span>{" "}
+                {formatEventTime(event.start_time, event.end_time)}
+              </>
+            )}
+          </span>
+        </div>
+        {event.venues?.name || event.location ? (
+          <div className="flex items-center gap-1 text-xs text-ocean-deep-700 font-inter">
+            <MapPin size={15} className="mr-1" />
+            <span className="truncate">
+              {event.venues?.name || event.location}
+            </span>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+};
+
+interface ViewAllCardProps {
+  onClick?: () => void;
+}
+export const ViewAllCard: React.FC<ViewAllCardProps> = ({ onClick }) => (
+  <div
+    className="group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col items-center justify-center max-w-xs min-h-[256px] w-[80px] cursor-pointer"
+    onClick={onClick}
+    tabIndex={0}
+    role="button"
+    aria-label="View all events"
+  >
+    <div className="flex items-center justify-center h-16">
+      <span className="bg-ocean-deep-500 text-white rounded-full p-3">
+        <ArrowRight size={28} />
+      </span>
+    </div>
+    <div className="text-ocean-deep-800 font-medium text-xs mt-4">View All</div>
+  </div>
+);

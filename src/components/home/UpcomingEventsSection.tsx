@@ -1,13 +1,10 @@
 
-import React, { useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
-import { CategoryPill } from '@/components/ui/category-pill';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { useEventImages } from '@/hooks/useEventImages';
-import { LineupImage } from '@/components/ui/lineup-image';
-import { formatFeaturedDate, formatEventTime } from '@/utils/date-formatting';
-import { Event } from '@/types';
+import React from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { CategoryPill } from "@/components/ui/category-pill";
+import { UpcomingEventCard, ViewAllCard } from "./UpcomingEventCard";
+import { Event } from "@/types";
+import { cn } from "@/lib/utils";
 
 interface UpcomingEventsSectionProps {
   isLoading: boolean;
@@ -30,24 +27,23 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
   getEventImageUrl,
   handleEventClick,
 }) => {
+  const navigate = useNavigate();
+
   return (
-    <section className="py-8 bg-gray-50">
-      <div className="container mx-auto px-2 sm:px-4">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-semibold tracking-tight">Upcoming Events</h2>
-          <Link to="/events" className="text-blue-600 hover:text-blue-800 font-medium">
-            View all →
-          </Link>
-        </div>
+    <section className="py-10 bg-gray-50">
+      <div className="container mx-auto px-3 md:px-6">
+        <h2 className="text-3xl font-bold tracking-tight mb-6 text-ocean-deep-900 text-left font-inter">
+          Upcoming Events
+        </h2>
         {/* Category Filter Pills */}
-        <div className="flex gap-2 mb-8 overflow-x-auto">
+        <div className="flex gap-2 mb-7 overflow-x-auto">
           <CategoryPill
             category="All categories"
             active={!selectedCategory}
             noBorder={true}
             onClick={() => setSelectedCategory(null)}
           />
-          {availableCategoriesInUpcoming.map((category) => (
+          {availableCategoriesInUpcoming.map(category => (
             <CategoryPill
               key={category}
               category={category}
@@ -57,50 +53,36 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
             />
           ))}
         </div>
-        {/* Events Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Events Row (Slider Style) */}
+        <div
+          className={cn(
+            "flex flex-nowrap gap-6 w-full overflow-x-auto pb-3",
+            isLoading ? "justify-center items-center" : "justify-start"
+          )}
+          style={{ WebkitOverflowScrolling: "touch" }}
+        >
           {isLoading ? (
-            <div className="flex justify-center w-full py-8 col-span-3">
-              <div className="animate-spin rounded-full h-8 w-8 border-2 border-black"></div>
+            <div className="flex justify-center w-full py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-black" />
             </div>
           ) : filteredEvents.length > 0 ? (
-            filteredEvents.slice(0, 3).map((event) => (
-              <div
-                key={event.id}
-                className="cursor-pointer"
-                onClick={() => handleEventClick(event)}
-              >
-                <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="relative">
-                    <LineupImage
-                      src={event.image_urls && event.image_urls.length > 0 ? event.image_urls[0] : getEventImageUrl(event)}
-                      alt={event.title}
-                      aspectRatio="video"
-                      overlayVariant="ocean"
-                      className="h-48"
-                    />
-                    {event.event_category && (
-                      <div className="absolute top-3 left-3 z-30">
-                        <CategoryPill
-                          category={event.event_category}
-                          active={true}
-                          noBorder={true}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold mb-2">{event.title}</h3>
-                    <p className="text-sm text-gray-600 mb-1">
-                      {formatFeaturedDate(event.start_date)} • {formatEventTime(event.start_time, event.end_time)}
-                    </p>
-                    <p className="text-sm text-gray-600">{event.venues?.name || event.location}</p>
-                  </CardContent>
-                </Card>
-              </div>
-            ))
+            <>
+              {filteredEvents.slice(0, 4).map(event => (
+                <UpcomingEventCard
+                  key={event.id}
+                  event={event}
+                  onClick={handleEventClick}
+                  showCategory={true}
+                  className="shrink-0"
+                />
+              ))}
+              {/* Instead of an event, last card is "View All" if there are more events */}
+              {filteredEvents.length > 4 && (
+                <ViewAllCard onClick={() => navigate("/events")} />
+              )}
+            </>
           ) : (
-            <div className="col-span-3 text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-gray-500 w-full">
               No events available
             </div>
           )}
