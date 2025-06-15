@@ -18,6 +18,9 @@ import { LineupImage } from '@/components/ui/lineup-image';
 import { Helmet } from 'react-helmet-async';
 import PolymetEventCard from '@/components/polymet/event-card';
 import { HomeUpcomingEventsSection } from "@/components/home/HomeUpcomingEventsSection";
+import HomeHeaderSection from '@/components/home/HomeHeaderSection';
+import HomeHowItWorksSection from '@/components/home/HomeHowItWorksSection';
+import HomeCtaSection from '@/components/home/HomeCtaSection';
 const Home = () => {
   const {
     isAuthenticated
@@ -115,106 +118,37 @@ const Home = () => {
       navigate(`/events/${event.id}`);
     }
   }, [navigate]);
-  return <div className="w-full min-h-screen">
+  return (
+    <div className="w-full min-h-screen">
       <Helmet>
         <title>the lineup</title>
         <meta name="description" content="Discover and join events in your area" />
       </Helmet>
 
-      {/* Simple Page Header */}
-      <section className="w-full border-b pt-10 pb-8 px-4 sm:px-8 bg-cyan-200">
-        <div className="max-w-4xl mx-auto text-left">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-ocean-deep mb-2">
-            Find events that fit your <span className="text-handwritten text-sunset-yellow">vibe</span>
-          </h1>
-          <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
-            Discover what's happening nearby — from beach parties to yoga, music, and more. Join when you want, connect if you want.
-          </p>
-        </div>
-      </section>
+      {/* Standardized Page Header */}
+      <HomeHeaderSection />
 
-      {/* Upcoming Events Section (EXTRACTED, SIMPLIFIED, Polymet cards only) */}
-      <HomeUpcomingEventsSection isLoading={isLoading} filteredEvents={filteredEvents} handleEventClick={handleEventClick} availableVibes={availableVibes} selectedVibe={selectedVibe} setSelectedVibe={setSelectedVibe} getEventImageUrl={getEventImageUrl} />
+      {/* Upcoming Events Section */}
+      <HomeUpcomingEventsSection
+        isLoading={isLoading}
+        filteredEvents={filteredEvents}
+        handleEventClick={handleEventClick}
+        availableVibes={availableVibes}
+        selectedVibe={selectedVibe}
+        setSelectedVibe={setSelectedVibe}
+        getEventImageUrl={getEventImageUrl}
+      />
 
-      {/* How The Lineup Works Section */}
-      <section className="py-16 w-full bg-cyan-800">
-        <div className="w-full px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold tracking-tight text-ocean-deep mb-4">
-                How <span className="text-handwritten text-seafoam-green">The Lineup</span> Works
-              </h2>
-              <p className="text-lg text-clay-earth">
-                Discover, connect, and experience amazing events in your area with just a few taps.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center group">
-                <div className="w-20 h-20 gradient-sky rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Search className="h-10 w-10 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3 text-ocean-deep">Discover Events</h3>
-                <p className="text-clay-earth">
-                  Browse events happening near you, from yoga sessions to beach parties and everything in between.
-                </p>
-              </div>
-              
-              <div className="text-center group">
-                <div className="w-20 h-20 gradient-sunset rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Calendar className="h-10 w-10 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3 text-ocean-deep">RSVP & Plan</h3>
-                <p className="text-clay-earth">
-                  Show interest or commit to going. Keep track of your plans and never miss out on what matters to you.
-                </p>
-              </div>
-              
-              <div className="text-center group">
-                <div className="w-20 h-20 gradient-ocean rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <Users className="h-10 w-10 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3 text-ocean-deep">Connect & Enjoy</h3>
-                <p className="text-clay-earth">
-                  Meet like-minded people at events and build meaningful connections in your community.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Standardized How It Works Section */}
+      <HomeHowItWorksSection />
 
       {/* Casual Plans Feature Section */}
       <CasualPlansHomeSection />
 
-      {/* CTA Section */}
-      <section className="py-16 w-full gradient-ocean bg-cyan-500">
-        <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold tracking-tight text-white mb-4">
-              Ready to Find Your Next <span className="text-handwritten text-sunset-yellow">Adventure?</span>
-            </h2>
-            <p className="text-xl mb-8 text-white/90">
-              Join our community and start discovering events that match your interests and vibe.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="btn-sunset text-white font-medium">
-                <Link to="/events">
-                  <Search className="mr-2 h-4 w-4" />
-                  Explore Events
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="border-2 border-white/50 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20">
-                <Link to="/profile">
-                  <UserCircle className="mr-2 h-4 w-4" />
-                  Create Profile
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>;
+      {/* Standardized CTA Section */}
+      <HomeCtaSection />
+    </div>
+  );
 };
+
 export default Home;
