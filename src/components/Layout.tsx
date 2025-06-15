@@ -46,7 +46,7 @@ const Layout = () => {
 
         {/* Main Content Area */}
         <div
-          className={`flex-1 w-full min-h-screen main-feed-gradient flex flex-col`}
+          className="flex-1 w-full min-h-screen main-feed-gradient flex flex-col"
           style={
             !isMobile
               ? {
@@ -59,8 +59,9 @@ const Layout = () => {
               : {}
           }
         >
-          <main className="main-feed-gradient w-full min-h-full max-w-3xl mx-auto flex-1 flex flex-col">
-            <div className="flex-1 flex flex-col justify-center py-4">
+          {/* ENSURE FULL WIDTH and REMOVE max-w-3xl restriction */}
+          <main className="main-feed-gradient w-full flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col justify-start">
               <Outlet />
             </div>
           </main>
