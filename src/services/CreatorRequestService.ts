@@ -48,7 +48,7 @@ export const CreatorRequestService = {
   },
 
   async notifyAdminOfCreatorRequest(userId: string, requestDetails: CreatorRequestDetails, userProfile: UserProfileDetails): Promise<{ error: any }> {
-    const { error } = await supabase
+    const { error: notificationError } = await supabase
       .from('admin_notifications')
       .insert({
         notification_type: 'creator_request',
@@ -60,11 +60,25 @@ export const CreatorRequestService = {
         }
       });
 
-    if (error) {
-      console.error('Error creating admin notification for creator request:', error);
+    if (notificationError) {
+      console.error('Error creating admin notification for creator request:', notificationError);
     }
     
-    return { error };
+    // Invoke the edge function to send an email notification
+    const { error: functionError } = await supabase.functions.invoke('notify-admin-creator-request', {
+        body: {
+          username: userProfile.username,
+          user_email: userProfile.email,
+          ...requestDetails,
+        }
+    });
+
+    if (functionError) {
+      console.error('Error invoking email notification function:', functionError);
+      // We don't block the user's flow if email fails. The in-app notification is the primary source.
+    }
+    
+    return { error: notificationError };
   },
 
   async getCreatorRequestsForAdmin(): Promise<{ data: any[] | null; error: any }> {

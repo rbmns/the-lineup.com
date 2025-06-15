@@ -1,1 +1,5 @@
+
 project_id = "vbxhcqlcbusqwsqesoxw"
+
+[functions.notify-admin-creator-request]
+verify_jwt = false
