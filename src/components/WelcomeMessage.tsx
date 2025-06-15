@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 export const WelcomeMessage = () => {
   return (
-    <Card className="max-w-md mx-auto mb-8 shadow-xl border border-gray-100 transform transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 bg-gradient-to-br from-white to-gray-50 rounded-xl overflow-hidden animate-fade-in">
+    <Card className="max-w-md mx-auto mb-8 border-none shadow-card-lg rounded-xl overflow-hidden bg-white/80 backdrop-blur-md">
       <CardContent className="space-y-4 p-6">
         <div className="text-center mb-4">
           <img 
