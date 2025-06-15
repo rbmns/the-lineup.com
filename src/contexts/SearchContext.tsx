@@ -1,5 +1,4 @@
-
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useCallback } from 'react';
 import { Event, UserProfile } from '@/types';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
@@ -58,7 +57,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [similarResults, setSimilarResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  const trackSearch = async (term: string) => {
+  const trackSearch = useCallback(async (term: string) => {
     try {
       await fetch('/api/track-search', {
         method: 'POST',
@@ -73,9 +72,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } catch (error) {
       console.error('Failed to track search:', error);
     }
-  };
+  }, []);
 
-  const trackClick = async (searchTerm: string, resultId: string, resultType: string) => {
+  const trackClick = useCallback(async (searchTerm: string, resultId: string, resultType: string) => {
     try {
       await fetch('/api/track-search', {
         method: 'POST',
@@ -93,9 +92,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } catch (error) {
       console.error('Failed to track click:', error);
     }
-  };
+  }, []);
 
-  const performSearch = async (term: string): Promise<SearchResult[]> => {
+  const performSearch = useCallback(async (term: string): Promise<SearchResult[]> => {
     if (!term.trim()) return [];
     
     setIsSearching(true);
@@ -114,16 +113,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       if (eventError) throw eventError;
       
       const results = (eventData || []).map(event => {
-        const venueData = event.venue_id || {};
         return {
-          id: event.id,
+          ...event,
           type: 'event' as const,
-          title: event.title,
-          description: event.description,
-          location: venueData.city || 'Location not specified',
-          event_type: event.event_type,
-          start_time: event.start_time,
-          end_time: event.end_time,
         };
       });
       
@@ -138,9 +130,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } finally {
       setIsSearching(false);
     }
-  };
+  }, [trackSearch]);
 
-  const searchByLocation = async (location: string) => {
+  const searchByLocation = useCallback(async (location: string) => {
     setIsSearching(true);
     setSearchTerm(location);
     
@@ -150,9 +142,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } finally {
       setIsSearching(false);
     }
-  };
+  }, [performSearch]);
 
-  const searchByCategory = async (category: string) => {
+  const searchByCategory = useCallback(async (category: string) => {
     setIsSearching(true);
     setSearchTerm(category);
     
@@ -190,9 +182,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } finally {
       setIsSearching(false);
     }
-  };
+  }, []);
 
-  const searchByKeyword = async (keyword: string) => {
+  const searchByKeyword = useCallback(async (keyword: string) => {
     setIsSearching(true);
     setSearchTerm(keyword);
     
@@ -202,9 +194,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } finally {
       setIsSearching(false);
     }
-  };
+  }, [performSearch]);
 
-  const advancedSearch = async (params: {
+  const advancedSearch = useCallback(async (params: {
     term?: string;
     location?: string;
     category?: string;
@@ -268,7 +260,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } finally {
       setIsSearching(false);
     }
-  };
+  }, []);
 
   return (
     <SearchContext.Provider value={{

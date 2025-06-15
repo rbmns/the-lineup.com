@@ -24,6 +24,7 @@ import TermsOfService from '@/pages/TermsOfService';
 import CookiePolicy from '@/pages/CookiePolicy';
 import NotFound from '@/pages/NotFound';
 import DesignSystem from '@/pages/DesignSystem';
+import SearchPage from '@/pages/SearchPage';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
                 <Route path="friends" element={<Friends />} />
                 <Route path="profile" element={<ProfilePage />} />
                 <Route path="profile/edit" element={<ProfileEdit />} />
+                <Route path="search" element={<SearchPage />} />
                 <Route path="login" element={<Login />} />
                 <Route path="signup" element={<Signup />} />
                 <Route path="forgot-password" element={<ForgotPassword />} />
