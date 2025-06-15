@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss"
 
 const config = {
@@ -26,58 +25,62 @@ const config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        background: "#F3F4F6", // Updated app-wide background
+        foreground: "#1F1F1F",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#00A6A6",
+          foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "#F9FAFB", // Sidebar and containers
+          foreground: "#1F1F1F",
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: "#FF5C57",
+          foreground: "#FFFFFF",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "#6B7280",
+          foreground: "#374151",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "#4ADEDE",
+          foreground: "#00A6A6",
         },
         'brand-turquoise': '#00A6A6',
-        'brand-coral-red': '#FF5C57',
-        'brand-neutral-bg': '#F8F9FA',
+        'brand-seafoam': '#4ADEDE',
+        'brand-neutral-bg': '#F3F4F6',
         'brand-text-primary': '#1F1F1F',
-        'brand-text-secondary': '#6B7280',
+        'brand-text-secondary': '#374151',
+        'brand-muted': '#6B7280',
         'brand-online-green': '#22C55E',
         'brand-away-orange': '#F97316',
         'ocean-deep': '#0C3B5C',
         'sunset-yellow': '#FFCB6B',
         'seafoam-green': '#80D8DA',
         'clay-earth': '#A17C6B',
+        'pastel-turquoise': '#E0F7F7',
+        'pastel-coral': '#FFEDE8',
       },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-        xl: "calc(var(--radius) + 4px)",
+      boxShadow: {
+        'turquoise': '0 4px 24px 0 rgba(0,166,166,0.08)',
+        'card-lg': '0 8px 40px 0 rgba(0,166,166,0.10)',
+      },
+      backgroundImage: {
+        'accent-gradient': 'linear-gradient(135deg, #00A6A6, #4ADEDE)',
+        'zone-main': 'linear-gradient(to bottom, #F3F4F6 0%, #FFFFFF 100%)',
       },
       fontFamily: {
         'inter': ['Inter', 'sans-serif'],
-        'caveat': ['Caveat', 'cursive'],
-        'handwritten': ['Caveat', 'cursive'],
+      },
+      borderRadius: {
+        lg: "1rem",
+        md: "0.75rem",
+        sm: "0.5rem",
+        xl: "1.5rem",
+      },
+      transitionProperty: {
+        'coastal': 'box-shadow, background-color, color, transform',
       },
       keyframes: {
         "accordion-down": {

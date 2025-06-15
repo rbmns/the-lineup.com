@@ -1,77 +1,105 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Caveat&display=swap');
 
+/* Global background and zoning */
 @layer base {
   :root {
-    /* Brand Style: Coastal Minimalism */
-    --background: 248 249 250; /* #F8F9FA */
+    --background: 243 244 246; /* #F3F4F6 */
     --foreground: 31 31 31; /* #1F1F1F */
 
     --card: 255 255 255; /* #FFFFFF */
-    --card-foreground: 31 31 31; /* #1F1F1F */
-
-    --popover: 255 255 255;
-    --popover-foreground: 31 31 31;
-
+    --card-foreground: 31 31 31;
+    
     --primary: 0 166 166; /* #00A6A6 */
     --primary-foreground: 255 255 255;
 
-    --secondary: 229 231 235; /* light gray */
+    --secondary: 249 250 251; /* #F9FAFB */
     --secondary-foreground: 31 31 31;
 
     --muted: 229 231 235;
-    --muted-foreground: 107 114 128; /* #6B7280 */
+    --muted-foreground: 107 114 128;
 
-    --accent: 248 249 250;
-    --accent-foreground: 31 31 31;
+    --accent: 74 222 222;
+    --accent-foreground: 0 166 166;
 
-    --destructive: 255 92 87; /* #FF5C57 */
+    --destructive: 255 92 87;
     --destructive-foreground: 255 255 255;
 
     --border: 229 231 235;
     --input: 229 231 235;
     --ring: 0 166 166;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
   }
-}
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground font-inter leading-relaxed;
+  html, body {
+    background: linear-gradient(to bottom, #F3F4F6 0%, #FFFFFF 100%);
+    color: #374151;
+    font-family: 'Inter', sans-serif;
     min-height: 100vh;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold uppercase;
+    color: #1F1F1F;
+    @apply font-semibold uppercase tracking-wide;
+  }
+
+  .text-turquoise {
+    color: #00A6A6 !important;
   }
 }
 
-@layer components {
-  .btn-sunset {
-    @apply bg-gradient-to-r from-sunset-yellow to-brand-coral-red text-white font-semibold;
-  }
-  .gradient-sky {
-    @apply bg-gradient-to-br from-cyan-200 to-blue-200;
-  }
-  .gradient-sunset {
-    @apply bg-gradient-to-br from-sunset-yellow to-brand-coral-red;
-  }
-  .gradient-ocean {
-    @apply bg-gradient-to-br from-primary to-ocean-deep;
-  }
-}
-
+/* Utility classes for coastal look */
 @layer utilities {
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  .shadow-turquoise {
+    box-shadow: 0 4px 24px 0 rgba(0,166,166,0.08) !important;
   }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  .shadow-card-lg {
+    box-shadow: 0 8px 40px 0 rgba(0,166,166,0.10) !important;
+  }
+  .bg-accent-gradient {
+    background: linear-gradient(135deg, #00A6A6, #4ADEDE) !important;
+  }
+  .badge-pastel-turquoise {
+    background-color: #E0F7F7 !important;
+    color: #00A6A6 !important;
+  }
+  .badge-pastel-coral {
+    background-color: #FFEDE8 !important;
+    color: #FF5C57 !important;
+  }
+  .hover-soft-tint-turquoise:hover {
+    background-color: rgba(0,166,166,0.08) !important;
+    transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+    box-shadow: 0 2px 8px 0 rgba(0,166,166,0.07);
+  }
+  .hover-soft-tint-coral:hover {
+    background-color: rgba(255,92,87,0.08) !important;
+    transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+    box-shadow: 0 2px 8px 0 rgba(255,92,87,0.07);
+  }
+  .transition-coastal {
+    transition: box-shadow 0.15s, background-color 0.15s, color 0.15s, transform 0.15s;
+  }
+  .sidebar-zoning {
+    background: #F9FAFB !important;
+  }
+  .main-feed-gradient {
+    background: linear-gradient(to bottom, #F3F4F6 0%, #FFFFFF 100%) !important;
   }
 }
+
+/* Focused search styling */
+.input-search-coastal {
+  background: #FFF !important;
+  border: 1px solid #E5E7EB !important;
+  box-shadow: 0 2px 8px 0 rgba(0,166,166,0.05);
+  color: #374151;
+  padding-left: 2.5rem !important;
+  transition: border 0.15s, box-shadow 0.15s;
+}
+.input-search-coastal:focus {
+  border: 1.5px solid #00A6A6 !important;
+  box-shadow: 0 0 0 2px #4ADEDE55;
+}
+
