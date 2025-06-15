@@ -81,7 +81,7 @@ const EditEvent = () => {
       </div>
       
       <div className="bg-white rounded-lg border shadow-sm p-6">
-        <EventForm eventId={eventId} isEditMode={true} />
+        <EventForm eventId={eventId} isEditMode={true} initialData={event} />
       </div>
     </div>
   );

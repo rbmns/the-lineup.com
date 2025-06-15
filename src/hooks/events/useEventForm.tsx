@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -18,9 +17,10 @@ import { useVenues } from '@/hooks/useVenues';
 interface UseEventFormProps {
   eventId?: string;
   isEditMode?: boolean;
+  initialData?: Event;
 }
 
-export const useEventForm = ({ eventId, isEditMode = false }: UseEventFormProps) => {
+export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEventFormProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,40 +50,29 @@ export const useEventForm = ({ eventId, isEditMode = false }: UseEventFormProps)
   });
 
   useEffect(() => {
-    const fetchEventData = async () => {
-      if (isEditMode && eventId && user?.id) {
-        try {
-          const fetchedEventData = await fetchEventById(eventId, user.id);
-          if (fetchedEventData) {
-            const defaultVals = {
-                title: fetchedEventData.title || '',
-                description: fetchedEventData.description || '',
-                event_category: (fetchedEventData as any).event_category || (fetchedEventData as any).event_type || 'other',
-                start_date: fetchedEventData.start_date ? new Date(fetchedEventData.start_date) : new Date(),
-                start_time: fetchedEventData.start_time?.substring(0, 5) || '',
-                end_date: fetchedEventData.end_date ? new Date(fetchedEventData.end_date) : new Date(),
-                end_time: fetchedEventData.end_time?.substring(0, 5) || '',
-                venue_id: fetchedEventData.venue_id || '',
-                organizer_link: fetchedEventData.organizer_link || '',
-                fee: fetchedEventData.fee?.toString() || '0',
-                booking_link: fetchedEventData.booking_link || '',
-                extra_info: fetchedEventData.extra_info || '',
-                tags: Array.isArray(fetchedEventData.tags) ? fetchedEventData.tags.join(', ') : (fetchedEventData.tags || ''),
-                vibe: (fetchedEventData as any).vibe || '',
-            };
-            Object.entries(defaultVals).forEach(([key, value]) => {
-                form.setValue(key as keyof FormValues, value);
-            });
-          }
-        } catch (error) {
-          console.error("Failed to fetch event data for editing", error);
-          toast.error("Failed to fetch event data for editing");
-        }
-      }
-    };
-
-    fetchEventData();
-  }, [isEditMode, eventId, user?.id, form.setValue]);
+    if (isEditMode && initialData) {
+      const fetchedEventData = initialData;
+      const defaultVals = {
+          title: fetchedEventData.title || '',
+          description: fetchedEventData.description || '',
+          event_category: (fetchedEventData as any).event_category || (fetchedEventData as any).event_type || 'other',
+          start_date: fetchedEventData.start_date ? new Date(fetchedEventData.start_date) : new Date(),
+          start_time: fetchedEventData.start_time?.substring(0, 5) || '',
+          end_date: fetchedEventData.end_date ? new Date(fetchedEventData.end_date) : new Date(),
+          end_time: fetchedEventData.end_time?.substring(0, 5) || '',
+          venue_id: fetchedEventData.venue_id || '',
+          organizer_link: fetchedEventData.organizer_link || '',
+          fee: fetchedEventData.fee?.toString() || '0',
+          booking_link: fetchedEventData.booking_link || '',
+          extra_info: fetchedEventData.extra_info || '',
+          tags: Array.isArray(fetchedEventData.tags) ? fetchedEventData.tags.join(', ') : (fetchedEventData.tags || ''),
+          vibe: (fetchedEventData as any).vibe || '',
+      };
+      Object.entries(defaultVals).forEach(([key, value]) => {
+          form.setValue(key as keyof FormValues, value);
+      });
+    }
+  }, [isEditMode, initialData, form.setValue]);
   
   const handleVenueCreated = (newVenue: Venue) => {
     queryClient.invalidateQueries({ queryKey: ['venues'] });

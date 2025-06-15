@@ -12,13 +12,15 @@ import { MetaFields } from './form-sections/MetaFields';
 import { VibeField } from './form-sections/VibeField';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
+import { Event } from '@/types';
 
 interface EventFormProps {
   eventId?: string;
   isEditMode?: boolean;
+  initialData?: Event;
 }
 
-export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = false }) => {
+export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = false, initialData }) => {
   const {
     form,
     isSubmitting,
@@ -29,7 +31,7 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
     handleVenueCreated,
     onSubmit,
     onInvalid,
-  } = useEventForm({ eventId, isEditMode });
+  } = useEventForm({ eventId, isEditMode, initialData });
 
   const { register, handleSubmit, setValue, watch, formState: { errors }, control } = form;
 
