@@ -65,7 +65,7 @@ export const useUserEvents = (userId: string | undefined): UseUserEventsResult =
         const allEvents = processEventsData(eventsData, userId);
         
         const pastEvents = filterPastEvents(allEvents);
-        const sortedPastEvents = sortEventsB_yDate(pastEvents);
+        const sortedPastEvents = sortEventsByDate(pastEvents);
         
         const upcomingEvents = filterUpcomingEvents(allEvents);
         const sortedUpcomingEvents = sortEventsByDate(upcomingEvents);

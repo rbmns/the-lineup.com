@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -9,6 +10,7 @@ import { CasualPlansHomeSection } from '@/components/home/CasualPlansHomeSection
 import { UpcomingEventsSection } from '@/components/home/UpcomingEventsSection';
 import { HowItWorksSection } from '@/components/home/HowItWorksSection';
 import { LandingCtaSection } from '@/components/home/LandingCtaSection';
+import { startOfDay } from 'date-fns';
 
 const LandingPage = () => {
   const {
@@ -41,11 +43,14 @@ const LandingPage = () => {
     if (!events || events.length === 0) return [];
     const oneWeekFromNow = new Date();
     oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
+    const today = startOfDay(new Date());
+
     const nextWeekEvents = events.filter(event => {
       if (!event.start_date) return false;
       const eventDate = new Date(event.start_date);
-      return eventDate <= oneWeekFromNow;
+      return eventDate >= today && eventDate <= oneWeekFromNow;
     });
+
     const eventsByType = nextWeekEvents.reduce((acc, event) => {
       if (!event.event_category) return acc;
       if (!acc[event.event_category]) acc[event.event_category] = [];

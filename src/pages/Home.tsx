@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,8 @@ import { HomeUpcomingEventsSection } from "@/components/home/HomeUpcomingEventsS
 import HomePageHeaderSection from '@/components/home/HomePageHeaderSection';
 import HomeHowItWorksSection from '@/components/home/HomeHowItWorksSection';
 import HomeCtaSection from '@/components/home/HomeCtaSection';
+import { startOfDay } from 'date-fns';
+
 const Home = () => {
   const {
     isAuthenticated
@@ -57,12 +60,13 @@ const Home = () => {
     if (!events || events.length === 0) return [];
     const oneWeekFromNow = new Date();
     oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
+    const today = startOfDay(new Date());
 
     // Get events for the next week
     const nextWeekEvents = events.filter(event => {
       if (!event.start_date) return false;
       const eventDate = new Date(event.start_date);
-      return eventDate <= oneWeekFromNow;
+      return eventDate >= today && eventDate <= oneWeekFromNow;
     });
 
     // Group by event category to ensure diversity
