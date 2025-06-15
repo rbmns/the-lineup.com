@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -17,11 +16,10 @@ interface LocationState {
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
-  const { isAuthenticated, user, loading, signOut } = useAuth();
+  const { isAuthenticated, user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as LocationState | null;
-  const [isNewUser, setIsNewUser] = useState(false);
   
   // Determine whether to show success toast (default to false)
   const suppressSuccessToast = state?.suppressToast || true;
@@ -55,21 +53,16 @@ const Login = () => {
   }, []);
 
   useEffect(() => {
-    // Only redirect if loading is complete and user is authenticated
+    // If the user is authenticated, always redirect them away from the login page.
     if (!loading && isAuthenticated && user) {      
-      // If the user is new, send them to the profile edit page
-      if (isNewUser) {
-        navigate('/profile/edit');
-      } else {
-        navigate('/profile');
-      }
+      navigate('/profile');
     }
     
     // Check if we should start in register mode (from the Register button)
     if (state?.initialMode === 'register') {
       setIsLogin(false);
     }
-  }, [isAuthenticated, user, navigate, state, loading, isNewUser]);
+  }, [isAuthenticated, user, navigate, state, loading]);
 
   const handleToggleMode = () => {
     setIsLogin(!isLogin);
