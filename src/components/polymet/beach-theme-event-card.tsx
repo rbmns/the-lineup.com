@@ -167,12 +167,19 @@ export default function BeachThemeEventCard({
                 </div>
               )}
               {/* Date & Time */}
-              <div className="flex items-center text-sm text-gray-600 font-inter text-left w-full">
-                <CalendarIcon size={14} className="mr-1 text-[#F59E0B]" />
-                <span>
-                  {date}
-                  {time && ` • ${time}`}
-                </span>
+              <div className="flex items-start text-sm text-gray-600 font-inter text-left w-full">
+                <CalendarIcon size={14} className="mr-1 text-[#F59E0B] mt-0.5" />
+                <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-x-1">
+                  <span>
+                    {date}
+                  </span>
+                  {time && (
+                    <>
+                      <span className="hidden sm:inline mx-1">•</span>
+                      <span>{time}</span>
+                    </>
+                  )}
+                </div>
               </div>
               {/* Attendees */}
               {attendees && (

@@ -146,11 +146,17 @@ export default function BohemianEventCard({
             </h3>
 
             <div className="space-y-2 mb-4 w-full">
-              <div className="flex items-center text-primary-light font-inter text-left">
-                <CalendarIcon size={16} className="mr-2 flex-shrink-0" />
-                <span className="text-sm">
-                  {date} {time && `• ${time}`}
-                </span>
+              <div className="flex items-start text-primary-light font-inter text-left">
+                <CalendarIcon size={16} className="mr-2 flex-shrink-0 mt-0.5" />
+                <div className="text-sm flex flex-col sm:flex-row sm:items-baseline sm:gap-x-1">
+                    <span>{date}</span>
+                    {time && (
+                      <>
+                        <span className="hidden sm:inline mx-1">•</span>
+                        <span>{time}</span>
+                      </>
+                    )}
+                </div>
               </div>
 
               {location && (
@@ -227,11 +233,17 @@ export default function BohemianEventCard({
         </h3>
 
         <div className="space-y-2 mb-3 w-full">
-          <div className="flex items-center text-primary-light font-inter text-left">
-            <CalendarIcon size={16} className="mr-2 flex-shrink-0" />
-            <span className="text-sm">
-              {date} {time && `• ${time}`}
-            </span>
+          <div className="flex items-start text-primary-light font-inter text-left">
+            <CalendarIcon size={16} className="mr-2 flex-shrink-0 mt-0.5" />
+            <div className="text-sm flex flex-col sm:flex-row sm:items-baseline sm:gap-x-1">
+              <span>{date}</span>
+              {time && (
+                <>
+                  <span className="hidden sm:inline mx-1">•</span>
+                  <span>{time}</span>
+                </>
+              )}
+            </div>
           </div>
           {location && (
             <div className="flex items-center text-primary-light font-inter text-left w-full">

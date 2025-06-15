@@ -35,7 +35,7 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
   return (
     <Card
       className={cn(
-        "group hover:shadow-lg transition-shadow flex flex-col max-w-xs w-[265px] cursor-pointer overflow-hidden",
+        "group hover:shadow-lg transition-shadow flex flex-col max-w-xs w-[265px] cursor-pointer overflow-hidden rounded-xl shadow-md",
         className
       )}
       onClick={handleClick}
@@ -67,18 +67,18 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
         <h3 className="text-base font-bold leading-tight line-clamp-2 mb-1 text-ocean-deep-900 font-inter text-left">
           {event.title}
         </h3>
-        <div className="flex items-center gap-1 text-xs text-ocean-deep-700 font-inter text-left">
-          <Calendar size={15} className="mr-1" />
-          <span>
-            {formatFeaturedDate(event.start_date)}
+        <div className="flex items-start gap-1 text-xs text-ocean-deep-700 font-inter text-left">
+          <Calendar size={15} className="mr-1 mt-0.5 flex-shrink-0" />
+          <div className="flex flex-col">
+            <span>
+              {formatFeaturedDate(event.start_date)}
+            </span>
             {event.start_time && (
-              <>
-                {" "}
-                <span className="text-ocean-deep-300">•</span>{" "}
+              <span>
                 {formatEventTime(event.start_time, event.end_time)}
-              </>
+              </span>
             )}
-          </span>
+          </div>
         </div>
         {event.venues?.name || event.location ? (
           <div className="flex items-center gap-1 text-xs text-ocean-deep-700 font-inter text-left">

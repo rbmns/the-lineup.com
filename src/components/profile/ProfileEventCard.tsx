@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin, Users } from 'lucide-react';
@@ -20,7 +19,7 @@ export const ProfileEventCard: React.FC<ProfileEventCardProps> = ({ event }) => 
 
   return (
     <Card 
-      className="p-4 hover:bg-gray-50 hover:shadow-lg transition-all cursor-pointer"
+      className="p-4 hover:bg-gray-50 hover:shadow-lg transition-all cursor-pointer rounded-xl shadow-md"
       onClick={handleClick}
     >
       <div className="flex items-start space-x-4">
@@ -37,11 +36,19 @@ export const ProfileEventCard: React.FC<ProfileEventCardProps> = ({ event }) => 
             {event.title}
           </h3>
           
-          <div className="flex items-center text-sm text-gray-600 mb-2">
-            <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
-            <span className="mr-4">
-              {event.start_date && formatDate(event.start_date)} {event.start_time && `at ${formatEventTime(event.start_time, event.end_time)}`}
-            </span>
+          <div className="flex items-start text-sm text-gray-600 mb-2">
+            <Calendar className="h-4 w-4 mr-2 flex-shrink-0 mt-0.5" />
+            <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-x-1">
+              <span>
+                {event.start_date && formatDate(event.start_date)}
+              </span>
+              {event.start_time && (
+                <>
+                  <span className="hidden sm:inline mx-1">•</span>
+                  <span>{formatEventTime(event.start_time, event.end_time)}</span>
+                </>
+              )}
+            </div>
           </div>
           
           {event.location && (

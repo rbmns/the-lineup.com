@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import CategoryBadge from "@/components/polymet/category-badge";
@@ -125,11 +124,16 @@ export default function EventCard({
         {host && <p className="mb-2 text-sm text-neutral-75 font-inter text-left w-full">By {host.name}</p>}
 
         {/* Date and time */}
-        <div className="mb-2 flex items-center text-sm text-neutral-75 font-inter text-left w-full">
-          <span>
-            {date}
-            {time && ` • ${time}`}
-          </span>
+        <div className="mb-2 flex items-start text-sm text-neutral-75 font-inter text-left w-full">
+          <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-x-1">
+            <span>{date}</span>
+            {time && (
+              <>
+                <span className="hidden sm:inline mx-1">•</span>
+                <span>{time}</span>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Location */}

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin } from 'lucide-react';
@@ -96,7 +95,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
     <div className={cn("w-full px-4 sm:px-6 lg:px-8", className)}>
       <Card 
         className={cn(
-          "flex flex-col sm:flex-row gap-4 sm:h-24 hover:shadow-lg transition-all cursor-pointer overflow-hidden text-left",
+          "flex flex-col sm:flex-row gap-4 sm:h-24 hover:shadow-lg transition-all duration-300 ease-in-out cursor-pointer overflow-hidden text-left rounded-xl shadow-md",
           className
         )}
         onClick={handleClick}
@@ -139,17 +138,19 @@ const EventCardList: React.FC<EventCardListProps> = ({
           </h3>
             
           {/* Date and Time - Left aligned */}
-          <div className="flex items-center gap-1 text-xs text-gray-500 mt-1 text-left">
-            <Calendar className="h-3 w-3" />
-            <span>
-              {formattedDate && timeDisplay ? (
+          <div className="flex items-start gap-1 text-xs text-gray-500 mt-1 text-left">
+            <Calendar className="h-3 w-3 mt-0.5 flex-shrink-0" />
+            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-x-1">
+              <span>
+                {formattedDate || 'Date not set'}
+              </span>
+              {timeDisplay && (
                 <>
-                  {formattedDate} • {timeDisplay}
+                  <span className="hidden sm:inline-block mx-0.5">•</span>
+                  <span>{timeDisplay}</span>
                 </>
-              ) : (
-                formattedDate || 'Date not set'
               )}
-            </span>
+            </div>
           </div>
           
           {/* Bottom row with location and RSVP buttons - Left aligned */}
