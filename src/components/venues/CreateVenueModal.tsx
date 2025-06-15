@@ -7,6 +7,7 @@ import { CreateVenueFormValues } from './CreateVenueSchema';
 import { toast } from 'sonner';
 import { Venue } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CreateVenueModalProps {
   open: boolean;
@@ -17,11 +18,17 @@ interface CreateVenueModalProps {
 export const CreateVenueModal: React.FC<CreateVenueModalProps> = ({ open, onOpenChange, onVenueCreated }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const handleCreateVenue = async (formData: CreateVenueFormValues) => {
+    if (!user) {
+      toast.error("You must be logged in to create a venue.");
+      return;
+    }
     setIsSubmitting(true);
     try {
-      const { data: newVenue, error } = await createVenue(formData);
+      const venueData = { ...formData, creator_id: user.id };
+      const { data: newVenue, error } = await createVenue(venueData);
       if (error || !newVenue) {
         throw error || new Error("Failed to create venue.");
       }

@@ -768,6 +768,7 @@ export type Database = {
         Row: {
           city: string | null
           created_at: string | null
+          creator_id: string | null
           google_maps: string | null
           id: string
           name: string | null
@@ -779,6 +780,7 @@ export type Database = {
         Insert: {
           city?: string | null
           created_at?: string | null
+          creator_id?: string | null
           google_maps?: string | null
           id?: string
           name?: string | null
@@ -790,6 +792,7 @@ export type Database = {
         Update: {
           city?: string | null
           created_at?: string | null
+          creator_id?: string | null
           google_maps?: string | null
           id?: string
           name?: string | null
@@ -798,7 +801,15 @@ export type Database = {
           street?: string | null
           website?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "venues_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
