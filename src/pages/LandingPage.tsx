@@ -78,7 +78,7 @@ const LandingPage = () => {
       navigate(`/events/${event.id}`);
     }
   }, [navigate]);
-  return <div className="w-full">
+  return <div className="w-full px-[20px] py-[20px]">
       {/* HEADER HERO */}
       <section className="w-full border-b pt-0 mt-0 bg-transparent">
         {/* FLUSH, NO HORIZONTAL PADDING */}
