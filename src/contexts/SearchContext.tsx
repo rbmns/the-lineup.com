@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useCallback } from 'react';
 import { Event, UserProfile } from '@/types';
 import { supabase } from '@/lib/supabase';
@@ -16,7 +17,7 @@ interface SearchResult {
   type: 'event' | 'profile' | 'location';
   title?: string;
   username?: string;
-  event_type?: string;
+  event_category?: string;
   location?: string;
   categories?: string[];
   keywords?: string[];
@@ -103,12 +104,12 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       await trackSearch(term);
       
-      // Search events by title, description or event type
+      // Search events by title, description, event_category, or destination
       const { data: eventData, error: eventError } = await supabase
         .from('events')
         .select('*, venue_id(*)')
-        .or(`title.ilike.%${term}%,description.ilike.%${term}%,event_type.ilike.%${term}%`)
-        .order('start_time', { ascending: true });
+        .or(`title.ilike.%${term}%,description.ilike.%${term}%,event_category.ilike.%${term}%,destination.ilike.%${term}%`)
+        .order('start_date', { ascending: true });
         
       if (eventError) throw eventError;
       
@@ -119,6 +120,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         };
       });
       
+      console.log('Search results found:', results.length);
       setSearchResults(results);
       return results;
     } catch (error) {
@@ -157,8 +159,8 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           venues:venue_id(*),
           event_rsvps(id, user_id, status)
         `)
-        .eq('event_type', asEqParam(category))
-        .order('start_time', { ascending: true });
+        .eq('event_category', asEqParam(category))
+        .order('start_date', { ascending: true });
         
       if (error) throw error;
       
@@ -168,7 +170,6 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           forceTypeCast(safeGet(venuesData, 'city', 'Location not specified')) : 
           'Location not specified';
         
-        // Use forceTypeCast to avoid "spread types" error
         return { 
           ...forceTypeCast<any>(item), 
           type: 'event' as const,
@@ -215,7 +216,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       `);
       
       if (params.term) {
-        query = query.or(`title.ilike.%${params.term}%,description.ilike.%${params.term}%,event_type.ilike.%${params.term}%`);
+        query = query.or(`title.ilike.%${params.term}%,description.ilike.%${params.term}%,event_category.ilike.%${params.term}%`);
       }
       
       if (params.location) {
@@ -223,18 +224,18 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
       
       if (params.category) {
-        query = query.eq('event_type', asEqParam(params.category));
+        query = query.eq('event_category', asEqParam(params.category));
       }
       
       if (params.startDate) {
-        query = query.gte('start_time', params.startDate);
+        query = query.gte('start_date', params.startDate);
       }
       
       if (params.endDate) {
-        query = query.lte('end_time', params.endDate);
+        query = query.lte('end_date', params.endDate);
       }
       
-      query = query.order('start_time', { ascending: true });
+      query = query.order('start_date', { ascending: true });
       
       const { data, error } = await query;
       
@@ -246,7 +247,6 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           forceTypeCast(safeGet(venuesData, 'city', 'Location not specified')) : 
           'Location not specified';
         
-        // Use forceTypeCast to avoid "spread types" error
         return { 
           ...forceTypeCast<any>(item), 
           type: 'event' as const,
