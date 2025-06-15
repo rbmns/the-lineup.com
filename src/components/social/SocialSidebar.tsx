@@ -11,14 +11,20 @@ interface SocialSidebarProps {
   onToggleVisibility?: () => void;
 }
 
-export const SocialSidebar: React.FC<SocialSidebarProps> = ({ 
+export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   visible = true,
-  onToggleVisibility 
+  onToggleVisibility,
 }) => {
   const { user } = useAuth();
 
+  // Always render the SidebarToggle
   if (!visible) {
-    return <SidebarToggle visible={false} onToggle={onToggleVisibility} />;
+    // Render the toggle absolutely fixed to the right edge, visible when the sidebar is hidden
+    return (
+      <div>
+        <SidebarToggle visible={false} onToggle={onToggleVisibility} />
+      </div>
+    );
   }
 
   return (
