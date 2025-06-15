@@ -76,9 +76,9 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
           )}
 
           {/* Event Cards Grid (Polymet Only) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {isLoading ? (
-              Array.from({ length: 3 }).map((_, i) => (
+              Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="card-coastal animate-pulse">
                   <div className="h-48 bg-driftwood-grey/30"></div>
                   <div className="p-6 space-y-3">
@@ -89,7 +89,7 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
                 </div>
               ))
             ) : filteredEvents.length > 0 ? (
-              filteredEvents.slice(0, 3).map((event) => (
+              filteredEvents.slice(0, 4).map((event) => (
                 <div
                   key={event.id}
                   className="cursor-pointer h-full transform hover:scale-105 transition-all duration-300"
@@ -134,7 +134,7 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
                 </div>
               ))
             ) : (
-              <div className="col-span-3 text-center py-12 text-clay-earth">
+              <div className="col-span-1 md:col-span-2 text-center py-12 text-clay-earth">
                 <Sparkles className="h-12 w-12 mx-auto mb-4 text-driftwood-grey" />
                 <p>No events match your selected vibe</p>
               </div>
