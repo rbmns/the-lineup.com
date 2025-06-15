@@ -51,7 +51,7 @@ export interface Event {
   area?: string | null;
   google_maps?: string | null;
   organizer_link?: string | null;
-  creator?: UserProfile | null;
+  creator?: string;
   venues?: Venue | null;
   extra_info?: string | null;
   fee?: number;

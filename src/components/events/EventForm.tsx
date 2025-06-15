@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Event, Venue } from '@/types';
-import { FormValues } from '@/components/events/form/EventFormTypes';
+import { FormValues, EVENT_CATEGORIES } from '@/components/events/form/EventFormTypes';
 import { EventSchema } from '@/components/events/form/EventFormSchema';
 import { processFormData } from '@/components/events/form/EventFormUtils';
 import { Input } from '@/components/ui/input';
