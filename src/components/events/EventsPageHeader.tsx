@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -20,13 +19,6 @@ export const EventsPageHeader: React.FC<EventsPageHeaderProps> = ({
   if (showBackground) {
     return (
       <div className="relative h-[200px] md:h-[250px] overflow-hidden w-full">
-        {/* Background Image - Full width */}
-        <img
-          src={backgroundImage}
-          alt="Events Header"
-          className="w-full h-full object-cover"
-        />
-        
         {/* Overlay */}
         <div className="absolute inset-0 bg-black/40"></div>
         

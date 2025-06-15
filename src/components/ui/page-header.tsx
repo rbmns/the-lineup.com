@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface PageHeaderProps {
@@ -11,18 +10,13 @@ interface PageHeaderProps {
 export const PageHeader: React.FC<PageHeaderProps> = ({
   title,
   subtitle,
-  backgroundImage = "/lovable-uploads/7f287109-ef9d-4780-ae28-713458ecf85c.png",
+  backgroundImage, // Keep this prop for fallback use, but don't render image
   className = ""
 }) => {
   return (
     <div className={`relative h-[200px] md:h-[250px] overflow-hidden w-full ${className}`}>
-      {/* Background Image - Full width */}
-      <img
-        src={backgroundImage}
-        alt={`${title} Header`}
-        className="w-full h-full object-cover"
-      />
-      
+      {/* Removed Background Image */}
+
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40"></div>
       
