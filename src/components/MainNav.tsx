@@ -49,19 +49,21 @@ const MainNav = () => {
         : 'bg-white/80 backdrop-blur-sm'
     }`}>
       <div className={cn(
-        "w-full h-16 flex items-center justify-between", // RESTORED: items-center for vertical alignment
+        "w-full h-16 flex items-center justify-between",
         isMobile ? "px-4" : "px-6 lg:px-8"
       )}>
-        {/* Left side - Logo + Brand, vertically centered to match sidebar icon */}
+        {/* Left side - Logo symbol vertically aligned with LeftSidebar icons */}
         <div className="flex items-center gap-2 flex-shrink-0 h-16">
-          <Link to="/" className="flex items-center h-16">
+          {/* Icon column: mimic the same w-16 as LeftSidebar icon column */}
+          <Link to="/" className="flex items-center justify-center w-16 h-16">
             <img 
               src="/lovable-uploads/272de8da-6e0c-40fd-a1b7-9f82414ed290.png" 
-              alt="TheLineup Logo" 
-              className="w-10 h-10 sm:w-12 sm:h-12" // REMOVED my-3 and custom margin
+              alt="TheLineup Icon" 
+              className="w-8 h-8" // Match the LeftSidebar icons (h-6/w-6 or h-8/w-8 for more presence)
             />
           </Link>
-          <BrandLogo showText={true} />
+          {/* Brand wordmark stays as before */}
+          <BrandLogo showText={true} className="ml-0" />
         </div>
         {/* Right side - User menu or auth buttons */}
         <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0">
