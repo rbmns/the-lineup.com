@@ -9,12 +9,12 @@ import { Plus, Users } from 'lucide-react';
 import { AuthOverlay } from '@/components/auth/AuthOverlay';
 import { RequestCreatorModal } from './RequestCreatorModal';
 import { CreatorRequestsManager } from './CreatorRequestsManager';
-import { UserService } from '@/services/UserService';
 import { CreatorRequestService } from '@/services/CreatorRequestService';
 import { toast } from "sonner";
 import { supabase } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
+import { useCreatorStatus } from '@/hooks/useCreatorStatus';
 
 interface SocialSidebarProps {
   visible?: boolean;
@@ -38,35 +38,15 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   const [showAuth, setShowAuth] = useState(false);
 
   // For event creator handling:
-  const [canCreateEvents, setCanCreateEvents] = useState<boolean | null>(null); // null = unknown
-  const [isAdmin, setIsAdmin] = useState(false);
+  const {
+    isLoading: isCreatorStatusLoading,
+    canCreateEvents,
+    isAdmin,
+    creatorRequestStatus,
+  } = useCreatorStatus();
+
   const [showRequestCreator, setShowRequestCreator] = useState(false);
   const [showRequestsManager, setShowRequestsManager] = useState(false);
-  const [creatorRequestStatus, setCreatorRequestStatus] = useState<string | null>(null); // 'pending', 'not_requested', null (loading)
-
-  // Fetch user roles and request status if logged in
-  useEffect(() => {
-    let isMounted = true;
-    if (user) {
-      UserService.getUserRoles(user.id).then(({ data }) => {
-        if (isMounted) {
-          const roles = data || [];
-          setCanCreateEvents(roles.includes('event_creator') || roles.includes('admin') || false);
-          setIsAdmin(roles.includes('admin'));
-        }
-      });
-      CreatorRequestService.getCreatorRequestStatus(user.id).then(({ data }) => {
-        if (isMounted) {
-          setCreatorRequestStatus(data?.status || 'not_requested');
-        }
-      });
-    } else {
-      setCanCreateEvents(null);
-      setCreatorRequestStatus(null);
-      setIsAdmin(false);
-    }
-    return () => { isMounted = false; }
-  }, [user]);
 
   const fetchAdminRequests = async () => {
     const { data, error } = await CreatorRequestService.getCreatorRequestsForAdmin();
@@ -139,10 +119,11 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
       return;
     }
     // If event creator status still loading, optimistically disable
-    if (canCreateEvents === null || creatorRequestStatus === null) return;
+    if (isCreatorStatusLoading) return;
     
-    // Also consider user as creator if their request is approved, to handle potential sync issues with roles.
-    if (canCreateEvents || creatorRequestStatus === 'approved') {
+    const hasPermission = canCreateEvents || creatorRequestStatus === 'approved';
+    
+    if (hasPermission) {
       navigate('/events/create');
     } else {
       setShowRequestCreator(true);
@@ -157,7 +138,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
       toast.error("There was an issue submitting your request. Please try again.");
     } else {
       toast.success("Your request has been submitted!");
-      setCreatorRequestStatus('pending');
+      
 
       // Fetch user profile for notification details
       const { data: profile } = await supabase
@@ -244,7 +225,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
                 variant="primary"
                 className="w-full"
                 onClick={handleCreateEventClick}
-                disabled={canCreateEvents === null || creatorRequestStatus === null} // Disable while checking roles or request status
+                disabled={isCreatorStatusLoading} // Disable while checking roles or request status
               >
                 <Plus className="w-4 h-4" />
                 Create Event
