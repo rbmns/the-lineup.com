@@ -13,7 +13,7 @@ interface CreatorGuardProps {
 export const CreatorGuard: React.FC<CreatorGuardProps> = ({ children }) => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [isCreator, setIsCreator] = useState<boolean | null>(null);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,12 +31,12 @@ export const CreatorGuard: React.FC<CreatorGuardProps> = ({ children }) => {
     UserService.getUserRoles(user.id)
       .then(({ data }) => {
         if (isMounted) {
-          const hasCreatorRole = data?.includes('event_creator') || false;
-          if (!hasCreatorRole) {
+          const canCreateEvents = data?.includes('event_creator') || data?.includes('admin') || false;
+          if (!canCreateEvents) {
             toast.error("You don't have permission to create events.");
             navigate('/');
           }
-          setIsCreator(hasCreatorRole);
+          setHasPermission(canCreateEvents);
         }
       })
       .catch(() => {
@@ -54,7 +54,7 @@ export const CreatorGuard: React.FC<CreatorGuardProps> = ({ children }) => {
     return () => { isMounted = false; }
   }, [user, authLoading, navigate]);
 
-  if (loading || authLoading || isCreator === null) {
+  if (loading || authLoading || hasPermission === null) {
     return (
         <div className="container mx-auto px-4 py-8 max-w-4xl">
             <div className="space-y-4">

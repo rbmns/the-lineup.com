@@ -36,7 +36,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   const [showAuth, setShowAuth] = useState(false);
 
   // For event creator handling:
-  const [isEventCreator, setIsEventCreator] = useState<boolean | null>(null); // null = unknown
+  const [canCreateEvents, setCanCreateEvents] = useState<boolean | null>(null); // null = unknown
   const [showRequestCreator, setShowRequestCreator] = useState(false);
   const [creatorRequestStatus, setCreatorRequestStatus] = useState<string | null>(null); // 'pending', 'not_requested', null (loading)
 
@@ -46,7 +46,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
     if (user) {
       UserService.getUserRoles(user.id).then(({ data }) => {
         if (isMounted) {
-          setIsEventCreator(data?.includes('event_creator') || false);
+          setCanCreateEvents(data?.includes('event_creator') || data?.includes('admin') || false);
         }
       });
       CreatorRequestService.getCreatorRequestStatus(user.id).then(({ data }) => {
@@ -55,7 +55,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
         }
       });
     } else {
-      setIsEventCreator(null);
+      setCanCreateEvents(null);
       setCreatorRequestStatus(null);
     }
     return () => { isMounted = false; }
@@ -113,10 +113,10 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
       return;
     }
     // If event creator status still loading, optimistically disable
-    if (isEventCreator === null || creatorRequestStatus === null) return;
+    if (canCreateEvents === null || creatorRequestStatus === null) return;
     
     // Also consider user as creator if their request is approved, to handle potential sync issues with roles.
-    if (isEventCreator || creatorRequestStatus === 'approved') {
+    if (canCreateEvents || creatorRequestStatus === 'approved') {
       navigate('/events/create');
     } else {
       setShowRequestCreator(true);
@@ -197,7 +197,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
                 size="sm"
                 className="w-full flex items-center justify-center gap-2 bg-ocean-deep-600 text-white hover:bg-ocean-deep-700 shadow-sm rounded-md py-2 px-4 transition-all"
                 onClick={handleCreateEventClick}
-                disabled={isEventCreator === null || creatorRequestStatus === null} // Disable while checking roles or request status
+                disabled={canCreateEvents === null || creatorRequestStatus === null} // Disable while checking roles or request status
               >
                 <Plus className="w-4 h-4" />
                 Create Event
