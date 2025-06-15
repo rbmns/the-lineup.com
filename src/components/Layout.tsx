@@ -26,19 +26,18 @@ const Layout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background w-full overflow-x-hidden">
+    <div className="min-h-screen w-full overflow-x-hidden">
       <MainNav />
       <div className="flex w-full min-h-screen">
         {/* Left sidebar - Desktop only, start below navbar */}
         {!isMobile && (
           <div
-            className="fixed left-0"
+            className="fixed left-0 sidebar-zoning"
             style={{
               top: TOP_NAV_HEIGHT,
               bottom: 0,
               width: LEFT_SIDEBAR_WIDTH,
               zIndex: 30,
-              background: "var(--card)",
               height: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
             }}
           >
@@ -46,9 +45,9 @@ const Layout = () => {
           </div>
         )}
 
-        {/* Main Content Area */}
+        {/* Main Content Area with zoning */}
         <div
-          className={`flex-1 w-full min-h-screen bg-background ${
+          className={`flex-1 w-full min-h-screen main-feed-gradient ${
             isMobile
               ? 'pt-14 pb-20'
               : rightSidebarVisible
@@ -66,7 +65,7 @@ const Layout = () => {
               : undefined
           }
         >
-          <main className="bg-background w-full min-h-full">
+          <main className="main-feed-gradient w-full min-h-full">
             <Outlet />
           </main>
           {/* Footer - Desktop only */}
@@ -76,13 +75,12 @@ const Layout = () => {
         {/* Right Social Sidebar - Desktop only */}
         {!isMobile && (
           <div
-            className={`fixed right-0`}
+            className={`fixed right-0 sidebar-zoning`}
             style={{
               top: TOP_NAV_HEIGHT,
               bottom: 0,
               width: RIGHT_SIDEBAR_WIDTH,
               zIndex: 30,
-              background: "var(--card)",
               height: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
               display: rightSidebarVisible ? "block" : "none",
             }}
