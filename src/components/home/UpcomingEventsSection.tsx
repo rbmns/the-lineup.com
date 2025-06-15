@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { CategoryPill } from "@/components/ui/category-pill";
@@ -35,7 +36,7 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
           Upcoming Events
         </h2>
         {/* Vibe Filter Pills */}
-        <div className="flex flex-nowrap gap-2 mb-7 overflow-x-auto pb-2 no-scrollbar">
+        <div className="flex flex-nowrap gap-2 mb-7 overflow-x-auto pb-2 scrollbar-hide">
           <CategoryPill
             category="All vibes"
             active={!selectedVibe}

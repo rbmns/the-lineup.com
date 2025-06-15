@@ -1,3 +1,4 @@
+
 import { Event } from '@/types';
 
 /**
@@ -8,27 +9,50 @@ import { Event } from '@/types';
 export const shouldShowEvent = (event: Event): boolean => {
   const now = new Date();
   
-  // If no start_date or start_time, keep the event visible
-  if (!event.start_date || !event.start_time) return true;
+  if (!event.start_date) {
+    return true; // Keep events without a start date (e.g., drafts)
+  }
+
+  // If no start_time is provided, treat it as an all-day event for the given date(s).
+  if (!event.start_time) {
+    const eventEndDate = event.end_date ? new Date(event.end_date) : new Date(event.start_date);
+    eventEndDate.setHours(23, 59, 59, 999); // Event is visible until the very end of its last day.
+    return now <= eventEndDate;
+  }
   
-  // Create the event start datetime
   const eventStartDateTime = new Date(`${event.start_date}T${event.start_time}`);
   
-  // Handle fixed start time events (yoga, classes, etc.)
+  // If parsing results in an invalid date, we can't filter by time. Fallback to date check.
+  if (isNaN(eventStartDateTime.getTime())) {
+    const eventEndDate = event.end_date ? new Date(event.end_date) : new Date(event.start_date);
+    eventEndDate.setHours(23, 59, 59, 999);
+    return now <= eventEndDate;
+  }
+
+  // Handle fixed start time events (e.g., classes)
   if (event.fixed_start_time) {
-    // Hide fixed start time events 30 minutes after they start
+    // Hide these events 30 minutes after they start
     const cutoffTime = new Date(eventStartDateTime.getTime() + 30 * 60 * 1000);
     return now < cutoffTime;
   }
   
-  // Handle flexible events (festivals, markets, etc.)
-  // Show until end time, or if no end time, show until start + 4 hours
+  // Handle flexible events (e.g., festivals, markets)
   let eventEndDateTime: Date;
   
   if (event.end_date && event.end_time) {
     eventEndDateTime = new Date(`${event.end_date}T${event.end_time}`);
-  } else {
-    // Default to 4 hours after start time if no end time specified
+  } else if (event.end_date) {
+    // If there's an end_date but no end_time, assume it ends at the end of that day.
+    eventEndDateTime = new Date(event.end_date);
+    eventEndDateTime.setHours(23, 59, 59, 999);
+  }
+   else {
+    // If no end date/time, default to 4 hours after start time
+    eventEndDateTime = new Date(eventStartDateTime.getTime() + 4 * 60 * 60 * 1000);
+  }
+
+  // Fallback for invalid end datetime
+  if (isNaN(eventEndDateTime.getTime())) {
     eventEndDateTime = new Date(eventStartDateTime.getTime() + 4 * 60 * 60 * 1000);
   }
   
