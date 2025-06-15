@@ -1,9 +1,13 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { SocialHeader } from './SocialHeader';
 import { SignUpPrompt } from './SignUpPrompt';
 import { CommunitySection } from './CommunitySection';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import { AuthOverlay } from '@/components/auth/AuthOverlay';
 
 interface SocialSidebarProps {
   visible?: boolean;
@@ -17,13 +21,14 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   onToggleVisibility,
 }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const [showAuth, setShowAuth] = useState(false);
 
-  // If sidebar is hidden: show the toggle arrow just to the left of where the sidebar would appear
+  // Show the "Expand" button if sidebar is hidden
   if (!visible) {
     return (
       <div
         className="fixed z-50"
-        // Position at the left edge of where the sidebar would be (left-aligned with sidebar)
         style={{
           top: '50%',
           right: `${SIDEBAR_WIDTH_PX}px`,
@@ -49,42 +54,69 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
     );
   }
 
-  // If sidebar is visible: show the sidebar + toggle, always attached to left of it
+  // If sidebar is visible
   return (
-    <div className="fixed top-0 right-0 h-full z-50 flex">
-      <div className="relative h-full w-56 bg-white border-l border-gray-200 shadow-lg overflow-y-auto">
-        {/* Toggle button attached to the left border, vertically centered (outside the sidebar, not inside) */}
-        <div
-          className="absolute"
-          style={{
-            left: '-48px', // puts the button outside, flush left to sidebar border (button is 48px tall)
-            top: '50%',
-            transform: 'translateY(-50%)',
-            zIndex: 10,
-          }}
-        >
-          <button
-            className="bg-white border border-gray-200 shadow-lg rounded-r-lg rounded-l-none px-2 py-2 flex items-center justify-center hover:bg-sand transition-colors"
+    <>
+      <div className="fixed top-0 right-0 h-full z-50 flex">
+        <div className="relative h-full w-56 bg-white border-l border-gray-200 shadow-lg overflow-y-auto">
+          {/* Collapse Button */}
+          <div
+            className="absolute"
             style={{
-              height: '48px',
-              minWidth: '32px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.06)'
+              left: '-48px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              zIndex: 10,
             }}
-            aria-label="Collapse social sidebar"
-            onClick={onToggleVisibility}
           >
-            {/* ChevronLeft means "close" */}
-            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
-          </button>
-        </div>
-        <div className="p-4 space-y-4">
-          <SocialHeader />
-          {!user && <SignUpPrompt />}
-          <CommunitySection />
+            <button
+              className="bg-white border border-gray-200 shadow-lg rounded-r-lg rounded-l-none px-2 py-2 flex items-center justify-center hover:bg-sand transition-colors"
+              style={{
+                height: '48px',
+                minWidth: '32px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.06)'
+              }}
+              aria-label="Collapse social sidebar"
+              onClick={onToggleVisibility}
+            >
+              {/* ChevronLeft means "close" */}
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+          </div>
+          <div className="p-4 space-y-4">
+            <SocialHeader />
+            {/* "Create Event" Button */}
+            <Button
+              size="sm"
+              className="w-full flex items-center justify-center gap-2 bg-ocean-deep-600 text-white hover:bg-ocean-deep-700"
+              onClick={() => {
+                if (user) {
+                  navigate('/events/create');
+                } else {
+                  setShowAuth(true);
+                }
+              }}
+            >
+              <Plus className="w-4 h-4" />
+              Create Event
+            </Button>
+            {!user && <SignUpPrompt />}
+            <CommunitySection />
+          </div>
         </div>
       </div>
-    </div>
+      {/* Auth Overlay Modal: only show if prompted and not logged in */}
+      {showAuth && !user && (
+        <AuthOverlay
+          title="Create your account"
+          description="Sign up or log in to create and share your own events!"
+          browseEventsButton={true}
+        >
+          {/* We can pass in children or background here if wanted */}
+        </AuthOverlay>
+      )}
+    </>
   );
 };
