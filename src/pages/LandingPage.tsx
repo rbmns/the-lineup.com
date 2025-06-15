@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -87,15 +86,14 @@ const LandingPage = () => {
     }
   }, [navigate]);
 
-  return <div className="w-full px-[20px] py-[20px]">
+  return <div className="w-full">
       {/* HEADER HERO */}
-      <section className="w-full border-b pt-0 mt-0 bg-transparent">
-        {/* FLUSH, NO HORIZONTAL PADDING */}
-        <div className="w-full text-left pt-0 mt-0 py-[20px]">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4 mt-0 px-4 md:px-8">
+      <section className="w-full border-b bg-transparent pb-8">
+        <div className="w-full text-left">
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4">
             Find events that fit your <span className="font-handwritten text-primary">vibe</span>
           </h1>
-          <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mt-0 px-4 md:px-8">
+          <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
             Discover what's happening nearby — from beach parties to yoga, music, and more. Join when you want, connect if you want.
           </p>
         </div>
