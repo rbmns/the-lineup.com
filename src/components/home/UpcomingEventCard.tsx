@@ -30,7 +30,8 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
   return (
     <div
       className={cn(
-        "group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col max-w-xs w-[265px] cursor-pointer",
+        // Ensure card is rounded-xl, shadowed, white, and left-aligned
+        "group bg-white rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-shadow flex flex-col max-w-xs w-[265px] cursor-pointer overflow-hidden",
         className
       )}
       onClick={handleClick}
@@ -51,11 +52,11 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
         )}
       </div>
 
-      <div className="flex flex-col gap-2 pt-3 pb-4 px-4 w-full text-left">
-        <h3 className="text-base font-bold leading-tight line-clamp-2 mb-1 text-ocean-deep-900 font-inter">
+      <div className="flex flex-col gap-2 pt-4 pb-5 px-5 w-full text-left items-start">
+        <h3 className="text-base font-bold leading-tight line-clamp-2 mb-1 text-ocean-deep-900 font-inter text-left">
           {event.title}
         </h3>
-        <div className="flex items-center gap-1 text-xs text-ocean-deep-700 font-inter">
+        <div className="flex items-center gap-1 text-xs text-ocean-deep-700 font-inter text-left">
           <Calendar size={15} className="mr-1" />
           <span>
             {formatFeaturedDate(event.start_date)}
@@ -69,7 +70,7 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
           </span>
         </div>
         {event.venues?.name || event.location ? (
-          <div className="flex items-center gap-1 text-xs text-ocean-deep-700 font-inter">
+          <div className="flex items-center gap-1 text-xs text-ocean-deep-700 font-inter text-left">
             <MapPin size={15} className="mr-1" />
             <span className="truncate">
               {event.venues?.name || event.location}
