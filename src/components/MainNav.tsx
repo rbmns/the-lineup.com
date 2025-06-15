@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -43,21 +42,18 @@ const MainNav = () => {
   };
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ${
-      isScrolled 
-        ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-driftwood-grey/30' 
-        : 'bg-white/80 backdrop-blur-sm'
-    }`}>
+    <header className={cn(
+      "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 bg-white border-b border-gray-200",
+    )}>
       <div className={cn(
-        "w-full h-12 flex items-center justify-between",
+        "w-full h-14 flex items-center justify-between", // 56px
         isMobile ? "px-3" : "pl-0 pr-3 lg:pr-6"
       )}>
-        {/* Left side - Icon flush left + wordmark (no gap before icon) */}
-        <div className="flex items-center h-12 flex-shrink-0">
-          {/* Symbol icon should perfectly align with sidebar icon column, flush left */}
-          <Link to="/" className="flex items-center justify-center w-12 h-12 mr-0 pl-0">
-            <img 
-              src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" 
+        {/* Left side - Icon flush left + wordmark */}
+        <div className="flex items-center h-14 flex-shrink-0">
+          <Link to="/" className="flex items-center justify-center w-16 h-14 mr-0 pl-0">
+            <img
+              src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png"
               alt="thelineup Symbol"
               className="w-7 h-7"
               style={{ display: 'block' }}
@@ -71,17 +67,17 @@ const MainNav = () => {
             <UserMenu user={user} profile={profile} handleSignOut={signOut} />
           ) : (
             <div className="flex items-center gap-2">
-              <Button 
-                variant="ghost" 
-                size={isMobile ? "sm" : "sm"} 
-                onClick={handleSignInClick} 
+              <Button
+                variant="ghost"
+                size={isMobile ? "sm" : "sm"}
+                onClick={handleSignInClick}
                 className="text-sm font-medium text-ocean-deep hover:text-seafoam-green hover:bg-sand/50"
               >
                 Sign in
               </Button>
-              <Button 
-                size={isMobile ? "sm" : "sm"} 
-                onClick={handleRegisterClick} 
+              <Button
+                size={isMobile ? "sm" : "sm"}
+                onClick={handleRegisterClick}
                 className="btn-ocean text-white text-sm font-medium"
               >
                 Sign up

@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import MainNav from "@/components/MainNav";
 import LeftSidebar from "@/components/nav/LeftSidebar";
@@ -23,40 +22,36 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-white w-full overflow-x-hidden">
-      {/* Bring back MainNav */}
       <MainNav />
-      
-      {/* Main Layout Container */}
       <div className="flex w-full min-h-screen">
         {/* Left sidebar - Desktop only */}
         {!isMobile && (
-          <div className="fixed left-0 top-16 bottom-0 w-20 bg-white z-30">
+          <div className="fixed left-0 top-0 bottom-0 w-16 bg-white z-30 border-r border-gray-200">
             <LeftSidebar />
           </div>
         )}
-        
-        {/* Main Content Area - Remove all padding */}
-        <div 
+
+        {/* Main Content Area */}
+        <div
           className={`flex-1 w-full min-h-screen ${
-            isMobile 
-              ? 'pt-16 pb-20' // Mobile: only nav spacing
-              : rightSidebarVisible 
-                ? 'pt-16 pl-20 pr-56' // Desktop with narrower right sidebar
-                : 'pt-16 pl-20' // Desktop without right sidebar
+            isMobile
+              ? 'pt-14 pb-20'
+              : rightSidebarVisible
+                ? 'pt-14 pl-16 pr-72'
+                : 'pt-14 pl-16'
           }`}
         >
-          <main className="bg-white w-full min-h-full"> {/* Completely remove padding/margin */}
+          <main className="bg-white w-full min-h-full">
             <Outlet />
           </main>
-          
           {/* Footer - Desktop only */}
           {!isMobile && <Footer />}
         </div>
 
-        {/* Right Social Sidebar - Desktop only, made even narrower */}
+        {/* Right Social Sidebar - Desktop only, wider */}
         {!isMobile && (
-          <div className="fixed right-0 top-16 bottom-0 w-56 z-30">
-            <SocialSidebar 
+          <div className="fixed right-0 top-0 bottom-0 w-72 bg-white border-l border-gray-200 z-30">
+            <SocialSidebar
               visible={rightSidebarVisible}
               onToggleVisibility={toggleRightSidebar}
             />
