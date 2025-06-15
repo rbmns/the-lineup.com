@@ -65,14 +65,8 @@ const LandingPage = () => {
     if (!upcomingEvents || upcomingEvents.length === 0) return [];
     const vibes = new Set<string>();
     upcomingEvents.forEach(event => {
-      const eventTags = event.tags;
-      if (Array.isArray(eventTags)) {
-        eventTags.forEach(tag => tag && vibes.add(tag));
-      } else if (typeof eventTags === 'string' && eventTags) {
-        eventTags.split(',').forEach(tag => {
-          const trimmedTag = tag.trim();
-          if (trimmedTag) vibes.add(trimmedTag);
-        });
+      if (event.vibe) {
+        vibes.add(event.vibe);
       }
     });
     return Array.from(vibes).sort();
@@ -80,16 +74,7 @@ const LandingPage = () => {
 
   const filteredEvents = React.useMemo(() => {
     if (!selectedVibe) return upcomingEvents;
-    return upcomingEvents.filter(event => {
-      const eventTags = event.tags;
-      if (Array.isArray(eventTags)) {
-        return eventTags.includes(selectedVibe);
-      }
-      if (typeof eventTags === 'string') {
-        return eventTags.split(',').map(t => t.trim()).includes(selectedVibe);
-      }
-      return false;
-    });
+    return upcomingEvents.filter(event => event.vibe === selectedVibe);
   }, [upcomingEvents, selectedVibe]);
 
   const handleVibeClick = (vibe: string) => {
