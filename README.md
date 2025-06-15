@@ -1,3 +1,4 @@
+
 # The Lineup - Social Event App
 
 The Lineup is a social application that helps people connect with each other locally through events. Users can discover nearby events, RSVP to them, and connect with friends to see who's attending what events.
@@ -50,6 +51,29 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
+## How To
+
+This section provides guides for common actions within The Lineup application.
+
+### Create an Event
+1.  **Sign up or log in** to your account.
+2.  Click the **"Create Event"** button, usually found in the sidebar or header.
+3.  If you're not already an event creator, you may need to **request creator access**. Fill out the form with the required details.
+4.  Once you have access, fill out the event creation form with details like title, description, date, location, and category.
+5.  **Publish** your event to make it visible to other users.
+
+### Discover and RSVP to Events
+1.  Navigate to the **"Events"** or **"Explore"** page.
+2.  Use the **filters** to narrow down events by date, category, vibe, or location.
+3.  Click on an event card to view more details.
+4.  On the event detail page, click the **"I'm Going"** or **"Interested"** button to RSVP.
+
+### Connect with Friends
+1.  Go to the **"Friends"** section of the app.
+2.  Use the search bar to find friends by their username.
+3.  Send a **friend request**. Once they accept, you'll be able to see which events they are attending.
+4.  You can also see friend suggestions based on mutual events or friends.
+
 ## What technologies are used for this project?
 
 This project is built with:
@@ -71,3 +95,4 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
