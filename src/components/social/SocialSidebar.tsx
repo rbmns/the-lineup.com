@@ -22,7 +22,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   }
 
   return (
-    <div className="h-full w-full bg-white border-l border-sand shadow-lg overflow-y-auto">
+    <div className="h-full w-full bg-white border-l border-gray-200 shadow-lg overflow-y-auto">
       <SidebarToggle visible={true} onToggle={onToggleVisibility} />
 
       <div className="p-4 space-y-4">
