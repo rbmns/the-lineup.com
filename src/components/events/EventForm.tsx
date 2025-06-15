@@ -35,6 +35,9 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
 
   const { register, handleSubmit, setValue, watch, formState: { errors }, control } = form;
 
+  console.log('EventForm render - isEditMode:', isEditMode, 'eventId:', eventId, 'isSubmitting:', isSubmitting);
+  console.log('Form errors:', errors);
+
   return (
     <>
       <Form {...form}>
@@ -55,7 +58,15 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
           <MetaFields register={register} errors={errors} />
           <VibeField control={control} />
 
-          <Button type="submit" variant="primary" disabled={isSubmitting}>
+          <Button 
+            type="submit" 
+            variant="primary" 
+            disabled={isSubmitting}
+            onClick={() => {
+              console.log('Submit button clicked, isSubmitting:', isSubmitting);
+              console.log('Current form values:', form.getValues());
+            }}
+          >
             {isSubmitting ? "Submitting..." : isEditMode ? "Update Event" : "Create Event"}
           </Button>
         </form>

@@ -52,6 +52,7 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
 
   useEffect(() => {
     if (isEditMode && initialData) {
+      console.log('Populating form with initial data:', initialData);
       const fetchedEventData = initialData;
       const defaultVals = {
           title: fetchedEventData.title || '',
@@ -69,11 +70,16 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
           tags: Array.isArray(fetchedEventData.tags) ? fetchedEventData.tags.join(', ') : (fetchedEventData.tags || ''),
           vibe: (fetchedEventData as any).vibe || null,
       };
+      
+      console.log('Setting form values:', defaultVals);
       Object.entries(defaultVals).forEach(([key, value]) => {
           form.setValue(key as keyof FormValues, value as any);
       });
+      
+      // Force form to recognize it has been modified with initial data
+      form.trigger();
     }
-  }, [isEditMode, initialData, form.setValue]);
+  }, [isEditMode, initialData, form]);
   
   const handleVenueCreated = (newVenue: Venue) => {
     queryClient.invalidateQueries({ queryKey: ['venues'] });
@@ -82,33 +88,41 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
   };
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
+    console.log('Form submission started with data:', data);
+    
     if (!user) {
       toast.error("You must be logged in to create an event.");
       return;
     }
+    
     setIsSubmitting(true);
     
     try {
       const processedEventData = processFormData(data, user.id);
-      console.log('Submitting event data:', JSON.stringify(processedEventData, null, 2));
+      console.log('Processed event data for submission:', JSON.stringify(processedEventData, null, 2));
       
       if (isEditMode && eventId) {
+        console.log('Updating event with ID:', eventId);
         const { error } = await updateEvent(eventId, processedEventData as any);
         if (error) {
           console.error("Failed to update event", error);
           console.error("Supabase error details:", JSON.stringify(error, null, 2));
-          throw error;
+          toast.error(error.message || "Failed to update event");
+          return;
         }
+        console.log("Event updated successfully");
         toast.success('Event updated successfully!');
         await queryClient.invalidateQueries({ queryKey: ['events'] });
         await queryClient.invalidateQueries({ queryKey: ['event-details', eventId] });
         navigate('/events');
       } else {
+        console.log('Creating new event');
         const { data: createdEvent, error } = await createEvent(processedEventData as any);
         if (error) {
           console.error("Failed to create event", error);
           console.error("Supabase error details:", JSON.stringify(error, null, 2));
-          throw error;
+          toast.error(error.message || "Failed to create event");
+          return;
         }
         console.log("Event created successfully in DB:", createdEvent);
         toast.success('Event created successfully!');
@@ -124,6 +138,7 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
   };
 
   const onInvalid = (errors: FieldErrors<FormValues>) => {
+    console.log('Form validation errors:', errors);
     const errorList = Object.entries(errors).map(([fieldName, error]) => {
       const formattedFieldName = fieldName
         .replace(/_/g, " ")
