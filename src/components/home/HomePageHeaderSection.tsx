@@ -11,7 +11,7 @@ const HomePageHeaderSection = () => (
       <h1 className={`${typography.display} mb-4 text-white mt-0 px-4 md:px-8`}>
         Find events that fit your <span className="font-handwritten text-sunset-yellow">vibe</span>
       </h1>
-      <p className={`${typography.lead} text-white/90 leading-relaxed max-w-2xl mx-auto mt-0 px-4 md:px-8`}>
+      <p className={`${typography.lead} text-white/90 leading-relaxed max-w-2xl mx-auto mt-0 px-4 md:px-8 mb-8`}>
         Discover what's happening nearby — from beach parties to chill yoga sessions. Join when you want, connect if you want.
       </p>
     </div>
@@ -19,3 +19,4 @@ const HomePageHeaderSection = () => (
 );
 
 export default HomePageHeaderSection;
+
