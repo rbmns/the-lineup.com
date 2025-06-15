@@ -15,13 +15,25 @@ interface VibeFieldProps {
 const NO_VIBE_VALUE = '__NO_VIBE__';
 
 export const VibeField: React.FC<VibeFieldProps> = ({ control }) => {
-  const { data: vibes, isLoading } = useEventVibes();
+  const { data: vibes, isLoading, isError, error } = useEventVibes();
 
   if (isLoading) {
     return (
       <FormItem>
         <Label htmlFor="vibe">Vibe</Label>
         <Skeleton className="h-10 w-full" />
+      </FormItem>
+    );
+  }
+
+  if (isError) {
+    return (
+      <FormItem>
+        <Label htmlFor="vibe">Vibe</Label>
+        <div className="text-sm text-destructive p-2 bg-destructive/10 border border-destructive/20 rounded-md">
+          <p className="font-semibold">Error loading vibes</p>
+          <p>{error?.message}</p>
+        </div>
       </FormItem>
     );
   }
