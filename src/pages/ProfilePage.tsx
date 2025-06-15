@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { useAdminData } from '@/hooks/useAdminData';
 import { CreatorRequestsDashboard } from '@/components/admin/CreatorRequestsDashboard';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useCreatorStatus } from '@/hooks/useCreatorStatus';
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
@@ -19,12 +20,13 @@ const ProfilePage: React.FC = () => {
 
   const {
     profile,
-    loading,
+    loading: profileLoading,
     error,
     isNotFound
   } = useProfileData(user?.id);
   
   const { isAdmin, requests, isLoading: isAdminLoading } = useAdminData();
+  const { canCreateEvents, isLoading: isCreatorStatusLoading } = useCreatorStatus();
 
   // Redirect to login if not authenticated
   React.useEffect(() => {
@@ -36,6 +38,8 @@ const ProfilePage: React.FC = () => {
   if (!user) {
     return null; // Will redirect in the effect
   }
+
+  const loading = profileLoading || isCreatorStatusLoading;
 
   if (loading) {
     return (
@@ -59,8 +63,6 @@ const ProfilePage: React.FC = () => {
     );
   }
   
-  const isCreator = profile?.status === 'Event Host';
-
   const tabStyle = "pb-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ease-in-out";
   const activeTabStyle = "border-primary text-primary";
   const inactiveTabStyle = "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300";
@@ -82,7 +84,7 @@ const ProfilePage: React.FC = () => {
                 >
                     My RSVPs
                 </button>
-                {isCreator && (
+                {canCreateEvents && (
                     <button
                         onClick={() => setActiveTab('created')}
                         className={cn(tabStyle, activeTab === 'created' ? activeTabStyle : inactiveTabStyle)}
@@ -102,7 +104,7 @@ const ProfilePage: React.FC = () => {
         </div>
         <div className="mt-8">
             {activeTab === 'rsvps' && <UserRsvpedEvents userId={user.id} />}
-            {activeTab === 'created' && isCreator && <UserCreatedEvents />}
+            {activeTab === 'created' && canCreateEvents && <UserCreatedEvents />}
             {activeTab === 'admin' && isAdmin && (
               isAdminLoading ? (
                 <div className="space-y-4">
