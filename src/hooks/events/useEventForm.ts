@@ -102,11 +102,14 @@ export const useEventForm = ({ eventId, isEditMode = false }: UseEventFormProps)
       
       if (isEditMode && eventId) {
         toast.success('Event updated successfully!');
+        await queryClient.invalidateQueries({ queryKey: ['events'] });
+        await queryClient.invalidateQueries({ queryKey: ['event-details', eventId] });
         navigate('/events');
       } else {
         const { error } = await createEvent(processedEventData as any);
         if (error) throw error;
         toast.success('Event created successfully!');
+        await queryClient.invalidateQueries({ queryKey: ['events'] });
         navigate('/events');
       }
     } catch (error) {
