@@ -70,7 +70,7 @@ const LeftSidebar: React.FC = () => {
 
   // Desktop vertical layout
   return (
-    <div className="h-full flex flex-col items-center py-6 space-y-4">
+    <div className="h-full flex flex-col items-center py-4 space-y-2">
       {navItems.map((item) => {
         const Icon = item.icon;
         const isActive = location.pathname === item.path;
@@ -80,18 +80,18 @@ const LeftSidebar: React.FC = () => {
             key={item.path}
             to={item.path}
             className={cn(
-              "flex flex-col items-center p-3 rounded-lg transition-colors group w-16",
+              "flex flex-col items-center p-2 rounded-lg transition-colors group w-12",
               isActive 
                 ? "bg-blue-50 text-blue-600" 
                 : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
             )}
           >
             <Icon className={cn(
-              "h-6 w-6 mb-2",
+              "h-5 w-5 mb-1",
               isActive ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"
             )} />
             <span className={cn(
-              "text-xs font-medium text-center leading-tight",
+              "text-[10px] font-medium text-center leading-tight",
               isActive ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"
             )}>
               {item.label}
