@@ -1,6 +1,5 @@
 
 import React, { Component, ErrorInfo, ReactNode } from "react";
-import { Button } from "@/components/ui/button";
 
 interface Props {
   children: ReactNode;
@@ -9,6 +8,7 @@ interface Props {
 interface State {
   hasError: boolean;
   error?: Error;
+  errorInfo?: ErrorInfo;
 }
 
 class ErrorBoundary extends Component<Props, State> {
@@ -22,32 +22,28 @@ class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo);
+    this.setState({ errorInfo: errorInfo });
   }
 
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-background">
-          <div className="text-center space-y-6 max-w-lg p-8 bg-card text-card-foreground rounded-lg shadow-lg">
-            <h1 className="text-5xl font-bold text-destructive">Oops!</h1>
-            <h2 className="text-3xl font-semibold tracking-tight">Something went wrong</h2>
-            <p className="text-muted-foreground">
-              We've encountered an unexpected error. Please try refreshing the page. If the problem persists, please contact support.
-            </p>
-            {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="text-left text-sm">
-                  <summary className="cursor-pointer">Error Details</summary>
-                  <pre className="mt-2 bg-muted p-4 rounded-md overflow-x-auto">
-                    {this.state.error.toString()}
-                    <br />
-                    {this.state.error.stack}
-                  </pre>
-              </details>
-            )}
-            <Button onClick={() => window.location.reload()}>
-              Refresh Page
-            </Button>
-          </div>
+        <div style={{ padding: '2rem', margin: '2rem', backgroundColor: '#fff0f0', border: '2px solid red', borderRadius: '8px', color: 'black' }}>
+          <h1 style={{ fontSize: '2rem', fontWeight: 'bold' }}>Something went wrong.</h1>
+          <p>We've encountered an unexpected error. Please try refreshing the page.</p>
+          <button 
+            onClick={() => window.location.reload()}
+            style={{ padding: '0.5rem 1rem', marginTop: '1rem', border: '1px solid black', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            Refresh Page
+          </button>
+          {this.state.error && (
+            <details style={{ whiteSpace: 'pre-wrap', marginTop: '1rem', backgroundColor: '#f0f0f0', padding: '1rem', borderRadius: '4px' }}>
+                <summary style={{ cursor: 'pointer', fontWeight: 'bold' }}>Error Details</summary>
+                <p><strong>Error:</strong> {this.state.error.toString()}</p>
+                {this.state.errorInfo && <p><strong>Stack Trace:</strong>{this.state.errorInfo.componentStack}</p>}
+            </details>
+          )}
         </div>
       );
     }
