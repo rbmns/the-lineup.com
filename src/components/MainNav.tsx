@@ -52,10 +52,10 @@ const MainNav = () => {
         "w-full h-16 flex items-center justify-between",
         isMobile ? "px-4" : "px-6 lg:px-8"
       )}>
-        {/* Left side - Symbol icon column + Brand wordmark */}
-        <div className="flex items-center gap-2 flex-shrink-0 h-16">
-          {/* Symbol icon should perfectly align with sidebar icon cell */}
-          <Link to="/" className="flex items-center justify-center w-16 h-16">
+        {/* Left side - Icon flush left + wordmark (no gap before icon) */}
+        <div className="flex items-center h-16 flex-shrink-0">
+          {/* Symbol icon should perfectly align with sidebar icon column, flush left */}
+          <Link to="/" className="flex items-center justify-center w-16 h-16 mr-0 pl-0">
             <img 
               src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" 
               alt="thelineup Symbol"
@@ -63,6 +63,7 @@ const MainNav = () => {
               style={{ display: 'block' }}
             />
           </Link>
+          {/* Brand wordmark directly after - no extra gap */}
           <BrandLogo showText={true} className="ml-0" />
         </div>
         {/* Right side - User menu or auth buttons */}
