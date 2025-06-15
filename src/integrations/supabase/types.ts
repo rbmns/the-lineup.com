@@ -578,57 +578,6 @@ export type Database = {
         }
         Relationships: []
       }
-      test: {
-        Row: {
-          created_at: string | null
-          creator: string | null
-          description: string | null
-          end_time: string | null
-          event_type: string | null
-          "Extra info": string | null
-          fee: string | null
-          id: string | null
-          image_urls: string | null
-          organizer_link: string | null
-          start_time: string | null
-          title: string | null
-          updated_at: string | null
-          venue_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          creator?: string | null
-          description?: string | null
-          end_time?: string | null
-          event_type?: string | null
-          "Extra info"?: string | null
-          fee?: string | null
-          id?: string | null
-          image_urls?: string | null
-          organizer_link?: string | null
-          start_time?: string | null
-          title?: string | null
-          updated_at?: string | null
-          venue_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          creator?: string | null
-          description?: string | null
-          end_time?: string | null
-          event_type?: string | null
-          "Extra info"?: string | null
-          fee?: string | null
-          id?: string | null
-          image_urls?: string | null
-          organizer_link?: string | null
-          start_time?: string | null
-          title?: string | null
-          updated_at?: string | null
-          venue_id?: string | null
-        }
-        Relationships: []
-      }
       user_activity: {
         Row: {
           anonymous_id: string | null
