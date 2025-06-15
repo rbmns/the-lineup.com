@@ -1,4 +1,3 @@
-
 import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { HelmetProvider } from 'react-helmet-async';
@@ -22,6 +21,7 @@ import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import TermsOfService from '@/pages/TermsOfService';
 import CookiePolicy from '@/pages/CookiePolicy';
 import NotFound from '@/pages/NotFound';
+import DesignSystem from '@/pages/DesignSystem';
 
 function App() {
   return (
@@ -48,6 +48,7 @@ function App() {
                 <Route path="privacy" element={<PrivacyPolicy />} />
                 <Route path="terms" element={<TermsOfService />} />
                 <Route path="cookies" element={<CookiePolicy />} />
+                <Route path="design-system" element={<DesignSystem />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
             </Routes>
