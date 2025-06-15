@@ -4,6 +4,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Calendar, Users, Coffee, Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { BrandLogo } from "@/components/ui/brand-logo";
 
 const LeftSidebar: React.FC = () => {
   const location = useLocation();
@@ -68,39 +69,45 @@ const LeftSidebar: React.FC = () => {
     );
   }
 
-  // Desktop vertical layout
+  // Desktop vertical layout - center logo and menu items vertically and horizontally
   return (
-    <div className="h-full flex flex-col items-center py-6 space-y-4">
-      {navItems.map((item) => {
-        const Icon = item.icon;
-        const isActive = location.pathname === item.path;
-        
-        return (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={cn(
-              "flex flex-col items-center p-3 rounded-lg transition-colors group w-16",
-              isActive 
-                ? "bg-blue-50 text-blue-600" 
-                : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
-            )}
-          >
-            <Icon className={cn(
-              "h-6 w-6 mb-2",
-              isActive ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"
-            )} />
-            <span className={cn(
-              "text-xs font-medium text-center leading-tight",
-              isActive ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"
-            )}>
-              {item.label}
-            </span>
-          </Link>
-        );
-      })}
+    <div className="h-full flex flex-col items-center justify-center py-6 space-y-6">
+      <div className="w-full flex justify-center mb-4">
+        <BrandLogo showText={true} className="mx-auto" />
+      </div>
+      <div className="flex-1 flex flex-col items-center justify-center w-full">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = location.pathname === item.path;
+          
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={cn(
+                "flex flex-col items-center p-3 rounded-lg transition-colors group w-16",
+                isActive 
+                  ? "bg-blue-50 text-blue-600" 
+                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+              )}
+            >
+              <Icon className={cn(
+                "h-6 w-6 mb-2",
+                isActive ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"
+              )} />
+              <span className={cn(
+                "text-xs font-medium text-center leading-tight",
+                isActive ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"
+              )}>
+                {item.label}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 };
 
 export default LeftSidebar;
+
