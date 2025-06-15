@@ -26,6 +26,7 @@ import NotFound from '@/pages/NotFound';
 import DesignSystem from '@/pages/DesignSystem';
 import SearchPage from '@/pages/SearchPage';
 import { SearchProvider } from '@/contexts/SearchContext';
+import AdminPage from '@/pages/AdminPage';
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
                   <Route path="profile" element={<ProfilePage />} />
                   <Route path="profile/edit" element={<ProfileEdit />} />
                   <Route path="search" element={<SearchPage />} />
+                  <Route path="admin" element={<AdminPage />} />
                   <Route path="login" element={<Login />} />
                   <Route path="signup" element={<Signup />} />
                   <Route path="forgot-password" element={<ForgotPassword />} />
