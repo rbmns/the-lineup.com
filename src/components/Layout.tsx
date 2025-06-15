@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import MainNav from "@/components/MainNav";
 import LeftSidebar from "@/components/nav/LeftSidebar";
@@ -10,7 +11,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { SocialSidebar } from "@/components/social/SocialSidebar";
 
 const TOP_NAV_HEIGHT = 56; // px, matches h-14
-const LEFT_SIDEBAR_WIDTH = 64; // px, matches w-16
+const LEFT_SIDEBAR_WIDTH = 80; // px, matches w-20
 const RIGHT_SIDEBAR_WIDTH = 288; // px, matches w-72
 
 const Layout = () => {
@@ -25,19 +26,19 @@ const Layout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white w-full overflow-x-hidden">
+    <div className="min-h-screen bg-background w-full overflow-x-hidden">
       <MainNav />
       <div className="flex w-full min-h-screen">
         {/* Left sidebar - Desktop only, start below navbar */}
         {!isMobile && (
           <div
-            className="fixed left-0 border-r border-gray-200"
+            className="fixed left-0"
             style={{
               top: TOP_NAV_HEIGHT,
               bottom: 0,
               width: LEFT_SIDEBAR_WIDTH,
               zIndex: 30,
-              background: "#fff",
+              background: "var(--card)",
               height: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
             }}
           >
@@ -47,12 +48,12 @@ const Layout = () => {
 
         {/* Main Content Area */}
         <div
-          className={`flex-1 w-full min-h-screen ${
+          className={`flex-1 w-full min-h-screen bg-background ${
             isMobile
               ? 'pt-14 pb-20'
               : rightSidebarVisible
-                ? 'pt-14 pl-16 pr-72'
-                : 'pt-14 pl-16'
+                ? 'pt-14 pl-20 pr-72'
+                : 'pt-14 pl-20'
           }`}
           style={
             !isMobile
@@ -65,7 +66,7 @@ const Layout = () => {
               : undefined
           }
         >
-          <main className="bg-white w-full min-h-full">
+          <main className="bg-background w-full min-h-full">
             <Outlet />
           </main>
           {/* Footer - Desktop only */}
@@ -75,13 +76,13 @@ const Layout = () => {
         {/* Right Social Sidebar - Desktop only */}
         {!isMobile && (
           <div
-            className={`fixed right-0 border-l border-gray-200`}
+            className={`fixed right-0 border-l border-border`}
             style={{
               top: TOP_NAV_HEIGHT,
               bottom: 0,
               width: RIGHT_SIDEBAR_WIDTH,
               zIndex: 30,
-              background: "#fff",
+              background: "var(--card)",
               height: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
               display: rightSidebarVisible ? "block" : "none",
             }}
@@ -96,7 +97,7 @@ const Layout = () => {
 
       {/* Mobile Navigation - Fixed to bottom */}
       {isMobile && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white z-50 safe-area-pb">
+        <div className="fixed bottom-0 left-0 right-0 bg-card z-50 safe-area-pb border-t border-border">
           <LeftSidebar />
         </div>
       )}

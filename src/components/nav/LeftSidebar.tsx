@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Calendar, Users, Star, Home, Settings } from 'lucide-react';
@@ -68,7 +67,7 @@ const LeftSidebar: React.FC = () => {
 
   // Desktop vertical layout
   return (
-    <div className="h-full flex flex-col items-center w-20 bg-card border-r border-border">
+    <div className="h-full flex flex-col items-center w-20 bg-card">
       <div className="flex flex-col flex-1 items-center justify-start py-4 space-y-2 w-full">
         {navItems.map((item) => {
           const Icon = item.icon;
