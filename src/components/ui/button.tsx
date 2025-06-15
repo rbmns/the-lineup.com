@@ -6,7 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:scale-105 hover:shadow-md",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-base font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:scale-105 hover:shadow-md break-keep overflow-hidden text-ellipsis text-center select-none",
   {
     variants: {
       variant: {
@@ -25,14 +25,15 @@ const buttonVariants = cva(
         dark: "bg-foreground text-background hover:bg-foreground/90",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 px-3 text-xs",
-        lg: "h-11 px-8",
-        icon: "h-10 w-10",
+        default: "min-w-[96px] h-11 px-5 py-2 text-base", // bigger by default
+        sm: "min-w-[80px] h-9 px-4 py-1.5 text-sm",
+        lg: "min-w-[120px] h-13 px-8 py-2.5 text-lg",
+        icon: "min-w-[44px] h-11 w-11 p-0",
       },
     },
     defaultVariants: {
       variant: "default",
+      size: "default",
     },
   }
 );
@@ -58,3 +59,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button";
 
 export { Button, buttonVariants };
+
