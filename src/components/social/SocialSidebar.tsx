@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -188,7 +189,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   return (
     <>
       <div className="fixed top-0 right-0 h-full z-50 flex">
-        <div className="relative h-full w-56 bg-white border-l border-gray-200 shadow-lg overflow-y-auto">
+        <div className="relative h-full w-56 bg-card shadow-lg overflow-y-auto">
           {/* Collapse Button */}
           <div
             className="absolute"

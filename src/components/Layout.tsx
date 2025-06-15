@@ -12,7 +12,7 @@ import { SocialSidebar } from "@/components/social/SocialSidebar";
 
 const TOP_NAV_HEIGHT = 56; // px, matches h-14
 const LEFT_SIDEBAR_WIDTH = 80; // px, matches w-20
-const RIGHT_SIDEBAR_WIDTH = 288; // px, matches w-72
+const RIGHT_SIDEBAR_WIDTH = 224; // px, matches w-56
 
 const Layout = () => {
   const { user, loading } = useAuth();
@@ -52,7 +52,7 @@ const Layout = () => {
             isMobile
               ? 'pt-14 pb-20'
               : rightSidebarVisible
-                ? 'pt-14 pl-20 pr-72'
+                ? 'pt-14 pl-20 pr-56'
                 : 'pt-14 pl-20'
           }`}
           style={
@@ -76,7 +76,7 @@ const Layout = () => {
         {/* Right Social Sidebar - Desktop only */}
         {!isMobile && (
           <div
-            className={`fixed right-0 border-l border-border`}
+            className={`fixed right-0`}
             style={{
               top: TOP_NAV_HEIGHT,
               bottom: 0,
