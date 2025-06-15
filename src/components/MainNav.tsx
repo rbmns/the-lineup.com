@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -6,6 +7,7 @@ import { BrandLogo } from '@/components/ui/brand-logo';
 import UserMenu from '@/components/nav/UserMenu';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { useCreatorStatus } from '@/hooks/useCreatorStatus';
 
 const MainNav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,6 +17,7 @@ const MainNav = () => {
     profile,
     signOut
   } = useAuth();
+  const { canCreateEvents } = useCreatorStatus();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const location = useLocation();
@@ -64,7 +67,7 @@ const MainNav = () => {
         {/* Right side - User menu or auth buttons */}
         <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0">
           {isAuthenticated && user ? (
-            <UserMenu user={user} profile={profile} handleSignOut={signOut} />
+            <UserMenu user={user} profile={profile} handleSignOut={signOut} canCreateEvents={canCreateEvents} />
           ) : (
             <div className="flex items-center gap-2">
               <Button

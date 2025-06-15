@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ProfilePageLayout } from '@/components/profile/ProfilePageLayout';
 import { useProfileData } from '@/hooks/useProfileData';
 import { UserCreatedEvents } from '@/components/profile/UserCreatedEvents';
@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [showSettings, setShowSettings] = useState(false);
 
   const {
@@ -66,6 +67,18 @@ const ProfilePage: React.FC = () => {
   const numTabs = 1 + (canCreateEvents ? 2 : 0) + (isAdmin ? 1 : 0);
   const gridColsClass = `grid-cols-${numTabs}`;
 
+  const searchParams = new URLSearchParams(location.search);
+  const tabQueryParam = searchParams.get('tab');
+
+  const validTabs = ['rsvps'];
+  if (canCreateEvents) {
+    validTabs.push('created', 'venues');
+  }
+  if (isAdmin) {
+    validTabs.push('admin');
+  }
+  const defaultTab = tabQueryParam && validTabs.includes(tabQueryParam) ? tabQueryParam : 'rsvps';
+
   return (
     <>
       <ProfilePageLayout
@@ -75,7 +88,7 @@ const ProfilePage: React.FC = () => {
         onToggleSettings={() => setShowSettings(!showSettings)}
       />
       <div className="container mx-auto px-4 py-8 max-w-5xl">
-        <Tabs defaultValue="rsvps" className="w-full">
+        <Tabs defaultValue={defaultTab} className="w-full">
           <TabsList className={`grid w-full ${gridColsClass}`}>
               <TabsTrigger value="rsvps">
                   My RSVPs
