@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useLoginForm } from '@/hooks/useLoginForm';
 import { LoginErrorDisplay } from '@/components/auth/LoginErrorDisplay';
@@ -81,8 +80,10 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         </div>
       </div>
       
+      {/* Always use variant="primary" and size="lg" for Google auth to keep a strong CTA look */}
       <Button 
-        variant="outline" 
+        variant="primary"
+        size="lg"
         className="w-full" 
         onClick={handleGoogleLogin} 
         disabled={loading || authLoading}

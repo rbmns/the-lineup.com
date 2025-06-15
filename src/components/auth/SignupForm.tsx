@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Form } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
@@ -78,8 +77,9 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
       </div>
       
       <Button 
-        variant="outline" 
-        className="w-full" 
+        variant="primary"
+        size="lg"
+        className="w-full"
         onClick={handleGoogleLogin} 
         disabled={loading || authLoading}
       >
