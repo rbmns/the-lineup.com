@@ -6,6 +6,7 @@ import { ProfilePageLayout } from '@/components/profile/ProfilePageLayout';
 import { useProfileData } from '@/hooks/useProfileData';
 import { UserCreatedEvents } from '@/components/profile/UserCreatedEvents';
 import { UserRsvpedEvents } from '@/components/profile/UserRsvpedEvents';
+import { UserCreatedVenues } from '@/components/profile/UserCreatedVenues';
 import { useAdminData } from '@/hooks/useAdminData';
 import { CreatorRequestsDashboard } from '@/components/admin/CreatorRequestsDashboard';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -62,7 +63,7 @@ const ProfilePage: React.FC = () => {
     );
   }
   
-  const numTabs = 1 + (canCreateEvents ? 1 : 0) + (isAdmin ? 1 : 0);
+  const numTabs = 1 + (canCreateEvents ? 2 : 0) + (isAdmin ? 1 : 0);
   const gridColsClass = `grid-cols-${numTabs}`;
 
   return (
@@ -80,9 +81,14 @@ const ProfilePage: React.FC = () => {
                   My RSVPs
               </TabsTrigger>
               {canCreateEvents && (
-                  <TabsTrigger value="created">
-                      My Created Events
-                  </TabsTrigger>
+                  <>
+                      <TabsTrigger value="created">
+                          My Events
+                      </TabsTrigger>
+                      <TabsTrigger value="venues">
+                          My Venues
+                      </TabsTrigger>
+                  </>
               )}
               {isAdmin && (
                 <TabsTrigger value="admin">
@@ -94,9 +100,14 @@ const ProfilePage: React.FC = () => {
               <UserRsvpedEvents userId={user.id} />
           </TabsContent>
           {canCreateEvents && (
-              <TabsContent value="created" className="mt-8">
-                  <UserCreatedEvents />
-              </TabsContent>
+              <>
+                  <TabsContent value="created" className="mt-8">
+                      <UserCreatedEvents />
+                  </TabsContent>
+                  <TabsContent value="venues" className="mt-8">
+                      <UserCreatedVenues />
+                  </TabsContent>
+              </>
           )}
           {isAdmin && (
             <TabsContent value="admin" className="mt-8">
