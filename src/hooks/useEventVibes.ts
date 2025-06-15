@@ -14,7 +14,7 @@ export const useEventVibes = () => {
       
       if (error) {
         console.error('Error fetching event vibes:', error.message);
-        throw new Error(`Failed to fetch event vibes. Please check if the 'event_vibe' table exists and has public read access.`);
+        throw new Error(`Failed to fetch event vibes: ${error.message}`);
       }
       
       console.log('Successfully fetched event vibes data:', data);
@@ -23,9 +23,13 @@ export const useEventVibes = () => {
 
       if (vibes.length === 0) {
         console.warn('No event vibes found in the database. The "event_vibe" table might be empty.');
+        // Return default vibes if none found in database
+        return ['party', 'chill', 'wellness', 'active', 'social', 'creative'];
       }
       
       return vibes;
-    }
+    },
+    retry: 1,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
