@@ -1,7 +1,6 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Event } from '@/types';
+import { Event, Profile } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { safeGet } from '@/utils/supabaseTypeUtils';
 
@@ -67,7 +66,7 @@ export const useEventSearch = () => {
     try {
       const { data, error } = await supabase
         .from('events')
-        .select('*, venue_id(id, name, city, street)')
+        .select('*, venue_id(id, name, city, street), creator:profiles(*)')
         .order('start_time', { ascending: true });
 
       if (error) {

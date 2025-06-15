@@ -1,4 +1,6 @@
 
+import { UserProfile as UserProfileType } from './'; // Self-reference for aliasing
+
 export interface Profile {
   id: string;
   username: string;
@@ -42,8 +44,7 @@ export interface Event {
   location?: string;
   venue_id?: string;
   venues?: Venue;
-  creator?: string;
-  creator_profile?: Profile;
+  creator?: Profile;
   event_category?: string;
   tags?: string;
   image_urls?: string[];

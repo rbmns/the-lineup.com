@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, SubmitHandler } from 'react-hook-form';
@@ -124,7 +123,7 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
         return;
       } else {
         // Create new event
-        const { data: newEvent, error } = await createEvent(eventData as Partial<Event>);
+        const { data: newEvent, error } = await createEvent(eventData as any);
         if (error) {
           throw error;
         }
