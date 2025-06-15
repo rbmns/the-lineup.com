@@ -1,6 +1,8 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import PolymetEventCard from '@/components/polymet/event-card';
+import EventCard from '@/components/EventCard';
 import { cn } from '@/lib/utils';
 import { EventGrid as InfiniteEventGrid } from './list-components/EventGrid';
 
@@ -26,12 +28,10 @@ const mapEventToPolymetCard = (event: Event) => ({
   attendees: event.going_count || event.interested_count
     ? {
         count: (event.going_count ?? 0) + (event.interested_count ?? 0),
-        // Avatar demo: doesn't display avatars in current event type
         avatars: [],
       }
     : undefined,
   showRsvp: false,
-  // RSVP handlers can be attached later if you decide to switch fully
   className: "h-full w-full"
 });
 
@@ -51,7 +51,7 @@ interface EventGridProps {
   compact?: boolean;
 }
 
-// NEW: Use PolymetEventCard for all events in the grid so you can compare.
+// Render both cards side-by-side for each event
 export const EventGrid: React.FC<EventGridProps> = ({
   events,
   onRsvp,
@@ -91,11 +91,11 @@ export const EventGrid: React.FC<EventGridProps> = ({
     );
   }
 
-  // Render using PolymetEventCard for all events, as preview
+  // Render both the original card and the Polymet card for each event
   return (
     <div
       className={cn(
-        "grid gap-3 w-full",
+        "grid gap-6 w-full",
         "grid-cols-1",
         "xs:grid-cols-1",
         "sm:grid-cols-2",
@@ -108,10 +108,19 @@ export const EventGrid: React.FC<EventGridProps> = ({
       style={style}
     >
       {events.map((event) => (
-        <div key={event.id} data-event-id={event.id} className="w-full min-w-0">
-          <PolymetEventCard {...mapEventToPolymetCard(event)} />
+        <div key={event.id} data-event-id={event.id} className="w-full min-w-0 flex flex-col gap-4">
+          <div>
+            <div className="text-xs text-gray-400 mb-1">Original Design</div>
+            {/* This is your legacy card; swap as needed */}
+            <EventCard event={event} />
+          </div>
+          <div>
+            <div className="text-xs text-purple-700 font-bold mb-1">Preview: Polymet Design</div>
+            <PolymetEventCard {...mapEventToPolymetCard(event)} />
+          </div>
         </div>
       ))}
     </div>
   );
 };
+
