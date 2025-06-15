@@ -1,4 +1,3 @@
-
 export interface Profile {
   id: string;
   username: string | null;
@@ -34,6 +33,7 @@ export interface Venue {
   created_at?: string;
   region?: string | null;
   tags?: string[] | null;
+  creator_id?: string | null;
 }
 
 export interface Event {
