@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -33,23 +32,24 @@ export const FriendsTabsNew = ({
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 md:space-y-6">
       <TabsList className={`
-        w-full bg-muted p-1
+        w-full shadow-turquoise border border-[#AEF0E7]
+        bg-gradient-to-r from-[#E0F7F7] via-[#FFF] to-[#FFFBEB]
         ${isMobile 
-          ? 'grid grid-cols-3 h-auto gap-1' 
-          : 'grid grid-cols-5 h-10'
+          ? 'grid grid-cols-3 h-auto gap-1 rounded-2xl'
+          : 'grid grid-cols-5 h-12 rounded-2xl'
         }
       `}>
         <TabsTrigger 
           value="all-friends" 
           className={`
             ${isMobile 
-              ? 'flex flex-col items-center gap-1 px-1 py-2 text-xs' 
-              : 'flex items-center gap-2 px-3 py-1.5 text-sm'
+              ? 'flex flex-col items-center gap-1 px-1 py-2 text-xs rounded-xl' 
+              : 'flex items-center gap-2 px-3 py-2 text-base rounded-xl'
             }
-            whitespace-nowrap rounded-sm font-medium transition-all
+            whitespace-nowrap font-semibold transition-all data-[state=active]:bg-brand-turquoise data-[state=active]:text-white data-[state=active]:shadow-turquoise hover:bg-yellow-50 hover:text-ocean-deep
           `}
         >
-          <Users className={`${isMobile ? 'h-4 w-4' : 'h-4 w-4'}`} />
+          <Users className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
           <span className={isMobile ? 'leading-none' : ''}>
             {isMobile ? 'Friends' : 'All Friends'}
           </span>
@@ -59,13 +59,13 @@ export const FriendsTabsNew = ({
           value="suggestions" 
           className={`
             ${isMobile 
-              ? 'flex flex-col items-center gap-1 px-1 py-2 text-xs relative' 
-              : 'relative flex items-center gap-2 px-3 py-1.5 text-sm'
+              ? 'flex flex-col items-center gap-1 px-1 py-2 text-xs relative rounded-xl'
+              : 'relative flex items-center gap-2 px-3 py-2 text-base rounded-xl'
             }
-            whitespace-nowrap rounded-sm font-medium transition-all
+            whitespace-nowrap font-semibold transition-all data-[state=active]:bg-brand-turquoise data-[state=active]:text-white data-[state=active]:shadow-turquoise hover:bg-yellow-50 hover:text-ocean-deep
           `}
         >
-          <UserPlus className={`${isMobile ? 'h-4 w-4' : 'h-4 w-4'}`} />
+          <UserPlus className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
           <span className={isMobile ? 'leading-none' : ''}>
             {isMobile ? 'Discover' : 'Suggestions'}
           </span>
@@ -75,7 +75,7 @@ export const FriendsTabsNew = ({
               className={`
                 absolute ${isMobile ? '-top-0.5 -right-0.5' : '-top-1 -right-1'} 
                 h-4 w-4 p-0 flex items-center justify-center 
-                text-[10px] bg-blue-500 text-white
+                text-[10px] bg-brand-seafoam text-brand-turquoise border border-brand-turquoise shadow-turquoise
               `}
             >
               {suggestedFriendsCount}
@@ -87,13 +87,13 @@ export const FriendsTabsNew = ({
           value="requests" 
           className={`
             ${isMobile 
-              ? 'flex flex-col items-center gap-1 px-1 py-2 text-xs relative' 
-              : 'relative flex items-center gap-2 px-3 py-1.5 text-sm'
+              ? 'flex flex-col items-center gap-1 px-1 py-2 text-xs relative rounded-xl'
+              : 'relative flex items-center gap-2 px-3 py-2 text-base rounded-xl'
             }
-            whitespace-nowrap rounded-sm font-medium transition-all
+            whitespace-nowrap font-semibold transition-all data-[state=active]:bg-[#FB7185] data-[state=active]:text-white data-[state=active]:shadow-turquoise hover:bg-yellow-50 hover:text-ocean-deep
           `}
         >
-          <Bell className={`${isMobile ? 'h-4 w-4' : 'h-4 w-4'}`} />
+          <Bell className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
           <span className={isMobile ? 'leading-none' : ''}>
             {isMobile ? 'Requests' : 'Requests'}
           </span>
@@ -103,7 +103,7 @@ export const FriendsTabsNew = ({
               className={`
                 absolute ${isMobile ? '-top-0.5 -right-0.5' : '-top-1 -right-1'}
                 h-4 w-4 p-0 flex items-center justify-center 
-                text-[10px]
+                text-[10px] bg-pastel-coral text-[#FF5C57] border border-[#FF5C57] shadow-turquoise
               `}
             >
               {pendingRequestsCount}
@@ -115,17 +115,16 @@ export const FriendsTabsNew = ({
           <>
             <TabsTrigger 
               value="events" 
-              className="flex items-center gap-2 px-3 py-1.5 whitespace-nowrap rounded-sm text-sm font-medium transition-all"
+              className="flex items-center gap-2 px-3 py-2 rounded-xl whitespace-nowrap font-semibold text-base transition-all data-[state=active]:bg-brand-turquoise data-[state=active]:text-white data-[state=active]:shadow-turquoise hover:bg-yellow-50 hover:text-ocean-deep"
             >
-              <Calendar className="h-4 w-4" />
+              <Calendar className="h-5 w-5" />
               Events
             </TabsTrigger>
-
             <TabsTrigger 
               value="casual-plans" 
-              className="flex items-center gap-2 px-3 py-1.5 whitespace-nowrap rounded-sm text-sm font-medium transition-all"
+              className="flex items-center gap-2 px-3 py-2 rounded-xl whitespace-nowrap font-semibold text-base transition-all data-[state=active]:bg-brand-turquoise data-[state=active]:text-white data-[state=active]:shadow-turquoise hover:bg-yellow-50 hover:text-ocean-deep"
             >
-              <MapPin className="h-4 w-4" />
+              <MapPin className="h-5 w-5" />
               Casual Plans
             </TabsTrigger>
           </>
