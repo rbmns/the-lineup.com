@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -111,7 +110,9 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
           return;
         }
         console.log("Event updated successfully");
-        toast.success('Event updated successfully!');
+        toast.success('Event updated successfully! 🎉', {
+          description: 'Your event changes have been saved.',
+        });
         await queryClient.invalidateQueries({ queryKey: ['events'] });
         await queryClient.invalidateQueries({ queryKey: ['event-details', eventId] });
         navigate('/events');
@@ -125,7 +126,9 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
           return;
         }
         console.log("Event created successfully in DB:", createdEvent);
-        toast.success('Event created successfully!');
+        toast.success('Event created successfully! 🎉', {
+          description: 'Your new event is now live and ready for RSVPs.',
+        });
         await queryClient.invalidateQueries({ queryKey: ['events'] });
         navigate('/events');
       }
