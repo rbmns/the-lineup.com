@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -6,13 +5,16 @@ import { SocialHeader } from './SocialHeader';
 import { SignUpPrompt } from './SignUpPrompt';
 import { CommunitySection } from './CommunitySection';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Users } from 'lucide-react';
 import { AuthOverlay } from '@/components/auth/AuthOverlay';
 import { RequestCreatorModal } from './RequestCreatorModal';
+import { CreatorRequestsManager } from './CreatorRequestsManager';
 import { UserService } from '@/services/UserService';
 import { CreatorRequestService } from '@/services/CreatorRequestService';
 import { toast } from "sonner";
 import { supabase } from '@/lib/supabase';
+import { useQuery } from '@tanstack/react-query';
+import { Badge } from '@/components/ui/badge';
 
 interface SocialSidebarProps {
   visible?: boolean;
@@ -37,7 +39,9 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
 
   // For event creator handling:
   const [canCreateEvents, setCanCreateEvents] = useState<boolean | null>(null); // null = unknown
+  const [isAdmin, setIsAdmin] = useState(false);
   const [showRequestCreator, setShowRequestCreator] = useState(false);
+  const [showRequestsManager, setShowRequestsManager] = useState(false);
   const [creatorRequestStatus, setCreatorRequestStatus] = useState<string | null>(null); // 'pending', 'not_requested', null (loading)
 
   // Fetch user roles and request status if logged in
@@ -46,7 +50,9 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
     if (user) {
       UserService.getUserRoles(user.id).then(({ data }) => {
         if (isMounted) {
-          setCanCreateEvents(data?.includes('event_creator') || data?.includes('admin') || false);
+          const roles = data || [];
+          setCanCreateEvents(roles.includes('event_creator') || roles.includes('admin') || false);
+          setIsAdmin(roles.includes('admin'));
         }
       });
       CreatorRequestService.getCreatorRequestStatus(user.id).then(({ data }) => {
@@ -57,9 +63,29 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
     } else {
       setCanCreateEvents(null);
       setCreatorRequestStatus(null);
+      setIsAdmin(false);
     }
     return () => { isMounted = false; }
   }, [user]);
+
+  const fetchAdminRequests = async () => {
+    const { data, error } = await CreatorRequestService.getCreatorRequestsForAdmin();
+    if (error) {
+      console.log("Could not fetch creator requests, user might not be admin.");
+      return [];
+    }
+    return data || [];
+  };
+
+  const { data: adminRequests } = useQuery({
+    queryKey: ['adminCreatorRequests'],
+    queryFn: fetchAdminRequests,
+    enabled: isAdmin,
+    refetchInterval: 60000,
+  });
+  
+  const pendingRequestsCount = adminRequests?.filter(r => !r.is_read).length || 0;
+
 
   // Show the "Expand" button if sidebar is hidden
   if (!visible) {
@@ -191,6 +217,26 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
           </div>
           <div className="p-4 space-y-4">
             <SocialHeader />
+
+            {isAdmin && (
+              <div className="py-2 border-b">
+                <h3 className="text-xs font-semibold uppercase text-muted-foreground px-1 mb-2">Admin</h3>
+                <Button
+                    variant="ghost"
+                    className="w-full justify-between"
+                    onClick={() => setShowRequestsManager(true)}
+                >
+                    <span className="flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        Creator Requests
+                    </span>
+                    {pendingRequestsCount > 0 && (
+                        <Badge variant="destructive" className="h-5">{pendingRequestsCount}</Badge>
+                    )}
+                </Button>
+              </div>
+            )}
+
             {/* Spacing/padding around Create Event button */}
             <div className="py-2">
               <Button
@@ -208,6 +254,13 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
           </div>
         </div>
       </div>
+      {/* Creator Requests Manager Modal for admins */}
+      {isAdmin && 
+        <CreatorRequestsManager
+            open={showRequestsManager}
+            onClose={() => setShowRequestsManager(false)}
+        />
+      }
       {/* Event Creator Request Modal */}
       <RequestCreatorModal
         open={showRequestCreator}
