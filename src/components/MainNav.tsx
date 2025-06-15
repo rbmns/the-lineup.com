@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -78,7 +79,8 @@ const MainNav = () => {
               <Button
                 size={isMobile ? "sm" : "sm"}
                 onClick={handleRegisterClick}
-                className="btn-ocean text-white text-sm font-medium"
+                // UPDATED: use a solid ocean color background, white text, and accessible hover
+                className="bg-ocean-deep text-white text-sm font-medium hover:bg-seafoam-green focus:bg-seafoam-green focus:ring-2 focus:ring-ocean-deep transition-colors"
               >
                 Sign up
               </Button>
