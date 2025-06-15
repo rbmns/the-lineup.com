@@ -20,6 +20,8 @@ const EVENT_FALLBACK_IMAGES = {
   default: "https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg",
 };
 
+export const DEFAULT_FALLBACK_IMAGE_URL = EVENT_FALLBACK_IMAGES.default;
+
 // Export as DEFAULT_EVENT_IMAGES for compatibility
 export const DEFAULT_EVENT_IMAGES = {
   yoga: "https://raw.githubusercontent.com/rbmns/images/main/lineup/yoga.jpg",

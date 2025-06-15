@@ -7,6 +7,7 @@ import { LineupImage } from "@/components/ui/lineup-image";
 import { formatFeaturedDate, formatEventTime } from "@/utils/date-formatting";
 import { Event } from "@/types";
 import { useEventImages } from "@/hooks/useEventImages";
+import { DEFAULT_FALLBACK_IMAGE_URL } from "@/utils/eventImages";
 
 interface UpcomingEventCardProps {
   event: Event;
@@ -42,17 +43,17 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
       tabIndex={0}
       role="button"
     >
-      <div className="relative w-full h-40 rounded-t-xl overflow-hidden">
+      <div className="relative w-full h-40 rounded-t-xl overflow-hidden transform">
         <LineupImage
-          src={imageUrl || "/img/default.jpg"}
+          src={imageUrl}
           alt={event.title}
           aspectRatio="video"
           className="h-40"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            if (!target.src.includes('/img/default.jpg')) {
+            if (target.src !== DEFAULT_FALLBACK_IMAGE_URL) {
               console.log(`[UpcomingEventCard] Image failed to load: ${target.src}. Falling back to default.`);
-              target.src = "/img/default.jpg";
+              target.src = DEFAULT_FALLBACK_IMAGE_URL;
             }
           }}
         />
