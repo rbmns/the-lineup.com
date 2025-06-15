@@ -84,9 +84,9 @@ const LandingPage = () => {
 
   return (
     <div>
-      {/* HEADER HERO - flush with top nav, no pb-12/pt-8 */}
-      <section className="w-full border-b px-4 sm:px-8 bg-background m-0 p-0"> {/* pb-12/pt-* removed */}
-        <div className="max-w-4xl mx-auto text-left">
+      {/* HEADER HERO - flush with top nav, NO extra top padding or margin */}
+      <section className="w-full border-b px-4 sm:px-8 bg-background pt-0 mt-0">
+        <div className="max-w-4xl mx-auto text-left pt-0 mt-0">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4 mt-0">
             Find events that fit your <span className="font-handwritten text-primary">vibe</span>
           </h1>
@@ -117,3 +117,4 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
+
