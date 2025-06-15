@@ -1,6 +1,3 @@
-
-import { UserProfile as UserProfileType } from './'; // Self-reference for aliasing
-
 export interface Profile {
   id: string;
   username: string;
