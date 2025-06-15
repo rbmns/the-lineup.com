@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,7 +21,7 @@ export const WelcomeMessage = () => {
           Join the flow and discover local events, connect with people around you, and make the most of your experiences.
         </p>
         <div className="flex justify-center">
-          <Button asChild className="bg-black hover:bg-black/90 text-white shadow-md hover:shadow-xl transform transition-all duration-500 hover:-translate-y-1 rounded-lg">
+          <Button asChild variant="dark">
             <Link to="/profile/edit">Complete Your Profile</Link>
           </Button>
         </div>

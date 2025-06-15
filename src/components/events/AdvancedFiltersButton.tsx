@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Filter, ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Popover,
@@ -30,19 +29,15 @@ export const AdvancedFiltersButton: React.FC<AdvancedFiltersButtonProps> = ({
     return (
       <div className={className}>
         <Button 
-          variant={hasActiveFilters ? "default" : "outline"} 
+          variant={hasActiveFilters ? "dark" : "outline"} 
           size="sm"
           onClick={() => onOpen && onOpen(!isOpen)}
-          className={cn(
-            "flex items-center justify-center w-9 h-9 p-0 transition-all duration-200 shadow-sm", 
-            hasActiveFilters ? "bg-slate-800 hover:bg-slate-900 text-white" : 
-            "border-slate-300 text-slate-700 hover:bg-slate-50"
-          )}
+          className={cn("w-9 h-9 p-0")}
         >
           <SlidersHorizontal className="h-4 w-4" />
           <span className="sr-only">Advanced Filters</span>
           {hasActiveFilters && (
-            <span className="absolute top-0 right-0 w-2 h-2 bg-[#9b87f5] rounded-full transform translate-x-1/2 -translate-y-1/3"></span>
+            <span className="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full transform translate-x-1/3 -translate-y-1/3"></span>
           )}
         </Button>
         {isOpen && (
@@ -58,19 +53,17 @@ export const AdvancedFiltersButton: React.FC<AdvancedFiltersButtonProps> = ({
     <Popover open={isOpen} onOpenChange={onOpen}>
       <PopoverTrigger asChild>
         <Button 
-          variant={hasActiveFilters ? "default" : "outline"} 
+          variant={hasActiveFilters ? "dark" : "outline"} 
           size="sm"
           className={cn(
-            "flex items-center justify-center w-9 h-9 p-0 shadow-sm transition-all duration-200", 
-            hasActiveFilters ? "bg-slate-800 hover:bg-slate-900 text-white" : 
-            "border-slate-300 text-slate-700 hover:bg-slate-50",
+            "w-9 h-9 p-0", 
             className
           )}
         >
           <SlidersHorizontal className="h-4 w-4" />
           <span className="sr-only">Advanced Filters</span>
           {hasActiveFilters && (
-            <span className="absolute top-0 right-0 w-2 h-2 bg-[#9b87f5] rounded-full transform translate-x-1/2 -translate-y-1/3"></span>
+            <span className="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full transform translate-x-1/3 -translate-y-1/3"></span>
           )}
         </Button>
       </PopoverTrigger>

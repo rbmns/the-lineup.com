@@ -49,7 +49,7 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
         <DetailsFields register={register} errors={errors} />
         <MetaFields register={register} errors={errors} />
 
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" variant="primary" disabled={isSubmitting}>
           {isSubmitting ? "Submitting..." : isEditMode ? "Update Event" : "Create Event"}
         </Button>
       </form>

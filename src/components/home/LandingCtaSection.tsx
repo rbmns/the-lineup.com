@@ -18,7 +18,7 @@ export const LandingCtaSection: React.FC = () => (
             Explore Events
           </Link>
         </Button>
-        <Button asChild variant="default" size="lg">
+        <Button asChild variant="outline" size="lg">
           <Link to="/profile">
             Create Profile
           </Link>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -242,7 +241,8 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
             <div className="py-2">
               <Button
                 size="sm"
-                className="w-full flex items-center justify-center gap-2 bg-ocean-deep-600 text-white hover:bg-ocean-deep-700 shadow-sm rounded-md py-2 px-4 transition-all"
+                variant="primary"
+                className="w-full"
                 onClick={handleCreateEventClick}
                 disabled={canCreateEvents === null || creatorRequestStatus === null} // Disable while checking roles or request status
               >
