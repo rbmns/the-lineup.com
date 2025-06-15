@@ -1,9 +1,8 @@
 import React from 'react';
-import { brandColors } from '@/components/polymet/brand-colors';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/polymet/button';
+import { Button } from '@/components/ui/button';
 import { Heart, MessageCircle, Share, Bookmark, Download } from 'lucide-react';
 import { typography } from '@/components/polymet/brand-typography';
 import { Logo } from '@/components/polymet/logo';

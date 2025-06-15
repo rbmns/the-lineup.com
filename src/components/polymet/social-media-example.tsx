@@ -1,6 +1,4 @@
-
 import React from 'react';
-import { brandColors } from '@/components/polymet/brand-colors';
 import { Calendar, MapPin } from 'lucide-react';
 
 // Simple Logo component for social media
@@ -12,9 +10,9 @@ const Logo: React.FC<{ className?: string }> = ({ className }) => (
 );
 
 const SocialMediaExample: React.FC = () => {
-  const vibrantColor = brandColors.vibrant?.[500] || '#ec4899';
-  const natureColor = brandColors.nature?.[500] || '#22c55e';
-  const primaryColor = brandColors.primary[500];
+  const vibrantColor = '#ec4899';
+  const natureColor = '#22c55e';
+  const primaryColor = '#0891b2'; // Example primary color
 
   return (
     <div className="space-y-8 p-6">

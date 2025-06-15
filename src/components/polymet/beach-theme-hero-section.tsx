@@ -1,6 +1,5 @@
-
 import { cn } from "@/lib/utils";
-import { BeachThemeButton } from "@/components/polymet/beach-theme-button";
+import { Button } from "@/components/ui/button";
 import { beachLifeColors } from "@/components/polymet/beach-life-color-palette";
 import { SearchIcon, MapPinIcon } from "lucide-react";
 
@@ -52,10 +51,6 @@ export default function BeachThemeHeroSection({
     large: "min-h-[500px] md:min-h-[600px]",
   };
 
-  // Button variants based on hero variant - fixed to use proper types
-  const primaryButtonVariant: "default" | "secondary" | "outline" | "ghost" | "link" | "coral" | "turquoise" | "lime" | "sunset" | "ocean" | "beach" = "beach";
-  const secondaryButtonVariant: "default" | "secondary" | "outline" | "ghost" | "link" | "coral" | "turquoise" | "lime" | "sunset" | "ocean" | "beach" = "outline";
-
   return (
     <div
       className={cn(
@@ -104,25 +99,23 @@ export default function BeachThemeHeroSection({
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <BeachThemeButton
-              variant={primaryButtonVariant}
+            <Button
+              variant="primary"
               size="lg"
-              rounded="full"
               onClick={onExplore}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 rounded-full"
             >
               <SearchIcon size={18} />
               Explore Events
-            </BeachThemeButton>
-            <BeachThemeButton
-              variant={secondaryButtonVariant}
+            </Button>
+            <Button
+              variant="outline"
               size="lg"
-              rounded="full"
               onClick={onCreateProfile}
-              className="bg-white/20 border-white text-white hover:bg-white/30"
+              className="bg-white/20 border-white text-white hover:bg-white/30 rounded-full"
             >
               Create Profile
-            </BeachThemeButton>
+            </Button>
           </div>
 
           {/* Location Indicator */}

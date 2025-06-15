@@ -1,220 +1,93 @@
-
 import React from 'react';
-import { brandColors } from '@/components/polymet/brand-colors';
+import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-interface ColorCardProps {
-  name: string;
-  value: string;
-  textColor?: string;
-}
+const marketingColors = {
+  primary: {
+    '50': '#f0f9ff', '100': '#e0f2fe', '200': '#bae6fd', '300': '#7dd3fc',
+    '400': '#38bdf8', '500': '#0ea5e9', '600': '#0284c7', '700': '#0369a1',
+    '800': '#075985', '900': '#0c4a6e'
+  },
+  secondary: {
+    '50': '#f8fafc', '100': '#f1f5f9', '200': '#e2e8f0', '300': '#cbd5e1',
+    '400': '#94a3b8', '500': '#64748b', '600': '#475569', '700': '#334155',
+    '800': '#1e293b', '900': '#0f172a'
+  },
+  vibrant: {
+    '50': '#fdf2f8', '100': '#fce7f3', '200': '#fbcfe8', '300': '#f9a8d4',
+    '400': '#f472b6', '500': '#ec4899', '600': '#db2777', '700': '#be185d',
+    '800': '#9d174d', '900': '#831843'
+  }
+};
 
-const ColorCard: React.FC<ColorCardProps> = ({ name, value, textColor = 'text-white' }) => (
-  <div 
-    className={`p-4 rounded-lg ${textColor}`}
-    style={{ backgroundColor: value }}
-  >
-    <div className="font-medium">{name}</div>
-    <div className="text-sm opacity-90">{value}</div>
-  </div>
-);
+const ColorSwatch = ({
+  colorName,
+  hex,
+  className,
+}: {
+  colorName: string;
+  hex: string;
+  className?: string;
+}) => {
+  return (
+    <div className={cn("flex flex-col", className)}>
+      <div
+        className="h-16 rounded-md border"
+        style={{ backgroundColor: hex }}
+      />
+      <div className="mt-2 text-sm font-medium">{colorName}</div>
+      <div className="text-xs text-muted-foreground">{hex}</div>
+    </div>
+  );
+};
+
+const ColorPalette = ({
+  title,
+  colors,
+}: {
+  title: string;
+  colors: { [key: string]: string };
+}) => {
+  return (
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold">{title}</h3>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+        {Object.entries(colors).map(([key, value]) => (
+          <ColorSwatch key={key} colorName={key} hex={value} />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const MarketingColorPalette: React.FC = () => {
-  const vibrantColors = brandColors.vibrant || { 500: '#ec4899' };
-  const natureColors = brandColors.nature || { 500: '#22c55e' };
-
-  const colorPalettes = {
-    vibrant: {
-      name: 'Vibrant',
-      colors: vibrantColors
-    },
-    nature: {
-      name: 'Nature', 
-      colors: natureColors
-    }
-  };
-
-  const gradientExamples = [
-    {
-      name: 'Ocean Sunset',
-      gradient: 'linear-gradient(135deg, #0891b2 0%, #f59e0b 100%)',
-      text: 'text-white'
-    },
-    {
-      name: 'Beach Vibes',
-      gradient: 'linear-gradient(135deg, #06b6d4 0%, #84cc16 100%)',
-      text: 'text-white'
-    }
-  ];
-
-  const socialMediaColors = [
-    { 
-      name: 'Instagram Story',
-      bg: brandColors.vibrant?.[500] || '#ec4899',
-      text: 'text-white' 
-    },
-    { 
-      name: 'Facebook Post',
-      bg: brandColors.primary[500],
-      text: 'text-white' 
-    },
-    { 
-      name: 'Twitter Header',
-      bg: brandColors.nature?.[500] || '#22c55e',
-      text: 'text-white' 
-    }
-  ];
-
-  // Type-safe access to brand colors
-  const getPrimaryColorValue = (shade: string): string => {
-    return (brandColors.primary as any)[shade] || '#0891b2';
-  };
-
-  const getSecondaryColorValue = (shade: string): string => {
-    return (brandColors.secondary as any)[shade] || '#f59e0b';
-  };
-
   return (
-    <div className="space-y-8 p-6">
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Marketing Color Palette</h2>
-        <p className="text-gray-600 mb-6">
-          A comprehensive color system for marketing materials and brand applications.
-        </p>
-      </div>
+    <div className="p-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Marketing Color Palette</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-8">
+          <ColorPalette title="Primary Colors (Cool Blues)" colors={marketingColors.primary} />
+          <ColorPalette title="Secondary Colors (Neutral Grays)" colors={marketingColors.secondary} />
+          <ColorPalette title="Vibrant Accent (Energetic Pinks)" colors={marketingColors.vibrant} />
 
-      {/* Primary Colors */}
-      <section>
-        <h3 className="text-xl font-semibold mb-4">Primary Colors</h3>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {Object.entries(brandColors.primary).map(([shade, color]) => (
-            <ColorCard
-              key={shade}
-              name={`Primary ${shade}`}
-              value={color}
-              textColor={['50', '100'].includes(shade) ? 'text-gray-800' : 'text-white'}
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* Secondary Colors */}
-      <section>
-        <h3 className="text-xl font-semibold mb-4">Secondary Colors</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {Object.entries(brandColors.secondary).map(([shade, color]) => (
-            <ColorCard
-              key={shade}
-              name={`Secondary ${shade}`}
-              value={color}
-              textColor={['50', '100'].includes(shade) ? 'text-gray-800' : 'text-white'}
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* Accent Colors */}
-      <section>
-        <h3 className="text-xl font-semibold mb-4">Accent Colors</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {Object.entries(brandColors.accent).map(([name, color]) => (
-            <ColorCard
-              key={name}
-              name={`Accent ${name.charAt(0).toUpperCase() + name.slice(1)}`}
-              value={color}
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* Extended Palette */}
-      <section>
-        <h3 className="text-xl font-semibold mb-4">Extended Palette</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {Object.entries(colorPalettes).map(([key, palette]) => (
-            <div key={key}>
-              <h4 className="text-lg font-medium mb-3">{palette.name}</h4>
-              <div className="grid grid-cols-2 gap-2">
-                {Object.entries(palette.colors).map(([shade, color]) => (
-                  <ColorCard
-                    key={shade}
-                    name={shade}
-                    value={color}
-                    textColor={['50', '100'].includes(shade) ? 'text-gray-800' : 'text-white'}
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Gradient Examples */}
-      <section>
-        <h3 className="text-xl font-semibold mb-4">Gradient Examples</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {gradientExamples.map((example, index) => (
-            <div
-              key={index}
-              className={`p-6 rounded-lg ${example.text}`}
-              style={{ background: example.gradient }}
-            >
-              <h4 className="text-lg font-medium">{example.name}</h4>
-              <p className="text-sm opacity-90">Perfect for hero sections and CTAs</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Social Media Applications */}
-      <section>
-        <h3 className="text-xl font-semibold mb-4">Social Media Applications</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {socialMediaColors.map((item, index) => {
-            const hasGradient = 'gradient' in item;
-            const style = hasGradient 
-              ? { background: (item as any).gradient }
-              : { backgroundColor: (item as any).bg };
-            
-            return (
-              <div
-                key={index}
-                className={`p-6 rounded-lg ${item.text}`}
-                style={style}
-              >
-                <h4 className="text-lg font-medium">{item.name}</h4>
-                <p className="text-sm opacity-90">Optimized for platform visibility</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Usage Guidelines */}
-      <section>
-        <h3 className="text-xl font-semibold mb-4">Usage Guidelines</h3>
-        <div className="bg-gray-50 p-6 rounded-lg">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="font-medium text-green-800 mb-3">Do</h4>
-              <ul className="space-y-2 text-sm">
-                <li>• Use primary colors for main CTAs and navigation</li>
-                <li>• Apply secondary colors for highlights and accents</li>
-                <li>• Maintain sufficient contrast ratios</li>
-                <li>• Use gradients sparingly for hero sections</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-medium text-red-800 mb-3">Don't</h4>
-              <ul className="space-y-2 text-sm">
-                <li>• Mix too many colors in one design</li>
-                <li>• Use light colors on light backgrounds</li>
-                <li>• Override brand colors without approval</li>
-                <li>• Apply gradients to text or small elements</li>
-              </ul>
-            </div>
+          <div className="prose prose-sm max-w-none text-gray-600">
+            <h3 className="text-gray-800">Usage Guidelines</h3>
+            <ul>
+              <li>
+                <strong>Primary:</strong> Use for main UI elements like buttons, links, and active states.
+              </li>
+              <li>
+                <strong>Secondary:</strong> Use for backgrounds, borders, and text.
+              </li>
+              <li>
+                <strong>Vibrant:</strong> Use sparingly for call-to-actions or to highlight key information.
+              </li>
+            </ul>
           </div>
-        </div>
-      </section>
+        </CardContent>
+      </Card>
     </div>
   );
 };

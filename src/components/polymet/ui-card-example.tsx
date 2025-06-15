@@ -1,7 +1,8 @@
 import React from 'react';
-import { brandColors, type BackgroundColor } from '@/components/polymet/brand-colors';
 import { Logo } from '@/components/polymet/logo';
 import { cn } from '@/lib/utils';
+
+type BackgroundColor = '50' | '100' | '200' | '300' | '400' | '500' | '600' | '700' | '800' | '900';
 
 interface UICardExampleProps {
   backgroundColor?: BackgroundColor;

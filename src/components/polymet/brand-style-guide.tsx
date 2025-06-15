@@ -1,23 +1,13 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { brandColors } from '@/components/polymet/brand-colors';
+import { typography } from '@/components/polymet/brand-typography';
+import { Button } from '@/components/ui/button';
+import MarketingColorPalette from './marketing-color-palette';
+import { Logo } from '@/components/polymet/logo';
+import { Palette, Type, Layout, Image as ImageIcon, Zap, Eye, Download, Share2, Heart, Star } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/polymet/button';
-import { 
-  Palette, 
-  Type, 
-  Layout, 
-  Image as ImageIcon, 
-  Zap, 
-  Eye,
-  Download,
-  Share2,
-  Heart,
-  Star
-} from 'lucide-react';
-import { typography } from '@/components/polymet/brand-typography';
 import { WaveIcon } from '@/components/polymet/wave-icon';
 
 export default function BrandStyleGuide() {

@@ -1,72 +1,66 @@
 import React from 'react';
-import { brandColors } from '@/components/polymet/brand-colors';
 import { cn } from '@/lib/utils';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/polymet/button';
-import { Heart, MessageCircle, Share, Bookmark } from 'lucide-react';
-import { typography } from '@/components/polymet/brand-typography';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Heart, MessageCircle, Send, Bookmark } from 'lucide-react';
 import { Logo } from '@/components/polymet/logo';
 
 interface InstagramPostTemplateProps {
-  imageSrc: string;
-  logoSrc?: string;
-  title: string;
-  category: string;
-  description: string;
-  likes: number;
-  comments: number;
-  shares: number;
+  brandName: string;
+  handle: string;
+  content: string;
+  imageUrl: string;
 }
 
 const InstagramPostTemplate: React.FC<InstagramPostTemplateProps> = ({
-  imageSrc,
-  logoSrc,
-  title,
-  category,
-  description,
-  likes,
-  comments,
-  shares,
+  brandName,
+  handle,
+  content,
+  imageUrl,
 }) => {
   return (
     <Card className="w-full max-w-md rounded-xl border-none shadow-md">
-      <div className="relative">
+      <CardHeader className="flex items-center justify-between p-4">
+        <div className="flex items-center space-x-3">
+          <Avatar>
+            <AvatarImage src="/api/placeholder/48/48" alt={brandName} />
+            <AvatarFallback>{brandName.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div>
+            <div className="font-semibold">{brandName}</div>
+            <div className="text-xs text-gray-500">{handle}</div>
+          </div>
+        </div>
+        <div className="text-gray-500">...</div>
+      </CardHeader>
+      <CardContent className="p-0">
         <img
-          src={imageSrc}
-          alt={title}
+          src={imageUrl}
+          alt={content}
           className="aspect-square w-full object-cover"
         />
-        <div className="absolute top-4 left-4">
-          {logoSrc ? (
-            <img src={logoSrc} alt="Logo" className="h-8 w-auto" />
-          ) : (
-            <Logo className="h-8" />
-          )}
-        </div>
-        <Badge className="absolute top-4 right-4 rounded-full">{category}</Badge>
-      </div>
-      <CardContent className="p-4">
-        <h3 className={cn(typography.h3, "mb-2")}>{title}</h3>
-        <p className="text-sm text-primary-75">{description}</p>
-        <div className="mt-4 flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+        <div className="p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="flex space-x-4">
+              <Button variant="ghost" size="icon">
+                <Heart className="h-5 w-5" />
+              </Button>
+              <Button variant="ghost" size="icon">
+                <MessageCircle className="h-5 w-5" />
+              </Button>
+              <Button variant="ghost" size="icon">
+                <Send className="h-5 w-5" />
+              </Button>
+            </div>
             <Button variant="ghost" size="icon">
-              <Heart className="h-5 w-5" />
-              <span className="ml-1 text-sm">{likes}</span>
-            </Button>
-            <Button variant="ghost" size="icon">
-              <MessageCircle className="h-5 w-5" />
-              <span className="ml-1 text-sm">{comments}</span>
-            </Button>
-            <Button variant="ghost" size="icon">
-              <Share className="h-5 w-5" />
-              <span className="ml-1 text-sm">{shares}</span>
+              <Bookmark className="h-5 w-5" />
             </Button>
           </div>
-          <Button variant="ghost" size="icon">
-            <Bookmark className="h-5 w-5" />
-          </Button>
+          <div className="mb-2 text-sm">
+            <span className="font-semibold">{brandName}</span> {content}
+          </div>
+          <div className="text-xs text-gray-500">View all comments</div>
         </div>
       </CardContent>
     </Card>

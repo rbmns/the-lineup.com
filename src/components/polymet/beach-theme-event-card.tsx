@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { BeachThemeCategoryBadge } from "@/components/polymet/beach-theme-category-badge";
-import { BeachThemeButton } from "@/components/polymet/beach-theme-button";
+import { Button } from "@/components/ui/button";
 import { CalendarIcon, MapPinIcon, UserIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -186,24 +186,22 @@ export default function BeachThemeEventCard({
               {/* RSVP Buttons */}
               {showRsvp && (
                 <div className="flex gap-2 mt-3 w-full">
-                  <BeachThemeButton
-                    variant="ocean"
+                  <Button
+                    variant="primary"
                     size="sm"
-                    rounded="full"
+                    className="rounded-full flex-1 font-inter"
                     onClick={handleRsvpGoing}
-                    className="flex-1 font-inter"
                   >
                     Going
-                  </BeachThemeButton>
-                  <BeachThemeButton
+                  </Button>
+                  <Button
                     variant="outline"
                     size="sm"
-                    rounded="full"
+                    className="rounded-full flex-1 border-[#0891B2] text-[#0891B2] font-inter"
                     onClick={handleRsvpInterested}
-                    className="flex-1 border-[#0891B2] text-[#0891B2] font-inter"
                   >
                     Interested
-                  </BeachThemeButton>
+                  </Button>
                 </div>
               )}
             </div>

@@ -1,6 +1,5 @@
-
 import { cn } from "@/lib/utils";
-import { badgeVariants } from "@/components/polymet/color-system";
+import { Badge } from "@/components/ui/badge";
 import {
   MusicIcon,
   SunIcon,
@@ -50,34 +49,6 @@ const categoryIcons = {
   creative: PaintbrushIcon,
 };
 
-// Map category to variant
-const getCategoryVariant = (category: string) => {
-  const lowerCategory = category.toLowerCase();
-
-  if (lowerCategory.includes("community")) return "community";
-  if (lowerCategory.includes("culture") || lowerCategory.includes("art"))
-    return "culture";
-  if (lowerCategory.includes("food")) return "food";
-  if (lowerCategory.includes("market")) return "market";
-  if (lowerCategory.includes("music")) return "music";
-  if (lowerCategory.includes("sport")) return "sports";
-  if (lowerCategory.includes("yoga") || lowerCategory.includes("wellness"))
-    return "yoga";
-  if (lowerCategory.includes("beach")) return "beach";
-  if (lowerCategory.includes("surf")) return "surf";
-  if (lowerCategory.includes("festival")) return "festival";
-  if (lowerCategory.includes("game")) return "game";
-  if (lowerCategory.includes("party")) return "party";
-  if (lowerCategory.includes("kite")) return "kite";
-  if (lowerCategory.includes("chill")) return "chill";
-  if (lowerCategory.includes("active")) return "active";
-  if (lowerCategory.includes("social")) return "social";
-  if (lowerCategory.includes("creative")) return "creative";
-
-  // Default to primary color if no match
-  return "default";
-};
-
 interface CategoryBadgeProps {
   category: string;
   size?: "sm" | "md" | "lg";
@@ -93,7 +64,7 @@ export default function CategoryBadge({
 }: CategoryBadgeProps) {
   // Get the appropriate icon component
   const IconComponent =
-    categoryIcons[category.toLowerCase() as keyof typeof categoryIcons] || categoryIcons.other;
+    categoryIcons[category.toLowerCase() as keyof typeof categoryIcons] || HelpCircleIcon;
 
   // Size classes
   const sizeClasses = {
@@ -106,16 +77,16 @@ export default function CategoryBadge({
   const showIcon = size === "lg";
 
   return (
-    <span
+    <Badge
+      variant="secondary"
       className={cn(
-        badgeVariants({ variant: getCategoryVariant(category) }),
-        sizeClasses[size],
         "inline-flex items-center gap-1",
+        sizeClasses[size],
         className
       )}
     >
       {showIcon && <IconComponent size={14} />}
       {category}
-    </span>
+    </Badge>
   );
 }

@@ -1,24 +1,24 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { brandColors } from '@/components/polymet/brand-colors';
+import { cn } from '@/lib/utils';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Logo } from '@/components/polymet/logo';
 
-interface LogoProps {
-  className?: string;
-  showText?: boolean;
-}
+const BrandLogo: React.FC = () => {
+  const primaryColor = '#0ea5e9'; // Example color
+  const secondaryColor = '#e2e8f0'; // Example color
 
-export const Logo = React.forwardRef<HTMLDivElement, LogoProps>(
-  ({ className = '', showText = true }, ref) => {
-    return (
-      <div ref={ref} className={`flex items-center gap-2 ${className}`}>
-        <Link to="/" className="flex items-center gap-2 group transition-all duration-300">
-          <div className="flex items-center">
-            <span className="text-lg font-medium lowercase text-black">thelineup</span>
-          </div>
-        </Link>
-      </div>
-    );
-  }
-);
+  return (
+    <div className="p-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Brand Logo</CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center">
+          <Logo />
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
 
-Logo.displayName = "Logo";
+export default BrandLogo;

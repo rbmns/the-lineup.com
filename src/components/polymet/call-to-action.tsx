@@ -1,6 +1,6 @@
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/polymet/button";
+import { Button } from "@/components/ui/button";
 
 interface CallToActionProps {
   title: string;

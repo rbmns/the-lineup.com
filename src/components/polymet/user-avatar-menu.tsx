@@ -20,7 +20,7 @@ import {
   Users,
   MessageSquare
 } from 'lucide-react';
-import { Button } from '@/components/polymet/button';
+import { Button } from '@/components/ui/button';
 
 interface UserAvatarMenuProps {
   user: {

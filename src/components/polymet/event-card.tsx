@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Button } from "@/components/polymet/button";
+import { Button } from "@/components/ui/button";
 import CategoryBadge from "@/components/polymet/category-badge";
 import { LineupImage } from "@/components/ui/lineup-image";
 import { DEFAULT_FALLBACK_IMAGE_URL } from "@/utils/eventImages";

@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Button } from "@/components/polymet/button";
+import { Button } from "@/components/ui/button";
 import { UserPlusIcon, CheckIcon, UserIcon } from "lucide-react";
 
 export type FriendRequestStatus = "none" | "pending" | "accepted" | "sent";

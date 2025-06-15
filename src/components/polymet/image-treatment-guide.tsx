@@ -1,82 +1,88 @@
-
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { brandColors, type BackgroundColor } from '@/components/polymet/brand-colors';
-import { Button } from '@/components/polymet/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-interface ImageTreatmentExampleProps {
-  backgroundColor: BackgroundColor;
-  title: string;
-  description: string;
-  imageSrc: string;
-  className?: string;
-}
-
-const ImageTreatmentExample: React.FC<ImageTreatmentExampleProps> = ({
-  backgroundColor,
-  title,
-  description,
-  imageSrc,
-  className,
-}) => {
-  const bgColorClass = `bg-primary-${backgroundColor}`;
-
-  return (
-    <Card className={className}>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="grid gap-4">
-        <div className="aspect-w-16 aspect-h-9 overflow-hidden rounded-md">
-          <img
-            src={imageSrc}
-            alt={title}
-            className="object-cover"
-          />
-        </div>
-        <p className="text-sm text-muted-foreground">{description}</p>
-        <Badge className={bgColorClass}>{backgroundColor}</Badge>
-      </CardContent>
-    </Card>
-  );
-};
-
-interface BadgeProps {
-  className?: string;
-  children: React.ReactNode;
-}
-
-const Badge: React.FC<BadgeProps> = ({ className, children }) => {
-  return (
-    <div className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2", className)}>
-      {children}
-    </div>
-  );
-};
+import { CheckCircle, XCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const ImageTreatmentGuide: React.FC = () => {
+  const primaryColor = '#0891b2'; // Example color
+  const vibrantColor = '#ec4899'; // Example color
+
   return (
-    <section className="container grid items-start gap-6 py-8 md:grid-cols-2 lg:grid-cols-3">
-      <ImageTreatmentExample
-        backgroundColor="500"
-        title="Hero Image"
-        description="Used for main website banners and promotional materials."
-        imageSrc="https://images.unsplash.com/photo-1680269243397-099a9fc9904f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2835&q=80"
-      />
-      <ImageTreatmentExample
-        backgroundColor="600"
-        title="Event Thumbnail"
-        description="Smaller images used in event listings and cards."
-        imageSrc="https://images.unsplash.com/photo-1679759017939-153956a4974c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2787&q=80"
-      />
-      <ImageTreatmentExample
-        backgroundColor="50"
-        title="Profile Avatar"
-        description="Circular images used for user profiles."
-        imageSrc="https://images.unsplash.com/photo-1679692474059-619f5ca95944?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2787&q=80"
-      />
-    </section>
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">Image Treatment Guide</h2>
+      <p className="text-gray-600 mb-6">
+        How to properly treat images to align with our brand.
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Correct Image Treatment */}
+        <div className="space-y-4">
+          <h3 className="text-xl font-semibold mb-2">
+            <CheckCircle className="inline-block h-5 w-5 mr-2 text-green-500 align-text-top" />
+            Do’s
+          </h3>
+          <div className="rounded-lg overflow-hidden shadow-md">
+            <img
+              src="https://source.unsplash.com/random/600x400?beach"
+              alt="Correct Image"
+              className="w-full h-48 object-cover"
+            />
+          </div>
+          <ul className="list-disc list-inside text-gray-700">
+            <li>Use high-resolution images.</li>
+            <li>Ensure images are well-lit and clear.</li>
+            <li>Maintain a consistent color palette.</li>
+            <li>Focus on natural and authentic scenes.</li>
+          </ul>
+        </div>
+
+        {/* Incorrect Image Treatment */}
+        <div className="space-y-4">
+          <h3 className="text-xl font-semibold mb-2">
+            <XCircle className="inline-block h-5 w-5 mr-2 text-red-500 align-text-top" />
+            Don'ts
+          </h3>
+          <div className="rounded-lg overflow-hidden shadow-md">
+            <img
+              src="https://source.unsplash.com/random/600x400?abstract"
+              alt="Incorrect Image"
+              className="w-full h-48 object-cover opacity-70 grayscale"
+            />
+          </div>
+          <ul className="list-disc list-inside text-gray-700">
+            <li>Avoid low-resolution or blurry images.</li>
+            <li>Don't use overly filtered or artificial-looking images.</li>
+            <li>Don't use images that clash with the brand's color palette.</li>
+            <li>Avoid generic stock photos.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold mb-4">Additional Guidelines</h3>
+        <p className="text-gray-600">
+          When selecting images, consider the following:
+        </p>
+        <ul className="list-disc list-inside text-gray-700">
+          <li>
+            <strong>Relevance:</strong> Ensure the image is relevant to the
+            content and target audience.
+          </li>
+          <li>
+            <strong>Composition:</strong> Pay attention to the composition of the
+            image, including the rule of thirds, leading lines, and balance.
+          </li>
+          <li>
+            <strong>Accessibility:</strong> Provide alt text for all images to
+            ensure accessibility for users with visual impairments.
+          </li>
+        </ul>
+      </div>
+
+      <div className="mt-8">
+        <Button>View Image Library</Button>
+      </div>
+    </div>
   );
 };
 
