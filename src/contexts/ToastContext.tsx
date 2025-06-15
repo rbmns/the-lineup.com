@@ -1,6 +1,6 @@
 
 import React, { createContext, ReactNode } from 'react';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster } from '@/components/ui/sonner';
 
 // Simple context implementation that wraps the Toaster component
 type ToastContextType = {
