@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 
 interface CreatorRequestDetails {
@@ -66,5 +65,79 @@ export const CreatorRequestService = {
     }
     
     return { error };
+  },
+
+  async getCreatorRequestsForAdmin(): Promise<{ data: any[] | null; error: any }> {
+    const { data, error } = await supabase
+      .from('admin_notifications')
+      .select('id, created_at, is_read, data')
+      .eq('notification_type', 'creator_request')
+      .order('is_read', { ascending: true })
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching creator requests for admin:', error);
+    }
+    return { data, error };
+  },
+
+  async approveCreatorRequest(userId: string, notificationId: string): Promise<{ error: any }> {
+    // 1. Grant event_creator role
+    const { error: roleError } = await supabase
+      .from('user_roles')
+      .insert({ user_id: userId, role: 'event_creator' });
+
+    if (roleError && roleError.code !== '23505') { // 23505 is unique_violation
+      console.error('Error granting event_creator role:', roleError);
+      return { error: roleError };
+    }
+
+    // 2. Update request status to approved
+    const { error: requestError } = await supabase
+      .from('creator_requests')
+      .update({ status: 'approved' })
+      .eq('user_id', userId);
+
+    if (requestError) {
+      console.error('Error updating creator request status to approved:', requestError);
+      return { error: requestError };
+    }
+
+    // 3. Mark notification as read
+    const { error: notificationError } = await supabase
+      .from('admin_notifications')
+      .update({ is_read: true })
+      .eq('id', notificationId);
+      
+    if (notificationError) {
+        console.error('Error updating notification status:', notificationError);
+    }
+
+    return { error: null };
+  },
+
+  async denyCreatorRequest(userId: string, notificationId: string): Promise<{ error: any }> {
+    // 1. Update request status to denied
+    const { error: requestError } = await supabase
+      .from('creator_requests')
+      .update({ status: 'denied' })
+      .eq('user_id', userId);
+
+    if (requestError) {
+      console.error('Error updating creator request status to denied:', requestError);
+      return { error: requestError };
+    }
+
+    // 2. Mark notification as read
+    const { error: notificationError } = await supabase
+      .from('admin_notifications')
+      .update({ is_read: true })
+      .eq('id', notificationId);
+      
+    if (notificationError) {
+        console.error('Error updating notification status:', notificationError);
+    }
+
+    return { error: null };
   }
 };
