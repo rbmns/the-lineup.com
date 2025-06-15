@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -55,8 +56,10 @@ const LandingPage = () => {
       if (!acc[event.event_category]) acc[event.event_category] = [];
       acc[event.event_category].push(event);
       return acc;
-    }, {} as Record<string, typeof events>);
-    const featured = Object.values(eventsByType).map(typeEvents => typeEvents[0]);
+    }, {} as Record<string, Event[]>);
+
+    const featured = Object.values(eventsByType).map(typeEvents => typeEvents[0]).filter(Boolean) as Event[];
+    
     if (featured.length < 5 && nextWeekEvents.length > 0) {
       const moreEvents = nextWeekEvents.filter(event => !featured.some(f => f.id === event.id)).slice(0, 5 - featured.length);
       return [...featured, ...moreEvents];
