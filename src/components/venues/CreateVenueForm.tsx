@@ -6,24 +6,28 @@ import { CreateVenueSchema, CreateVenueFormValues } from './CreateVenueSchema';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Venue } from '@/types';
 
 interface CreateVenueFormProps {
   onSubmit: (data: CreateVenueFormValues) => Promise<void>;
   isSubmitting: boolean;
+  venue?: Venue | null;
 }
 
-export const CreateVenueForm: React.FC<CreateVenueFormProps> = ({ onSubmit, isSubmitting }) => {
+export const CreateVenueForm: React.FC<CreateVenueFormProps> = ({ onSubmit, isSubmitting, venue }) => {
   const form = useForm<CreateVenueFormValues>({
     resolver: zodResolver(CreateVenueSchema),
     defaultValues: {
-      name: '',
-      city: '',
-      street: '',
-      postal_code: '',
-      website: '',
-      google_maps: '',
+      name: venue?.name || '',
+      city: venue?.city || '',
+      street: venue?.street || '',
+      postal_code: venue?.postal_code || '',
+      website: venue?.website || '',
+      google_maps: venue?.google_maps || '',
     },
   });
+
+  const isEditMode = !!venue;
 
   return (
     <Form {...form}>
@@ -107,7 +111,7 @@ export const CreateVenueForm: React.FC<CreateVenueFormProps> = ({ onSubmit, isSu
           )}
         />
         <Button type="submit" disabled={isSubmitting} className="w-full">
-          {isSubmitting ? 'Creating...' : 'Create Venue'}
+          {isSubmitting ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Venue' : 'Create Venue')}
         </Button>
       </form>
     </Form>
