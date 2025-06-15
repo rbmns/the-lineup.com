@@ -1,4 +1,3 @@
-
 import { format, isValid } from 'date-fns';
 import { SafeEventData } from './EventFormTypes';
 
@@ -107,7 +106,7 @@ export const extractEventValues = (event: any): SafeEventData => {
       organizer_link: event.organizer_link || '',
       fee: typeof event.fee === 'string' ? parseFloat(event.fee) : (event.fee || 0), // Ensure fee is a number
       booking_link: event.booking_link || '',
-      extra_info: event.extra_info || event['Extra info'] || '',
+      extra_info: event.extra_info || '',
       tags: Array.isArray(event.tags) ? event.tags : (typeof event.tags === 'string' ? event.tags.split(',') : []),
       slug: event.slug,
       creator: event.creator,

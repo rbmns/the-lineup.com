@@ -11,7 +11,7 @@ import { Event, Venue } from '@/types';
 import { FormValues } from '@/components/events/form/EventFormTypes';
 import { EventSchema } from '@/components/events/form/EventFormSchema';
 import { processFormData } from '@/components/events/form/EventFormUtils';
-import { fetchEventById, createEvent } from '@/lib/eventService';
+import { fetchEventById, createEvent, updateEvent } from '@/lib/eventService';
 import { useAuth } from '@/contexts/AuthContext';
 import { useVenues } from '@/hooks/useVenues';
 
@@ -102,6 +102,11 @@ export const useEventForm = ({ eventId, isEditMode = false }: UseEventFormProps)
       const processedEventData = processFormData(data, user.id);
       
       if (isEditMode && eventId) {
+        const { error } = await updateEvent(eventId, processedEventData as any);
+        if (error) {
+          console.error("Failed to update event", error);
+          throw error;
+        }
         toast.success('Event updated successfully!');
         await queryClient.invalidateQueries({ queryKey: ['events'] });
         await queryClient.invalidateQueries({ queryKey: ['event-details', eventId] });
