@@ -1,9 +1,10 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Caveat&display=swap');
 
 @layer base {
   :root {
-    /* New Brand Style - Coastal Minimalism */
+    /* Brand Style: Coastal Minimalism */
     --background: 248 249 250; /* #F8F9FA */
     --foreground: 31 31 31; /* #1F1F1F */
 
@@ -16,21 +17,21 @@
     --primary: 0 166 166; /* #00A6A6 */
     --primary-foreground: 255 255 255;
 
-    --secondary: 229 231 235; /* a light gray for secondary elements */
+    --secondary: 229 231 235; /* light gray */
     --secondary-foreground: 31 31 31;
 
     --muted: 229 231 235;
     --muted-foreground: 107 114 128; /* #6B7280 */
 
-    --accent: 248 249 250; /* Using neutral bg as accent */
+    --accent: 248 249 250;
     --accent-foreground: 31 31 31;
 
     --destructive: 255 92 87; /* #FF5C57 */
     --destructive-foreground: 255 255 255;
 
-    --border: 229 231 235; /* Light border */
+    --border: 229 231 235;
     --input: 229 231 235;
-    --ring: 0 166 166; /* #00A6A6 */
+    --ring: 0 166 166;
 
     --radius: 0.75rem;
   }
