@@ -6,7 +6,7 @@ import { typography } from "@/components/polymet/brand-typography";
  * A wide, modern home page hero section, matching events page style.
  */
 const HomePageHeaderSection = () => (
-  <section className="w-full gradient-sky relative m-0 pb-10 pt-[61px] px-[20px] overflow-visible">
+  <section className="w-full gradient-sky relative m-0 pb-16 pt-[61px] px-[20px] overflow-visible">
     {/* Subtle overlay for depth */}
     <div className="absolute inset-0 bg-black/10 pointer-events-none" />
     <div className="relative w-full flex flex-col items-center text-center text-white min-h-[290px]">
@@ -22,3 +22,4 @@ const HomePageHeaderSection = () => (
 );
 
 export default HomePageHeaderSection;
+
