@@ -7,12 +7,15 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { UserCreatedEvents } from '@/components/profile/UserCreatedEvents';
 import { UserRsvpedEvents } from '@/components/profile/UserRsvpedEvents';
 import { cn } from '@/lib/utils';
+import { useAdminData } from '@/hooks/useAdminData';
+import { CreatorRequestsDashboard } from '@/components/admin/CreatorRequestsDashboard';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
-  const [activeTab, setActiveTab] = useState<'rsvps' | 'created'>('rsvps');
+  const [activeTab, setActiveTab] = useState<'rsvps' | 'created' | 'admin'>('rsvps');
 
   const {
     profile,
@@ -20,6 +23,8 @@ const ProfilePage: React.FC = () => {
     error,
     isNotFound
   } = useProfileData(user?.id);
+  
+  const { isAdmin, requests, isLoading: isAdminLoading } = useAdminData();
 
   // Redirect to login if not authenticated
   React.useEffect(() => {
@@ -85,11 +90,29 @@ const ProfilePage: React.FC = () => {
                         My Created Events
                     </button>
                 )}
+                {isAdmin && (
+                  <button
+                    onClick={() => setActiveTab('admin')}
+                    className={cn(tabStyle, activeTab === 'admin' ? activeTabStyle : inactiveTabStyle)}
+                  >
+                    Creator Requests
+                  </button>
+                )}
             </nav>
         </div>
         <div className="mt-8">
-            {activeTab === 'rsvps' && <UserRsvpedEvents userId={user.id} isCurrentUser />}
+            {activeTab === 'rsvps' && <UserRsvpedEvents userId={user.id} />}
             {activeTab === 'created' && isCreator && <UserCreatedEvents />}
+            {activeTab === 'admin' && isAdmin && (
+              isAdminLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-48 w-full rounded-lg" />
+                  <Skeleton className="h-48 w-full rounded-lg" />
+                </div>
+              ) : (
+                <CreatorRequestsDashboard requests={requests || []} />
+              )
+            )}
         </div>
       </div>
     </>
