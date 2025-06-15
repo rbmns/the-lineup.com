@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import PolymetEventCard from '@/components/polymet/event-card';
@@ -16,7 +15,9 @@ const mapEventToPolymetCard = (event: Event) => ({
     ? {
         id: event.creator.id,
         name: event.creator.username || event.creator.email || "Host",
-        avatar: event.creator.avatar_url,
+        avatar: Array.isArray(event.creator.avatar_url)
+          ? event.creator.avatar_url[0]
+          : event.creator.avatar_url,
       }
     : undefined,
   location: event.venues?.name || event.location || "",
@@ -114,4 +115,3 @@ export const EventGrid: React.FC<EventGridProps> = ({
     </div>
   );
 };
-
