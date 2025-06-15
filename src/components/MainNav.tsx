@@ -79,8 +79,8 @@ const MainNav = () => {
               <Button
                 size={isMobile ? "sm" : "sm"}
                 onClick={handleRegisterClick}
-                // UPDATED: use a solid ocean color background, white text, and accessible hover
-                className="bg-ocean-deep text-white text-sm font-medium hover:bg-seafoam-green focus:bg-seafoam-green focus:ring-2 focus:ring-ocean-deep transition-colors"
+                // Use a light background and make text black for readability
+                className="bg-ocean-deep text-black text-sm font-medium hover:bg-seafoam-green hover:text-ocean-deep focus:bg-seafoam-green focus:text-ocean-deep focus:ring-2 focus:ring-ocean-deep transition-colors"
               >
                 Sign up
               </Button>
@@ -93,3 +93,4 @@ const MainNav = () => {
 };
 
 export default MainNav;
+
