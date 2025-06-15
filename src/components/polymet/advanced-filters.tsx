@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { CalendarIcon, ChevronsUpDown, Search } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
+import { DateRange } from 'react-day-picker';
 
 interface AdvancedFiltersProps {
   onFilterChange: (filters: any) => void;
@@ -59,7 +60,8 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
     );
   };
 
-  const handleDateChange = (newDate: Date | undefined) => {
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    const newDate = range?.from;
     setDate(newDate);
     setDateFilter(newDate ? 'Custom Date' : 'Any Date');
   };
@@ -214,7 +216,10 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                   </PopoverContent>
                 </Popover>
                 {dateFilter === 'Any Date' && (
-                  <DateRangePicker selected={date} onSelect={handleDateChange} />
+                  <DateRangePicker
+                    value={date ? { from: date } : undefined}
+                    onChange={handleDateRangeChange}
+                  />
                 )}
               </div>
             </div>
