@@ -72,8 +72,8 @@ export const EventCard: React.FC<EventCardProps> = ({
         
         {/* Date & Time - Prominent and lined up */}
         {event.start_date && (
-          <div className="flex items-center text-ocean-deep-700 font-medium gap-2 mb-1 mt-0.5 w-full text-left font-inter">
-            <Calendar className={`flex-shrink-0 ${compact ? 'h-4 w-4' : 'h-5 w-5'}`} />
+          <div className="flex items-start text-ocean-deep-700 font-medium gap-2 mb-1 mt-0.5 w-full text-left font-inter">
+            <Calendar className={`flex-shrink-0 ${compact ? 'h-4 w-4' : 'h-5 w-5'} mt-px`} />
             <span className={`${compact ? 'text-xs' : 'text-sm'} font-medium`}>
               {formatDate(event.start_date)}
               {event.start_time && (
