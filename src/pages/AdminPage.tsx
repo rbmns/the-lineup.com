@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAdminData } from '@/hooks/useAdminData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,7 +26,7 @@ const AdminPage = () => {
       <div className="container mx-auto py-10 text-center">
         <PageHeader
             title="Access Denied"
-            subtitle="You do not have permission to view this page."
+            description="You do not have permission to view this page."
         />
       </div>
     );
@@ -35,7 +36,7 @@ const AdminPage = () => {
     <div className="container mx-auto py-10">
         <PageHeader
             title="Admin Dashboard"
-            subtitle="Review and manage events and venues."
+            description="Review and manage events and venues."
         />
       <Tabs defaultValue="events" className="mt-6">
         <TabsList>

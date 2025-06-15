@@ -57,6 +57,7 @@ export interface Event {
   vibe?: string | null;
   destination?: string;
   organiser_name?: string | null;
+  status: 'draft' | 'pending_approval' | 'published' | 'rejected';
   rsvp_status?: 'Going' | 'Interested' | null;
   rsvp_count?: number;
   going_count?: number;
