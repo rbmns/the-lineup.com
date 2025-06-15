@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -114,7 +113,8 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
           description="Sign up or log in to create and share your own events!"
           browseEventsButton={true}
         >
-          {/* We can pass in children or background here if wanted */}
+          {/* Passing empty fragment as required `children` prop */}
+          <></>
         </AuthOverlay>
       )}
     </>
