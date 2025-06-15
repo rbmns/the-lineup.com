@@ -7,6 +7,7 @@ import { useEventDetails } from '@/hooks/useEventDetails';
 import { useCreatorStatus } from '@/hooks/useCreatorStatus';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { BackButton } from '@/components/profile/BackButton';
 
 const EditEvent = () => {
   const { eventId } = useParams<{ eventId: string }>();
@@ -49,7 +50,8 @@ const EditEvent = () => {
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="mb-8">
+        <BackButton defaultPath="/profile" />
+        <div className="mb-8 mt-4">
           <h1 className="text-4xl font-bold tracking-tight mb-2">Edit Event</h1>
           <p className="text-xl text-muted-foreground leading-relaxed">
             Loading event details...
@@ -73,7 +75,8 @@ const EditEvent = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="mb-8">
+      <BackButton defaultPath="/profile" />
+      <div className="mb-8 mt-4">
         <h1 className="text-4xl font-bold tracking-tight mb-2">Edit Event</h1>
         <p className="text-xl text-muted-foreground leading-relaxed">
           Update your event details and information.
