@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, SubmitHandler } from 'react-hook-form';
@@ -124,19 +123,13 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
         return;
       } else {
         // Create new event
-        const { data: newEvent, error } = await createEvent(eventData as any);
+        const { error } = await createEvent(eventData as any);
         if (error) {
           throw error;
         }
         
         toast.success('Event created successfully!');
-
-        if (newEvent?.id) {
-          navigate(`/events/${newEvent.id}`);
-        } else {
-          console.warn('Event created, but ID was not returned. This could be due to RLS policies. Redirecting to events list.');
-          navigate('/events');
-        }
+        navigate('/events');
       }
     } catch (error) {
       console.error("Form submission error", error);
