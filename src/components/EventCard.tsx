@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { LineupImage } from '@/components/ui/lineup-image';
-import { MapPin, Calendar, Clock } from 'lucide-react';
+import { MapPin, Calendar } from 'lucide-react';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
 import { useEventImages } from '@/hooks/useEventImages';
 import { Event } from '@/types';
@@ -59,72 +59,77 @@ export const EventCard: React.FC<EventCardProps> = ({
               category={event.event_category} 
               active={true}
               noBorder={true}
+              size="sm"
             />
           </div>
         )}
       </div>
       
-      <CardContent className={`${compact ? 'p-3' : 'p-4 sm:p-5'} flex-1 flex flex-col`}>
-        <h3 className={`font-semibold mb-3 line-clamp-2 text-ocean-deep group-hover:text-seafoam-green transition-colors ${compact ? 'text-sm' : ''}`}>
+      <CardContent className={`${compact ? 'p-3' : 'p-5'} flex-1 flex flex-col`}>
+        {/* Title */}
+        <h3 className={`font-semibold text-ocean-deep group-hover:text-seafoam-green transition-colors ${compact ? 'text-base mb-1 mt-1' : 'text-xl mb-2 mt-1'} line-clamp-2`}>
           {event.title}
         </h3>
         
-        <div className={`space-y-2 text-clay-earth ${compact ? 'text-xs' : 'text-sm'}`}>
-          {event.start_date && (
-            <div className="flex items-center">
-              <Calendar className={`mr-2 flex-shrink-0 ${compact ? 'h-3 w-3' : 'h-4 w-4'}`} />
-              <span>
-                {formatDate(event.start_date)}
-                {event.start_time && ` • ${formatEventTime(event.start_time, event.end_time)}`}
-              </span>
-            </div>
-          )}
-          
-          {(event.venues?.name || event.location) && (
-            <div className="flex items-center">
-              <MapPin className={`mr-2 flex-shrink-0 ${compact ? 'h-3 w-3' : 'h-4 w-4'}`} />
-              <span className="line-clamp-1">
-                {event.venues?.name || event.location}
-              </span>
-            </div>
-          )}
-        </div>
+        {/* Date & Time - Prominent and lined up */}
+        {event.start_date && (
+          <div className="flex items-center text-slate-800 font-medium gap-2 mb-1 mt-0.5">
+            <Calendar className={`flex-shrink-0 ${compact ? 'h-4 w-4' : 'h-5 w-5'}`} />
+            <span className={`${compact ? 'text-xs' : 'text-base'} font-medium`}>
+              {formatDate(event.start_date)}
+              {event.start_time && (
+                <>
+                  <span className="mx-1 text-slate-400 font-normal">•</span>
+                  {formatEventTime(event.start_time, event.end_time)}
+                </>
+              )}
+            </span>
+          </div>
+        )}
 
-        {/* RSVP Buttons - only show if authenticated and enabled */}
+        {/* Location */}
+        {(event.venues?.name || event.location) && (
+          <div className="flex items-center text-slate-600 gap-2 mb-2 mt-1">
+            <MapPin className={`flex-shrink-0 ${compact ? 'h-4 w-4' : 'h-5 w-5'}`} />
+            <span className={`truncate ${compact ? 'text-xs' : 'text-sm'} font-normal`}>
+              {event.venues?.name || event.location}
+            </span>
+          </div>
+        )}
+
+        {/* RSVP Buttons */}
         {showRsvpButtons && onRsvp && (
-          <div className="mt-auto pt-3">
-            <div className="flex gap-2">
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onRsvp(event.id, 'Going');
-                }}
-                disabled={loadingEventId === event.id}
-                className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                  event.rsvp_status === 'Going'
-                    ? 'bg-seafoam-green text-white'
-                    : 'bg-sand text-ocean-deep hover:bg-seafoam-green hover:text-white'
-                }`}
-              >
-                Going
-              </button>
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  onRsvp(event.id, 'Interested');
-                }}
-                disabled={loadingEventId === event.id}
-                className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                  event.rsvp_status === 'Interested'
-                    ? 'bg-sky-blue text-white'
-                    : 'bg-sand text-ocean-deep hover:bg-sky-blue hover:text-white'
-                }`}
-              >
-                Interested
-              </button>
-            </div>
+          <div className="mt-auto pt-3 flex gap-2">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onRsvp(event.id, 'Going');
+              }}
+              disabled={loadingEventId === event.id}
+              className={`flex-1 px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                event.rsvp_status === 'Going'
+                  ? 'bg-seafoam-green text-white'
+                  : 'bg-sand text-ocean-deep hover:bg-seafoam-green hover:text-white'
+              }`}
+            >
+              Going
+            </button>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onRsvp(event.id, 'Interested');
+              }}
+              disabled={loadingEventId === event.id}
+              className={`flex-1 px-3 py-1.5 text-xs font-semibold rounded-md transition-colors ${
+                event.rsvp_status === 'Interested'
+                  ? 'bg-sky-blue text-white'
+                  : 'bg-sand text-ocean-deep hover:bg-sky-blue hover:text-white'
+              }`}
+            >
+              Interested
+            </button>
           </div>
         )}
       </CardContent>
@@ -145,3 +150,4 @@ export const EventCard: React.FC<EventCardProps> = ({
     </Link>
   );
 };
+
