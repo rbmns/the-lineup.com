@@ -45,28 +45,32 @@ const Layout = () => {
           </div>
         )}
 
-        {/* Main Content Area with zoning */}
+        {/* Main Content Area with best-practice zoning and revealed gradient */}
         <div
           className={`flex-1 w-full min-h-screen main-feed-gradient ${
             isMobile
-              ? 'pt-14 pb-20'
+              ? 'pt-16 pb-24 px-2'
               : rightSidebarVisible
-                ? 'pt-14 pl-20 pr-56'
-                : 'pt-14 pl-20'
-          }`}
+                ? 'pt-16 pl-24 pr-64 px-2'
+                : 'pt-16 pl-24 px-2'
+          } flex flex-col`}
           style={
             !isMobile
               ? {
-                  paddingTop: TOP_NAV_HEIGHT,
-                  paddingLeft: LEFT_SIDEBAR_WIDTH,
-                  paddingRight: rightSidebarVisible ? RIGHT_SIDEBAR_WIDTH : 0,
+                  paddingTop: TOP_NAV_HEIGHT + 24,
+                  paddingLeft: LEFT_SIDEBAR_WIDTH + 16,
+                  paddingRight: rightSidebarVisible ? (RIGHT_SIDEBAR_WIDTH + 16) : 16,
                   minHeight: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
+                  boxSizing: 'border-box',
                 }
-              : undefined
+              : { }
           }
         >
-          <main className="main-feed-gradient w-full min-h-full">
-            <Outlet />
+          <main className="main-feed-gradient w-full min-h-full max-w-3xl mx-auto flex-1 flex flex-col">
+            {/* Give vertical space on top/bottom, so the card isn't against edge */}
+            <div className="flex-1 flex flex-col justify-center py-4">
+              <Outlet />
+            </div>
           </main>
           {/* Footer - Desktop only */}
           {!isMobile && <Footer />}
