@@ -1,3 +1,4 @@
+
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { CalendarIcon, MapPinIcon, UserIcon } from "lucide-react";
@@ -85,7 +86,7 @@ export default function BohemianEventCard({
       <Link
         to={`/events/${id}`}
         className={cn(
-          "group block rounded-lg overflow-hidden shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md font-inter",
+          "group block rounded-xl overflow-hidden shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg font-inter",
           className
         )}
       >
@@ -117,7 +118,7 @@ export default function BohemianEventCard({
       <Link
         to={`/events/${id}`}
         className={cn(
-          "group block rounded-lg overflow-hidden border border-secondary-medium bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md font-inter",
+          "group block rounded-xl overflow-hidden border border-secondary-medium bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg font-inter",
           className
         )}
       >
@@ -203,7 +204,7 @@ export default function BohemianEventCard({
     <Link
       to={`/events/${id}`}
       className={cn(
-        "group block rounded-lg overflow-hidden border border-secondary-medium bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md font-inter",
+        "group block rounded-xl overflow-hidden border border-secondary-medium bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-lg font-inter",
         className
       )}
     >

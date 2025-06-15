@@ -3,6 +3,7 @@ import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin, Users } from 'lucide-react';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
+import { Card } from '@/components/ui/card';
 
 interface ProfileEventCardProps {
   event: Event;
@@ -18,8 +19,8 @@ export const ProfileEventCard: React.FC<ProfileEventCardProps> = ({ event }) => 
   };
 
   return (
-    <div 
-      className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+    <Card 
+      className="p-4 hover:bg-gray-50 hover:shadow-lg transition-all cursor-pointer"
       onClick={handleClick}
     >
       <div className="flex items-start space-x-4">
@@ -70,6 +71,6 @@ export const ProfileEventCard: React.FC<ProfileEventCardProps> = ({ event }) => 
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 };

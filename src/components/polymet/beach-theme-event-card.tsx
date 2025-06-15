@@ -1,3 +1,4 @@
+
 import { cn } from "@/lib/utils";
 import { BeachThemeCategoryBadge } from "@/components/polymet/beach-theme-category-badge";
 import { Button } from "@/components/ui/button";
@@ -70,7 +71,7 @@ export default function BeachThemeEventCard({
     <Link
       to={`/events/${id}`}
       className={cn(
-        "group block overflow-hidden rounded-lg transition-all duration-300 hover:shadow-md font-inter",
+        "group block overflow-hidden rounded-xl shadow-md transition-all duration-300 hover:shadow-lg font-inter",
         isFeatured ? "bg-white" : "",
         className
       )}

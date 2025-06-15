@@ -42,7 +42,7 @@ export const EventCard: React.FC<EventCardProps> = ({
   };
 
   const cardContent = (
-    <div className={`card-coastal overflow-hidden h-full flex flex-col group hover:scale-105 transition-all duration-300 ${className}`}>
+    <Card className={`overflow-hidden h-full flex flex-col group hover:scale-105 hover:shadow-lg transition-all duration-300 ${className}`}>
       <div className="relative">
         <LineupImage
           src={eventImage}
@@ -131,7 +131,7 @@ export const EventCard: React.FC<EventCardProps> = ({
           </div>
         )}
       </CardContent>
-    </div>
+    </Card>
   );
 
   if (onClick) {

@@ -84,7 +84,7 @@ export default function EventCard({
   return (
     <Link
       to={eventUrl}
-      className={`group flex h-full flex-col overflow-hidden rounded-lg border border-secondary-50 bg-white shadow-sm transition-shadow hover:shadow-md font-inter ${className}`}
+      className={`group flex h-full flex-col overflow-hidden rounded-xl border border-secondary-50 bg-white shadow-md transition-shadow hover:shadow-lg font-inter ${className}`}
     >
       {/* Image */}
       <div className="relative aspect-[16/9] w-full overflow-hidden">

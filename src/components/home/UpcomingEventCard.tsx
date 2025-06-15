@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Calendar, MapPin, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -8,6 +7,7 @@ import { formatFeaturedDate, formatEventTime } from "@/utils/date-formatting";
 import { Event } from "@/types";
 import { useEventImages } from "@/hooks/useEventImages";
 import { DEFAULT_FALLBACK_IMAGE_URL } from "@/utils/eventImages";
+import { Card } from "@/components/ui/card";
 
 interface UpcomingEventCardProps {
   event: Event;
@@ -33,10 +33,9 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
   };
 
   return (
-    <div
+    <Card
       className={cn(
-        // Ensure card is rounded-xl, shadowed, white, and left-aligned
-        "group bg-white rounded-xl border border-gray-200 shadow-md hover:shadow-lg transition-shadow flex flex-col max-w-xs w-[265px] cursor-pointer overflow-hidden",
+        "group hover:shadow-lg transition-shadow flex flex-col max-w-xs w-[265px] cursor-pointer overflow-hidden",
         className
       )}
       onClick={handleClick}
@@ -90,7 +89,7 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
           </div>
         ) : null}
       </div>
-    </div>
+    </Card>
   );
 };
 

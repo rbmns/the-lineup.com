@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin } from 'lucide-react';
@@ -10,6 +11,7 @@ import { toast } from '@/hooks/use-toast';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
 import { LineupImage } from '@/components/ui/lineup-image';
 import { useAuth } from '@/contexts/AuthContext';
+import { Card } from '@/components/ui/card';
 
 interface EventCardListProps {
   event: Event;
@@ -92,9 +94,9 @@ const EventCardList: React.FC<EventCardListProps> = ({
 
   return (
     <div className={cn("w-full px-4 sm:px-6 lg:px-8", className)}>
-      <div 
+      <Card 
         className={cn(
-          "flex flex-col sm:flex-row gap-4 sm:h-24 bg-white rounded-lg shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden text-left",
+          "flex flex-col sm:flex-row gap-4 sm:h-24 hover:shadow-lg transition-all cursor-pointer overflow-hidden text-left",
           className
         )}
         onClick={handleClick}
@@ -177,7 +179,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
             )}
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
