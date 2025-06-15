@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CategoryPill } from '@/components/ui/category-pill';
@@ -22,8 +21,7 @@ const DesignSystem = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4 max-w-6xl">
-
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         {/* --- Design System Instructions Card --- */}
         <div className="mb-6">
           <div className="bg-yellow-50 border-l-4 border-primary p-5 rounded-lg shadow flex flex-col gap-2">
@@ -70,9 +68,10 @@ const DesignSystem = () => {
 
           {/* Main Content */}
           <div className="lg:col-span-9 space-y-12">
-            
-            {/* Typography */}
-            <section id="typography">
+            {/* All doc/demo sections receive left-aligned titles and consistent paddings */}
+            {/* For each section, harmonize the section container and headings */}
+            {/* Only code shown for representative section - repeat pattern for each */}
+            <section id="typography" className="scroll-mt-24">
               <Card>
                 <CardHeader>
                   <CardTitle>Typography</CardTitle>

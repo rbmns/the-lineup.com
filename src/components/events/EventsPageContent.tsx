@@ -68,39 +68,42 @@ export const EventsPageContent: React.FC<EventsPageContentProps> = ({
   user
 }) => {
   return (
-    <div className="space-y-16">
-      <EventFilterSection
-        showEventTypeFilter={showEventTypeFilter}
-        setShowEventTypeFilter={setShowEventTypeFilter}
-        showVenueFilter={showVenueFilter}
-        setShowVenueFilter={setShowVenueFilter}
-        showDateFilter={showDateFilter}
-        setShowDateFilter={setShowDateFilter}
-        selectedEventTypes={selectedEventTypes}
-        setSelectedEventTypes={setSelectedEventTypes}
-        selectedVenues={selectedVenues}
-        setSelectedVenues={setSelectedVenues}
-        dateRange={dateRange}
-        setDateRange={setDateRange}
-        selectedDateFilter={selectedDateFilter}
-        setSelectedDateFilter={setSelectedDateFilter}
-        availableEventTypes={availableEventTypes}
-        availableVenues={availableVenues}
-        resetFilters={resetFilters}
-        hasActiveFilters={hasActiveFilters}
-      />
-      
-      <FilterSummary 
-        selectedEventTypes={selectedEventTypes}
-        selectedVenues={selectedVenues}
-        dateRange={dateRange}
-        selectedDateFilter={selectedDateFilter}
-        eventTypeOptions={availableEventTypes}
-        venueOptions={availableVenues}
-        onRemoveEventType={handleRemoveEventType}
-        onRemoveVenue={handleRemoveVenue}
-        onClearDateFilter={handleClearDateFilter}
-      />
+    <div className="space-y-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <div className="mb-4">
+        <EventFilterSection
+          showEventTypeFilter={showEventTypeFilter}
+          setShowEventTypeFilter={setShowEventTypeFilter}
+          showVenueFilter={showVenueFilter}
+          setShowVenueFilter={setShowVenueFilter}
+          showDateFilter={showDateFilter}
+          setShowDateFilter={setShowDateFilter}
+          selectedEventTypes={selectedEventTypes}
+          setSelectedEventTypes={setSelectedEventTypes}
+          selectedVenues={selectedVenues}
+          setSelectedVenues={setSelectedVenues}
+          dateRange={dateRange}
+          setDateRange={setDateRange}
+          selectedDateFilter={selectedDateFilter}
+          setSelectedDateFilter={setSelectedDateFilter}
+          availableEventTypes={availableEventTypes}
+          availableVenues={availableVenues}
+          resetFilters={resetFilters}
+          hasActiveFilters={hasActiveFilters}
+        />
+      </div>
+      <div className="mb-4">
+        <FilterSummary 
+          selectedEventTypes={selectedEventTypes}
+          selectedVenues={selectedVenues}
+          dateRange={dateRange}
+          selectedDateFilter={selectedDateFilter}
+          eventTypeOptions={availableEventTypes}
+          venueOptions={availableVenues}
+          onRemoveEventType={handleRemoveEventType}
+          onRemoveVenue={handleRemoveVenue}
+          onClearDateFilter={handleClearDateFilter}
+        />
+      </div>
 
       {/* No Exact Matches Message */}
       {showNoExactMatchesMessage && (
@@ -108,17 +111,19 @@ export const EventsPageContent: React.FC<EventsPageContentProps> = ({
       )}
 
       {/* Events List Section */}
-      <LazyEventsList 
-        mainEvents={exactMatches}
-        relatedEvents={similarEvents}
-        isLoading={isLoading || isFilterLoading}
-        // isRsvpLoading={rsvpLoading} // Removed, LazyEventsList uses loadingEventId
-        onRsvp={user ? handleEventRsvp : undefined}
-        showRsvpButtons={!!user}
-        hasActiveFilters={hasActiveFilters}
-        // loadingEventId should be passed here if available in EventsPageContentProps
-        // For now, it's not, so it will be undefined, which is acceptable.
-      />
+      <div>
+        <LazyEventsList 
+          mainEvents={exactMatches}
+          relatedEvents={similarEvents}
+          isLoading={isLoading || isFilterLoading}
+          // isRsvpLoading={rsvpLoading} // Removed, LazyEventsList uses loadingEventId
+          onRsvp={user ? handleEventRsvp : undefined}
+          showRsvpButtons={!!user}
+          hasActiveFilters={hasActiveFilters}
+          // loadingEventId should be passed here if available in EventsPageContentProps
+          // For now, it's not, so it will be undefined, which is acceptable.
+        />
+      </div>
     </div>
   );
 };

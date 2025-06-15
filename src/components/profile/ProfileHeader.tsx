@@ -37,7 +37,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   };
   
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 px-4 sm:px-6 lg:px-8">
       {showAvatar && (
         <div className="flex justify-center">
           <ProfileAvatar profile={profile} size="xl" className="w-32 h-32 border-4 border-white/20" />
