@@ -17,9 +17,8 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
 }) => {
   const { user } = useAuth();
 
-  // If sidebar is not visible, render the toggle to bring it back (outside of the sidebar container)
+  // When NOT visible, render the toggle button to re-open sidebar (fixed to right)
   if (!visible) {
-    // Make sure the toggle is fixed to the right edge of the viewport and always visible
     return (
       <div className="fixed right-0 top-1/2 transform -translate-y-1/2 z-50">
         <SidebarToggle visible={false} onToggle={onToggleVisibility} />
@@ -29,8 +28,10 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
 
   return (
     <div className="h-full w-56 bg-white border-l border-gray-200 shadow-lg overflow-y-auto relative">
-      {/* Render the toggle to collapse the sidebar */}
-      <SidebarToggle visible={true} onToggle={onToggleVisibility} />
+      {/* Toggle to collapse: always visible when sidebar is open, on the left edge */}
+      <div className="absolute -left-8 top-1/2 transform -translate-y-1/2 z-50">
+        <SidebarToggle visible={true} onToggle={onToggleVisibility} />
+      </div>
 
       <div className="p-4 space-y-4">
         <SocialHeader />
