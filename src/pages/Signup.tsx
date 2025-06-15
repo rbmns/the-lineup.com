@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import SignupForm from '@/components/auth/SignupForm';
 
@@ -20,14 +20,6 @@ const Signup = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <SignupForm onToggleMode={() => navigate('/login')} />
-          <div className="text-center mt-4">
-            <p className="text-sm text-gray-500">
-              Already have an account?{' '}
-              <Link to="/login" className="text-blue-600 hover:text-blue-800 font-medium">
-                Sign in
-              </Link>
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>
