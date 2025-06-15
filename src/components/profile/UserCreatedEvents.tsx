@@ -67,7 +67,7 @@ export const UserCreatedEvents: React.FC = () => {
                     </div>
                     <div className="flex gap-2 self-end sm:self-center">
                         <Button asChild variant="outline" size="sm">
-                            <Link to={`/events/edit/${event.id}`}>Edit</Link>
+                            <Link to={`/events/${event.id}/edit`}>Edit</Link>
                         </Button>
                         <Button variant="destructive" size="sm" onClick={() => handleDelete(event.id)}>
                             Delete

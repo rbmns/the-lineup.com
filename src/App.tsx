@@ -1,3 +1,4 @@
+
 import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { HelmetProvider } from 'react-helmet-async';
@@ -8,6 +9,7 @@ import LandingPage from '@/pages/LandingPage';
 import Events from '@/pages/Events';
 import EventDetail from '@/pages/EventDetail';
 import CreateEvent from '@/pages/events/create';
+import EditEvent from '@/pages/events/EditEventPage';
 import CasualPlans from '@/pages/CasualPlans';
 import Friends from '@/pages/Friends';
 import ProfilePage from '@/pages/ProfilePage';
@@ -36,6 +38,7 @@ function App() {
                 <Route path="events" element={<Events />} />
                 <Route path="events/create" element={<CreateEvent />} />
                 <Route path="events/:id" element={<EventDetail />} />
+                <Route path="events/:eventId/edit" element={<EditEvent />} />
                 <Route path="casual-plans" element={<CasualPlans />} />
                 <Route path="friends" element={<Friends />} />
                 <Route path="profile" element={<ProfilePage />} />
