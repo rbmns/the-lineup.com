@@ -2,7 +2,7 @@
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { processEventsData } from '@/utils/eventProcessorUtils';
-import { filterEventsByTime, shouldShowEvent } from '@/utils/eventTimeFiltering';
+import { isUpcomingEvent, filterUpcomingEvents } from '@/utils/date-filtering';
 import { AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
 
 /**
@@ -37,7 +37,7 @@ export const fetchEventById = async (eventId: string, userId: string | undefined
     const event = processedEvents[0] || null;
     
     // Check if event should still be visible based on timing rules
-    if (event && !shouldShowEvent(event)) {
+    if (event && !isUpcomingEvent(event)) {
       console.log(`Event ${eventId} is no longer visible due to timing rules`);
       return null;
     }
@@ -230,7 +230,7 @@ export const fetchSimilarEvents = async (
 
     // Process events data and apply time-based filtering
     const processedEvents = processEventsData(data, userId);
-    const filteredEvents = filterEventsByTime(processedEvents);
+    const filteredEvents = filterUpcomingEvents(processedEvents);
     
     return filteredEvents.slice(0, minResults);
 
@@ -277,7 +277,7 @@ export const searchEvents = async (query: string, userId: string | undefined = u
     const processedEvents = processEventsData(data, userId);
     
     // Apply time-based filtering to show only relevant events
-    const filteredEvents = filterEventsByTime(processedEvents);
+    const filteredEvents = filterUpcomingEvents(processedEvents);
     
     return filteredEvents;
 

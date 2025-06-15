@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { processEventsData } from '@/utils/eventProcessorUtils';
-import { filterEventsByTime } from '@/utils/eventTimeFiltering';
+import { filterUpcomingEvents } from '@/utils/date-filtering';
 
 export interface UseEventsResult {
   data: Event[];
@@ -42,8 +42,8 @@ export const useEvents = (userId: string | undefined = undefined): UseEventsResu
         // Process the events data
         const processedEvents = processEventsData(data, userId);
         
-        // Apply time-based filtering using the new logic
-        const filteredEvents = filterEventsByTime(processedEvents);
+        // Apply time-based filtering to only show upcoming events
+        const filteredEvents = filterUpcomingEvents(processedEvents);
         
         console.log(`Total events fetched: ${processedEvents.length}`);
         console.log(`Filtered events after time filtering: ${filteredEvents.length}`);
