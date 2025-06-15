@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { typography } from '@/components/polymet/brand-typography';
 
 interface EventsPageHeaderProps {
   title: string;
@@ -25,11 +26,11 @@ export const EventsPageHeader: React.FC<EventsPageHeaderProps> = ({
         
         {/* Content - Left aligned */}
         <div className="absolute inset-0 flex flex-col justify-center px-4 md:px-6 lg:px-8 text-left text-white">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 text-left">
+          <h1 className={`${typography.display} mb-2 text-left text-white`}>
             {title}
           </h1>
           {!isMobile && (
-            <p className="text-lg md:text-xl text-white/90 leading-relaxed max-w-2xl text-left">
+            <p className={`${typography.lead} text-white/90 leading-relaxed max-w-2xl text-left`}>
               {subtitle}
             </p>
           )}
@@ -41,10 +42,10 @@ export const EventsPageHeader: React.FC<EventsPageHeaderProps> = ({
   return (
     <div className="border-b bg-card">
       <div className="px-4 md:px-6 lg:px-8 py-6 md:py-8 text-left">
-        <h1 className={`font-bold tracking-tight mb-2 text-left ${isMobile ? 'text-xl' : 'text-3xl md:text-4xl'}`}>
+        <h1 className={`${typography.h1} mb-2 text-left`}>
           {title}
         </h1>
-        <p className={`text-muted-foreground leading-relaxed text-left ${isMobile ? 'text-sm' : 'text-lg md:text-xl'}`}>
+        <p className={`${typography.lead} text-left`}>
           {subtitle}
         </p>
       </div>
