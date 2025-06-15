@@ -82,7 +82,7 @@ const LandingPage = () => {
       {/* HEADER HERO */}
       <section className="w-full border-b pt-0 mt-0 bg-transparent">
         {/* FLUSH, NO HORIZONTAL PADDING */}
-        <div className="w-full text-left pt-0 mt-0">
+        <div className="w-full text-left pt-0 mt-0 py-[20px]">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4 mt-0 px-4 md:px-8">
             Find events that fit your <span className="font-handwritten text-primary">vibe</span>
           </h1>
