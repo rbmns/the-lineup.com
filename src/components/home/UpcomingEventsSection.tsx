@@ -30,7 +30,7 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
   const navigate = useNavigate();
 
   return (
-    <section className="py-10 bg-gray-50">
+    <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-3 md:px-6">
         <h2 className="text-3xl font-bold tracking-tight mb-6 text-ocean-deep-900 text-left font-inter">
           Upcoming Events

@@ -27,7 +27,7 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
   getEventImageUrl,
 }) => {
   return (
-    <section className="py-12 w-full">
+    <section className="py-16 w-full">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-between items-center mb-8">
