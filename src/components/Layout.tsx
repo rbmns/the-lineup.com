@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import MainNav from "@/components/MainNav";
 import LeftSidebar from "@/components/nav/LeftSidebar";
@@ -8,6 +9,10 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SocialSidebar } from "@/components/social/SocialSidebar";
+
+const TOP_NAV_HEIGHT = 56; // px, matches h-14
+const LEFT_SIDEBAR_WIDTH = 64; // px, matches w-16
+const RIGHT_SIDEBAR_WIDTH = 288; // px, matches w-72
 
 const Layout = () => {
   const { user, loading } = useAuth();
@@ -24,9 +29,20 @@ const Layout = () => {
     <div className="min-h-screen bg-white w-full overflow-x-hidden">
       <MainNav />
       <div className="flex w-full min-h-screen">
-        {/* Left sidebar - Desktop only */}
+        {/* Left sidebar - Desktop only, start below navbar */}
         {!isMobile && (
-          <div className="fixed left-0 top-0 bottom-0 w-16 bg-white z-30 border-r border-gray-200">
+          <div
+            className="fixed left-0"
+            style={{
+              top: TOP_NAV_HEIGHT,
+              bottom: 0,
+              width: LEFT_SIDEBAR_WIDTH,
+              zIndex: 30,
+              background: "#fff",
+              borderRight: "1px solid #e5e7eb",
+              height: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
+            }}
+          >
             <LeftSidebar />
           </div>
         )}
@@ -40,6 +56,16 @@ const Layout = () => {
                 ? 'pt-14 pl-16 pr-72'
                 : 'pt-14 pl-16'
           }`}
+          style={
+            !isMobile
+              ? {
+                  paddingTop: TOP_NAV_HEIGHT,
+                  paddingLeft: LEFT_SIDEBAR_WIDTH,
+                  paddingRight: rightSidebarVisible ? RIGHT_SIDEBAR_WIDTH : 0,
+                  minHeight: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
+                }
+              : undefined
+          }
         >
           <main className="bg-white w-full min-h-full">
             <Outlet />
@@ -48,9 +74,21 @@ const Layout = () => {
           {!isMobile && <Footer />}
         </div>
 
-        {/* Right Social Sidebar - Desktop only, wider */}
+        {/* Right Social Sidebar - Desktop only */}
         {!isMobile && (
-          <div className="fixed right-0 top-0 bottom-0 w-72 bg-white border-l border-gray-200 z-30">
+          <div
+            className="fixed right-0"
+            style={{
+              top: TOP_NAV_HEIGHT,
+              bottom: 0,
+              width: RIGHT_SIDEBAR_WIDTH,
+              zIndex: 30,
+              background: "#fff",
+              borderLeft: "1px solid #e5e7eb",
+              height: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
+              display: rightSidebarVisible ? "block" : "none",
+            }}
+          >
             <SocialSidebar
               visible={rightSidebarVisible}
               onToggleVisibility={toggleRightSidebar}
