@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +9,8 @@ import { Plus } from 'lucide-react';
 import { AuthOverlay } from '@/components/auth/AuthOverlay';
 import { RequestCreatorModal } from './RequestCreatorModal';
 import { UserService } from '@/services/UserService';
+import { CreatorRequestService } from '@/services/CreatorRequestService';
+import { toast } from "sonner";
 
 interface SocialSidebarProps {
   visible?: boolean;
@@ -29,9 +30,9 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   // For event creator handling:
   const [isEventCreator, setIsEventCreator] = useState<boolean | null>(null); // null = unknown
   const [showRequestCreator, setShowRequestCreator] = useState(false);
-  const [creatorRequested, setCreatorRequested] = useState(false);
+  const [creatorRequestStatus, setCreatorRequestStatus] = useState<string | null>(null); // 'pending', 'not_requested', null (loading)
 
-  // Fetch user roles if logged in
+  // Fetch user roles and request status if logged in
   useEffect(() => {
     let isMounted = true;
     if (user) {
@@ -40,8 +41,14 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
           setIsEventCreator(data?.includes('event_creator') || false);
         }
       });
+      CreatorRequestService.getCreatorRequestStatus(user.id).then(({ data }) => {
+        if (isMounted) {
+          setCreatorRequestStatus(data?.status || 'not_requested');
+        }
+      });
     } else {
       setIsEventCreator(null);
+      setCreatorRequestStatus(null);
     }
     return () => { isMounted = false; }
   }, [user]);
@@ -98,7 +105,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
       return;
     }
     // If event creator status still loading, optimistically disable
-    if (isEventCreator === null) return;
+    if (isEventCreator === null || creatorRequestStatus === null) return;
     if (isEventCreator) {
       navigate('/events/create');
     } else {
@@ -107,10 +114,15 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   };
 
   // Handle request action
-  const handleRequestCreator = () => {
-    setCreatorRequested(true);
-    // Here, you could add actual logic, e.g., send an email or insert a request into Supabase
-    // For now, we only show confirmation
+  const handleRequestCreator = async () => {
+    if (!user) return;
+    const { error } = await CreatorRequestService.requestCreatorAccess(user.id);
+    if (error) {
+      toast.error("There was an issue submitting your request. Please try again.");
+    } else {
+      toast.success("Your request has been submitted!");
+      setCreatorRequestStatus('pending');
+    }
   };
 
   // If sidebar is visible
@@ -152,7 +164,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
                 size="sm"
                 className="w-full flex items-center justify-center gap-2 bg-ocean-deep-600 text-white hover:bg-ocean-deep-700 shadow-sm rounded-md py-2 px-4 transition-all"
                 onClick={handleCreateEventClick}
-                disabled={isEventCreator === null} // Disable while checking
+                disabled={isEventCreator === null || creatorRequestStatus === null} // Disable while checking roles or request status
               >
                 <Plus className="w-4 h-4" />
                 Create Event
@@ -166,12 +178,9 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
       {/* Event Creator Request Modal */}
       <RequestCreatorModal
         open={showRequestCreator}
-        onClose={() => {
-          setShowRequestCreator(false);
-          setCreatorRequested(false);
-        }}
+        onClose={() => setShowRequestCreator(false)}
         onRequest={handleRequestCreator}
-        requested={creatorRequested}
+        requestStatus={creatorRequestStatus}
       />
       {/* Auth Overlay Modal: only show if prompted and not logged in */}
       {showAuth && !user && (

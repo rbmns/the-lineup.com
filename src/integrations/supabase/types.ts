@@ -145,6 +145,30 @@ export type Database = {
         }
         Relationships: []
       }
+      creator_requests: {
+        Row: {
+          created_at: string
+          id: string
+          status: Database["public"]["Enums"]["request_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          status?: Database["public"]["Enums"]["request_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          status?: Database["public"]["Enums"]["request_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       event_categories: {
         Row: {
           created_at: string
@@ -788,7 +812,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      request_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -903,6 +927,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      request_status: ["pending", "approved", "rejected"],
+    },
   },
 } as const

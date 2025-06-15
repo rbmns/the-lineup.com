@@ -7,15 +7,17 @@ interface RequestCreatorModalProps {
   open: boolean;
   onClose: () => void;
   onRequest: () => void;
-  requested: boolean;
+  requestStatus: string | null;
 }
 
 export const RequestCreatorModal: React.FC<RequestCreatorModalProps> = ({
   open,
   onClose,
   onRequest,
-  requested,
+  requestStatus,
 }) => {
+  const hasPendingRequest = requestStatus === 'pending';
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
@@ -26,7 +28,7 @@ export const RequestCreatorModal: React.FC<RequestCreatorModalProps> = ({
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
-          {requested ? (
+          {hasPendingRequest ? (
             <div className="text-green-600 font-semibold">
               Your request has been submitted! We'll review it and get in touch soon.
             </div>
@@ -37,7 +39,7 @@ export const RequestCreatorModal: React.FC<RequestCreatorModalProps> = ({
           )}
         </div>
         <DialogFooter>
-          {requested ? (
+          {hasPendingRequest ? (
             <Button onClick={onClose} variant="default" className="w-full">Close</Button>
           ) : (
             <Button onClick={onRequest} variant="default" className="w-full">Request Creator Access</Button>
