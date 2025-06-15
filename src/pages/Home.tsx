@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -124,57 +123,6 @@ const Home = () => {
         <meta name="description" content="Discover and join events in your area" />
       </Helmet>
       
-      {/* Hero Section with Ocean Gradient */}
-      <section className="relative w-full gradient-ocean" style={{
-        height: isMobile ? '90vh' : '70vh'
-      }}>
-        <div className="absolute inset-0">
-          <img 
-            src="/lovable-uploads/68eaf77e-c1bd-4326-bfdc-72328318f27d.png" 
-            alt="Zandvoort Beach" 
-            className="w-full h-full object-cover opacity-30"
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-ocean-deep/60 to-seafoam-green/40"></div>
-        </div>
-        
-        <div className="relative w-full px-4 sm:px-6 lg:px-8 text-center text-white h-full flex items-center">
-          <div className="max-w-4xl mx-auto">
-            <h1 className={`font-bold tracking-tight mb-6 text-white ${
-              isMobile ? 'text-3xl' : 'text-5xl md:text-6xl'
-            }`}>
-              See what's on in <span className="text-handwritten text-sunset-yellow">Zandvoort</span>
-            </h1>
-            <p className={`leading-relaxed mb-8 text-white/90 ${
-              isMobile ? 'text-base' : 'text-xl'
-            }`}>
-              Discover local events and casual plans that fit your vibe. Explore what's happening nearby - music, surf, art, community, and more.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size={isMobile ? "default" : "lg"} className="btn-sunset text-white font-medium">
-                <Link to="/events">
-                  <Search className="mr-2 h-4 w-4" />
-                  Explore Events
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size={isMobile ? "default" : "lg"} className="border-2 border-white/50 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20">
-                <Link to="/profile">
-                  <UserCircle className="mr-2 h-4 w-4" />
-                  Create Your Profile
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-        
-        {/* Scroll indicator arrow - only on mobile */}
-        {isMobile && (
-          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 animate-bounce">
-            <ChevronDown className="h-6 w-6 text-white/80" />
-          </div>
-        )}
-      </section>
-
       {/* Upcoming Events Section */}
       <section className="py-12 w-full">
         <div className="w-full px-4 sm:px-6 lg:px-8">

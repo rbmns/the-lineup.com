@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -114,34 +113,6 @@ const LandingPage = () => {
 
   return (
     <div>
-      {/* Hero Section with Updated Background */}
-      <section className="relative bg-cover bg-center py-20" style={{
-        backgroundImage: "url('/lovable-uploads/68eaf77e-c1bd-4326-bfdc-72328318f27d.png')"
-      }}>
-        <div className="absolute inset-0 bg-black/50"></div>
-        <div className="relative container mx-auto px-4 text-center text-white">
-          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
-            See what's on in Zandvoort
-          </h1>
-          <p className="text-xl leading-relaxed mb-8 max-w-3xl mx-auto">
-            Discover local events and casual plans that fit your vibe. Explore what's happening nearby - music, surf, art, community, and more. Join events or post your own casual plans. Or, just browse events.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
-            <Button asChild variant="outline" size="lg" className="border-2 bg-transparent border-white text-white hover:bg-white/10">
-              <Link to="/events">
-                Explore Events
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="border-2 bg-transparent border-white text-white hover:bg-white/10">
-              <Link to="/profile">
-                Create Your Free Profile
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-
       {/* Upcoming Events Section */}
       <section className="py-8 bg-gray-50">
         <div className="container mx-auto px-4">
