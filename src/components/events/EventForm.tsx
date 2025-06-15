@@ -74,7 +74,7 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
       <CreateVenueModal 
         open={isCreateVenueModalOpen}
         onOpenChange={setCreateVenueModalOpen}
-        onVenueCreated={handleVenueCreated}
+        onComplete={handleVenueCreated}
       />
     </>
   );
