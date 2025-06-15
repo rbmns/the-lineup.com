@@ -69,7 +69,7 @@ const MainNav = () => {
 
           {/* Center - Search Bar */}
           {!isMobile && (
-            <div className="flex-1 flex justify-center max-w-2xl">
+            <div className="flex-1 flex justify-center max-w-md">
               <NavbarSearch />
             </div>
           )}
