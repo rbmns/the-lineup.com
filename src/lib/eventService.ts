@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { processEventsData } from '@/utils/eventProcessorUtils';
@@ -307,18 +308,53 @@ export const createEvent = async (eventData: Partial<Event>): Promise<{ data: Ev
  * Updates an existing event.
  */
 export const updateEvent = async (eventId: string, eventData: Partial<Event>): Promise<{ data: Event | null; error: any }> => {
+  console.log('updateEvent called with eventId:', eventId, 'and data:', eventData);
+  
+  // First check if the event exists
+  const { data: existingEvent, error: fetchError } = await supabase
+    .from('events')
+    .select('id')
+    .eq('id', eventId)
+    .maybeSingle();
+
+  if (fetchError) {
+    console.error('Error checking if event exists:', fetchError);
+    return { data: null, error: fetchError };
+  }
+
+  if (!existingEvent) {
+    const notFoundError = {
+      message: `Event with ID ${eventId} not found`,
+      code: 'EVENT_NOT_FOUND'
+    };
+    console.error('Event not found for update:', notFoundError);
+    return { data: null, error: notFoundError };
+  }
+
+  // Now update the event
   const { data, error } = await supabase
     .from('events')
     .update(eventData)
     .eq('id', eventId)
     .select()
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error updating event:', error);
+    return { data: null, error };
   }
 
-  return { data, error };
+  if (!data) {
+    const updateError = {
+      message: 'Event update succeeded but no data returned',
+      code: 'UPDATE_NO_DATA'
+    };
+    console.error('No data returned after update:', updateError);
+    return { data: null, error: updateError };
+  }
+
+  console.log('Event updated successfully:', data);
+  return { data, error: null };
 };
 
 /**
