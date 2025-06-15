@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar, MapPin, Users, Clock, Search, Plus, Heart, Star } from 'lucide-react';
+import { typography } from '@/components/polymet/brand-typography';
 
 const DesignSystem = () => {
   // All category pills from the image
@@ -41,8 +42,8 @@ const DesignSystem = () => {
         {/* --- End Design System Instructions Card --- */}
 
         <div className="mb-8">
-          <h1 className="text-4xl font-bold tracking-tight mb-2">Design System</h1>
-          <p className="text-xl text-muted-foreground">The lineup's comprehensive design guidelines and components</p>
+          <h1 className={`${typography.h1} mb-2`}>Design System</h1>
+          <p className={`${typography.lead}`}>The lineup's comprehensive design guidelines and components</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

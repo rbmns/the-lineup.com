@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
 import { Profile } from '@/types';
+import { typography } from '@/components/polymet/brand-typography';
 
 interface ProfileHeaderProps {
   profile: Profile | null;
@@ -44,7 +45,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       )}
       
       <div className="space-y-2 text-center">
-        <h2 className="text-2xl font-bold text-white">
+        <h2 className={`${typography.h2} text-white`}>
           {profile?.username || 'Anonymous User'}
         </h2>
         

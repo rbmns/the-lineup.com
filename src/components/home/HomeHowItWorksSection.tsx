@@ -42,7 +42,7 @@ const HomeHowItWorksSection = () => (
               <div className={`w-20 h-20 ${step.bg} rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-105 transition-transform duration-300`}>
                 {step.icon}
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-white">{step.label}</h3>
+              <h3 className={`${typography.h4} text-white mb-3`}>{step.label}</h3>
               <p className="text-cyan-100">{step.desc}</p>
             </div>
           ))}
