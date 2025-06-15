@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,26 +12,34 @@ import { CasualPlansHomeSection } from '@/components/home/CasualPlansHomeSection
 import { UpcomingEventsSection } from '@/components/home/UpcomingEventsSection';
 import { HowItWorksSection } from '@/components/home/HowItWorksSection';
 import { LandingCtaSection } from '@/components/home/LandingCtaSection';
-
 const LandingPage = () => {
-  const { isAuthenticated } = useAuth();
-  const { data: events, isLoading } = useEvents();
+  const {
+    isAuthenticated
+  } = useAuth();
+  const {
+    data: events,
+    isLoading
+  } = useEvents();
   const isMobile = useIsMobile();
-  const { getEventImageUrl } = useEventImages();
+  const {
+    getEventImageUrl
+  } = useEventImages();
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const { availableCategories } = useEventCategories(events);
-
+  const {
+    availableCategories
+  } = useEventCategories(events);
   useEffect(() => {
     const scrollToTop = () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     };
-    if (window.location.pathname === '/' && document.referrer &&
-      !document.referrer.includes(window.location.origin + '/')) {
+    if (window.location.pathname === '/' && document.referrer && !document.referrer.includes(window.location.origin + '/')) {
       scrollToTop();
     }
   }, []);
-
   const upcomingEvents = React.useMemo(() => {
     if (!events || events.length === 0) return [];
     const oneWeekFromNow = new Date();
@@ -50,42 +57,30 @@ const LandingPage = () => {
     }, {} as Record<string, typeof events>);
     const featured = Object.values(eventsByType).map(typeEvents => typeEvents[0]);
     if (featured.length < 5 && nextWeekEvents.length > 0) {
-      const moreEvents = nextWeekEvents
-        .filter(event => !featured.some(f => f.id === event.id))
-        .slice(0, 5 - featured.length);
+      const moreEvents = nextWeekEvents.filter(event => !featured.some(f => f.id === event.id)).slice(0, 5 - featured.length);
       return [...featured, ...moreEvents];
     }
     return featured;
   }, [events]);
-
   const filteredEvents = React.useMemo(() => {
     if (!selectedCategory) return upcomingEvents;
     return upcomingEvents.filter(event => event.event_category === selectedCategory);
   }, [upcomingEvents, selectedCategory]);
-
   const availableCategoriesInUpcoming = React.useMemo(() => {
     if (!upcomingEvents || upcomingEvents.length === 0) return [];
-    return Array.from(new Set(
-      upcomingEvents
-        .filter(event => event.event_category)
-        .map(event => event.event_category as string)
-    )).sort();
+    return Array.from(new Set(upcomingEvents.filter(event => event.event_category).map(event => event.event_category as string))).sort();
   }, [upcomingEvents]);
-
   const handleCategoryClick = (category: string) => {
     setSelectedCategory(prevCategory => prevCategory === category ? null : category);
   };
-
   const handleEventClick = useCallback((event: Event) => {
     if (event.id) {
       navigate(`/events/${event.id}`);
     }
   }, [navigate]);
-
-  return (
-    <div className="w-full">
+  return <div className="w-full">
       {/* HEADER HERO */}
-      <section className="w-full border-b bg-background pt-0 mt-0">
+      <section className="w-full border-b pt-0 mt-0 bg-transparent">
         {/* FLUSH, NO HORIZONTAL PADDING */}
         <div className="w-full text-left pt-0 mt-0">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4 mt-0 px-4 md:px-8">
@@ -97,22 +92,11 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <UpcomingEventsSection
-        isLoading={isLoading}
-        filteredEvents={filteredEvents}
-        availableCategoriesInUpcoming={availableCategoriesInUpcoming}
-        selectedCategory={selectedCategory}
-        handleCategoryClick={handleCategoryClick}
-        setSelectedCategory={setSelectedCategory}
-        getEventImageUrl={getEventImageUrl}
-        handleEventClick={handleEventClick}
-      />
+      <UpcomingEventsSection isLoading={isLoading} filteredEvents={filteredEvents} availableCategoriesInUpcoming={availableCategoriesInUpcoming} selectedCategory={selectedCategory} handleCategoryClick={handleCategoryClick} setSelectedCategory={setSelectedCategory} getEventImageUrl={getEventImageUrl} handleEventClick={handleEventClick} />
 
       <HowItWorksSection />
       <CasualPlansHomeSection />
       <LandingCtaSection />
-    </div>
-  );
+    </div>;
 };
-
 export default LandingPage;
