@@ -64,20 +64,37 @@ const ProfilePage: React.FC = () => {
     );
   }
   
-  const numTabs = 1 + (canCreateEvents ? 2 : 0) + (isAdmin ? 1 : 0);
+  let numTabs: number;
+  if (canCreateEvents) {
+    // For creators: "My Events", "My Venues", and "Admin" tab if they are an admin.
+    numTabs = 2 + (isAdmin ? 1 : 0);
+  } else {
+    // For regular users: just "My RSVPs".
+    numTabs = 1;
+  }
   const gridColsClass = `grid-cols-${numTabs}`;
 
   const searchParams = new URLSearchParams(location.search);
   const tabQueryParam = searchParams.get('tab');
 
-  const validTabs = ['rsvps'];
+  const validTabs: string[] = [];
+  let defaultTab: string;
+
   if (canCreateEvents) {
     validTabs.push('created', 'venues');
+    if (isAdmin) {
+      validTabs.push('admin');
+    }
+    defaultTab = 'created';
+  } else {
+    validTabs.push('rsvps');
+    defaultTab = 'rsvps';
   }
-  if (isAdmin) {
-    validTabs.push('admin');
+
+  if (tabQueryParam && validTabs.includes(tabQueryParam)) {
+    defaultTab = tabQueryParam;
   }
-  const defaultTab = tabQueryParam && validTabs.includes(tabQueryParam) ? tabQueryParam : 'rsvps';
+
 
   return (
     <>
@@ -98,9 +115,11 @@ const ProfilePage: React.FC = () => {
         )}
         <Tabs defaultValue={defaultTab} className="w-full">
           <TabsList className={`grid w-full ${gridColsClass}`}>
-              <TabsTrigger value="rsvps">
-                  My RSVPs
-              </TabsTrigger>
+              {!canCreateEvents && (
+                <TabsTrigger value="rsvps">
+                    My RSVPs
+                </TabsTrigger>
+              )}
               {canCreateEvents && (
                   <>
                       <TabsTrigger value="created">
@@ -117,9 +136,11 @@ const ProfilePage: React.FC = () => {
                 </TabsTrigger>
               )}
           </TabsList>
-          <TabsContent value="rsvps" className="mt-8">
-              <UserRsvpedEvents userId={user.id} />
-          </TabsContent>
+          {!canCreateEvents && (
+            <TabsContent value="rsvps" className="mt-8">
+                <UserRsvpedEvents userId={user.id} />
+            </TabsContent>
+          )}
           {canCreateEvents && (
               <>
                   <TabsContent value="created" className="mt-8">
