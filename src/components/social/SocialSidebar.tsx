@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -56,6 +57,16 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   // Callback to close Auth Modal (passed to AuthOverlay)
   const handleCloseAuthOverlay = () => {
     setShowAuth(false);
+  };
+
+  // Handler for browse events: close modal, then navigate.
+  const handleBrowseEvents = () => {
+    setShowAuth(false);
+    setTimeout(() => {
+      if (window.location.pathname !== '/events') {
+        navigate('/events');
+      }
+    }, 0);
   };
 
   // If sidebar is visible
@@ -119,7 +130,8 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
           title="Create your account"
           description="Sign up or log in to create and share your own events!"
           browseEventsButton={true}
-          onClose={handleCloseAuthOverlay} // <-- Pass handler to close overlay
+          onClose={handleCloseAuthOverlay}
+          onBrowseEvents={handleBrowseEvents}
         >
           {/* Passing empty fragment as required `children` prop */}
           <></>
@@ -128,3 +140,4 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
     </>
   );
 };
+

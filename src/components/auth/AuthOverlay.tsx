@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,28 +8,19 @@ interface AuthOverlayProps {
   description: string;
   children: React.ReactNode;
   browseEventsButton?: boolean;
-  onClose?: () => void; // NEW for overlay dismissal
+  onClose?: () => void; // to dismiss overlay
+  onBrowseEvents?: () => void; // callback for browse events
 }
 
-export const AuthOverlay: React.FC<AuthOverlayProps> = ({ 
-  title, 
-  description, 
+export const AuthOverlay: React.FC<AuthOverlayProps> = ({
+  title,
+  description,
   children,
   browseEventsButton = false,
-  onClose
+  onClose,
+  onBrowseEvents
 }) => {
   const navigate = useNavigate();
-
-  const handleBrowseEvents = () => {
-    // If user provided onClose, call it.
-    if (onClose) {
-      onClose();
-    }
-    // Only navigate if not already on /events.
-    if (window.location.pathname !== '/events') {
-      navigate('/events');
-    }
-  };
 
   return (
     <div className="relative min-h-screen">
@@ -38,7 +28,6 @@ export const AuthOverlay: React.FC<AuthOverlayProps> = ({
       <div className="opacity-30 pointer-events-none">
         {children}
       </div>
-      
       {/* Overlay */}
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
         <Card className="w-full max-w-md mx-auto bg-white">
@@ -64,7 +53,7 @@ export const AuthOverlay: React.FC<AuthOverlayProps> = ({
             </Button>
             {browseEventsButton && (
               <Button 
-                onClick={handleBrowseEvents}
+                onClick={onBrowseEvents}
                 variant="ghost"
                 className="w-full text-gray-600 hover:text-gray-800 text-base py-3"
               >
