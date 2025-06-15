@@ -52,6 +52,7 @@ export const useEventSearch = () => {
       fee: event.fee,
       tags: event.tags,
       vibe: event.vibe,
+      status: event.status,
       attendees: {
         going: event.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Going').length || 0,
         interested: event.event_rsvps?.filter((rsvp: any) => rsvp.status === 'Interested').length || 0
