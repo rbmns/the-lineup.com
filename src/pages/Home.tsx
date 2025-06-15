@@ -1,12 +1,26 @@
 
 import React from 'react';
+import { useEvents } from '@/hooks/useEvents';
+import HomePageHeaderSection from '@/components/home/HomePageHeaderSection';
+import { PublicHome } from '@/components/home/PublicHome';
+import HomeCtaSection from '@/components/home/HomeCtaSection';
+import HomeHowItWorksSection from '@/components/home/HomeHowItWorksSection';
 
 const Home = () => {
+  const { data: events, isLoading } = useEvents();
+
   return (
-    <div className="p-8">
-      <h1 className="text-4xl font-bold mb-4">Welcome to the Home Page</h1>
-      <p className="text-lg">If you are seeing this message, it means the routing and basic page structure are working correctly.</p>
-      <p className="text-lg mt-4">The issue is likely within the original content of the Home component or one of its dependencies.</p>
+    <div className="w-full">
+      <HomePageHeaderSection />
+      
+      <div className="w-full bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <PublicHome events={events} isLoading={isLoading} />
+        </div>
+      </div>
+
+      <HomeHowItWorksSection />
+      <HomeCtaSection />
     </div>
   );
 };
