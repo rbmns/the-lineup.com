@@ -10,6 +10,7 @@ import {
   endOfWeek,
   compareAsc
 } from 'date-fns';
+import { isDateInEventRange } from '@/utils/event-date-utils';
 
 /**
  * Checks if an event is upcoming or currently ongoing.
