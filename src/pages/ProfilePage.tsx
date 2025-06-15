@@ -6,17 +6,16 @@ import { ProfilePageLayout } from '@/components/profile/ProfilePageLayout';
 import { useProfileData } from '@/hooks/useProfileData';
 import { UserCreatedEvents } from '@/components/profile/UserCreatedEvents';
 import { UserRsvpedEvents } from '@/components/profile/UserRsvpedEvents';
-import { cn } from '@/lib/utils';
 import { useAdminData } from '@/hooks/useAdminData';
 import { CreatorRequestsDashboard } from '@/components/admin/CreatorRequestsDashboard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCreatorStatus } from '@/hooks/useCreatorStatus';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
-  const [activeTab, setActiveTab] = useState<'rsvps' | 'created' | 'admin'>('rsvps');
 
   const {
     profile,
@@ -63,9 +62,8 @@ const ProfilePage: React.FC = () => {
     );
   }
   
-  const tabStyle = "pb-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ease-in-out";
-  const activeTabStyle = "border-primary text-primary";
-  const inactiveTabStyle = "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300";
+  const numTabs = 1 + (canCreateEvents ? 1 : 0) + (isAdmin ? 1 : 0);
+  const gridColsClass = `grid-cols-${numTabs}`;
 
   return (
     <>
@@ -76,46 +74,43 @@ const ProfilePage: React.FC = () => {
         onToggleSettings={() => setShowSettings(!showSettings)}
       />
       <div className="container mx-auto px-4 py-8 max-w-5xl">
-        <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-                <button
-                    onClick={() => setActiveTab('rsvps')}
-                    className={cn(tabStyle, activeTab === 'rsvps' ? activeTabStyle : inactiveTabStyle)}
-                >
-                    My RSVPs
-                </button>
-                {canCreateEvents && (
-                    <button
-                        onClick={() => setActiveTab('created')}
-                        className={cn(tabStyle, activeTab === 'created' ? activeTabStyle : inactiveTabStyle)}
-                    >
-                        My Created Events
-                    </button>
-                )}
-                {isAdmin && (
-                  <button
-                    onClick={() => setActiveTab('admin')}
-                    className={cn(tabStyle, activeTab === 'admin' ? activeTabStyle : inactiveTabStyle)}
-                  >
-                    Creator Requests
-                  </button>
-                )}
-            </nav>
-        </div>
-        <div className="mt-8">
-            {activeTab === 'rsvps' && <UserRsvpedEvents userId={user.id} />}
-            {activeTab === 'created' && canCreateEvents && <UserCreatedEvents />}
-            {activeTab === 'admin' && isAdmin && (
-              isAdminLoading ? (
+        <Tabs defaultValue="rsvps" className="w-full">
+          <TabsList className={`grid w-full ${gridColsClass}`}>
+              <TabsTrigger value="rsvps">
+                  My RSVPs
+              </TabsTrigger>
+              {canCreateEvents && (
+                  <TabsTrigger value="created">
+                      My Created Events
+                  </TabsTrigger>
+              )}
+              {isAdmin && (
+                <TabsTrigger value="admin">
+                  Creator Requests
+                </TabsTrigger>
+              )}
+          </TabsList>
+          <TabsContent value="rsvps" className="mt-8">
+              <UserRsvpedEvents userId={user.id} />
+          </TabsContent>
+          {canCreateEvents && (
+              <TabsContent value="created" className="mt-8">
+                  <UserCreatedEvents />
+              </TabsContent>
+          )}
+          {isAdmin && (
+            <TabsContent value="admin" className="mt-8">
+              {isAdminLoading ? (
                 <div className="space-y-4">
                   <Skeleton className="h-48 w-full rounded-lg" />
                   <Skeleton className="h-48 w-full rounded-lg" />
                 </div>
               ) : (
                 <CreatorRequestsDashboard requests={requests || []} />
-              )
-            )}
-        </div>
+              )}
+            </TabsContent>
+          )}
+        </Tabs>
       </div>
     </>
   );
