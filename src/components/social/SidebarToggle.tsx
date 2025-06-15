@@ -16,7 +16,7 @@ export const SidebarToggle: React.FC<SidebarToggleProps> = ({ visible, onToggle 
           variant="ghost"
           size="sm"
           onClick={onToggle}
-          className="bg-white shadow-lg border border-sand hover:bg-sand rounded-l-lg rounded-r-none px-2"
+          className="bg-white shadow-lg border border-gray-200 hover:bg-sand rounded-l-lg rounded-r-none px-2"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -30,7 +30,7 @@ export const SidebarToggle: React.FC<SidebarToggleProps> = ({ visible, onToggle 
         variant="ghost"
         size="sm"
         onClick={onToggle}
-        className="bg-white shadow-lg border border-sand hover:bg-sand rounded-l-lg rounded-r-none px-2"
+        className="bg-white shadow-lg border border-gray-200 hover:bg-sand rounded-l-lg rounded-r-none px-2"
       >
         <ChevronRight className="h-4 w-4" />
       </Button>
