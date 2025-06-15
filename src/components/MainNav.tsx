@@ -49,17 +49,16 @@ const MainNav = () => {
         : 'bg-white/80 backdrop-blur-sm'
     }`}>
       <div className={cn(
-        "w-full h-16 flex items-start justify-between", // key: items-start instead of items-center for vertical alignment
+        "w-full h-16 flex items-center justify-between", // RESTORED: items-center for vertical alignment
         isMobile ? "px-4" : "px-6 lg:px-8"
       )}>
-        {/* Left side - Logo + Brand, align to top for vertical match with sidebar icons */}
+        {/* Left side - Logo + Brand, vertically centered to match sidebar icon */}
         <div className="flex items-center gap-2 flex-shrink-0 h-16">
-          <Link to="/" className="flex items-center h-full">
+          <Link to="/" className="flex items-center h-16">
             <img 
               src="/lovable-uploads/272de8da-6e0c-40fd-a1b7-9f82414ed290.png" 
               alt="TheLineup Logo" 
-              className="w-10 h-10 sm:w-12 sm:h-12 my-3" // adds margin-y for precise vertical match
-              style={{marginTop: "4px", marginBottom: "4px"}} // adjust as needed for pixel match
+              className="w-10 h-10 sm:w-12 sm:h-12" // REMOVED my-3 and custom margin
             />
           </Link>
           <BrandLogo showText={true} />
@@ -94,3 +93,4 @@ const MainNav = () => {
 };
 
 export default MainNav;
+
