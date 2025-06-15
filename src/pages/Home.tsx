@@ -18,25 +18,33 @@ import { LineupImage } from '@/components/ui/lineup-image';
 import { Helmet } from 'react-helmet-async';
 import PolymetEventCard from '@/components/polymet/event-card';
 import { HomeUpcomingEventsSection } from "@/components/home/HomeUpcomingEventsSection";
-
 const Home = () => {
-  const { isAuthenticated } = useAuth();
-  const { data: events, isLoading } = useEvents();
+  const {
+    isAuthenticated
+  } = useAuth();
+  const {
+    data: events,
+    isLoading
+  } = useEvents();
   const eventsContainerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
-  const { getEventImageUrl } = useEventImages();
+  const {
+    getEventImageUrl
+  } = useEventImages();
   const navigate = useNavigate();
   const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
-  
+
   // Scroll to top when coming from another page (but not on initial load)
   useEffect(() => {
     const scrollToTop = () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
     };
-    
+
     // Only scroll to top if we're navigating from another page
-    if (window.location.pathname === '/' && document.referrer && 
-        !document.referrer.includes(window.location.origin + '/')) {
+    if (window.location.pathname === '/' && document.referrer && !document.referrer.includes(window.location.origin + '/')) {
       scrollToTop();
     }
   }, []);
@@ -44,17 +52,16 @@ const Home = () => {
   // Get upcoming events for the next week
   const upcomingEvents = React.useMemo(() => {
     if (!events || events.length === 0) return [];
-    
     const oneWeekFromNow = new Date();
     oneWeekFromNow.setDate(oneWeekFromNow.getDate() + 7);
-    
+
     // Get events for the next week
     const nextWeekEvents = events.filter(event => {
       if (!event.start_date) return false;
       const eventDate = new Date(event.start_date);
       return eventDate <= oneWeekFromNow;
     });
-    
+
     // Group by event category to ensure diversity
     const eventsByType = nextWeekEvents.reduce((acc, event) => {
       if (!event.event_category) return acc;
@@ -62,71 +69,60 @@ const Home = () => {
       acc[event.event_category].push(event);
       return acc;
     }, {} as Record<string, typeof events>);
-    
+
     // Get one event from each type
     const featured = Object.values(eventsByType).map(typeEvents => typeEvents[0]);
-    
+
     // If we don't have at least 5 events, add more from any category
     if (featured.length < 5 && nextWeekEvents.length > 0) {
-      const moreEvents = nextWeekEvents
-        .filter(event => !featured.some(f => f.id === event.id))
-        .slice(0, 5 - featured.length);
-      
+      const moreEvents = nextWeekEvents.filter(event => !featured.some(f => f.id === event.id)).slice(0, 5 - featured.length);
       return [...featured, ...moreEvents];
     }
-    
     return featured;
   }, [events]);
 
   // Get available vibes from upcoming events
   const availableVibes = React.useMemo(() => {
     if (!upcomingEvents || upcomingEvents.length === 0) return [];
-    
     const vibes = new Set<string>();
     upcomingEvents.forEach(event => {
       if (event.tags && Array.isArray(event.tags)) {
         event.tags.forEach(tag => vibes.add(tag));
       }
     });
-    
     return Array.from(vibes).sort();
   }, [upcomingEvents]);
 
   // Filter events by selected vibe
   const filteredEvents = React.useMemo(() => {
     if (!selectedVibe) return upcomingEvents;
-    return upcomingEvents.filter(event => 
-      event.tags && Array.isArray(event.tags) && event.tags.includes(selectedVibe)
-    );
+    return upcomingEvents.filter(event => event.tags && Array.isArray(event.tags) && event.tags.includes(selectedVibe));
   }, [upcomingEvents, selectedVibe]);
-
   const handleVibeClick = (vibe: string) => {
     setSelectedVibe(prevVibe => prevVibe === vibe ? null : vibe);
   };
-
   const scrollEvents = (direction: 'left' | 'right') => {
     if (!eventsContainerRef.current) return;
-    
     const container = eventsContainerRef.current;
     const scrollAmount = container.clientWidth * (direction === 'left' ? -0.8 : 0.8);
-    container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    container.scrollBy({
+      left: scrollAmount,
+      behavior: 'smooth'
+    });
   };
-
   const handleEventClick = useCallback((event: Event) => {
     if (event.id) {
       navigate(`/events/${event.id}`);
     }
   }, [navigate]);
-
-  return (
-    <div className="w-full min-h-screen">
+  return <div className="w-full min-h-screen">
       <Helmet>
         <title>the lineup</title>
         <meta name="description" content="Discover and join events in your area" />
       </Helmet>
 
       {/* Simple Page Header */}
-      <section className="w-full border-b bg-white pt-10 pb-8 px-4 sm:px-8">
+      <section className="w-full border-b pt-10 pb-8 px-4 sm:px-8 bg-cyan-200">
         <div className="max-w-4xl mx-auto text-left">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-ocean-deep mb-2">
             Find events that fit your <span className="text-handwritten text-sunset-yellow">vibe</span>
@@ -138,17 +134,10 @@ const Home = () => {
       </section>
 
       {/* Upcoming Events Section (EXTRACTED, SIMPLIFIED, Polymet cards only) */}
-      <HomeUpcomingEventsSection
-        isLoading={isLoading}
-        filteredEvents={filteredEvents}
-        handleEventClick={handleEventClick}
-        availableVibes={availableVibes}
-        selectedVibe={selectedVibe}
-        setSelectedVibe={setSelectedVibe}
-      />
+      <HomeUpcomingEventsSection isLoading={isLoading} filteredEvents={filteredEvents} handleEventClick={handleEventClick} availableVibes={availableVibes} selectedVibe={selectedVibe} setSelectedVibe={setSelectedVibe} />
 
       {/* How The Lineup Works Section */}
-      <section className="py-16 bg-white/50 w-full">
+      <section className="py-16 w-full bg-cyan-800">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
@@ -199,7 +188,7 @@ const Home = () => {
       <CasualPlansHomeSection />
 
       {/* CTA Section */}
-      <section className="py-16 w-full gradient-ocean">
+      <section className="py-16 w-full gradient-ocean bg-cyan-500">
         <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold tracking-tight text-white mb-4">
@@ -226,8 +215,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default Home;
