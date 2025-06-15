@@ -23,8 +23,7 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-white w-full overflow-x-hidden">
-      {/* Fixed Navigation - Always at top */}
-      <MainNav />
+      {/* MainNav removed */}
       
       {/* Main Layout Container */}
       <div className="flex w-full min-h-screen">
@@ -55,7 +54,7 @@ const Layout = () => {
 
         {/* Right Social Sidebar - Desktop only, made even narrower */}
         {!isMobile && (
-          <div className="fixed right-0 top-16 bottom-0 w-56 z-30"> {/* Further reduced from w-64 to w-56 */}
+          <div className="fixed right-0 top-16 bottom-0 w-56 z-30">
             <SocialSidebar 
               visible={rightSidebarVisible}
               onToggleVisibility={toggleRightSidebar}
@@ -78,3 +77,4 @@ const Layout = () => {
 };
 
 export default Layout;
+
