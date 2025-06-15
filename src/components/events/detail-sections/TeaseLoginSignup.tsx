@@ -27,7 +27,8 @@ const TeaseLoginSignup = () => {
         <div className="pt-2">
           <Button 
             onClick={handleSignUp} 
-            className="w-full bg-primary hover:bg-primary/90"
+            variant="primary"
+            className="w-full"
           >
             Sign up
           </Button>

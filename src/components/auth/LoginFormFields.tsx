@@ -54,7 +54,8 @@ export const LoginFormFields: React.FC<LoginFormFieldsProps> = ({
       <Button 
         type="submit"
         disabled={loading || rateLimited} 
-        className="w-full bg-black text-white hover:bg-gray-800"
+        variant="primary"
+        className="w-full"
       >
         {loading ? 'Logging in...' : 'Login'}
       </Button>

@@ -54,11 +54,11 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
             )}
             
             {step < 2 ? (
-              <Button type="button" onClick={nextStep} disabled={loading} className="ml-auto">
+              <Button type="button" variant="primary" onClick={nextStep} disabled={loading} className="ml-auto">
                 Next
               </Button>
             ) : (
-              <Button type="submit" disabled={loading || authLoading} className="ml-auto">
+              <Button type="submit" variant="primary" disabled={loading || authLoading} className="ml-auto">
                 {loading ? "Creating account..." : "Create account"}
               </Button>
             )}

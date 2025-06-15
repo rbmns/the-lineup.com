@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -72,15 +71,13 @@ const MainNav = () => {
                 variant="ghost"
                 size={isMobile ? "sm" : "sm"}
                 onClick={handleSignInClick}
-                className="text-sm font-medium text-ocean-deep hover:text-seafoam-green hover:bg-sand/50"
               >
                 Sign in
               </Button>
               <Button
+                variant="primary"
                 size={isMobile ? "sm" : "sm"}
                 onClick={handleRegisterClick}
-                // Use a light background and make text black for readability
-                className="bg-ocean-deep text-black text-sm font-medium hover:bg-seafoam-green hover:text-ocean-deep focus:bg-seafoam-green focus:text-ocean-deep focus:ring-2 focus:ring-ocean-deep transition-colors"
               >
                 Sign up
               </Button>
@@ -93,4 +90,3 @@ const MainNav = () => {
 };
 
 export default MainNav;
-

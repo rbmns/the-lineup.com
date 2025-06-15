@@ -17,7 +17,8 @@ export const FriendsLoginPrompt: React.FC = () => {
           <div className="space-y-3">
             <Button 
               onClick={() => navigate('/signup')} 
-              className="w-full bg-black text-white hover:bg-gray-800"
+              variant="primary"
+              className="w-full"
             >
               Sign Up
             </Button>
