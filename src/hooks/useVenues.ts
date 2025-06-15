@@ -1,37 +1,27 @@
 
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Venue } from '@/types';
 import { supabase } from '@/lib/supabase';
 
+const fetchVenues = async (): Promise<Venue[]> => {
+  const { data, error } = await supabase
+    .from('venues')
+    .select('*')
+    .order('name', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching venues:', error);
+    throw new Error(error.message);
+  }
+
+  return data || [];
+};
+
 export const useVenues = () => {
-  const [venues, setVenues] = useState<Venue[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const { data: venues, isLoading, error, isSuccess } = useQuery<Venue[], Error>({
+    queryKey: ['venues'],
+    queryFn: fetchVenues,
+  });
 
-  useEffect(() => {
-    const fetchVenues = async () => {
-      try {
-        setIsLoading(true);
-        const { data, error } = await supabase
-          .from('venues')
-          .select('*')
-          .order('name', { ascending: true });
-
-        if (error) {
-          throw error;
-        }
-
-        setVenues(data || []);
-      } catch (err) {
-        console.error('Error fetching venues:', err);
-        setError(err instanceof Error ? err : new Error('Unknown error occurred'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchVenues();
-  }, []);
-
-  return { venues, isLoading, error };
+  return { venues: venues || [], isLoading, error, isSuccess };
 };

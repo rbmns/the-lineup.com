@@ -1,48 +1,30 @@
-
-import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { useMemo, useState, useEffect } from 'react';
+import { useVenues } from '@/hooks/useVenues';
 
 export const useVenueData = () => {
-  const [venues, setVenues] = useState<Array<{ value: string, label: string }>>([]);
+  const { venues: allVenues, isLoading: isVenuesLoading, error } = useVenues();
+  
+  const venues = useMemo(() => {
+    if (!allVenues) return [];
+    return allVenues.map(venue => ({
+      value: venue.id,
+      label: venue.name
+    }));
+  }, [allVenues]);
+  
   const [locations, setLocations] = useState<Array<{ value: string, label: string }>>([]);
-  const [isVenuesLoading, setIsVenuesLoading] = useState(true);
 
   useEffect(() => {
-    const fetchVenues = async () => {
-      setIsVenuesLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from('venues')
-          .select('id, name')
-          .order('name');
-          
-        if (error) throw error;
-        
-        if (data) {
-          const venueOptions = data.map(venue => ({
-            value: venue.id,
-            label: venue.name
-          }));
-          setVenues(venueOptions);
-        }
-        
-        // Create sample locations for the design (now just fixed to "Zandvoort Area")
-        setLocations([
-          { value: 'zandvoort-area', label: 'Zandvoort Area' }
-        ]);
-      } catch (err) {
-        console.error('Error fetching venues:', err);
-      } finally {
-        setIsVenuesLoading(false);
-      }
-    };
-
-    fetchVenues();
+    // This seems to be static, so we can keep it in useEffect.
+    setLocations([
+      { value: 'zandvoort-area', label: 'Zandvoort Area' }
+    ]);
   }, []);
 
   return {
     venues,
     locations,
-    isVenuesLoading
+    isVenuesLoading,
+    error,
   };
 };
