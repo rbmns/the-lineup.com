@@ -67,9 +67,9 @@ const MainNav = () => {
             <BrandLogo showText={!isMobile} className="ml-0" />
           </div>
 
-          {/* Center - Search Bar */}
+          {/* Center-Right - Search Bar */}
           {!isMobile && (
-            <div className="flex-1 flex justify-center max-w-md">
+            <div className="flex-1 flex justify-end max-w-lg mr-8">
               <NavbarSearch />
             </div>
           )}
