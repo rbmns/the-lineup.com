@@ -86,21 +86,23 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
           </div>
           <div className="p-4 space-y-4">
             <SocialHeader />
-            {/* "Create Event" Button */}
-            <Button
-              size="sm"
-              className="w-full flex items-center justify-center gap-2 bg-ocean-deep-600 text-white hover:bg-ocean-deep-700"
-              onClick={() => {
-                if (user) {
-                  navigate('/events/create');
-                } else {
-                  setShowAuth(true);
-                }
-              }}
-            >
-              <Plus className="w-4 h-4" />
-              Create Event
-            </Button>
+            {/* Spacing/padding around Create Event button */}
+            <div className="py-2">
+              <Button
+                size="sm"
+                className="w-full flex items-center justify-center gap-2 bg-ocean-deep-600 text-white hover:bg-ocean-deep-700 shadow-sm rounded-md py-2 px-4 transition-all"
+                onClick={() => {
+                  if (user) {
+                    navigate('/events/create');
+                  } else {
+                    setShowAuth(true);
+                  }
+                }}
+              >
+                <Plus className="w-4 h-4" />
+                Create Event
+              </Button>
+            </div>
             {!user && <SignUpPrompt />}
             <CommunitySection />
           </div>
