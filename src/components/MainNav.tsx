@@ -9,6 +9,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { useCreatorStatus } from '@/hooks/useCreatorStatus';
 import { NavbarSearch } from './nav/NavbarSearch';
+import { useAdminData } from '@/hooks/useAdminData';
 
 const MainNav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -19,6 +20,7 @@ const MainNav = () => {
     signOut
   } = useAuth();
   const { canCreateEvents } = useCreatorStatus();
+  const { isAdmin } = useAdminData();
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   const location = useLocation();
@@ -77,7 +79,14 @@ const MainNav = () => {
           {/* Right side - User menu or auth buttons */}
           <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0">
             {isAuthenticated && user ? (
-              <UserMenu user={user} profile={profile} handleSignOut={signOut} canCreateEvents={canCreateEvents} />
+              <>
+                {isAdmin && (
+                  <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
+                    <Link to="/admin">Admin</Link>
+                  </Button>
+                )}
+                <UserMenu user={user} profile={profile} handleSignOut={signOut} canCreateEvents={canCreateEvents} />
+              </>
             ) : (
               <div className="flex items-center gap-2">
                 <Button
