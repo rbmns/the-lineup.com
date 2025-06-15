@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -113,14 +112,17 @@ export const useEventForm = ({ eventId, isEditMode = false }: UseEventFormProps)
         navigate('/events');
       } else {
         const { error } = await createEvent(processedEventData as any);
-        if (error) throw error;
+        if (error) {
+          console.error("Failed to create event", error);
+          throw error;
+        }
         toast.success('Event created successfully!');
         await queryClient.invalidateQueries({ queryKey: ['events'] });
         navigate('/events');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Form submission error", error);
-      toast.error("Failed to save event. Please check the form data.");
+      toast.error(error.message || "Failed to save event. Please check the form data.");
     } finally {
       setIsSubmitting(false);
     }
