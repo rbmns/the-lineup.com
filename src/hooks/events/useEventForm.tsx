@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -44,7 +45,7 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
       booking_link: '',
       extra_info: '',
       tags: '',
-      vibe: '',
+      vibe: null,
     },
     mode: 'onChange',
   });
@@ -66,10 +67,10 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
           booking_link: fetchedEventData.booking_link || '',
           extra_info: fetchedEventData.extra_info || '',
           tags: Array.isArray(fetchedEventData.tags) ? fetchedEventData.tags.join(', ') : (fetchedEventData.tags || ''),
-          vibe: (fetchedEventData as any).vibe || '',
+          vibe: (fetchedEventData as any).vibe ?? null,
       };
       Object.entries(defaultVals).forEach(([key, value]) => {
-          form.setValue(key as keyof FormValues, value);
+          form.setValue(key as keyof FormValues, value as any);
       });
     }
   }, [isEditMode, initialData, form.setValue]);

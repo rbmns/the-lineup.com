@@ -31,13 +31,16 @@ export const VibeField: React.FC<VibeFieldProps> = ({ control }) => {
       render={({ field }) => (
         <FormItem>
           <Label htmlFor="vibe">Vibe</Label>
-          <Select onValueChange={field.onChange} value={field.value || ''}>
+          <Select onValueChange={field.onChange} value={field.value ?? ''}>
             <FormControl>
               <SelectTrigger id="vibe">
                 <SelectValue placeholder="Select a vibe for your event" />
               </SelectTrigger>
             </FormControl>
             <SelectContent>
+              <SelectItem value="">
+                <span className="text-muted-foreground">-- No Vibe --</span>
+              </SelectItem>
               {(vibes || []).map((vibe) => (
                 <SelectItem key={vibe} value={vibe}>
                   {vibe.charAt(0).toUpperCase() + vibe.slice(1)}
