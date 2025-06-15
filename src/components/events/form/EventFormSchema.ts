@@ -18,9 +18,7 @@ export const EventSchema = z.object({
   booking_link: z.string().url("Please enter a valid URL").or(z.string().length(0)),
   extra_info: z.string().optional(),
   tags: z.string().optional(),
-  vibe: z.enum(EVENT_VIBES, { 
-    errorMap: () => ({ message: "Please select a valid vibe" })
-  }),
+  vibe: z.enum(EVENT_VIBES).optional().or(z.literal('')),
 });
 
 export type EventFormValues = z.infer<typeof EventSchema>;
