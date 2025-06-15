@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -84,10 +83,10 @@ const LandingPage = () => {
 
   return (
     <div>
-      <section className="w-full border-b pt-10 pb-8 px-4 sm:px-8 bg-cyan-200">
+      <section className="w-full border-b pt-16 pb-12 px-4 sm:px-8 bg-background">
         <div className="max-w-4xl mx-auto text-left">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-ocean-deep mb-2">
-            Find events that fit your <span className="text-handwritten text-sunset-yellow">vibe</span>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4">
+            Find events that fit your <span className="font-handwritten text-primary">vibe</span>
           </h1>
           <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
             Discover what's happening nearby — from beach parties to yoga, music, and more. Join when you want, connect if you want.
