@@ -6,7 +6,7 @@ import { ProfilePageLayout } from '@/components/profile/ProfilePageLayout';
 import { useProfileData } from '@/hooks/useProfileData';
 import { UserCreatedEvents } from '@/components/profile/UserCreatedEvents';
 import { UserRsvpedEvents } from '@/components/profile/UserRsvpedEvents';
-import { UserCreatedVenues } from '@/components/profile/UserCreatedVenues';
+import { UserCreatedVenues } from '@/components/venues/UserCreatedVenues';
 import { useAdminData } from '@/hooks/useAdminData';
 import { CreatorRequestsDashboard } from '@/components/admin/CreatorRequestsDashboard';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -81,13 +81,21 @@ const ProfilePage: React.FC = () => {
 
   return (
     <>
-      <ProfilePageLayout
-        profile={profile}
-        isOwnProfile={true}
-        showSettings={showSettings}
-        onToggleSettings={() => setShowSettings(!showSettings)}
-      />
+      {!canCreateEvents && (
+        <ProfilePageLayout
+          profile={profile}
+          isOwnProfile={true}
+          showSettings={showSettings}
+          onToggleSettings={() => setShowSettings(!showSettings)}
+        />
+      )}
       <div className="container mx-auto px-4 py-8 max-w-5xl">
+        {canCreateEvents && (
+          <div className="mb-8 pt-8">
+            <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
+            <p className="text-xl text-muted-foreground leading-relaxed mt-2">Manage your events, venues, and admin tasks.</p>
+          </div>
+        )}
         <Tabs defaultValue={defaultTab} className="w-full">
           <TabsList className={`grid w-full ${gridColsClass}`}>
               <TabsTrigger value="rsvps">
