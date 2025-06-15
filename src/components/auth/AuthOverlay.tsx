@@ -22,6 +22,17 @@ export const AuthOverlay: React.FC<AuthOverlayProps> = ({
 }) => {
   const navigate = useNavigate();
 
+  const handleLogin = () => {
+    if (onClose) onClose();
+    // Use setTimeout to let overlay unmount before navigating
+    setTimeout(() => navigate('/login'), 0);
+  };
+
+  const handleSignup = () => {
+    if (onClose) onClose();
+    setTimeout(() => navigate('/signup'), 0);
+  };
+
   return (
     <div className="relative min-h-screen">
       {/* Background content - greyed out and non-interactive */}
@@ -39,13 +50,13 @@ export const AuthOverlay: React.FC<AuthOverlayProps> = ({
           </CardHeader>
           <CardContent className="space-y-4">
             <Button 
-              onClick={() => navigate('/login')} 
+              onClick={handleLogin} 
               className="w-full bg-black text-white hover:bg-gray-800 text-base font-semibold py-3"
             >
               Log In
             </Button>
             <Button 
-              onClick={() => navigate('/signup')} 
+              onClick={handleSignup} 
               variant="outline"
               className="w-full text-black border-gray-300 hover:bg-gray-50 text-base font-semibold py-3"
             >
