@@ -5,8 +5,8 @@ import { typography } from "@/components/polymet/brand-typography";
 
 const HomeHeaderSection = () => {
   return (
-    <section className="w-full px-4 pb-10 bg-white m-0 p-0">
-      <div className="max-w-4xl mx-auto text-center p-0 m-0">
+    <section className="w-full px-4 pb-8 bg-white">
+      <div className="max-w-4xl mx-auto">
         <AppPageHeader className="text-primary mt-0 mb-2">
           What's Happening?
         </AppPageHeader>
