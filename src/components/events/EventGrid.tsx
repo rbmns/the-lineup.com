@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import PolymetEventCard from '@/components/polymet/event-card';
-import EventCard from '@/components/EventCard';
+import { EventCard } from '@/components/EventCard';
 import { cn } from '@/lib/utils';
 import { EventGrid as InfiniteEventGrid } from './list-components/EventGrid';
 
@@ -123,4 +122,3 @@ export const EventGrid: React.FC<EventGridProps> = ({
     </div>
   );
 };
-
