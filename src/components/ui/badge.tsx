@@ -9,12 +9,12 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+          "border-transparent bg-ocean-deep-500 text-white hover:bg-ocean-deep-600",
         secondary:
-          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "border-gray-200 bg-brand-sand text-ocean-deep-700 hover:bg-ocean-deep-50",
         destructive:
-          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
+          "border-transparent bg-brand-coral text-white hover:bg-brand-coral/80",
+        outline: "text-ocean-deep-700 border-ocean-deep-200",
       },
     },
     defaultVariants: {

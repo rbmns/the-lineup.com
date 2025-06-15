@@ -10,15 +10,13 @@ interface PageHeaderProps {
 export const PageHeader: React.FC<PageHeaderProps> = ({
   title,
   subtitle,
-  backgroundImage, // Keep this prop for fallback use, but don't render image
+  backgroundImage, // no longer used
   className = ""
 }) => {
   return (
-    <div className={`relative h-[200px] md:h-[250px] overflow-hidden w-full ${className}`}>
-      {/* Removed Background Image */}
-
+    <div className={`relative h-[200px] md:h-[250px] overflow-hidden w-full ${className} bg-ocean-deep-600`}>
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-ocean-deep-600 to-ocean-deep-400 opacity-70"></div>
       
       {/* Content - Left aligned */}
       <div className="absolute inset-0 flex flex-col justify-center px-4 md:px-6 lg:px-8 text-left text-white">
