@@ -11,6 +11,7 @@ import { DetailsFields } from './form-sections/DetailsFields';
 import { MetaFields } from './form-sections/MetaFields';
 import { VibeField } from './form-sections/VibeField';
 import { Button } from '@/components/ui/button';
+import { Form } from '@/components/ui/form';
 
 interface EventFormProps {
   eventId?: string;
@@ -34,27 +35,29 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-8">
-        <TitleField register={register} errors={errors} />
-        <DescriptionField register={register} errors={errors} />
-        <CategoryField watch={watch} setValue={setValue} errors={errors} />
-        <DateTimeFields register={register} watch={watch} setValue={setValue} errors={errors} />
-        <VenueField 
-          watch={watch} 
-          setValue={setValue} 
-          errors={errors} 
-          venues={venues} 
-          isLoadingVenues={isLoadingVenues} 
-          onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)}
-        />
-        <DetailsFields register={register} errors={errors} />
-        <MetaFields register={register} errors={errors} />
-        <VibeField control={control} />
+      <Form {...form}>
+        <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-8">
+          <TitleField register={register} errors={errors} />
+          <DescriptionField register={register} errors={errors} />
+          <CategoryField watch={watch} setValue={setValue} errors={errors} />
+          <DateTimeFields register={register} watch={watch} setValue={setValue} errors={errors} />
+          <VenueField 
+            watch={watch} 
+            setValue={setValue} 
+            errors={errors} 
+            venues={venues} 
+            isLoadingVenues={isLoadingVenues} 
+            onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)}
+          />
+          <DetailsFields register={register} errors={errors} />
+          <MetaFields register={register} errors={errors} />
+          <VibeField control={control} />
 
-        <Button type="submit" variant="primary" disabled={isSubmitting}>
-          {isSubmitting ? "Submitting..." : isEditMode ? "Update Event" : "Create Event"}
-        </Button>
-      </form>
+          <Button type="submit" variant="primary" disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : isEditMode ? "Update Event" : "Create Event"}
+          </Button>
+        </form>
+      </Form>
       <CreateVenueModal 
         open={isCreateVenueModalOpen}
         onOpenChange={setCreateVenueModalOpen}
