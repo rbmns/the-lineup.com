@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import MainNav from "@/components/MainNav";
 import LeftSidebar from "@/components/nav/LeftSidebar";
@@ -32,14 +31,13 @@ const Layout = () => {
         {/* Left sidebar - Desktop only, start below navbar */}
         {!isMobile && (
           <div
-            className="fixed left-0"
+            className="fixed left-0 border-r border-gray-200"
             style={{
               top: TOP_NAV_HEIGHT,
               bottom: 0,
               width: LEFT_SIDEBAR_WIDTH,
               zIndex: 30,
               background: "#fff",
-              borderRight: "1px solid #e5e7eb",
               height: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
             }}
           >
@@ -77,14 +75,13 @@ const Layout = () => {
         {/* Right Social Sidebar - Desktop only */}
         {!isMobile && (
           <div
-            className="fixed right-0"
+            className={`fixed right-0 border-l border-gray-200`}
             style={{
               top: TOP_NAV_HEIGHT,
               bottom: 0,
               width: RIGHT_SIDEBAR_WIDTH,
               zIndex: 30,
               background: "#fff",
-              borderLeft: "1px solid #e5e7eb",
               height: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
               display: rightSidebarVisible ? "block" : "none",
             }}
