@@ -12,7 +12,7 @@ interface PageHeaderProps {
 export const PageHeader: React.FC<PageHeaderProps> = ({
   title,
   subtitle,
-  backgroundImage, // no longer used
+  backgroundImage,
   className = ""
 }) => {
   return (

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CategoryPill } from '@/components/ui/category-pill';
@@ -8,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar, MapPin, Users, Clock, Search, Plus, Heart, Star } from 'lucide-react';
+import AppPageHeader from '@/components/ui/AppPageHeader';
 import { typography } from '@/components/polymet/brand-typography';
 
 const DesignSystem = () => {
@@ -42,7 +44,7 @@ const DesignSystem = () => {
         {/* --- End Design System Instructions Card --- */}
 
         <div className="mb-8">
-          <h1 className={`${typography.h1} mb-2`}>Design System</h1>
+          <AppPageHeader>Design System</AppPageHeader>
           <p className={`${typography.lead}`}>The lineup's comprehensive design guidelines and components</p>
         </div>
 
