@@ -50,6 +50,15 @@ interface SearchContextType {
   trackClick: (searchTerm: string, resultId: string, resultType: string) => Promise<void>;
 }
 
+const buildOrCondition = (fields: string[], term: string, translatedTerm: string) => {
+  const originalTermQuery = fields.map(f => `${f}.ilike.%${term}%`).join(',');
+  if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
+    const translatedTermQuery = fields.map(f => `${f}.ilike.%${translatedTerm}%`).join(',');
+    return `${originalTermQuery},${translatedTermQuery}`;
+  }
+  return originalTermQuery;
+};
+
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
 export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -120,10 +129,11 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         translatedTerm = translatedTerm.replace(regex, english);
       });
 
-      let eventOrCondition = `title.ilike.%${term}%,description.ilike.%${term}%,event_category.ilike.%${term}%,destination.ilike.%${term}%,tags.ilike.%${term}%,vibe.ilike.%${term}%`;
-      if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
-        eventOrCondition += `,title.ilike.%${translatedTerm}%,description.ilike.%${translatedTerm}%,event_category.ilike.%${translatedTerm}%,destination.ilike.%${translatedTerm}%,tags.ilike.%${translatedTerm}%,vibe.ilike.%${translatedTerm}%`;
-      }
+      const eventOrCondition = buildOrCondition(
+        ['title', 'description', 'event_category', 'destination', 'tags', 'vibe'],
+        term,
+        translatedTerm
+      );
 
       const eventSearch = supabase
         .from('events')
@@ -131,20 +141,22 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         .or(eventOrCondition)
         .order('start_date', { ascending: true });
 
-      let venueOrCondition = `name.ilike.%${term}%,city.ilike.%${term}%`;
-      if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
-        venueOrCondition += `,name.ilike.%${translatedTerm}%,city.ilike.%${translatedTerm}%`;
-      }
+      const venueOrCondition = buildOrCondition(
+        ['name', 'city'],
+        term,
+        translatedTerm
+      );
 
       const venueSearch = supabase
         .from('venues')
         .select('*')
         .or(venueOrCondition);
 
-      let casualPlanOrCondition = `title.ilike.%${term}%,description.ilike.%${term}%,vibe.ilike.%${term}%,location.ilike.%${term}%`;
-      if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
-        casualPlanOrCondition += `,title.ilike.%${translatedTerm}%,description.ilike.%${translatedTerm}%,vibe.ilike.%${translatedTerm}%,location.ilike.%${translatedTerm}%`;
-      }
+      const casualPlanOrCondition = buildOrCondition(
+        ['title', 'description', 'vibe', 'location'],
+        term,
+        translatedTerm
+      );
       
       const casualPlanSearch = supabase
         .from('casual_plans')
