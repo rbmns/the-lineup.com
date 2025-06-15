@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { SocialHeader } from './SocialHeader';
@@ -8,6 +8,8 @@ import { CommunitySection } from './CommunitySection';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { AuthOverlay } from '@/components/auth/AuthOverlay';
+import { RequestCreatorModal } from './RequestCreatorModal';
+import { UserService } from '@/services/UserService';
 
 interface SocialSidebarProps {
   visible?: boolean;
@@ -23,6 +25,26 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showAuth, setShowAuth] = useState(false);
+
+  // For event creator handling:
+  const [isEventCreator, setIsEventCreator] = useState<boolean | null>(null); // null = unknown
+  const [showRequestCreator, setShowRequestCreator] = useState(false);
+  const [creatorRequested, setCreatorRequested] = useState(false);
+
+  // Fetch user roles if logged in
+  useEffect(() => {
+    let isMounted = true;
+    if (user) {
+      UserService.getUserRoles(user.id).then(({ data }) => {
+        if (isMounted) {
+          setIsEventCreator(data?.includes('event_creator') || false);
+        }
+      });
+    } else {
+      setIsEventCreator(null);
+    }
+    return () => { isMounted = false; }
+  }, [user]);
 
   // Show the "Expand" button if sidebar is hidden
   if (!visible) {
@@ -69,6 +91,28 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
     }, 0);
   };
 
+  // New callback for "Create Event"
+  const handleCreateEventClick = () => {
+    if (!user) {
+      setShowAuth(true);
+      return;
+    }
+    // If event creator status still loading, optimistically disable
+    if (isEventCreator === null) return;
+    if (isEventCreator) {
+      navigate('/events/create');
+    } else {
+      setShowRequestCreator(true);
+    }
+  };
+
+  // Handle request action
+  const handleRequestCreator = () => {
+    setCreatorRequested(true);
+    // Here, you could add actual logic, e.g., send an email or insert a request into Supabase
+    // For now, we only show confirmation
+  };
+
   // If sidebar is visible
   return (
     <>
@@ -107,13 +151,8 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
               <Button
                 size="sm"
                 className="w-full flex items-center justify-center gap-2 bg-ocean-deep-600 text-white hover:bg-ocean-deep-700 shadow-sm rounded-md py-2 px-4 transition-all"
-                onClick={() => {
-                  if (user) {
-                    navigate('/events/create');
-                  } else {
-                    setShowAuth(true);
-                  }
-                }}
+                onClick={handleCreateEventClick}
+                disabled={isEventCreator === null} // Disable while checking
               >
                 <Plus className="w-4 h-4" />
                 Create Event
@@ -124,6 +163,16 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
           </div>
         </div>
       </div>
+      {/* Event Creator Request Modal */}
+      <RequestCreatorModal
+        open={showRequestCreator}
+        onClose={() => {
+          setShowRequestCreator(false);
+          setCreatorRequested(false);
+        }}
+        onRequest={handleRequestCreator}
+        requested={creatorRequested}
+      />
       {/* Auth Overlay Modal: only show if prompted and not logged in */}
       {showAuth && !user && (
         <AuthOverlay
@@ -140,4 +189,3 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
     </>
   );
 };
-
