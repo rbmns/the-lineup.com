@@ -3,17 +3,32 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useVenues } from '@/hooks/useVenues';
 import { CreateVenueModal } from '@/components/venues/CreateVenueModal';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, MapPin, Globe, ExternalLink, Edit } from 'lucide-react';
+import { Plus, MapPin, Globe, ExternalLink, Edit, Trash } from 'lucide-react';
 import { Venue } from '@/types';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { deleteVenue } from '@/lib/venueService';
 
 export const UserCreatedVenues: React.FC = () => {
   const { user } = useAuth();
   const { venues, isLoading } = useVenues();
   const [isCreateVenueModalOpen, setCreateVenueModalOpen] = useState(false);
   const [venueToEdit, setVenueToEdit] = useState<Venue | null>(null);
+  const [venueToDelete, setVenueToDelete] = useState<Venue | null>(null);
+  const queryClient = useQueryClient();
 
   // Filter venues created by the current user
   const userVenues = venues.filter(venue => venue.creator_id === user?.id);
@@ -35,6 +50,26 @@ export const UserCreatedVenues: React.FC = () => {
 
   const handleComplete = () => {
     handleModalClose();
+  };
+
+  const handleDeleteClick = (venue: Venue) => {
+    setVenueToDelete(venue);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!venueToDelete) return;
+
+    const { error } = await deleteVenue(venueToDelete.id);
+
+    if (error) {
+      toast.error(`Failed to delete venue: ${venueToDelete.name}`);
+      console.error("Error deleting venue:", error);
+    } else {
+      toast.success(`Venue "${venueToDelete.name}" deleted successfully!`);
+      queryClient.invalidateQueries({ queryKey: ['venues'] });
+    }
+
+    setVenueToDelete(null); // Close the dialog
   };
 
   if (isLoading) {
@@ -142,7 +177,7 @@ export const UserCreatedVenues: React.FC = () => {
                   </div>
                 </CardContent>
               </div>
-              <CardFooter className="p-4 pt-0">
+              <CardFooter className="p-4 pt-0 flex gap-2">
                  <Button
                   variant="outline"
                   size="sm"
@@ -150,7 +185,16 @@ export const UserCreatedVenues: React.FC = () => {
                   onClick={() => handleEditClick(venue)}
                 >
                   <Edit className="h-3 w-3 mr-2" />
-                  Edit Venue
+                  Edit
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => handleDeleteClick(venue)}
+                >
+                  <Trash className="h-3 w-3 mr-2" />
+                  Delete
                 </Button>
               </CardFooter>
             </Card>
@@ -170,6 +214,26 @@ export const UserCreatedVenues: React.FC = () => {
         onComplete={handleComplete}
         venueToEdit={venueToEdit}
       />
+
+      <AlertDialog open={!!venueToDelete} onOpenChange={(open) => !open && setVenueToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to delete this venue?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the venue: <strong>{venueToDelete?.name}</strong>.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setVenueToDelete(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className={buttonVariants({ variant: "destructive" })}
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

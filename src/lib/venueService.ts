@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { Venue } from '@/types';
 import { CreateVenueFormValues } from '@/components/venues/CreateVenueSchema';
@@ -33,4 +32,17 @@ export const updateVenue = async (id: string, venueData: CreateVenueFormValues):
   }
 
   return { data, error };
+};
+
+export const deleteVenue = async (id: string): Promise<{ error: any }> => {
+  const { error } = await supabase
+    .from('venues')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting venue:', error);
+  }
+
+  return { error };
 };
