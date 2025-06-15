@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { useAdminData } from '@/hooks/useAdminData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EventsTable } from '@/components/admin/EventsTable';
 import { VenuesTable } from '@/components/admin/VenuesTable';
 import { Skeleton } from '@/components/ui/skeleton';
-import { PageHeader } from '@/components/polymet/page-header';
+import PageHeader from '@/components/polymet/page-header';
 
 const AdminPage = () => {
   const { isAdmin, isLoading } = useAdminData();

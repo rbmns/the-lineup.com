@@ -12,12 +12,12 @@ export interface UseEventsResult {
   refetch: () => Promise<any>;
 }
 
-export const useEvents = (userId: string | undefined = undefined): UseEventsResult => {
+export const useEvents = (userId: string | undefined = undefined, options: { includePastEvents?: boolean } = {}): UseEventsResult => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['events', userId],
+    queryKey: ['events', userId, options],
     queryFn: async () => {
       try {
-        console.log('Fetching events for user:', userId);
+        console.log('Fetching events for user:', userId, 'with options:', options);
         
         const { data, error } = await supabase
           .from('events')
@@ -41,6 +41,11 @@ export const useEvents = (userId: string | undefined = undefined): UseEventsResu
         
         // Process the events data
         const processedEvents = processEventsData(data, userId);
+        
+        if (options.includePastEvents) {
+          console.log(`Total events fetched (including past): ${processedEvents.length}`);
+          return processedEvents;
+        }
         
         // Apply time-based filtering to only show upcoming events
         const filteredEvents = filterUpcomingEvents(processedEvents);
