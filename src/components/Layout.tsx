@@ -23,7 +23,8 @@ const Layout = () => {
 
   return (
     <div className="min-h-screen bg-white w-full overflow-x-hidden">
-      {/* MainNav removed */}
+      {/* Bring back MainNav */}
+      <MainNav />
       
       {/* Main Layout Container */}
       <div className="flex w-full min-h-screen">
@@ -77,4 +78,3 @@ const Layout = () => {
 };
 
 export default Layout;
-
