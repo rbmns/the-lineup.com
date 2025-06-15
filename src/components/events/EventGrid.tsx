@@ -1,8 +1,38 @@
+
 import React from 'react';
 import { Event } from '@/types';
-import { EventCard } from '@/components/EventCard';
+import PolymetEventCard from '@/components/polymet/event-card';
 import { cn } from '@/lib/utils';
 import { EventGrid as InfiniteEventGrid } from './list-components/EventGrid';
+
+// Helper function to map Event to PolymetEventCard props
+const mapEventToPolymetCard = (event: Event) => ({
+  id: event.id,
+  title: event.title,
+  image: event.image_urls?.[0] || "/img/default.jpg",
+  category: event.event_category || "Other",
+  vibe: event.tags && event.tags.length > 0 ? event.tags[0] : undefined,
+  host: event.creator 
+    ? {
+        id: event.creator.id,
+        name: event.creator.username || event.creator.email || "Host",
+        avatar: event.creator.avatar_url,
+      }
+    : undefined,
+  location: event.venues?.name || event.location || "",
+  date: event.start_date || "",
+  time: event.start_time || undefined,
+  attendees: event.going_count || event.interested_count
+    ? {
+        count: (event.going_count ?? 0) + (event.interested_count ?? 0),
+        // Avatar demo: doesn't display avatars in current event type
+        avatars: [],
+      }
+    : undefined,
+  showRsvp: false,
+  // RSVP handlers can be attached later if you decide to switch fully
+  className: "h-full w-full"
+});
 
 interface EventGridProps {
   events: Event[];
@@ -20,13 +50,13 @@ interface EventGridProps {
   compact?: boolean;
 }
 
+// NEW: Use PolymetEventCard for all events in the grid so you can compare.
 export const EventGrid: React.FC<EventGridProps> = ({
   events,
   onRsvp,
   showRsvpButtons = true,
   className,
   style,
-  loadingEventId,
   visibleCount,
   hasMore,
   isLoading,
@@ -35,9 +65,13 @@ export const EventGrid: React.FC<EventGridProps> = ({
   eventsBeforeTeaserCount = 6,
   compact
 }) => {
-  // If we have the lazy loading props, use the InfiniteEventGrid component
-  if (visibleCount !== undefined && hasMore !== undefined && 
-      isLoading !== undefined && onLoadMore !== undefined) {
+  // If we have the lazy loading props, use the InfiniteEventGrid as before
+  if (
+    visibleCount !== undefined &&
+    hasMore !== undefined &&
+    isLoading !== undefined &&
+    onLoadMore !== undefined
+  ) {
     return (
       <InfiniteEventGrid
         events={events}
@@ -49,42 +83,35 @@ export const EventGrid: React.FC<EventGridProps> = ({
         showRsvpButtons={showRsvpButtons}
         className={className}
         style={style}
-        loadingEventId={loadingEventId}
         showSignupTeaser={showSignupTeaser}
         eventsBeforeTeaserCount={eventsBeforeTeaserCount}
         compact={compact}
       />
     );
   }
-  
-  // Improved responsive grid with better breakpoints for smaller screens
+
+  // Render using PolymetEventCard for all events, as preview
   return (
-    <div 
+    <div
       className={cn(
         "grid gap-3 w-full",
-        "grid-cols-1", // Mobile: 1 column (very small screens)
-        "xs:grid-cols-1", // Extra small: 1 column
-        "sm:grid-cols-2", // Small screens: 2 columns (576px+)
-        "md:grid-cols-2", // Medium screens: 2 columns (768px+)
-        "lg:grid-cols-3", // Large screens: 3 columns (1024px+)
-        "xl:grid-cols-3", // Extra large: 3 columns (1280px+)
-        "2xl:grid-cols-4", // 2XL: 4 columns for very wide screens
+        "grid-cols-1",
+        "xs:grid-cols-1",
+        "sm:grid-cols-2",
+        "md:grid-cols-2",
+        "lg:grid-cols-3",
+        "xl:grid-cols-3",
+        "2xl:grid-cols-4",
         className
-      )} 
+      )}
       style={style}
     >
       {events.map((event) => (
         <div key={event.id} data-event-id={event.id} className="w-full min-w-0">
-          <EventCard 
-            event={event}
-            onRsvp={onRsvp}
-            showRsvpButtons={showRsvpButtons}
-            compact={compact}
-            className="h-full w-full"
-            loadingEventId={loadingEventId}
-          />
+          <PolymetEventCard {...mapEventToPolymetCard(event)} />
         </div>
       ))}
     </div>
   );
 };
+
