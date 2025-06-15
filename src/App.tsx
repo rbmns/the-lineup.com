@@ -5,7 +5,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from '@/components/ui/toaster';
 import { QueryClient } from '@/components/query-client';
 import Layout from '@/components/Layout';
-import LandingPage from '@/pages/LandingPage';
+import Home from '@/pages/Home';
 import Events from '@/pages/Events';
 import EventDetail from '@/pages/EventDetail';
 import CreateEvent from '@/pages/events/create';
@@ -38,7 +38,7 @@ function App() {
               <Routes>
                 {/* All routes now use Layout with sticky navigation */}
                 <Route path="/" element={<Layout />}>
-                  <Route index element={<LandingPage />} />
+                  <Route index element={<Home />} />
                   <Route path="events" element={<Events />} />
                   <Route path="events/create" element={<CreateEvent />} />
                   <Route path="events/:id" element={<EventDetail />} />
