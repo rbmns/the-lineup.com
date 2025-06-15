@@ -7,22 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Event } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { navigateToEvent } from '@/utils/navigationUtils';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-
-const EventResultCard = ({ result, navigate }: { result: Event; navigate: ReturnType<typeof useNavigate> }) => (
-    <Card 
-        className="cursor-pointer hover:shadow-lg transition-shadow"
-        onClick={() => navigateToEvent(result.id, navigate)}
-    >
-        <CardHeader>
-            <CardTitle className="line-clamp-2">{result.title}</CardTitle>
-            <CardDescription>{new Date(result.start_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</CardDescription>
-        </CardHeader>
-        <CardContent>
-            <p className="text-sm text-muted-foreground line-clamp-3">{result.description}</p>
-        </CardContent>
-    </Card>
-);
+import { EventCard } from '@/components/EventCard';
 
 const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -64,7 +49,7 @@ const SearchPage: React.FC = () => {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {searchResults.map((result) => {
             if (result.type === 'event') {
-              return <EventResultCard key={result.id} result={result as unknown as Event} navigate={navigate} />;
+              return <EventCard key={result.id} event={result as unknown as Event} onClick={(event) => navigateToEvent(event.id, navigate)} />;
             }
             return null;
           })}
