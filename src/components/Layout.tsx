@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import MainNav from "@/components/MainNav";
 import LeftSidebar from "@/components/nav/LeftSidebar";
@@ -45,19 +44,22 @@ const Layout = () => {
           </div>
         )}
 
-        {/* Main Content Area with best-practice zoning and revealed gradient */}
+        {/* Main Content Area */}
         <div
           className={`flex-1 w-full min-h-screen main-feed-gradient ${
             isMobile
-              ? 'pt-16 pb-24 px-2'
+              ? 'pb-24 px-2'
               : rightSidebarVisible
-                ? 'pt-16 pl-24 pr-64 px-2'
-                : 'pt-16 pl-24 px-2'
+                ? 'pl-24 pr-64 px-2'
+                : 'pl-24 px-2'
           } flex flex-col`}
           style={
             !isMobile
               ? {
-                  paddingTop: TOP_NAV_HEIGHT + 24,
+                  paddingTop:
+                    location.pathname === '/'
+                      ? 0
+                      : TOP_NAV_HEIGHT + 24,
                   paddingLeft: LEFT_SIDEBAR_WIDTH + 16,
                   paddingRight: rightSidebarVisible ? (RIGHT_SIDEBAR_WIDTH + 16) : 16,
                   minHeight: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
