@@ -9,6 +9,7 @@ import { DateTimeFields } from './form-sections/DateTimeFields';
 import { VenueField } from './form-sections/VenueField';
 import { DetailsFields } from './form-sections/DetailsFields';
 import { MetaFields } from './form-sections/MetaFields';
+import { VibeField } from './form-sections/VibeField';
 import { Button } from '@/components/ui/button';
 
 interface EventFormProps {
@@ -29,7 +30,7 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
     onInvalid,
   } = useEventForm({ eventId, isEditMode });
 
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = form;
+  const { register, handleSubmit, setValue, watch, formState: { errors }, control } = form;
 
   return (
     <>
@@ -48,6 +49,7 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
         />
         <DetailsFields register={register} errors={errors} />
         <MetaFields register={register} errors={errors} />
+        <VibeField control={control} />
 
         <Button type="submit" variant="primary" disabled={isSubmitting}>
           {isSubmitting ? "Submitting..." : isEditMode ? "Update Event" : "Create Event"}
