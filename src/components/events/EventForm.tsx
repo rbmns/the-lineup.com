@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useEventForm } from '@/hooks/events/useEventForm';
+import { useEventForm } from '@/hooks/events/useEventForm.tsx';
 import { CreateVenueModal } from '@/components/venues/CreateVenueModal';
 import { TitleField } from './form-sections/TitleField';
 import { DescriptionField } from './form-sections/DescriptionField';
@@ -26,13 +26,14 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
     setCreateVenueModalOpen,
     handleVenueCreated,
     onSubmit,
+    onInvalid,
   } = useEventForm({ eventId, isEditMode });
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = form;
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-8">
         <TitleField register={register} errors={errors} />
         <DescriptionField register={register} errors={errors} />
         <CategoryField watch={watch} setValue={setValue} errors={errors} />

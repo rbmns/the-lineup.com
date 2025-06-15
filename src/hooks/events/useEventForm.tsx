@@ -1,7 +1,8 @@
 
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -120,6 +121,23 @@ export const useEventForm = ({ eventId, isEditMode = false }: UseEventFormProps)
     }
   };
 
+  const onInvalid = (errors: FieldErrors<FormValues>) => {
+    const errorList = Object.entries(errors).map(([fieldName, error]) => {
+      const formattedFieldName = fieldName
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase());
+      return (
+        <div key={fieldName}>
+          <strong>{formattedFieldName}:</strong> {error.message}
+        </div>
+      );
+    });
+
+    toast.error("Please correct the errors in the form", {
+      description: <div className="flex flex-col gap-1 mt-2">{errorList}</div>,
+    });
+  };
+
   return {
     form,
     isSubmitting,
@@ -130,5 +148,6 @@ export const useEventForm = ({ eventId, isEditMode = false }: UseEventFormProps)
     setCreateVenueModalOpen,
     handleVenueCreated,
     onSubmit,
+    onInvalid,
   };
 };
