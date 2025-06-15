@@ -209,7 +209,6 @@ const Home = () => {
                       title={event.title}
                       image={event.image_urls?.[0] || "/img/default.jpg"}
                       category={event.event_category || "Other"}
-                      vibe={event.tags && event.tags.length > 0 ? event.tags[0] : undefined}
                       host={event.creator 
                         ? {
                             id: event.creator.id,
