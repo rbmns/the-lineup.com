@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -84,9 +83,9 @@ const LandingPage = () => {
 
   return (
     <div>
-      {/* HEADER HERO - flush with top nav, NO extra top padding or margin */}
-      <section className="w-full border-b px-4 sm:px-8 bg-background pt-0 mt-0">
-        <div className="max-w-4xl mx-auto text-left pt-0 mt-0">
+      {/* HEADER HERO - flush with top nav, NO extra padding/margin */}
+      <section className="w-full border-b bg-background pt-0 mt-0">
+        <div className="max-w-4xl mx-auto text-left pt-0 mt-0 px-0">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4 mt-0">
             Find events that fit your <span className="font-handwritten text-primary">vibe</span>
           </h1>
@@ -117,4 +116,3 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
-

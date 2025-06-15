@@ -46,28 +46,20 @@ const Layout = () => {
 
         {/* Main Content Area */}
         <div
-          className={`flex-1 w-full min-h-screen main-feed-gradient ${
-            isMobile
-              ? 'pb-24 px-2'
-              : rightSidebarVisible
-                ? 'pl-24 pr-64 px-2'
-                : 'pl-24 px-2'
-          } flex flex-col`}
+          className={`flex-1 w-full min-h-screen main-feed-gradient flex flex-col`}
           style={
             !isMobile
               ? {
-                  // Always only the height of the nav so content isn't behind it, nothing extra
                   paddingTop: TOP_NAV_HEIGHT,
-                  paddingLeft: LEFT_SIDEBAR_WIDTH + 16,
-                  paddingRight: rightSidebarVisible ? (RIGHT_SIDEBAR_WIDTH + 16) : 16,
+                  paddingLeft: LEFT_SIDEBAR_WIDTH,
+                  paddingRight: rightSidebarVisible ? RIGHT_SIDEBAR_WIDTH : 0,
                   minHeight: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
                   boxSizing: 'border-box',
                 }
-              : { }
+              : {}
           }
         >
           <main className="main-feed-gradient w-full min-h-full max-w-3xl mx-auto flex-1 flex flex-col">
-            {/* Give vertical space on top/bottom, so the card isn't against edge */}
             <div className="flex-1 flex flex-col justify-center py-4">
               <Outlet />
             </div>

@@ -22,7 +22,7 @@ export const EventsPageLayout: React.FC<EventsPageLayoutProps> = ({ children }) 
         </div>
       </div>
 
-      {/* Remove px-4 for flush edges */}
+      {/* Remove all horizontal padding for flush edges */}
       <div className="w-full">
         <div className="space-y-6 max-w-7xl mx-auto">
           {children}
