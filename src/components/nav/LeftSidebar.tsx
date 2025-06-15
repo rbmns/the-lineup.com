@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Calendar, Users, Star, Home, Settings } from 'lucide-react';
+import { Calendar, Users, Star, Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -65,7 +66,7 @@ const LeftSidebar: React.FC = () => {
     );
   }
 
-  // Desktop vertical layout
+  // Desktop vertical layout, REMOVED settings icon at the bottom
   return (
     <div className="h-full flex flex-col items-center w-20 bg-card">
       <div className="flex flex-col flex-1 items-center justify-start py-4 space-y-2 w-full">
@@ -98,17 +99,10 @@ const LeftSidebar: React.FC = () => {
           );
         })}
       </div>
-      {/* Settings icon at the bottom */}
-      <div className="py-4 w-full flex flex-col items-center">
-        <Link
-          to="/settings"
-          className="flex flex-col items-center w-full py-2 transition-colors text-muted-foreground hover:text-foreground"
-        >
-          <Settings className="h-5 w-5 mb-0.5" />
-        </Link>
-      </div>
+      {/* REMOVED: Settings icon at the bottom */}
     </div>
   );
 };
 
 export default LeftSidebar;
+
