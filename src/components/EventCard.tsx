@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -65,15 +64,15 @@ export const EventCard: React.FC<EventCardProps> = ({
         )}
       </div>
       
-      <CardContent className={`${compact ? 'p-3' : 'p-5'} flex-1 flex flex-col`}>
+      <CardContent className={`${compact ? 'p-3' : 'p-5'} flex-1 flex flex-col items-start text-left`}>
         {/* Title */}
-        <h3 className={`font-semibold text-ocean-deep group-hover:text-seafoam-green transition-colors ${compact ? 'text-base mb-1 mt-1' : 'text-xl mb-2 mt-1'} line-clamp-2`}>
+        <h3 className={`font-semibold text-ocean-deep group-hover:text-seafoam-green transition-colors ${compact ? 'text-base mb-1 mt-1' : 'text-xl mb-2 mt-1'} line-clamp-2 text-left w-full`}>
           {event.title}
         </h3>
         
         {/* Date & Time - Prominent and lined up */}
         {event.start_date && (
-          <div className="flex items-center text-slate-800 font-medium gap-2 mb-1 mt-0.5">
+          <div className="flex items-center text-slate-800 font-medium gap-2 mb-1 mt-0.5 w-full text-left">
             <Calendar className={`flex-shrink-0 ${compact ? 'h-4 w-4' : 'h-5 w-5'}`} />
             <span className={`${compact ? 'text-xs' : 'text-base'} font-medium`}>
               {formatDate(event.start_date)}
@@ -89,7 +88,7 @@ export const EventCard: React.FC<EventCardProps> = ({
 
         {/* Location */}
         {(event.venues?.name || event.location) && (
-          <div className="flex items-center text-slate-600 gap-2 mb-2 mt-1">
+          <div className="flex items-center text-slate-600 gap-2 mb-2 mt-1 w-full text-left">
             <MapPin className={`flex-shrink-0 ${compact ? 'h-4 w-4' : 'h-5 w-5'}`} />
             <span className={`truncate ${compact ? 'text-xs' : 'text-sm'} font-normal`}>
               {event.venues?.name || event.location}
@@ -99,7 +98,7 @@ export const EventCard: React.FC<EventCardProps> = ({
 
         {/* RSVP Buttons */}
         {showRsvpButtons && onRsvp && (
-          <div className="mt-auto pt-3 flex gap-2">
+          <div className="mt-auto pt-3 flex gap-2 w-full">
             <button
               onClick={(e) => {
                 e.preventDefault();
@@ -150,4 +149,3 @@ export const EventCard: React.FC<EventCardProps> = ({
     </Link>
   );
 };
-
