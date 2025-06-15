@@ -9,6 +9,7 @@ import { HomeUpcomingEventsSection } from '@/components/home/HomeUpcomingEventsS
 import { HowItWorksSection } from '@/components/home/HowItWorksSection';
 import { LandingCtaSection } from '@/components/home/LandingCtaSection';
 import { startOfDay } from 'date-fns';
+import HomePageHeaderSection from '@/components/home/HomePageHeaderSection';
 
 const LandingPage = () => {
   const {
@@ -88,16 +89,7 @@ const LandingPage = () => {
 
   return <div className="w-full">
       {/* HEADER HERO */}
-      <section className="w-full border-b bg-transparent pb-8">
-        <div className="w-full text-left">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4">
-            Find events that fit your <span className="font-handwritten text-primary">vibe</span>
-          </h1>
-          <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
-            Vibe with others and maybe connect back after. Discover what's happening nearby — from beach parties to yoga, music, and more.
-          </p>
-        </div>
-      </section>
+      <HomePageHeaderSection />
 
       <HomeUpcomingEventsSection
         isLoading={isLoading}
