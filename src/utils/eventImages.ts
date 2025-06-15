@@ -1,4 +1,3 @@
-
 import { Event } from "@/types";
 
 const EVENT_FALLBACK_IMAGES = {
@@ -42,31 +41,56 @@ export const eventTypeColors = {
 };
 
 export const getEventFallbackImage = (category?: string, tags?: string[]): string => {
-  if (!category) return EVENT_FALLBACK_IMAGES.default;
-  
-  const normalizedCategory = category.toLowerCase().trim();
-  
-  // Direct category match first
-  if (EVENT_FALLBACK_IMAGES[normalizedCategory as keyof typeof EVENT_FALLBACK_IMAGES]) {
-    return EVENT_FALLBACK_IMAGES[normalizedCategory as keyof typeof EVENT_FALLBACK_IMAGES];
+  const fallbackDefault = EVENT_FALLBACK_IMAGES.default;
+
+  if (!category) {
+    console.log("getEventFallbackImage: No category provided, using default:", fallbackDefault);
+    return fallbackDefault;
   }
   
-  // Check for partial matches or related categories
-  if (normalizedCategory.includes('yoga') || normalizedCategory.includes('wellness')) return EVENT_FALLBACK_IMAGES.yoga;
-  if (normalizedCategory.includes('surf')) return EVENT_FALLBACK_IMAGES.surf;
-  if (normalizedCategory.includes('beach')) return EVENT_FALLBACK_IMAGES.beach;
-  if (normalizedCategory.includes('music') || normalizedCategory.includes('concert')) return EVENT_FALLBACK_IMAGES.music;
-  if (normalizedCategory.includes('food') || normalizedCategory.includes('restaurant')) return EVENT_FALLBACK_IMAGES.food;
-  if (normalizedCategory.includes('sport')) return EVENT_FALLBACK_IMAGES.sports;
-  if (normalizedCategory.includes('art') || normalizedCategory.includes('culture')) return EVENT_FALLBACK_IMAGES.culture;
-  if (normalizedCategory.includes('festival')) return EVENT_FALLBACK_IMAGES.festival;
-  if (normalizedCategory.includes('game')) return EVENT_FALLBACK_IMAGES.game;
-  if (normalizedCategory.includes('party')) return EVENT_FALLBACK_IMAGES.party;
-  if (normalizedCategory.includes('kite')) return EVENT_FALLBACK_IMAGES.kite;
-  if (normalizedCategory.includes('community')) return EVENT_FALLBACK_IMAGES.community;
-  if (normalizedCategory.includes('market')) return EVENT_FALLBACK_IMAGES.market;
+  const normalizedCategory = category.toLowerCase().trim();
+
+  let selected: string | undefined = undefined;
+
+  // Direct category match first
+  if (EVENT_FALLBACK_IMAGES[normalizedCategory as keyof typeof EVENT_FALLBACK_IMAGES]) {
+    selected = EVENT_FALLBACK_IMAGES[normalizedCategory as keyof typeof EVENT_FALLBACK_IMAGES];
+  } else if (normalizedCategory.includes('yoga') || normalizedCategory.includes('wellness')) {
+    selected = EVENT_FALLBACK_IMAGES.yoga;
+  } else if (normalizedCategory.includes('surf')) {
+    selected = EVENT_FALLBACK_IMAGES.surf;
+  } else if (normalizedCategory.includes('beach')) {
+    selected = EVENT_FALLBACK_IMAGES.beach;
+  } else if (normalizedCategory.includes('music') || normalizedCategory.includes('concert')) {
+    selected = EVENT_FALLBACK_IMAGES.music;
+  } else if (normalizedCategory.includes('food') || normalizedCategory.includes('restaurant')) {
+    selected = EVENT_FALLBACK_IMAGES.food;
+  } else if (normalizedCategory.includes('sport')) {
+    selected = EVENT_FALLBACK_IMAGES.sports;
+  } else if (normalizedCategory.includes('art') || normalizedCategory.includes('culture')) {
+    selected = EVENT_FALLBACK_IMAGES.culture;
+  } else if (normalizedCategory.includes('festival')) {
+    selected = EVENT_FALLBACK_IMAGES.festival;
+  } else if (normalizedCategory.includes('game')) {
+    selected = EVENT_FALLBACK_IMAGES.game;
+  } else if (normalizedCategory.includes('party')) {
+    selected = EVENT_FALLBACK_IMAGES.party;
+  } else if (normalizedCategory.includes('kite')) {
+    selected = EVENT_FALLBACK_IMAGES.kite;
+  } else if (normalizedCategory.includes('community')) {
+    selected = EVENT_FALLBACK_IMAGES.community;
+  } else if (normalizedCategory.includes('market')) {
+    selected = EVENT_FALLBACK_IMAGES.market;
+  } else {
+    selected = fallbackDefault;
+  }
+
+  // Debug logging for troubleshooting category issues
+  console.log(
+    `getEventFallbackImage: category="${category}" (normalized: "${normalizedCategory}") -> "${selected}"`
+  );
   
-  return EVENT_FALLBACK_IMAGES.default;
+  return selected;
 };
 
 export const getEventImage = (event: Event): string => {
