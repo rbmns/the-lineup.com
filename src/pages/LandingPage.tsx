@@ -83,7 +83,7 @@ const LandingPage = () => {
 
   return (
     <div>
-      <section className="w-full border-b pt-16 pb-12 px-4 sm:px-8 bg-background">
+      <section className="w-full border-b pt-4 pb-12 px-4 sm:px-8 bg-background">
         <div className="max-w-4xl mx-auto text-left">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4">
             Find events that fit your <span className="font-handwritten text-primary">vibe</span>
