@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { UserProfile } from '@/types';
 
@@ -99,21 +98,20 @@ export const UserService = {
   },
   
   /**
-   * Get user roles
+   * Get user roles from the user_roles table
    */
   getUserRoles: async (userId: string): Promise<{ data: string[], error: any }> => {
     try {
-      // Get the role from profiles table
+      // Get roles from the user_roles table
       const { data, error } = await supabase
-        .from('profiles')
+        .from('user_roles')
         .select('role')
-        .eq('id', userId)
-        .maybeSingle();
+        .eq('user_id', userId);
       
       if (error) throw error;
 
-      // If role exists, return it as a single-item array, otherwise return empty array
-      const roles = data?.role ? [data.role] : [];
+      // Map the array of objects to an array of strings
+      const roles = data ? data.map(item => item.role) : [];
       
       return { 
         data: roles,
@@ -126,21 +124,24 @@ export const UserService = {
   },
 
   /**
-   * Check if a user has a specific role
+   * Check if a user has a specific role using the has_role DB function
    */
   hasRole: async (userId: string, role: string): Promise<boolean> => {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', userId)
-        .maybeSingle();
+      // Using the 'has_role' RPC function for an efficient check.
+      const { data, error } = await supabase.rpc('has_role', {
+        user_id: userId,
+        role_name: role
+      });
+
+      if (error) {
+        console.error('Error checking user role via rpc:', error);
+        throw error;
+      }
       
-      if (error) throw error;
-      
-      return data?.role === role;
+      return data || false;
     } catch (error) {
-      console.error('Error checking user role:', error);
+      console.error('Error in hasRole:', error);
       return false;
     }
   }
