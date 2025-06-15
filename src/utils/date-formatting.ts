@@ -68,7 +68,7 @@ export const formatEventTime = (startTime: string, endTime?: string | null): str
 };
 
 /**
- * Formats event date and time for cards, e.g. "Sun, 25 May, 20h"
+ * Formats event date and time for cards, e.g. "Sun, 25 May, 20:30"
  */
 export const formatEventCardDateTime = (dateString: string, startTime?: string | null): string => {
   if (!dateString) return '';
@@ -83,7 +83,7 @@ export const formatEventCardDateTime = (dateString: string, startTime?: string |
     // Create a new date object with the time for correct timezone formatting
     // Handles both ISO date strings and simple time strings.
     const timeDate = new Date(startTime.includes('T') ? startTime : `${dateString.split('T')[0]}T${startTime}`);
-    const timePart = formatInTimeZone(timeDate, AMSTERDAM_TIMEZONE, "HH'h'");
+    const timePart = formatInTimeZone(timeDate, AMSTERDAM_TIMEZONE, "HH:mm");
     
     return `${datePart}, ${timePart}`;
   } catch (error) {
