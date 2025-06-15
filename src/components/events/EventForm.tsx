@@ -1,28 +1,15 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Event, Venue } from '@/types';
-import { FormValues, EVENT_CATEGORIES } from '@/components/events/form/EventFormTypes';
-import { EventSchema } from '@/components/events/form/EventFormSchema';
-import { processFormData } from '@/components/events/form/EventFormUtils';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
-import { CalendarIcon, PlusCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { VenueSelect } from '@/components/events/VenueSelect';
-import { fetchEventById, createEvent } from '@/lib/eventService';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useVenues } from '@/hooks/useVenues';
+
+import React from 'react';
+import { useEventForm } from '@/hooks/events/useEventForm';
 import { CreateVenueModal } from '@/components/venues/CreateVenueModal';
-import { useQueryClient } from '@tanstack/react-query';
+import { TitleField } from './form-sections/TitleField';
+import { DescriptionField } from './form-sections/DescriptionField';
+import { CategoryField } from './form-sections/CategoryField';
+import { DateTimeFields } from './form-sections/DateTimeFields';
+import { VenueField } from './form-sections/VenueField';
+import { DetailsFields } from './form-sections/DetailsFields';
+import { MetaFields } from './form-sections/MetaFields';
+import { Button } from '@/components/ui/button';
 
 interface EventFormProps {
   eventId?: string;
@@ -30,384 +17,38 @@ interface EventFormProps {
 }
 
 export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = false }) => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { venues, isLoading: isLoadingVenues } = useVenues();
-  const [eventData, setEventData] = useState<Event | null>(null);
-  const [isCreateVenueModalOpen, setCreateVenueModalOpen] = useState(false);
-  const queryClient = useQueryClient();
-
   const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    getValues,
-    formState: { errors },
-  } = useForm<FormValues>({
-    resolver: zodResolver(EventSchema),
-    defaultValues: {},
-    mode: 'onChange',
-  });
+    form,
+    isSubmitting,
+    venues,
+    isLoadingVenues,
+    isCreateVenueModalOpen,
+    setCreateVenueModalOpen,
+    handleVenueCreated,
+    onSubmit,
+  } = useEventForm({ eventId, isEditMode });
 
-  // Fetch event data for editing if in edit mode
-  useEffect(() => {
-    const fetchEventData = async () => {
-      if (isEditMode && eventId) {
-        try {
-          const eventData = await fetchEventById(eventId, user?.id);
-          if (eventData) {
-            setEventData(eventData);
-          }
-        } catch (error) {
-          console.error("Failed to fetch event data for editing", error);
-          toast.error("Failed to fetch event data for editing");
-        }
-      }
-    };
-
-    fetchEventData();
-  }, [isEditMode, eventId, setValue]);
-
-  const defaultValues: FormValues = useMemo(() => {
-    if (eventData && isEditMode) {
-      return {
-        title: eventData.title || '',
-        description: eventData.description || '',
-        event_category: (eventData as any).event_category || (eventData as any).event_type || 'other',
-        start_date: eventData.start_date ? new Date(eventData.start_date) : new Date(),
-        start_time: eventData.start_time?.substring(0, 5) || '',
-        end_date: eventData.end_date ? new Date(eventData.end_date) : new Date(),
-        end_time: eventData.end_time?.substring(0, 5) || '',
-        venue_id: eventData.venue_id || '',
-        organizer_link: eventData.organizer_link || '',
-        fee: eventData.fee?.toString() || '0',
-        booking_link: eventData.booking_link || '',
-        extra_info: eventData.extra_info || '',
-        tags: Array.isArray(eventData.tags) ? eventData.tags.join(', ') : (eventData.tags || ''),
-        vibe: (eventData as any).vibe || '',
-      };
-    }
-    return {
-      title: '',
-      description: '',
-      event_category: 'other',
-      start_date: new Date(),
-      start_time: '',
-      end_date: new Date(),
-      end_time: '',
-      venue_id: '',
-      organizer_link: '',
-      fee: '0',
-      booking_link: '',
-      extra_info: '',
-      tags: '',
-      vibe: '',
-    };
-  }, [eventData, isEditMode]);
-
-  const handleVenueCreated = (newVenue: Venue) => {
-    // Refetch venues to update the list in VenueSelect
-    queryClient.invalidateQueries({ queryKey: ['venues'] });
-    // Set the newly created venue as the selected value
-    setValue("venue_id", newVenue.id, { shouldValidate: true, shouldDirty: true });
-  };
-
-  // Fix the EventForm submission handler with proper type conversions
-  const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    if (!user) {
-      toast.error("You must be logged in to create an event.");
-      return;
-    }
-    setIsSubmitting(true);
-    
-    try {
-      // Convert form data to event data using the utility
-      const eventData = processFormData(data, user.id);
-      
-      if (isEditMode && eventId) {
-        // Update existing event
-        // For now, just show a success message since we don't have the updateEvent function
-        toast.success('Event updated successfully!');
-        navigate('/events');
-        return;
-      } else {
-        // Create new event
-        const { error } = await createEvent(eventData as any);
-        if (error) {
-          throw error;
-        }
-        
-        toast.success('Event created successfully!');
-        navigate('/events');
-      }
-    } catch (error) {
-      console.error("Form submission error", error);
-      toast.error("Failed to save event. Please check the form data.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const processedData = useMemo(() => {
-    if (!user?.id) return null;
-    
-    return {
-      ...getValues(),
-      event_category: getValues('event_category'),
-      created_by: user.id,
-    };
-  }, [user?.id, getValues]);
-
-  // Watch for changes to update categories
-  const watchedCategory = watch('event_category');
-  const categories = watchedCategory ? [watchedCategory] : [];
-
-  useEffect(() => {
-    if (categories.length > 0) {
-      setValue('event_category', categories[0]);
-    }
-  }, [categories, setValue]);
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = form;
 
   return (
     <>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        <div>
-          <Label htmlFor="title">Title</Label>
-          <Input
-            id="title"
-            type="text"
-            placeholder="Event title"
-            {...register("title")}
-            aria-invalid={errors.title ? "true" : "false"}
-          />
-          {errors.title && (
-            <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
-          )}
-        </div>
+        <TitleField register={register} errors={errors} />
+        <DescriptionField register={register} errors={errors} />
+        <CategoryField watch={watch} setValue={setValue} errors={errors} />
+        <DateTimeFields register={register} watch={watch} setValue={setValue} errors={errors} />
+        <VenueField 
+          watch={watch} 
+          setValue={setValue} 
+          errors={errors} 
+          venues={venues} 
+          isLoadingVenues={isLoadingVenues} 
+          onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)}
+        />
+        <DetailsFields register={register} errors={errors} />
+        <MetaFields register={register} errors={errors} />
 
-        <div>
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            id="description"
-            placeholder="Event description"
-            {...register("description")}
-            aria-invalid={errors.description ? "true" : "false"}
-          />
-          {errors.description && (
-            <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
-          )}
-        </div>
-
-        <div>
-          <Label htmlFor="event_category">Event Category</Label>
-          <Select
-            value={watch("event_category")}
-            onValueChange={(value) => setValue("event_category", value as any)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select event category" />
-            </SelectTrigger>
-            <SelectContent>
-              {EVENT_CATEGORIES.map(category => (
-                <SelectItem key={category} value={category}>
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.event_category && (
-            <p className="text-red-500 text-sm mt-1">{errors.event_category.message}</p>
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="start_date">Start Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !watch("start_date") && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {watch("start_date") ? format(watch("start_date"), "PPP") : "Pick a date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={watch("start_date")}
-                  onSelect={(date) => setValue("start_date", date)}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-            {errors.start_date && (
-              <p className="text-red-500 text-sm mt-1">{errors.start_date.message}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="start_time">Start Time</Label>
-            <Input
-              id="start_time"
-              type="time"
-              {...register("start_time")}
-              aria-invalid={errors.start_time ? "true" : "false"}
-            />
-            {errors.start_time && (
-              <p className="text-red-500 text-sm mt-1">{errors.start_time.message}</p>
-            )}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="end_date">End Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant={"outline"}
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !watch("end_date") && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {watch("end_date") ? format(watch("end_date"), "PPP") : "Pick a date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={watch("end_date")}
-                  onSelect={(date) => setValue("end_date", date)}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-            {errors.end_date && (
-              <p className="text-red-500 text-sm mt-1">{errors.end_date.message}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="end_time">End Time</Label>
-            <Input
-              id="end_time"
-              type="time"
-              {...register("end_time")}
-              aria-invalid={errors.end_time ? "true" : "false"}
-            />
-            {errors.end_time && (
-              <p className="text-red-500 text-sm mt-1">{errors.end_time.message}</p>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <Label htmlFor="venue_id">Venue</Label>
-          <div className="flex items-center gap-2">
-            <div className="flex-grow">
-              <VenueSelect
-                id="venue_id"
-                venues={venues}
-                isLoading={isLoadingVenues}
-                value={watch("venue_id")}
-                onChange={(venueId) => setValue("venue_id", venueId)}
-                placeholder="Select a venue"
-              />
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setCreateVenueModalOpen(true)}
-            >
-              <PlusCircle className="h-4 w-4 mr-2" />
-              New Venue
-            </Button>
-          </div>
-          {errors.venue_id && (
-            <p className="text-red-500 text-sm mt-1">{errors.venue_id.message}</p>
-          )}
-        </div>
-
-        <div>
-          <Label htmlFor="organizer_link">Organizer Link</Label>
-          <Input
-            id="organizer_link"
-            type="url"
-            placeholder="https://organizer.com"
-            {...register("organizer_link")}
-            aria-invalid={errors.organizer_link ? "true" : "false"}
-          />
-          {errors.organizer_link && (
-            <p className="text-red-500 text-sm mt-1">{errors.organizer_link.message}</p>
-          )}
-        </div>
-
-        <div>
-          <Label htmlFor="fee">Fee</Label>
-          <Input
-            id="fee"
-            type="number"
-            placeholder="0.00"
-            {...register("fee")}
-            aria-invalid={errors.fee ? "true" : "false"}
-          />
-          {errors.fee && (
-            <p className="text-red-500 text-sm mt-1">{errors.fee.message}</p>
-          )}
-        </div>
-
-        <div>
-          <Label htmlFor="booking_link">Booking Link</Label>
-          <Input
-            id="booking_link"
-            type="url"
-            placeholder="https://booking.com"
-            {...register("booking_link")}
-            aria-invalid={errors.booking_link ? "true" : "false"}
-          />
-          {errors.booking_link && (
-            <p className="text-red-500 text-sm mt-1">{errors.booking_link.message}</p>
-          )}
-        </div>
-
-        <div>
-          <Label htmlFor="extra_info">Extra Info</Label>
-          <Textarea
-            id="extra_info"
-            placeholder="Extra information"
-            {...register("extra_info")}
-            aria-invalid={errors.extra_info ? "true" : "false"}
-          />
-          {errors.extra_info && (
-            <p className="text-red-500 text-sm mt-1">{errors.extra_info.message}</p>
-          )}
-        </div>
-
-        <div>
-          <Label htmlFor="tags">Tags</Label>
-          <Input
-            id="tags"
-            type="text"
-            placeholder="tag1, tag2, tag3"
-            {...register("tags")}
-            aria-invalid={errors.tags ? "true" : "false"}
-          />
-          {errors.tags && (
-            <p className="text-red-500 text-sm mt-1">{errors.tags.message}</p>
-          )}
-        </div>
-
-        <Button disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Submitting..." : isEditMode ? "Update Event" : "Create Event"}
         </Button>
       </form>
