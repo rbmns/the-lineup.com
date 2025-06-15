@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils';
 import { CalendarIcon, ChevronsUpDown, Search } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
-import { DateUtils } from '@/lib/date-utils';
 
 interface AdvancedFiltersProps {
   onFilterChange: (filters: any) => void;
@@ -135,7 +134,13 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                       id={venue}
                       value={venue}
                       checked={selectedVenues.includes(venue)}
-                      onChange={handleVenueChange}
+                      onCheckedChange={(checked) => {
+                        setSelectedVenues((prev) =>
+                          checked
+                            ? [...prev, venue]
+                            : prev.filter((v) => v !== venue)
+                        );
+                      }}
                     />
                     <Label htmlFor={venue} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                       {venue}
@@ -154,7 +159,13 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                       id={vibe}
                       value={vibe}
                       checked={selectedVibes.includes(vibe)}
-                      onChange={handleVibeChange}
+                      onCheckedChange={(checked) => {
+                        setSelectedVibes((prev) =>
+                          checked
+                            ? [...prev, vibe]
+                            : prev.filter((v) => v !== vibe)
+                        );
+                      }}
                     />
                     <Label htmlFor={vibe} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                       {vibe}
@@ -203,7 +214,7 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                   </PopoverContent>
                 </Popover>
                 {dateFilter === 'Any Date' && (
-                  <DateRangePicker date={date} onDateChange={handleDateChange} />
+                  <DateRangePicker selected={date} onSelect={handleDateChange} />
                 )}
               </div>
             </div>
