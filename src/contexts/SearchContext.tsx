@@ -104,21 +104,52 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       await trackSearch(term);
       
+      const dutchToEnglish: { [key: string]: string } = {
+        'strand': 'beach',
+        'zomer': 'summer',
+        'feest': 'party',
+        'muziek': 'music',
+        'lente': 'spring',
+        'herfst': 'autumn',
+        'winter': 'winter',
+      };
+
+      let translatedTerm = term;
+      Object.entries(dutchToEnglish).forEach(([dutch, english]) => {
+        const regex = new RegExp(`\\b${dutch}\\b`, 'gi');
+        translatedTerm = translatedTerm.replace(regex, english);
+      });
+
+      let eventOrCondition = `title.ilike.%${term}%,description.ilike.%${term}%,event_category.ilike.%${term}%,destination.ilike.%${term}%,tags.ilike.%${term}%,vibe.ilike.%${term}%`;
+      if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
+        eventOrCondition += `,title.ilike.%${translatedTerm}%,description.ilike.%${translatedTerm}%,event_category.ilike.%${translatedTerm}%,destination.ilike.%${translatedTerm}%,tags.ilike.%${translatedTerm}%,vibe.ilike.%${translatedTerm}%`;
+      }
+
       const eventSearch = supabase
         .from('events')
         .select('*, venue_id(*)')
-        .or(`title.ilike.%${term}%,description.ilike.%${term}%,event_category.ilike.%${term}%,destination.ilike.%${term}%,tags.ilike.%${term}%,vibe.ilike.%${term}%`)
+        .or(eventOrCondition)
         .order('start_date', { ascending: true });
+
+      let venueOrCondition = `name.ilike.%${term}%,city.ilike.%${term}%`;
+      if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
+        venueOrCondition += `,name.ilike.%${translatedTerm}%,city.ilike.%${translatedTerm}%`;
+      }
 
       const venueSearch = supabase
         .from('venues')
         .select('*')
-        .or(`name.ilike.%${term}%,city.ilike.%${term}%`);
+        .or(venueOrCondition);
 
+      let casualPlanOrCondition = `title.ilike.%${term}%,description.ilike.%${term}%,vibe.ilike.%${term}%,location.ilike.%${term}%`;
+      if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
+        casualPlanOrCondition += `,title.ilike.%${translatedTerm}%,description.ilike.%${translatedTerm}%,vibe.ilike.%${translatedTerm}%,location.ilike.%${translatedTerm}%`;
+      }
+      
       const casualPlanSearch = supabase
         .from('casual_plans')
         .select('*, creator_profile:profiles(id, username, avatar_url)')
-        .or(`title.ilike.%${term}%,description.ilike.%${term}%,vibe.ilike.%${term}%,location.ilike.%${term}%`);
+        .or(casualPlanOrCondition);
 
       const [eventResponse, venueResponse, casualPlanResponse] = await Promise.all([
         eventSearch,

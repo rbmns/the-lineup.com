@@ -18,14 +18,16 @@ export const useQueryOnlyResults = (setQueryOnlyResults: (results: Event[] | nul
         'muziek': 'music'
       };
       
-      let enhancedQuery = query;
+      let translatedQuery = query;
       Object.entries(dutchToEnglish).forEach(([dutch, english]) => {
-        if (query.toLowerCase().includes(dutch)) {
-          enhancedQuery += ` OR ${english}`;
-        }
+        const regex = new RegExp(`\\b${dutch}\\b`, 'gi');
+        translatedQuery = translatedQuery.replace(regex, english);
       });
       
-      const searchTerms = query.split(' ').filter(term => term.length > 2);
+      let orCondition = `title.ilike.%${query}%,description.ilike.%${query}%,destination.ilike.%${query}%,event_category.ilike.%${query}%,tags.ilike.%${query}%,vibe.ilike.%${query}%`;
+      if (query.toLowerCase() !== translatedQuery.toLowerCase()) {
+        orCondition += `,title.ilike.%${translatedQuery}%,description.ilike.%${translatedQuery}%,destination.ilike.%${translatedQuery}%,event_category.ilike.%${translatedQuery}%,tags.ilike.%${translatedQuery}%,vibe.ilike.%${translatedQuery}%`;
+      }
       
       const { data, error } = await supabase
         .from('events')
@@ -35,7 +37,7 @@ export const useQueryOnlyResults = (setQueryOnlyResults: (results: Event[] | nul
           venues:venue_id(*),
           event_rsvps(id, user_id, status)
         `)
-        .or(`title.ilike.%${query}%,description.ilike.%${query}%,location.ilike.%${query}%,event_type.ilike.%${query}%,tags.cs.{${enhancedQuery}}`)
+        .or(orCondition)
         .order('start_time', { ascending: true });
         
       if (error) throw error;
