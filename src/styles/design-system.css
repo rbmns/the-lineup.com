@@ -57,8 +57,10 @@
 
   --muted: var(--gray-200);
   --muted-foreground: var(--gray-700);
-  --accent: var(--brand-gold);
-  --accent-foreground: var(--brand-deep);
+
+  /* Changed accent to ocean blue with white text */
+  --accent: var(--ocean-deep-600);
+  --accent-foreground: #fff;
 
   --destructive: #EF8354;
   --destructive-foreground: #fff;
