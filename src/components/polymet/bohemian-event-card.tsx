@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import { CalendarIcon, MapPinIcon, UserIcon } from "lucide-react";
@@ -146,23 +145,18 @@ export default function BohemianEventCard({
             </h3>
 
             <div className="space-y-2 mb-4 w-full">
-              <div className="flex items-start text-primary-light font-inter text-left">
-                <CalendarIcon size={16} className="mr-2 flex-shrink-0 mt-0.5" />
-                <div className="text-sm flex flex-col sm:flex-row sm:items-baseline sm:gap-x-1">
-                    <span>{date}</span>
-                    {time && (
-                      <>
-                        <span className="hidden sm:inline mx-1">•</span>
-                        <span>{time}</span>
-                      </>
-                    )}
-                </div>
+              <div className="flex items-center text-sm text-primary-light font-inter text-left">
+                <CalendarIcon size={16} className="mr-2 flex-shrink-0" />
+                <span>
+                  {date}
+                  {time && ` • ${time}`}
+                </span>
               </div>
 
               {location && (
                 <div className="flex items-center text-primary-light font-inter text-left w-full">
                   <MapPinIcon size={16} className="mr-2 flex-shrink-0" />
-                  <span className="text-sm">{location}</span>
+                  <span className="text-sm truncate">{location}</span>
                 </div>
               )}
 
@@ -233,22 +227,17 @@ export default function BohemianEventCard({
         </h3>
 
         <div className="space-y-2 mb-3 w-full">
-          <div className="flex items-start text-primary-light font-inter text-left">
-            <CalendarIcon size={16} className="mr-2 flex-shrink-0 mt-0.5" />
-            <div className="text-sm flex flex-col sm:flex-row sm:items-baseline sm:gap-x-1">
-              <span>{date}</span>
-              {time && (
-                <>
-                  <span className="hidden sm:inline mx-1">•</span>
-                  <span>{time}</span>
-                </>
-              )}
-            </div>
+          <div className="flex items-center text-sm text-primary-light font-inter text-left">
+            <CalendarIcon size={16} className="mr-2 flex-shrink-0" />
+            <span>
+              {date}
+              {time && ` • ${time}`}
+            </span>
           </div>
           {location && (
             <div className="flex items-center text-primary-light font-inter text-left w-full">
               <MapPinIcon size={16} className="mr-2 flex-shrink-0" />
-              <span className="text-sm">{location}</span>
+              <span className="text-sm truncate">{location}</span>
             </div>
           )}
         </div>

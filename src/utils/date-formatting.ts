@@ -1,4 +1,3 @@
-
 import { formatInTimeZone } from 'date-fns-tz';
 
 // Set timezone constant for Amsterdam/Netherlands
@@ -66,4 +65,33 @@ export const formatEventTime = (startTime: string, endTime?: string | null): str
   
   const formattedEndTime = formatTime(endTime);
   return `${formattedStartTime}-${formattedEndTime}`;
+};
+
+/**
+ * Formats event date and time for cards, e.g. "Sun, 25 May, 20h"
+ */
+export const formatEventCardDateTime = (dateString: string, startTime?: string | null): string => {
+  if (!dateString) return '';
+  try {
+    const date = new Date(dateString);
+    const datePart = formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, d MMM");
+
+    if (!startTime) {
+      return datePart;
+    }
+
+    // Create a new date object with the time for correct timezone formatting
+    // Handles both ISO date strings and simple time strings.
+    const timeDate = new Date(startTime.includes('T') ? startTime : `${dateString.split('T')[0]}T${startTime}`);
+    const timePart = formatInTimeZone(timeDate, AMSTERDAM_TIMEZONE, "HH'h'");
+    
+    return `${datePart}, ${timePart}`;
+  } catch (error) {
+    console.error('Error formatting event card date-time:', error);
+    // Fallback to a simpler format
+    const datePart = formatFeaturedDate(dateString);
+    if (!startTime) return datePart;
+    const timePart = formatTime(startTime).substring(0, 5); // Just get HH:mm
+    return `${datePart}, ${timePart}`;
+  }
 };

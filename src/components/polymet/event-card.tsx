@@ -1,8 +1,10 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import CategoryBadge from "@/components/polymet/category-badge";
 import { LineupImage } from "@/components/ui/lineup-image";
 import { DEFAULT_FALLBACK_IMAGE_URL } from "@/utils/eventImages";
+import { CalendarIcon, MapPinIcon } from "lucide-react";
 
 interface EventVibeLabel {
   vibe: string;
@@ -123,25 +125,24 @@ export default function EventCard({
         {/* Host info */}
         {host && <p className="mb-2 text-sm text-neutral-75 font-inter text-left w-full">By {host.name}</p>}
 
-        {/* Date and time */}
-        <div className="mb-2 flex items-start text-sm text-neutral-75 font-inter text-left w-full">
-          <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-x-1">
-            <span>{date}</span>
-            {time && (
-              <>
-                <span className="hidden sm:inline mx-1">•</span>
-                <span>{time}</span>
-              </>
-            )}
+        <div className="flex flex-col gap-1.5 mt-1 w-full">
+          {/* Date and time */}
+          <div className="flex items-center text-sm text-neutral-75 font-inter text-left">
+            <CalendarIcon size={16} className="mr-2 flex-shrink-0" />
+            <span>
+              {date}
+              {time && ` • ${time}`}
+            </span>
           </div>
-        </div>
 
-        {/* Location */}
-        {location && (
-          <p className="mb-2 text-sm text-neutral-75 line-clamp-1 font-inter text-left w-full">
-            {location}
-          </p>
-        )}
+          {/* Location */}
+          {location && (
+            <div className="flex items-center text-sm text-neutral-75 font-inter text-left">
+              <MapPinIcon size={16} className="mr-2 flex-shrink-0" />
+              <span className="line-clamp-1">{location}</span>
+            </div>
+          )}
+        </div>
 
         {/* Attendees */}
         {attendees && (

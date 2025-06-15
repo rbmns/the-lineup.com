@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { LineupImage } from '@/components/ui/lineup-image';
 import { MapPin, Calendar } from 'lucide-react';
-import { formatDate, formatEventTime } from '@/utils/date-formatting';
+import { formatDate, formatEventTime, formatEventCardDateTime } from '@/utils/date-formatting';
 import { useEventImages } from '@/hooks/useEventImages';
 import { Event } from '@/types';
 
@@ -62,45 +62,37 @@ export const EventCard: React.FC<EventCardProps> = ({
         )}
       </div>
       
-      <CardContent className={`${compact ? 'p-3' : 'p-5'} flex-1 flex flex-col items-start text-left font-inter`}>
+      <CardContent className={`${compact ? 'p-3' : 'p-4'} flex-1 flex flex-col items-start text-left font-inter gap-2`}>
         {/* Title */}
-        <h3 className={`font-semibold text-ocean-deep group-hover:text-seafoam-green transition-colors ${compact ? 'text-base mb-1 mt-1' : 'text-lg mb-2 mt-1'} line-clamp-2 text-left w-full font-inter`}>
+        <h3 className={`font-semibold text-ocean-deep group-hover:text-seafoam-green transition-colors ${compact ? 'text-base' : 'text-lg'} line-clamp-2 text-left w-full font-inter`}>
           {event.title}
         </h3>
         
-        {/* Date & Time - Prominent and lined up */}
-        {event.start_date && (
-          <div className="flex items-start text-ocean-deep-700 font-medium gap-2 mb-1 mt-0.5 w-full text-left font-inter">
-            <Calendar className={`flex-shrink-0 ${compact ? 'h-4 w-4' : 'h-5 w-5'} mt-1`} />
-            <div className={`flex flex-col sm:flex-row sm:items-baseline sm:gap-x-1 ${compact ? 'text-xs' : 'text-sm'}`}>
+        <div className="flex flex-col gap-2 w-full">
+          {/* Date & Time */}
+          {event.start_date && (
+            <div className={`flex items-center text-ocean-deep-700 font-medium gap-2 w-full text-left font-inter ${compact ? 'text-xs' : 'text-sm'}`}>
+              <Calendar className={`flex-shrink-0 ${compact ? 'h-4 w-4' : 'h-5 w-5'}`} />
               <span className="font-medium">
-                {formatDate(event.start_date)}
+                {formatEventCardDateTime(event.start_date, event.start_time)}
               </span>
-              {event.start_time && (
-                <div className="flex items-baseline">
-                  <span className="hidden sm:inline mx-1 text-ocean-deep-300 font-normal">•</span>
-                  <span className="font-medium">
-                    {formatEventTime(event.start_time, event.end_time)}
-                  </span>
-                </div>
-              )}
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Location */}
-        {(event.venues?.name || event.location) && (
-          <div className="flex items-center text-ocean-deep-600 gap-2 mb-2 mt-1 w-full text-left font-inter">
-            <MapPin className={`flex-shrink-0 ${compact ? 'h-4 w-4' : 'h-5 w-5'}`} />
-            <span className={`truncate ${compact ? 'text-xs' : 'text-sm'} font-normal`}>
-              {event.venues?.name || event.location}
-            </span>
-          </div>
-        )}
+          {/* Location */}
+          {(event.venues?.name || event.location) && (
+            <div className={`flex items-center text-ocean-deep-600 gap-2 w-full text-left font-inter ${compact ? 'text-xs' : 'text-sm'}`}>
+              <MapPin className={`flex-shrink-0 ${compact ? 'h-4 w-4' : 'h-5 w-5'}`} />
+              <span className={`truncate font-normal`}>
+                {event.venues?.name || event.location}
+              </span>
+            </div>
+          )}
+        </div>
 
         {/* RSVP Buttons */}
         {showRsvpButtons && onRsvp && (
-          <div className="mt-auto pt-3 flex gap-2 w-full">
+          <div className="mt-auto pt-2 flex gap-2 w-full">
             <button
               onClick={(e) => {
                 e.preventDefault();

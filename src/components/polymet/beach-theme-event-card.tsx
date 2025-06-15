@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils";
 import { BeachThemeCategoryBadge } from "@/components/polymet/beach-theme-category-badge";
 import { Button } from "@/components/ui/button";
@@ -158,7 +157,15 @@ export default function BeachThemeEventCard({
             )}
 
             {/* Event Details */}
-            <div className="mt-auto space-y-1.5 w-full">
+            <div className="space-y-1.5 w-full">
+              {/* Date & Time */}
+              <div className="flex items-center text-sm text-gray-600 font-inter text-left w-full">
+                <CalendarIcon size={14} className="mr-1 text-[#F59E0B]" />
+                <span>
+                  {date}
+                  {time && ` • ${time}`}
+                </span>
+              </div>
               {/* Location */}
               {location && (
                 <div className="flex items-center text-sm text-gray-600 font-inter text-left w-full">
@@ -166,21 +173,6 @@ export default function BeachThemeEventCard({
                   <span className="truncate">{location}</span>
                 </div>
               )}
-              {/* Date & Time */}
-              <div className="flex items-start text-sm text-gray-600 font-inter text-left w-full">
-                <CalendarIcon size={14} className="mr-1 text-[#F59E0B] mt-0.5" />
-                <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-x-1">
-                  <span>
-                    {date}
-                  </span>
-                  {time && (
-                    <>
-                      <span className="hidden sm:inline mx-1">•</span>
-                      <span>{time}</span>
-                    </>
-                  )}
-                </div>
-              </div>
               {/* Attendees */}
               {attendees && (
                 <div className="flex items-center text-sm text-gray-600 font-inter text-left w-full">

@@ -3,7 +3,7 @@ import { Calendar, MapPin, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CategoryPill } from "@/components/ui/category-pill";
 import { LineupImage } from "@/components/ui/lineup-image";
-import { formatFeaturedDate, formatEventTime } from "@/utils/date-formatting";
+import { formatEventCardDateTime } from "@/utils/date-formatting";
 import { Event } from "@/types";
 import { useEventImages } from "@/hooks/useEventImages";
 import { DEFAULT_FALLBACK_IMAGE_URL } from "@/utils/eventImages";
@@ -63,26 +63,19 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
         )}
       </div>
 
-      <div className="flex flex-col gap-2 pt-4 pb-5 px-5 w-full text-left items-start">
-        <h3 className="text-base font-bold leading-tight line-clamp-2 mb-1 text-ocean-deep-900 font-inter text-left">
+      <div className="flex flex-col gap-2 p-4 w-full text-left items-start">
+        <h3 className="text-base font-bold leading-tight line-clamp-2 text-ocean-deep-900 font-inter text-left">
           {event.title}
         </h3>
-        <div className="flex items-start gap-1 text-xs text-ocean-deep-700 font-inter text-left">
-          <Calendar size={15} className="mr-1 mt-0.5 flex-shrink-0" />
-          <div className="flex flex-col">
-            <span>
-              {formatFeaturedDate(event.start_date)}
-            </span>
-            {event.start_time && (
-              <span>
-                {formatEventTime(event.start_time, event.end_time)}
-              </span>
-            )}
-          </div>
+        <div className="flex items-center gap-2 text-sm text-ocean-deep-700 font-inter text-left">
+          <Calendar size={15} className="flex-shrink-0" />
+          <span>
+            {formatEventCardDateTime(event.start_date, event.start_time)}
+          </span>
         </div>
         {event.venues?.name || event.location ? (
-          <div className="flex items-center gap-1 text-xs text-ocean-deep-700 font-inter text-left">
-            <MapPin size={15} className="mr-1" />
+          <div className="flex items-center gap-2 text-sm text-ocean-deep-700 font-inter text-left">
+            <MapPin size={15} className="flex-shrink-0" />
             <span className="truncate">
               {event.venues?.name || event.location}
             </span>

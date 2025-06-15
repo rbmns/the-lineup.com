@@ -7,7 +7,7 @@ import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { useEventImages } from '@/hooks/useEventImages';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { toast } from '@/hooks/use-toast';
-import { formatDate, formatEventTime } from '@/utils/date-formatting';
+import { formatEventCardDateTime } from '@/utils/date-formatting';
 import { LineupImage } from '@/components/ui/lineup-image';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
@@ -72,11 +72,6 @@ const EventCardList: React.FC<EventCardListProps> = ({
     }
   };
 
-  // Format date and time for display
-  const formattedDate = event.start_date ? formatDate(event.start_date) : '';
-  const timeDisplay = event.start_time ? 
-    formatEventTime(event.start_time, event.end_time) : '';
-
   // Handle RSVP and ensure we always return a Promise<boolean>
   const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp || !shouldShowRsvp) return false;
@@ -131,33 +126,25 @@ const EventCardList: React.FC<EventCardListProps> = ({
         </div>
         
         {/* Content - Left aligned */}
-        <div className="flex flex-col flex-1 p-3 py-2 justify-between text-left">
+        <div className="flex flex-col flex-1 p-3 justify-center text-left gap-1">
           {/* Title - Left aligned */}
           <h3 className="font-semibold text-gray-900 text-base line-clamp-1 text-left">
             {event.title}
           </h3>
             
           {/* Date and Time - Left aligned */}
-          <div className="flex items-start gap-1 text-xs text-gray-500 mt-1 text-left">
-            <Calendar className="h-3 w-3 mt-0.5 flex-shrink-0" />
-            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-x-1">
-              <span>
-                {formattedDate || 'Date not set'}
-              </span>
-              {timeDisplay && (
-                <>
-                  <span className="hidden sm:inline-block mx-0.5">•</span>
-                  <span>{timeDisplay}</span>
-                </>
-              )}
-            </div>
+          <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
+            <Calendar className="h-4 w-4 mt-0.5 flex-shrink-0" />
+            <span>
+              {formatEventCardDateTime(event.start_date, event.start_time)}
+            </span>
           </div>
           
           {/* Bottom row with location and RSVP buttons - Left aligned */}
           <div className="flex items-center justify-between mt-1">
             {/* Location - Left aligned */}
-            <div className="flex items-center gap-1 text-xs text-gray-500 text-left">
-              <MapPin className="h-3 w-3" />
+            <div className="flex items-center gap-2 text-xs text-gray-500 text-left">
+              <MapPin className="h-4 w-4" />
               <span className="truncate max-w-[200px]">
                 {event.venues?.name || event.location || 'No location'}
               </span>
