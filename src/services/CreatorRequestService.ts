@@ -1,11 +1,23 @@
 
 import { supabase } from '@/lib/supabase';
 
+interface CreatorRequestDetails {
+  reason: string;
+  contact_email?: string;
+  contact_phone?: string;
+}
+
 export const CreatorRequestService = {
-  async requestCreatorAccess(userId: string): Promise<{ data: any; error: any }> {
+  async requestCreatorAccess(userId: string, details: CreatorRequestDetails): Promise<{ data: any; error: any }> {
     const { data, error } = await supabase
       .from('creator_requests')
-      .insert({ user_id: userId, status: 'pending' })
+      .insert({ 
+        user_id: userId, 
+        status: 'pending',
+        reason: details.reason,
+        contact_email: details.contact_email || null,
+        contact_phone: details.contact_phone || null,
+      })
       .select()
       .single();
 

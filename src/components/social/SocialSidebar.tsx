@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +12,7 @@ import { RequestCreatorModal } from './RequestCreatorModal';
 import { UserService } from '@/services/UserService';
 import { CreatorRequestService } from '@/services/CreatorRequestService';
 import { toast } from "sonner";
+import { supabase } from '@/lib/supabase';
 
 interface SocialSidebarProps {
   visible?: boolean;
@@ -18,6 +20,12 @@ interface SocialSidebarProps {
 }
 
 const SIDEBAR_WIDTH_PX = 224; // 56 x 4px
+
+interface CreatorRequestFormValues {
+  reason: string;
+  contact_email?: string;
+  contact_phone?: string;
+}
 
 export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   visible = true,
@@ -116,14 +124,33 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   };
 
   // Handle request action
-  const handleRequestCreator = async () => {
+  const handleRequestCreator = async (formData: CreatorRequestFormValues) => {
     if (!user) return;
-    const { error } = await CreatorRequestService.requestCreatorAccess(user.id);
+    const { error } = await CreatorRequestService.requestCreatorAccess(user.id, formData);
     if (error) {
       toast.error("There was an issue submitting your request. Please try again.");
     } else {
       toast.success("Your request has been submitted!");
       setCreatorRequestStatus('pending');
+
+      // Fetch user profile for email details
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('username, email')
+        .eq('id', user.id)
+        .single();
+      
+      // Trigger email notification to admin
+      await supabase.functions.invoke('send-creator-request-email', {
+        body: { 
+          request: {
+            ...formData,
+            user_id: user.id,
+            username: profile?.username || 'N/A',
+            user_email: profile?.email || user.email,
+          }
+        },
+      });
     }
   };
 

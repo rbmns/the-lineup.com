@@ -147,22 +147,31 @@ export type Database = {
       }
       creator_requests: {
         Row: {
+          contact_email: string | null
+          contact_phone: string | null
           created_at: string
           id: string
+          reason: string | null
           status: Database["public"]["Enums"]["request_status"]
           updated_at: string
           user_id: string
         }
         Insert: {
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           id?: string
+          reason?: string | null
           status?: Database["public"]["Enums"]["request_status"]
           updated_at?: string
           user_id: string
         }
         Update: {
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           id?: string
+          reason?: string | null
           status?: Database["public"]["Enums"]["request_status"]
           updated_at?: string
           user_id?: string
