@@ -77,7 +77,7 @@ const config = {
         lg: "1rem",
         md: "0.75rem",
         sm: "0.5rem",
-        xl: "1.5rem",
+        xl: "0.75rem", // LESS ROUND (was 1.5rem)
       },
       transitionProperty: {
         'coastal': 'box-shadow, background-color, color, transform',
