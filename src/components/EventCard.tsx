@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -31,9 +32,7 @@ export const EventCard: React.FC<EventCardProps> = ({
 }) => {
   const { getEventImageUrl } = useEventImages();
 
-  const eventImage = event.image_urls && event.image_urls.length > 0 
-    ? event.image_urls[0] 
-    : getEventImageUrl(event);
+  const eventImage = getEventImageUrl(event);
 
   const handleClick = (e: React.MouseEvent) => {
     if (onClick) {

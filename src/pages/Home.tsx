@@ -134,7 +134,7 @@ const Home = () => {
       </section>
 
       {/* Upcoming Events Section (EXTRACTED, SIMPLIFIED, Polymet cards only) */}
-      <HomeUpcomingEventsSection isLoading={isLoading} filteredEvents={filteredEvents} handleEventClick={handleEventClick} availableVibes={availableVibes} selectedVibe={selectedVibe} setSelectedVibe={setSelectedVibe} />
+      <HomeUpcomingEventsSection isLoading={isLoading} filteredEvents={filteredEvents} handleEventClick={handleEventClick} availableVibes={availableVibes} selectedVibe={selectedVibe} setSelectedVibe={setSelectedVibe} getEventImageUrl={getEventImageUrl} />
 
       {/* How The Lineup Works Section */}
       <section className="py-16 w-full bg-cyan-800">

@@ -1,6 +1,9 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/polymet/button";
 import CategoryBadge from "@/components/polymet/category-badge";
+import { LineupImage } from "@/components/ui/lineup-image";
+import { DEFAULT_FALLBACK_IMAGE_URL } from "@/utils/eventImages";
 
 interface EventVibeLabel {
   vibe: string;
@@ -85,10 +88,16 @@ export default function EventCard({
     >
       {/* Image */}
       <div className="relative aspect-[16/9] w-full overflow-hidden">
-        <img
+        <LineupImage
           src={image}
           alt={title}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105 brightness-100"
+          aspectRatio="video"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            if (target.src !== DEFAULT_FALLBACK_IMAGE_URL) {
+              target.src = DEFAULT_FALLBACK_IMAGE_URL;
+            }
+          }}
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />

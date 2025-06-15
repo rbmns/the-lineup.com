@@ -1,3 +1,4 @@
+
 import React, { useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Sparkles } from "lucide-react";
@@ -13,6 +14,7 @@ interface HomeUpcomingEventsSectionProps {
   availableVibes: string[];
   selectedVibe: string | null;
   setSelectedVibe: (vibe: string | null) => void;
+  getEventImageUrl: (event: Event) => string;
 }
 
 export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps> = ({
@@ -22,6 +24,7 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
   availableVibes,
   selectedVibe,
   setSelectedVibe,
+  getEventImageUrl,
 }) => {
   return (
     <section className="py-12 w-full">
@@ -95,7 +98,7 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
                   <PolymetEventCard
                     id={event.id}
                     title={event.title}
-                    image={event.image_urls?.[0] || "/img/default.jpg"}
+                    image={getEventImageUrl(event)}
                     category={event.event_category || "Other"}
                     // vibe omitted! No 'v' label on card
                     host={
