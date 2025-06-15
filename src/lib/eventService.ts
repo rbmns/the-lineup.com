@@ -320,3 +320,19 @@ export const updateEvent = async (eventId: string, eventData: Partial<Event>): P
 
   return { data, error };
 };
+
+/**
+ * Deletes an event.
+ */
+export const deleteEvent = async (eventId: string): Promise<{ error: any }> => {
+  const { error } = await supabase
+    .from('events')
+    .delete()
+    .eq('id', eventId);
+
+  if (error) {
+    console.error('Error deleting event:', error);
+  }
+
+  return { error };
+};

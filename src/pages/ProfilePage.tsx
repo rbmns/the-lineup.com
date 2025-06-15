@@ -4,11 +4,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { ProfilePageLayout } from '@/components/profile/ProfilePageLayout';
 import { useProfileData } from '@/hooks/useProfileData';
+import { UserCreatedEvents } from '@/components/profile/UserCreatedEvents';
+import { UserRsvpedEvents } from '@/components/profile/UserRsvpedEvents';
+import { cn } from '@/lib/utils';
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
+  const [activeTab, setActiveTab] = useState<'rsvps' | 'created'>('rsvps');
 
   const {
     profile,
@@ -49,14 +53,46 @@ const ProfilePage: React.FC = () => {
       </div>
     );
   }
+  
+  const isCreator = profile?.status === 'Event Host';
+
+  const tabStyle = "pb-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ease-in-out";
+  const activeTabStyle = "border-primary text-primary";
+  const inactiveTabStyle = "border-transparent text-muted-foreground hover:text-foreground hover:border-gray-300";
 
   return (
-    <ProfilePageLayout
-      profile={profile}
-      isOwnProfile={true}
-      showSettings={showSettings}
-      onToggleSettings={() => setShowSettings(!showSettings)}
-    />
+    <>
+      <ProfilePageLayout
+        profile={profile}
+        isOwnProfile={true}
+        showSettings={showSettings}
+        onToggleSettings={() => setShowSettings(!showSettings)}
+      />
+      <div className="container mx-auto px-4 py-8 max-w-5xl">
+        <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                <button
+                    onClick={() => setActiveTab('rsvps')}
+                    className={cn(tabStyle, activeTab === 'rsvps' ? activeTabStyle : inactiveTabStyle)}
+                >
+                    My RSVPs
+                </button>
+                {isCreator && (
+                    <button
+                        onClick={() => setActiveTab('created')}
+                        className={cn(tabStyle, activeTab === 'created' ? activeTabStyle : inactiveTabStyle)}
+                    >
+                        My Created Events
+                    </button>
+                )}
+            </nav>
+        </div>
+        <div className="mt-8">
+            {activeTab === 'rsvps' && <UserRsvpedEvents userId={user.id} />}
+            {activeTab === 'created' && isCreator && <UserCreatedEvents />}
+        </div>
+      </div>
+    </>
   );
 };
 

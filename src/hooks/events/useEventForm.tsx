@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -99,11 +100,13 @@ export const useEventForm = ({ eventId, isEditMode = false }: UseEventFormProps)
     
     try {
       const processedEventData = processFormData(data, user.id);
+      console.log('Submitting event data:', JSON.stringify(processedEventData, null, 2));
       
       if (isEditMode && eventId) {
         const { error } = await updateEvent(eventId, processedEventData as any);
         if (error) {
           console.error("Failed to update event", error);
+          console.error("Supabase error details:", JSON.stringify(error, null, 2));
           throw error;
         }
         toast.success('Event updated successfully!');
@@ -111,11 +114,13 @@ export const useEventForm = ({ eventId, isEditMode = false }: UseEventFormProps)
         await queryClient.invalidateQueries({ queryKey: ['event-details', eventId] });
         navigate('/events');
       } else {
-        const { error } = await createEvent(processedEventData as any);
+        const { data: createdEvent, error } = await createEvent(processedEventData as any);
         if (error) {
           console.error("Failed to create event", error);
+          console.error("Supabase error details:", JSON.stringify(error, null, 2));
           throw error;
         }
+        console.log("Event created successfully in DB:", createdEvent);
         toast.success('Event created successfully!');
         await queryClient.invalidateQueries({ queryKey: ['events'] });
         navigate('/events');
