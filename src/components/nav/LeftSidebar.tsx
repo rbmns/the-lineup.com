@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Calendar, Users, Coffee, Home, MapPin, Settings } from 'lucide-react';
+import { Calendar, Users, Coffee, Home, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -19,11 +18,6 @@ const LeftSidebar: React.FC = () => {
       path: '/events',
       icon: Calendar,
       label: 'Events',
-    },
-    {
-      path: '/map',
-      icon: MapPin,
-      label: 'Map',
     },
     {
       path: '/casual-plans',
