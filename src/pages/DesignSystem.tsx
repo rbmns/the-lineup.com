@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CategoryPill } from '@/components/ui/category-pill';
@@ -21,6 +20,26 @@ const DesignSystem = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-6xl">
+
+        {/* --- Design System Instructions Card --- */}
+        <div className="mb-6">
+          <div className="bg-yellow-50 border-l-4 border-primary p-5 rounded-lg shadow flex flex-col gap-2">
+            <h2 className="text-xl font-bold tracking-tight text-primary mb-1">Design System: Single Source of Truth</h2>
+            <p className="text-base leading-7 text-gray-700">
+              This page documents all design tokens, components, and usage guidelines for this app.
+              <br />
+              <strong>To change the design system:</strong> Edit <code>src/pages/DesignSystem.tsx</code> for documentation/examples, or update individual UI components in <code>src/components/ui/</code>.<br />
+              All designers and developers should reference this page to ensure consistency—this is the <span className="font-semibold text-primary">single source of truth</span> for visual design.
+            </p>
+            <ul className="list-disc list-inside text-sm text-muted-foreground mt-2">
+              <li>Preview changes by visiting <code>/design-system</code> in the app.</li>
+              <li>Document all new or updated components here for clarity and review before wider adoption.</li>
+              <li>Consult this page before starting new UI work.</li>
+            </ul>
+          </div>
+        </div>
+        {/* --- End Design System Instructions Card --- */}
+
         <div className="mb-8">
           <h1 className="text-4xl font-bold tracking-tight mb-2">Design System</h1>
           <p className="text-xl text-muted-foreground">The lineup's comprehensive design guidelines and components</p>
