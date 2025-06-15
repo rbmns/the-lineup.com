@@ -48,9 +48,13 @@ export const CreateVenueModal: React.FC<CreateVenueModalProps> = ({ open, onOpen
       }
       queryClient.invalidateQueries({ queryKey: ['venues'] });
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to save venue", error);
-      toast.error("Failed to save venue. Please try again.");
+      if (error?.code === '23505' && error?.message?.includes('venues_name_key')) {
+        toast.error("A venue with this name already exists. Please use a different name.");
+      } else {
+        toast.error("Failed to save venue. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
