@@ -44,8 +44,10 @@ interface EventsDataProviderProps {
     setSelectedVibes?: (vibes: string[]) => void;
     vibes?: string[];
     vibesLoading?: boolean;
-    setUserLocation: (location: LocationData | null) => void;
     isFilteredByLocation: boolean;
+    userLocation: LocationData | null;
+    selectedLocationId: string | null;
+    onLocationChange: (id: string | null) => void;
   }) => React.ReactNode;
 }
 
@@ -55,13 +57,8 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
   const { venues = [], isLoading: isVenuesLoading } = useVenues();
   const { data: vibes = [], isLoading: vibesLoading } = useEventVibes();
   const { handleRsvp, loading: rsvpLoading } = useRsvpActions(user?.id);
-  const [userLocation, setUserLocation] = useState<LocationData | null>(() => {
-    if (typeof window !== 'undefined') {
-      const storedLocation = sessionStorage.getItem('userLocation');
-      return storedLocation ? JSON.parse(storedLocation) : null;
-    }
-    return null;
-  });
+  const [userLocation, setUserLocation] = useState<LocationData | null>(null);
+  const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   
   const {
     selectedCategories,
@@ -89,12 +86,24 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
   } = useFilterState();
 
   useEffect(() => {
-    if (userLocation) {
-      sessionStorage.setItem('userLocation', JSON.stringify(userLocation));
-    } else {
-      sessionStorage.removeItem('userLocation');
+    if (!selectedLocationId) {
+      setUserLocation(null);
+      return;
     }
-  }, [userLocation]);
+
+    const eventAtVenue = events.find(e => e.venue_id === selectedLocationId && e.coordinates);
+    if (eventAtVenue && eventAtVenue.coordinates) {
+      const venueName = venues.find(v => v.id === selectedLocationId)?.name || 'selected area';
+      const [longitude, latitude] = eventAtVenue.coordinates;
+      setUserLocation({
+        location: venueName,
+        latitude,
+        longitude,
+      });
+    } else {
+      setUserLocation(null);
+    }
+  }, [selectedLocationId, events, venues]);
 
   // Get all unique event types
   const allEventTypes = useMemo(() => {
@@ -213,7 +222,7 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
 
   const fullResetFilters = () => {
     resetFilters();
-    setUserLocation(null);
+    setSelectedLocationId(null);
   }
 
   return children({
@@ -250,7 +259,9 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     setSelectedVibes,
     vibes,
     vibesLoading,
-    setUserLocation,
     isFilteredByLocation: !!userLocation,
+    userLocation,
+    selectedLocationId,
+    onLocationChange: setSelectedLocationId,
   });
 };
