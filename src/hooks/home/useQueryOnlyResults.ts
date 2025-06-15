@@ -29,11 +29,10 @@ export const useQueryOnlyResults = (setQueryOnlyResults: (results: Event[] | nul
         translatedQuery = translatedQuery.replace(regex, english);
       });
       
-      const fields = ['title', 'description', 'destination', 'event_category', 'tags', 'vibe'];
-      let orCondition = fields.map(f => `${f}.ilike.%${query}%`).join(',');
+      let orCondition = `title.ilike.%${query}%,description.ilike.%${query}%,destination.ilike.%${query}%,event_category.ilike.%${query}%,tags.ilike.%${query}%,vibe.ilike.%${query}%`;
 
       if (query.toLowerCase() !== translatedQuery.toLowerCase()) {
-        orCondition += `,${fields.map(f => `${f}.ilike.%${translatedQuery}%`).join(',')}`;
+        orCondition += `,title.ilike.%${translatedQuery}%,description.ilike.%${translatedQuery}%,destination.ilike.%${translatedQuery}%,event_category.ilike.%${translatedQuery}%,tags.ilike.%${translatedQuery}%,vibe.ilike.%${translatedQuery}%`;
       }
       
       const { data, error } = await supabase

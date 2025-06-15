@@ -129,11 +129,10 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         translatedTerm = translatedTerm.replace(regex, english);
       });
 
-      const eventOrCondition = buildOrCondition(
-        ['title', 'description', 'event_category', 'destination', 'tags', 'vibe'],
-        term,
-        translatedTerm
-      );
+      let eventOrCondition = `title.ilike.%${term}%,description.ilike.%${term}%,event_category.ilike.%${term}%,destination.ilike.%${term}%,tags.ilike.%${term}%,vibe.ilike.%${term}%`;
+      if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
+        eventOrCondition += `,title.ilike.%${translatedTerm}%,description.ilike.%${translatedTerm}%,event_category.ilike.%${translatedTerm}%,destination.ilike.%${translatedTerm}%,tags.ilike.%${translatedTerm}%,vibe.ilike.%${translatedTerm}%`;
+      }
 
       const eventSearch = supabase
         .from('events')
@@ -141,22 +140,20 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         .or(eventOrCondition)
         .order('start_date', { ascending: true });
 
-      const venueOrCondition = buildOrCondition(
-        ['name', 'city'],
-        term,
-        translatedTerm
-      );
+      let venueOrCondition = `name.ilike.%${term}%,city.ilike.%${term}%`;
+      if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
+        venueOrCondition += `,name.ilike.%${translatedTerm}%,city.ilike.%${translatedTerm}%`;
+      }
 
       const venueSearch = supabase
         .from('venues')
         .select('*')
         .or(venueOrCondition);
 
-      const casualPlanOrCondition = buildOrCondition(
-        ['title', 'description', 'vibe', 'location'],
-        term,
-        translatedTerm
-      );
+      let casualPlanOrCondition = `title.ilike.%${term}%,description.ilike.%${term}%,vibe.ilike.%${term}%,location.ilike.%${term}%`;
+      if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
+        casualPlanOrCondition += `,title.ilike.%${translatedTerm}%,description.ilike.%${translatedTerm}%,vibe.ilike.%${translatedTerm}%,location.ilike.%${translatedTerm}%`;
+      }
       
       const casualPlanSearch = supabase
         .from('casual_plans')
