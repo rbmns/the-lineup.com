@@ -35,7 +35,7 @@ export const VibeField: React.FC<VibeFieldProps> = ({ control }) => {
           <Label htmlFor="vibe">Vibe</Label>
           <Select 
             onValueChange={(value) => field.onChange(value === NO_VIBE_VALUE ? null : value)} 
-            value={field.value ?? ''}
+            value={field.value ?? NO_VIBE_VALUE}
           >
             <FormControl>
               <SelectTrigger id="vibe">
