@@ -20,7 +20,7 @@ export const useUserCreatedEvents = () => {
           venues:venue_id(*)
         `)
         .eq('creator', user.id)
-        .order('start_date', { ascending: false });
+        .order('start_date', { ascending: true });
 
       if (error) {
         throw new Error(error.message);
