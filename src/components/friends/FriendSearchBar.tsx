@@ -16,10 +16,10 @@ export const FriendSearchBar = ({
 }: FriendSearchBarProps) => {
   return (
     <div className="relative">
-      <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+      <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
       <Input
         placeholder={placeholder}
-        className="pl-9 bg-white border-gray-300 focus-visible:ring-black text-black shadow-sm"
+        className="pl-10 pr-4 py-2 w-full rounded-full bg-card border-border focus-visible:ring-primary text-foreground"
         value={searchQuery}
         onChange={onSearchChange}
       />

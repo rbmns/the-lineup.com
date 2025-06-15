@@ -1,40 +1,37 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Caveat:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    /* Brand Colors */
-    --ocean-deep: 13 95 115;
-    --seafoam-green: 42 157 143;
-    --sky-blue: 0 180 219;
-    --sunset-yellow: 237 196 106;
-    --sand: 244 231 211;
-    --clay-earth: 169 113 85;
-    --driftwood-grey: 184 184 170;
-    
-    /* Semantic color mappings */
-    --background: var(--sand);
-    --foreground: var(--ocean-deep);
-    --card: 255 255 255;
-    --card-foreground: var(--ocean-deep);
+    /* New Brand Style - Coastal Minimalism */
+    --background: 248 249 250; /* #F8F9FA */
+    --foreground: 31 31 31; /* #1F1F1F */
+
+    --card: 255 255 255; /* #FFFFFF */
+    --card-foreground: 31 31 31; /* #1F1F1F */
+
     --popover: 255 255 255;
-    --popover-foreground: var(--ocean-deep);
-    --primary: var(--seafoam-green);
+    --popover-foreground: 31 31 31;
+
+    --primary: 0 166 166; /* #00A6A6 */
     --primary-foreground: 255 255 255;
-    --secondary: var(--sand);
-    --secondary-foreground: var(--ocean-deep);
-    --muted: var(--driftwood-grey);
-    --muted-foreground: var(--clay-earth);
-    --accent: var(--sunset-yellow);
-    --accent-foreground: var(--ocean-deep);
-    --destructive: 239 68 68;
-    --destructive-foreground: 248 250 252;
-    --border: var(--driftwood-grey);
-    --input: var(--driftwood-grey);
-    --ring: var(--seafoam-green);
+
+    --secondary: 229 231 235; /* a light gray for secondary elements */
+    --secondary-foreground: 31 31 31;
+
+    --muted: 229 231 235;
+    --muted-foreground: 107 114 128; /* #6B7280 */
+
+    --accent: 248 249 250; /* Using neutral bg as accent */
+    --accent-foreground: 31 31 31;
+
+    --destructive: 255 92 87; /* #FF5C57 */
+    --destructive-foreground: 255 255 255;
+
+    --border: 229 231 235; /* Light border */
+    --input: 229 231 235;
+    --ring: 0 166 166; /* #00A6A6 */
+
     --radius: 0.75rem;
   }
 }
@@ -44,82 +41,13 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-inter;
-    /* Beachy sand-to-ocean gradient background as primary default */
-    background: linear-gradient(135deg, hsl(var(--sand)) 0%, hsl(var(--seafoam-green)) 85%, hsl(var(--ocean-deep)) 100%);
+    @apply bg-background text-foreground font-inter leading-relaxed;
     min-height: 100vh;
   }
-}
-/* Explicit brand background utility just in case Tailwind's bg-background isn't working as expected */
-.bg-background {
-  background: linear-gradient(135deg, hsl(var(--sand)) 0%, hsl(var(--seafoam-green)) 85%, hsl(var(--ocean-deep)) 100%) !important;
-}
 
-@layer components {
-  /* Brand gradients */
-  .gradient-ocean {
-    background: linear-gradient(135deg, hsl(var(--ocean-deep)) 0%, hsl(var(--seafoam-green)) 100%);
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold uppercase;
   }
-  
-  .gradient-sunset {
-    background: linear-gradient(135deg, hsl(var(--sunset-yellow)) 0%, hsl(var(--clay-earth)) 100%);
-  }
-  
-  .gradient-sky {
-    background: linear-gradient(135deg, hsl(var(--sky-blue)) 0%, hsl(var(--seafoam-green)) 100%);
-  }
-
-  /* Card styles with coastal feeling */
-  .card-coastal {
-    @apply bg-white/80 backdrop-blur-sm border border-white/50 shadow-lg rounded-xl;
-    box-shadow: 0 8px 32px rgba(13, 95, 115, 0.1);
-  }
-
-  /* Button variants */
-  .btn-ocean {
-    background: linear-gradient(135deg, hsl(var(--ocean-deep)) 0%, hsl(var(--seafoam-green)) 100%);
-    @apply text-white border-0 shadow-md hover:shadow-lg transition-all duration-300;
-  }
-  
-  .btn-sunset {
-    background: linear-gradient(135deg, hsl(var(--sunset-yellow)) 0%, hsl(var(--clay-earth)) 100%);
-    @apply text-white border-0 shadow-md hover:shadow-lg transition-all duration-300;
-  }
-
-  /* Text styles */
-  .text-handwritten {
-    font-family: 'Caveat', cursive;
-    @apply text-lg;
-  }
-}
-
-/* Enhanced RSVP Button Animations */
-@keyframes buttonClickPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(0.95); }
-  100% { transform: scale(1); }
-}
-
-.button-click-animation {
-  animation: buttonClickPulse 0.15s ease-out;
-}
-
-@keyframes rsvpGoingPulse {
-  0% { box-shadow: 0 0 0 0px rgba(34, 197, 94, 0.1); }
-  100% { box-shadow: 0 0 0 4px rgba(34, 197, 94, 0); }
-}
-
-.rsvp-going-animation {
-  animation: rsvpGoingPulse 0.3s ease-out;
-}
-
-@keyframes rsvpInterestedPulse {
-  0% { box-shadow: 0 0 0 0px rgba(59, 130, 246, 0.1); }
-  100% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0); }
-}
-
-.rsvp-interested-animation {
-  animation: rsvpInterestedPulse 0.3s ease-out;
 }
 
 @layer utilities {
@@ -127,57 +55,7 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
-  }
-
-  /* Safe area padding for mobile devices */
-  .safe-area-pb {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-
-  .safe-area-pt {
-    padding-top: env(safe-area-inset-top);
-  }
-
-  /* Mobile-optimized touch targets */
-  .touch-target {
-    min-height: 44px;
-    min-width: 44px;
-  }
-
-  /* Responsive text scaling */
-  .text-responsive-xs {
-    @apply text-xs sm:text-sm;
-  }
-
-  .text-responsive-sm {
-    @apply text-sm sm:text-base;
-  }
-
-  .text-responsive-base {
-    @apply text-base sm:text-lg;
-  }
-
-  .text-responsive-lg {
-    @apply text-lg sm:text-xl md:text-2xl;
-  }
-
-  .text-responsive-xl {
-    @apply text-xl sm:text-2xl md:text-3xl;
-  }
-
-  /* Mobile-first spacing */
-  .spacing-mobile {
-    @apply p-4 sm:p-6 md:p-8;
-  }
-
-  .spacing-mobile-x {
-    @apply px-4 sm:px-6 md:px-8;
-  }
-
-  .spacing-mobile-y {
-    @apply py-4 sm:py-6 md:py-8;
   }
 }

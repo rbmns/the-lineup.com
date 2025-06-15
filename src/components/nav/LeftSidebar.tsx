@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Calendar, Users, Star, Home, Settings } from 'lucide-react';
@@ -34,7 +35,7 @@ const LeftSidebar: React.FC = () => {
   if (isMobile) {
     // Mobile horizontal layout at bottom
     return (
-      <div className="flex items-center justify-around py-2 px-1 bg-white border-t border-gray-200">
+      <div className="flex items-center justify-around py-2 px-1 bg-card border-t border-border">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
@@ -46,17 +47,15 @@ const LeftSidebar: React.FC = () => {
               className={cn(
                 "flex flex-col items-center p-2 min-w-0 flex-1 transition-colors",
                 isActive
-                  ? "text-blue-600"
-                  : "text-gray-600 hover:text-gray-800"
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               <Icon className={cn(
-                "h-5 w-5 mb-1",
-                isActive ? "text-blue-600" : "text-gray-600"
+                "h-5 w-5 mb-1"
               )} />
               <span className={cn(
-                "text-xs font-medium truncate",
-                isActive ? "text-blue-600" : "text-gray-600"
+                "text-xs font-medium truncate"
               )}>
                 {item.label}
               </span>
@@ -67,9 +66,9 @@ const LeftSidebar: React.FC = () => {
     );
   }
 
-  // Desktop vertical layout, icons centered, settings icon at bottom
+  // Desktop vertical layout
   return (
-    <div className="h-full flex flex-col items-center w-16 bg-white border-r border-gray-200">
+    <div className="h-full flex flex-col items-center w-20 bg-card border-r border-border">
       <div className="flex flex-col flex-1 items-center justify-start py-4 space-y-2 w-full">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -82,17 +81,17 @@ const LeftSidebar: React.FC = () => {
               className={cn(
                 "flex flex-col items-center justify-center w-full py-3 rounded-lg transition-colors group",
                 isActive
-                  ? "bg-blue-50 text-blue-600"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                  ? "bg-secondary text-primary"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
               )}
             >
               <Icon className={cn(
                 "h-6 w-6 mb-1",
-                isActive ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"
+                isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
               )} />
               <span className={cn(
                 "text-[10px] font-medium text-center leading-tight",
-                isActive ? "text-blue-600" : "text-gray-500 group-hover:text-gray-700"
+                isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
               )}>
                 {item.label}
               </span>
@@ -104,7 +103,7 @@ const LeftSidebar: React.FC = () => {
       <div className="py-4 w-full flex flex-col items-center">
         <Link
           to="/settings"
-          className="flex flex-col items-center w-full py-2 transition-colors text-gray-400 hover:text-gray-700"
+          className="flex flex-col items-center w-full py-2 transition-colors text-muted-foreground hover:text-foreground"
         >
           <Settings className="h-5 w-5 mb-0.5" />
         </Link>

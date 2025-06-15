@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss"
 
 const config = {
@@ -22,30 +23,6 @@ const config = {
         'xs': '480px',
       },
       colors: {
-        gray: {
-          50: "#F8FAFA",
-          100: "#F2F4F4",
-          200: "#E5E8EA",
-          300: "#C9CDD1",
-          400: "#A3AAB1",
-          500: "#7F868C",
-          600: "#5B636A",
-          700: "#393F45",
-          800: "#262B2F",
-          900: "#16191B",
-        },
-        "ocean-deep": {
-          50: "#F9FCFC",
-          100: "#E7F7FA",
-          200: "#B9E7EF",
-          300: "#7FD1E0",
-          400: "#4ABACE",
-          500: "#17809C",
-          600: "#106074",
-          700: "#0A4351",
-          800: "#082D35",
-          900: "#05181C"
-        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -79,21 +56,23 @@ const config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        'brand-ocean': '#106074',
-        'brand-sand': '#F5EEDF',
-        'brand-gold': '#C4A14B',
-        'brand-coral': '#EF8354',
-        'brand-deep': '#05181C',
+        'brand-turquoise': '#00A6A6',
+        'brand-coral-red': '#FF5C57',
+        'brand-neutral-bg': '#F8F9FA',
+        'brand-text-primary': '#1F1F1F',
+        'brand-text-secondary': '#6B7280',
+        'brand-online-green': '#22C55E',
+        'brand-away-orange': '#F97316',
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "calc(var(--radius) + 4px)",
       },
       fontFamily: {
         'inter': ['Inter', 'sans-serif'],
         'caveat': ['Caveat', 'cursive'],
-        'serif': ['Georgia', 'serif'],
       },
       keyframes: {
         "accordion-down": {

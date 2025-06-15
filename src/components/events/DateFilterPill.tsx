@@ -18,8 +18,8 @@ export const DateFilterPill: React.FC<DateFilterPillProps> = ({
   const baseClasses = cn(
     'px-3 py-1.5 rounded-full text-sm font-medium cursor-pointer transition-all duration-300',
     active 
-      ? 'bg-purple-500 text-white shadow-sm'
-      : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:shadow-sm',
+      ? 'bg-primary text-primary-foreground shadow-sm'
+      : 'bg-secondary text-secondary-foreground hover:bg-muted/50 hover:shadow-sm',
     className
   );
 
