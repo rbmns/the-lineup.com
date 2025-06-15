@@ -1,168 +1,33 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from '@/lib/supabase';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, CheckCircle } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/AuthContext';
 
-// Define form schema with zod
-const formSchema = z.object({
-  email: z.string().email({
-    message: "Invalid email address.",
-  }),
-  password: z.string().min(6, {
-    message: "Password must be at least 6 characters.",
-  }),
-  confirmPassword: z.string().min(6, {
-    message: "Password must be at least 6 characters.",
-  }),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+import React from 'react';
+import { Form } from '@/components/ui/form';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
+import { useSignupForm } from '@/hooks/useSignupForm';
+import { SignupSuccess } from './signup/SignupSuccess';
+import { SignupStep1 } from './signup/SignupStep1';
+import { SignupStep2 } from './signup/SignupStep2';
 
 export default function SignupForm({ onToggleMode }: { onToggleMode: () => void }) {
-  const [step, setStep] = useState<number>(1);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [registrationComplete, setRegistrationComplete] = useState<boolean>(false);
-  const [registeredEmail, setRegisteredEmail] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [blurredFields, setBlurredFields] = useState<Record<string, boolean>>({
-    password: false,
-    confirmPassword: false
-  });
-  const navigate = useNavigate();
-  const { loginWithGoogle, loading: authLoading } = useAuth();
-  
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },
-    mode: 'onBlur', // Only validate on blur, not on change
-  });
-
-  const handleGoogleLogin = async () => {
-    if (loading || authLoading) return;
-    await loginWithGoogle();
-  };
-
-  const handleFieldBlur = (fieldName: string) => {
-    setBlurredFields(prev => ({ ...prev, [fieldName]: true }));
-  };
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setLoading(true);
-    setErrorMessage("");
-    
-    try {
-      // Clean up any lingering auth state
-      try {
-        await supabase.auth.signOut({ scope: 'global' });
-      } catch (err) {
-        // Ignore errors during signout
-      }
-      
-      // Get the current base URL for redirects
-      const baseUrl = window.location.origin;
-      console.log('Signup with redirect URL:', `${baseUrl}/profile/edit?welcome=true`);
-      
-      // Register the user with Supabase
-      const { data, error } = await supabase.auth.signUp({
-        email: values.email,
-        password: values.password,
-        options: {
-          emailRedirectTo: `${baseUrl}/profile/edit?welcome=true`,
-        }
-      });
-
-      if (error) {
-        // Check for existing account error
-        if (error.message.includes("User already registered")) {
-          setErrorMessage("This email is already registered. Please use a different email or try logging in.");
-          toast({
-            title: "Account already exists",
-            description: "This email address is already registered. Please try logging in instead.",
-            variant: "destructive"
-          });
-          return;
-        }
-        
-        throw error;
-      }
-      
-      console.log('Signup response:', data);
-
-      // Show success message
-      setRegistrationComplete(true);
-      setRegisteredEmail(values.email);
-      
-      toast({
-        title: "Sign up successful!",
-        description: "We've sent you a confirmation email. Please check your inbox and verify your account.",
-        variant: "success"
-      });
-    } catch (error: any) {
-      // Show error message
-      console.error("Signup failed:", error.message);
-      setErrorMessage(error.message || "Something went wrong");
-      
-      toast({
-        title: "Sign up failed",
-        description: error.message || "Something went wrong with your registration. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const nextStep = async () => {
-    // Validate current step before proceeding
-    if (step === 1) {
-      const emailValid = await form.trigger('email');
-      if (emailValid) {
-        setStep(2);
-      }
-    }
-  };
-
-  const prevStep = () => {
-    setStep(1);
-    setErrorMessage("");
-  };
+  const {
+    form,
+    step,
+    loading,
+    authLoading,
+    errorMessage,
+    registrationComplete,
+    registeredEmail,
+    blurredFields,
+    onSubmit,
+    nextStep,
+    prevStep,
+    handleGoogleLogin,
+    handleFieldBlur,
+  } = useSignupForm();
 
   if (registrationComplete) {
-    return (
-      <div className="space-y-4 max-w-md w-full">
-        <Alert className="bg-green-50 border-green-200">
-          <CheckCircle className="h-4 w-4 text-green-600" />
-          <AlertTitle className="text-green-800">Registration successful!</AlertTitle>
-          <AlertDescription className="text-green-700">
-            We've sent a confirmation email to <strong>{registeredEmail}</strong>.
-            Please check your inbox and click the verification link to activate your account.
-          </AlertDescription>
-        </Alert>
-        
-        <div className="space-y-2 mt-4">
-          <p className="text-sm text-gray-600">
-            Don't see the email? Check your spam folder or try logging in anyway.
-          </p>
-          <Button variant="outline" className="w-full" onClick={onToggleMode}>
-            Go to Login
-          </Button>
-        </div>
-      </div>
-    );
+    return <SignupSuccess registeredEmail={registeredEmail} onToggleMode={onToggleMode} />;
   }
 
   return (
@@ -178,107 +43,22 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          {step === 1 && (
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="name@example.com" 
-                      type="email" 
-                      autoComplete="email" 
-                      disabled={loading} 
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
-
-          {step === 2 && (
-            <>
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="••••••••" 
-                        type="password" 
-                        autoComplete="new-password"
-                        disabled={loading} 
-                        onBlur={(e) => {
-                          field.onBlur();
-                          handleFieldBlur('password');
-                        }}
-                        {...field} 
-                      />
-                    </FormControl>
-                    {blurredFields.password && <FormMessage />}
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="••••••••" 
-                        type="password" 
-                        autoComplete="new-password" 
-                        disabled={loading} 
-                        onBlur={(e) => {
-                          field.onBlur();
-                          handleFieldBlur('confirmPassword');
-                        }}
-                        {...field} 
-                      />
-                    </FormControl>
-                    {blurredFields.confirmPassword && <FormMessage />}
-                  </FormItem>
-                )}
-              />
-            </>
-          )}
+          {step === 1 && <SignupStep1 loading={loading} />}
+          {step === 2 && <SignupStep2 loading={loading} blurredFields={blurredFields} handleFieldBlur={handleFieldBlur} />}
 
           <div className="flex justify-between mt-6">
             {step > 1 && (
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={prevStep} 
-                disabled={loading}
-              >
+              <Button type="button" variant="outline" onClick={prevStep} disabled={loading}>
                 Back
               </Button>
             )}
             
             {step < 2 ? (
-              <Button 
-                type="button" 
-                onClick={nextStep} 
-                disabled={loading} 
-                className="ml-auto"
-              >
+              <Button type="button" onClick={nextStep} disabled={loading} className="ml-auto">
                 Next
               </Button>
             ) : (
-              <Button 
-                type="submit" 
-                disabled={loading || authLoading} 
-                className="ml-auto"
-              >
+              <Button type="submit" disabled={loading || authLoading} className="ml-auto">
                 {loading ? "Creating account..." : "Create account"}
               </Button>
             )}
