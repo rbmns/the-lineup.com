@@ -6,6 +6,7 @@ import { CategoryPill } from "@/components/ui/category-pill";
 import { LineupImage } from "@/components/ui/lineup-image";
 import { formatFeaturedDate, formatEventTime } from "@/utils/date-formatting";
 import { Event } from "@/types";
+import { useEventImages } from "@/hooks/useEventImages";
 
 interface UpcomingEventCardProps {
   event: Event;
@@ -20,6 +21,9 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
   className = "",
   showCategory = true,
 }) => {
+  const { getEventImageUrl } = useEventImages();
+  const imageUrl = getEventImageUrl(event);
+
   const handleClick = (e: React.MouseEvent) => {
     if (onClick) {
       e.preventDefault();
@@ -40,7 +44,7 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
     >
       <div className="relative w-full h-40 rounded-t-xl overflow-hidden">
         <LineupImage
-          src={event.image_urls?.[0] || "/img/default.jpg"}
+          src={imageUrl || "/img/default.jpg"}
           alt={event.title}
           aspectRatio="video"
           className="h-40"
