@@ -53,6 +53,11 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
     );
   }
 
+  // Callback to close Auth Modal (passed to AuthOverlay)
+  const handleCloseAuthOverlay = () => {
+    setShowAuth(false);
+  };
+
   // If sidebar is visible
   return (
     <>
@@ -114,6 +119,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
           title="Create your account"
           description="Sign up or log in to create and share your own events!"
           browseEventsButton={true}
+          onClose={handleCloseAuthOverlay} // <-- Pass handler to close overlay
         >
           {/* Passing empty fragment as required `children` prop */}
           <></>

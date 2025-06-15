@@ -9,15 +9,28 @@ interface AuthOverlayProps {
   description: string;
   children: React.ReactNode;
   browseEventsButton?: boolean;
+  onClose?: () => void; // NEW for overlay dismissal
 }
 
 export const AuthOverlay: React.FC<AuthOverlayProps> = ({ 
   title, 
   description, 
   children,
-  browseEventsButton = false
+  browseEventsButton = false,
+  onClose
 }) => {
   const navigate = useNavigate();
+
+  const handleBrowseEvents = () => {
+    // If user provided onClose, call it.
+    if (onClose) {
+      onClose();
+    }
+    // Only navigate if not already on /events.
+    if (window.location.pathname !== '/events') {
+      navigate('/events');
+    }
+  };
 
   return (
     <div className="relative min-h-screen">
@@ -51,7 +64,7 @@ export const AuthOverlay: React.FC<AuthOverlayProps> = ({
             </Button>
             {browseEventsButton && (
               <Button 
-                onClick={() => navigate('/events')} 
+                onClick={handleBrowseEvents}
                 variant="ghost"
                 className="w-full text-gray-600 hover:text-gray-800 text-base py-3"
               >
