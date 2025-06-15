@@ -26,12 +26,11 @@ const buttonVariants = cva(
         dark: "bg-foreground text-background hover:bg-foreground/90",
       },
       size: {
-        // Slightly reduce heights for a more unified look
-        default: "min-w-[104px] h-11 px-5 py-2 text-base", // base default
+        // Heights adjusted for a sleeker, more standard feel
+        default: "min-w-[104px] h-10 px-5 py-2 text-base", // was h-11
         sm: "min-w-[88px] h-9 px-4 py-2 text-sm",
-        // Unify "lg" height to not be visually thicker than default
-        lg: "min-w-[120px] h-12 px-6 py-2.5 text-base", // was h-13, now h-12 (48px)
-        icon: "min-w-[44px] h-11 w-11 p-0",
+        lg: "min-w-[120px] h-11 px-6 py-2.5 text-base", // was h-12
+        icon: "h-10 w-10",
       },
     },
     defaultVariants: {
