@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { EventsPageHeader } from '@/components/events/EventsPageHeader';
 import { useEventPageMeta } from '@/components/events/EventsPageMeta';
@@ -67,7 +68,9 @@ const Events = () => {
               selectedVibes,
               setSelectedVibes,
               vibes,
-              vibesLoading
+              vibesLoading,
+              setUserLocation,
+              isFilteredByLocation,
             }) => {
               // Wrap the handleRsvp to convert Promise<boolean> to Promise<void>
               const wrappedHandleRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<void> => {
@@ -76,6 +79,11 @@ const Events = () => {
 
               return (
                 <div className="space-y-6">
+                  {isFilteredByLocation && (
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-md text-center text-sm text-blue-800">
+                      Showing events near your current location.
+                    </div>
+                  )}
                   {/* Vibe Filter Section */}
                   <EventsVibeSection
                     selectedVibes={selectedVibes || []}
@@ -106,6 +114,8 @@ const Events = () => {
                     handleRemoveVenue={handleRemoveVenue}
                     handleClearDateFilter={handleClearDateFilter}
                     resetFilters={resetFilters}
+                    setUserLocation={setUserLocation}
+                    isFilteredByLocation={isFilteredByLocation}
                   />
                   
                   {/* Results Display */}

@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useEvents } from '@/hooks/useEvents';
 import { useVenues } from '@/hooks/useVenues';
 import { useEventVibes } from '@/hooks/useEventVibes';
@@ -7,7 +6,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRsvpActions } from '@/hooks/event-rsvp/useRsvpActions';
 import { useFilterState } from '@/contexts/FilterStateContext';
 import { Event } from '@/types';
-import { useMemo } from 'react';
+import { LocationData } from '@/hooks/useLocation';
+import { isEventNearby } from '@/utils/geolocationUtils';
 
 interface EventsDataProviderProps {
   children: (data: {
@@ -44,6 +44,8 @@ interface EventsDataProviderProps {
     setSelectedVibes?: (vibes: string[]) => void;
     vibes?: string[];
     vibesLoading?: boolean;
+    setUserLocation: (location: LocationData | null) => void;
+    isFilteredByLocation: boolean;
   }) => React.ReactNode;
 }
 
@@ -53,6 +55,13 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
   const { venues = [], isLoading: isVenuesLoading } = useVenues();
   const { data: vibes = [], isLoading: vibesLoading } = useEventVibes();
   const { handleRsvp, loading: rsvpLoading } = useRsvpActions(user?.id);
+  const [userLocation, setUserLocation] = useState<LocationData | null>(() => {
+    if (typeof window !== 'undefined') {
+      const storedLocation = sessionStorage.getItem('userLocation');
+      return storedLocation ? JSON.parse(storedLocation) : null;
+    }
+    return null;
+  });
   
   const {
     selectedCategories,
@@ -79,6 +88,14 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     setLoadingEventId
   } = useFilterState();
 
+  useEffect(() => {
+    if (userLocation) {
+      sessionStorage.setItem('userLocation', JSON.stringify(userLocation));
+    } else {
+      sessionStorage.removeItem('userLocation');
+    }
+  }, [userLocation]);
+
   // Get all unique event types
   const allEventTypes = useMemo(() => {
     if (!events) return [];
@@ -103,7 +120,21 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
   const filteredEvents = useMemo(() => {
     if (!events) return [];
     
-    return events.filter((event) => {
+    let tempFilteredEvents = [...events];
+
+    // New location filter
+    if (userLocation && userLocation.latitude && userLocation.longitude) {
+      tempFilteredEvents = tempFilteredEvents.filter(event => {
+        if (!event.venues?.latitude || !event.venues?.longitude) return false;
+        return isEventNearby(
+          { latitude: event.venues.latitude, longitude: event.venues.longitude },
+          { latitude: userLocation.latitude!, longitude: userLocation.longitude! },
+          50 // 50km radius
+        );
+      });
+    }
+
+    return tempFilteredEvents.filter((event) => {
       // Event type filter
       if (selectedCategories.length > 0 && !selectedCategories.includes(event.event_category || '')) {
         return false;
@@ -162,7 +193,7 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
       
       return true;
     });
-  }, [events, selectedCategories, selectedVenues, selectedVibes, dateRange, selectedDateFilter]);
+  }, [events, selectedCategories, selectedVenues, selectedVibes, dateRange, selectedDateFilter, userLocation]);
 
   // Format venues for the component
   const formattedVenues = venues.map(venue => ({
@@ -171,6 +202,11 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
   }));
 
   const isFilterLoading = vibesLoading;
+
+  const fullResetFilters = () => {
+    resetFilters();
+    setUserLocation(null);
+  }
 
   return children({
     filteredEvents,
@@ -198,13 +234,15 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     hasAdvancedFilters,
     handleRemoveVenue,
     handleClearDateFilter,
-    resetFilters,
+    resetFilters: fullResetFilters,
     handleRsvp: enhancedHandleRsvp,
     showRsvpButtons: !!user,
     loadingEventId,
     selectedVibes,
     setSelectedVibes,
     vibes,
-    vibesLoading
+    vibesLoading,
+    setUserLocation,
+    isFilteredByLocation: !!userLocation,
   });
 };

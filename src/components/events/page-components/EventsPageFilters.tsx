@@ -1,9 +1,10 @@
-
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { EventsFilterBar } from '@/components/events/page-components/EventsFilterBar';
 import { EventsFilterPanel } from '@/components/events/page-components/EventsFilterPanel';
 import { useNavigationHistory } from '@/hooks/useNavigationHistory';
+import { NearbyEventsButton } from '@/components/events/NearbyEventsButton';
+import { LocationData } from '@/hooks/useLocation';
 
 interface EventsPageFiltersProps {
   allEventTypes: string[];
@@ -26,6 +27,8 @@ interface EventsPageFiltersProps {
   handleRemoveVenue: (venue: string) => void;
   handleClearDateFilter: () => void;
   resetFilters: () => void;
+  setUserLocation: (location: LocationData | null) => void;
+  isFilteredByLocation: boolean;
 }
 
 export const EventsPageFilters: React.FC<EventsPageFiltersProps> = ({
@@ -48,7 +51,9 @@ export const EventsPageFilters: React.FC<EventsPageFiltersProps> = ({
   hasAdvancedFilters,
   handleRemoveVenue,
   handleClearDateFilter,
-  resetFilters
+  resetFilters,
+  setUserLocation,
+  isFilteredByLocation,
 }) => {
   const location = useLocation();
   const { saveFilterState } = useNavigationHistory();
@@ -75,20 +80,37 @@ export const EventsPageFilters: React.FC<EventsPageFiltersProps> = ({
     saveFilterState
   ]);
 
+  const handleLocationAcquired = (locationData: LocationData) => {
+    setUserLocation(locationData);
+  };
+  
+  const handleLocationClear = () => {
+    setUserLocation(null);
+  };
+
   return (
     <div className="space-y-4">
       {/* Main filter bar with location and advanced filter toggle */}
-      <div className="w-full">
-        <EventsFilterBar
-          allEventTypes={allEventTypes}
-          selectedCategories={selectedCategories}
-          toggleCategory={toggleCategory}
-          selectAll={selectAll}
-          deselectAll={deselectAll}
-          hasActiveFilters={hasActiveFilters}
-          showAdvancedFilters={showAdvancedFilters}
-          toggleAdvancedFilters={toggleAdvancedFilters}
-        />
+      <div className="flex flex-wrap items-center gap-2 w-full">
+        <div className="flex-grow">
+          <EventsFilterBar
+            allEventTypes={allEventTypes}
+            selectedCategories={selectedCategories}
+            toggleCategory={toggleCategory}
+            selectAll={selectAll}
+            deselectAll={deselectAll}
+            hasActiveFilters={hasActiveFilters}
+            showAdvancedFilters={showAdvancedFilters}
+            toggleAdvancedFilters={toggleAdvancedFilters}
+          />
+        </div>
+        <div className="flex-shrink-0">
+           <NearbyEventsButton
+            onLocationAcquired={handleLocationAcquired}
+            onLocationClear={handleLocationClear}
+            isFilteredByLocation={isFilteredByLocation}
+          />
+        </div>
       </div>
       
       {/* Advanced Filters Panel & Filter Summary */}
