@@ -106,7 +106,9 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
     }
     // If event creator status still loading, optimistically disable
     if (isEventCreator === null || creatorRequestStatus === null) return;
-    if (isEventCreator) {
+    
+    // Also consider user as creator if their request is approved, to handle potential sync issues with roles.
+    if (isEventCreator || creatorRequestStatus === 'approved') {
       navigate('/events/create');
     } else {
       setShowRequestCreator(true);
