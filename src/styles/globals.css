@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -46,9 +45,14 @@
   }
   body {
     @apply bg-background text-foreground font-inter;
-    background: linear-gradient(135deg, hsl(var(--sand)) 0%, rgb(250 250 250) 100%);
+    /* Beachy sand-to-ocean gradient background as primary default */
+    background: linear-gradient(135deg, hsl(var(--sand)) 0%, hsl(var(--seafoam-green)) 85%, hsl(var(--ocean-deep)) 100%);
     min-height: 100vh;
   }
+}
+/* Explicit brand background utility just in case Tailwind's bg-background isn't working as expected */
+.bg-background {
+  background: linear-gradient(135deg, hsl(var(--sand)) 0%, hsl(var(--seafoam-green)) 85%, hsl(var(--ocean-deep)) 100%) !important;
 }
 
 @layer components {
