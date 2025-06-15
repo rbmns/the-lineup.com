@@ -199,7 +199,7 @@ const Home = () => {
       <CasualPlansHomeSection />
 
       {/* CTA Section */}
-      <section className="py-16 gradient-ocean w-full">
+      <section className="py-16 w-full gradient-ocean">
         <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold tracking-tight text-white mb-4">
@@ -208,7 +208,7 @@ const Home = () => {
             <p className="text-xl mb-8 text-white/90">
               Join our community and start discovering events that match your interests and vibe.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="btn-sunset text-white font-medium">
                 <Link to="/events">
