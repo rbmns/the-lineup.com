@@ -102,14 +102,14 @@ export const EventsPageFilters: React.FC<EventsPageFiltersProps> = ({
         <div className="flex-shrink-0 sm:w-auto w-full sm:max-w-xs">
           <div className="relative">
             <Select
-              value={selectedLocationId || ''}
-              onValueChange={(value) => onLocationChange(value || null)}
+              value={selectedLocationId || 'all-locations'}
+              onValueChange={(value) => onLocationChange(value === 'all-locations' ? null : value)}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Filter by location..." />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Locations</SelectItem>
+                <SelectItem value="all-locations">All Locations</SelectItem>
                 {locations.map(loc => (
                   <SelectItem key={loc.value} value={loc.value}>{loc.label}</SelectItem>
                 ))}
