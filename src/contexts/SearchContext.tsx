@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useCallback } from 'react';
 import { Event, UserProfile, Venue } from '@/types';
 import { CasualPlan } from '@/types/casual-plans';
@@ -49,15 +50,6 @@ interface SearchContextType {
   trackSearch: (term: string) => Promise<void>;
   trackClick: (searchTerm: string, resultId: string, resultType: string) => Promise<void>;
 }
-
-const buildOrCondition = (fields: string[], term: string, translatedTerm: string) => {
-  const originalTermQuery = fields.map(f => `${f}.ilike.%${term}%`).join(',');
-  if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
-    const translatedTermQuery = fields.map(f => `${f}.ilike.%${translatedTerm}%`).join(',');
-    return `${originalTermQuery},${translatedTermQuery}`;
-  }
-  return originalTermQuery;
-};
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
@@ -118,31 +110,11 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       await trackSearch(term);
       
-      const dutchToEnglish: { [key: string]: string } = {
-        'strand': 'beach',
-        'zomer': 'summer',
-        'feest': 'party',
-        'muziek': 'music',
-        'lente': 'spring',
-        'herfst': 'autumn',
-        'winter': 'winter',
-      };
-
-      let translatedTerm = term;
-      Object.entries(dutchToEnglish).forEach(([dutch, english]) => {
-        const regex = new RegExp(`\\b${dutch}\\b`, 'gi');
-        translatedTerm = translatedTerm.replace(regex, english);
-      });
-
-      // Search events with better field coverage and debugging
-      let eventOrCondition = `title.ilike.%${term}%,description.ilike.%${term}%,event_type.ilike.%${term}%,destination.ilike.%${term}%,tags.ilike.%${term}%,vibe.ilike.%${term}%`;
-      if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
-        eventOrCondition += `,title.ilike.%${translatedTerm}%,description.ilike.%${translatedTerm}%,event_type.ilike.%${translatedTerm}%,destination.ilike.%${translatedTerm}%,tags.ilike.%${translatedTerm}%,vibe.ilike.%${translatedTerm}%`;
-      }
-
-      console.log('Event search condition:', eventOrCondition);
-
-      const eventSearch = supabase
+      // Enhanced search to cover more fields and use OR conditions properly
+      const searchPattern = `%${term.toLowerCase()}%`;
+      
+      // Search events with comprehensive field coverage
+      const { data: eventData, error: eventError } = await supabase
         .from('events')
         .select(`
           *,
@@ -150,67 +122,52 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           creator:profiles(id, username, avatar_url, email, location, status, tagline),
           event_rsvps(id, user_id, status)
         `)
-        .or(eventOrCondition)
+        .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},destination.ilike.${searchPattern},vibe.ilike.${searchPattern},event_category.ilike.${searchPattern},tags.cs.{${term}},specific_venue.ilike.${searchPattern}`)
         .order('start_date', { ascending: true });
 
-      let venueOrCondition = `name.ilike.%${term}%,city.ilike.%${term}%`;
-      if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
-        venueOrCondition += `,name.ilike.%${translatedTerm}%,city.ilike.%${translatedTerm}%`;
+      console.log('Event search query result:', eventData?.length || 0, 'events found');
+      if (eventError) {
+        console.error('Event search error:', eventError);
       }
 
-      const venueSearch = supabase
+      // Search venues
+      const { data: venueData, error: venueError } = await supabase
         .from('venues')
         .select('*')
-        .or(venueOrCondition);
+        .or(`name.ilike.${searchPattern},city.ilike.${searchPattern}`)
 
-      let casualPlanOrCondition = `title.ilike.%${term}%,description.ilike.%${term}%,vibe.ilike.%${term}%,location.ilike.%${term}%`;
-      if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
-        casualPlanOrCondition += `,title.ilike.%${translatedTerm}%,description.ilike.%${translatedTerm}%,vibe.ilike.%${translatedTerm}%,location.ilike.%${translatedTerm}%`;
+      console.log('Venue search result:', venueData?.length || 0, 'venues found');
+      if (venueError) {
+        console.error('Venue search error:', venueError);
       }
-      
-      const casualPlanSearch = supabase
+
+      // Search casual plans
+      const { data: casualPlanData, error: casualPlanError } = await supabase
         .from('casual_plans')
         .select('*, creator_profile:profiles(id, username, avatar_url)')
-        .or(casualPlanOrCondition);
+        .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},vibe.ilike.${searchPattern},location.ilike.${searchPattern}`)
 
-      const [eventResponse, venueResponse, casualPlanResponse] = await Promise.all([
-        eventSearch,
-        venueSearch,
-        casualPlanSearch,
-      ]);
+      console.log('Casual plan search result:', casualPlanData?.length || 0, 'plans found');
+      if (casualPlanError) {
+        console.error('Casual plan search error:', casualPlanError);
+      }
 
-      console.log('Event search results:', eventResponse.data?.length || 0);
-      console.log('Venue search results:', venueResponse.data?.length || 0);
-      console.log('Casual plan search results:', casualPlanResponse.data?.length || 0);
-
-      if (eventResponse.error) {
-        console.error('Event search error:', eventResponse.error);
-        throw eventResponse.error;
-      }
-      if (venueResponse.error) {
-        console.error('Venue search error:', venueResponse.error);
-        throw venueResponse.error;
-      }
-      if (casualPlanResponse.error) {
-        console.error('Casual plan search error:', casualPlanResponse.error);
-        throw casualPlanResponse.error;
-      }
-      
-      const eventResults = (eventResponse.data || []).map(event => ({
-          ...event,
-          type: 'event' as const,
+      // Format results
+      const eventResults = (eventData || []).map(event => ({
+        ...event,
+        type: 'event' as const,
       }));
 
-      const venueResults = (venueResponse.data || []).map(venue => ({
-          ...venue,
-          type: 'venue' as const,
-          title: venue.name,
-          location: venue.city,
+      const venueResults = (venueData || []).map(venue => ({
+        ...venue,
+        type: 'venue' as const,
+        title: venue.name,
+        location: venue.city,
       }));
 
-      const casualPlanResults = (casualPlanResponse.data || []).map(plan => ({
-          ...plan,
-          type: 'casual_plan' as const,
+      const casualPlanResults = (casualPlanData || []).map(plan => ({
+        ...plan,
+        type: 'casual_plan' as const,
       }));
       
       const results: SearchResult[] = [...eventResults, ...venueResults, ...casualPlanResults];
@@ -254,7 +211,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           venues:venue_id(*),
           event_rsvps(id, user_id, status)
         `)
-        .eq('event_type', asEqParam(category))
+        .eq('event_category', asEqParam(category))
         .order('start_date', { ascending: true });
         
       if (error) throw error;
@@ -311,7 +268,8 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       `);
       
       if (params.term) {
-        query = query.or(`title.ilike.%${params.term}%,description.ilike.%${params.term}%,event_type.ilike.%${params.term}%`);
+        const searchPattern = `%${params.term.toLowerCase()}%`;
+        query = query.or(`title.ilike.${searchPattern},description.ilike.${searchPattern},destination.ilike.${searchPattern},vibe.ilike.${searchPattern},event_category.ilike.${searchPattern}`);
       }
       
       if (params.location) {
@@ -319,7 +277,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
       
       if (params.category) {
-        query = query.eq('event_type', asEqParam(params.category));
+        query = query.eq('event_category', asEqParam(params.category));
       }
       
       if (params.startDate) {

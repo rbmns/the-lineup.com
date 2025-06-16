@@ -1,74 +1,61 @@
 
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
+import { processEventsData } from '@/utils/eventProcessorUtils';
 
-export const useEventDetails = (eventId: string | null) => {
-  return useQuery({
-    queryKey: ['event-details', eventId],
-    queryFn: async (): Promise<Event | null> => {
-      if (!eventId) return null;
-      
-      const { data, error } = await supabase
-        .from('events')
-        .select(`
-          *,
-          venues (
-            id,
-            name,
-            street,
-            postal_code,
-            city,
-            website,
-            google_maps
-          ),
-          profiles:creator (
-            id,
-            username,
-            avatar_url,
-            email,
-            location,
-            location_category,
-            status,
-            status_details,
-            tagline,
-            created_at,
-            updated_at
-          ),
-          event_rsvps!left (
-            status
-          )
-        `)
-        .eq('id', eventId)
-        .single();
+export const useEventDetails = (eventId: string | undefined, userId: string | undefined) => {
+  const [event, setEvent] = useState<Event | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-      if (error) {
-        console.error('Error fetching event details:', error);
-        throw error;
+  useEffect(() => {
+    if (!eventId) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchEvent = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const { data, error: fetchError } = await supabase
+          .from('events')
+          .select(`
+            *,
+            creator:profiles(id, username, avatar_url, email, location, status, tagline),
+            venues:venue_id(*),
+            event_rsvps(id, user_id, status)
+          `)
+          .eq('id', eventId)
+          .maybeSingle();
+
+        if (fetchError) {
+          console.error('Error fetching event:', fetchError);
+          setError('Failed to load event details');
+          return;
+        }
+
+        if (!data) {
+          setError('Event not found');
+          return;
+        }
+
+        // Process the event data using the same utility function
+        const processedEvents = processEventsData([data], userId);
+        setEvent(processedEvents[0] || null);
+
+      } catch (err) {
+        console.error('Unexpected error:', err);
+        setError('An unexpected error occurred');
+      } finally {
+        setLoading(false);
       }
+    };
 
-      if (!data) return null;
+    fetchEvent();
+  }, [eventId, userId]);
 
-      // Transform the data to match the Event type
-      const transformedEvent: Event = {
-        ...data,
-        // Map creator profile properly
-        creator: data.profiles || null,
-        // Transform tags from string to string array
-        tags: data.tags ? data.tags.split(',').map(tag => tag.trim()).filter(Boolean) : [],
-        // Calculate attendees from event_rsvps
-        attendees: {
-          going: data.event_rsvps?.filter(rsvp => rsvp.status === 'Going').length || 0,
-          interested: data.event_rsvps?.filter(rsvp => rsvp.status === 'Interested').length || 0,
-        },
-        // Map other required fields
-        going_count: data.event_rsvps?.filter(rsvp => rsvp.status === 'Going').length || 0,
-        interested_count: data.event_rsvps?.filter(rsvp => rsvp.status === 'Interested').length || 0,
-      };
-
-      return transformedEvent;
-    },
-    enabled: !!eventId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
+  return { event, loading, error };
 };
