@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Calendar, MapPin, ArrowRight } from "lucide-react";
+import { Calendar, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { CategoryPill } from "@/components/ui/category-pill";
 import { LineupImage } from "@/components/ui/lineup-image";
@@ -8,7 +8,6 @@ import { formatEventCardDateTime } from "@/utils/date-formatting";
 import { Event } from "@/types";
 import { useEventImages } from "@/hooks/useEventImages";
 import { DEFAULT_FALLBACK_IMAGE_URL } from "@/utils/eventImages";
-import { Card } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface UpcomingEventCardProps {
@@ -36,22 +35,22 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
   };
 
   return (
-    <Card
+    <div
       className={cn(
-        "group hover:shadow-lg transition-shadow flex flex-col cursor-pointer overflow-hidden rounded-xl shadow-md",
-        isMobile ? "w-full" : "w-80",
+        "group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden border border-[#F4E7D3] hover:border-[#2A9D8F]/30 transform hover:-translate-y-1",
         className
       )}
       onClick={handleClick}
       tabIndex={0}
       role="button"
     >
-      <div className={`relative w-full ${isMobile ? 'h-40' : 'h-48'} rounded-t-xl overflow-hidden transform`}>
+      {/* Image Container */}
+      <div className="relative w-full h-48 md:h-56 overflow-hidden rounded-t-2xl bg-gradient-to-br from-[#F4E7D3] to-[#EDC46A]/30">
         <LineupImage
           src={imageUrl}
           alt={event.title}
           aspectRatio="video"
-          className={isMobile ? "h-40" : "h-48"}
+          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (target.src !== DEFAULT_FALLBACK_IMAGE_URL) {
@@ -60,8 +59,12 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
             }
           }}
         />
+        
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+        
         {showCategory && event.event_category && (
-          <div className="absolute top-3 left-3">
+          <div className="absolute top-4 left-4">
             <CategoryPill 
               category={event.event_category} 
               active={true} 
@@ -72,52 +75,66 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
         )}
       </div>
 
-      <div className={`flex flex-col gap-2 ${isMobile ? 'p-3' : 'p-4'} w-full text-left items-start`}>
-        <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-bold leading-tight line-clamp-2 text-ocean-deep-900 font-inter text-left`}>
+      {/* Content */}
+      <div className="p-5 md:p-6">
+        {/* Title */}
+        <h3 className="font-bold text-lg md:text-xl leading-tight mb-3 text-[#005F73] line-clamp-2 group-hover:text-[#2A9D8F] transition-colors">
           {event.title}
         </h3>
-        <div className={`flex items-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'} text-ocean-deep-700 font-inter text-left`}>
-          <Calendar size={isMobile ? 13 : 15} className="flex-shrink-0" />
-          <span>
-            {formatEventCardDateTime(event.start_date, event.start_time)}
-          </span>
-        </div>
-        {event.venues?.name || event.location ? (
-          <div className={`flex items-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'} text-ocean-deep-700 font-inter text-left`}>
-            <MapPin size={isMobile ? 13 : 15} className="flex-shrink-0" />
-            <span className="truncate">
-              {event.venues?.name || event.location}
+        
+        {/* Event Details */}
+        <div className="space-y-2 mb-4">
+          {/* Date & Time */}
+          <div className="flex items-center gap-3 text-[#005F73]/70">
+            <Calendar className="h-4 w-4 text-[#2A9D8F] flex-shrink-0" />
+            <span className="text-sm font-medium">
+              {formatEventCardDateTime(event.start_date, event.start_time)}
             </span>
           </div>
-        ) : null}
+
+          {/* Location */}
+          {(event.venues?.name || event.location) && (
+            <div className="flex items-center gap-3 text-[#005F73]/70">
+              <MapPin className="h-4 w-4 text-[#2A9D8F] flex-shrink-0" />
+              <span className="text-sm font-medium truncate">
+                {event.venues?.name || event.location}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom accent */}
+        <div className="h-1 w-12 bg-gradient-to-r from-[#2A9D8F] to-[#00B4DB] rounded-full group-hover:w-16 transition-all duration-300" />
       </div>
-    </Card>
+    </div>
   );
 };
 
 interface ViewAllCardProps {
   onClick?: () => void;
 }
+
 export const ViewAllCard: React.FC<ViewAllCardProps> = ({ onClick }) => {
   const isMobile = useIsMobile();
   
   return (
     <div
       className={cn(
-        "group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col items-center justify-center cursor-pointer",
-        isMobile ? "w-full min-h-[200px]" : "max-w-xs min-h-[256px] w-[80px]"
+        "group bg-gradient-to-br from-[#F4E7D3] to-[#EDC46A]/30 rounded-2xl border-2 border-dashed border-[#2A9D8F]/40 hover:border-[#2A9D8F] transition-all duration-300 flex flex-col items-center justify-center cursor-pointer min-h-[280px] hover:shadow-lg transform hover:-translate-y-1",
+        isMobile ? "w-full" : "max-w-xs"
       )}
       onClick={onClick}
       tabIndex={0}
       role="button"
       aria-label="View all events"
     >
-      <div className="flex items-center justify-center h-16">
-        <span className="bg-ocean-deep-500 text-white rounded-full p-3">
-          <ArrowRight size={isMobile ? 24 : 28} />
-        </span>
+      <div className="text-center p-6">
+        <div className="w-16 h-16 bg-[#2A9D8F] rounded-full flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
+          <span className="text-white text-2xl">→</span>
+        </div>
+        <h3 className="text-lg font-semibold text-[#005F73] mb-2">View All Events</h3>
+        <p className="text-[#005F73]/70 text-sm">Discover more experiences</p>
       </div>
-      <div className={`text-ocean-deep-800 font-medium ${isMobile ? 'text-sm' : 'text-xs'} mt-4`}>View All</div>
     </div>
   );
 };

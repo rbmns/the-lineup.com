@@ -11,23 +11,22 @@ const Home = () => {
   const { data: events, isLoading } = useEvents();
 
   return (
-    <div className="w-full">
+    <div className="w-full bg-white">
+      {/* Hero Section */}
       <HomePageHeaderSection />
       
-      <div className="w-full bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <HomeUpcomingEventsSection events={events} isLoading={isLoading} />
-        </div>
-      </div>
+      {/* Upcoming Events Section */}
+      <HomeUpcomingEventsSection events={events} isLoading={isLoading} />
 
+      {/* How It Works Section */}
       <HomeHowItWorksSection />
       
-      <div className="w-full bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <HomeCasualPlansSection />
-        </div>
+      {/* Casual Plans Section */}
+      <div className="bg-[#F4E7D3]/20">
+        <HomeCasualPlansSection />
       </div>
       
+      {/* CTA Section */}
       <HomeCtaSection />
     </div>
   );

@@ -49,20 +49,23 @@ const MainNav = () => {
 
   return (
     <header className={cn(
-      "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 bg-white border-b border-gray-200",
+      "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300",
+      isScrolled 
+        ? "bg-white/95 backdrop-blur-md border-b border-[#F4E7D3] shadow-sm" 
+        : "bg-white/90 backdrop-blur-sm border-b border-[#F4E7D3]/50"
     )}>
       <div className="w-full flex flex-col">
         <div className={cn(
           "w-full flex items-center justify-between gap-2 sm:gap-4",
-          isMobile ? "h-14 px-3" : "h-16 px-4 sm:px-6"
+          isMobile ? "h-14 px-4" : "h-16 px-6 lg:px-8"
         )}>
-          {/* Left side - Icon flush left + wordmark */}
+          {/* Left side - Logo */}
           <div className="flex items-center h-full flex-shrink-0 min-w-0">
-            <Link to="/" className="flex items-center justify-center mr-2 flex-shrink-0">
+            <Link to="/" className="flex items-center justify-center mr-3 flex-shrink-0">
               <img
                 src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png"
                 alt="thelineup Symbol"
-                className={isMobile ? "w-5 h-5" : "w-6 h-6 sm:w-7 sm:h-7"}
+                className={isMobile ? "w-6 h-6" : "w-7 h-7"}
                 style={{ display: 'block' }}
               />
             </Link>
@@ -71,47 +74,53 @@ const MainNav = () => {
 
           {/* Center-Right - Search Bar for desktop */}
           {!isMobile && (
-            <div className="flex-1 flex justify-end max-w-md mr-2">
+            <div className="flex-1 flex justify-end max-w-md mr-4">
               <NavbarSearch />
             </div>
           )}
 
           {/* Right side - User menu or auth buttons */}
-          <div className="flex items-center gap-1 sm:gap-2 lg:gap-3 flex-shrink-0">
+          <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0">
             {isAuthenticated && user ? (
               <>
                 {isAdmin && (
-                  <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex">
+                  <Button asChild variant="ghost" size="sm" className="hidden md:inline-flex text-[#005F73] hover:text-[#2A9D8F]">
                     <Link to="/admin">Admin</Link>
                   </Button>
                 )}
                 <UserMenu user={user} profile={profile} handleSignOut={signOut} canCreateEvents={canCreateEvents} />
               </>
             ) : (
-              <div className="flex items-center gap-1 sm:gap-2">
+              <div className="flex items-center gap-2">
                 <Button
-                  variant="default"
+                  variant="ghost"
                   size={isMobile ? "sm" : "sm"}
                   onClick={handleSignInClick}
-                  className={isMobile ? "text-xs px-2" : "text-xs sm:text-sm px-2 sm:px-3"}
+                  className={cn(
+                    "text-[#005F73] hover:text-[#2A9D8F] hover:bg-[#F4E7D3]/50",
+                    isMobile ? "text-sm px-3" : "text-sm px-4"
+                  )}
                 >
                   Sign in
                 </Button>
                 <Button
-                  variant="primary"
                   size={isMobile ? "sm" : "sm"}
                   onClick={handleRegisterClick}
-                  className={isMobile ? "text-xs px-2" : "text-xs sm:text-sm px-2 sm:px-3"}
+                  className={cn(
+                    "bg-[#2A9D8F] hover:bg-[#005F73] text-white rounded-full",
+                    isMobile ? "text-sm px-4" : "text-sm px-6"
+                  )}
                 >
-                  Sign up
+                  Join the flow
                 </Button>
               </div>
             )}
           </div>
         </div>
+        
         {/* Mobile search bar */}
         {isMobile && (
-          <div className="px-3 pb-2 bg-white border-t border-gray-100">
+          <div className="px-4 pb-3 bg-white/95 border-t border-[#F4E7D3]/50">
             <NavbarSearch />
           </div>
         )}
