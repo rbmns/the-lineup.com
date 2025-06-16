@@ -323,14 +323,20 @@ export type Database = {
           fee: number | null
           fixed_start_time: boolean
           id: string
+          image_url: string | null
           image_urls: string[] | null
+          location_id: number | null
           organiser_name: string | null
+          organizer_email_internal: string | null
           organizer_link: string | null
+          scraper_source_url: string | null
           slug: string | null
+          source_type: Database["public"]["Enums"]["event_source_type"] | null
+          specific_venue: string | null
           start_date: string | null
           start_time: string | null
           status: Database["public"]["Enums"]["event_status"]
-          tags: string | null
+          tags: string[] | null
           title: string
           updated_at: string | null
           venue_id: string | null
@@ -349,14 +355,20 @@ export type Database = {
           fee?: number | null
           fixed_start_time?: boolean
           id?: string
+          image_url?: string | null
           image_urls?: string[] | null
+          location_id?: number | null
           organiser_name?: string | null
+          organizer_email_internal?: string | null
           organizer_link?: string | null
+          scraper_source_url?: string | null
           slug?: string | null
+          source_type?: Database["public"]["Enums"]["event_source_type"] | null
+          specific_venue?: string | null
           start_date?: string | null
           start_time?: string | null
           status?: Database["public"]["Enums"]["event_status"]
-          tags?: string | null
+          tags?: string[] | null
           title: string
           updated_at?: string | null
           venue_id?: string | null
@@ -375,14 +387,20 @@ export type Database = {
           fee?: number | null
           fixed_start_time?: boolean
           id?: string
+          image_url?: string | null
           image_urls?: string[] | null
+          location_id?: number | null
           organiser_name?: string | null
+          organizer_email_internal?: string | null
           organizer_link?: string | null
+          scraper_source_url?: string | null
           slug?: string | null
+          source_type?: Database["public"]["Enums"]["event_source_type"] | null
+          specific_venue?: string | null
           start_date?: string | null
           start_time?: string | null
           status?: Database["public"]["Enums"]["event_status"]
-          tags?: string | null
+          tags?: string[] | null
           title?: string
           updated_at?: string | null
           venue_id?: string | null
@@ -397,11 +415,11 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "events_event_category_fkey"
-            columns: ["event_category"]
+            foreignKeyName: "events_location_id_fkey"
+            columns: ["location_id"]
             isOneToOne: false
-            referencedRelation: "event_categories"
-            referencedColumns: ["name"]
+            referencedRelation: "locations"
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "events_venue_id_fkey"
@@ -443,6 +461,60 @@ export type Database = {
           status?: string | null
           updated_at?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      locations: {
+        Row: {
+          accessibility_info: string | null
+          amenities_list: string | null
+          country: string | null
+          created_at: string
+          general_description: string | null
+          id: number
+          is_curated: boolean
+          key_surf_spots: string | null
+          last_scraped_date: string | null
+          local_vibe: string | null
+          official_links: string[] | null
+          primary_image_url: string | null
+          scraped_sources: string[] | null
+          surf_characteristics: string | null
+          town_name: string
+        }
+        Insert: {
+          accessibility_info?: string | null
+          amenities_list?: string | null
+          country?: string | null
+          created_at?: string
+          general_description?: string | null
+          id?: number
+          is_curated?: boolean
+          key_surf_spots?: string | null
+          last_scraped_date?: string | null
+          local_vibe?: string | null
+          official_links?: string[] | null
+          primary_image_url?: string | null
+          scraped_sources?: string[] | null
+          surf_characteristics?: string | null
+          town_name: string
+        }
+        Update: {
+          accessibility_info?: string | null
+          amenities_list?: string | null
+          country?: string | null
+          created_at?: string
+          general_description?: string | null
+          id?: number
+          is_curated?: boolean
+          key_surf_spots?: string | null
+          last_scraped_date?: string | null
+          local_vibe?: string | null
+          official_links?: string[] | null
+          primary_image_url?: string | null
+          scraped_sources?: string[] | null
+          surf_characteristics?: string | null
+          town_name?: string
         }
         Relationships: []
       }
@@ -578,27 +650,6 @@ export type Database = {
           created_at?: string | null
           id?: string
           name?: string | null
-        }
-        Relationships: []
-      }
-      towns: {
-        Row: {
-          country: string
-          created_at: string
-          id: number
-          name: string
-        }
-        Insert: {
-          country: string
-          created_at?: string
-          id?: number
-          name: string
-        }
-        Update: {
-          country?: string
-          created_at?: string
-          id?: number
-          name?: string
         }
         Relationships: []
       }
@@ -829,6 +880,7 @@ export type Database = {
       }
     }
     Enums: {
+      event_source_type: "Submitted" | "Scraped"
       event_status: "draft" | "pending_approval" | "published" | "rejected"
       request_status: "pending" | "approved" | "rejected"
     }
@@ -946,6 +998,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      event_source_type: ["Submitted", "Scraped"],
       event_status: ["draft", "pending_approval", "published", "rejected"],
       request_status: ["pending", "approved", "rejected"],
     },

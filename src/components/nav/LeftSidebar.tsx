@@ -33,9 +33,9 @@ const LeftSidebar: React.FC = () => {
   ];
 
   if (isMobile) {
-    // Mobile horizontal layout at bottom
+    // Mobile horizontal layout at bottom with better iPhone compatibility
     return (
-      <div className="flex items-center justify-around py-2 px-1 bg-card border-t border-border">
+      <div className="flex items-center justify-around h-full px-2 bg-card border-t border-border safe-area-bottom">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
@@ -45,10 +45,10 @@ const LeftSidebar: React.FC = () => {
               key={item.path}
               to={item.path}
               className={cn(
-                "flex flex-col items-center p-2 min-w-0 flex-1 transition-colors",
+                "flex flex-col items-center justify-center p-3 min-w-0 flex-1 transition-colors rounded-lg",
                 isActive
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "text-primary bg-secondary"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
               )}
             >
               <Icon className={cn(
@@ -66,7 +66,7 @@ const LeftSidebar: React.FC = () => {
     );
   }
 
-  // Desktop vertical layout, REMOVED settings icon at the bottom
+  // Desktop vertical layout
   return (
     <div className="h-full flex flex-col items-center w-20 bg-card">
       <div className="flex flex-col flex-1 items-center justify-start py-4 space-y-2 w-full">
@@ -99,10 +99,8 @@ const LeftSidebar: React.FC = () => {
           );
         })}
       </div>
-      {/* REMOVED: Settings icon at the bottom */}
     </div>
   );
 };
 
 export default LeftSidebar;
-

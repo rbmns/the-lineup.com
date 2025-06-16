@@ -21,8 +21,15 @@ export const NavbarSearch: React.FC<NavbarSearchProps> = ({ className }) => {
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (query.trim()) {
+      console.log('Searching for:', query.trim()); // Debug log
       navigate(`/search?q=${encodeURIComponent(query.trim())}`);
     }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newQuery = e.target.value;
+    setQuery(newQuery);
+    console.log('Search query updated:', newQuery); // Debug log
   };
 
   return (
@@ -31,7 +38,7 @@ export const NavbarSearch: React.FC<NavbarSearchProps> = ({ className }) => {
         type="text"
         placeholder="Search events, locations, or instructors..."
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={handleInputChange}
         className="w-full rounded-full pl-10 pr-4 h-10 text-sm"
       />
       <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">

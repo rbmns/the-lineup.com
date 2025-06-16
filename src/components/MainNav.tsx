@@ -47,12 +47,16 @@ const MainNav = () => {
     navigate('/login');
   };
 
+  // Calculate total header height for mobile
+  const mobileHeaderHeight = isMobile ? 'h-[112px]' : 'h-16'; // 56px main nav + 56px search = 112px on mobile
+
   return (
     <header className={cn(
       "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300",
       isScrolled 
         ? "bg-white/95 backdrop-blur-md border-b border-[#F4E7D3] shadow-sm" 
-        : "bg-white/90 backdrop-blur-sm border-b border-[#F4E7D3]/50"
+        : "bg-white/90 backdrop-blur-sm border-b border-[#F4E7D3]/50",
+      mobileHeaderHeight
     )}>
       <div className="w-full flex flex-col">
         <div className={cn(
@@ -118,9 +122,9 @@ const MainNav = () => {
           </div>
         </div>
         
-        {/* Mobile search bar */}
+        {/* Mobile search bar with proper spacing */}
         {isMobile && (
-          <div className="px-4 pb-3 bg-white/95 border-t border-[#F4E7D3]/50">
+          <div className="h-14 px-4 py-2 bg-white/95 border-t border-[#F4E7D3]/50 flex items-center">
             <NavbarSearch />
           </div>
         )}

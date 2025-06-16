@@ -10,10 +10,11 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SocialSidebar } from "@/components/social/SocialSidebar";
 
-const TOP_NAV_HEIGHT_MOBILE = 56; // Mobile nav height
+const TOP_NAV_HEIGHT_MOBILE = 112; // 56px main nav + 56px search on mobile
 const TOP_NAV_HEIGHT_DESKTOP = 64; // Desktop nav height
 const LEFT_SIDEBAR_WIDTH = 80; // px, matches w-20
 const RIGHT_SIDEBAR_WIDTH = 224; // px, matches w-56
+const MOBILE_BOTTOM_NAV_HEIGHT = 80; // Increased for better iPhone compatibility
 
 const Layout = () => {
   const { user, loading } = useAuth();
@@ -63,7 +64,7 @@ const Layout = () => {
                 }
               : {
                   paddingTop: topNavHeight,
-                  paddingBottom: 60, // Add space for mobile navigation
+                  paddingBottom: MOBILE_BOTTOM_NAV_HEIGHT, // Increased spacing for iPhone
                 }
           }
         >
@@ -98,9 +99,15 @@ const Layout = () => {
         )}
       </div>
 
-      {/* Mobile Navigation - Fixed to bottom */}
+      {/* Mobile Navigation - Fixed to bottom with better iPhone compatibility */}
       {isMobile && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white z-50 border-t border-border h-14">
+        <div 
+          className="fixed bottom-0 left-0 right-0 bg-white z-50 border-t border-border"
+          style={{ 
+            height: MOBILE_BOTTOM_NAV_HEIGHT,
+            paddingBottom: 'env(safe-area-inset-bottom, 20px)' // iPhone safe area
+          }}
+        >
           <LeftSidebar />
         </div>
       )}

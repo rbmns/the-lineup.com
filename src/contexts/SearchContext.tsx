@@ -69,11 +69,14 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const trackSearch = useCallback(async (term: string) => {
     try {
+      console.log('Tracking search:', term);
+      const { data: session } = await supabase.auth.getSession();
+      
       await fetch('/api/track-search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabase.auth.getSession()}`
+          'Authorization': session.session ? `Bearer ${session.session.access_token}` : ''
         },
         body: JSON.stringify({
           query: term
@@ -86,11 +89,13 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const trackClick = useCallback(async (searchTerm: string, resultId: string, resultType: string) => {
     try {
+      const { data: session } = await supabase.auth.getSession();
+      
       await fetch('/api/track-search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabase.auth.getSession()}`
+          'Authorization': session.session ? `Bearer ${session.session.access_token}` : ''
         },
         body: JSON.stringify({
           query: searchTerm,
@@ -129,14 +134,22 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         translatedTerm = translatedTerm.replace(regex, english);
       });
 
-      let eventOrCondition = `title.ilike.%${term}%,description.ilike.%${term}%,event_category.ilike.%${term}%,destination.ilike.%${term}%,tags.ilike.%${term}%,vibe.ilike.%${term}%`;
+      // Search events with better field coverage and debugging
+      let eventOrCondition = `title.ilike.%${term}%,description.ilike.%${term}%,event_type.ilike.%${term}%,destination.ilike.%${term}%,tags.ilike.%${term}%,vibe.ilike.%${term}%`;
       if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
-        eventOrCondition += `,title.ilike.%${translatedTerm}%,description.ilike.%${translatedTerm}%,event_category.ilike.%${translatedTerm}%,destination.ilike.%${translatedTerm}%,tags.ilike.%${translatedTerm}%,vibe.ilike.%${translatedTerm}%`;
+        eventOrCondition += `,title.ilike.%${translatedTerm}%,description.ilike.%${translatedTerm}%,event_type.ilike.%${translatedTerm}%,destination.ilike.%${translatedTerm}%,tags.ilike.%${translatedTerm}%,vibe.ilike.%${translatedTerm}%`;
       }
+
+      console.log('Event search condition:', eventOrCondition);
 
       const eventSearch = supabase
         .from('events')
-        .select('*, venue_id(*)')
+        .select(`
+          *,
+          venue_id(*),
+          creator:profiles(id, username, avatar_url, email, location, status, tagline),
+          event_rsvps(id, user_id, status)
+        `)
         .or(eventOrCondition)
         .order('start_date', { ascending: true });
 
@@ -166,9 +179,22 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         casualPlanSearch,
       ]);
 
-      if (eventResponse.error) throw eventResponse.error;
-      if (venueResponse.error) throw venueResponse.error;
-      if (casualPlanResponse.error) throw casualPlanResponse.error;
+      console.log('Event search results:', eventResponse.data?.length || 0);
+      console.log('Venue search results:', venueResponse.data?.length || 0);
+      console.log('Casual plan search results:', casualPlanResponse.data?.length || 0);
+
+      if (eventResponse.error) {
+        console.error('Event search error:', eventResponse.error);
+        throw eventResponse.error;
+      }
+      if (venueResponse.error) {
+        console.error('Venue search error:', venueResponse.error);
+        throw venueResponse.error;
+      }
+      if (casualPlanResponse.error) {
+        console.error('Casual plan search error:', casualPlanResponse.error);
+        throw casualPlanResponse.error;
+      }
       
       const eventResults = (eventResponse.data || []).map(event => ({
           ...event,
@@ -189,7 +215,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       const results: SearchResult[] = [...eventResults, ...venueResults, ...casualPlanResults];
       
-      console.log('Search results found:', results.length);
+      console.log('Total search results found:', results.length);
       setSearchResults(results);
       return results;
     } catch (error) {
@@ -228,7 +254,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           venues:venue_id(*),
           event_rsvps(id, user_id, status)
         `)
-        .eq('event_category', asEqParam(category))
+        .eq('event_type', asEqParam(category))
         .order('start_date', { ascending: true });
         
       if (error) throw error;
@@ -285,7 +311,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       `);
       
       if (params.term) {
-        query = query.or(`title.ilike.%${params.term}%,description.ilike.%${params.term}%,event_category.ilike.%${params.term}%`);
+        query = query.or(`title.ilike.%${params.term}%,description.ilike.%${params.term}%,event_type.ilike.%${params.term}%`);
       }
       
       if (params.location) {
@@ -293,7 +319,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
       
       if (params.category) {
-        query = query.eq('event_category', asEqParam(params.category));
+        query = query.eq('event_type', asEqParam(params.category));
       }
       
       if (params.startDate) {
