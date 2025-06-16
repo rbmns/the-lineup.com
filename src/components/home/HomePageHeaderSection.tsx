@@ -1,12 +1,10 @@
-
 import React from "react";
 import { typography } from "@/components/polymet/brand-typography";
 
 /**
  * Home page hero section with proper styling and gradients
  */
-const HomePageHeaderSection = () => (
-  <div className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 m-0 p-0 pb-16 pt-16 md:pb-24 md:pt-20">
+const HomePageHeaderSection = () => <div className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 m-0 p-0 pb-16 pt-24 md:pb-24 md:pt-20">
     <div className="w-full text-center text-white px-4 sm:px-6 lg:px-8">
       <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white mb-4">
         Find events that fit your <span className="text-yellow-300 font-handwritten">vibe</span>
@@ -16,7 +14,5 @@ const HomePageHeaderSection = () => (
         Join when you want, connect if you want.
       </p>
     </div>
-  </div>
-);
-
+  </div>;
 export default HomePageHeaderSection;
