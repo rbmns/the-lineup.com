@@ -26,7 +26,7 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
   onClose
 }) => {
   const { isAuthenticated, user } = useAuth();
-  const { data: event, isLoading, error } = useEventDetails(eventId);
+  const { event, loading, error } = useEventDetails(eventId, user?.id);
   const { handleRsvp, loading: rsvpLoading } = useRsvpActions(user?.id);
   const queryClient = useQueryClient();
 
@@ -73,7 +73,7 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
 
       {/* Content */}
       <div className="p-6 space-y-6">
-        {isLoading ? (
+        {loading ? (
           <div className="space-y-4">
             <div className="h-48 bg-gray-200 rounded-lg animate-pulse" />
             <div className="h-4 bg-gray-200 rounded animate-pulse" />

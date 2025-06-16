@@ -13,7 +13,7 @@ const EditEvent = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const { data: event, isLoading: eventLoading, error } = useEventDetails(eventId ?? null);
+  const { event, loading: eventLoading, error } = useEventDetails(eventId ?? null, user?.id);
   const { isAdmin, isLoading: isCreatorStatusLoading } = useCreatorStatus();
 
   const isLoading = authLoading || eventLoading || isCreatorStatusLoading;
