@@ -78,7 +78,7 @@ const EventDetailContent = ({
   const imageUrl = getEventImageUrl(event);
 
   return (
-    <div className="w-full">
+    <div className="w-full bg-white">
       {/* Full width image header with category pill on top */}
       <div className="relative w-full">
         <LineupImage
@@ -86,7 +86,7 @@ const EventDetailContent = ({
           alt={event.title}
           aspectRatio="hero"
           overlayVariant="sunset"
-          className="w-full"
+          className="w-full h-64 sm:h-80 lg:h-96"
           loading="eager"
         />
         
@@ -102,24 +102,26 @@ const EventDetailContent = ({
         )}
       </div>
 
-      {/* Content area with full width */}
-      <div className="w-full px-6 py-6">
-        <div className="space-y-6 text-left">
-          {/* Event title - left aligned */}
-          <div className="text-left">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-6 text-left">{event.title}</h1>
+      {/* Content area with structured layout */}
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="max-w-4xl mx-auto space-y-8">
+          {/* Title Section */}
+          <div>
+            <h1 className="font-inter font-bold text-2xl sm:text-3xl lg:text-4xl text-gray-900 leading-tight mb-4">
+              {event.title}
+            </h1>
           </div>
           
-          {/* Event Details Cards */}
-          <div className="grid gap-4">
+          {/* Key Details Grid */}
+          <div className="grid gap-4 sm:gap-6">
             {/* Date & Time Card */}
-            <Card className="bg-gray-50">
-              <CardContent className="p-4">
+            <Card className="bg-gray-50 border-gray-200">
+              <CardContent className="p-4 sm:p-5">
                 <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-gray-600" />
+                  <Calendar className="h-5 w-5 text-gray-500 flex-shrink-0" />
                   <div>
-                    <h3 className="font-medium text-gray-900">Date & Time</h3>
-                    <p className="text-sm text-gray-600">
+                    <h3 className="font-inter font-semibold text-gray-900 mb-1">Date & Time</h3>
+                    <p className="font-inter text-sm text-gray-600">
                       {event.start_date && formatDate(event.start_date)}
                       {event.start_time && ` • ${formatEventTime(event.start_time, event.end_time)}`}
                     </p>
@@ -129,13 +131,13 @@ const EventDetailContent = ({
             </Card>
 
             {/* Location Card */}
-            <Card className="bg-gray-50">
-              <CardContent className="p-4">
+            <Card className="bg-gray-50 border-gray-200">
+              <CardContent className="p-4 sm:p-5">
                 <div className="flex items-center gap-3">
-                  <MapPin className="h-5 w-5 text-gray-600" />
+                  <MapPin className="h-5 w-5 text-gray-500 flex-shrink-0" />
                   <div>
-                    <h3 className="font-medium text-gray-900">Venue</h3>
-                    <p className="text-sm text-gray-600">{eventLocation}</p>
+                    <h3 className="font-inter font-semibold text-gray-900 mb-1">Venue</h3>
+                    <p className="font-inter text-sm text-gray-600">{eventLocation}</p>
                   </div>
                 </div>
               </CardContent>
@@ -143,13 +145,13 @@ const EventDetailContent = ({
 
             {/* Entrance Fee Card - only show if fee exists */}
             {event.fee && (
-              <Card className="bg-gray-50">
-                <CardContent className="p-4">
+              <Card className="bg-gray-50 border-gray-200">
+                <CardContent className="p-4 sm:p-5">
                   <div className="flex items-center gap-3">
-                    <Euro className="h-5 w-5 text-gray-600" />
+                    <Euro className="h-5 w-5 text-gray-500 flex-shrink-0" />
                     <div>
-                      <h3 className="font-medium text-gray-900">Entrance Fee</h3>
-                      <p className="text-sm text-gray-600">€{event.fee}</p>
+                      <h3 className="font-inter font-semibold text-gray-900 mb-1">Entrance Fee</h3>
+                      <p className="font-inter text-sm text-gray-600">€{event.fee}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -157,52 +159,65 @@ const EventDetailContent = ({
             )}
           </div>
           
-          {/* RSVP Section - prominently placed and responsive */}
-          <div className="bg-gray-50 rounded-lg p-4 text-left">
-            <EventRsvpSection 
-              isOwner={isOwner}
-              onRsvp={handleRsvp}
-              isRsvpLoading={isRsvpLoading || rsvpLoading}
-              currentStatus={event.rsvp_status || null}
-            />
-          </div>
+          {/* RSVP Section */}
+          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+            <CardContent className="p-4 sm:p-6">
+              <EventRsvpSection 
+                isOwner={isOwner}
+                onRsvp={handleRsvp}
+                isRsvpLoading={isRsvpLoading || rsvpLoading}
+                currentStatus={event.rsvp_status || null}
+              />
+            </CardContent>
+          </Card>
           
-          <Separator />
+          <Separator className="my-8" />
           
           {/* Description */}
-          <div className="text-left">
-            <EventDescriptionSection description={event.description || ''} />
-          </div>
+          {event.description && (
+            <div className="prose max-w-none">
+              <EventDescriptionSection description={event.description} />
+            </div>
+          )}
           
           {/* Attendees summary */}
-          <div className="text-left">
-            <EventAttendeesSummary 
-              goingCount={attendees?.going?.length || event.attendees?.going || 0}
-              interestedCount={attendees?.interested?.length || event.attendees?.interested || 0}
-            />
-          </div>
+          <Card className="bg-gray-50 border-gray-200">
+            <CardContent className="p-4 sm:p-6">
+              <EventAttendeesSummary 
+                goingCount={attendees?.going?.length || event.attendees?.going || 0}
+                interestedCount={attendees?.interested?.length || event.attendees?.interested || 0}
+              />
+            </CardContent>
+          </Card>
           
           {/* Friends attending section */}
           {friendAttendees && (friendAttendees.going.length > 0 || friendAttendees.interested.length > 0) && (
-            <div className="bg-gray-50 p-4 rounded-lg text-left">
-              <EventFriendRsvps 
-                going={friendAttendees.going}
-                interested={friendAttendees.interested}
-              />
-            </div>
+            <Card className="bg-green-50 border-green-200">
+              <CardContent className="p-4 sm:p-6">
+                <h3 className="font-inter font-semibold text-gray-900 mb-4">Friends Attending</h3>
+                <EventFriendRsvps 
+                  going={friendAttendees.going}
+                  interested={friendAttendees.interested}
+                />
+              </CardContent>
+            </Card>
           )}
           
           {/* External link if available */}
           {bookingLink && (
-            <div className="text-left">
-              <EventExternalLink url={bookingLink} />
-            </div>
+            <Card className="bg-orange-50 border-orange-200">
+              <CardContent className="p-4 sm:p-6">
+                <EventExternalLink url={bookingLink} />
+              </CardContent>
+            </Card>
           )}
           
           {/* Tags */}
-          <div className="text-left">
-            <EventTagsSection tags={event.tags} />
-          </div>
+          {event.tags && event.tags.length > 0 && (
+            <div>
+              <EventTagsSection tags={event.tags} />
+            </div>
+          )}
         </div>
       </div>
     </div>

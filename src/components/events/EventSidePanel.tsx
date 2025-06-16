@@ -54,13 +54,13 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
   return (
     <div
       className={cn(
-        "fixed right-80 top-16 bottom-0 w-[480px] bg-white shadow-2xl z-50 transition-transform duration-300 overflow-y-auto border-l",
+        "fixed right-0 top-0 bottom-0 w-full sm:w-[480px] sm:right-80 sm:top-16 bg-white shadow-2xl z-50 transition-transform duration-300 overflow-y-auto border-l",
         isOpen ? "translate-x-0" : "translate-x-full"
       )}
     >
       {/* Header */}
-      <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between z-10">
-        <h2 className="font-semibold text-lg">Event Details</h2>
+      <div className="sticky top-0 bg-white border-b px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between z-10">
+        <h2 className="font-inter font-semibold text-lg text-gray-900">Event Details</h2>
         <Button
           variant="ghost"
           size="sm"
@@ -72,18 +72,18 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
       </div>
 
       {/* Content */}
-      <div className="p-6 space-y-6">
+      <div className="p-4 sm:p-6 space-y-6">
         {loading ? (
           <div className="space-y-4">
-            <div className="h-48 bg-gray-200 rounded-lg animate-pulse" />
-            <div className="h-4 bg-gray-200 rounded animate-pulse" />
-            <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
-            <div className="h-4 bg-gray-200 rounded animate-pulse w-1/2" />
+            <div className="h-48 bg-gray-100 rounded-xl animate-pulse" />
+            <div className="h-4 bg-gray-100 rounded animate-pulse" />
+            <div className="h-4 bg-gray-100 rounded animate-pulse w-3/4" />
+            <div className="h-4 bg-gray-100 rounded animate-pulse w-1/2" />
           </div>
         ) : error ? (
           <div className="text-center py-8">
-            <p className="text-gray-500">Error loading event details</p>
-            <Button variant="outline" onClick={onClose} className="mt-4">
+            <p className="font-inter text-gray-500 text-sm mb-4">Error loading event details</p>
+            <Button variant="outline" onClick={onClose} className="font-inter">
               Close
             </Button>
           </div>
@@ -96,7 +96,7 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
                 alt={event.title}
                 aspectRatio="video"
                 overlayVariant="ocean"
-                className="w-full h-56"
+                className="w-full h-48 sm:h-56 rounded-xl"
               />
               {event.event_category && (
                 <div className="absolute top-3 left-3">
@@ -109,27 +109,32 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
             </div>
 
             {/* Event Info */}
-            <div className="space-y-4">
-              <h1 className="text-2xl font-bold text-gray-900">{event.title}</h1>
-              
-              {/* Date & Time */}
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Calendar className="h-4 w-4" />
-                <span>
-                  {event.start_date ? formatDate(event.start_date) : 'Date TBA'}
-                  {event.start_time && ` • ${formatEventTime(event.start_time, event.end_time)}`}
-                </span>
-              </div>
+            <div className="space-y-6">
+              <div>
+                <h1 className="font-inter font-bold text-xl sm:text-2xl text-gray-900 mb-4 leading-tight">{event.title}</h1>
+                
+                {/* Key Details */}
+                <div className="space-y-3">
+                  {/* Date & Time */}
+                  <div className="flex items-center gap-3 text-sm text-gray-600">
+                    <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                    <span className="font-inter">
+                      {event.start_date ? formatDate(event.start_date) : 'Date TBA'}
+                      {event.start_time && ` • ${formatEventTime(event.start_time, event.end_time)}`}
+                    </span>
+                  </div>
 
-              {/* Location */}
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <MapPin className="h-4 w-4" />
-                <span>{event.venues?.name || event.location || 'Location TBA'}</span>
+                  {/* Location */}
+                  <div className="flex items-center gap-3 text-sm text-gray-600">
+                    <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                    <span className="font-inter">{event.venues?.name || event.location || 'Location TBA'}</span>
+                  </div>
+                </div>
               </div>
 
               {/* RSVP Buttons */}
               {isAuthenticated && (
-                <div className="pt-2">
+                <div className="bg-gray-50 p-4 rounded-xl">
                   <EventRsvpButtons
                     currentStatus={event.rsvp_status || null}
                     onRsvp={handleRsvpClick}
@@ -141,9 +146,9 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
 
               {/* Description */}
               {event.description && (
-                <div className="pt-2">
-                  <h3 className="font-medium text-gray-900 mb-2">About</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                <div>
+                  <h3 className="font-inter font-semibold text-gray-900 mb-3">About</h3>
+                  <p className="font-inter text-sm text-gray-600 leading-relaxed">
                     {event.description}
                   </p>
                 </div>
@@ -151,29 +156,29 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
 
               {/* Location Details */}
               {event.venues && (
-                <Card className="bg-gray-50">
+                <Card className="bg-gray-50 border-gray-200">
                   <CardContent className="p-4">
-                    <h3 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                    <h3 className="font-inter font-semibold text-gray-900 mb-3 flex items-center gap-2">
                       <MapPin className="h-4 w-4" />
                       Location
                     </h3>
                     <div className="space-y-2">
-                      <p className="font-medium">{event.venues.name}</p>
+                      <p className="font-inter font-medium text-gray-900">{event.venues.name}</p>
                       {(event.venues.street || event.venues.city || event.venues.postal_code) && (
-                        <p className="text-sm text-gray-600">
+                        <p className="font-inter text-sm text-gray-600">
                           {[event.venues.street, event.venues.city, event.venues.postal_code]
                             .filter(Boolean)
                             .join(', ')}
                         </p>
                       )}
                       {(event.venues.website || event.venues.google_maps) && (
-                        <div className="flex gap-4 mt-2">
+                        <div className="flex gap-4 mt-3">
                           {event.venues.website && (
                             <a
                               href={event.venues.website}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                              className="font-inter text-sm text-primary hover:text-primary/80 hover:underline"
                             >
                               Website
                             </a>
@@ -183,7 +188,7 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
                               href={event.venues.google_maps}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                              className="font-inter text-sm text-primary hover:text-primary/80 hover:underline"
                             >
                               Maps
                             </a>
@@ -197,31 +202,31 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
 
               {/* Booking Information */}
               {(event.fee || event.booking_link || event.organizer_link || event.extra_info) && (
-                <Card className="bg-gray-50">
+                <Card className="bg-gray-50 border-gray-200">
                   <CardContent className="p-4">
-                    <h3 className="font-medium text-gray-900 mb-3">Booking Info</h3>
+                    <h3 className="font-inter font-semibold text-gray-900 mb-3">Booking Info</h3>
                     
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       {typeof event.fee === 'number' && event.fee > 0 && (
-                        <div className="flex items-start gap-2">
-                          <Ticket className="h-4 w-4 text-gray-500 mt-1" />
+                        <div className="flex items-start gap-3">
+                          <Ticket className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
                           <div>
-                            <p className="text-sm font-medium">Entry fee</p>
-                            <p className="text-sm">€{event.fee.toFixed(2)}</p>
+                            <p className="font-inter text-sm font-medium text-gray-900">Entry fee</p>
+                            <p className="font-inter text-sm text-gray-600">€{event.fee.toFixed(2)}</p>
                           </div>
                         </div>
                       )}
                       
                       {event.booking_link && (
-                        <div className="flex items-start gap-2">
-                          <CalendarClock className="h-4 w-4 text-gray-500 mt-1" />
+                        <div className="flex items-start gap-3">
+                          <CalendarClock className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
                           <div>
-                            <p className="text-sm font-medium">Booking required</p>
+                            <p className="font-inter text-sm font-medium text-gray-900">Booking required</p>
                             <a 
                               href={event.booking_link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-1 inline-block"
+                              className="font-inter text-sm text-primary hover:text-primary/80 hover:underline mt-1 inline-block"
                             >
                               Book Now
                             </a>
@@ -230,15 +235,15 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
                       )}
                       
                       {event.organizer_link && (
-                        <div className="flex items-start gap-2">
-                          <Globe className="h-4 w-4 text-gray-500 mt-1" />
+                        <div className="flex items-start gap-3">
+                          <Globe className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
                           <div>
-                            <p className="text-sm font-medium">Organizer website</p>
+                            <p className="font-inter text-sm font-medium text-gray-900">Organizer website</p>
                             <a 
                               href={event.organizer_link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-1 inline-block"
+                              className="font-inter text-sm text-primary hover:text-primary/80 hover:underline mt-1 inline-block"
                             >
                               {new URL(event.organizer_link).hostname.replace('www.', '')}
                             </a>
@@ -249,11 +254,11 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
                       {event.extra_info && (
                         <>
                           {(event.fee || event.booking_link || event.organizer_link) && (
-                            <Separator className="my-2" />
+                            <Separator className="my-3" />
                           )}
                           <div>
-                            <p className="text-sm font-medium mb-1">Additional information</p>
-                            <p className="text-sm text-gray-600">{event.extra_info}</p>
+                            <p className="font-inter text-sm font-medium text-gray-900 mb-2">Additional information</p>
+                            <p className="font-inter text-sm text-gray-600 leading-relaxed">{event.extra_info}</p>
                           </div>
                         </>
                       )}

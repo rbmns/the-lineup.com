@@ -60,7 +60,7 @@ export const EventCard: React.FC<EventCardProps> = ({
   };
 
   const cardContent = (
-    <Card className={`overflow-hidden h-full flex flex-col group hover:scale-105 hover:shadow-lg transition-all duration-300 ease-in-out ${className} rounded-xl shadow-md`}>
+    <Card className={`overflow-hidden h-full flex flex-col group hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out ${className} rounded-xl shadow-md border-gray-200`}>
       <div className="relative">
         <LineupImage
           src={eventImage}
@@ -81,18 +81,18 @@ export const EventCard: React.FC<EventCardProps> = ({
         )}
       </div>
       
-      <CardContent className={`${compact ? 'p-3' : (isMobile ? 'p-3' : 'p-4')} flex-1 flex flex-col items-start text-left font-inter gap-2`}>
+      <CardContent className={`${compact ? 'p-3' : (isMobile ? 'p-4' : 'p-5')} flex-1 flex flex-col items-start text-left gap-3`}>
         {/* Title */}
-        <h3 className={`font-semibold text-ocean-deep group-hover:text-seafoam-green transition-colors ${compact ? 'text-base' : (isMobile ? 'text-base' : 'text-lg')} line-clamp-2 text-left w-full font-inter`}>
+        <h3 className={`font-inter font-semibold text-gray-900 group-hover:text-primary transition-colors ${compact ? 'text-base' : (isMobile ? 'text-lg' : 'text-xl')} line-clamp-2 text-left w-full leading-tight`}>
           {event.title}
         </h3>
         
-        <div className="flex flex-col gap-2 w-full">
+        <div className="flex flex-col gap-3 w-full flex-1">
           {/* Date & Time */}
           {event.start_date && (
-            <div className={`flex items-center text-ocean-deep-700 font-medium gap-2 w-full text-left font-inter ${compact ? 'text-xs' : (isMobile ? 'text-xs' : 'text-sm')}`}>
-              <Calendar className={`flex-shrink-0 ${compact ? 'h-4 w-4' : (isMobile ? 'h-4 w-4' : 'h-5 w-5')}`} />
-              <span className="font-medium">
+            <div className={`flex items-center text-gray-600 gap-2 w-full text-left ${compact ? 'text-xs' : (isMobile ? 'text-sm' : 'text-sm')}`}>
+              <Calendar className={`flex-shrink-0 text-gray-400 ${compact ? 'h-4 w-4' : (isMobile ? 'h-4 w-4' : 'h-4 w-4')}`} />
+              <span className="font-inter font-medium">
                 {formatEventCardDateTime(event.start_date, event.start_time)}
               </span>
             </div>
@@ -100,9 +100,9 @@ export const EventCard: React.FC<EventCardProps> = ({
 
           {/* Location */}
           {(event.venues?.name || event.location) && (
-            <div className={`flex items-center text-ocean-deep-600 gap-2 w-full text-left font-inter ${compact ? 'text-xs' : (isMobile ? 'text-xs' : 'text-sm')}`}>
-              <MapPin className={`flex-shrink-0 ${compact ? 'h-4 w-4' : (isMobile ? 'h-4 w-4' : 'h-5 w-5')}`} />
-              <span className={`truncate font-normal`}>
+            <div className={`flex items-center text-gray-600 gap-2 w-full text-left ${compact ? 'text-xs' : (isMobile ? 'text-sm' : 'text-sm')}`}>
+              <MapPin className={`flex-shrink-0 text-gray-400 ${compact ? 'h-4 w-4' : (isMobile ? 'h-4 w-4' : 'h-4 w-4')}`} />
+              <span className={`truncate font-inter`}>
                 {event.venues?.name || event.location}
               </span>
             </div>
@@ -111,14 +111,14 @@ export const EventCard: React.FC<EventCardProps> = ({
 
         {/* RSVP Buttons */}
         {showRsvpButtons && onRsvp && (
-          <div className="mt-auto pt-2 flex gap-2 w-full">
+          <div className="mt-auto pt-3 flex gap-2 w-full">
             <button
               onClick={(e) => handleRsvpClick(e, 'Going')}
               disabled={loadingEventId === event.id}
-              className={`flex-1 px-3 py-1.5 ${isMobile ? 'text-xs' : 'text-xs'} font-semibold rounded-md transition-colors font-inter ${
+              className={`flex-1 px-3 py-2 ${isMobile ? 'text-xs' : 'text-sm'} font-inter font-semibold rounded-lg transition-colors ${
                 event.rsvp_status === 'Going'
-                  ? 'bg-seafoam-green text-white'
-                  : 'bg-sand text-ocean-deep hover:bg-seafoam-green hover:text-white'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-green-600 hover:text-white border border-gray-200'
               }`}
             >
               Going
@@ -126,10 +126,10 @@ export const EventCard: React.FC<EventCardProps> = ({
             <button
               onClick={(e) => handleRsvpClick(e, 'Interested')}
               disabled={loadingEventId === event.id}
-              className={`flex-1 px-3 py-1.5 ${isMobile ? 'text-xs' : 'text-xs'} font-semibold rounded-md transition-colors font-inter ${
+              className={`flex-1 px-3 py-2 ${isMobile ? 'text-xs' : 'text-sm'} font-inter font-semibold rounded-lg transition-colors ${
                 event.rsvp_status === 'Interested'
-                  ? 'bg-sky-blue text-white'
-                  : 'bg-sand text-ocean-deep hover:bg-sky-blue hover:text-white'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white border border-gray-200'
               }`}
             >
               Interested
