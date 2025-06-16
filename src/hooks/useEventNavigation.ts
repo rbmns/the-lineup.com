@@ -17,13 +17,26 @@ export const useEventNavigation = () => {
     const eventRoute = `/events/${event.id}`;
     
     navigate(eventRoute, {
-      state: preserveScroll ? { preserveScroll: true } : undefined
+      state: preserveScroll ? { preserveScroll: true } : { scrollToTop: true }
     });
+
+    // Scroll to top unless preserveScroll is true
+    if (!preserveScroll) {
+      // Use setTimeout to ensure navigation completes first
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 100);
+    }
   };
 
   const navigateToDestinationEvents = (destination: string) => {
     // Navigate to events page with destination filter
     navigate(`/events?destination=${encodeURIComponent(destination)}`);
+    
+    // Scroll to top for filter navigation
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
   };
 
   return { navigateToEvent, navigateToDestinationEvents };

@@ -9,6 +9,7 @@ import { formatDate, formatEventTime, formatEventCardDateTime } from '@/utils/da
 import { useEventImages } from '@/hooks/useEventImages';
 import { Event } from '@/types';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useEventNavigation } from '@/hooks/useEventNavigation';
 
 interface EventCardProps {
   event: Event;
@@ -32,6 +33,7 @@ export const EventCard: React.FC<EventCardProps> = ({
   loadingEventId
 }) => {
   const { getEventImageUrl } = useEventImages();
+  const { navigateToEvent } = useEventNavigation();
   const isMobile = useIsMobile();
 
   const eventImage = getEventImageUrl(event);
@@ -40,6 +42,20 @@ export const EventCard: React.FC<EventCardProps> = ({
     if (onClick) {
       e.preventDefault();
       onClick(event);
+    } else {
+      // Use navigation hook which will scroll to top
+      e.preventDefault();
+      navigateToEvent(event, false); // false = don't preserve scroll
+    }
+  };
+
+  const handleRsvpClick = async (e: React.MouseEvent, status: 'Going' | 'Interested') => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (onRsvp) {
+      // For RSVP actions, we want to preserve scroll position
+      await onRsvp(event.id, status);
     }
   };
 
@@ -97,11 +113,7 @@ export const EventCard: React.FC<EventCardProps> = ({
         {showRsvpButtons && onRsvp && (
           <div className="mt-auto pt-2 flex gap-2 w-full">
             <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onRsvp(event.id, 'Going');
-              }}
+              onClick={(e) => handleRsvpClick(e, 'Going')}
               disabled={loadingEventId === event.id}
               className={`flex-1 px-3 py-1.5 ${isMobile ? 'text-xs' : 'text-xs'} font-semibold rounded-md transition-colors font-inter ${
                 event.rsvp_status === 'Going'
@@ -112,11 +124,7 @@ export const EventCard: React.FC<EventCardProps> = ({
               Going
             </button>
             <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onRsvp(event.id, 'Interested');
-              }}
+              onClick={(e) => handleRsvpClick(e, 'Interested')}
               disabled={loadingEventId === event.id}
               className={`flex-1 px-3 py-1.5 ${isMobile ? 'text-xs' : 'text-xs'} font-semibold rounded-md transition-colors font-inter ${
                 event.rsvp_status === 'Interested'
@@ -141,8 +149,8 @@ export const EventCard: React.FC<EventCardProps> = ({
   }
 
   return (
-    <Link to={`/events/${event.id}`} className="block h-full">
+    <div onClick={handleClick} className="cursor-pointer h-full">
       {cardContent}
-    </Link>
+    </div>
   );
 };
