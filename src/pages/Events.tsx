@@ -22,7 +22,7 @@ const Events = () => {
           showBackground={true}
         />
         
-        <div className="w-full py-6 md:py-8 max-w-7xl mx-auto">
+        <div className="w-full py-4 sm:py-6 md:py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <EventsDataProvider>
             {({
               filteredEvents,
@@ -68,9 +68,9 @@ const Events = () => {
               };
 
               return (
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                   {isFilteredByLocation && userLocation && (
-                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-md text-center text-sm text-blue-800">
+                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-md text-center text-sm text-blue-800 mx-4 sm:mx-0">
                       Showing events near <strong>{userLocation.location}</strong>.
                     </div>
                   )}

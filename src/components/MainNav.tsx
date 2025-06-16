@@ -53,23 +53,23 @@ const MainNav = () => {
     )}>
       <div className="w-full flex flex-col">
         <div className={cn(
-          "w-full h-14 flex items-center justify-between gap-4",
-          isMobile ? "px-3" : "px-6"
+          "w-full h-14 flex items-center justify-between gap-2 sm:gap-4",
+          isMobile ? "px-3" : "px-4 sm:px-6"
         )}>
           {/* Left side - Icon flush left + wordmark */}
-          <div className="flex items-center h-14 flex-shrink-0">
-            <Link to="/" className="flex items-center justify-center mr-2">
+          <div className="flex items-center h-14 flex-shrink-0 min-w-0">
+            <Link to="/" className="flex items-center justify-center mr-2 flex-shrink-0">
               <img
                 src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png"
                 alt="thelineup Symbol"
-                className="w-7 h-7"
+                className="w-6 h-6 sm:w-7 sm:h-7"
                 style={{ display: 'block' }}
               />
             </Link>
-            <BrandLogo showText={!isMobile} className="ml-0" />
+            <BrandLogo showText={!isMobile} className="ml-0 min-w-0" />
           </div>
 
-          {/* Center-Right - Search Bar */}
+          {/* Center-Right - Search Bar for desktop */}
           {!isMobile && (
             <div className="flex-1 flex justify-end max-w-md mr-2">
               <NavbarSearch />
@@ -77,7 +77,7 @@ const MainNav = () => {
           )}
 
           {/* Right side - User menu or auth buttons */}
-          <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2 lg:gap-3 flex-shrink-0">
             {isAuthenticated && user ? (
               <>
                 {isAdmin && (
@@ -88,18 +88,20 @@ const MainNav = () => {
                 <UserMenu user={user} profile={profile} handleSignOut={signOut} canCreateEvents={canCreateEvents} />
               </>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
                 <Button
                   variant="default"
-                  size="sm"
+                  size={isMobile ? "sm" : "sm"}
                   onClick={handleSignInClick}
+                  className="text-xs sm:text-sm px-2 sm:px-3"
                 >
                   Sign in
                 </Button>
                 <Button
                   variant="primary"
-                  size="sm"
+                  size={isMobile ? "sm" : "sm"}
                   onClick={handleRegisterClick}
+                  className="text-xs sm:text-sm px-2 sm:px-3"
                 >
                   Sign up
                 </Button>
@@ -107,8 +109,9 @@ const MainNav = () => {
             )}
           </div>
         </div>
+        {/* Mobile search bar */}
         {isMobile && (
-          <div className="px-3 pb-3 bg-white">
+          <div className="px-3 pb-3 bg-white border-t border-gray-100">
             <NavbarSearch />
           </div>
         )}

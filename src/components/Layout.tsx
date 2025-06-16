@@ -58,13 +58,16 @@ const Layout = () => {
                   minHeight: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
                   boxSizing: 'border-box',
                 }
-              : {}
+              : {
+                  paddingTop: TOP_NAV_HEIGHT,
+                  paddingBottom: 60, // Add space for mobile navigation
+                }
           }
         >
-          {/* ENSURE FULL WIDTH and REMOVE max-w-3xl restriction */}
+          {/* ENSURE FULL WIDTH and proper mobile spacing */}
           <main className="main-feed-gradient w-full flex-1 flex flex-col">
             {/* Add uniform padding for all pages here, except home */}
-            <div className={`flex-1 flex flex-col justify-start ${!isHomePage ? 'pt-[20px] px-[20px]' : ''}`}>
+            <div className={`flex-1 flex flex-col justify-start ${!isHomePage ? 'pt-4 px-4 sm:pt-5 sm:px-5' : ''}`}>
               <Outlet />
             </div>
           </main>
@@ -95,7 +98,7 @@ const Layout = () => {
 
       {/* Mobile Navigation - Fixed to bottom */}
       {isMobile && (
-        <div className="fixed bottom-0 left-0 right-0 bg-card z-50 safe-area-pb border-t border-border">
+        <div className="fixed bottom-0 left-0 right-0 bg-white z-50 border-t border-border">
           <LeftSidebar />
         </div>
       )}
