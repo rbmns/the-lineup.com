@@ -108,7 +108,7 @@ const MainNav = () => {
           </div>
         </div>
         {isMobile && (
-          <div className="px-3 pb-3">
+          <div className="px-3 pb-3 bg-white">
             <NavbarSearch />
           </div>
         )}

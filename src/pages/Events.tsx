@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { EventsPageHeader } from '@/components/events/EventsPageHeader';
 import { useEventPageMeta } from '@/components/events/EventsPageMeta';
@@ -7,18 +8,10 @@ import { EventsResultsDisplay } from '@/components/events/page-components/Events
 import { EventsVibeSection } from '@/components/events/page-sections/EventsVibeSection';
 import { FilterStateProvider } from '@/contexts/FilterStateContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { useOutletContext } from 'react-router-dom';
-
-interface OutletContext {
-  onEventSelect?: (eventId: string | null) => void;
-  selectedEventId?: string | null;
-}
 
 const Events = () => {
   useEventPageMeta();
   const { isAuthenticated } = useAuth();
-  const context = useOutletContext<OutletContext>();
-  const { selectedEventId, onEventSelect } = context || {};
   
   return (
     <FilterStateProvider>
@@ -29,10 +22,7 @@ const Events = () => {
           showBackground={true}
         />
         
-        {/* Remove unnecessary px-4/md:px-6 for flush left/right */}
-        <div className={`w-full py-6 md:py-8 transition-all duration-300 ${
-          selectedEventId ? 'max-w-4xl' : 'max-w-7xl'
-        } mx-auto`}>
+        <div className="w-full py-6 md:py-8 max-w-7xl mx-auto">
           <EventsDataProvider>
             {({
               filteredEvents,
@@ -73,7 +63,6 @@ const Events = () => {
               selectedLocationId,
               onLocationChange,
             }) => {
-              // Wrap the handleRsvp to convert Promise<boolean> to Promise<void>
               const wrappedHandleRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<void> => {
                 await handleRsvp(eventId, status);
               };
@@ -85,7 +74,7 @@ const Events = () => {
                       Showing events near <strong>{userLocation.location}</strong>.
                     </div>
                   )}
-                  {/* Vibe Filter Section */}
+                  
                   <EventsVibeSection
                     selectedVibes={selectedVibes || []}
                     onVibeChange={setSelectedVibes || (() => {})}
@@ -93,7 +82,6 @@ const Events = () => {
                     vibesLoading={vibesLoading || false}
                   />
                   
-                  {/* Category and Advanced Filters */}
                   <EventsPageFilters
                     allEventTypes={allEventTypes}
                     selectedCategories={selectedCategories}
@@ -119,7 +107,6 @@ const Events = () => {
                     onLocationChange={onLocationChange}
                   />
                   
-                  {/* Results Display */}
                   <EventsResultsDisplay
                     filteredEvents={filteredEvents}
                     similarEvents={similarEvents}
@@ -132,9 +119,9 @@ const Events = () => {
                     loadingEventId={loadingEventId}
                     isNoneSelected={isNoneSelected}
                     selectAll={selectAll}
-                    onEventSelect={onEventSelect}
-                    selectedEventId={selectedEventId}
-                    isOverlayMode={!!selectedEventId}
+                    onEventSelect={undefined}
+                    selectedEventId={undefined}
+                    isOverlayMode={false}
                   />
                 </div>
               );
