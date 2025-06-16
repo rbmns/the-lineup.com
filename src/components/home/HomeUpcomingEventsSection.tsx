@@ -1,82 +1,93 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { CategoryPill } from '@/components/ui/category-pill';
-import { VibeFilter } from '@/components/home/VibeFilter';
+import React from 'react';
+import { Event } from '@/types';
 import { UpcomingEventCard } from '@/components/home/UpcomingEventCard';
-import { typography } from '@/components/polymet/brand-typography';
+import { useNavigate } from 'react-router-dom';
+import { useEventNavigation } from '@/hooks/useEventNavigation';
+import { Loader2 } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface HomeUpcomingEventsSectionProps {
-  events: any[];
+  events: Event[] | undefined;
   isLoading: boolean;
 }
-
-const vibes = ['active', 'mindful', 'social', 'creative', 'wellness'];
 
 export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps> = ({
   events,
   isLoading
 }) => {
-  const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { navigateToEvent } = useEventNavigation();
+  const isMobile = useIsMobile();
 
-  const filteredEvents = selectedVibe 
-    ? events?.filter(event => event.vibe?.toLowerCase() === selectedVibe.toLowerCase()) || []
-    : events || [];
+  const handleEventClick = (event: Event) => {
+    navigateToEvent(event);
+  };
 
-  return (
-    <section className="py-8 md:py-12 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="space-y-6 md:space-y-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="text-center sm:text-left">
-              <h2 className={`${typography.h2} mb-2 text-gray-900`}>Upcoming Events</h2>
-              <p className={`${typography.body} text-muted-foreground`}>
-                Discover what's happening in your area
-              </p>
-            </div>
-            <Button asChild variant="ghost" className="self-center sm:self-auto">
-              <Link to="/events" className="flex items-center gap-2">
-                View all
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
+  const handleViewAllClick = () => {
+    navigate('/events');
+  };
 
-          {/* Vibe Filter - centered on mobile */}
-          <div className="w-full overflow-x-auto">
-            <div className="flex justify-center sm:justify-start">
-              <VibeFilter 
-                vibes={vibes}
-                selectedVibe={selectedVibe}
-                onVibeSelect={setSelectedVibe}
-              />
-            </div>
-          </div>
-
-          {/* Events Grid - properly spaced */}
-          <div className="space-y-4">
-            {isLoading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="h-64 bg-gray-200 rounded-lg animate-pulse" />
-                ))}
-              </div>
-            ) : filteredEvents.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredEvents.slice(0, 6).map((event) => (
-                  <UpcomingEventCard key={event.id} event={event} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No events found for this vibe. Try a different filter!</p>
-              </div>
-            )}
-          </div>
+  if (isLoading) {
+    return (
+      <div className="py-8 md:py-12">
+        <div className="flex justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
         </div>
       </div>
+    );
+  }
+
+  const upcomingEvents = events?.slice(0, isMobile ? 4 : 6) || [];
+
+  if (!upcomingEvents.length) {
+    return (
+      <div className="py-8 md:py-12 text-center">
+        <h2 className="text-2xl md:text-3xl font-bold mb-4">Upcoming Events</h2>
+        <p className="text-gray-600">No upcoming events found.</p>
+      </div>
+    );
+  }
+
+  return (
+    <section className="py-8 md:py-12">
+      <div className="flex justify-between items-center mb-6 md:mb-8">
+        <h2 className="text-2xl md:text-3xl font-bold">Upcoming Events</h2>
+        <button
+          onClick={handleViewAllClick}
+          className="text-blue-600 hover:text-blue-800 font-medium text-sm md:text-base"
+        >
+          View All →
+        </button>
+      </div>
+      
+      {/* Mobile: Horizontal scroll, Desktop: Grid */}
+      {isMobile ? (
+        <div className="overflow-x-auto pb-4">
+          <div className="flex gap-4" style={{ width: 'max-content' }}>
+            {upcomingEvents.map((event) => (
+              <div key={event.id} className="flex-none w-72">
+                <UpcomingEventCard
+                  event={event}
+                  onClick={handleEventClick}
+                  className="h-full"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {upcomingEvents.map((event) => (
+            <UpcomingEventCard
+              key={event.id}
+              event={event}
+              onClick={handleEventClick}
+              className="h-full"
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 };

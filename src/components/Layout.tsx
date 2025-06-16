@@ -10,7 +10,8 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SocialSidebar } from "@/components/social/SocialSidebar";
 
-const TOP_NAV_HEIGHT = 64; // increased from 56 to 64px for better mobile spacing
+const TOP_NAV_HEIGHT_MOBILE = 56; // Mobile nav height
+const TOP_NAV_HEIGHT_DESKTOP = 64; // Desktop nav height
 const LEFT_SIDEBAR_WIDTH = 80; // px, matches w-20
 const RIGHT_SIDEBAR_WIDTH = 224; // px, matches w-56
 
@@ -21,6 +22,8 @@ const Layout = () => {
   const isMobile = useIsMobile();
   const [rightSidebarVisible, setRightSidebarVisible] = useState(true);
   const isHomePage = location.pathname === '/';
+
+  const topNavHeight = isMobile ? TOP_NAV_HEIGHT_MOBILE : TOP_NAV_HEIGHT_DESKTOP;
 
   const toggleRightSidebar = () => {
     setRightSidebarVisible(!rightSidebarVisible);
@@ -35,11 +38,11 @@ const Layout = () => {
           <div
             className="fixed left-0 sidebar-zoning"
             style={{
-              top: TOP_NAV_HEIGHT,
+              top: topNavHeight,
               bottom: 0,
               width: LEFT_SIDEBAR_WIDTH,
               zIndex: 30,
-              height: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
+              height: `calc(100vh - ${topNavHeight}px)`,
             }}
           >
             <LeftSidebar />
@@ -52,21 +55,21 @@ const Layout = () => {
           style={
             !isMobile
               ? {
-                  paddingTop: TOP_NAV_HEIGHT,
+                  paddingTop: topNavHeight,
                   paddingLeft: LEFT_SIDEBAR_WIDTH,
                   paddingRight: rightSidebarVisible ? RIGHT_SIDEBAR_WIDTH : 0,
-                  minHeight: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
+                  minHeight: `calc(100vh - ${topNavHeight}px)`,
                   boxSizing: 'border-box',
                 }
               : {
-                  paddingTop: TOP_NAV_HEIGHT,
+                  paddingTop: topNavHeight,
                   paddingBottom: 60, // Add space for mobile navigation
                 }
           }
         >
           {/* Main content with proper mobile spacing */}
           <main className="w-full flex-1 flex flex-col">
-            <div className={`flex-1 flex flex-col justify-start ${!isHomePage ? 'pt-4 px-4 sm:pt-6 sm:px-6' : ''}`}>
+            <div className={`flex-1 flex flex-col justify-start ${!isHomePage ? (isMobile ? 'pt-2 px-3' : 'pt-4 px-4 sm:pt-6 sm:px-6') : ''}`}>
               <Outlet />
             </div>
           </main>
@@ -79,11 +82,11 @@ const Layout = () => {
           <div
             className={`fixed right-0 sidebar-zoning`}
             style={{
-              top: TOP_NAV_HEIGHT,
+              top: topNavHeight,
               bottom: 0,
               width: RIGHT_SIDEBAR_WIDTH,
               zIndex: 30,
-              height: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
+              height: `calc(100vh - ${topNavHeight}px)`,
               display: rightSidebarVisible ? "block" : "none",
             }}
           >
@@ -97,7 +100,7 @@ const Layout = () => {
 
       {/* Mobile Navigation - Fixed to bottom */}
       {isMobile && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white z-50 border-t border-border">
+        <div className="fixed bottom-0 left-0 right-0 bg-white z-50 border-t border-border h-14">
           <LeftSidebar />
         </div>
       )}

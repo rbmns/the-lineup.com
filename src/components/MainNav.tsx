@@ -53,16 +53,16 @@ const MainNav = () => {
     )}>
       <div className="w-full flex flex-col">
         <div className={cn(
-          "w-full h-16 flex items-center justify-between gap-2 sm:gap-4",
-          isMobile ? "px-3" : "px-4 sm:px-6"
+          "w-full flex items-center justify-between gap-2 sm:gap-4",
+          isMobile ? "h-14 px-3" : "h-16 px-4 sm:px-6"
         )}>
           {/* Left side - Icon flush left + wordmark */}
-          <div className="flex items-center h-16 flex-shrink-0 min-w-0">
+          <div className="flex items-center h-full flex-shrink-0 min-w-0">
             <Link to="/" className="flex items-center justify-center mr-2 flex-shrink-0">
               <img
                 src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png"
                 alt="thelineup Symbol"
-                className="w-6 h-6 sm:w-7 sm:h-7"
+                className={isMobile ? "w-5 h-5" : "w-6 h-6 sm:w-7 sm:h-7"}
                 style={{ display: 'block' }}
               />
             </Link>
@@ -93,7 +93,7 @@ const MainNav = () => {
                   variant="default"
                   size={isMobile ? "sm" : "sm"}
                   onClick={handleSignInClick}
-                  className="text-xs sm:text-sm px-2 sm:px-3"
+                  className={isMobile ? "text-xs px-2" : "text-xs sm:text-sm px-2 sm:px-3"}
                 >
                   Sign in
                 </Button>
@@ -101,7 +101,7 @@ const MainNav = () => {
                   variant="primary"
                   size={isMobile ? "sm" : "sm"}
                   onClick={handleRegisterClick}
-                  className="text-xs sm:text-sm px-2 sm:px-3"
+                  className={isMobile ? "text-xs px-2" : "text-xs sm:text-sm px-2 sm:px-3"}
                 >
                   Sign up
                 </Button>
@@ -111,7 +111,7 @@ const MainNav = () => {
         </div>
         {/* Mobile search bar */}
         {isMobile && (
-          <div className="px-3 pb-3 bg-white border-t border-gray-100">
+          <div className="px-3 pb-2 bg-white border-t border-gray-100">
             <NavbarSearch />
           </div>
         )}

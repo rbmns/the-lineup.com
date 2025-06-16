@@ -9,6 +9,7 @@ import { Event } from "@/types";
 import { useEventImages } from "@/hooks/useEventImages";
 import { DEFAULT_FALLBACK_IMAGE_URL } from "@/utils/eventImages";
 import { Card } from "@/components/ui/card";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface UpcomingEventCardProps {
   event: Event;
@@ -24,6 +25,7 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
   showCategory = true,
 }) => {
   const { getEventImageUrl } = useEventImages();
+  const isMobile = useIsMobile();
   const imageUrl = getEventImageUrl(event);
 
   const handleClick = (e: React.MouseEvent) => {
@@ -36,19 +38,20 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
   return (
     <Card
       className={cn(
-        "group hover:shadow-lg transition-shadow flex flex-col w-80 cursor-pointer overflow-hidden rounded-xl shadow-md",
+        "group hover:shadow-lg transition-shadow flex flex-col cursor-pointer overflow-hidden rounded-xl shadow-md",
+        isMobile ? "w-full" : "w-80",
         className
       )}
       onClick={handleClick}
       tabIndex={0}
       role="button"
     >
-      <div className="relative w-full h-48 rounded-t-xl overflow-hidden transform">
+      <div className={`relative w-full ${isMobile ? 'h-40' : 'h-48'} rounded-t-xl overflow-hidden transform`}>
         <LineupImage
           src={imageUrl}
           alt={event.title}
           aspectRatio="video"
-          className="h-48"
+          className={isMobile ? "h-40" : "h-48"}
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (target.src !== DEFAULT_FALLBACK_IMAGE_URL) {
@@ -59,24 +62,29 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
         />
         {showCategory && event.event_category && (
           <div className="absolute top-3 left-3">
-            <CategoryPill category={event.event_category} active={true} noBorder={true} />
+            <CategoryPill 
+              category={event.event_category} 
+              active={true} 
+              noBorder={true} 
+              size={isMobile ? "xs" : "sm"}
+            />
           </div>
         )}
       </div>
 
-      <div className="flex flex-col gap-2 p-4 w-full text-left items-start">
-        <h3 className="text-base font-bold leading-tight line-clamp-2 text-ocean-deep-900 font-inter text-left">
+      <div className={`flex flex-col gap-2 ${isMobile ? 'p-3' : 'p-4'} w-full text-left items-start`}>
+        <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-bold leading-tight line-clamp-2 text-ocean-deep-900 font-inter text-left`}>
           {event.title}
         </h3>
-        <div className="flex items-center gap-2 text-sm text-ocean-deep-700 font-inter text-left">
-          <Calendar size={15} className="flex-shrink-0" />
+        <div className={`flex items-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'} text-ocean-deep-700 font-inter text-left`}>
+          <Calendar size={isMobile ? 13 : 15} className="flex-shrink-0" />
           <span>
             {formatEventCardDateTime(event.start_date, event.start_time)}
           </span>
         </div>
         {event.venues?.name || event.location ? (
-          <div className="flex items-center gap-2 text-sm text-ocean-deep-700 font-inter text-left">
-            <MapPin size={15} className="flex-shrink-0" />
+          <div className={`flex items-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'} text-ocean-deep-700 font-inter text-left`}>
+            <MapPin size={isMobile ? 13 : 15} className="flex-shrink-0" />
             <span className="truncate">
               {event.venues?.name || event.location}
             </span>
@@ -90,19 +98,26 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
 interface ViewAllCardProps {
   onClick?: () => void;
 }
-export const ViewAllCard: React.FC<ViewAllCardProps> = ({ onClick }) => (
-  <div
-    className="group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col items-center justify-center max-w-xs min-h-[256px] w-[80px] cursor-pointer"
-    onClick={onClick}
-    tabIndex={0}
-    role="button"
-    aria-label="View all events"
-  >
-    <div className="flex items-center justify-center h-16">
-      <span className="bg-ocean-deep-500 text-white rounded-full p-3">
-        <ArrowRight size={28} />
-      </span>
+export const ViewAllCard: React.FC<ViewAllCardProps> = ({ onClick }) => {
+  const isMobile = useIsMobile();
+  
+  return (
+    <div
+      className={cn(
+        "group bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow flex flex-col items-center justify-center cursor-pointer",
+        isMobile ? "w-full min-h-[200px]" : "max-w-xs min-h-[256px] w-[80px]"
+      )}
+      onClick={onClick}
+      tabIndex={0}
+      role="button"
+      aria-label="View all events"
+    >
+      <div className="flex items-center justify-center h-16">
+        <span className="bg-ocean-deep-500 text-white rounded-full p-3">
+          <ArrowRight size={isMobile ? 24 : 28} />
+        </span>
+      </div>
+      <div className={`text-ocean-deep-800 font-medium ${isMobile ? 'text-sm' : 'text-xs'} mt-4`}>View All</div>
     </div>
-    <div className="text-ocean-deep-800 font-medium text-xs mt-4">View All</div>
-  </div>
-);
+  );
+};

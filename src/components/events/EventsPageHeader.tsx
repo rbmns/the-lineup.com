@@ -20,13 +20,13 @@ export const EventsPageHeader: React.FC<EventsPageHeaderProps> = ({
 
   if (showBackground) {
     return (
-      <div className="relative h-[200px] md:h-[250px] overflow-hidden w-full bg-secondary m-0 p-0">
+      <div className={`relative ${isMobile ? 'h-[150px]' : 'h-[200px] md:h-[250px]'} overflow-hidden w-full bg-secondary m-0 p-0`}>
         {/* Overlay */}
         <div className="absolute inset-0 bg-black/20"></div>
         
         {/* Content - Left aligned */}
-        <div className="absolute inset-0 flex flex-col justify-center px-4 text-left text-white m-0 p-0">
-          <h1 className={`${typography.display} mb-2 text-left text-white mt-0`}>
+        <div className={`absolute inset-0 flex flex-col justify-center ${isMobile ? 'px-3' : 'px-4'} text-left text-white m-0 p-0`}>
+          <h1 className={`${typography.display} ${isMobile ? 'text-2xl' : ''} mb-2 text-left text-white mt-0`}>
             {title}
           </h1>
           {!isMobile && (
@@ -41,11 +41,11 @@ export const EventsPageHeader: React.FC<EventsPageHeaderProps> = ({
 
   return (
     <div className="border-b bg-card m-0 p-0">
-      <div className="px-4 text-left m-0 p-0">
-        <h1 className={`${typography.h1} mb-2 text-left mt-0`}>
+      <div className={`${isMobile ? 'px-3' : 'px-4'} text-left m-0 p-0`}>
+        <h1 className={`${typography.h1} ${isMobile ? 'text-xl' : ''} mb-2 text-left mt-0`}>
           {title}
         </h1>
-        <p className={`${typography.lead} text-left mt-0`}>
+        <p className={`${typography.lead} ${isMobile ? 'text-sm' : ''} text-left mt-0`}>
           {subtitle}
         </p>
       </div>

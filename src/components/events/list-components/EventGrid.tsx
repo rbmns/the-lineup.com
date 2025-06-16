@@ -1,9 +1,11 @@
+
 import React, { useRef, useEffect } from 'react';
 import { Event } from '@/types';
 import { EventCard } from '@/components/EventCard';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { EventsSignupTeaser } from '@/components/events/list-components/EventsSignupTeaser';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface EventGridProps {
   events: Event[];
@@ -37,6 +39,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
   compact
 }) => {
   const observerTarget = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   
   // Split events if teaser should be shown
   const eventsBeforeTeaser = showSignupTeaser ? events.slice(0, eventsBeforeTeaserCount) : [];
@@ -109,13 +112,8 @@ export const EventGrid: React.FC<EventGridProps> = ({
       {/* Grid with improved responsive layout - reduced gap on mobile */}
       <div className={cn(
         "grid w-full auto-rows-fr",
-        // Improved responsive grid with smaller gaps on mobile
-        "gap-2 sm:gap-4", // Reduced gap on mobile
-        "grid-cols-1", // Mobile: 1 column (up to 640px)
-        "min-[640px]:grid-cols-2", // Small tablets: 2 columns (640px+)
-        "min-[900px]:grid-cols-3", // Medium: 3 columns (900px+)  
-        "min-[1200px]:grid-cols-3", // Large: 3 columns (1200px+)
-        "min-[1600px]:grid-cols-4", // Very large: 4 columns (1600px+)
+        // Mobile-optimized responsive grid
+        isMobile ? "gap-3 grid-cols-1" : "gap-2 sm:gap-4 grid-cols-1 min-[640px]:grid-cols-2 min-[900px]:grid-cols-3 min-[1200px]:grid-cols-3 min-[1600px]:grid-cols-4",
         className
       )} style={style}>
         {/* If using teaser, render events before teaser */}
@@ -136,12 +134,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
       {showSignupTeaser && eventsAfterTeaser.length > 0 && (
         <div className={cn(
           "grid w-full auto-rows-fr",
-          "gap-2 sm:gap-4",
-          "grid-cols-1",
-          "min-[640px]:grid-cols-2",
-          "min-[900px]:grid-cols-3",
-          "min-[1200px]:grid-cols-3",
-          "min-[1600px]:grid-cols-4",
+          isMobile ? "gap-3 grid-cols-1" : "gap-2 sm:gap-4 grid-cols-1 min-[640px]:grid-cols-2 min-[900px]:grid-cols-3 min-[1200px]:grid-cols-3 min-[1600px]:grid-cols-4",
           className
         )}>
           {eventsAfterTeaser.map(renderEventCard)}
