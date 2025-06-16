@@ -1,4 +1,3 @@
-
 export interface Profile {
   id: string;
   username: string | null;
@@ -34,6 +33,7 @@ export interface Venue {
   created_at?: string;
   region?: string | null;
   tags?: string[] | null;
+  creator_id?: string | null;
 }
 
 export interface Event {
@@ -57,6 +57,7 @@ export interface Event {
   vibe?: string | null;
   destination?: string;
   organiser_name?: string | null;
+  status?: 'draft' | 'pending_approval' | 'published' | 'rejected';
   rsvp_status?: 'Going' | 'Interested' | null;
   rsvp_count?: number;
   going_count?: number;

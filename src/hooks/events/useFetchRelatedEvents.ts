@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Event } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
@@ -82,6 +81,7 @@ export const useFetchRelatedEvents = ({
               created_at: event.created_at,
               updated_at: event.updated_at,
               image_urls: event.image_urls || [],
+              status: event.status,
               attendees: { going: 0, interested: 0 },
               venue_id: event.venue_id,
               fee: event.fee,

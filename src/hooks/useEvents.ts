@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { processEventsData } from '@/utils/eventProcessorUtils';
-import { filterEventsByTime } from '@/utils/eventTimeFiltering';
+import { filterUpcomingEvents } from '@/utils/date-filtering';
 
 export interface UseEventsResult {
   data: Event[];
@@ -12,14 +12,12 @@ export interface UseEventsResult {
   refetch: () => Promise<any>;
 }
 
-export const useEvents = (userId: string | undefined = undefined): UseEventsResult => {
+export const useEvents = (userId: string | undefined = undefined, options: { includePastEvents?: boolean } = {}): UseEventsResult => {
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['events', userId],
+    queryKey: ['events', userId, options],
     queryFn: async () => {
       try {
-        console.log('Fetching events for user:', userId);
-        // Get the current date as YYYY-MM-DD for filtering
-        const currentDate = new Date().toISOString().split('T')[0];
+        console.log('Fetching events for user:', userId, 'with options:', options);
         
         const { data, error } = await supabase
           .from('events')
@@ -29,7 +27,6 @@ export const useEvents = (userId: string | undefined = undefined): UseEventsResu
             venues:venue_id(*),
             event_rsvps(id, user_id, status)
           `)
-          .gte('start_date', currentDate) // Filter events from today onwards
           .order('start_date', { ascending: true })
           .order('start_time', { ascending: true });
         
@@ -45,10 +42,16 @@ export const useEvents = (userId: string | undefined = undefined): UseEventsResu
         // Process the events data
         const processedEvents = processEventsData(data, userId);
         
-        // Apply time-based filtering using the new logic
-        const filteredEvents = filterEventsByTime(processedEvents);
+        if (options.includePastEvents) {
+          console.log(`Total events fetched (including past): ${processedEvents.length}`);
+          return processedEvents;
+        }
         
-        console.log(`Filtered ${processedEvents.length - filteredEvents.length} events based on timing rules`);
+        // Apply time-based filtering to only show upcoming events
+        const filteredEvents = filterUpcomingEvents(processedEvents);
+        
+        console.log(`Total events fetched: ${processedEvents.length}`);
+        console.log(`Filtered events after time filtering: ${filteredEvents.length}`);
         
         return filteredEvents;
       } catch (error) {
@@ -57,7 +60,7 @@ export const useEvents = (userId: string | undefined = undefined): UseEventsResu
       }
     },
     refetchOnWindowFocus: true,
-    staleTime: 1000 * 30, // Reduced stale time to 30 seconds for more frequent updates
+    staleTime: 1000 * 10, // Reduced stale time to 10 seconds for more frequent updates
   });
 
   return {

@@ -1,142 +1,77 @@
 
-import React, { useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Sparkles } from "lucide-react";
-import PolymetEventCard from "@/components/polymet/event-card";
-import { Button } from "@/components/ui/button";
-import { Event } from "@/types";
-import { formatFeaturedDate } from "@/utils/date-formatting";
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { CategoryPill } from '@/components/ui/category-pill';
+import { VibeFilter } from '@/components/home/VibeFilter';
+import { UpcomingEventCard } from '@/components/home/UpcomingEventCard';
+import { typography } from '@/components/polymet/brand-typography';
 
 interface HomeUpcomingEventsSectionProps {
+  events: any[];
   isLoading: boolean;
-  filteredEvents: Event[];
-  handleEventClick: (event: Event) => void;
-  availableVibes: string[];
-  selectedVibe: string | null;
-  setSelectedVibe: (vibe: string | null) => void;
-  getEventImageUrl: (event: Event) => string;
 }
 
+const vibes = ['active', 'mindful', 'social', 'creative', 'wellness'];
+
 export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps> = ({
-  isLoading,
-  filteredEvents,
-  handleEventClick,
-  availableVibes,
-  selectedVibe,
-  setSelectedVibe,
-  getEventImageUrl,
+  events,
+  isLoading
 }) => {
+  const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
+
+  const filteredEvents = selectedVibe 
+    ? events?.filter(event => event.vibe?.toLowerCase() === selectedVibe.toLowerCase()) || []
+    : events || [];
+
   return (
-    <section className="py-16 w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h2 className="text-3xl font-bold tracking-tight text-ocean-deep mb-2">Upcoming Events</h2>
-              <p className="text-clay-earth">Discover what's happening in your area</p>
+    <section className="py-8 md:py-12 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="space-y-6 md:space-y-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="text-center sm:text-left">
+              <h2 className={`${typography.h2} mb-2 text-gray-900`}>Upcoming Events</h2>
+              <p className={`${typography.body} text-muted-foreground`}>
+                Discover what's happening in your area
+              </p>
             </div>
-            <Link
-              to="/events"
-              className="text-seafoam-green hover:text-ocean-deep font-medium transition-colors"
-            >
-              View all →
-            </Link>
+            <Button asChild variant="ghost" className="self-center sm:self-auto">
+              <Link to="/events" className="flex items-center gap-2">
+                View all
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
           </div>
-          {/* Vibe Filter Pills */}
-          {availableVibes.length > 0 && (
-            <div className="mb-8">
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                <button
-                  onClick={() => setSelectedVibe(null)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${
-                    !selectedVibe
-                      ? "btn-ocean text-white shadow-md"
-                      : "bg-white/80 text-clay-earth hover:bg-white border border-driftwood-grey"
-                  }`}
-                >
-                  All vibes
-                </button>
-                {availableVibes.map((vibe) => (
-                  <button
-                    key={vibe}
-                    onClick={() =>
-                      setSelectedVibe(selectedVibe === vibe ? null : vibe)
-                    }
-                    className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${
-                      selectedVibe === vibe
-                        ? "btn-sunset text-white shadow-md"
-                        : "bg-white/80 text-clay-earth hover:bg-white border border-driftwood-grey"
-                    }`}
-                  >
-                    {vibe}
-                  </button>
+
+          {/* Vibe Filter - centered on mobile */}
+          <div className="w-full overflow-x-auto">
+            <div className="flex justify-center sm:justify-start">
+              <VibeFilter 
+                vibes={vibes}
+                selectedVibe={selectedVibe}
+                onVibeSelect={setSelectedVibe}
+              />
+            </div>
+          </div>
+
+          {/* Events Grid - properly spaced */}
+          <div className="space-y-4">
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="h-64 bg-gray-200 rounded-lg animate-pulse" />
                 ))}
               </div>
-            </div>
-          )}
-
-          {/* Event Cards Grid (Polymet Only) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {isLoading ? (
-              Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="card-coastal animate-pulse">
-                  <div className="h-48 bg-driftwood-grey/30"></div>
-                  <div className="p-6 space-y-3">
-                    <div className="h-4 bg-driftwood-grey/30 w-3/4"></div>
-                    <div className="h-3 bg-driftwood-grey/30 w-1/2"></div>
-                    <div className="h-3 bg-driftwood-grey/30 w-2/3"></div>
-                  </div>
-                </div>
-              ))
             ) : filteredEvents.length > 0 ? (
-              filteredEvents.slice(0, 4).map((event) => (
-                <div
-                  key={event.id}
-                  className="cursor-pointer h-full transform hover:scale-105 transition-all duration-300"
-                  onClick={() => handleEventClick(event)}
-                >
-                  <PolymetEventCard
-                    id={event.id}
-                    title={event.title}
-                    image={getEventImageUrl(event)}
-                    category={event.event_category || "Other"}
-                    // vibe omitted! No 'v' label on card
-                    host={
-                      event.creator
-                        ? {
-                            id: event.creator.id,
-                            name:
-                              event.creator.username ||
-                              event.creator.email ||
-                              "Host",
-                            avatar: Array.isArray(event.creator.avatar_url)
-                              ? event.creator.avatar_url[0]
-                              : event.creator.avatar_url,
-                          }
-                        : undefined
-                    }
-                    location={event.venues?.name || event.location || ""}
-                    date={formatFeaturedDate(event.start_date || "")}
-                    time={event.start_time || undefined}
-                    attendees={
-                      event.going_count || event.interested_count
-                        ? {
-                            count:
-                              (event.going_count ?? 0) +
-                              (event.interested_count ?? 0),
-                            avatars: [],
-                          }
-                        : undefined
-                    }
-                    showRsvp={false}
-                    className="h-full w-full rounded-md"
-                  />
-                </div>
-              ))
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredEvents.slice(0, 6).map((event) => (
+                  <UpcomingEventCard key={event.id} event={event} />
+                ))}
+              </div>
             ) : (
-              <div className="col-span-1 md:col-span-2 text-center py-12 text-clay-earth">
-                <Sparkles className="h-12 w-12 mx-auto mb-4 text-driftwood-grey" />
-                <p>No events match your selected vibe</p>
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">No events found for this vibe. Try a different filter!</p>
               </div>
             )}
           </div>
