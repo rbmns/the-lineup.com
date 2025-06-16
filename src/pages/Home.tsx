@@ -15,7 +15,7 @@ const Home = () => {
       {/* Hero Section */}
       <HomePageHeaderSection />
       
-      {/* Upcoming Events Section */}
+      {/* Upcoming Events Section with Vibe Filters */}
       <HomeUpcomingEventsSection events={events} isLoading={isLoading} />
 
       {/* How It Works Section */}
