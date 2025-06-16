@@ -329,7 +329,6 @@ export type Database = {
           slug: string | null
           start_date: string | null
           start_time: string | null
-          status: Database["public"]["Enums"]["event_status"]
           tags: string | null
           title: string
           updated_at: string | null
@@ -355,7 +354,6 @@ export type Database = {
           slug?: string | null
           start_date?: string | null
           start_time?: string | null
-          status?: Database["public"]["Enums"]["event_status"]
           tags?: string | null
           title: string
           updated_at?: string | null
@@ -381,7 +379,6 @@ export type Database = {
           slug?: string | null
           start_date?: string | null
           start_time?: string | null
-          status?: Database["public"]["Enums"]["event_status"]
           tags?: string | null
           title?: string
           updated_at?: string | null
@@ -578,27 +575,6 @@ export type Database = {
           created_at?: string | null
           id?: string
           name?: string | null
-        }
-        Relationships: []
-      }
-      towns: {
-        Row: {
-          country: string
-          created_at: string
-          id: number
-          name: string
-        }
-        Insert: {
-          country: string
-          created_at?: string
-          id?: number
-          name: string
-        }
-        Update: {
-          country?: string
-          created_at?: string
-          id?: number
-          name?: string
         }
         Relationships: []
       }
@@ -829,7 +805,6 @@ export type Database = {
       }
     }
     Enums: {
-      event_status: "draft" | "pending_approval" | "published" | "rejected"
       request_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
@@ -946,7 +921,6 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      event_status: ["draft", "pending_approval", "published", "rejected"],
       request_status: ["pending", "approved", "rejected"],
     },
   },

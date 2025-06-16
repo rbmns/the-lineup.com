@@ -10,7 +10,7 @@ export const LandingCtaSection: React.FC = () => (
         Ready to Find Your Next Adventure?
       </h2>
       <p className="text-xl mb-8 max-w-2xl mx-auto text-muted-foreground">
-        Vibe with others and maybe connect back after.
+        Join our community and start discovering events that match your interests and vibe.
       </p>
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <Button asChild variant="primary" size="lg">

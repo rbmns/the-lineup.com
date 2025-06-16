@@ -9,10 +9,10 @@ import { cn } from "@/lib/utils";
 interface UpcomingEventsSectionProps {
   isLoading: boolean;
   filteredEvents: Event[];
-  availableVibes: string[];
-  selectedVibe: string | null;
-  handleVibeClick: (vibe: string) => void;
-  setSelectedVibe: (vibe: string | null) => void;
+  availableCategoriesInUpcoming: string[];
+  selectedCategory: string | null;
+  handleCategoryClick: (category: string) => void;
+  setSelectedCategory: (category: string | null) => void;
   getEventImageUrl: (event: Event) => string | null;
   handleEventClick: (event: Event) => void;
 }
@@ -20,10 +20,10 @@ interface UpcomingEventsSectionProps {
 export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
   isLoading,
   filteredEvents,
-  availableVibes,
-  selectedVibe,
-  handleVibeClick,
-  setSelectedVibe,
+  availableCategoriesInUpcoming,
+  selectedCategory,
+  handleCategoryClick,
+  setSelectedCategory,
   getEventImageUrl,
   handleEventClick,
 }) => {
@@ -35,21 +35,21 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
         <h2 className="text-3xl font-bold tracking-tight mb-6 text-ocean-deep-900 text-left font-inter">
           Upcoming Events
         </h2>
-        {/* Vibe Filter Pills */}
-        <div className="flex flex-nowrap gap-2 mb-7 overflow-x-auto pb-2 scrollbar-hide">
+        {/* Category Filter Pills */}
+        <div className="flex gap-2 mb-7 overflow-x-auto">
           <CategoryPill
-            category="All vibes"
-            active={!selectedVibe}
+            category="All categories"
+            active={!selectedCategory}
             noBorder={true}
-            onClick={() => setSelectedVibe(null)}
+            onClick={() => setSelectedCategory(null)}
           />
-          {availableVibes.map(vibe => (
+          {availableCategoriesInUpcoming.map(category => (
             <CategoryPill
-              key={vibe}
-              category={vibe}
-              active={selectedVibe === vibe}
+              key={category}
+              category={category}
+              active={selectedCategory === category}
               noBorder={true}
-              onClick={() => handleVibeClick(vibe)}
+              onClick={() => handleCategoryClick(category)}
             />
           ))}
         </div>

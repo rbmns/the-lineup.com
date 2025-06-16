@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import MainNav from "@/components/MainNav";
 import LeftSidebar from "@/components/nav/LeftSidebar";
@@ -10,7 +9,7 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SocialSidebar } from "@/components/social/SocialSidebar";
 
-const TOP_NAV_HEIGHT = 64; // increased from 56 to 64px for better mobile spacing
+const TOP_NAV_HEIGHT = 56; // px, matches h-14
 const LEFT_SIDEBAR_WIDTH = 80; // px, matches w-20
 const RIGHT_SIDEBAR_WIDTH = 224; // px, matches w-56
 
@@ -20,7 +19,6 @@ const Layout = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const [rightSidebarVisible, setRightSidebarVisible] = useState(true);
-  const isHomePage = location.pathname === '/';
 
   const toggleRightSidebar = () => {
     setRightSidebarVisible(!rightSidebarVisible);
@@ -48,7 +46,7 @@ const Layout = () => {
 
         {/* Main Content Area */}
         <div
-          className="flex-1 w-full min-h-screen bg-gray-50 flex flex-col"
+          className="flex-1 w-full min-h-screen main-feed-gradient flex flex-col"
           style={
             !isMobile
               ? {
@@ -58,15 +56,13 @@ const Layout = () => {
                   minHeight: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
                   boxSizing: 'border-box',
                 }
-              : {
-                  paddingTop: TOP_NAV_HEIGHT,
-                  paddingBottom: 60, // Add space for mobile navigation
-                }
+              : {}
           }
         >
-          {/* Main content with proper mobile spacing */}
-          <main className="w-full flex-1 flex flex-col">
-            <div className={`flex-1 flex flex-col justify-start ${!isHomePage ? 'pt-4 px-4 sm:pt-6 sm:px-6' : ''}`}>
+          {/* ENSURE FULL WIDTH and REMOVE max-w-3xl restriction */}
+          <main className="main-feed-gradient w-full flex-1 flex flex-col">
+            {/* Add uniform padding for all pages here */}
+            <div className="flex-1 flex flex-col justify-start pt-[20px] px-[20px]">
               <Outlet />
             </div>
           </main>
@@ -97,7 +93,7 @@ const Layout = () => {
 
       {/* Mobile Navigation - Fixed to bottom */}
       {isMobile && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white z-50 border-t border-border">
+        <div className="fixed bottom-0 left-0 right-0 bg-card z-50 safe-area-pb border-t border-border">
           <LeftSidebar />
         </div>
       )}

@@ -51,7 +51,6 @@ export const processEventData = (event: any): Event => {
     extra_info: event["Extra info"] || null,
     fee: event.fee,
     venue_id: event.venue_id,
-    status: event.status,
     tags: event.tags ? (typeof event.tags === 'string' ? [event.tags] : event.tags) : []
   } as Event;
 };

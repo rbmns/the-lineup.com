@@ -13,16 +13,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
-import { Settings, LogOut, User as UserIcon, Calendar } from 'lucide-react';
+import { Settings, LogOut, User as UserIcon } from 'lucide-react';
 
 export interface UserMenuProps {
   user: User;
   profile: UserProfile | null;
   handleSignOut: () => Promise<void>;
-  canCreateEvents?: boolean;
 }
 
-const UserMenu = ({ user, profile, handleSignOut, canCreateEvents }: UserMenuProps) => {
+const UserMenu = ({ user, profile, handleSignOut }: UserMenuProps) => {
   const navigate = useNavigate();
 
   const onSignOut = async (e: React.MouseEvent) => {
@@ -58,14 +57,6 @@ const UserMenu = ({ user, profile, handleSignOut, canCreateEvents }: UserMenuPro
             <span>Profile</span>
           </Link>
         </DropdownMenuItem>
-        {canCreateEvents && (
-            <DropdownMenuItem asChild>
-              <Link to="/profile?tab=created" className="w-full cursor-pointer">
-                <Calendar className="mr-2 h-4 w-4" />
-                <span>My Events</span>
-              </Link>
-            </DropdownMenuItem>
-        )}
         <DropdownMenuItem asChild>
           <Link to="/profile/edit" className="w-full cursor-pointer">
             <Settings className="mr-2 h-4 w-4" />

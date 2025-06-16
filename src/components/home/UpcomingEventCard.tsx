@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Calendar, MapPin, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -36,19 +35,19 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
   return (
     <Card
       className={cn(
-        "group hover:shadow-lg transition-shadow flex flex-col w-80 cursor-pointer overflow-hidden rounded-xl shadow-md",
+        "group hover:shadow-lg transition-shadow flex flex-col max-w-xs w-[265px] cursor-pointer overflow-hidden rounded-xl shadow-md",
         className
       )}
       onClick={handleClick}
       tabIndex={0}
       role="button"
     >
-      <div className="relative w-full h-48 rounded-t-xl overflow-hidden transform">
+      <div className="relative w-full h-40 rounded-t-xl overflow-hidden transform">
         <LineupImage
           src={imageUrl}
           alt={event.title}
           aspectRatio="video"
-          className="h-48"
+          className="h-40"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (target.src !== DEFAULT_FALLBACK_IMAGE_URL) {

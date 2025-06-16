@@ -1,8 +1,7 @@
-
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { processEventsData } from '@/utils/eventProcessorUtils';
-import { isUpcomingEvent, filterUpcomingEvents } from '@/utils/date-filtering';
+import { filterEventsByTime, shouldShowEvent } from '@/utils/eventTimeFiltering';
 import { AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
 
 /**
@@ -37,7 +36,7 @@ export const fetchEventById = async (eventId: string, userId: string | undefined
     const event = processedEvents[0] || null;
     
     // Check if event should still be visible based on timing rules
-    if (event && !isUpcomingEvent(event)) {
+    if (event && !shouldShowEvent(event)) {
       console.log(`Event ${eventId} is no longer visible due to timing rules`);
       return null;
     }
@@ -230,7 +229,7 @@ export const fetchSimilarEvents = async (
 
     // Process events data and apply time-based filtering
     const processedEvents = processEventsData(data, userId);
-    const filteredEvents = filterUpcomingEvents(processedEvents);
+    const filteredEvents = filterEventsByTime(processedEvents);
     
     return filteredEvents.slice(0, minResults);
 
@@ -277,7 +276,7 @@ export const searchEvents = async (query: string, userId: string | undefined = u
     const processedEvents = processEventsData(data, userId);
     
     // Apply time-based filtering to show only relevant events
-    const filteredEvents = filterUpcomingEvents(processedEvents);
+    const filteredEvents = filterEventsByTime(processedEvents);
     
     return filteredEvents;
 
@@ -308,53 +307,18 @@ export const createEvent = async (eventData: Partial<Event>): Promise<{ data: Ev
  * Updates an existing event.
  */
 export const updateEvent = async (eventId: string, eventData: Partial<Event>): Promise<{ data: Event | null; error: any }> => {
-  console.log('updateEvent called with eventId:', eventId, 'and data:', eventData);
-  
-  // First check if the event exists
-  const { data: existingEvent, error: fetchError } = await supabase
-    .from('events')
-    .select('id')
-    .eq('id', eventId)
-    .maybeSingle();
-
-  if (fetchError) {
-    console.error('Error checking if event exists:', fetchError);
-    return { data: null, error: fetchError };
-  }
-
-  if (!existingEvent) {
-    const notFoundError = {
-      message: `Event with ID ${eventId} not found`,
-      code: 'EVENT_NOT_FOUND'
-    };
-    console.error('Event not found for update:', notFoundError);
-    return { data: null, error: notFoundError };
-  }
-
-  // Now update the event
   const { data, error } = await supabase
     .from('events')
     .update(eventData)
     .eq('id', eventId)
     .select()
-    .maybeSingle();
+    .single();
 
   if (error) {
     console.error('Error updating event:', error);
-    return { data: null, error };
   }
 
-  if (!data) {
-    const updateError = {
-      message: 'Event update succeeded but no data returned',
-      code: 'UPDATE_NO_DATA'
-    };
-    console.error('No data returned after update:', updateError);
-    return { data: null, error: updateError };
-  }
-
-  console.log('Event updated successfully:', data);
-  return { data, error: null };
+  return { data, error };
 };
 
 /**

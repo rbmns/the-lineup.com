@@ -1,6 +1,6 @@
-import React, { createContext, useState, useContext, useCallback } from 'react';
-import { Event, UserProfile, Venue } from '@/types';
-import { CasualPlan } from '@/types/casual-plans';
+
+import React, { createContext, useState, useContext } from 'react';
+import { Event, UserProfile } from '@/types';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { 
@@ -14,10 +14,10 @@ import {
 
 interface SearchResult {
   id: string;
-  type: 'event' | 'profile' | 'location' | 'venue' | 'casual_plan';
+  type: 'event' | 'profile' | 'location';
   title?: string;
   username?: string;
-  event_category?: string;
+  event_type?: string;
   location?: string;
   categories?: string[];
   keywords?: string[];
@@ -50,15 +50,6 @@ interface SearchContextType {
   trackClick: (searchTerm: string, resultId: string, resultType: string) => Promise<void>;
 }
 
-const buildOrCondition = (fields: string[], term: string, translatedTerm: string) => {
-  const originalTermQuery = fields.map(f => `${f}.ilike.%${term}%`).join(',');
-  if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
-    const translatedTermQuery = fields.map(f => `${f}.ilike.%${translatedTerm}%`).join(',');
-    return `${originalTermQuery},${translatedTermQuery}`;
-  }
-  return originalTermQuery;
-};
-
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
 export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -67,7 +58,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [similarResults, setSimilarResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  const trackSearch = useCallback(async (term: string) => {
+  const trackSearch = async (term: string) => {
     try {
       await fetch('/api/track-search', {
         method: 'POST',
@@ -82,9 +73,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } catch (error) {
       console.error('Failed to track search:', error);
     }
-  }, []);
+  };
 
-  const trackClick = useCallback(async (searchTerm: string, resultId: string, resultType: string) => {
+  const trackClick = async (searchTerm: string, resultId: string, resultType: string) => {
     try {
       await fetch('/api/track-search', {
         method: 'POST',
@@ -102,9 +93,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } catch (error) {
       console.error('Failed to track click:', error);
     }
-  }, []);
+  };
 
-  const performSearch = useCallback(async (term: string): Promise<SearchResult[]> => {
+  const performSearch = async (term: string): Promise<SearchResult[]> => {
     if (!term.trim()) return [];
     
     setIsSearching(true);
@@ -113,83 +104,29 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       await trackSearch(term);
       
-      const dutchToEnglish: { [key: string]: string } = {
-        'strand': 'beach',
-        'zomer': 'summer',
-        'feest': 'party',
-        'muziek': 'music',
-        'lente': 'spring',
-        'herfst': 'autumn',
-        'winter': 'winter',
-      };
-
-      let translatedTerm = term;
-      Object.entries(dutchToEnglish).forEach(([dutch, english]) => {
-        const regex = new RegExp(`\\b${dutch}\\b`, 'gi');
-        translatedTerm = translatedTerm.replace(regex, english);
-      });
-
-      let eventOrCondition = `title.ilike.%${term}%,description.ilike.%${term}%,event_category.ilike.%${term}%,destination.ilike.%${term}%,tags.ilike.%${term}%,vibe.ilike.%${term}%`;
-      if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
-        eventOrCondition += `,title.ilike.%${translatedTerm}%,description.ilike.%${translatedTerm}%,event_category.ilike.%${translatedTerm}%,destination.ilike.%${translatedTerm}%,tags.ilike.%${translatedTerm}%,vibe.ilike.%${translatedTerm}%`;
-      }
-
-      const eventSearch = supabase
+      // Search events by title, description or event type
+      const { data: eventData, error: eventError } = await supabase
         .from('events')
         .select('*, venue_id(*)')
-        .or(eventOrCondition)
-        .order('start_date', { ascending: true });
-
-      let venueOrCondition = `name.ilike.%${term}%,city.ilike.%${term}%`;
-      if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
-        venueOrCondition += `,name.ilike.%${translatedTerm}%,city.ilike.%${translatedTerm}%`;
-      }
-
-      const venueSearch = supabase
-        .from('venues')
-        .select('*')
-        .or(venueOrCondition);
-
-      let casualPlanOrCondition = `title.ilike.%${term}%,description.ilike.%${term}%,vibe.ilike.%${term}%,location.ilike.%${term}%`;
-      if (term.toLowerCase() !== translatedTerm.toLowerCase()) {
-        casualPlanOrCondition += `,title.ilike.%${translatedTerm}%,description.ilike.%${translatedTerm}%,vibe.ilike.%${translatedTerm}%,location.ilike.%${translatedTerm}%`;
-      }
+        .or(`title.ilike.%${term}%,description.ilike.%${term}%,event_type.ilike.%${term}%`)
+        .order('start_time', { ascending: true });
+        
+      if (eventError) throw eventError;
       
-      const casualPlanSearch = supabase
-        .from('casual_plans')
-        .select('*, creator_profile:profiles(id, username, avatar_url)')
-        .or(casualPlanOrCondition);
-
-      const [eventResponse, venueResponse, casualPlanResponse] = await Promise.all([
-        eventSearch,
-        venueSearch,
-        casualPlanSearch,
-      ]);
-
-      if (eventResponse.error) throw eventResponse.error;
-      if (venueResponse.error) throw venueResponse.error;
-      if (casualPlanResponse.error) throw casualPlanResponse.error;
-      
-      const eventResults = (eventResponse.data || []).map(event => ({
-          ...event,
+      const results = (eventData || []).map(event => {
+        const venueData = event.venue_id || {};
+        return {
+          id: event.id,
           type: 'event' as const,
-      }));
-
-      const venueResults = (venueResponse.data || []).map(venue => ({
-          ...venue,
-          type: 'venue' as const,
-          title: venue.name,
-          location: venue.city,
-      }));
-
-      const casualPlanResults = (casualPlanResponse.data || []).map(plan => ({
-          ...plan,
-          type: 'casual_plan' as const,
-      }));
+          title: event.title,
+          description: event.description,
+          location: venueData.city || 'Location not specified',
+          event_type: event.event_type,
+          start_time: event.start_time,
+          end_time: event.end_time,
+        };
+      });
       
-      const results: SearchResult[] = [...eventResults, ...venueResults, ...casualPlanResults];
-      
-      console.log('Search results found:', results.length);
       setSearchResults(results);
       return results;
     } catch (error) {
@@ -201,9 +138,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } finally {
       setIsSearching(false);
     }
-  }, [trackSearch]);
+  };
 
-  const searchByLocation = useCallback(async (location: string) => {
+  const searchByLocation = async (location: string) => {
     setIsSearching(true);
     setSearchTerm(location);
     
@@ -213,9 +150,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } finally {
       setIsSearching(false);
     }
-  }, [performSearch]);
+  };
 
-  const searchByCategory = useCallback(async (category: string) => {
+  const searchByCategory = async (category: string) => {
     setIsSearching(true);
     setSearchTerm(category);
     
@@ -228,8 +165,8 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           venues:venue_id(*),
           event_rsvps(id, user_id, status)
         `)
-        .eq('event_category', asEqParam(category))
-        .order('start_date', { ascending: true });
+        .eq('event_type', asEqParam(category))
+        .order('start_time', { ascending: true });
         
       if (error) throw error;
       
@@ -239,6 +176,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           forceTypeCast(safeGet(venuesData, 'city', 'Location not specified')) : 
           'Location not specified';
         
+        // Use forceTypeCast to avoid "spread types" error
         return { 
           ...forceTypeCast<any>(item), 
           type: 'event' as const,
@@ -252,9 +190,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } finally {
       setIsSearching(false);
     }
-  }, []);
+  };
 
-  const searchByKeyword = useCallback(async (keyword: string) => {
+  const searchByKeyword = async (keyword: string) => {
     setIsSearching(true);
     setSearchTerm(keyword);
     
@@ -264,9 +202,9 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } finally {
       setIsSearching(false);
     }
-  }, [performSearch]);
+  };
 
-  const advancedSearch = useCallback(async (params: {
+  const advancedSearch = async (params: {
     term?: string;
     location?: string;
     category?: string;
@@ -285,7 +223,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       `);
       
       if (params.term) {
-        query = query.or(`title.ilike.%${params.term}%,description.ilike.%${params.term}%,event_category.ilike.%${params.term}%`);
+        query = query.or(`title.ilike.%${params.term}%,description.ilike.%${params.term}%,event_type.ilike.%${params.term}%`);
       }
       
       if (params.location) {
@@ -293,18 +231,18 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
       
       if (params.category) {
-        query = query.eq('event_category', asEqParam(params.category));
+        query = query.eq('event_type', asEqParam(params.category));
       }
       
       if (params.startDate) {
-        query = query.gte('start_date', params.startDate);
+        query = query.gte('start_time', params.startDate);
       }
       
       if (params.endDate) {
-        query = query.lte('end_date', params.endDate);
+        query = query.lte('end_time', params.endDate);
       }
       
-      query = query.order('start_date', { ascending: true });
+      query = query.order('start_time', { ascending: true });
       
       const { data, error } = await query;
       
@@ -316,6 +254,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           forceTypeCast(safeGet(venuesData, 'city', 'Location not specified')) : 
           'Location not specified';
         
+        // Use forceTypeCast to avoid "spread types" error
         return { 
           ...forceTypeCast<any>(item), 
           type: 'event' as const,
@@ -329,7 +268,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } finally {
       setIsSearching(false);
     }
-  }, []);
+  };
 
   return (
     <SearchContext.Provider value={{

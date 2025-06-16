@@ -8,11 +8,6 @@ export const useQueryOnlyResults = (setQueryOnlyResults: (results: Event[] | nul
   // Fetch results that only match the query text
   const fetchQueryOnlyResults = async (query: string) => {
     try {
-      if (!query || query.trim() === '') {
-        setQueryOnlyResults(null);
-        return;
-      }
-
       const dutchToEnglish: {[key: string]: string} = {
         'lente': 'spring',
         'zomer': 'summer',
@@ -23,17 +18,14 @@ export const useQueryOnlyResults = (setQueryOnlyResults: (results: Event[] | nul
         'muziek': 'music'
       };
       
-      let translatedQuery = query;
+      let enhancedQuery = query;
       Object.entries(dutchToEnglish).forEach(([dutch, english]) => {
-        const regex = new RegExp(`\\b${dutch}\\b`, 'gi');
-        translatedQuery = translatedQuery.replace(regex, english);
+        if (query.toLowerCase().includes(dutch)) {
+          enhancedQuery += ` OR ${english}`;
+        }
       });
       
-      let orCondition = `title.ilike.%${query}%,description.ilike.%${query}%,destination.ilike.%${query}%,event_category.ilike.%${query}%,tags.ilike.%${query}%,vibe.ilike.%${query}%`;
-
-      if (query.toLowerCase() !== translatedQuery.toLowerCase()) {
-        orCondition += `,title.ilike.%${translatedQuery}%,description.ilike.%${translatedQuery}%,destination.ilike.%${translatedQuery}%,event_category.ilike.%${translatedQuery}%,tags.ilike.%${translatedQuery}%,vibe.ilike.%${translatedQuery}%`;
-      }
+      const searchTerms = query.split(' ').filter(term => term.length > 2);
       
       const { data, error } = await supabase
         .from('events')
@@ -43,14 +35,10 @@ export const useQueryOnlyResults = (setQueryOnlyResults: (results: Event[] | nul
           venues:venue_id(*),
           event_rsvps(id, user_id, status)
         `)
-        .or(orCondition)
-        .order('start_date', { ascending: true })
+        .or(`title.ilike.%${query}%,description.ilike.%${query}%,location.ilike.%${query}%,event_type.ilike.%${query}%,tags.cs.{${enhancedQuery}}`)
         .order('start_time', { ascending: true });
         
-      if (error) {
-        console.error('Query-only search error:', error);
-        throw error;
-      }
+      if (error) throw error;
       
       if (data && data.length > 0) {
         const formattedEvents: Event[] = data.map(processEventData);
@@ -61,8 +49,7 @@ export const useQueryOnlyResults = (setQueryOnlyResults: (results: Event[] | nul
         setQueryOnlyResults([]);
       }
     } catch (error) {
-      console.error('Error in fetchQueryOnlyResults:', error);
-      setQueryOnlyResults([]);
+      console.error('Query-only search error:', error);
     }
   };
 

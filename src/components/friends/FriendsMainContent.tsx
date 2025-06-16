@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFriendData } from '@/hooks/useFriendData';
@@ -160,9 +161,8 @@ export const FriendsMainContent: React.FC = () => {
                   onAcceptRequest={onAcceptRequest}
                   onDeclineRequest={onDeclineRequest}
                   showFriendRequests={false}
-                  // Remove searchQuery and onSearchChange to hide the duplicate search bar
-                  searchQuery={undefined}
-                  onSearchChange={undefined}
+                  searchQuery=""
+                  onSearchChange={() => {}}
                 />
               }
               suggestionsContent={
@@ -183,9 +183,8 @@ export const FriendsMainContent: React.FC = () => {
                   onAcceptRequest={onAcceptRequest}
                   onDeclineRequest={onDeclineRequest}
                   showFriendRequests={true}
-                  // Remove searchQuery and onSearchChange to hide the duplicate search bar
-                  searchQuery={undefined}
-                  onSearchChange={undefined}
+                  searchQuery=""
+                  onSearchChange={() => {}}
                 />
               }
               eventsContent={

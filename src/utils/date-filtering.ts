@@ -10,36 +10,38 @@ import {
   endOfWeek,
   compareAsc
 } from 'date-fns';
-import { isDateInEventRange } from '@/utils/event-date-utils';
-
-/**
- * Checks if an event is upcoming or currently ongoing.
- */
-export const isUpcomingEvent = (event: Event): boolean => {
-  const now = new Date();
-  const today = startOfDay(now);
-
-  if (!event.start_date) {
-    return true; // Keep events without a start date (e.g., drafts)
-  }
-
-  const eventStartDate = startOfDay(new Date(event.start_date));
-
-  // For multi-day events, check if the event has already ended
-  if (event.end_date) {
-    const eventEndDate = endOfDay(new Date(event.end_date));
-    return eventEndDate >= today;
-  }
-  
-  // For single-day events, check if start date is not in the past
-  return eventStartDate >= today;
-};
+import { isDateInEventRange } from './event-date-utils';
 
 /**
  * Filters upcoming events (events with start date in the future or ongoing multi-day events)
  */
 export const filterUpcomingEvents = (events: Event[]): Event[] => {
-  return events.filter(isUpcomingEvent);
+  const now = new Date();
+  const today = startOfDay(now);
+  
+  return events.filter(event => {
+    // If no start_date, include the event
+    if (!event.start_date) return true;
+    
+    // For multi-day events, check if today falls within the event range
+    if (event.end_date) {
+      const startDate = new Date(event.start_date);
+      const endDate = new Date(event.end_date);
+      
+      // If it's a multi-day event and today is within the range, include it
+      if (endDate > startDate && isDateInEventRange(now, event)) {
+        return true;
+      }
+    }
+    
+    // Convert to Date object if it's a string
+    const eventDate = typeof event.start_date === 'string' 
+      ? new Date(event.start_date) 
+      : event.start_date;
+      
+    // Keep events that are today or in the future
+    return eventDate >= today;
+  });
 };
 
 /**

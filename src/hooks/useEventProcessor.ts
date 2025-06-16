@@ -57,7 +57,6 @@ export const useEventProcessor = () => {
       fee: event.fee,
       venue_id: event.venue_id,
       tags: Array.isArray(event.tags) ? event.tags : (event.tags ? [event.tags] : []),
-      status: event.status,
       ...(event.coordinates && { coordinates: event.coordinates }),
       ...(event.created_by && { created_by: event.created_by })
     };

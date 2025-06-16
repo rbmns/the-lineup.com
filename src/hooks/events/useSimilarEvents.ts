@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import { Event } from '@/types';
 import { supabase } from '@/lib/supabase';
@@ -26,7 +27,6 @@ export const useSimilarEvents = (selectedEventTypes: string[], selectedVenues: s
         image_urls: item.image_urls || [],
         fee: item.fee,
         tags: item.tags,
-        status: item.status,
         rsvp_status: undefined,
         isExactMatch: isExactMatch,
         attendees: {
