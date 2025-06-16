@@ -43,6 +43,8 @@ function App() {
                   <Route path="events/create" element={<CreateEvent />} />
                   <Route path="events/:id" element={<EventDetail />} />
                   <Route path="events/:eventId/edit" element={<EditEvent />} />
+                  {/* Add redirect from /event to /events */}
+                  <Route path="event" element={<Navigate to="/events" replace />} />
                   <Route path="casual-plans" element={<CasualPlans />} />
                   <Route path="friends" element={<Friends />} />
                   <Route path="profile" element={<ProfilePage />} />
