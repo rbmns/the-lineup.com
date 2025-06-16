@@ -2,9 +2,9 @@
 import React from 'react';
 import { useEvents } from '@/hooks/useEvents';
 import HomePageHeaderSection from '@/components/home/HomePageHeaderSection';
-import HomeUpcomingEventsSection from '@/components/home/HomeUpcomingEventsSection';
+import { HomeUpcomingEventsSection } from '@/components/home/HomeUpcomingEventsSection';
 import HomeHowItWorksSection from '@/components/home/HomeHowItWorksSection';
-import HomeCasualPlansSection from '@/components/home/HomeCasualPlansSection';
+import { HomeCasualPlansSection } from '@/components/home/HomeCasualPlansSection';
 import HomeCtaSection from '@/components/home/HomeCtaSection';
 
 const Home = () => {
