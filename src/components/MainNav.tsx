@@ -53,11 +53,11 @@ const MainNav = () => {
     )}>
       <div className="w-full flex flex-col">
         <div className={cn(
-          "w-full h-14 flex items-center justify-between gap-2 sm:gap-4",
+          "w-full h-16 flex items-center justify-between gap-2 sm:gap-4",
           isMobile ? "px-3" : "px-4 sm:px-6"
         )}>
           {/* Left side - Icon flush left + wordmark */}
-          <div className="flex items-center h-14 flex-shrink-0 min-w-0">
+          <div className="flex items-center h-16 flex-shrink-0 min-w-0">
             <Link to="/" className="flex items-center justify-center mr-2 flex-shrink-0">
               <img
                 src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png"

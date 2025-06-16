@@ -10,7 +10,7 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SocialSidebar } from "@/components/social/SocialSidebar";
 
-const TOP_NAV_HEIGHT = 56; // px, matches h-14
+const TOP_NAV_HEIGHT = 64; // increased from 56 to 64px for better mobile spacing
 const LEFT_SIDEBAR_WIDTH = 80; // px, matches w-20
 const RIGHT_SIDEBAR_WIDTH = 224; // px, matches w-56
 
@@ -48,7 +48,7 @@ const Layout = () => {
 
         {/* Main Content Area */}
         <div
-          className="flex-1 w-full min-h-screen main-feed-gradient flex flex-col"
+          className="flex-1 w-full min-h-screen bg-gray-50 flex flex-col"
           style={
             !isMobile
               ? {
@@ -64,10 +64,9 @@ const Layout = () => {
                 }
           }
         >
-          {/* ENSURE FULL WIDTH and proper mobile spacing */}
-          <main className="main-feed-gradient w-full flex-1 flex flex-col">
-            {/* Add uniform padding for all pages here, except home */}
-            <div className={`flex-1 flex flex-col justify-start ${!isHomePage ? 'pt-4 px-4 sm:pt-5 sm:px-5' : ''}`}>
+          {/* Main content with proper mobile spacing */}
+          <main className="w-full flex-1 flex flex-col">
+            <div className={`flex-1 flex flex-col justify-start ${!isHomePage ? 'pt-4 px-4 sm:pt-6 sm:px-6' : ''}`}>
               <Outlet />
             </div>
           </main>

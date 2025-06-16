@@ -26,51 +26,55 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
     : events || [];
 
   return (
-    <section className="py-8 md:py-12">
-      <div className="space-y-6 md:space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h2 className={`${typography.h2} mb-2`}>Upcoming Events</h2>
-            <p className={`${typography.body} text-muted-foreground`}>
-              Discover what's happening in your area
-            </p>
+    <section className="py-8 md:py-12 bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="space-y-6 md:space-y-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="text-center sm:text-left">
+              <h2 className={`${typography.h2} mb-2 text-gray-900`}>Upcoming Events</h2>
+              <p className={`${typography.body} text-muted-foreground`}>
+                Discover what's happening in your area
+              </p>
+            </div>
+            <Button asChild variant="ghost" className="self-center sm:self-auto">
+              <Link to="/events" className="flex items-center gap-2">
+                View all
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
           </div>
-          <Button asChild variant="ghost" className="self-start sm:self-auto">
-            <Link to="/events" className="flex items-center gap-2">
-              View all
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
 
-        {/* Vibe Filter */}
-        <div className="w-full overflow-x-auto">
-          <VibeFilter 
-            vibes={vibes}
-            selectedVibe={selectedVibe}
-            onVibeSelect={setSelectedVibe}
-          />
-        </div>
+          {/* Vibe Filter - centered on mobile */}
+          <div className="w-full overflow-x-auto">
+            <div className="flex justify-center sm:justify-start">
+              <VibeFilter 
+                vibes={vibes}
+                selectedVibe={selectedVibe}
+                onVibeSelect={setSelectedVibe}
+              />
+            </div>
+          </div>
 
-        {/* Events Grid */}
-        <div className="space-y-4">
-          {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-64 bg-gray-200 rounded-lg animate-pulse" />
-              ))}
-            </div>
-          ) : filteredEvents.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-              {filteredEvents.slice(0, 6).map((event) => (
-                <UpcomingEventCard key={event.id} event={event} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">No events found for this vibe. Try a different filter!</p>
-            </div>
-          )}
+          {/* Events Grid - properly spaced */}
+          <div className="space-y-4">
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="h-64 bg-gray-200 rounded-lg animate-pulse" />
+                ))}
+              </div>
+            ) : filteredEvents.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredEvents.slice(0, 6).map((event) => (
+                  <UpcomingEventCard key={event.id} event={event} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">No events found for this vibe. Try a different filter!</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>
