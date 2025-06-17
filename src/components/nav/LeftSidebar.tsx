@@ -1,13 +1,17 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Calendar, Users, Star, Home } from 'lucide-react';
+import { Calendar, Users, Star, Home, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCreatorStatus } from '@/hooks/useCreatorStatus';
 
 const LeftSidebar: React.FC = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
+  const { isAuthenticated } = useAuth();
+  const { canCreateEvents } = useCreatorStatus();
 
   const navItems = [
     {
@@ -33,10 +37,11 @@ const LeftSidebar: React.FC = () => {
   ];
 
   if (isMobile) {
-    // Mobile horizontal layout at bottom with better iPhone compatibility
+    // Mobile horizontal layout at bottom with centered create button
     return (
       <div className="flex items-center justify-around h-full px-2 bg-card border-t border-border safe-area-bottom">
-        {navItems.map((item) => {
+        {/* First two nav items */}
+        {navItems.slice(0, 2).map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
 
@@ -51,12 +56,42 @@ const LeftSidebar: React.FC = () => {
                   : "text-muted-foreground hover:text-foreground hover:bg-secondary"
               )}
             >
-              <Icon className={cn(
-                "h-5 w-5 mb-1"
-              )} />
-              <span className={cn(
-                "text-xs font-medium truncate"
-              )}>
+              <Icon className="h-5 w-5 mb-1" />
+              <span className="text-xs font-medium truncate">
+                {item.label}
+              </span>
+            </Link>
+          );
+        })}
+
+        {/* Centered Create Event Button */}
+        {isAuthenticated && canCreateEvents && (
+          <Link
+            to="/events/create"
+            className="flex flex-col items-center justify-center p-2 transition-colors rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg mx-2"
+          >
+            <Plus className="h-6 w-6" />
+          </Link>
+        )}
+
+        {/* Last two nav items */}
+        {navItems.slice(2).map((item) => {
+          const Icon = item.icon;
+          const isActive = location.pathname === item.path;
+
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={cn(
+                "flex flex-col items-center justify-center p-3 min-w-0 flex-1 transition-colors rounded-lg",
+                isActive
+                  ? "text-primary bg-secondary"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+              )}
+            >
+              <Icon className="h-5 w-5 mb-1" />
+              <span className="text-xs font-medium truncate">
                 {item.label}
               </span>
             </Link>
