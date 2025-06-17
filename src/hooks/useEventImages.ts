@@ -38,7 +38,9 @@ export const useEventImages = (event?: Event | null): EventImageResult => {
       // Handle different formats of image_urls
       if (Array.isArray(eventData.image_urls)) {
         // If it's already an array, get the first valid URL
-        imageUrl = eventData.image_urls.find(url => url && typeof url === 'string' && url.trim().length > 0) || null;
+        imageUrl = eventData.image_urls.find((url): url is string => {
+          return typeof url === 'string' && url.trim().length > 0;
+        }) || null;
       } else if (typeof eventData.image_urls === 'string') {
         // If it's a string, try to parse it or use it directly
         const trimmedString = eventData.image_urls.trim();
@@ -47,7 +49,9 @@ export const useEventImages = (event?: Event | null): EventImageResult => {
           try {
             const parsed = JSON.parse(trimmedString);
             if (Array.isArray(parsed)) {
-              imageUrl = parsed.find(url => url && typeof url === 'string' && url.trim().length > 0) || null;
+              imageUrl = parsed.find((url): url is string => {
+                return typeof url === 'string' && url.trim().length > 0;
+              }) || null;
             }
           } catch (e) {
             console.warn(`[EventImage] Failed to parse image_urls JSON: ${trimmedString}`);
