@@ -40,7 +40,7 @@ export const ProfileEventCard: React.FC<ProfileEventCardProps> = ({ event }) => 
           <div className="space-y-2 mt-2">
             <div className="flex items-center text-sm text-gray-600">
               <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
-              <span>{formatEventCardDateTime(event.start_date, event.start_time)}</span>
+              <span>{formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}</span>
             </div>
             
             {(event.venues?.name || event.location) && (

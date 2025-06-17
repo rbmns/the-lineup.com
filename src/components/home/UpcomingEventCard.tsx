@@ -88,7 +88,7 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
           <div className="flex items-center gap-3 text-[#005F73]/70">
             <Calendar className="h-4 w-4 text-[#2A9D8F] flex-shrink-0" />
             <span className="text-sm font-medium">
-              {formatEventCardDateTime(event.start_date, event.start_time)}
+              {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
             </span>
           </div>
 

@@ -164,7 +164,7 @@ export const EventCard: React.FC<EventCardProps> = ({
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
             <span className="font-medium">
-              {formatEventCardDateTime(event.start_date, event.start_time)}
+              {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
             </span>
           </div>
           

@@ -1,3 +1,4 @@
+
 import { formatInTimeZone } from 'date-fns-tz';
 
 // Set timezone constant for Amsterdam/Netherlands
@@ -68,12 +69,57 @@ export const formatEventTime = (startTime: string, endTime?: string | null): str
 };
 
 /**
- * Formats event date and time for cards, e.g. "Sun, 25 May, 20:30"
+ * Check if an event spans multiple days
  */
-export const formatEventCardDateTime = (dateString: string, startTime?: string | null): string => {
-  if (!dateString) return '';
+export const isMultiDayEvent = (startDate: string, endDate?: string | null): boolean => {
+  if (!startDate || !endDate) return false;
+  
   try {
-    const date = new Date(dateString);
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    // Compare dates without time components
+    const startDateOnly = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const endDateOnly = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+    
+    return endDateOnly > startDateOnly;
+  } catch (error) {
+    console.error('Error checking multi-day event:', error);
+    return false;
+  }
+};
+
+/**
+ * Format date range for multi-day events
+ */
+export const formatMultiDayRange = (startDate: string, endDate: string): string => {
+  try {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    const startFormatted = formatInTimeZone(start, AMSTERDAM_TIMEZONE, "EEE, d MMM");
+    const endFormatted = formatInTimeZone(end, AMSTERDAM_TIMEZONE, "EEE, d MMM");
+    
+    return `${startFormatted} - ${endFormatted}`;
+  } catch (error) {
+    console.error('Error formatting multi-day range:', error);
+    return '';
+  }
+};
+
+/**
+ * Formats event date and time for cards, e.g. "Sun, 25 May, 20:30" or "Sat, 31 May - Sun, 1 Jun" for multi-day events
+ */
+export const formatEventCardDateTime = (startDate: string, startTime?: string | null, endDate?: string | null): string => {
+  if (!startDate) return '';
+  
+  // Check if it's a multi-day event
+  if (isMultiDayEvent(startDate, endDate)) {
+    return formatMultiDayRange(startDate, endDate!);
+  }
+  
+  try {
+    const date = new Date(startDate);
     const datePart = formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, d MMM");
 
     if (!startTime) {
@@ -82,14 +128,14 @@ export const formatEventCardDateTime = (dateString: string, startTime?: string |
 
     // Create a new date object with the time for correct timezone formatting
     // Handles both ISO date strings and simple time strings.
-    const timeDate = new Date(startTime.includes('T') ? startTime : `${dateString.split('T')[0]}T${startTime}`);
+    const timeDate = new Date(startTime.includes('T') ? startTime : `${startDate.split('T')[0]}T${startTime}`);
     const timePart = formatInTimeZone(timeDate, AMSTERDAM_TIMEZONE, "HH:mm");
     
     return `${datePart}, ${timePart}`;
   } catch (error) {
     console.error('Error formatting event card date-time:', error);
     // Fallback to a simpler format
-    const datePart = formatFeaturedDate(dateString);
+    const datePart = formatFeaturedDate(startDate);
     if (!startTime) return datePart;
     const timePart = formatTime(startTime).substring(0, 5); // Just get HH:mm
     return `${datePart}, ${timePart}`;
