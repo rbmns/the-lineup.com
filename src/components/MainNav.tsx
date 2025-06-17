@@ -59,12 +59,15 @@ const MainNav = () => {
     )}>
       <div className="w-full flex flex-col">
         <div className={cn(
-          "w-full flex items-center justify-between gap-2 sm:gap-4",
-          isMobile ? "h-16 px-4" : "h-16 px-6 lg:px-8"
+          "w-full flex items-center justify-between",
+          isMobile ? "h-16 px-3 gap-2" : "h-16 px-6 lg:px-8 gap-4"
         )}>
           {/* Left side - Logo */}
-          <div className="flex items-center h-full flex-shrink-0 min-w-0">
-            <Link to="/" className="flex items-center justify-center mr-3 flex-shrink-0">
+          <div className={cn(
+            "flex items-center h-full flex-shrink-0",
+            isMobile ? "min-w-0 max-w-[140px]" : "min-w-0"
+          )}>
+            <Link to="/" className="flex items-center justify-center mr-2 flex-shrink-0">
               <img 
                 src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" 
                 alt="thelineup Symbol" 
@@ -72,7 +75,13 @@ const MainNav = () => {
                 style={{ display: 'block' }} 
               />
             </Link>
-            <BrandLogo showText={!isMobile} className="ml-0 min-w-0" />
+            <BrandLogo 
+              showText={!isMobile} 
+              className={cn(
+                "ml-0 min-w-0",
+                isMobile && "max-w-[100px] overflow-hidden"
+              )} 
+            />
           </div>
 
           {/* Center-Right - Search Bar for desktop */}
@@ -83,22 +92,25 @@ const MainNav = () => {
           )}
 
           {/* Right side - Search icon + User menu or auth buttons */}
-          <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0">
+          <div className={cn(
+            "flex items-center flex-shrink-0",
+            isMobile ? "gap-1" : "gap-2 lg:gap-3"
+          )}>
             {/* Mobile Search Icon */}
             {isMobile && (
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleMobileSearch}
-                className="w-10 h-10 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                className="w-9 h-9 text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex-shrink-0"
               >
-                <Search className="h-5 w-5" />
+                <Search className="h-4 w-4" />
               </Button>
             )}
 
             {isAuthenticated && user ? (
               <>
-                {isAdmin && (
+                {isAdmin && !isMobile && (
                   <Button 
                     asChild 
                     variant="ghost" 
@@ -108,7 +120,7 @@ const MainNav = () => {
                     <Link to="/admin">Admin</Link>
                   </Button>
                 )}
-                <div className={isMobile ? "w-10 h-10" : ""}>
+                <div className="flex-shrink-0">
                   <UserMenu 
                     user={user} 
                     profile={profile} 
@@ -118,14 +130,17 @@ const MainNav = () => {
                 </div>
               </>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className={cn(
+                "flex items-center",
+                isMobile ? "gap-1" : "gap-2"
+              )}>
                 <Button 
                   variant="ghost" 
-                  size={isMobile ? "sm" : "sm"} 
+                  size="sm"
                   onClick={handleSignInClick} 
                   className={cn(
-                    "text-gray-700 hover:text-gray-900 hover:bg-gray-100",
-                    isMobile ? "text-sm px-3 py-2" : "text-sm px-4"
+                    "text-gray-700 hover:text-gray-900 hover:bg-gray-100 flex-shrink-0",
+                    isMobile ? "text-sm px-2 py-2" : "text-sm px-4"
                   )}
                 >
                   Sign in
@@ -135,7 +150,7 @@ const MainNav = () => {
                   <Button 
                     size="sm" 
                     onClick={() => navigate('/login', { state: { initialMode: 'register' } })} 
-                    className="bg-gray-900 hover:bg-gray-800 text-white rounded-full text-sm px-6"
+                    className="bg-gray-900 hover:bg-gray-800 text-white rounded-full text-sm px-6 flex-shrink-0"
                   >
                     Sign Up
                   </Button>

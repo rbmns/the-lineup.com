@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { Settings, LogOut, User as UserIcon, Calendar } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export interface UserMenuProps {
   user: User;
@@ -24,6 +25,7 @@ export interface UserMenuProps {
 
 const UserMenu = ({ user, profile, handleSignOut, canCreateEvents }: UserMenuProps) => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const onSignOut = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -40,7 +42,10 @@ const UserMenu = ({ user, profile, handleSignOut, canCreateEvents }: UserMenuPro
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+        <Button 
+          variant="ghost" 
+          className={`relative rounded-full ${isMobile ? 'h-9 w-9' : 'h-10 w-10'}`}
+        >
           <ProfileAvatar profile={profile} size="sm" />
         </Button>
       </DropdownMenuTrigger>
