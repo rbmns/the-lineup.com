@@ -82,6 +82,9 @@ const MainNav = () => {
   // Calculate total header height for mobile
   const mobileHeaderHeight = isMobile ? (showMobileSearch ? 'h-[112px]' : 'h-16') : 'h-16';
 
+  // Show create event button only if user is authenticated and has permissions OR if not authenticated (to show auth overlay)
+  const shouldShowCreateButton = !isAuthenticated || (isAuthenticated && canCreateEvents);
+
   return (
     <>
       <header className={cn(
@@ -140,18 +143,20 @@ const MainNav = () => {
                 </Button>
               )}
 
-              {/* Create Event Button - shown for both authenticated and non-authenticated users */}
-              <Button
-                onClick={handleCreateEventClick}
-                disabled={isCreatorStatusLoading}
-                className={cn(
-                  "bg-gray-900 hover:bg-gray-800 text-white rounded-full flex items-center gap-2 flex-shrink-0",
-                  isMobile ? "text-sm px-3 py-2" : "text-sm px-4 py-2"
-                )}
-              >
-                <Plus className="h-4 w-4" />
-                {!isMobile && "Create Event"}
-              </Button>
+              {/* Create Event Button - only shown to event creators or non-authenticated users */}
+              {shouldShowCreateButton && (
+                <Button
+                  onClick={handleCreateEventClick}
+                  disabled={isCreatorStatusLoading}
+                  className={cn(
+                    "bg-gray-900 hover:bg-gray-800 text-white rounded-full flex items-center gap-2 flex-shrink-0",
+                    isMobile ? "text-sm px-3 py-2" : "text-sm px-4 py-2"
+                  )}
+                >
+                  <Plus className="h-4 w-4" />
+                  {!isMobile && "Create Event"}
+                </Button>
+              )}
 
               {isAuthenticated && user ? (
                 <>

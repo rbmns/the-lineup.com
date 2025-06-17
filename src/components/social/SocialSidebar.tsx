@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -65,7 +66,6 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   });
   
   const pendingRequestsCount = adminRequests?.filter(r => !r.is_read).length || 0;
-
 
   // Show the "Expand" button if sidebar is hidden
   if (!visible) {
@@ -165,6 +165,9 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
     }
   };
 
+  // Only show create event button if user is authenticated and has permissions OR if not authenticated
+  const shouldShowCreateButton = !user || (user && canCreateEvents);
+
   // If sidebar is visible
   return (
     <>
@@ -218,19 +221,21 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
               </div>
             )}
 
-            {/* Spacing/padding around Create Event button */}
-            <div className="py-2">
-              <Button
-                size="sm"
-                variant="primary"
-                className="w-full"
-                onClick={handleCreateEventClick}
-                disabled={isCreatorStatusLoading} // Disable while checking roles or request status
-              >
-                <Plus className="w-4 h-4" />
-                Create Event
-              </Button>
-            </div>
+            {/* Spacing/padding around Create Event button - only show if user has permissions */}
+            {shouldShowCreateButton && (
+              <div className="py-2">
+                <Button
+                  size="sm"
+                  variant="primary"
+                  className="w-full"
+                  onClick={handleCreateEventClick}
+                  disabled={isCreatorStatusLoading} // Disable while checking roles or request status
+                >
+                  <Plus className="w-4 h-4" />
+                  Create Event
+                </Button>
+              </div>
+            )}
             {!user && <SignUpPrompt />}
             <CommunitySection />
           </div>
