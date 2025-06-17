@@ -330,7 +330,7 @@ export type Database = {
           slug: string | null
           start_date: string | null
           start_time: string | null
-          status: string | null
+          status: Database["public"]["Enums"]["event_status"] | null
           tags: string | null
           title: string | null
           updated_at: string | null
@@ -357,7 +357,7 @@ export type Database = {
           slug?: string | null
           start_date?: string | null
           start_time?: string | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["event_status"] | null
           tags?: string | null
           title?: string | null
           updated_at?: string | null
@@ -384,14 +384,43 @@ export type Database = {
           slug?: string | null
           start_date?: string | null
           start_time?: string | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["event_status"] | null
           tags?: string | null
           title?: string | null
           updated_at?: string | null
           venue_id?: string | null
           vibe?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "events_creator_fkey1"
+            columns: ["creator"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_event_category_fkey1"
+            columns: ["event_category"]
+            isOneToOne: false
+            referencedRelation: "event_categories"
+            referencedColumns: ["name"]
+          },
+          {
+            foreignKeyName: "events_venue_id_fkey1"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "events_vibe_fkey1"
+            columns: ["vibe"]
+            isOneToOne: false
+            referencedRelation: "event_vibe"
+            referencedColumns: ["name"]
+          },
+        ]
       }
       events3: {
         Row: {
