@@ -69,7 +69,7 @@ export const useEventImages = (event?: Event | null): EventImageResult => {
       }
       
       // Validate the URL
-      if (imageUrl && typeof imageUrl === 'string' && imageUrl.startsWith('http')) {
+      if (imageUrl && imageUrl.startsWith('http')) {
         console.log(`[EventImage] Found valid DB image: ${imageUrl}`);
         return imageUrl;
       } else if (imageUrl) {

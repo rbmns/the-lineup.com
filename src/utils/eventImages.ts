@@ -145,7 +145,7 @@ export const getEventImage = (event: Event): string => {
       }
     }
     
-    if (imageUrl && typeof imageUrl === 'string' && imageUrl.startsWith('http')) {
+    if (imageUrl && imageUrl.startsWith('http')) {
       return imageUrl;
     }
   }
