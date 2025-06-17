@@ -19,11 +19,11 @@ export const useEvents = (userId: string | undefined = undefined, options: { inc
       try {
         console.log('Fetching events for user:', userId, 'with options:', options);
         
+        // Simplified query to avoid the foreign key relationship issues
         const { data, error } = await supabase
           .from('events')
           .select(`
             *,
-            creator:creator(id, username, avatar_url, email, location, status, tagline),
             venues!events_venue_id_fkey(*),
             event_rsvps(id, user_id, status)
           `)
@@ -39,8 +39,30 @@ export const useEvents = (userId: string | undefined = undefined, options: { inc
           return [];
         }
         
+        // Now fetch creator profiles separately to avoid the foreign key conflict
+        const eventIds = data.map(event => event.id);
+        const creatorIds = data.map(event => event.creator).filter(Boolean);
+        
+        let creatorsData = [];
+        if (creatorIds.length > 0) {
+          const { data: creators, error: creatorsError } = await supabase
+            .from('profiles')
+            .select('id, username, avatar_url, email, location, status, tagline')
+            .in('id', creatorIds);
+            
+          if (!creatorsError && creators) {
+            creatorsData = creators;
+          }
+        }
+        
+        // Combine the data manually
+        const eventsWithCreators = data.map(event => ({
+          ...event,
+          creator: creatorsData.find(creator => creator.id === event.creator) || null
+        }));
+        
         // Process the events data
-        const processedEvents = processEventsData(data, userId);
+        const processedEvents = processEventsData(eventsWithCreators, userId);
         
         if (options.includePastEvents) {
           console.log(`Total events fetched (including past): ${processedEvents.length}`);

@@ -14,7 +14,6 @@ export const fetchEventById = async (eventId: string, userId: string | undefined
       .from('events')
       .select(`
         *,
-        creator:creator(id, username, avatar_url, email, location, status, tagline),
         venues!events_venue_id_fkey(*),
         event_rsvps(id, user_id, status)
       `)
@@ -31,8 +30,28 @@ export const fetchEventById = async (eventId: string, userId: string | undefined
       return null;
     }
     
+    // Fetch creator separately
+    let creatorData = null;
+    if (data.creator) {
+      const { data: creator, error: creatorError } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url, email, location, status, tagline')
+        .eq('id', data.creator)
+        .single();
+        
+      if (!creatorError && creator) {
+        creatorData = creator;
+      }
+    }
+    
+    // Combine event with creator data
+    const eventWithCreator = {
+      ...data,
+      creator: creatorData
+    };
+    
     // Process the event data to include user's RSVP status
-    const processedEvents = processEventsData([data], userId);
+    const processedEvents = processEventsData([eventWithCreator], userId);
     const event = processedEvents[0] || null;
     
     // Check if event should still be visible based on timing rules
@@ -182,7 +201,6 @@ export const fetchSimilarEvents = async (
       .from('events')
       .select(`
         *,
-        creator:creator(id, username, avatar_url, email, location, status, tagline),
         venues!events_venue_id_fkey(*),
         event_rsvps(id, user_id, status)
       `)
@@ -227,8 +245,29 @@ export const fetchSimilarEvents = async (
       return [];
     }
 
+    // Fetch creators separately for these events
+    const creatorIds = data.map(event => event.creator).filter(Boolean);
+    let creatorsData = [];
+    
+    if (creatorIds.length > 0) {
+      const { data: creators, error: creatorsError } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url, email, location, status, tagline')
+        .in('id', creatorIds);
+        
+      if (!creatorsError && creators) {
+        creatorsData = creators;
+      }
+    }
+    
+    // Combine events with creator data
+    const eventsWithCreators = data.map(event => ({
+      ...event,
+      creator: creatorsData.find(creator => creator.id === event.creator) || null
+    }));
+
     // Process events data and apply time-based filtering
-    const processedEvents = processEventsData(data, userId);
+    const processedEvents = processEventsData(eventsWithCreators, userId);
     const filteredEvents = filterUpcomingEvents(processedEvents);
     
     return filteredEvents.slice(0, minResults);
@@ -255,7 +294,6 @@ export const searchEvents = async (query: string, userId: string | undefined = u
       .from('events')
       .select(`
         *,
-        creator:creator(id, username, avatar_url, email, location, status, tagline),
         venues!events_venue_id_fkey(*),
         event_rsvps(id, user_id, status)
       `)
@@ -272,8 +310,29 @@ export const searchEvents = async (query: string, userId: string | undefined = u
       return [];
     }
 
+    // Fetch creators separately
+    const creatorIds = data.map(event => event.creator).filter(Boolean);
+    let creatorsData = [];
+    
+    if (creatorIds.length > 0) {
+      const { data: creators, error: creatorsError } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url, email, location, status, tagline')
+        .in('id', creatorIds);
+        
+      if (!creatorsError && creators) {
+        creatorsData = creators;
+      }
+    }
+    
+    // Combine events with creator data
+    const eventsWithCreators = data.map(event => ({
+      ...event,
+      creator: creatorsData.find(creator => creator.id === event.creator) || null
+    }));
+
     // Process the event data to include user's RSVP status
-    const processedEvents = processEventsData(data, userId);
+    const processedEvents = processEventsData(eventsWithCreators, userId);
     
     // Apply time-based filtering to show only relevant events
     const filteredEvents = filterUpcomingEvents(processedEvents);

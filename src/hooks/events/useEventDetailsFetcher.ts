@@ -32,11 +32,11 @@ export const useEventDetailsFetcher = (eventId: string): UseEventDetailsFetcherR
 
       console.log(`Fetching event details for eventId=${eventId}, userId=${user?.id}`);
       
+      // Fetch event without creator to avoid foreign key issues
       const { data, error } = await supabase
         .from('events')
         .select(`
           *,
-          creator:creator(id, username, avatar_url, email, location, status, tagline),
           venues!events_venue_id_fkey(*),
           event_rsvps(id, user_id, status)
         `)
@@ -53,16 +53,36 @@ export const useEventDetailsFetcher = (eventId: string): UseEventDetailsFetcherR
       if (data) {
         console.log('Event data loaded:', data);
         
+        // Fetch creator separately if needed
+        let creatorData = null;
+        if (data.creator) {
+          const { data: creator, error: creatorError } = await supabase
+            .from('profiles')
+            .select('id, username, avatar_url, email, location, status, tagline')
+            .eq('id', data.creator)
+            .single();
+            
+          if (!creatorError && creator) {
+            creatorData = creator;
+          }
+        }
+        
+        // Combine event with creator data
+        const eventWithCreator = {
+          ...data,
+          creator: creatorData
+        };
+        
         // Extract RSVP status for the current user
         if (user && data.event_rsvps && data.event_rsvps.length > 0) {
           const userRsvp = data.event_rsvps.find((rsvp: any) => rsvp.user_id === user.id);
           if (userRsvp) {
-            data.rsvp_status = userRsvp.status;
-            console.log(`Set RSVP status for event ${eventId}:`, data.rsvp_status);
+            eventWithCreator.rsvp_status = userRsvp.status;
+            console.log(`Set RSVP status for event ${eventId}:`, eventWithCreator.rsvp_status);
           }
         }
         
-        setEvent(data);
+        setEvent(eventWithCreator);
       } else {
         setError('Event not found');
       }

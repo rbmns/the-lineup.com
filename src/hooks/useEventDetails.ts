@@ -24,7 +24,6 @@ export const useEventDetails = (eventId: string | undefined, userId: string | un
           .from('events')
           .select(`
             *,
-            creator:profiles(id, username, avatar_url, email, location, status, tagline),
             venues:venue_id(*),
             event_rsvps(id, user_id, status)
           `)
@@ -42,8 +41,28 @@ export const useEventDetails = (eventId: string | undefined, userId: string | un
           return;
         }
 
+        // Fetch creator separately
+        let creatorData = null;
+        if (data.creator) {
+          const { data: creator, error: creatorError } = await supabase
+            .from('profiles')
+            .select('id, username, avatar_url, email, location, status, tagline')
+            .eq('id', data.creator)
+            .single();
+            
+          if (!creatorError && creator) {
+            creatorData = creator;
+          }
+        }
+        
+        // Combine event with creator data
+        const eventWithCreator = {
+          ...data,
+          creator: creatorData
+        };
+
         // Process the event data using the same utility function
-        const processedEvents = processEventsData([data], userId);
+        const processedEvents = processEventsData([eventWithCreator], userId);
         setEvent(processedEvents[0] || null);
 
       } catch (err) {
