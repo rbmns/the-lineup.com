@@ -91,6 +91,20 @@ export const EventCard: React.FC<EventCardProps> = ({
     }
   };
 
+  // Get venue display name with fallback
+  const getVenueDisplay = (): string => {
+    if (event.venues?.name) {
+      if (event.venues.city && event.venues.city !== event.venues.name) {
+        return `${event.venues.name}, ${event.venues.city}`;
+      }
+      return event.venues.name;
+    }
+    if (event.location) {
+      return event.location;
+    }
+    return 'Location TBD';
+  };
+
   const totalAttendees = (event.going_count || 0) + (event.interested_count || 0);
 
   return (
@@ -156,7 +170,7 @@ export const EventCard: React.FC<EventCardProps> = ({
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
             <span className="truncate">
-              {event.venues?.name || event.location || 'No location'}
+              {getVenueDisplay()}
             </span>
           </div>
 

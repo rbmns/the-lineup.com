@@ -87,6 +87,20 @@ const EventCardList: React.FC<EventCardListProps> = ({
     }
   };
 
+  // Get venue display name with fallback
+  const getVenueDisplay = (): string => {
+    if (event.venues?.name) {
+      if (event.venues.city && event.venues.city !== event.venues.name) {
+        return `${event.venues.name}, ${event.venues.city}`;
+      }
+      return event.venues.name;
+    }
+    if (event.location) {
+      return event.location;
+    }
+    return 'Location TBD';
+  };
+
   return (
     <div className={cn("w-full px-4 sm:px-6 lg:px-8", className)}>
       <Card 
@@ -148,7 +162,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
             <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 text-left flex-1 min-w-0">
               <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
               <span className="font-inter truncate">
-                {event.venues?.name || event.location || 'No location'}
+                {getVenueDisplay()}
               </span>
             </div>
             

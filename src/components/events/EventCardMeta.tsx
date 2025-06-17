@@ -9,7 +9,12 @@ interface EventCardMetaProps {
   event: { 
     start_date?: string | null;
     start_time?: string | null;
-    venues?: { name: string } | null;
+    venues?: { 
+      name: string;
+      city?: string;
+      street?: string;
+    } | null;
+    location?: string;
   };
   compact?: boolean;
   className?: string;
@@ -39,6 +44,20 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
     return formatTime(event.start_time);
   };
 
+  // Get venue display name with fallback to location
+  const getVenueDisplay = (): string => {
+    if (event.venues?.name) {
+      if (event.venues.city && event.venues.city !== event.venues.name) {
+        return `${event.venues.name}, ${event.venues.city}`;
+      }
+      return event.venues.name;
+    }
+    if (event.location) {
+      return event.location;
+    }
+    return 'Location TBD';
+  };
+
   const textSize = compact ? 'text-xs' : 'text-sm';
 
   return (
@@ -53,7 +72,7 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
       <div className="flex items-center text-gray-600">
         <MapPin className="h-4 w-4 mr-2" />
         <span className={cn("font-inter leading-7", textSize)}>
-          {event.venues?.name || 'No Venue'}
+          {getVenueDisplay()}
         </span>
       </div>
     </div>

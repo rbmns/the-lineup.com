@@ -70,12 +70,33 @@ const EventDetailContent = ({
     }
   }, [onRsvp, event.rsvp_status]);
 
-  // Format event location
-  const eventLocation = event.venues?.name ? 
-    `${event.venues.name}${event.venues.city ? `, ${event.venues.city}` : ''}` : 
-    event.location || 'Location TBD';
+  // Format event location with improved venue handling
+  const eventLocation = useMemo(() => {
+    if (event.venues?.name) {
+      const parts = [event.venues.name];
+      if (event.venues.city && event.venues.city !== event.venues.name) {
+        parts.push(event.venues.city);
+      }
+      return parts.join(', ');
+    }
+    return event.location || 'Location TBD';
+  }, [event.venues, event.location]);
+
+  // Get full venue address for display
+  const getVenueAddress = () => {
+    if (!event.venues) return null;
+    
+    const addressParts = [
+      event.venues.street,
+      event.venues.postal_code,
+      event.venues.city
+    ].filter(Boolean);
+    
+    return addressParts.length > 0 ? addressParts.join(', ') : null;
+  };
   
   const imageUrl = getEventImageUrl(event);
+  const venueAddress = getVenueAddress();
 
   return (
     <div className="w-full bg-white">
@@ -130,14 +151,42 @@ const EventDetailContent = ({
               </CardContent>
             </Card>
 
-            {/* Location Card */}
+            {/* Location Card - Enhanced with venue details */}
             <Card className="bg-gray-50 border-gray-200">
               <CardContent className="p-4 sm:p-5">
-                <div className="flex items-center gap-3">
-                  <MapPin className="h-5 w-5 text-gray-500 flex-shrink-0" />
-                  <div>
+                <div className="flex items-start gap-3">
+                  <MapPin className="h-5 w-5 text-gray-500 flex-shrink-0 mt-1" />
+                  <div className="flex-1">
                     <h3 className="font-inter font-semibold text-gray-900 mb-1">Venue</h3>
-                    <p className="font-inter text-sm text-gray-600">{eventLocation}</p>
+                    <p className="font-inter text-sm text-gray-600 mb-1">{eventLocation}</p>
+                    {venueAddress && (
+                      <p className="font-inter text-xs text-gray-500">{venueAddress}</p>
+                    )}
+                    {/* Venue links */}
+                    {event.venues && (event.venues.website || event.venues.google_maps) && (
+                      <div className="flex gap-3 mt-2">
+                        {event.venues.website && (
+                          <a
+                            href={event.venues.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-inter"
+                          >
+                            Website
+                          </a>
+                        )}
+                        {event.venues.google_maps && (
+                          <a
+                            href={event.venues.google_maps}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-inter"
+                          >
+                            View on Maps
+                          </a>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
