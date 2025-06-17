@@ -15,6 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCasualPlansMutations } from '@/hooks/casual-plans/useCasualPlansMutations';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
+import { filterUpcomingEvents } from '@/utils/date-filtering';
 
 const VenueResultCard = ({ result, navigate }: { result: any; navigate: ReturnType<typeof useNavigate> }) => (
     <Card 
@@ -67,14 +68,24 @@ const SearchPage: React.FC = () => {
     navigate('/login');
   };
 
+  // Filter search results to only show upcoming events
+  const filteredSearchResults = searchResults.map(result => {
+    if (result.type === 'event') {
+      // Filter out past events
+      const upcomingEvents = filterUpcomingEvents([result as unknown as Event]);
+      return upcomingEvents.length > 0 ? result : null;
+    }
+    return result;
+  }).filter(Boolean);
+
   return (
     <div className={`${isMobile ? 'px-3 py-4' : 'container mx-auto px-4 py-8'} min-h-screen`}>
       <div className="flex items-center mb-6">
         <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="mr-2">
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold tracking-tight`}>
-          Search results for: <span className="text-primary">{query}</span>
+        <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold tracking-tight text-gray-900`}>
+          Search results for: <span className="text-gray-700">{query}</span>
         </h1>
       </div>
 
@@ -82,9 +93,9 @@ const SearchPage: React.FC = () => {
         <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}`}>
           {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-48 w-full" />)}
         </div>
-      ) : searchResults.length > 0 ? (
+      ) : filteredSearchResults.length > 0 ? (
         <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}`}>
-          {searchResults.map((result) => {
+          {filteredSearchResults.map((result) => {
             if (result.type === 'event') {
               return <EventCard key={result.id} event={result as unknown as Event} onClick={(event) => navigateToEvent(event.id, navigate)} />;
             }
@@ -114,8 +125,8 @@ const SearchPage: React.FC = () => {
       ) : (
         !isSearching && query && (
           <div className="text-center py-12">
-            <h2 className="text-xl font-medium">No results found</h2>
-            <p className="text-muted-foreground mt-2">Try a different search term.</p>
+            <h2 className="text-xl font-medium text-gray-900">No results found</h2>
+            <p className="text-gray-600 mt-2">Try a different search term.</p>
           </div>
         )
       )}

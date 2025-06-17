@@ -18,9 +18,7 @@ const Home = () => {
       <HomeHowItWorksSection />
       
       {/* Casual Plans Section */}
-      <div className="bg-[#F4E7D3]/20">
-        <HomeCasualPlansSection />
-      </div>
+      <HomeCasualPlansSection />
       
       {/* CTA Section */}
       <HomeCtaSection />
