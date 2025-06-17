@@ -31,13 +31,13 @@ const Layout = () => {
   };
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden">
+    <div className="min-h-screen w-full overflow-x-hidden bg-white">
       <MainNav />
       <div className="flex w-full min-h-screen">
         {/* Left sidebar - Desktop only, start below navbar */}
         {!isMobile && (
           <div
-            className="fixed left-0 sidebar-zoning"
+            className="fixed left-0 bg-gray-50"
             style={{
               top: topNavHeight,
               bottom: 0,
@@ -52,7 +52,7 @@ const Layout = () => {
 
         {/* Main Content Area */}
         <div
-          className="flex-1 w-full min-h-screen bg-gray-50 flex flex-col"
+          className="flex-1 w-full min-h-screen bg-white flex flex-col"
           style={
             !isMobile
               ? {
@@ -64,7 +64,7 @@ const Layout = () => {
                 }
               : {
                   paddingTop: topNavHeight,
-                  paddingBottom: MOBILE_BOTTOM_NAV_HEIGHT, // Increased spacing for iPhone
+                  paddingBottom: MOBILE_BOTTOM_NAV_HEIGHT,
                 }
           }
         >
@@ -81,7 +81,7 @@ const Layout = () => {
         {/* Right Social Sidebar - Desktop only */}
         {!isMobile && (
           <div
-            className={`fixed right-0 sidebar-zoning`}
+            className={`fixed right-0 bg-gray-50`}
             style={{
               top: topNavHeight,
               bottom: 0,
@@ -102,10 +102,10 @@ const Layout = () => {
       {/* Mobile Navigation - Fixed to bottom with better iPhone compatibility */}
       {isMobile && (
         <div 
-          className="fixed bottom-0 left-0 right-0 bg-white z-50 border-t border-border"
+          className="fixed bottom-0 left-0 right-0 bg-white z-50"
           style={{ 
             height: MOBILE_BOTTOM_NAV_HEIGHT,
-            paddingBottom: 'env(safe-area-inset-bottom, 20px)' // iPhone safe area
+            paddingBottom: 'env(safe-area-inset-bottom, 20px)'
           }}
         >
           <LeftSidebar />

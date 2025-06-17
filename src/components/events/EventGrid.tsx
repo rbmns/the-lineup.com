@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import PolymetEventCard from '@/components/polymet/event-card';
@@ -50,7 +51,6 @@ interface EventGridProps {
   compact?: boolean;
 }
 
-// Render both cards side-by-side for each event
 export const EventGrid: React.FC<EventGridProps> = ({
   events,
   onRsvp,
@@ -90,16 +90,20 @@ export const EventGrid: React.FC<EventGridProps> = ({
     );
   }
 
-  // Render both the original card and the Polymet card for each event
+  // Optimized grid for all viewport sizes - better tablet experience
   return (
     <div
       className={cn(
-        "grid gap-6 w-full",
+        "grid gap-4 sm:gap-6 w-full",
+        // Mobile: 1 column
         "grid-cols-1",
-        "xs:grid-cols-1",
+        // Small tablets: 2 columns with wider cards
         "sm:grid-cols-2",
+        // Medium tablets: 2 columns
         "md:grid-cols-2",
+        // Large tablets and small desktops: 3 columns
         "lg:grid-cols-3",
+        // Large desktops: 3 columns (max for good card width)
         "xl:grid-cols-3",
         "2xl:grid-cols-4",
         className
@@ -107,16 +111,14 @@ export const EventGrid: React.FC<EventGridProps> = ({
       style={style}
     >
       {events.map((event) => (
-        <div key={event.id} data-event-id={event.id} className="w-full min-w-0 flex flex-col gap-4">
-          <div>
-            <div className="text-xs text-gray-400 mb-1">Original Design</div>
-            {/* This is your legacy card; swap as needed */}
-            <EventCard event={event} />
-          </div>
-          <div>
-            <div className="text-xs text-purple-700 font-bold mb-1">Preview: Polymet Design</div>
-            <PolymetEventCard {...mapEventToPolymetCard(event)} />
-          </div>
+        <div key={event.id} data-event-id={event.id} className="w-full min-w-0">
+          <EventCard 
+            event={event} 
+            onRsvp={onRsvp}
+            showRsvpButtons={showRsvpButtons}
+            loadingEventId={loadingEventId}
+            compact={compact}
+          />
         </div>
       ))}
     </div>
