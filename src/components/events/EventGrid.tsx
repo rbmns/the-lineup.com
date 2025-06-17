@@ -57,6 +57,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
   showRsvpButtons = true,
   className,
   style,
+  loadingEventId,
   visibleCount,
   hasMore,
   isLoading,
@@ -83,6 +84,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
         showRsvpButtons={showRsvpButtons}
         className={className}
         style={style}
+        loadingEventId={loadingEventId}
         showSignupTeaser={showSignupTeaser}
         eventsBeforeTeaserCount={eventsBeforeTeaserCount}
         compact={compact}
@@ -99,7 +101,7 @@ export const EventGrid: React.FC<EventGridProps> = ({
         "grid-cols-1",
         // Small tablets: 2 columns with wider cards
         "sm:grid-cols-2",
-        // Medium tablets: 2 columns
+        // Medium tablets: 2 columns but wider cards
         "md:grid-cols-2",
         // Large tablets and small desktops: 3 columns
         "lg:grid-cols-3",
