@@ -15,6 +15,7 @@ export const processEventsData = (eventsData: any[], userId?: string): Event[] =
     // Process venue data - handle both direct venue object and array format
     let venueData: Venue | null = null;
     if (eventData.venues) {
+      // Handle array format (from joins)
       if (Array.isArray(eventData.venues) && eventData.venues.length > 0) {
         const venue = eventData.venues[0];
         venueData = {
@@ -28,7 +29,9 @@ export const processEventsData = (eventsData: any[], userId?: string): Event[] =
           region: venue.region || null,
           tags: venue.tags || null
         };
-      } else if (typeof eventData.venues === 'object' && eventData.venues !== null) {
+      } 
+      // Handle direct object format (from single queries)
+      else if (typeof eventData.venues === 'object' && eventData.venues !== null && !Array.isArray(eventData.venues)) {
         venueData = {
           id: eventData.venues.id || '',
           name: eventData.venues.name || '',

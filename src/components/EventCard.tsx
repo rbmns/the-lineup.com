@@ -91,17 +91,23 @@ export const EventCard: React.FC<EventCardProps> = ({
     }
   };
 
-  // Get venue display name with fallback
+  // Get venue display name with proper fallback
   const getVenueDisplay = (): string => {
+    // First priority: venue name from venues table
     if (event.venues?.name) {
+      // If venue has a city and it's different from the name, include it
       if (event.venues.city && event.venues.city !== event.venues.name) {
         return `${event.venues.name}, ${event.venues.city}`;
       }
       return event.venues.name;
     }
+    
+    // Second priority: location field (legacy)
     if (event.location) {
       return event.location;
     }
+    
+    // Fallback
     return 'Location TBD';
   };
 
