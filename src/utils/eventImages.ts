@@ -1,4 +1,3 @@
-
 import { Event } from "@/types";
 
 const EVENT_FALLBACK_IMAGES = {
@@ -135,7 +134,7 @@ export const getEventImage = (event: Event): string => {
       }
     }
     
-    if (imageUrl && imageUrl.startsWith('http')) {
+    if (imageUrl && typeof imageUrl === 'string' && imageUrl.startsWith('http')) {
       return imageUrl;
     }
   }
