@@ -250,7 +250,7 @@ export type Database = {
             foreignKeyName: "event_rsvps_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
-            referencedRelation: "events"
+            referencedRelation: "events3"
             referencedColumns: ["id"]
           },
         ]
@@ -319,20 +319,99 @@ export type Database = {
           end_date: string | null
           end_time: string | null
           event_category: string | null
+          "Extra info": string | null
+          fee: string | null
+          fixed_start_time: boolean | null
+          id: string
+          image_urls: string | null
+          organiser_name: string | null
+          organizer_email_internal: string | null
+          organizer_link: string | null
+          slug: string | null
+          start_date: string | null
+          start_time: string | null
+          status: string | null
+          tags: string | null
+          title: string | null
+          updated_at: string | null
+          venue_id: string | null
+          vibe: string | null
+        }
+        Insert: {
+          booking_link?: string | null
+          created_at?: string | null
+          creator?: string | null
+          description?: string | null
+          destination?: string | null
+          end_date?: string | null
+          end_time?: string | null
+          event_category?: string | null
+          "Extra info"?: string | null
+          fee?: string | null
+          fixed_start_time?: boolean | null
+          id?: string
+          image_urls?: string | null
+          organiser_name?: string | null
+          organizer_email_internal?: string | null
+          organizer_link?: string | null
+          slug?: string | null
+          start_date?: string | null
+          start_time?: string | null
+          status?: string | null
+          tags?: string | null
+          title?: string | null
+          updated_at?: string | null
+          venue_id?: string | null
+          vibe?: string | null
+        }
+        Update: {
+          booking_link?: string | null
+          created_at?: string | null
+          creator?: string | null
+          description?: string | null
+          destination?: string | null
+          end_date?: string | null
+          end_time?: string | null
+          event_category?: string | null
+          "Extra info"?: string | null
+          fee?: string | null
+          fixed_start_time?: boolean | null
+          id?: string
+          image_urls?: string | null
+          organiser_name?: string | null
+          organizer_email_internal?: string | null
+          organizer_link?: string | null
+          slug?: string | null
+          start_date?: string | null
+          start_time?: string | null
+          status?: string | null
+          tags?: string | null
+          title?: string | null
+          updated_at?: string | null
+          venue_id?: string | null
+          vibe?: string | null
+        }
+        Relationships: []
+      }
+      events3: {
+        Row: {
+          booking_link: string | null
+          created_at: string | null
+          creator: string | null
+          description: string | null
+          destination: string | null
+          end_date: string | null
+          end_time: string | null
+          event_category: string | null
           extra_info: string | null
           fee: number | null
           fixed_start_time: boolean
           id: string
-          image_url: string | null
-          image_urls: string[] | null
-          location_id: number | null
+          image_urls: string | null
           organiser_name: string | null
           organizer_email_internal: string | null
           organizer_link: string | null
-          scraper_source_url: string | null
           slug: string | null
-          source_type: Database["public"]["Enums"]["event_source_type"] | null
-          specific_venue: string | null
           start_date: string | null
           start_time: string | null
           status: Database["public"]["Enums"]["event_status"]
@@ -355,16 +434,11 @@ export type Database = {
           fee?: number | null
           fixed_start_time?: boolean
           id?: string
-          image_url?: string | null
-          image_urls?: string[] | null
-          location_id?: number | null
+          image_urls?: string | null
           organiser_name?: string | null
           organizer_email_internal?: string | null
           organizer_link?: string | null
-          scraper_source_url?: string | null
           slug?: string | null
-          source_type?: Database["public"]["Enums"]["event_source_type"] | null
-          specific_venue?: string | null
           start_date?: string | null
           start_time?: string | null
           status?: Database["public"]["Enums"]["event_status"]
@@ -387,16 +461,11 @@ export type Database = {
           fee?: number | null
           fixed_start_time?: boolean
           id?: string
-          image_url?: string | null
-          image_urls?: string[] | null
-          location_id?: number | null
+          image_urls?: string | null
           organiser_name?: string | null
           organizer_email_internal?: string | null
           organizer_link?: string | null
-          scraper_source_url?: string | null
           slug?: string | null
-          source_type?: Database["public"]["Enums"]["event_source_type"] | null
-          specific_venue?: string | null
           start_date?: string | null
           start_time?: string | null
           status?: Database["public"]["Enums"]["event_status"]
@@ -415,11 +484,11 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "events_location_id_fkey"
-            columns: ["location_id"]
+            foreignKeyName: "events_event_category_fkey"
+            columns: ["event_category"]
             isOneToOne: false
-            referencedRelation: "locations"
-            referencedColumns: ["id"]
+            referencedRelation: "event_categories"
+            referencedColumns: ["name"]
           },
           {
             foreignKeyName: "events_venue_id_fkey"
@@ -847,7 +916,7 @@ export type Database = {
             foreignKeyName: "event_rsvps_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
-            referencedRelation: "events"
+            referencedRelation: "events3"
             referencedColumns: ["id"]
           },
         ]
@@ -863,7 +932,7 @@ export type Database = {
             foreignKeyName: "event_rsvps_event_id_fkey"
             columns: ["event_id"]
             isOneToOne: false
-            referencedRelation: "events"
+            referencedRelation: "events3"
             referencedColumns: ["id"]
           },
         ]

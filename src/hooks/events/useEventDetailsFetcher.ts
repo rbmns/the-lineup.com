@@ -36,54 +36,22 @@ export const useEventDetailsFetcher = (eventId: string): UseEventDetailsFetcherR
         .from('events')
         .select(`
           *,
-          creator:profiles(*),
-          venues:venue_id(*),
-          event_rsvps!inner(id, user_id, status)
+          creator:creator(id, username, avatar_url, email, location, status, tagline),
+          venues!events_venue_id_fkey(*),
+          event_rsvps(id, user_id, status)
         `)
         .eq('id', eventId)
         .single();
 
       if (error) {
-        // Maybe the event exists but user hasn't RSVP'd - try without inner join
-        const { data: dataNoRsvp, error: errorNoRsvp } = await supabase
-          .from('events')
-          .select(`
-            *,
-            creator:profiles(*),
-            venues:venue_id(*)
-          `)
-          .eq('id', eventId)
-          .single();
-          
-        if (errorNoRsvp) {
-          console.error('Error fetching event details:', errorNoRsvp);
-          setError('Failed to load event details.');
-          setIsLoading(false);
-          return;
-        } else {
-          // Successfully got event, but no RSVP
-          console.log('Event data loaded (no RSVP):', dataNoRsvp);
-          
-          // If user is logged in, check for RSVP separately
-          if (user) {
-            const { data: rsvpData } = await supabase
-              .from('event_rsvps')
-              .select('status')
-              .eq('event_id', eventId)
-              .eq('user_id', user.id)
-              .maybeSingle();
-              
-            if (rsvpData) {
-              // Add RSVP status to event data
-              dataNoRsvp.rsvp_status = rsvpData.status;
-              console.log(`Found RSVP status for event ${eventId}:`, rsvpData.status);
-            }
-          }
-          
-          setEvent(dataNoRsvp);
-        }
-      } else if (data) {
-        console.log('Event data loaded with RSVP:', data);
+        console.error('Error fetching event details:', error);
+        setError('Failed to load event details.');
+        setIsLoading(false);
+        return;
+      }
+
+      if (data) {
+        console.log('Event data loaded:', data);
         
         // Extract RSVP status for the current user
         if (user && data.event_rsvps && data.event_rsvps.length > 0) {

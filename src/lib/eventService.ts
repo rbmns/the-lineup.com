@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { processEventsData } from '@/utils/eventProcessorUtils';
@@ -15,8 +14,8 @@ export const fetchEventById = async (eventId: string, userId: string | undefined
       .from('events')
       .select(`
         *,
-        creator:profiles(id, username, avatar_url, email, location, status, tagline),
-        venues:venue_id(*),
+        creator:creator(id, username, avatar_url, email, location, status, tagline),
+        venues!events_venue_id_fkey(*),
         event_rsvps(id, user_id, status)
       `)
       .eq('id', eventId)
@@ -183,8 +182,8 @@ export const fetchSimilarEvents = async (
       .from('events')
       .select(`
         *,
-        creator:profiles(id, username, avatar_url, email, location, status, tagline),
-        venues:venue_id(*),
+        creator:creator(id, username, avatar_url, email, location, status, tagline),
+        venues!events_venue_id_fkey(*),
         event_rsvps(id, user_id, status)
       `)
       .neq('id', currentEventId) // Exclude the current event
@@ -193,9 +192,9 @@ export const fetchSimilarEvents = async (
       .order('start_time', { ascending: true })
       .limit(minResults * 3); // Initial limit to allow for filtering
 
-    // Filter by event_type
+    // Filter by event_category
     if (eventType) {
-      query = query.eq('event_type', eventType);
+      query = query.eq('event_category', eventType);
     }
 
     // Filter by vibe if it exists
@@ -251,16 +250,16 @@ export const searchEvents = async (query: string, userId: string | undefined = u
 
     const searchTerm = query.trim();
     
-    // Search events by title, description, location, or tags
+    // Search events by title, description, or tags
     const { data, error } = await supabase
       .from('events')
       .select(`
         *,
-        creator:profiles(id, username, avatar_url, email, location, status, tagline),
-        venues:venue_id(*),
+        creator:creator(id, username, avatar_url, email, location, status, tagline),
+        venues!events_venue_id_fkey(*),
         event_rsvps(id, user_id, status)
       `)
-      .or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,location.ilike.%${searchTerm}%,tags.ilike.%${searchTerm}%`)
+      .or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,tags.ilike.%${searchTerm}%`)
       .order('start_date', { ascending: true })
       .order('start_time', { ascending: true });
 

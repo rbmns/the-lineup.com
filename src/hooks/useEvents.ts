@@ -23,8 +23,8 @@ export const useEvents = (userId: string | undefined = undefined, options: { inc
           .from('events')
           .select(`
             *,
-            creator:profiles(id, username, avatar_url, email, location, status, tagline),
-            venues:venue_id(*),
+            creator:creator(id, username, avatar_url, email, location, status, tagline),
+            venues!events_venue_id_fkey(*),
             event_rsvps(id, user_id, status)
           `)
           .order('start_date', { ascending: true })
