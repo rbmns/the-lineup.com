@@ -118,7 +118,7 @@ export default function EventCard({
 
       {/* Content */}
       <div className="flex flex-1 flex-col p-4 items-start text-left font-inter">
-        <h3 className="mb-1 font-semibold text-primary line-clamp-2 font-inter text-left w-full">
+        <h3 className="mb-1 font-semibold text-black line-clamp-2 font-inter text-left w-full">
           {title}
         </h3>
 

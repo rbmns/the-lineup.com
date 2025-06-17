@@ -1,3 +1,4 @@
+
 import { cn } from "@/lib/utils";
 import { BeachThemeCategoryBadge } from "@/components/polymet/beach-theme-category-badge";
 import { Button } from "@/components/ui/button";
@@ -129,7 +130,7 @@ export default function BeachThemeEventCard({
             {/* Title */}
             <h3
               className={cn(
-                "font-semibold text-[#0891B2] line-clamp-2 font-inter text-left w-full",
+                "font-semibold text-black line-clamp-2 font-inter text-left w-full",
                 isFeatured ? "text-xl mb-2" : "text-base mb-1"
               )}
             >
@@ -160,7 +161,7 @@ export default function BeachThemeEventCard({
             <div className="space-y-1.5 w-full">
               {/* Date & Time */}
               <div className="flex items-center text-sm text-gray-600 font-inter text-left w-full">
-                <CalendarIcon size={14} className="mr-1 text-[#F59E0B]" />
+                <CalendarIcon size={14} className="mr-1 text-black" />
                 <span>
                   {date}
                   {time && ` • ${time}`}
@@ -169,14 +170,14 @@ export default function BeachThemeEventCard({
               {/* Location */}
               {location && (
                 <div className="flex items-center text-sm text-gray-600 font-inter text-left w-full">
-                  <MapPinIcon size={14} className="mr-1 text-[#F59E0B]" />
+                  <MapPinIcon size={14} className="mr-1 text-black" />
                   <span className="truncate">{location}</span>
                 </div>
               )}
               {/* Attendees */}
               {attendees && (
                 <div className="flex items-center text-sm text-gray-600 font-inter text-left w-full">
-                  <UserIcon size={14} className="mr-1 text-[#F59E0B]" />
+                  <UserIcon size={14} className="mr-1 text-black" />
                   <span>
                     {attendees.count} {attendees.max && `/ ${attendees.max}`}{" "}
                     attending
@@ -197,7 +198,7 @@ export default function BeachThemeEventCard({
                   <Button
                     variant="outline"
                     size="sm"
-                    className="rounded-full flex-1 border-[#0891B2] text-[#0891B2] font-inter"
+                    className="rounded-full flex-1 border-black text-black font-inter"
                     onClick={handleRsvpInterested}
                   >
                     Interested
