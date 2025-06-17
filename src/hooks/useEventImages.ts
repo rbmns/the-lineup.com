@@ -46,7 +46,8 @@ export const useEventImages = (event?: Event | null): EventImageResult => {
         }
       } else if (typeof eventData.image_urls === 'string') {
         // If it's a string, try to parse it or use it directly
-        const trimmedString = eventData.image_urls.trim();
+        const urlString = eventData.image_urls;
+        const trimmedString = urlString.trim();
         if (trimmedString.startsWith('[') && trimmedString.endsWith(']')) {
           // Looks like a JSON array string
           try {
