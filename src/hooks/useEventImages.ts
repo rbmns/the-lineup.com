@@ -41,20 +41,20 @@ export const useEventImages = (event?: Event | null): EventImageResult => {
         imageUrl = eventData.image_urls.find(url => url && typeof url === 'string' && url.trim().length > 0) || null;
       } else if (typeof eventData.image_urls === 'string') {
         // If it's a string, try to parse it or use it directly
-        const trimmed = eventData.image_urls.trim();
-        if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+        const trimmedString = eventData.image_urls.trim();
+        if (trimmedString.startsWith('[') && trimmedString.endsWith(']')) {
           // Looks like a JSON array string
           try {
-            const parsed = JSON.parse(trimmed);
+            const parsed = JSON.parse(trimmedString);
             if (Array.isArray(parsed)) {
               imageUrl = parsed.find(url => url && typeof url === 'string' && url.trim().length > 0) || null;
             }
           } catch (e) {
-            console.warn(`[EventImage] Failed to parse image_urls JSON: ${trimmed}`);
+            console.warn(`[EventImage] Failed to parse image_urls JSON: ${trimmedString}`);
           }
-        } else if (trimmed.length > 0) {
+        } else if (trimmedString.length > 0) {
           // Treat as a single URL
-          imageUrl = trimmed;
+          imageUrl = trimmedString;
         }
       }
       
