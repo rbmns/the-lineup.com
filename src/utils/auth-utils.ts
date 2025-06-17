@@ -1,23 +1,29 @@
 
-import { completeLogout, checkEmailRateLimit, markAuthAttempt, resetRateLimit } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase';
 
-// Function to handle rate limit errors
-export const handleRateLimitError = () => {
-  markAuthAttempt();
-  return {
-    rateLimited: true,
-    waitTime: 30, // Reset to 30 seconds wait time
-    error: "You've reached the maximum allowed attempts. Please wait a moment before trying again."
-  };
+export const handleLogout = async () => {
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Logout error:', error);
+      throw error;
+    }
+  } catch (error) {
+    console.error('Unexpected logout error:', error);
+    throw error;
+  }
 };
 
-// Function to prepare the login process
-export const prepareLoginProcess = async () => {
-  await completeLogout();
-};
-
-// Function to handle successful login
-export const handleSuccessfulLogin = () => {
-  resetRateLimit();
-  return 0; // Reset retry count
+export const checkAuthStatus = async () => {
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) {
+      console.error('Auth status check error:', error);
+      return null;
+    }
+    return session;
+  } catch (error) {
+    console.error('Unexpected auth status error:', error);
+    return null;
+  }
 };
