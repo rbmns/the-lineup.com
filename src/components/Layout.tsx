@@ -99,7 +99,7 @@ const Layout = () => {
         )}
       </div>
 
-      {/* Mobile Navigation - Fixed to bottom with better iPhone compatibility */}
+      {/* Mobile Navigation - Fixed to bottom without border */}
       {isMobile && (
         <div 
           className="fixed bottom-0 left-0 right-0 bg-white z-50"

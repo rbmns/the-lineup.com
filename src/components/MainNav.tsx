@@ -68,7 +68,7 @@ const MainNav = () => {
     )}>
       <div className="w-full flex flex-col">
         <div className={cn(
-          "w-full flex items-center justify-between gap-2 sm:gap-4 border-b border-gray-200/50",
+          "w-full flex items-center justify-between gap-2 sm:gap-4",
           isMobile ? "h-16 px-4" : "h-16 px-6 lg:px-8"
         )}>
           {/* Left side - Logo */}
@@ -92,16 +92,16 @@ const MainNav = () => {
           )}
 
           {/* Right side - Search icon + User menu or auth buttons */}
-          <div className="flex items-center gap-2 lg:gap-3 flex-shrink-0">
+          <div className="flex items-center gap-1 lg:gap-3 flex-shrink-0">
             {/* Mobile Search Icon */}
             {isMobile && (
               <Button
                 variant="ghost"
-                size="sm"
+                size="icon"
                 onClick={toggleMobileSearch}
-                className="text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                className="w-8 h-8 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
               >
-                <Search className="h-5 w-5" />
+                <Search className="h-4 w-4" />
               </Button>
             )}
 
@@ -117,12 +117,14 @@ const MainNav = () => {
                     <Link to="/admin">Admin</Link>
                   </Button>
                 )}
-                <UserMenu 
-                  user={user} 
-                  profile={profile} 
-                  handleSignOut={signOut} 
-                  canCreateEvents={canCreateEvents} 
-                />
+                <div className={isMobile ? "w-8 h-8" : ""}>
+                  <UserMenu 
+                    user={user} 
+                    profile={profile} 
+                    handleSignOut={signOut} 
+                    canCreateEvents={canCreateEvents} 
+                  />
+                </div>
               </>
             ) : (
               <div className="flex items-center gap-2">
@@ -154,7 +156,7 @@ const MainNav = () => {
         
         {/* Mobile search bar with proper spacing */}
         {isMobile && showMobileSearch && (
-          <div className="h-14 px-4 py-2 bg-white border-b border-gray-200/50 flex items-center">
+          <div className="h-14 px-4 py-2 bg-white flex items-center">
             <NavbarSearch />
           </div>
         )}

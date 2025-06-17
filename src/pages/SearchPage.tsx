@@ -13,6 +13,7 @@ import { CasualPlanCard } from '@/components/casual-plans/CasualPlanCard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCasualPlansMutations } from '@/hooks/casual-plans/useCasualPlansMutations';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const VenueResultCard = ({ result, navigate }: { result: any; navigate: ReturnType<typeof useNavigate> }) => (
     <Card 
@@ -29,12 +30,12 @@ const VenueResultCard = ({ result, navigate }: { result: any; navigate: ReturnTy
     </Card>
 );
 
-
 const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { searchResults, isSearching, performSearch, setSearchResults } = useSearch();
   const { isAuthenticated } = useAuth();
+  const isMobile = useIsMobile();
   const { 
     joinPlan, 
     leavePlan, 
@@ -63,22 +64,22 @@ const SearchPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className={`${isMobile ? 'px-3 py-4' : 'container mx-auto px-4 py-8'}`}>
       <div className="flex items-center mb-6">
         <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="mr-2">
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold tracking-tight`}>
           Search results for: <span className="text-primary">{query}</span>
         </h1>
       </div>
 
       {isSearching ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}`}>
           {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-48 w-full" />)}
         </div>
       ) : searchResults.length > 0 ? (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}`}>
           {searchResults.map((result) => {
             if (result.type === 'event') {
               return <EventCard key={result.id} event={result as unknown as Event} onClick={(event) => navigateToEvent(event.id, navigate)} />;
