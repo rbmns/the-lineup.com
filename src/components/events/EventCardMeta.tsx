@@ -48,10 +48,6 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
   const getVenueDisplay = (): string => {
     // First priority: venue name from venues table
     if (event.venues?.name) {
-      // If venue has a city and it's different from the name, include it
-      if (event.venues.city && event.venues.city !== event.venues.name) {
-        return `${event.venues.name}, ${event.venues.city}`;
-      }
       return event.venues.name;
     }
     

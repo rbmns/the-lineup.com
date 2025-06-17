@@ -46,6 +46,21 @@ export const processEventsData = (eventsData: any[], userId?: string): Event[] =
       }
     }
 
+    // For events without venue data but with location field, create a basic venue object
+    if (!venueData && eventData.location) {
+      venueData = {
+        id: '',
+        name: eventData.location,
+        street: '',
+        postal_code: '',
+        city: '',
+        website: null,
+        google_maps: null,
+        region: null,
+        tags: null
+      };
+    }
+
     // Determine user's RSVP status
     let rsvpStatus: 'Going' | 'Interested' | undefined = undefined;
     if (userId && eventData.event_rsvps && Array.isArray(eventData.event_rsvps)) {

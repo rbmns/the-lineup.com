@@ -13,7 +13,7 @@ import { EventExternalLink } from './detail-sections/EventExternalLink';
 import { EventFriendRsvps } from './EventFriendRsvps';
 import { extractEventCoordinates } from './detail-sections/EventCoordinatesExtractor';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, MapPin, Clock, Euro } from 'lucide-react';
+import { Calendar, MapPin, Clock, Euro, ExternalLink } from 'lucide-react';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { useEventImages } from '@/hooks/useEventImages';
@@ -73,11 +73,7 @@ const EventDetailContent = ({
   // Format event location with improved venue handling
   const eventLocation = useMemo(() => {
     if (event.venues?.name) {
-      const parts = [event.venues.name];
-      if (event.venues.city && event.venues.city !== event.venues.name) {
-        parts.push(event.venues.city);
-      }
-      return parts.join(', ');
+      return event.venues.name;
     }
     return event.location || 'Location TBD';
   }, [event.venues, event.location]);
@@ -170,8 +166,9 @@ const EventDetailContent = ({
                             href={event.venues.website}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-inter"
+                            className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-inter flex items-center gap-1"
                           >
+                            <ExternalLink className="h-3 w-3" />
                             Website
                           </a>
                         )}
@@ -180,8 +177,9 @@ const EventDetailContent = ({
                             href={event.venues.google_maps}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-inter"
+                            className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-inter flex items-center gap-1"
                           >
+                            <ExternalLink className="h-3 w-3" />
                             View on Maps
                           </a>
                         )}
