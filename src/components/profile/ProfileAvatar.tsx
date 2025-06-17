@@ -17,7 +17,7 @@ export const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
 }) => {
   const [imageError, setImageError] = useState(false);
   const sizeMap = {
-    sm: 'h-8 w-8',
+    sm: 'h-6 w-6',
     md: 'h-12 w-12',
     lg: 'h-16 w-16',
     xl: 'h-24 w-24'
@@ -32,7 +32,7 @@ export const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
   console.log('ProfileAvatar - using URL:', avatarUrl);
     
   return (
-    <Avatar className={`${sizeMap[size]} border border-gray-200 shadow-sm overflow-hidden ${className}`}>
+    <Avatar className={`${sizeMap[size]} border border-gray-200 shadow-sm overflow-hidden aspect-square ${className}`}>
       <AvatarImage 
         src={avatarUrl} 
         alt={profile?.username || ''}
@@ -45,7 +45,7 @@ export const ProfileAvatar: React.FC<ProfileAvatarProps> = ({
           console.log('ProfileAvatar - Image loaded successfully:', avatarUrl);
         }}
       />
-      <AvatarFallback className="bg-gray-100 text-gray-800">
+      <AvatarFallback className="bg-gray-100 text-gray-800 text-xs">
         {getInitials(profile?.username || profile?.email || '?')}
       </AvatarFallback>
     </Avatar>

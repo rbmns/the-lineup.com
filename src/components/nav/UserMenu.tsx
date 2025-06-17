@@ -44,9 +44,10 @@ const UserMenu = ({ user, profile, handleSignOut, canCreateEvents }: UserMenuPro
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
-          className={`relative rounded-full ${isMobile ? 'h-9 w-9' : 'h-10 w-10'}`}
+          size="icon"
+          className={`relative rounded-full flex-shrink-0 ${isMobile ? 'w-9 h-9 p-0' : 'w-10 h-10 p-0'}`}
         >
-          <ProfileAvatar profile={profile} size="sm" />
+          <ProfileAvatar profile={profile} size="sm" className="w-full h-full" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 bg-white shadow-lg border border-gray-200" align="end" forceMount>
