@@ -82,8 +82,8 @@ const MainNav = () => {
   // Calculate total header height for mobile
   const mobileHeaderHeight = isMobile ? (showMobileSearch ? 'h-[112px]' : 'h-16') : 'h-16';
 
-  // Show create event button only if user is authenticated and has permissions OR if not authenticated (to show auth overlay)
-  const shouldShowCreateButton = !isAuthenticated || (isAuthenticated && canCreateEvents);
+  // Only show create event button if user is authenticated and has permissions
+  const shouldShowCreateButton = isAuthenticated && canCreateEvents;
 
   return (
     <>
@@ -143,7 +143,7 @@ const MainNav = () => {
                 </Button>
               )}
 
-              {/* Create Event Button - only shown to event creators or non-authenticated users */}
+              {/* Create Event Button - only shown to authenticated event creators */}
               {shouldShowCreateButton && (
                 <Button
                   onClick={handleCreateEventClick}
