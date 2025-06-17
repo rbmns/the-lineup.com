@@ -5,34 +5,34 @@ import { typography } from "@/components/polymet/brand-typography";
 
 const steps = [
   {
-    icon: <Search className="h-10 w-10 text-white" />,
+    icon: <Search className="h-10 w-10 text-gray-700" />,
     label: "Discover Events",
     desc: "Browse events happening near you, from yoga sessions to beach parties and everything in between.",
-    bg: "gradient-sky",
+    bg: "bg-gray-100",
   },
   {
-    icon: <Calendar className="h-10 w-10 text-white" />,
+    icon: <Calendar className="h-10 w-10 text-gray-700" />,
     label: "RSVP & Plan",
     desc: "Show interest or commit to going. Keep track of your plans and never miss out on what matters to you.",
-    bg: "gradient-sunset",
+    bg: "bg-gray-100",
   },
   {
-    icon: <Users className="h-10 w-10 text-white" />,
+    icon: <Users className="h-10 w-10 text-gray-700" />,
     label: "Connect & Enjoy",
     desc: "Meet like-minded people at events and build meaningful connections in your community.",
-    bg: "gradient-ocean",
+    bg: "bg-gray-100",
   },
 ];
 
 const HomeHowItWorksSection = () => (
-  <section className="py-16 w-full bg-cyan-800">
+  <section className="py-16 w-full bg-white">
     <div className="w-full px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className={`${typography.h2} text-white mb-4`}>
-            How <span className="font-handwritten text-primary">The Lineup</span> Works
+          <h2 className={`${typography.h2} text-gray-900 mb-4`}>
+            How The Lineup Works
           </h2>
-          <p className={`${typography.body} text-cyan-100`}>
+          <p className={`${typography.body} text-gray-700`}>
             Discover, connect, and experience amazing events in your area with just a few taps.
           </p>
         </div>
@@ -42,8 +42,8 @@ const HomeHowItWorksSection = () => (
               <div className={`w-20 h-20 ${step.bg} rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-105 transition-transform duration-300`}>
                 {step.icon}
               </div>
-              <h3 className={`${typography.h4} text-white mb-3`}>{step.label}</h3>
-              <p className="text-cyan-100">{step.desc}</p>
+              <h3 className={`${typography.h4} text-gray-900 mb-3`}>{step.label}</h3>
+              <p className="text-gray-700">{step.desc}</p>
             </div>
           ))}
         </div>

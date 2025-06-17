@@ -39,7 +39,7 @@ const LeftSidebar: React.FC = () => {
   if (isMobile) {
     // Mobile horizontal layout at bottom with centered create button
     return (
-      <div className="flex items-center justify-around h-full px-2 bg-card border-t border-border safe-area-bottom">
+      <div className="flex items-center justify-center h-full px-2 bg-white border-t border-gray-200 safe-area-bottom">
         {/* First two nav items */}
         {navItems.slice(0, 2).map((item) => {
           const Icon = item.icon;
@@ -52,11 +52,11 @@ const LeftSidebar: React.FC = () => {
               className={cn(
                 "flex flex-col items-center justify-center p-3 min-w-0 flex-1 transition-colors rounded-lg",
                 isActive
-                  ? "text-primary bg-secondary"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                  ? "text-gray-900"
+                  : "text-gray-500 hover:text-gray-900"
               )}
             >
-              <Icon className="h-5 w-5 mb-1" />
+              <Icon className="h-6 w-6 mb-1" />
               <span className="text-xs font-medium truncate">
                 {item.label}
               </span>
@@ -64,13 +64,14 @@ const LeftSidebar: React.FC = () => {
           );
         })}
 
-        {/* Centered Create Event Button */}
+        {/* Centered Create Button */}
         {isAuthenticated && canCreateEvents && (
           <Link
             to="/events/create"
-            className="flex flex-col items-center justify-center p-2 transition-colors rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg mx-2"
+            className="flex flex-col items-center justify-center p-2 transition-colors rounded-full bg-gray-900 hover:bg-gray-800 text-white shadow-lg mx-4"
           >
-            <Plus className="h-6 w-6" />
+            <Plus className="h-7 w-7" />
+            <span className="text-xs font-medium mt-1">Create</span>
           </Link>
         )}
 
@@ -86,11 +87,11 @@ const LeftSidebar: React.FC = () => {
               className={cn(
                 "flex flex-col items-center justify-center p-3 min-w-0 flex-1 transition-colors rounded-lg",
                 isActive
-                  ? "text-primary bg-secondary"
-                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                  ? "text-gray-900"
+                  : "text-gray-500 hover:text-gray-900"
               )}
             >
-              <Icon className="h-5 w-5 mb-1" />
+              <Icon className="h-6 w-6 mb-1" />
               <span className="text-xs font-medium truncate">
                 {item.label}
               </span>
