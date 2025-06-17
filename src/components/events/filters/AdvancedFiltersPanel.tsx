@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface AdvancedFiltersPanelProps {
   isOpen: boolean;
@@ -27,6 +28,9 @@ interface AdvancedFiltersPanelProps {
   toggleCategory: (type: string) => void;
   selectAll: () => void;
   deselectAll: () => void;
+  // Location/venue selection props
+  selectedLocationId?: string | null;
+  onLocationChange?: (id: string | null) => void;
 }
 
 export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
@@ -45,7 +49,9 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
   selectedCategories,
   toggleCategory,
   selectAll,
-  deselectAll
+  deselectAll,
+  selectedLocationId,
+  onLocationChange
 }) => {
   if (!isOpen) return null;
 
@@ -105,9 +111,37 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
         </div>
 
         <div className="space-y-3">
-          <h3 className="text-sm font-medium">Location</h3>
-          <div className="flex items-center border rounded-md p-3 bg-gray-50 text-gray-600">
-            <span className="text-sm">Zandvoort Area</span>
+          <h3 className="text-sm font-medium">All Venues</h3>
+          <div className="relative">
+            <Select
+              value={selectedLocationId || 'all-venues'}
+              onValueChange={(value) => {
+                if (onLocationChange) {
+                  onLocationChange(value === 'all-venues' ? null : value);
+                }
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Filter by venue..." />
+              </SelectTrigger>
+              <SelectContent className="bg-white shadow-lg border border-gray-200 z-50">
+                <SelectItem value="all-venues">All Venues</SelectItem>
+                {locations.map(loc => (
+                  <SelectItem key={loc.value} value={loc.value}>{loc.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {selectedLocationId && onLocationChange && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-8 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
+                onClick={() => onLocationChange(null)}
+                aria-label="Clear venue filter"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         </div>
       </div>

@@ -26,6 +26,9 @@ interface EventsFilterPanelProps {
   toggleCategory: (type: string) => void;
   selectAll: () => void;
   deselectAll: () => void;
+  // Location/venue selection props
+  selectedLocationId: string | null;
+  onLocationChange: (id: string | null) => void;
 }
 
 export const EventsFilterPanel: React.FC<EventsFilterPanelProps> = ({
@@ -47,7 +50,9 @@ export const EventsFilterPanel: React.FC<EventsFilterPanelProps> = ({
   selectedCategories,
   toggleCategory,
   selectAll,
-  deselectAll
+  deselectAll,
+  selectedLocationId,
+  onLocationChange
 }) => {
   return (
     <>
@@ -70,6 +75,8 @@ export const EventsFilterPanel: React.FC<EventsFilterPanelProps> = ({
           toggleCategory={toggleCategory}
           selectAll={selectAll}
           deselectAll={deselectAll}
+          selectedLocationId={selectedLocationId}
+          onLocationChange={onLocationChange}
         />
       )}
       

@@ -4,10 +4,6 @@ import { useLocation } from 'react-router-dom';
 import { EventsFilterBar } from '@/components/events/page-components/EventsFilterBar';
 import { EventsFilterPanel } from '@/components/events/page-components/EventsFilterPanel';
 import { useNavigationHistory } from '@/hooks/useNavigationHistory';
-import { LocationData } from '@/hooks/useLocation';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
 
 interface EventsPageFiltersProps {
   allEventTypes: string[];
@@ -85,49 +81,18 @@ export const EventsPageFilters: React.FC<EventsPageFiltersProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Main filter bar with location and advanced filter toggle */}
-      <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
-        <div className="flex-grow w-full">
-          <EventsFilterBar
-            allEventTypes={allEventTypes}
-            selectedCategories={selectedCategories}
-            toggleCategory={toggleCategory}
-            selectAll={selectAll}
-            deselectAll={deselectAll}
-            hasActiveFilters={hasActiveFilters}
-            showAdvancedFilters={showAdvancedFilters}
-            toggleAdvancedFilters={toggleAdvancedFilters}
-          />
-        </div>
-        <div className="flex-shrink-0 sm:w-auto w-full sm:max-w-xs">
-          <div className="relative">
-            <Select
-              value={selectedLocationId || 'all-locations'}
-              onValueChange={(value) => onLocationChange(value === 'all-locations' ? null : value)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Filter by location..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all-locations">All Locations</SelectItem>
-                {locations.map(loc => (
-                  <SelectItem key={loc.value} value={loc.value}>{loc.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {selectedLocationId && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute right-8 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
-                onClick={() => onLocationChange(null)}
-                aria-label="Clear location filter"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        </div>
+      {/* Main filter bar - removed location filter */}
+      <div className="w-full">
+        <EventsFilterBar
+          allEventTypes={allEventTypes}
+          selectedCategories={selectedCategories}
+          toggleCategory={toggleCategory}
+          selectAll={selectAll}
+          deselectAll={deselectAll}
+          hasActiveFilters={hasActiveFilters}
+          showAdvancedFilters={showAdvancedFilters}
+          toggleAdvancedFilters={toggleAdvancedFilters}
+        />
       </div>
       
       {/* Advanced Filters Panel & Filter Summary */}
@@ -151,6 +116,8 @@ export const EventsPageFilters: React.FC<EventsPageFiltersProps> = ({
         toggleCategory={toggleCategory}
         selectAll={selectAll}
         deselectAll={deselectAll}
+        selectedLocationId={selectedLocationId}
+        onLocationChange={onLocationChange}
       />
     </div>
   );
