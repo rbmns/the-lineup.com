@@ -39,15 +39,6 @@ const MainNav = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleRegisterClick = () => {
-    console.log('Register button clicked, navigating to /login with register mode');
-    navigate('/login', {
-      state: {
-        initialMode: 'register'
-      }
-    });
-  };
-
   const handleSignInClick = () => {
     console.log('Sign in button clicked, navigating to /login');
     navigate('/login');
@@ -139,16 +130,16 @@ const MainNav = () => {
                 >
                   Sign in
                 </Button>
-                <Button 
-                  size={isMobile ? "sm" : "sm"} 
-                  onClick={handleRegisterClick} 
-                  className={cn(
-                    "bg-gray-900 hover:bg-gray-800 text-white rounded-full",
-                    isMobile ? "text-sm px-4 py-2" : "text-sm px-6"
-                  )}
-                >
-                  Sign Up
-                </Button>
+                {/* Remove sign up button on mobile */}
+                {!isMobile && (
+                  <Button 
+                    size="sm" 
+                    onClick={() => navigate('/login', { state: { initialMode: 'register' } })} 
+                    className="bg-gray-900 hover:bg-gray-800 text-white rounded-full text-sm px-6"
+                  >
+                    Sign Up
+                  </Button>
+                )}
               </div>
             )}
           </div>

@@ -70,7 +70,7 @@ const LeftSidebar: React.FC = () => {
     // Mobile horizontal layout at bottom with centered create button
     return (
       <>
-        <div className="flex items-center justify-center h-full px-2 bg-white border-t border-gray-200 safe-area-bottom">
+        <div className="flex items-center justify-between h-full px-4 bg-white border-t border-gray-100">
           {/* First two nav items */}
           {navItems.slice(0, 2).map((item) => {
             const Icon = item.icon;
@@ -81,14 +81,14 @@ const LeftSidebar: React.FC = () => {
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "flex flex-col items-center justify-center p-3 min-w-0 flex-1 transition-colors rounded-lg",
+                  "flex flex-col items-center justify-center py-2 px-3 min-w-0 transition-colors",
                   isActive
                     ? "text-gray-900"
-                    : "text-gray-500 hover:text-gray-900"
+                    : "text-gray-400 hover:text-gray-600"
                 )}
               >
                 <Icon className="h-6 w-6 mb-1" />
-                <span className="text-xs font-medium truncate">
+                <span className="text-xs font-medium">
                   {item.label}
                 </span>
               </Link>
@@ -99,10 +99,10 @@ const LeftSidebar: React.FC = () => {
           <button
             onClick={handleCreateClick}
             disabled={isCreatorStatusLoading}
-            className="flex flex-col items-center justify-center p-2 transition-colors rounded-full bg-gray-900 hover:bg-gray-800 text-white shadow-lg mx-4 disabled:opacity-50"
+            className="flex flex-col items-center justify-center py-2 px-3 transition-colors text-gray-400 hover:text-gray-600 disabled:opacity-50"
           >
-            <Plus className="h-7 w-7" />
-            <span className="text-xs font-medium mt-1">Create</span>
+            <Plus className="h-6 w-6 mb-1" />
+            <span className="text-xs font-medium">Create</span>
           </button>
 
           {/* Last two nav items */}
@@ -115,14 +115,14 @@ const LeftSidebar: React.FC = () => {
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "flex flex-col items-center justify-center p-3 min-w-0 flex-1 transition-colors rounded-lg",
+                  "flex flex-col items-center justify-center py-2 px-3 min-w-0 transition-colors",
                   isActive
                     ? "text-gray-900"
-                    : "text-gray-500 hover:text-gray-900"
+                    : "text-gray-400 hover:text-gray-600"
                 )}
               >
                 <Icon className="h-6 w-6 mb-1" />
-                <span className="text-xs font-medium truncate">
+                <span className="text-xs font-medium">
                   {item.label}
                 </span>
               </Link>
