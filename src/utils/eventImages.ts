@@ -1,3 +1,4 @@
+
 import { Event } from "@/types";
 
 const EVENT_FALLBACK_IMAGES = {
@@ -117,18 +118,24 @@ export const getEventImage = (event: Event): string => {
     
     // Handle different formats of image_urls
     if (Array.isArray(event.image_urls)) {
-      imageUrl = event.image_urls.find((url): url is string => {
-        return typeof url === 'string' && url.trim().length > 0;
-      }) || null;
+      for (const url of event.image_urls) {
+        if (typeof url === 'string' && url.trim().length > 0) {
+          imageUrl = url;
+          break;
+        }
+      }
     } else if (typeof event.image_urls === 'string') {
       const trimmedString = event.image_urls.trim();
       if (trimmedString.startsWith('[') && trimmedString.endsWith(']')) {
         try {
           const parsed = JSON.parse(trimmedString);
           if (Array.isArray(parsed)) {
-            imageUrl = parsed.find((url): url is string => {
-              return typeof url === 'string' && url.trim().length > 0;
-            }) || null;
+            for (const url of parsed) {
+              if (typeof url === 'string' && url.trim().length > 0) {
+                imageUrl = url;
+                break;
+              }
+            }
           }
         } catch (e) {
           console.warn(`Failed to parse image_urls JSON: ${trimmedString}`);

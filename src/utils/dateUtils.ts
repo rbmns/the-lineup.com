@@ -5,4 +5,12 @@
 // Re-export everything from the new modules
 export * from './date-formatting';
 export * from './date-filtering';
-export * from './event-date-utils';
+// Export specific functions from event-date-utils to avoid conflicts
+export { 
+  getWeekRange, 
+  getEventDateTime, 
+  getEventEndDateTime, 
+  combineDateAndTime, 
+  getMultiDayDateRange, 
+  isDateInEventRange 
+} from './event-date-utils';
