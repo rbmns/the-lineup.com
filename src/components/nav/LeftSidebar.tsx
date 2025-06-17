@@ -1,17 +1,20 @@
 
-import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Calendar, Users, Star, Home, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCreatorStatus } from '@/hooks/useCreatorStatus';
+import { AuthOverlay } from '@/components/auth/AuthOverlay';
 
 const LeftSidebar: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { isAuthenticated } = useAuth();
-  const { canCreateEvents } = useCreatorStatus();
+  const { isAuthenticated, user } = useAuth();
+  const { canCreateEvents, creatorRequestStatus, isLoading: isCreatorStatusLoading } = useCreatorStatus();
+  const [showAuthOverlay, setShowAuthOverlay] = useState(false);
 
   const navItems = [
     {
@@ -36,69 +39,110 @@ const LeftSidebar: React.FC = () => {
     },
   ];
 
+  const handleCreateClick = () => {
+    if (!isAuthenticated) {
+      setShowAuthOverlay(true);
+      return;
+    }
+
+    if (isCreatorStatusLoading) return;
+
+    if (canCreateEvents || creatorRequestStatus === 'approved') {
+      navigate('/events/create');
+    } else {
+      // Navigate to a page that explains how to become an organizer
+      // For now, we'll navigate to events and show a message
+      navigate('/events');
+      // You might want to show a toast or modal here explaining how to become an organizer
+    }
+  };
+
+  const handleCloseAuthOverlay = () => {
+    setShowAuthOverlay(false);
+  };
+
+  const handleBrowseEvents = () => {
+    setShowAuthOverlay(false);
+    navigate('/events');
+  };
+
   if (isMobile) {
     // Mobile horizontal layout at bottom with centered create button
     return (
-      <div className="flex items-center justify-center h-full px-2 bg-white border-t border-gray-200 safe-area-bottom">
-        {/* First two nav items */}
-        {navItems.slice(0, 2).map((item) => {
-          const Icon = item.icon;
-          const isActive = location.pathname === item.path;
+      <>
+        <div className="flex items-center justify-center h-full px-2 bg-white border-t border-gray-200 safe-area-bottom">
+          {/* First two nav items */}
+          {navItems.slice(0, 2).map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
 
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={cn(
-                "flex flex-col items-center justify-center p-3 min-w-0 flex-1 transition-colors rounded-lg",
-                isActive
-                  ? "text-gray-900"
-                  : "text-gray-500 hover:text-gray-900"
-              )}
-            >
-              <Icon className="h-6 w-6 mb-1" />
-              <span className="text-xs font-medium truncate">
-                {item.label}
-              </span>
-            </Link>
-          );
-        })}
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  "flex flex-col items-center justify-center p-3 min-w-0 flex-1 transition-colors rounded-lg",
+                  isActive
+                    ? "text-gray-900"
+                    : "text-gray-500 hover:text-gray-900"
+                )}
+              >
+                <Icon className="h-6 w-6 mb-1" />
+                <span className="text-xs font-medium truncate">
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
 
-        {/* Centered Create Button */}
-        {isAuthenticated && canCreateEvents && (
-          <Link
-            to="/events/create"
-            className="flex flex-col items-center justify-center p-2 transition-colors rounded-full bg-gray-900 hover:bg-gray-800 text-white shadow-lg mx-4"
+          {/* Centered Create Button */}
+          <button
+            onClick={handleCreateClick}
+            disabled={isCreatorStatusLoading}
+            className="flex flex-col items-center justify-center p-2 transition-colors rounded-full bg-gray-900 hover:bg-gray-800 text-white shadow-lg mx-4 disabled:opacity-50"
           >
             <Plus className="h-7 w-7" />
             <span className="text-xs font-medium mt-1">Create</span>
-          </Link>
+          </button>
+
+          {/* Last two nav items */}
+          {navItems.slice(2).map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  "flex flex-col items-center justify-center p-3 min-w-0 flex-1 transition-colors rounded-lg",
+                  isActive
+                    ? "text-gray-900"
+                    : "text-gray-500 hover:text-gray-900"
+                )}
+              >
+                <Icon className="h-6 w-6 mb-1" />
+                <span className="text-xs font-medium truncate">
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Auth Overlay for mobile create button */}
+        {showAuthOverlay && !isAuthenticated && (
+          <AuthOverlay
+            title="Join to Create Events"
+            description="Sign up or log in to create and organize your own events!"
+            browseEventsButton={true}
+            onClose={handleCloseAuthOverlay}
+            onBrowseEvents={handleBrowseEvents}
+          >
+            <></>
+          </AuthOverlay>
         )}
-
-        {/* Last two nav items */}
-        {navItems.slice(2).map((item) => {
-          const Icon = item.icon;
-          const isActive = location.pathname === item.path;
-
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={cn(
-                "flex flex-col items-center justify-center p-3 min-w-0 flex-1 transition-colors rounded-lg",
-                isActive
-                  ? "text-gray-900"
-                  : "text-gray-500 hover:text-gray-900"
-              )}
-            >
-              <Icon className="h-6 w-6 mb-1" />
-              <span className="text-xs font-medium truncate">
-                {item.label}
-              </span>
-            </Link>
-          );
-        })}
-      </div>
+      </>
     );
   }
 
