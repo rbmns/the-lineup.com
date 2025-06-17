@@ -9,47 +9,86 @@ export interface LoginFormData {
   password: string;
 }
 
-export const useLoginForm = () => {
+interface UseLoginFormOptions {
+  suppressSuccessToast?: boolean;
+}
+
+export const useLoginForm = (options: UseLoginFormOptions = {}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [rateLimited, setRateLimited] = useState(false);
+  const [waitTime, setWaitTime] = useState(0);
+  const [debugInfo, setDebugInfo] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const [showAdvancedError, setShowAdvancedError] = useState(false);
+  
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
 
-    setIsLoading(true);
+    setLoading(true);
+    setError(null);
+    setDebugInfo(null);
+    
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) {
-        console.error('Login error:', error);
-        toast.error(error.message || 'Login failed');
+      if (authError) {
+        console.error('Login error:', authError);
+        setError(authError.message || 'Login failed');
+        setRetryCount(prev => prev + 1);
+        
+        // Check for rate limiting
+        if (authError.message?.includes('rate limit') || authError.message?.includes('too many requests')) {
+          setRateLimited(true);
+          setWaitTime(60); // Default wait time
+        }
+        
+        setDebugInfo(`Error: ${authError.message}\nCode: ${authError.status || 'unknown'}`);
         return;
       }
 
-      toast.success('Login successful!');
+      if (!options.suppressSuccessToast) {
+        toast.success('Login successful!');
+      }
+      
       const from = location.state?.from?.pathname || '/';
       navigate(from, { replace: true });
     } catch (error) {
       console.error('Unexpected login error:', error);
-      toast.error('An unexpected error occurred');
+      setError('An unexpected error occurred');
+      setDebugInfo(`Unexpected error: ${error}`);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
+
+  // Legacy support for the old handleLogin method
+  const handleLogin = handleSubmit;
 
   return {
     email,
     setEmail,
     password,
     setPassword,
-    isLoading,
+    loading,
+    isLoading: loading, // For backward compatibility
+    error,
+    rateLimited,
+    waitTime,
+    debugInfo,
+    retryCount,
+    showAdvancedError,
+    setShowAdvancedError,
+    handleSubmit,
     handleLogin,
   };
 };

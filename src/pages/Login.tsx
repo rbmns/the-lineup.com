@@ -5,10 +5,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoginForm } from '@/components/auth/LoginForm';
 import { GoogleAuthButton } from '@/components/auth/GoogleAuthButton';
-import { supabase } from '@/lib/supabase';
 
 const Login = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loginWithGoogle, loading } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,15 +16,17 @@ const Login = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleLogout = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Logout error:', error);
-      }
-    } catch (error) {
-      console.error('Unexpected logout error:', error);
-    }
+  const handleToggleMode = () => {
+    navigate('/signup');
+  };
+
+  const handleForgotPassword = () => {
+    navigate('/forgot-password');
+  };
+
+  const handleGoogleLogin = async () => {
+    if (loading) return;
+    await loginWithGoogle();
   };
 
   if (isAuthenticated) {
@@ -42,7 +43,7 @@ const Login = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <GoogleAuthButton />
+          <GoogleAuthButton onClick={handleGoogleLogin} loading={loading} />
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
@@ -51,7 +52,10 @@ const Login = () => {
               <span className="bg-white px-2 text-muted-foreground">Or continue with</span>
             </div>
           </div>
-          <LoginForm />
+          <LoginForm 
+            onToggleMode={handleToggleMode}
+            onForgotPassword={handleForgotPassword}
+          />
           <p className="text-center text-sm text-gray-600">
             Don't have an account?{' '}
             <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500">

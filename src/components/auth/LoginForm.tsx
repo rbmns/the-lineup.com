@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useLoginForm } from '@/hooks/useLoginForm';
 import { LoginErrorDisplay } from '@/components/auth/LoginErrorDisplay';
@@ -6,19 +7,18 @@ import { DebugInfo } from '@/components/auth/DebugInfo';
 import { LoginFormFields } from '@/components/auth/LoginFormFields';
 import { LoginFooter } from '@/components/auth/LoginFooter';
 import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
 import GoogleAuthButton from './GoogleAuthButton';
 
 interface LoginFormProps {
-  onToggleMode: () => void;
-  onForgotPassword: () => void;
+  onToggleMode?: () => void;
+  onForgotPassword?: () => void;
   suppressSuccessToast?: boolean;
 }
 
 export const LoginForm: React.FC<LoginFormProps> = ({ 
   onToggleMode, 
   onForgotPassword,
-  suppressSuccessToast = true
+  suppressSuccessToast = false
 }) => {
   const {
     email,
@@ -35,6 +35,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     setShowAdvancedError,
     handleSubmit,
   } = useLoginForm({ suppressSuccessToast });
+  
   const { loginWithGoogle, loading: authLoading } = useAuth();
 
   const handleGoogleLogin = async () => {
@@ -88,10 +89,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         Sign in with Google
       </GoogleAuthButton>
       
-      <LoginFooter
-        onToggleMode={onToggleMode}
-        onForgotPassword={onForgotPassword}
-      />
+      {(onToggleMode || onForgotPassword) && (
+        <LoginFooter
+          onToggleMode={onToggleMode || (() => {})}
+          onForgotPassword={onForgotPassword || (() => {})}
+        />
+      )}
     </>
   );
 };
