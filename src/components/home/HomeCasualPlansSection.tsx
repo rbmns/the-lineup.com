@@ -1,33 +1,26 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { typography } from '@/components/polymet/brand-typography';
-
 export const HomeCasualPlansSection: React.FC = () => {
-  const casualPlans = [
-    {
-      id: 1,
-      title: 'Sunset watch & beers',
-      date: 'Thu, 26 Jun',
-      time: '12:00',
-      interested: 3,
-      avatar: '••••••'
-    },
-    {
-      id: 2,
-      title: 'guitar and campfire',
-      date: 'Tue, 1 Jul',
-      time: '20:30',
-      interested: 3,
-      avatar: '••••••'
-    }
-  ];
-
-  return (
-    <section className="py-8 md:py-12 bg-gray-50">
+  const casualPlans = [{
+    id: 1,
+    title: 'Sunset watch & beers',
+    date: 'Thu, 26 Jun',
+    time: '12:00',
+    interested: 3,
+    avatar: '••••••'
+  }, {
+    id: 2,
+    title: 'guitar and campfire',
+    date: 'Tue, 1 Jul',
+    time: '20:30',
+    interested: 3,
+    avatar: '••••••'
+  }];
+  return <section className="py-8 md:py-12 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="space-y-6 md:space-y-8">
           {/* Header */}
@@ -38,17 +31,7 @@ export const HomeCasualPlansSection: React.FC = () => {
               From impromptu beach walks to coffee meetups, make spontaneous connections happen.
             </p>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
-              <div className="text-center md:text-left">
-                <p className={`${typography.body} font-medium text-gray-700`}>Coffee chats, beach walks, local explorations</p>
-              </div>
-              <div className="text-center md:text-left">
-                <p className={`${typography.body} font-medium text-gray-700`}>Last-minute plans and spontaneous activities</p>
-              </div>
-              <div className="text-center md:text-left">
-                <p className={`${typography.body} font-medium text-gray-700`}>Connect with locals and travelers nearby</p>
-              </div>
-            </div>
+            
           </div>
 
           {/* Recent Plans Header */}
@@ -64,8 +47,7 @@ export const HomeCasualPlansSection: React.FC = () => {
 
           {/* Casual Plans Grid - properly spaced */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {casualPlans.map((plan) => (
-              <Card key={plan.id} className="hover:shadow-md transition-shadow bg-white">
+            {casualPlans.map(plan => <Card key={plan.id} className="hover:shadow-md transition-shadow bg-white">
                 <CardContent className="p-4 md:p-6">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
@@ -89,8 +71,7 @@ export const HomeCasualPlansSection: React.FC = () => {
                     </Button>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
 
           {/* Sign in prompt */}
@@ -112,6 +93,5 @@ export const HomeCasualPlansSection: React.FC = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
