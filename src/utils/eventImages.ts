@@ -125,7 +125,7 @@ export const getEventImage = (event: Event): string => {
         }
       }
     } else if (typeof event.image_urls === 'string') {
-      const urlString = event.image_urls;
+      const urlString: string = event.image_urls;
       const trimmedString = urlString.trim();
       if (trimmedString.startsWith('[') && trimmedString.endsWith(']')) {
         try {
