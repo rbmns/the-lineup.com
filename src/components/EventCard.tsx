@@ -1,156 +1,193 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
-import { CategoryPill } from '@/components/ui/category-pill';
-import { LineupImage } from '@/components/ui/lineup-image';
-import { MapPin, Calendar } from 'lucide-react';
-import { formatDate, formatEventTime, formatEventCardDateTime } from '@/utils/date-formatting';
-import { useEventImages } from '@/hooks/useEventImages';
 import { Event } from '@/types';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { Calendar, MapPin, Users } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
+import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
+import { useEventImages } from '@/hooks/useEventImages';
+import { CategoryPill } from '@/components/ui/category-pill';
+import { toast } from '@/hooks/use-toast';
+import { formatEventCardDateTime } from '@/utils/date-formatting';
+import { LineupImage } from '@/components/ui/lineup-image';
+import { useAuth } from '@/contexts/AuthContext';
+import { Card } from '@/components/ui/card';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface EventCardProps {
   event: Event;
-  className?: string;
-  showCategory?: boolean;
-  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
-  showRsvpButtons?: boolean;
-  onClick?: (event: Event) => void;
   compact?: boolean;
+  showRsvpButtons?: boolean;
+  showRsvpStatus?: boolean;
+  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
+  className?: string;
+  onClick?: (event: Event) => void;
   loadingEventId?: string | null;
 }
 
-export const EventCard: React.FC<EventCardProps> = ({ 
-  event, 
-  className = '',
-  showCategory = true,
-  onRsvp,
-  showRsvpButtons = false,
-  onClick,
+export const EventCard: React.FC<EventCardProps> = ({
+  event,
   compact = false,
-  loadingEventId
+  showRsvpButtons = false,
+  showRsvpStatus = false,
+  onRsvp,
+  className,
+  onClick,
+  loadingEventId,
 }) => {
-  const { getEventImageUrl } = useEventImages();
+  const { isAuthenticated } = useAuth();
   const { navigateToEvent } = useEventNavigation();
+  const { getEventImageUrl } = useEventImages();
   const isMobile = useIsMobile();
+  const imageUrl = getEventImageUrl(event);
 
-  const eventImage = getEventImageUrl(event);
+  // Only show RSVP functionality if user is authenticated AND showRsvpButtons is true
+  const shouldShowRsvp = isAuthenticated && showRsvpButtons;
 
   const handleClick = (e: React.MouseEvent) => {
-    if (onClick) {
-      e.preventDefault();
-      onClick(event);
-    } else {
-      // Use navigation hook which will scroll to top
-      e.preventDefault();
-      navigateToEvent(event, false); // false = don't preserve scroll
-    }
-  };
-
-  const handleRsvpClick = async (e: React.MouseEvent, status: 'Going' | 'Interested') => {
-    e.preventDefault();
-    e.stopPropagation();
+    // More thorough check for RSVP-related elements
+    const target = e.target as HTMLElement;
+    const isRsvpElement = 
+      target.closest('[data-rsvp-container="true"]') || 
+      target.closest('[data-rsvp-button="true"]') ||
+      target.hasAttribute('data-rsvp-button') ||
+      target.closest('button[data-status]');
     
-    if (onRsvp) {
-      // For RSVP actions, we want to preserve scroll position
-      await onRsvp(event.id, status);
+    if (isRsvpElement) {
+      e.stopPropagation();
+      e.preventDefault();
+      return;
+    }
+    
+    if (onClick) {
+      onClick(event);
+      return;
+    }
+    
+    try {
+      // Use hook for consistent navigation
+      navigateToEvent(event);
+    } catch (error) {
+      console.error("Error navigating to event:", error);
+      toast({
+        title: "Navigation Error",
+        description: "Could not navigate to event page",
+        variant: "destructive",
+      });
     }
   };
 
-  const cardContent = (
-    <Card className={`overflow-hidden h-full flex flex-col group hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out ${className} rounded-xl shadow-md border-gray-200`}>
-      <div className="relative">
+  // Handle RSVP and ensure we always return a Promise<boolean>
+  const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    if (!onRsvp || !shouldShowRsvp) return false;
+    
+    try {
+      const result = await onRsvp(event.id, status);
+      // Convert any result (including void) to a boolean
+      return result === undefined ? true : !!result;
+    } catch (error) {
+      console.error('Error in EventCard RSVP handler:', error);
+      return false;
+    }
+  };
+
+  const totalAttendees = (event.going_count || 0) + (event.interested_count || 0);
+
+  return (
+    <Card 
+      className={cn(
+        "flex flex-col h-full overflow-hidden cursor-pointer transition-all duration-300 ease-in-out hover:shadow-xl bg-white border border-gray-200 rounded-xl",
+        className
+      )}
+      onClick={handleClick}
+      data-event-id={event.id}
+    >
+      {/* Image with better mobile sizing */}
+      <div className={cn(
+        "relative w-full overflow-hidden bg-gray-100 flex-shrink-0",
+        isMobile ? "h-48" : "h-56"
+      )}>
         <LineupImage
-          src={eventImage}
+          src={imageUrl}
           alt={event.title}
           aspectRatio="video"
-          overlayVariant="ocean"
-          className={compact ? "h-32" : (isMobile ? "h-40" : "h-48")}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            if (!target.src.includes('/img/default.jpg')) {
+              console.log('Image failed to load, using default');
+              target.src = "/img/default.jpg";
+            }
+          }}
         />
-        {showCategory && event.event_category && (
-          <div className="absolute top-3 left-3 z-30">
+        
+        {/* Event category pill */}
+        {event.event_category && (
+          <div className="absolute top-3 left-3 z-10">
             <CategoryPill 
               category={event.event_category} 
-              active={true}
-              noBorder={true}
-              size={isMobile ? "xs" : "sm"}
+              size="sm" 
+              showIcon={false} 
             />
           </div>
         )}
       </div>
       
-      <CardContent className={`${compact ? 'p-3' : (isMobile ? 'p-4' : 'p-5')} flex-1 flex flex-col items-start text-left gap-3`}>
-        {/* Title */}
-        <h3 className={`font-inter font-semibold text-gray-900 group-hover:text-primary transition-colors ${compact ? 'text-base' : (isMobile ? 'text-lg' : 'text-xl')} line-clamp-2 text-left w-full leading-tight`}>
-          {event.title}
-        </h3>
-        
-        <div className="flex flex-col gap-3 w-full flex-1">
-          {/* Date & Time */}
-          {event.start_date && (
-            <div className={`flex items-center text-gray-600 gap-2 w-full text-left ${compact ? 'text-xs' : (isMobile ? 'text-sm' : 'text-sm')}`}>
-              <Calendar className={`flex-shrink-0 text-gray-400 ${compact ? 'h-4 w-4' : (isMobile ? 'h-4 w-4' : 'h-4 w-4')}`} />
-              <span className="font-inter font-medium">
-                {formatEventCardDateTime(event.start_date, event.start_time)}
-              </span>
-            </div>
-          )}
-
+      {/* Content with better mobile spacing */}
+      <div className={cn(
+        "flex flex-col flex-1 justify-between",
+        isMobile ? "p-4" : "p-5"
+      )}>
+        <div className="space-y-3">
+          {/* Title */}
+          <h3 className="font-semibold text-gray-900 text-lg leading-tight line-clamp-2">
+            {event.title}
+          </h3>
+          
+          {/* Date and Time */}
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
+            <span className="font-medium">
+              {formatEventCardDateTime(event.start_date, event.start_time)}
+            </span>
+          </div>
+          
           {/* Location */}
-          {(event.venues?.name || event.location) && (
-            <div className={`flex items-center text-gray-600 gap-2 w-full text-left ${compact ? 'text-xs' : (isMobile ? 'text-sm' : 'text-sm')}`}>
-              <MapPin className={`flex-shrink-0 text-gray-400 ${compact ? 'h-4 w-4' : (isMobile ? 'h-4 w-4' : 'h-4 w-4')}`} />
-              <span className={`truncate font-inter`}>
-                {event.venues?.name || event.location}
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
+            <span className="truncate">
+              {event.venues?.name || event.location || 'No location'}
+            </span>
+          </div>
+
+          {/* Attendees count */}
+          {totalAttendees > 0 && (
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <Users className="h-4 w-4 text-gray-400 flex-shrink-0" />
+              <span>
+                {totalAttendees} {totalAttendees === 1 ? 'person' : 'people'} interested
               </span>
             </div>
           )}
         </div>
-
-        {/* RSVP Buttons */}
-        {showRsvpButtons && onRsvp && (
-          <div className="mt-auto pt-3 flex gap-2 w-full">
-            <button
-              onClick={(e) => handleRsvpClick(e, 'Going')}
-              disabled={loadingEventId === event.id}
-              className={`flex-1 px-3 py-2 ${isMobile ? 'text-xs' : 'text-sm'} font-inter font-semibold rounded-lg transition-colors ${
-                event.rsvp_status === 'Going'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-green-600 hover:text-white border border-gray-200'
-              }`}
-            >
-              Going
-            </button>
-            <button
-              onClick={(e) => handleRsvpClick(e, 'Interested')}
-              disabled={loadingEventId === event.id}
-              className={`flex-1 px-3 py-2 ${isMobile ? 'text-xs' : 'text-sm'} font-inter font-semibold rounded-lg transition-colors ${
-                event.rsvp_status === 'Interested'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white border border-gray-200'
-              }`}
-            >
-              Interested
-            </button>
+        
+        {/* RSVP Buttons - only show if authenticated */}
+        {shouldShowRsvp && onRsvp && (
+          <div 
+            className="mt-4 pt-3 border-t border-gray-100" 
+            data-rsvp-container="true" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <EventRsvpButtons
+              currentStatus={event.rsvp_status || null}
+              onRsvp={handleRsvp}
+              size="sm"
+              isLoading={loadingEventId === event.id}
+              showStatusOnly={!shouldShowRsvp && showRsvpStatus}
+            />
           </div>
         )}
-      </CardContent>
-    </Card>
-  );
-
-  if (onClick) {
-    return (
-      <div onClick={handleClick} className="cursor-pointer h-full">
-        {cardContent}
       </div>
-    );
-  }
-
-  return (
-    <div onClick={handleClick} className="cursor-pointer h-full">
-      {cardContent}
-    </div>
+    </Card>
   );
 };

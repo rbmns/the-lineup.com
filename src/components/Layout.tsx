@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SocialSidebar } from "@/components/social/SocialSidebar";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 
 const TOP_NAV_HEIGHT_MOBILE = 112; // 56px main nav + 56px search on mobile
 const TOP_NAV_HEIGHT_DESKTOP = 64; // Desktop nav height
@@ -23,6 +24,9 @@ const Layout = () => {
   const isMobile = useIsMobile();
   const [rightSidebarVisible, setRightSidebarVisible] = useState(true);
   const isHomePage = location.pathname === '/';
+
+  // Scroll to top on route changes (except for RSVP actions)
+  useScrollToTop();
 
   const topNavHeight = isMobile ? TOP_NAV_HEIGHT_MOBILE : TOP_NAV_HEIGHT_DESKTOP;
 

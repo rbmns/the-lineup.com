@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAuth } from '@/contexts/AuthContext';
 import { useCasualPlansMutations } from '@/hooks/casual-plans/useCasualPlansMutations';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useScrollToTop } from '@/hooks/useScrollToTop';
 
 const VenueResultCard = ({ result, navigate }: { result: any; navigate: ReturnType<typeof useNavigate> }) => (
     <Card 
@@ -44,6 +45,9 @@ const SearchPage: React.FC = () => {
   } = useCasualPlansMutations();
   const query = searchParams.get('q') || '';
 
+  // Scroll to top on page load
+  useScrollToTop();
+
   useEffect(() => {
     if (query) {
       performSearch(query);
@@ -64,7 +68,7 @@ const SearchPage: React.FC = () => {
   };
 
   return (
-    <div className={`${isMobile ? 'px-3 py-4' : 'container mx-auto px-4 py-8'}`}>
+    <div className={`${isMobile ? 'px-3 py-4' : 'container mx-auto px-4 py-8'} min-h-screen`}>
       <div className="flex items-center mb-6">
         <Button variant="ghost" size="icon" onClick={() => navigate('/')} className="mr-2">
           <ArrowLeft className="h-5 w-5" />
