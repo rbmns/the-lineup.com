@@ -58,37 +58,52 @@ export const getEventFallbackImage = (category?: string, tags?: string[]): strin
   // Direct category match first
   if (EVENT_FALLBACK_IMAGES[normalizedCategory as keyof typeof EVENT_FALLBACK_IMAGES]) {
     selected = EVENT_FALLBACK_IMAGES[normalizedCategory as keyof typeof EVENT_FALLBACK_IMAGES];
+    console.log(`[FallbackLogic] Direct match for "${normalizedCategory}" -> ${selected}`);
   } else if (normalizedCategory.includes('yoga') || normalizedCategory.includes('wellness')) {
     selected = EVENT_FALLBACK_IMAGES.yoga;
+    console.log(`[FallbackLogic] Yoga/wellness match for "${normalizedCategory}" -> ${selected}`);
   } else if (normalizedCategory.includes('surf')) {
     selected = EVENT_FALLBACK_IMAGES.surf;
+    console.log(`[FallbackLogic] Surf match for "${normalizedCategory}" -> ${selected}`);
   } else if (normalizedCategory.includes('beach')) {
     selected = EVENT_FALLBACK_IMAGES.beach;
+    console.log(`[FallbackLogic] Beach match for "${normalizedCategory}" -> ${selected}`);
   } else if (normalizedCategory.includes('music') || normalizedCategory.includes('concert')) {
     selected = EVENT_FALLBACK_IMAGES.music;
+    console.log(`[FallbackLogic] Music match for "${normalizedCategory}" -> ${selected}`);
   } else if (normalizedCategory.includes('food') || normalizedCategory.includes('restaurant')) {
     selected = EVENT_FALLBACK_IMAGES.food;
+    console.log(`[FallbackLogic] Food match for "${normalizedCategory}" -> ${selected}`);
   } else if (normalizedCategory.includes('sport')) {
     selected = EVENT_FALLBACK_IMAGES.sports;
+    console.log(`[FallbackLogic] Sports match for "${normalizedCategory}" -> ${selected}`);
   } else if (normalizedCategory.includes('art') || normalizedCategory.includes('culture')) {
     selected = EVENT_FALLBACK_IMAGES.culture;
+    console.log(`[FallbackLogic] Art/culture match for "${normalizedCategory}" -> ${selected}`);
   } else if (normalizedCategory.includes('festival')) {
     selected = EVENT_FALLBACK_IMAGES.festival;
+    console.log(`[FallbackLogic] Festival match for "${normalizedCategory}" -> ${selected}`);
   } else if (normalizedCategory.includes('game')) {
     selected = EVENT_FALLBACK_IMAGES.game;
+    console.log(`[FallbackLogic] Game match for "${normalizedCategory}" -> ${selected}`);
   } else if (normalizedCategory.includes('party')) {
     selected = EVENT_FALLBACK_IMAGES.party;
+    console.log(`[FallbackLogic] Party match for "${normalizedCategory}" -> ${selected}`);
   } else if (normalizedCategory.includes('kite')) {
     selected = EVENT_FALLBACK_IMAGES.kite;
+    console.log(`[FallbackLogic] Kite match for "${normalizedCategory}" -> ${selected}`);
   } else if (normalizedCategory.includes('community')) {
     selected = EVENT_FALLBACK_IMAGES.community;
+    console.log(`[FallbackLogic] Community match for "${normalizedCategory}" -> ${selected}`);
   } else if (normalizedCategory.includes('market')) {
     selected = EVENT_FALLBACK_IMAGES.market;
+    console.log(`[FallbackLogic] Market match for "${normalizedCategory}" -> ${selected}`);
   } else {
     selected = fallbackDefault;
+    console.log(`[FallbackLogic] No match for "${normalizedCategory}", using default -> ${selected}`);
   }
 
-  // Debug logging for troubleshooting category issues
+  // Final debug logging
   console.log(
     `[FallbackLogic] Input category: "${category}" (Normalized: "${normalizedCategory}") -> Resolved Image: "${selected}"`
   );
@@ -97,12 +112,35 @@ export const getEventFallbackImage = (category?: string, tags?: string[]): strin
 };
 
 export const getEventImage = (event: Event): string => {
-  // Check for image_urls array first
-  if (event.image_urls && event.image_urls.length > 0) {
-    return event.image_urls[0];
+  // Check for image_urls array first with improved parsing
+  if (event.image_urls) {
+    let imageUrl: string | null = null;
+    
+    // Handle different formats of image_urls
+    if (Array.isArray(event.image_urls)) {
+      imageUrl = event.image_urls.find(url => url && typeof url === 'string' && url.trim().length > 0) || null;
+    } else if (typeof event.image_urls === 'string') {
+      const trimmed = event.image_urls.trim();
+      if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+        try {
+          const parsed = JSON.parse(trimmed);
+          if (Array.isArray(parsed)) {
+            imageUrl = parsed.find(url => url && typeof url === 'string' && url.trim().length > 0) || null;
+          }
+        } catch (e) {
+          console.warn(`Failed to parse image_urls JSON: ${trimmed}`);
+        }
+      } else if (trimmed.length > 0) {
+        imageUrl = trimmed;
+      }
+    }
+    
+    if (imageUrl && imageUrl.startsWith('http')) {
+      return imageUrl;
+    }
   }
   
-  // Fall back to event_category-based image from local /img folder
+  // Fall back to event_category-based image
   return getEventFallbackImage(event.event_category);
 };
 

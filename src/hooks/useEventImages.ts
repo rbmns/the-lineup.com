@@ -30,14 +30,45 @@ export const useEventImages = (event?: Event | null): EventImageResult => {
   // Function to get image URL for any event (useful when rendering lists)
   const getEventImageUrl = (eventData: Event): string => {
     console.log(`[EventImage] Getting image for: "${eventData.title}" (ID: ${eventData.id})`);
+    
     // Check for image_urls array first
-    if (eventData.image_urls && eventData.image_urls.length > 0 && eventData.image_urls[0]) {
-      console.log(`[EventImage] Found DB image: ${eventData.image_urls[0]}`);
-      return eventData.image_urls[0];
+    if (eventData.image_urls) {
+      let imageUrl: string | null = null;
+      
+      // Handle different formats of image_urls
+      if (Array.isArray(eventData.image_urls)) {
+        // If it's already an array, get the first valid URL
+        imageUrl = eventData.image_urls.find(url => url && typeof url === 'string' && url.trim().length > 0) || null;
+      } else if (typeof eventData.image_urls === 'string') {
+        // If it's a string, try to parse it or use it directly
+        const trimmed = eventData.image_urls.trim();
+        if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+          // Looks like a JSON array string
+          try {
+            const parsed = JSON.parse(trimmed);
+            if (Array.isArray(parsed)) {
+              imageUrl = parsed.find(url => url && typeof url === 'string' && url.trim().length > 0) || null;
+            }
+          } catch (e) {
+            console.warn(`[EventImage] Failed to parse image_urls JSON: ${trimmed}`);
+          }
+        } else if (trimmed.length > 0) {
+          // Treat as a single URL
+          imageUrl = trimmed;
+        }
+      }
+      
+      // Validate the URL
+      if (imageUrl && imageUrl.startsWith('http')) {
+        console.log(`[EventImage] Found valid DB image: ${imageUrl}`);
+        return imageUrl;
+      } else if (imageUrl) {
+        console.warn(`[EventImage] Invalid DB image URL: ${imageUrl}`);
+      }
     }
     
     // Use fallback based on event category
-    console.log(`[EventImage] No DB image. Falling back on category: "${eventData.event_category}"`);
+    console.log(`[EventImage] No valid DB image. Falling back on category: "${eventData.event_category}"`);
     const fallbackImage = getEventFallbackImage(eventData.event_category);
     console.log(`[EventImage] Fallback image is: ${fallbackImage}`);
     return fallbackImage;
@@ -54,16 +85,10 @@ export const useEventImages = (event?: Event | null): EventImageResult => {
         setIsLoading(true);
         setError(null);
 
-        // Process cover image
-        if (event.image_urls && event.image_urls.length > 0) {
-          setCoverImage(event.image_urls[0]);
-          setShareImage(event.image_urls[0]);
-        } else {
-          // Use fallback image based on event category
-          const fallbackImage = getEventFallbackImage(event.event_category);
-          setCoverImage(fallbackImage);
-          setShareImage(fallbackImage);
-        }
+        // Use the same logic as getEventImageUrl
+        const imageUrl = getEventImageUrl(event);
+        setCoverImage(imageUrl);
+        setShareImage(imageUrl);
 
         setIsLoading(false);
       } catch (err) {
