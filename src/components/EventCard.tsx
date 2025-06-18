@@ -101,7 +101,12 @@ export const EventCard: React.FC<EventCardProps> = ({
       return event.venues.name;
     }
     
-    // Second priority: location field (legacy)
+    // Second priority: venue_id data if it's an object with name
+    if (event.venue_id && typeof event.venue_id === 'object' && (event.venue_id as any).name) {
+      return (event.venue_id as any).name;
+    }
+    
+    // Third priority: location field (legacy)
     if (event.location) {
       return event.location;
     }
@@ -113,7 +118,7 @@ export const EventCard: React.FC<EventCardProps> = ({
   return (
     <Card 
       className={cn(
-        "group flex flex-col cursor-pointer hover:shadow-lg transition-all duration-300 bg-white rounded-xl shadow-md overflow-hidden border border-gray-200",
+        "group flex flex-col cursor-pointer hover:shadow-lg transition-all duration-300 bg-white shadow-md overflow-hidden border border-gray-200",
         "h-full w-full", // Ensure consistent sizing
         className
       )}

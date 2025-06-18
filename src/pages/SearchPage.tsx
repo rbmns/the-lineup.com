@@ -22,7 +22,7 @@ const VenueResultCard = ({ result, navigate }: { result: any; navigate: ReturnTy
         onClick={() => navigate(`/venues/${result.slug || result.id}`)}
     >
         <CardHeader>
-            <CardTitle className="line-clamp-2">{result.title}</CardTitle>
+            <CardTitle className="line-clamp-2">{result.title || result.name}</CardTitle>
             {result.location && <CardDescription>{result.location}</CardDescription>}
         </CardHeader>
         <CardContent>
@@ -77,8 +77,14 @@ const SearchPage: React.FC = () => {
         await trackClick(query, event.id, 'event');
       }
       
-      // Navigate to event detail page - force using ID-based route
-      const eventPath = `/events/${event.id}`;
+      // Navigate to event detail page using slug if available, otherwise ID
+      let eventPath;
+      if (event.slug) {
+        eventPath = `/events/${event.slug}`;
+      } else {
+        eventPath = `/events/${event.id}`;
+      }
+      
       console.log('Navigating to:', eventPath);
       navigate(eventPath);
     } catch (error) {
