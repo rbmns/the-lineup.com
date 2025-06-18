@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useCallback } from 'react';
 import { Event, UserProfile, Venue } from '@/types';
 import { CasualPlan } from '@/types/casual-plans';
@@ -23,13 +24,6 @@ interface SearchResult {
   keywords?: string[];
   tagline?: string;
   status?: string;
-  start_date?: string;
-  start_time?: string;
-  end_date?: string;
-  image_urls?: string;
-  venues?: any;
-  creator?: any;
-  slug?: string;
   [key: string]: any;
 }
 
@@ -112,37 +106,23 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     
     setIsSearching(true);
     try {
-      console.log('Performing comprehensive search with term:', term);
+      console.log('Performing search with term:', term);
       
       await trackSearch(term);
       
+      // Enhanced search to cover more fields and use OR conditions properly
       const searchPattern = `%${term.toLowerCase()}%`;
       
-      // Search events with better field selection - include events with null status
+      // Search events with comprehensive field coverage
       const { data: eventData, error: eventError } = await supabase
         .from('events')
         .select(`
-          id,
-          title,
-          description,
-          start_date,
-          start_time,
-          end_date,
-          end_time,
-          image_urls,
-          event_category,
-          vibe,
-          tags,
-          destination,
-          area,
-          organiser_name,
-          slug,
-          status,
-          venues!events_venue_id_fkey(id, name, city, street, postal_code, website, google_maps),
-          creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, status, tagline)
+          *,
+          venue_id(*),
+          creator:profiles(id, username, avatar_url, email, location, status, tagline),
+          event_rsvps(id, user_id, status)
         `)
-        .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},destination.ilike.${searchPattern},vibe.ilike.${searchPattern},event_category.ilike.${searchPattern},tags.ilike.${searchPattern},area.ilike.${searchPattern},organiser_name.ilike.${searchPattern}`)
-        .or('status.eq.published,status.is.null')
+        .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},destination.ilike.${searchPattern},vibe.ilike.${searchPattern},event_category.ilike.${searchPattern},tags.cs.{${term}},specific_venue.ilike.${searchPattern}`)
         .order('start_date', { ascending: true });
 
       console.log('Event search query result:', eventData?.length || 0, 'events found');
@@ -153,9 +133,8 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // Search venues
       const { data: venueData, error: venueError } = await supabase
         .from('venues')
-        .select('id, name, city, street, postal_code, website, google_maps, slug')
-        .or(`name.ilike.${searchPattern},city.ilike.${searchPattern},street.ilike.${searchPattern}`)
-        .limit(20);
+        .select('*')
+        .or(`name.ilike.${searchPattern},city.ilike.${searchPattern}`)
 
       console.log('Venue search result:', venueData?.length || 0, 'venues found');
       if (venueError) {
@@ -165,58 +144,20 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // Search casual plans
       const { data: casualPlanData, error: casualPlanError } = await supabase
         .from('casual_plans')
-        .select(`
-          id,
-          title,
-          description,
-          vibe,
-          location,
-          date,
-          time,
-          max_attendees,
-          creator_id,
-          created_at,
-          updated_at
-        `)
+        .select('*, creator_profile:profiles(id, username, avatar_url)')
         .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},vibe.ilike.${searchPattern},location.ilike.${searchPattern}`)
-        .limit(20);
 
       console.log('Casual plan search result:', casualPlanData?.length || 0, 'plans found');
       if (casualPlanError) {
         console.error('Casual plan search error:', casualPlanError);
       }
 
-      // Search event categories
-      const { data: categoryData, error: categoryError } = await supabase
-        .from('event_categories')
-        .select('id, name, created_at')
-        .ilike('name', searchPattern)
-        .limit(10);
-
-      console.log('Category search result:', categoryData?.length || 0, 'categories found');
-      if (categoryError) {
-        console.error('Category search error:', categoryError);
-      }
-
-      // Search event vibes
-      const { data: vibeData, error: vibeError } = await supabase
-        .from('event_vibe')
-        .select('id, name, created_at')
-        .ilike('name', searchPattern)
-        .limit(10);
-
-      console.log('Vibe search result:', vibeData?.length || 0, 'vibes found');
-      if (vibeError) {
-        console.error('Vibe search error:', vibeError);
-      }
-
-      // Format event results
+      // Format results
       const eventResults = (eventData || []).map(event => ({
         ...event,
         type: 'event' as const,
       }));
 
-      // Format venue results
       const venueResults = (venueData || []).map(venue => ({
         ...venue,
         type: 'venue' as const,
@@ -224,133 +165,16 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         location: venue.city,
       }));
 
-      // Format casual plan results with creator profiles
-      let casualPlanResults: SearchResult[] = [];
-      if (casualPlanData && casualPlanData.length > 0) {
-        const creatorIds = casualPlanData.map(plan => plan.creator_id).filter(Boolean);
-        let creatorProfiles: any[] = [];
-        
-        if (creatorIds.length > 0) {
-          const { data: profilesData } = await supabase
-            .from('profiles')
-            .select('id, username, avatar_url')
-            .in('id', creatorIds);
-          
-          creatorProfiles = profilesData || [];
-        }
-
-        casualPlanResults = casualPlanData.map(plan => ({
-          ...plan,
-          type: 'casual_plan' as const,
-          creator_profile: creatorProfiles.find(profile => profile.id === plan.creator_id)
-        }));
-      }
-
-      // If we found matching categories, search for events in those categories
-      let categoryEventResults: SearchResult[] = [];
-      if (categoryData && categoryData.length > 0) {
-        const categoryNames = categoryData.map(cat => cat.name);
-        console.log('Searching for events in matching categories:', categoryNames);
-        const { data: catEventData, error: catEventError } = await supabase
-          .from('events')
-          .select(`
-            id,
-            title,
-            description,
-            start_date,
-            start_time,
-            end_date,
-            end_time,
-            image_urls,
-            event_category,
-            vibe,
-            tags,
-            destination,
-            area,
-            organiser_name,
-            slug,
-            status,
-            venues!events_venue_id_fkey(id, name, city, street, postal_code, website, google_maps),
-            creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, status, tagline)
-          `)
-          .in('event_category', categoryNames)
-          .or('status.eq.published,status.is.null')
-          .order('start_date', { ascending: true })
-          .limit(10);
-
-        if (!catEventError && catEventData) {
-          console.log('Found', catEventData.length, 'events in matching categories');
-          categoryEventResults = catEventData.map(event => ({
-            ...event,
-            type: 'event' as const,
-          }));
-        }
-      }
-
-      // If we found matching vibes, search for events with those vibes
-      let vibeEventResults: SearchResult[] = [];
-      if (vibeData && vibeData.length > 0) {
-        const vibeNames = vibeData.map(vibe => vibe.name);
-        console.log('Searching for events with matching vibes:', vibeNames);
-        const { data: vibeEventData, error: vibeEventError } = await supabase
-          .from('events')
-          .select(`
-            id,
-            title,
-            description,
-            start_date,
-            start_time,
-            end_date,
-            end_time,
-            image_urls,
-            event_category,
-            vibe,
-            tags,
-            destination,
-            area,
-            organiser_name,
-            slug,
-            status,
-            venues!events_venue_id_fkey(id, name, city, street, postal_code, website, google_maps),
-            creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, status, tagline)
-          `)
-          .in('vibe', vibeNames)
-          .or('status.eq.published,status.is.null')
-          .order('start_date', { ascending: true })
-          .limit(10);
-
-        if (!vibeEventError && vibeEventData) {
-          console.log('Found', vibeEventData.length, 'events with matching vibes');
-          vibeEventResults = vibeEventData.map(event => ({
-            ...event,
-            type: 'event' as const,
-          }));
-        }
-      }
+      const casualPlanResults = (casualPlanData || []).map(plan => ({
+        ...plan,
+        type: 'casual_plan' as const,
+      }));
       
-      // Combine all results and remove duplicates
-      const allResults = [
-        ...eventResults,
-        ...venueResults,
-        ...casualPlanResults,
-        ...categoryEventResults,
-        ...vibeEventResults
-      ];
-
-      // Remove duplicates based on id and type
-      const uniqueResults = allResults.filter((result, index, self) =>
-        index === self.findIndex((r) => r.id === result.id && r.type === result.type)
-      );
+      const results: SearchResult[] = [...eventResults, ...venueResults, ...casualPlanResults];
       
-      console.log('Total unique search results found:', uniqueResults.length);
-      console.log('Result breakdown:', {
-        events: uniqueResults.filter(r => r.type === 'event').length,
-        venues: uniqueResults.filter(r => r.type === 'venue').length,
-        casualPlans: uniqueResults.filter(r => r.type === 'casual_plan').length
-      });
-      
-      setSearchResults(uniqueResults);
-      return uniqueResults;
+      console.log('Total search results found:', results.length);
+      setSearchResults(results);
+      return results;
     } catch (error) {
       console.error('Error in performSearch:', error);
       toast.error('Search failed', {
@@ -383,12 +207,11 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         .from('events')
         .select(`
           *,
-          creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, location_category, status, tagline),
+          creator:profiles(id, username, avatar_url, email, location, location_category, status, tagline),
           venues:venue_id(*),
           event_rsvps(id, user_id, status)
         `)
         .eq('event_category', asEqParam(category))
-        .or('status.eq.published,status.is.null')
         .order('start_date', { ascending: true });
         
       if (error) throw error;
@@ -439,10 +262,10 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       let query = supabase.from('events').select(`
         *,
-        creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, location_category, status, tagline),
+        creator:profiles(id, username, avatar_url, email, location, location_category, status, tagline),
         venues:venue_id(*),
         event_rsvps(id, user_id, status)
-      `).or('status.eq.published,status.is.null');
+      `);
       
       if (params.term) {
         const searchPattern = `%${params.term.toLowerCase()}%`;

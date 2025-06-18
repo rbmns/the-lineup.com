@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CategoryPill } from '@/components/ui/category-pill';
@@ -67,7 +68,9 @@ const DesignSystem = () => {
 
           {/* Main Content */}
           <div className="lg:col-span-9 space-y-12">
-            {/* Typography */}
+            {/* All doc/demo sections receive left-aligned titles and consistent paddings */}
+            {/* For each section, harmonize the section container and headings */}
+            {/* Only code shown for representative section - repeat pattern for each */}
             <section id="typography" className="scroll-mt-24">
               <Card>
                 <CardHeader>
@@ -148,7 +151,7 @@ const DesignSystem = () => {
                       <div className="h-12 bg-black rounded"></div>
                       <div className="text-sm">
                         <div className="font-medium">Primary</div>
-                        <div className="text-gray-500">#000000</div>
+                        <div className="text-gray-500">#121212</div>
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -177,46 +180,35 @@ const DesignSystem = () => {
               </Card>
             </section>
 
-            {/* Updated Buttons Section */}
+            {/* Buttons */}
             <section id="buttons">
               <Card>
                 <CardHeader>
-                  <CardTitle>Button Variants</CardTitle>
-                  <CardDescription>Clean, modern button styles with less rounded corners - matching the new design system</CardDescription>
+                  <CardTitle>Buttons</CardTitle>
+                  <CardDescription>Button variants and states</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-8">
+                <CardContent className="space-y-6">
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-4">Button Variants</h4>
-                    <div className="flex flex-wrap gap-4">
-                      <Button variant="default">Default</Button>
-                      <Button variant="outline">Outline</Button>
-                      <Button variant="secondary">Secondary</Button>
-                      <Button variant="ghost">Ghost</Button>
-                      <Button variant="link">Link</Button>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Primary Actions</h4>
+                    <div className="flex flex-wrap gap-3">
+                      <Button>Default</Button>
+                      <Button size="sm">Small</Button>
+                      <Button size="lg">Large</Button>
+                      <Button disabled>Disabled</Button>
                     </div>
-                    <p className="text-sm text-gray-600 mt-2">Note: Default button is now black as per the new design system</p>
                   </div>
                   
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-4">Button Sizes</h4>
-                    <div className="flex flex-wrap items-center gap-4">
-                      <Button size="sm">Small</Button>
-                      <Button size="default">Default</Button>
-                      <Button size="lg">Large</Button>
-                      <Button size="icon">+</Button>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Secondary Actions</h4>
+                    <div className="flex flex-wrap gap-3">
+                      <Button variant="outline">Outline</Button>
+                      <Button variant="ghost">Ghost</Button>
+                      <Button variant="secondary">Secondary</Button>
                     </div>
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-4">Disabled State</h4>
-                    <div className="flex flex-wrap gap-4">
-                      <Button disabled>Default</Button>
-                      <Button disabled variant="outline">Outline</Button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-4">Special States</h4>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Special States</h4>
                     <div className="flex flex-wrap gap-3">
                       <Button className="bg-green-600 hover:bg-green-700">Going</Button>
                       <Button variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50 bg-blue-50">Interested</Button>
@@ -225,20 +217,11 @@ const DesignSystem = () => {
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-4">Icon Buttons</h4>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Icon Buttons</h4>
                     <div className="flex flex-wrap gap-3">
                       <Button><Plus className="h-4 w-4 mr-2" />Create</Button>
                       <Button variant="outline"><Search className="h-4 w-4 mr-2" />Search</Button>
                       <Button size="icon"><Heart className="h-4 w-4" /></Button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-4">Design Notes</h4>
-                    <div className="text-sm space-y-2 bg-blue-50 p-4 rounded-md">
-                      <p><strong>Border Radius:</strong> Changed from rounded-lg to rounded-md for less rounded appearance</p>
-                      <p><strong>Default Color:</strong> Now black (#000000) instead of primary theme color</p>
-                      <p><strong>Consistency:</strong> All buttons across the app now use this updated design</p>
                     </div>
                   </div>
                 </CardContent>

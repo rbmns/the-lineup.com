@@ -3,23 +3,39 @@ import React, { useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useSearch } from '@/contexts/SearchContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, MapPin } from 'lucide-react';
 import { Event } from '@/types';
 import { CasualPlan } from '@/types/casual-plans';
 import { Skeleton } from '@/components/ui/skeleton';
+import { navigateToEvent } from '@/utils/navigationUtils';
 import { EventCard } from '@/components/EventCard';
 import { CasualPlanCard } from '@/components/casual-plans/CasualPlanCard';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCasualPlansMutations } from '@/hooks/casual-plans/useCasualPlansMutations';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { filterUpcomingEvents } from '@/utils/date-filtering';
-import { isAfter, subDays } from 'date-fns';
+
+const VenueResultCard = ({ result, navigate }: { result: any; navigate: ReturnType<typeof useNavigate> }) => (
+    <Card 
+        className="cursor-pointer hover:shadow-lg transition-shadow h-full"
+        onClick={() => navigate(`/venues/${result.slug || result.id}`)}
+    >
+        <CardHeader>
+            <CardTitle className="line-clamp-2">{result.title}</CardTitle>
+            {result.location && <CardDescription>{result.location}</CardDescription>}
+        </CardHeader>
+        <CardContent>
+            <p className="text-sm text-muted-foreground flex items-center"><MapPin className="h-4 w-4 mr-2" />Venue</p>
+        </CardContent>
+    </Card>
+);
 
 const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { searchResults, isSearching, performSearch, setSearchResults, trackClick } = useSearch();
+  const { searchResults, isSearching, performSearch, setSearchResults } = useSearch();
   const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   const { 
@@ -35,7 +51,6 @@ const SearchPage: React.FC = () => {
 
   useEffect(() => {
     if (query) {
-      console.log('SearchPage: Performing search for query:', query);
       performSearch(query);
     } else {
         setSearchResults([]);
@@ -53,118 +68,15 @@ const SearchPage: React.FC = () => {
     navigate('/login');
   };
 
-  // Handle event card click with proper navigation and tracking
-  const handleEventClick = async (event: Event) => {
-    try {
-      console.log('Search page - handling event click for event:', event.id);
-      
-      // Track the click
-      if (query) {
-        await trackClick(query, event.id, 'event');
-      }
-      
-      // Navigate to event detail page using ID (more reliable than slug)
-      const eventPath = `/events/${event.id}`;
-      
-      console.log('Navigating to:', eventPath);
-      navigate(eventPath);
-    } catch (error) {
-      console.error('Error handling event click:', error);
-      // Still navigate even if tracking fails
-      navigate(`/events/${event.id}`);
-    }
-  };
-
-  // Filter search results to include recent past events (within last 30 days) and all upcoming events
-  const filterRelevantEvents = (events: Event[]): Event[] => {
-    const thirtyDaysAgo = subDays(new Date(), 30);
-    
-    return events.filter(event => {
-      if (!event.start_date) return true; // Keep events without start_date
-      
-      const eventDate = new Date(event.start_date);
-      // Include events that are upcoming OR within the last 30 days
-      return isAfter(eventDate, thirtyDaysAgo);
-    });
-  };
-
-  // Convert search results to proper Event objects for EventCard
-  const convertSearchResultToEvent = (result: any): Event => {
-    return {
-      id: result.id,
-      title: result.title || '',
-      description: result.description || '',
-      start_date: result.start_date,
-      start_time: result.start_time,
-      end_date: result.end_date,
-      end_time: result.end_time,
-      image_urls: result.image_urls ? [result.image_urls] : [],
-      event_category: result.event_category,
-      vibe: result.vibe,
-      tags: result.tags ? (typeof result.tags === 'string' ? [result.tags] : result.tags) : [],
-      location: result.destination || result.area || '',
-      venues: result.venues,
-      creator: result.creator,
-      slug: result.slug,
-      status: result.status || 'published',
-      // Add other required fields with defaults
-      created_at: result.created_at || new Date().toISOString(),
-      updated_at: result.updated_at || new Date().toISOString(),
-      attendees: {
-        going: 0,
-        interested: 0
-      },
-      area: result.area,
-      google_maps: result.venues?.google_maps || null,
-      organizer_link: result.organizer_link || null,
-      extra_info: result['Extra info'] || null,
-      fee: result.fee,
-      venue_id: result.venue_id
-    } as Event;
-  };
-
-  // Filter and process search results
-  const processedResults = searchResults
-    .filter(result => {
-      const isValidType = result.type === 'event' || result.type === 'casual_plan';
-      console.log('SearchPage: Filtering result:', result.id, 'type:', result.type, 'isValidType:', isValidType);
-      return isValidType;
-    })
-    .map(result => {
-      if (result.type === 'event') {
-        const eventResult = convertSearchResultToEvent(result);
-        // For search results, show recent past events too (within last 30 days)
-        const relevantEvents = filterRelevantEvents([eventResult]);
-        const isRelevant = relevantEvents.length > 0;
-        console.log('SearchPage: Event', result.id, 'isRelevant:', isRelevant, 'title:', result.title);
-        return isRelevant ? result : null;
-      }
-      return result;
-    }).filter(Boolean);
-
-  // Separate upcoming and past events for display
-  const upcomingEvents = processedResults.filter(result => {
+  // Filter search results to only show upcoming events
+  const filteredSearchResults = searchResults.map(result => {
     if (result.type === 'event') {
-      const eventResult = convertSearchResultToEvent(result);
-      const upcomingEventsList = filterUpcomingEvents([eventResult]);
-      return upcomingEventsList.length > 0;
+      // Filter out past events
+      const upcomingEvents = filterUpcomingEvents([result as unknown as Event]);
+      return upcomingEvents.length > 0 ? result : null;
     }
-    return true; // Include casual plans
-  });
-
-  const pastEvents = processedResults.filter(result => {
-    if (result.type === 'event') {
-      const eventResult = convertSearchResultToEvent(result);
-      const upcomingEventsList = filterUpcomingEvents([eventResult]);
-      return upcomingEventsList.length === 0; // This is a past event
-    }
-    return false; // Don't include casual plans in past events
-  });
-
-  console.log('SearchPage: Final processed results count:', processedResults.length);
-  console.log('SearchPage: Upcoming events count:', upcomingEvents.length);
-  console.log('SearchPage: Past events count:', pastEvents.length);
-  console.log('SearchPage: Raw search results count:', searchResults.length);
+    return result;
+  }).filter(Boolean);
 
   return (
     <div className={`${isMobile ? 'px-3 py-4' : 'container mx-auto px-4 py-8'} min-h-screen`}>
@@ -181,86 +93,40 @@ const SearchPage: React.FC = () => {
         <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}`}>
           {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-48 w-full" />)}
         </div>
-      ) : processedResults.length > 0 ? (
-        <div className="space-y-8">
-          {/* Upcoming Events */}
-          {upcomingEvents.length > 0 && (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                Upcoming Events ({upcomingEvents.length})
-              </h2>
-              <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}`}>
-                {upcomingEvents.map((result) => {
-                  if (result.type === 'event') {
-                    const event = convertSearchResultToEvent(result);
-                    return (
-                      <EventCard 
-                        key={event.id} 
-                        event={event} 
-                        onClick={handleEventClick}
-                        showRsvpButtons={false}
-                      />
-                    );
-                  }
-                  if (result.type === 'casual_plan') {
-                    const plan = result as unknown as CasualPlan;
-                    return (
-                      <CasualPlanCard 
-                        key={plan.id} 
-                        plan={plan}
-                        onJoin={joinPlan}
-                        onLeave={leavePlan}
-                        onRsvp={rsvpToPlan}
-                        isJoining={loadingPlanId === plan.id}
-                        isLeaving={loadingPlanId === plan.id}
-                        isAuthenticated={isAuthenticated}
-                        onLoginPrompt={handleLoginPrompt}
-                        loadingPlanId={loadingPlanId}
-                      />
-                    );
-                  }
-                  return null;
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Recent Past Events */}
-          {pastEvents.length > 0 && (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-600 mb-4">
-                Recent Past Events ({pastEvents.length})
-              </h2>
-              <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}`}>
-                {pastEvents.map((result) => {
-                  if (result.type === 'event') {
-                    const event = convertSearchResultToEvent(result);
-                    return (
-                      <EventCard 
-                        key={event.id} 
-                        event={event} 
-                        onClick={handleEventClick}
-                        showRsvpButtons={false}
-                        className="opacity-75" // Slightly dimmed to indicate past event
-                      />
-                    );
-                  }
-                  return null;
-                })}
-              </div>
-            </div>
-          )}
+      ) : filteredSearchResults.length > 0 ? (
+        <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}`}>
+          {filteredSearchResults.map((result) => {
+            if (result.type === 'event') {
+              return <EventCard key={result.id} event={result as unknown as Event} onClick={(event) => navigateToEvent(event.id, navigate)} />;
+            }
+            if (result.type === 'casual_plan') {
+              const plan = result as unknown as CasualPlan;
+              return (
+                <CasualPlanCard 
+                  key={plan.id} 
+                  plan={plan}
+                  onJoin={joinPlan}
+                  onLeave={leavePlan}
+                  onRsvp={rsvpToPlan}
+                  isJoining={loadingPlanId === plan.id}
+                  isLeaving={loadingPlanId === plan.id}
+                  isAuthenticated={isAuthenticated}
+                  onLoginPrompt={handleLoginPrompt}
+                  loadingPlanId={loadingPlanId}
+                />
+              );
+            }
+            if (result.type === 'venue') {
+              return <VenueResultCard key={result.id} result={result} navigate={navigate} />;
+            }
+            return null;
+          })}
         </div>
       ) : (
         !isSearching && query && (
           <div className="text-center py-12">
             <h2 className="text-xl font-medium text-gray-900">No results found</h2>
-            <p className="text-gray-600 mt-2">
-              Try a different search term or check your spelling.
-            </p>
-            <p className="text-sm text-gray-500 mt-1">
-              Found {searchResults.length} total results, but none match your criteria
-            </p>
+            <p className="text-gray-600 mt-2">Try a different search term.</p>
           </div>
         )
       )}

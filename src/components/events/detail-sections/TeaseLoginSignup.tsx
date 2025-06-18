@@ -27,7 +27,7 @@ const TeaseLoginSignup = () => {
         <div className="pt-2">
           <Button 
             onClick={handleSignUp} 
-            variant="default"
+            variant="primary"
             className="w-full"
           >
             Sign up

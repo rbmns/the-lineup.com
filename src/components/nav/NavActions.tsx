@@ -94,7 +94,7 @@ export const NavActions: React.FC<NavActionsProps> = ({
             <Button 
               size="sm" 
               onClick={() => navigate('/login', { state: { initialMode: 'register' } })} 
-              className="bg-gray-900 hover:bg-gray-800 text-white text-sm px-6 flex-shrink-0"
+              className="bg-gray-900 hover:bg-gray-800 text-white rounded-full text-sm px-6 flex-shrink-0"
             >
               Sign Up
             </Button>

@@ -54,29 +54,21 @@ const MainNav = () => {
               "flex items-center h-full flex-shrink-0",
               isMobile ? "min-w-0 max-w-[140px]" : "min-w-0"
             )}>
-              {/* Only show wordmark on mobile, icon + wordmark on desktop */}
-              {isMobile ? (
-                <Link to="/" className="flex items-center group transition-all duration-300">
-                  <span className="text-xl font-bold lowercase text-black group-hover:text-gray-700 transition-colors">
-                    thelineup
-                  </span>
-                </Link>
-              ) : (
-                <>
-                  <Link to="/" className="flex items-center justify-center mr-2 flex-shrink-0">
-                    <img 
-                      src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" 
-                      alt="thelineup Symbol" 
-                      className="w-7 h-7" 
-                      style={{ display: 'block' }} 
-                    />
-                  </Link>
-                  <BrandLogo 
-                    showText={true} 
-                    className="ml-0 min-w-0" 
-                  />
-                </>
-              )}
+              <Link to="/" className="flex items-center justify-center mr-2 flex-shrink-0">
+                <img 
+                  src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" 
+                  alt="thelineup Symbol" 
+                  className={isMobile ? "w-6 h-6" : "w-7 h-7"} 
+                  style={{ display: 'block' }} 
+                />
+              </Link>
+              <BrandLogo 
+                showText={!isMobile} 
+                className={cn(
+                  "ml-0 min-w-0",
+                  isMobile && "max-w-[100px] overflow-hidden"
+                )} 
+              />
             </div>
 
             {/* Center-Right - Search Bar for desktop */}
