@@ -23,7 +23,7 @@ export const useEvents = (
     queryKey: ['events', userId, options],
     queryFn: async () => {
       try {
-        console.log('Fetching events for user:', userId, 'with options:', options);
+        console.log('🔍 Fetching events for user:', userId, 'with options:', options);
         
         // Build the query
         let query = supabase
@@ -38,17 +38,24 @@ export const useEvents = (
 
         // If not including all statuses (admin view), filter to published events only
         if (!options.includeAllStatuses) {
+          console.log('🔍 Filtering to published events only');
           query = query.eq('status', 'published');
+        } else {
+          console.log('🔍 Including all event statuses');
         }
         
         const { data, error } = await query;
         
         if (error) {
-          console.error('Error fetching events:', error);
+          console.error('❌ Error fetching events:', error);
           throw error;
         }
 
+        console.log('📊 Raw events data from database:', data?.length || 0, 'events');
+        console.log('📊 Sample event statuses:', data?.slice(0, 3).map(e => ({ id: e.id, title: e.title, status: e.status })));
+
         if (!data) {
+          console.log('⚠️ No data returned from query');
           return [];
         }
         
@@ -76,26 +83,32 @@ export const useEvents = (
         
         // Process the events data
         const processedEvents = processEventsData(eventsWithCreators, userId);
+        console.log('🔄 Processed events:', processedEvents?.length || 0);
         
         if (options.includePastEvents) {
-          console.log(`Total events fetched (including past): ${processedEvents.length}`);
+          console.log(`✅ Returning all events (including past): ${processedEvents.length}`);
           return processedEvents;
         }
         
         // Apply time-based filtering to only show upcoming events
         const filteredEvents = filterUpcomingEvents(processedEvents);
         
-        console.log(`Total events fetched: ${processedEvents.length}`);
-        console.log(`Filtered events after time filtering: ${filteredEvents.length}`);
+        console.log(`📅 Events after time filtering: ${filteredEvents.length} (from ${processedEvents.length} total)`);
         
         return filteredEvents;
       } catch (error) {
-        console.error('Error in useEvents:', error);
+        console.error('💥 Error in useEvents:', error);
         return [];
       }
     },
     refetchOnWindowFocus: true,
     staleTime: 1000 * 10, // Reduced stale time to 10 seconds for more frequent updates
+  });
+
+  console.log('🎯 useEvents hook result:', { 
+    dataLength: data?.length || 0, 
+    isLoading, 
+    hasError: !!error 
   });
 
   return {
