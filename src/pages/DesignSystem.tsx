@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CategoryPill } from '@/components/ui/category-pill';
@@ -189,10 +190,12 @@ const DesignSystem = () => {
                     <h4 className="text-sm font-medium text-gray-700 mb-4">Button Variants</h4>
                     <div className="flex flex-wrap gap-4">
                       <Button variant="default">Default</Button>
+                      <Button variant="primary">Primary</Button>
                       <Button variant="outline">Outline</Button>
                       <Button variant="secondary">Secondary</Button>
                       <Button variant="ghost">Ghost</Button>
                       <Button variant="link">Link</Button>
+                      <Button variant="dark">Dark</Button>
                     </div>
                   </div>
                   
