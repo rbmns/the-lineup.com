@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { Event } from '@/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 
 const EventStatusUpdater = ({ event }: { event: Event }) => {
   const queryClient = useQueryClient();
@@ -43,7 +44,7 @@ const EventStatusUpdater = ({ event }: { event: Event }) => {
 
   return (
     <Select
-      defaultValue={event.status}
+      defaultValue={event.status || 'draft'}
       onValueChange={(newStatus) => {
         if (event.id) {
             updateStatus({ eventId: event.id, status: newStatus });
@@ -64,15 +65,37 @@ const EventStatusUpdater = ({ event }: { event: Event }) => {
   );
 };
 
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'published':
+      return 'bg-green-100 text-green-800';
+    case 'pending_approval':
+      return 'bg-yellow-100 text-yellow-800';
+    case 'rejected':
+      return 'bg-red-100 text-red-800';
+    default:
+      return 'bg-gray-100 text-gray-800';
+  }
+};
+
 export const EventsTable = () => {
-  const { data: events, isLoading } = useEvents(undefined, { includePastEvents: true });
+  // Use includePastEvents: true and includeAllStatuses: true for admin view
+  const { data: events, isLoading } = useEvents(undefined, { 
+    includePastEvents: true,
+    includeAllStatuses: true 
+  });
 
   if (isLoading) {
     return <Skeleton className="h-96 w-full" />;
   }
 
   if (!events || events.length === 0) {
-    return <p>No events found.</p>;
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-500 mb-4">No events found.</p>
+        <p className="text-sm text-gray-400">Events will appear here once they are created.</p>
+      </div>
+    );
   }
 
   return (
@@ -84,18 +107,30 @@ export const EventsTable = () => {
             <TableHead>Creator</TableHead>
             <TableHead>Venue</TableHead>
             <TableHead>Start Date</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>Current Status</TableHead>
+            <TableHead>Update Status</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {events.map((event) => (
             <TableRow key={event.id}>
-              <TableCell className="font-medium">{event.title}</TableCell>
-              <TableCell>{event.creator?.username || 'N/A'}</TableCell>
-              <TableCell>{event.venues?.name || 'N/A'}</TableCell>
+              <TableCell className="font-medium">
+                {event.title || 'Untitled Event'}
+              </TableCell>
               <TableCell>
-                {event.start_date ? format(new Date(event.start_date), 'PPP') : 'N/A'}
+                {event.creator?.username || 'Unknown Creator'}
+              </TableCell>
+              <TableCell>
+                {event.venues?.name || 'No Venue'}
+              </TableCell>
+              <TableCell>
+                {event.start_date ? format(new Date(event.start_date), 'PPP') : 'No Date'}
+              </TableCell>
+              <TableCell>
+                <Badge className={getStatusColor(event.status || 'draft')}>
+                  {event.status || 'draft'}
+                </Badge>
               </TableCell>
               <TableCell>
                 <EventStatusUpdater event={event} />
