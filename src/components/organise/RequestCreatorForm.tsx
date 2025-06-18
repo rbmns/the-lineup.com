@@ -12,10 +12,9 @@ import { useCreatorStatus } from '@/hooks/useCreatorStatus';
 
 export const RequestCreatorForm: React.FC = () => {
   const [formData, setFormData] = useState({
-    businessName: '',
-    businessType: '',
-    experience: '',
-    reason: ''
+    reason: '',
+    contactEmail: '',
+    contactPhone: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -28,12 +27,10 @@ export const RequestCreatorForm: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      await CreatorRequestService.submitCreatorRequest({
-        user_id: user.id,
-        business_name: formData.businessName,
-        business_type: formData.businessType,
-        experience: formData.experience,
-        reason: formData.reason
+      await CreatorRequestService.requestCreatorAccess(user.id, {
+        reason: formData.reason,
+        contact_email: formData.contactEmail || undefined,
+        contact_phone: formData.contactPhone || undefined,
       });
 
       toast({
@@ -42,10 +39,9 @@ export const RequestCreatorForm: React.FC = () => {
       });
 
       setFormData({
-        businessName: '',
-        businessType: '',
-        experience: '',
-        reason: ''
+        reason: '',
+        contactEmail: '',
+        contactPhone: ''
       });
     } catch (error) {
       console.error('Error submitting creator request:', error);
@@ -98,48 +94,36 @@ export const RequestCreatorForm: React.FC = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="businessName">Business/Organization Name</Label>
-              <Input
-                id="businessName"
-                value={formData.businessName}
-                onChange={(e) => handleChange('businessName', e.target.value)}
-                placeholder="Enter your business or organization name"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="businessType">Type of Business/Organization</Label>
-              <Input
-                id="businessType"
-                value={formData.businessType}
-                onChange={(e) => handleChange('businessType', e.target.value)}
-                placeholder="e.g., Restaurant, Fitness Studio, Community Group"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="experience">Event Organization Experience</Label>
-              <Textarea
-                id="experience"
-                value={formData.experience}
-                onChange={(e) => handleChange('experience', e.target.value)}
-                placeholder="Tell us about your experience organizing events (if any)"
-                rows={3}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="reason">Why do you want to organize events?</Label>
               <Textarea
                 id="reason"
                 value={formData.reason}
                 onChange={(e) => handleChange('reason', e.target.value)}
-                placeholder="What types of events would you like to create and why?"
-                rows={3}
+                placeholder="Tell us about your goals and what types of events you'd like to create"
+                rows={4}
                 required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="contactEmail">Contact Email (Optional)</Label>
+              <Input
+                id="contactEmail"
+                type="email"
+                value={formData.contactEmail}
+                onChange={(e) => handleChange('contactEmail', e.target.value)}
+                placeholder="Alternative contact email"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="contactPhone">Contact Phone (Optional)</Label>
+              <Input
+                id="contactPhone"
+                type="tel"
+                value={formData.contactPhone}
+                onChange={(e) => handleChange('contactPhone', e.target.value)}
+                placeholder="Your phone number"
               />
             </div>
 
