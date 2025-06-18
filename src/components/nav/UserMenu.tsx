@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
-import { Settings, LogOut, User as UserIcon, Calendar } from 'lucide-react';
+import { Settings, LogOut, User as UserIcon, Calendar, Users } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export interface UserMenuProps {
@@ -62,6 +62,12 @@ const UserMenu = ({ user, profile, handleSignOut, canCreateEvents }: UserMenuPro
           <Link to="/profile" className="w-full cursor-pointer">
             <UserIcon className="mr-2 h-4 w-4" />
             <span>Profile</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to="/organise" className="w-full cursor-pointer">
+            <Users className="mr-2 h-4 w-4" />
+            <span>Organise</span>
           </Link>
         </DropdownMenuItem>
         {canCreateEvents && (
