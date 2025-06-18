@@ -23,6 +23,13 @@ interface SearchResult {
   keywords?: string[];
   tagline?: string;
   status?: string;
+  start_date?: string;
+  start_time?: string;
+  end_date?: string;
+  image_urls?: string;
+  venues?: any;
+  creator?: any;
+  slug?: string;
   [key: string]: any;
 }
 
@@ -111,14 +118,28 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       const searchPattern = `%${term.toLowerCase()}%`;
       
-      // Search events with corrected relationship specification
+      // Search events with better field selection
       const { data: eventData, error: eventError } = await supabase
         .from('events')
         .select(`
-          *,
-          venues!events_venue_id_fkey(*),
-          creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, status, tagline),
-          event_rsvps(id, user_id, status)
+          id,
+          title,
+          description,
+          start_date,
+          start_time,
+          end_date,
+          end_time,
+          image_urls,
+          event_category,
+          vibe,
+          tags,
+          destination,
+          area,
+          organiser_name,
+          slug,
+          status,
+          venues!events_venue_id_fkey(id, name, city, street, postal_code, website, google_maps),
+          creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, status, tagline)
         `)
         .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},destination.ilike.${searchPattern},vibe.ilike.${searchPattern},event_category.ilike.${searchPattern},tags.ilike.${searchPattern},area.ilike.${searchPattern},organiser_name.ilike.${searchPattern}`)
         .eq('status', 'published')
@@ -129,17 +150,10 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         console.error('Event search error:', eventError);
       }
 
-      // Log some details about found events for debugging
-      if (eventData) {
-        eventData.forEach(event => {
-          console.log('Found event:', event.title, 'start_date:', event.start_date, 'category:', event.event_category);
-        });
-      }
-
       // Search venues
       const { data: venueData, error: venueError } = await supabase
         .from('venues')
-        .select('*')
+        .select('id, name, city, street, postal_code, website, google_maps, slug')
         .or(`name.ilike.${searchPattern},city.ilike.${searchPattern},street.ilike.${searchPattern}`)
         .limit(20);
 
@@ -148,10 +162,22 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         console.error('Venue search error:', venueError);
       }
 
-      // Search casual plans - simplified query without the problematic relationship
+      // Search casual plans
       const { data: casualPlanData, error: casualPlanError } = await supabase
         .from('casual_plans')
-        .select('*')
+        .select(`
+          id,
+          title,
+          description,
+          vibe,
+          location,
+          date,
+          time,
+          max_attendees,
+          creator_id,
+          created_at,
+          updated_at
+        `)
         .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},vibe.ilike.${searchPattern},location.ilike.${searchPattern}`)
         .limit(20);
 
@@ -160,32 +186,10 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         console.error('Casual plan search error:', casualPlanError);
       }
 
-      // If we have casual plans, fetch their creator profiles separately
-      let casualPlanResults: SearchResult[] = [];
-      if (casualPlanData && casualPlanData.length > 0) {
-        const creatorIds = casualPlanData.map(plan => plan.creator_id).filter(Boolean);
-        let creatorProfiles: any[] = [];
-        
-        if (creatorIds.length > 0) {
-          const { data: profilesData } = await supabase
-            .from('profiles')
-            .select('id, username, avatar_url')
-            .in('id', creatorIds);
-          
-          creatorProfiles = profilesData || [];
-        }
-
-        casualPlanResults = casualPlanData.map(plan => ({
-          ...plan,
-          type: 'casual_plan' as const,
-          creator_profile: creatorProfiles.find(profile => profile.id === plan.creator_id)
-        }));
-      }
-
       // Search event categories
       const { data: categoryData, error: categoryError } = await supabase
         .from('event_categories')
-        .select('*')
+        .select('id, name, created_at')
         .ilike('name', searchPattern)
         .limit(10);
 
@@ -197,7 +201,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // Search event vibes
       const { data: vibeData, error: vibeError } = await supabase
         .from('event_vibe')
-        .select('*')
+        .select('id, name, created_at')
         .ilike('name', searchPattern)
         .limit(10);
 
@@ -220,7 +224,29 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         location: venue.city,
       }));
 
-      // If we found matching categories, also search for events in those categories
+      // Format casual plan results with creator profiles
+      let casualPlanResults: SearchResult[] = [];
+      if (casualPlanData && casualPlanData.length > 0) {
+        const creatorIds = casualPlanData.map(plan => plan.creator_id).filter(Boolean);
+        let creatorProfiles: any[] = [];
+        
+        if (creatorIds.length > 0) {
+          const { data: profilesData } = await supabase
+            .from('profiles')
+            .select('id, username, avatar_url')
+            .in('id', creatorIds);
+          
+          creatorProfiles = profilesData || [];
+        }
+
+        casualPlanResults = casualPlanData.map(plan => ({
+          ...plan,
+          type: 'casual_plan' as const,
+          creator_profile: creatorProfiles.find(profile => profile.id === plan.creator_id)
+        }));
+      }
+
+      // If we found matching categories, search for events in those categories
       let categoryEventResults: SearchResult[] = [];
       if (categoryData && categoryData.length > 0) {
         const categoryNames = categoryData.map(cat => cat.name);
@@ -228,10 +254,24 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         const { data: catEventData, error: catEventError } = await supabase
           .from('events')
           .select(`
-            *,
-            venues!events_venue_id_fkey(*),
-            creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, status, tagline),
-            event_rsvps(id, user_id, status)
+            id,
+            title,
+            description,
+            start_date,
+            start_time,
+            end_date,
+            end_time,
+            image_urls,
+            event_category,
+            vibe,
+            tags,
+            destination,
+            area,
+            organiser_name,
+            slug,
+            status,
+            venues!events_venue_id_fkey(id, name, city, street, postal_code, website, google_maps),
+            creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, status, tagline)
           `)
           .in('event_category', categoryNames)
           .eq('status', 'published')
@@ -247,7 +287,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         }
       }
 
-      // If we found matching vibes, also search for events with those vibes
+      // If we found matching vibes, search for events with those vibes
       let vibeEventResults: SearchResult[] = [];
       if (vibeData && vibeData.length > 0) {
         const vibeNames = vibeData.map(vibe => vibe.name);
@@ -255,10 +295,24 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         const { data: vibeEventData, error: vibeEventError } = await supabase
           .from('events')
           .select(`
-            *,
-            venues!events_venue_id_fkey(*),
-            creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, status, tagline),
-            event_rsvps(id, user_id, status)
+            id,
+            title,
+            description,
+            start_date,
+            start_time,
+            end_date,
+            end_time,
+            image_urls,
+            event_category,
+            vibe,
+            tags,
+            destination,
+            area,
+            organiser_name,
+            slug,
+            status,
+            venues!events_venue_id_fkey(id, name, city, street, postal_code, website, google_maps),
+            creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, status, tagline)
           `)
           .in('vibe', vibeNames)
           .eq('status', 'published')

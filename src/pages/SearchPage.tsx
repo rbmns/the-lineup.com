@@ -63,19 +63,14 @@ const SearchPage: React.FC = () => {
         await trackClick(query, event.id, 'event');
       }
       
-      // Navigate to event detail page using slug if available, otherwise ID
-      let eventPath;
-      if (event.slug) {
-        eventPath = `/events/${event.slug}`;
-      } else {
-        eventPath = `/events/${event.id}`;
-      }
+      // Navigate to event detail page using ID (more reliable than slug)
+      const eventPath = `/events/${event.id}`;
       
       console.log('Navigating to:', eventPath);
       navigate(eventPath);
     } catch (error) {
       console.error('Error handling event click:', error);
-      // Still navigate even if tracking fails - use fallback
+      // Still navigate even if tracking fails
       navigate(`/events/${event.id}`);
     }
   };
@@ -93,8 +88,43 @@ const SearchPage: React.FC = () => {
     });
   };
 
-  // Filter search results and add better debugging
-  const filteredSearchResults = searchResults
+  // Convert search results to proper Event objects for EventCard
+  const convertSearchResultToEvent = (result: any): Event => {
+    return {
+      id: result.id,
+      title: result.title || '',
+      description: result.description || '',
+      start_date: result.start_date,
+      start_time: result.start_time,
+      end_date: result.end_date,
+      end_time: result.end_time,
+      image_urls: result.image_urls ? [result.image_urls] : [],
+      event_category: result.event_category,
+      vibe: result.vibe,
+      tags: result.tags ? (typeof result.tags === 'string' ? [result.tags] : result.tags) : [],
+      location: result.destination || result.area || '',
+      venues: result.venues,
+      creator: result.creator,
+      slug: result.slug,
+      status: result.status || 'published',
+      // Add other required fields with defaults
+      created_at: result.created_at || new Date().toISOString(),
+      updated_at: result.updated_at || new Date().toISOString(),
+      attendees: {
+        going: 0,
+        interested: 0
+      },
+      area: result.area,
+      google_maps: result.venues?.google_maps || null,
+      organizer_link: result.organizer_link || null,
+      extra_info: result['Extra info'] || null,
+      fee: result.fee,
+      venue_id: result.venue_id
+    } as Event;
+  };
+
+  // Filter and process search results
+  const processedResults = searchResults
     .filter(result => {
       const isValidType = result.type === 'event' || result.type === 'casual_plan';
       console.log('SearchPage: Filtering result:', result.id, 'type:', result.type, 'isValidType:', isValidType);
@@ -102,8 +132,9 @@ const SearchPage: React.FC = () => {
     })
     .map(result => {
       if (result.type === 'event') {
+        const eventResult = convertSearchResultToEvent(result);
         // For search results, show recent past events too (within last 30 days)
-        const relevantEvents = filterRelevantEvents([result as unknown as Event]);
+        const relevantEvents = filterRelevantEvents([eventResult]);
         const isRelevant = relevantEvents.length > 0;
         console.log('SearchPage: Event', result.id, 'isRelevant:', isRelevant, 'title:', result.title);
         return isRelevant ? result : null;
@@ -112,23 +143,25 @@ const SearchPage: React.FC = () => {
     }).filter(Boolean);
 
   // Separate upcoming and past events for display
-  const upcomingEvents = filteredSearchResults.filter(result => {
+  const upcomingEvents = processedResults.filter(result => {
     if (result.type === 'event') {
-      const upcomingEventsList = filterUpcomingEvents([result as unknown as Event]);
+      const eventResult = convertSearchResultToEvent(result);
+      const upcomingEventsList = filterUpcomingEvents([eventResult]);
       return upcomingEventsList.length > 0;
     }
     return true; // Include casual plans
   });
 
-  const pastEvents = filteredSearchResults.filter(result => {
+  const pastEvents = processedResults.filter(result => {
     if (result.type === 'event') {
-      const upcomingEventsList = filterUpcomingEvents([result as unknown as Event]);
+      const eventResult = convertSearchResultToEvent(result);
+      const upcomingEventsList = filterUpcomingEvents([eventResult]);
       return upcomingEventsList.length === 0; // This is a past event
     }
     return false; // Don't include casual plans in past events
   });
 
-  console.log('SearchPage: Final filtered results count:', filteredSearchResults.length);
+  console.log('SearchPage: Final processed results count:', processedResults.length);
   console.log('SearchPage: Upcoming events count:', upcomingEvents.length);
   console.log('SearchPage: Past events count:', pastEvents.length);
   console.log('SearchPage: Raw search results count:', searchResults.length);
@@ -148,7 +181,7 @@ const SearchPage: React.FC = () => {
         <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}`}>
           {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-48 w-full" />)}
         </div>
-      ) : filteredSearchResults.length > 0 ? (
+      ) : processedResults.length > 0 ? (
         <div className="space-y-8">
           {/* Upcoming Events */}
           {upcomingEvents.length > 0 && (
@@ -159,7 +192,7 @@ const SearchPage: React.FC = () => {
               <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}`}>
                 {upcomingEvents.map((result) => {
                   if (result.type === 'event') {
-                    const event = result as unknown as Event;
+                    const event = convertSearchResultToEvent(result);
                     return (
                       <EventCard 
                         key={event.id} 
@@ -201,7 +234,7 @@ const SearchPage: React.FC = () => {
               <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}`}>
                 {pastEvents.map((result) => {
                   if (result.type === 'event') {
-                    const event = result as unknown as Event;
+                    const event = convertSearchResultToEvent(result);
                     return (
                       <EventCard 
                         key={event.id} 
