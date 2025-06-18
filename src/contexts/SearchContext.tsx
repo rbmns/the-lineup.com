@@ -118,7 +118,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       const searchPattern = `%${term.toLowerCase()}%`;
       
-      // Search events with better field selection
+      // Search events with better field selection - include events with null status
       const { data: eventData, error: eventError } = await supabase
         .from('events')
         .select(`
@@ -142,7 +142,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, status, tagline)
         `)
         .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},destination.ilike.${searchPattern},vibe.ilike.${searchPattern},event_category.ilike.${searchPattern},tags.ilike.${searchPattern},area.ilike.${searchPattern},organiser_name.ilike.${searchPattern}`)
-        .eq('status', 'published')
+        .or('status.eq.published,status.is.null')
         .order('start_date', { ascending: true });
 
       console.log('Event search query result:', eventData?.length || 0, 'events found');
@@ -274,7 +274,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, status, tagline)
           `)
           .in('event_category', categoryNames)
-          .eq('status', 'published')
+          .or('status.eq.published,status.is.null')
           .order('start_date', { ascending: true })
           .limit(10);
 
@@ -315,7 +315,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, status, tagline)
           `)
           .in('vibe', vibeNames)
-          .eq('status', 'published')
+          .or('status.eq.published,status.is.null')
           .order('start_date', { ascending: true })
           .limit(10);
 
@@ -388,7 +388,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           event_rsvps(id, user_id, status)
         `)
         .eq('event_category', asEqParam(category))
-        .eq('status', 'published')
+        .or('status.eq.published,status.is.null')
         .order('start_date', { ascending: true });
         
       if (error) throw error;
@@ -442,7 +442,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, location_category, status, tagline),
         venues:venue_id(*),
         event_rsvps(id, user_id, status)
-      `).eq('status', 'published');
+      `).or('status.eq.published,status.is.null');
       
       if (params.term) {
         const searchPattern = `%${params.term.toLowerCase()}%`;
