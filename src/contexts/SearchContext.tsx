@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useCallback } from 'react';
 import { Event, UserProfile, Venue } from '@/types';
 import { CasualPlan } from '@/types/casual-plans';
@@ -113,12 +112,12 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // Enhanced search to cover more fields and use OR conditions properly
       const searchPattern = `%${term.toLowerCase()}%`;
       
-      // Search events with comprehensive field coverage
+      // Search events with comprehensive field coverage - fix the relationship syntax
       const { data: eventData, error: eventError } = await supabase
         .from('events')
         .select(`
           *,
-          venue_id(*),
+          venues!events_venue_id_fkey(*),
           creator:profiles(id, username, avatar_url, email, location, status, tagline),
           event_rsvps(id, user_id, status)
         `)
@@ -141,10 +140,10 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         console.error('Venue search error:', venueError);
       }
 
-      // Search casual plans
+      // Search casual plans - fix the relationship syntax
       const { data: casualPlanData, error: casualPlanError } = await supabase
         .from('casual_plans')
-        .select('*, creator_profile:profiles(id, username, avatar_url)')
+        .select('*, creator_profile:profiles!casual_plans_creator_fkey(id, username, avatar_url)')
         .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},vibe.ilike.${searchPattern},location.ilike.${searchPattern}`)
 
       console.log('Casual plan search result:', casualPlanData?.length || 0, 'plans found');
@@ -208,7 +207,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         .select(`
           *,
           creator:profiles(id, username, avatar_url, email, location, location_category, status, tagline),
-          venues:venue_id(*),
+          venues!events_venue_id_fkey(*),
           event_rsvps(id, user_id, status)
         `)
         .eq('event_category', asEqParam(category))
@@ -263,7 +262,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       let query = supabase.from('events').select(`
         *,
         creator:profiles(id, username, avatar_url, email, location, location_category, status, tagline),
-        venues:venue_id(*),
+        venues!events_venue_id_fkey(*),
         event_rsvps(id, user_id, status)
       `);
       
