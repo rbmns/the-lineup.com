@@ -24,6 +24,7 @@ export const EventCardHeader: React.FC<EventCardHeaderProps> = ({
         src={imageUrl}
         alt={event.title || "Event image"}
         aspectRatio="video"
+        treatment="subtle-overlay"
         overlayVariant="ocean"
         className={cn(compact && "h-28")}
         onError={(e) => {

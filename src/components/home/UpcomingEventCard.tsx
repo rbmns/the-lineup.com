@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Calendar, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -50,7 +49,9 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
           src={imageUrl}
           alt={event.title}
           aspectRatio="video"
-          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+          treatment="subtle-overlay"
+          overlayVariant="ocean"
+          className="h-full w-full group-hover:scale-105 transition-transform duration-300"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (target.src !== DEFAULT_FALLBACK_IMAGE_URL) {
@@ -60,11 +61,8 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
           }}
         />
         
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-        
         {showCategory && event.event_category && (
-          <div className="absolute top-4 left-4">
+          <div className="absolute top-4 left-4 z-20">
             <CategoryPill 
               category={event.event_category} 
               active={true} 

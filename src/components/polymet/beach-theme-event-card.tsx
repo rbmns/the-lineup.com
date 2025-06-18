@@ -4,6 +4,7 @@ import { BeachThemeCategoryBadge } from "@/components/polymet/beach-theme-catego
 import { Button } from "@/components/ui/button";
 import { CalendarIcon, MapPinIcon, UserIcon } from "lucide-react";
 import { Link } from "react-router-dom";
+import { LineupImage } from "@/components/ui/lineup-image";
 
 export interface BeachThemeEventCardProps {
   id: string;
@@ -91,13 +92,14 @@ export default function BeachThemeEventCard({
             isCompact ? "h-24" : isFeatured ? "h-full" : "h-48"
           )}
         >
-          <img
+          <LineupImage
             src={image}
             alt={title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            aspectRatio={isCompact ? "square" : "video"}
+            treatment="warm-filter"
+            overlayVariant="sunset"
+            className="h-full w-full group-hover:scale-105 transition-transform duration-300"
           />
-
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
 
           {/* Category Badge - Top Left */}
           <div className="absolute top-2 left-2 z-10">

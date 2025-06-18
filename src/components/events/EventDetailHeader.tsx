@@ -47,6 +47,7 @@ export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({
         src={imageUrl}
         alt={title || event.title}
         aspectRatio="hero"
+        treatment="warm-filter"
         overlayVariant="sunset"
         className="rounded-t-lg"
         loading="eager"

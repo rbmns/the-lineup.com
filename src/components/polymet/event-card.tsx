@@ -93,6 +93,8 @@ export default function EventCard({
           src={image}
           alt={title}
           aspectRatio="video"
+          treatment="subtle-overlay"
+          overlayVariant="ocean"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (target.src !== DEFAULT_FALLBACK_IMAGE_URL) {
@@ -101,16 +103,14 @@ export default function EventCard({
           }}
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-
         {/* Category badge */}
-        <div className="absolute left-3 top-3">
+        <div className="absolute left-3 top-3 z-20">
           <CategoryBadge category={category} />
         </div>
 
         {/* Vibe label if provided */}
         {vibe && (
-          <div className="absolute right-3 top-3">
+          <div className="absolute right-3 top-3 z-20">
             <EventVibeLabel vibe={vibe} size="sm" />
           </div>
         )}
