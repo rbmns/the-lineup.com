@@ -137,10 +137,10 @@ export const EventCard: React.FC<EventCardProps> = ({
         )}
 
         {/* Event vibe pill - top right */}
-        {event.event_vibe && (
+        {event.vibe && (
           <div className="absolute top-3 right-3 z-10">
             <EventVibeLabel 
-              vibe={event.event_vibe} 
+              vibe={event.vibe} 
               size="sm"
             />
           </div>
