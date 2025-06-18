@@ -45,7 +45,7 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
     )).sort();
   }, [events]);
 
-  // Initialize with all categories selected by default
+  // Initialize with empty array (show all by default)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
@@ -53,13 +53,6 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [selectedVenues, setSelectedVenues] = useState<string[]>([]);
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
-
-  // Set all categories as selected when they're loaded
-  useEffect(() => {
-    if (allCategories.length > 0 && selectedCategories.length === 0) {
-      setSelectedCategories(allCategories);
-    }
-  }, [allCategories, selectedCategories.length]);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev => 
@@ -91,7 +84,7 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
   };
 
   const resetFilters = () => {
-    setSelectedCategories(allCategories); // Reset to all categories, not empty
+    setSelectedCategories([]); // Reset to empty array (show all)
     setSelectedVenues([]);
     setSelectedVibes([]);
     setDateRange(undefined);
@@ -100,7 +93,7 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const isNoneSelected = selectedCategories.length === 0;
   const hasAdvancedFilters = selectedVenues.length > 0 || !!dateRange || !!selectedDateFilter || selectedVibes.length > 0;
-  const hasActiveFilters = selectedCategories.length !== allCategories.length || hasAdvancedFilters;
+  const hasActiveFilters = selectedCategories.length > 0 || hasAdvancedFilters;
 
   return (
     <FilterStateContext.Provider value={{

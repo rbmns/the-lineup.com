@@ -151,6 +151,8 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     if (!allEvents) return [];
     
     console.log('🔍 Starting filteredEvents calculation with', allEvents.length, 'events');
+    console.log('🔍 selectedCategories:', selectedCategories);
+    console.log('🔍 allEventTypes:', allEventTypes);
     
     let tempFilteredEvents = [...allEvents];
 
@@ -175,12 +177,10 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     }
 
     const result = tempFilteredEvents.filter((event) => {
-      // Event type filter - simplified logic
-      // If we have categories available and some (but not all) are selected, filter by them
-      const hasAvailableCategories = allEventTypes.length > 0;
-      const someButNotAllSelected = selectedCategories.length > 0 && selectedCategories.length < allEventTypes.length;
-      
-      if (hasAvailableCategories && someButNotAllSelected) {
+      // Simplified category filter logic:
+      // If no categories are selected (empty array), show all events
+      // If specific categories are selected, filter by those categories only
+      if (selectedCategories.length > 0) {
         if (!selectedCategories.includes(event.event_category || '')) {
           return false;
         }
@@ -243,10 +243,9 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     console.log('🔍 filteredEvents result:', result.length, 'events');
     console.log('🔍 Filter state:', {
       selectedCategories: selectedCategories.length,
-      allEventTypes: allEventTypes.length,
       selectedVenues: selectedVenues.length,
       selectedVibes: selectedVibes?.length || 0,
-      someButNotAllSelected: selectedCategories.length > 0 && selectedCategories.length < allEventTypes.length
+      hasDateFilter: !!dateRange || !!selectedDateFilter
     });
     
     return result;
