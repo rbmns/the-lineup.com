@@ -7,7 +7,6 @@ import { ArrowLeft, MapPin } from 'lucide-react';
 import { Event } from '@/types';
 import { CasualPlan } from '@/types/casual-plans';
 import { Skeleton } from '@/components/ui/skeleton';
-import { navigateToEvent } from '@/utils/navigationUtils';
 import { EventCard } from '@/components/EventCard';
 import { CasualPlanCard } from '@/components/casual-plans/CasualPlanCard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,7 +34,7 @@ const VenueResultCard = ({ result, navigate }: { result: any; navigate: ReturnTy
 const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { searchResults, isSearching, performSearch, setSearchResults } = useSearch();
+  const { searchResults, isSearching, performSearch, setSearchResults, trackClick } = useSearch();
   const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   const { 
@@ -68,6 +67,23 @@ const SearchPage: React.FC = () => {
     navigate('/login');
   };
 
+  // Handle event card click with proper navigation and tracking
+  const handleEventClick = async (event: Event) => {
+    try {
+      // Track the click
+      if (query) {
+        await trackClick(query, event.id, 'event');
+      }
+      
+      // Navigate to event detail page using the event ID
+      navigate(`/events/${event.id}`);
+    } catch (error) {
+      console.error('Error handling event click:', error);
+      // Still navigate even if tracking fails
+      navigate(`/events/${event.id}`);
+    }
+  };
+
   // Filter search results to only show upcoming events
   const filteredSearchResults = searchResults.map(result => {
     if (result.type === 'event') {
@@ -97,7 +113,15 @@ const SearchPage: React.FC = () => {
         <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}`}>
           {filteredSearchResults.map((result) => {
             if (result.type === 'event') {
-              return <EventCard key={result.id} event={result as unknown as Event} onClick={(event) => navigateToEvent(event.id, navigate)} />;
+              const event = result as unknown as Event;
+              return (
+                <EventCard 
+                  key={event.id} 
+                  event={event} 
+                  onClick={handleEventClick}
+                  showRsvpButtons={false}
+                />
+              );
             }
             if (result.type === 'casual_plan') {
               const plan = result as unknown as CasualPlan;

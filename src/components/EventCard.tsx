@@ -107,27 +107,24 @@ export const EventCard: React.FC<EventCardProps> = ({
     return 'Location TBD';
   };
 
-  const totalAttendees = (event.going_count || 0) + (event.interested_count || 0);
-
   return (
     <Card 
       className={cn(
-        "flex flex-col h-full overflow-hidden cursor-pointer transition-all duration-300 ease-in-out hover:shadow-xl bg-white border border-gray-200 rounded-xl",
+        "group flex flex-col cursor-pointer hover:shadow-lg transition-all duration-300 bg-white rounded-xl shadow-md overflow-hidden border border-gray-200",
+        "h-full w-full", // Ensure consistent sizing
         className
       )}
       onClick={handleClick}
       data-event-id={event.id}
     >
-      {/* Image with better mobile sizing */}
-      <div className={cn(
-        "relative w-full overflow-hidden bg-gray-100 flex-shrink-0",
-        isMobile ? "h-48" : "h-56"
-      )}>
+      {/* Image Section - Always show image */}
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-gray-100">
         <LineupImage
           src={imageUrl}
           alt={event.title}
           aspectRatio="video"
-          className="w-full h-full object-cover"
+          overlayVariant="ocean"
+          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (!target.src.includes('/img/default.jpg')) {
@@ -137,7 +134,7 @@ export const EventCard: React.FC<EventCardProps> = ({
           }}
         />
         
-        {/* Event category pill */}
+        {/* Category pill overlay */}
         {event.event_category && (
           <div className="absolute top-3 left-3 z-10">
             <CategoryPill 
@@ -149,48 +146,43 @@ export const EventCard: React.FC<EventCardProps> = ({
         )}
       </div>
       
-      {/* Content with better mobile spacing */}
-      <div className={cn(
-        "flex flex-col flex-1 justify-between",
-        isMobile ? "p-4" : "p-5"
-      )}>
-        <div className="space-y-3">
-          {/* Title */}
-          <h3 className="font-semibold text-gray-900 text-lg leading-tight line-clamp-2">
-            {event.title}
-          </h3>
-          
-          {/* Date and Time */}
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
-            <span className="font-medium">
-              {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
-            </span>
-          </div>
-          
-          {/* Location */}
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
-            <span className="truncate">
-              {getVenueDisplay()}
-            </span>
-          </div>
-
-          {/* Attendees count */}
-          {totalAttendees > 0 && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Users className="h-4 w-4 text-gray-400 flex-shrink-0" />
-              <span>
-                {totalAttendees} {totalAttendees === 1 ? 'person' : 'people'} interested
-              </span>
-            </div>
-          )}
+      {/* Content Section */}
+      <div className="flex flex-col flex-1 p-4 text-left">
+        {/* Title */}
+        <h3 className="font-semibold text-gray-900 text-base leading-tight mb-2 line-clamp-2">
+          {event.title}
+        </h3>
+        
+        {/* Date and Time */}
+        <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
+          <Calendar className="h-4 w-4 flex-shrink-0" />
+          <span className="line-clamp-1">
+            {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
+          </span>
         </div>
         
-        {/* RSVP Buttons - only show if authenticated */}
+        {/* Location */}
+        <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+          <MapPin className="h-4 w-4 flex-shrink-0" />
+          <span className="line-clamp-1">
+            {getVenueDisplay()}
+          </span>
+        </div>
+        
+        {/* Attendees count if available */}
+        {(event.attendees?.going || event.going_count) && (
+          <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+            <Users className="h-4 w-4 flex-shrink-0" />
+            <span>
+              {event.attendees?.going || event.going_count || 0} attending
+            </span>
+          </div>
+        )}
+        
+        {/* RSVP Buttons - only show if authenticated and requested */}
         {shouldShowRsvp && onRsvp && (
           <div 
-            className="mt-4 pt-3 border-t border-gray-100" 
+            className="mt-auto" 
             data-rsvp-container="true" 
             onClick={(e) => e.stopPropagation()}
           >
@@ -198,7 +190,6 @@ export const EventCard: React.FC<EventCardProps> = ({
               currentStatus={event.rsvp_status || null}
               onRsvp={handleRsvp}
               size="sm"
-              isLoading={loadingEventId === event.id}
               showStatusOnly={!shouldShowRsvp && showRsvpStatus}
             />
           </div>
