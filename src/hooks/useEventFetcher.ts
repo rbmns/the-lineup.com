@@ -1,3 +1,4 @@
+
 import { useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
@@ -31,7 +32,8 @@ export const useEventFetcher = ({ onDataFetched, onError, onLoadingChange }: Pro
           creator:profiles(id, username, avatar_url, email, location, status, tagline),
           venues:venue_id(*),
           event_rsvps(id, user_id, status)
-        `);
+        `)
+        .eq('status', 'published'); // Only show published events
 
       // Apply text search filter
       if (searchQuery) {
@@ -165,6 +167,7 @@ export const useEventFetcher = ({ onDataFetched, onError, onLoadingChange }: Pro
             creator:profiles(id, username, avatar_url, email, location, status, tagline),
             venues:venue_id(*)
           `)
+          .eq('status', 'published') // Only show published events
           .textSearch('title', searchQuery, {
             type: 'websearch',
             config: 'english'

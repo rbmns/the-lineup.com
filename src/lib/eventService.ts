@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { processEventsData } from '@/utils/eventProcessorUtils';
@@ -18,6 +19,7 @@ export const fetchEventById = async (eventId: string, userId: string | undefined
         event_rsvps(id, user_id, status)
       `)
       .eq('id', eventId)
+      .eq('status', 'published') // Only fetch published events
       .single();
 
     if (error) {
@@ -205,6 +207,7 @@ export const fetchSimilarEvents = async (
         event_rsvps(id, user_id, status)
       `)
       .neq('id', currentEventId) // Exclude the current event
+      .eq('status', 'published') // Only show published events
       .gte('start_date', startDate) // Only include events on or after the current event's start date
       .order('start_date', { ascending: true })
       .order('start_time', { ascending: true })
@@ -297,6 +300,7 @@ export const searchEvents = async (query: string, userId: string | undefined = u
         venues!events_venue_id_fkey(*),
         event_rsvps(id, user_id, status)
       `)
+      .eq('status', 'published') // Only show published events
       .or(`title.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,tags.ilike.%${searchTerm}%`)
       .order('start_date', { ascending: true })
       .order('start_time', { ascending: true });
@@ -349,9 +353,15 @@ export const searchEvents = async (query: string, userId: string | undefined = u
  * Creates a new event.
  */
 export const createEvent = async (eventData: Partial<Event>): Promise<{ data: Event | null; error: any }> => {
+  // Ensure new events are created as published by default
+  const eventWithStatus = {
+    ...eventData,
+    status: eventData.status || 'published'
+  };
+  
   const { data, error } = await supabase
     .from('events')
-    .insert(eventData as any)
+    .insert(eventWithStatus as any)
     .select()
     .single();
 

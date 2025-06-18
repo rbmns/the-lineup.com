@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useCallback } from 'react';
 import { Event, UserProfile, Venue } from '@/types';
 import { CasualPlan } from '@/types/casual-plans';
@@ -112,7 +113,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // Enhanced search to cover more fields and use OR conditions properly
       const searchPattern = `%${term.toLowerCase()}%`;
       
-      // Search events with comprehensive field coverage - fix the relationship syntax
+      // Search events with comprehensive field coverage and status filter
       const { data: eventData, error: eventError } = await supabase
         .from('events')
         .select(`
@@ -121,6 +122,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           creator:profiles(id, username, avatar_url, email, location, status, tagline),
           event_rsvps(id, user_id, status)
         `)
+        .eq('status', 'published') // Only show published events in search
         .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},destination.ilike.${searchPattern},vibe.ilike.${searchPattern},event_category.ilike.${searchPattern},tags.cs.{${term}},specific_venue.ilike.${searchPattern}`)
         .order('start_date', { ascending: true });
 
@@ -140,7 +142,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         console.error('Venue search error:', venueError);
       }
 
-      // Search casual plans - fix the relationship syntax
+      // Search casual plans
       const { data: casualPlanData, error: casualPlanError } = await supabase
         .from('casual_plans')
         .select('*, creator_profile:profiles!casual_plans_creator_fkey(id, username, avatar_url)')
@@ -210,6 +212,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           venues!events_venue_id_fkey(*),
           event_rsvps(id, user_id, status)
         `)
+        .eq('status', 'published') // Only show published events
         .eq('event_category', asEqParam(category))
         .order('start_date', { ascending: true });
         
@@ -264,7 +267,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         creator:profiles(id, username, avatar_url, email, location, location_category, status, tagline),
         venues!events_venue_id_fkey(*),
         event_rsvps(id, user_id, status)
-      `);
+      `).eq('status', 'published'); // Only show published events
       
       if (params.term) {
         const searchPattern = `%${params.term.toLowerCase()}%`;

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Event, Profile } from '@/types';
@@ -68,6 +69,7 @@ export const useEventSearch = () => {
       const { data, error } = await supabase
         .from('events')
         .select('*, venue_id(id, name, city, street), creator:profiles(*)')
+        .eq('status', 'published') // Only fetch published events
         .order('start_time', { ascending: true });
 
       if (error) {
@@ -169,7 +171,8 @@ export const useEventSearch = () => {
       // Build the query to find similar events based on various parameters
       let query = supabase
         .from('events')
-        .select('*, venue_id(id, name, city, street)');
+        .select('*, venue_id(id, name, city, street)')
+        .eq('status', 'published'); // Only show published events
       
       // If we have an event category, prioritize events with the same category
       if (eventCategory) {
@@ -200,6 +203,7 @@ export const useEventSearch = () => {
       const { data: fallbackData, error: fallbackError } = await supabase
         .from('events')
         .select('*, venue_id(id, name, city, street)')
+        .eq('status', 'published') // Only show published events
         .order('start_time', { ascending: true })
         .limit(6);
         

@@ -54,13 +54,13 @@ interface EventsDataProviderProps {
 
 export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children }) => {
   const { user } = useAuth();
-  // Main events query - temporarily include all statuses to debug the filtering issue
+  // Main events query - show only published events by default (no includeAllStatuses override)
   const { 
     data: allEvents = [], 
     isLoading: eventsLoading, 
     error: eventsError,
     refetch: refetchEvents 
-  } = useEvents(user?.id, { includeAllStatuses: true });
+  } = useEvents(user?.id);
 
   const { venues = [], isLoading: isVenuesLoading } = useVenues();
   const { data: vibes = [], isLoading: vibesLoading } = useEventVibes();

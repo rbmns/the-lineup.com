@@ -342,7 +342,7 @@ export type Database = {
           slug: string | null
           start_date: string | null
           start_time: string | null
-          status: Database["public"]["Enums"]["event_status"] | null
+          status: Database["public"]["Enums"]["event_status"]
           tags: string | null
           title: string | null
           updated_at: string | null
@@ -374,7 +374,7 @@ export type Database = {
           slug?: string | null
           start_date?: string | null
           start_time?: string | null
-          status?: Database["public"]["Enums"]["event_status"] | null
+          status?: Database["public"]["Enums"]["event_status"]
           tags?: string | null
           title?: string | null
           updated_at?: string | null
@@ -406,7 +406,7 @@ export type Database = {
           slug?: string | null
           start_date?: string | null
           start_time?: string | null
-          status?: Database["public"]["Enums"]["event_status"] | null
+          status?: Database["public"]["Enums"]["event_status"]
           tags?: string | null
           title?: string | null
           updated_at?: string | null

@@ -36,7 +36,7 @@ export const useEvents = (
           .order('start_date', { ascending: true })
           .order('start_time', { ascending: true });
 
-        // If not including all statuses (admin view), filter to published events only
+        // Apply status filter - only show published events unless explicitly requesting all statuses
         if (!options.includeAllStatuses) {
           console.log('🔍 Filtering to published events only');
           query = query.eq('status', 'published');
