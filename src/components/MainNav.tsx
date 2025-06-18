@@ -1,39 +1,19 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 import { BrandLogo } from '@/components/ui/brand-logo';
-import UserMenu from '@/components/nav/UserMenu';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { useCreatorStatus } from '@/hooks/useCreatorStatus';
 import { NavbarSearch } from './nav/NavbarSearch';
-import { useAdminData } from '@/hooks/useAdminData';
-import { Search, Plus } from 'lucide-react';
 import { AuthOverlay } from '@/components/auth/AuthOverlay';
+import { MobileSearch } from './nav/MobileSearch';
+import { NavActions } from './nav/NavActions';
 
 const MainNav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [showAuthOverlay, setShowAuthOverlay] = useState(false);
-  const {
-    isAuthenticated,
-    user,
-    profile,
-    signOut
-  } = useAuth();
-  const {
-    canCreateEvents,
-    creatorRequestStatus,
-    isLoading: isCreatorStatusLoading
-  } = useCreatorStatus();
-  const {
-    isAdmin
-  } = useAdminData();
   const isMobile = useIsMobile();
-  const navigate = useNavigate();
-  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,47 +23,19 @@ const MainNav = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleSignInClick = () => {
-    console.log('Sign in button clicked, navigating to /login');
-    navigate('/login');
-  };
-
   const toggleMobileSearch = () => {
     setShowMobileSearch(!showMobileSearch);
-  };
-
-  const handleCreateEventClick = () => {
-    if (!isAuthenticated) {
-      setShowAuthOverlay(true);
-      return;
-    }
-    
-    if (isCreatorStatusLoading) return;
-    
-    const hasPermission = canCreateEvents || creatorRequestStatus === 'approved';
-    
-    if (hasPermission) {
-      navigate('/events/create');
-    } else {
-      // Navigate to events page with info about becoming an organizer
-      navigate('/events');
-    }
   };
 
   const handleCloseAuthOverlay = () => {
     setShowAuthOverlay(false);
   };
 
-  const handleBrowseEvents = () => {
-    setShowAuthOverlay(false);
-    navigate('/events');
+  const handleAuthRequired = () => {
+    setShowAuthOverlay(true);
   };
 
-  // Calculate total header height for mobile
   const mobileHeaderHeight = isMobile ? (showMobileSearch ? 'h-[112px]' : 'h-16') : 'h-16';
-
-  // Only show create event button if user is authenticated and has permissions
-  const shouldShowCreateButton = isAuthenticated && canCreateEvents;
 
   return (
     <>
@@ -126,107 +78,26 @@ const MainNav = () => {
               </div>
             )}
 
-            {/* Right side - Search icon, Create Event button + User menu or auth buttons */}
-            <div className={cn(
-              "flex items-center flex-shrink-0",
-              isMobile ? "gap-1" : "gap-2 lg:gap-3"
-            )}>
-              {/* Mobile Search Icon */}
-              {isMobile && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={toggleMobileSearch}
-                  className="w-9 h-9 text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex-shrink-0"
-                >
-                  <Search className="h-4 w-4" />
-                </Button>
-              )}
-
-              {/* Create Event Button - only shown to authenticated event creators */}
-              {shouldShowCreateButton && (
-                <Button
-                  onClick={handleCreateEventClick}
-                  disabled={isCreatorStatusLoading}
-                  className={cn(
-                    "bg-gray-900 hover:bg-gray-800 text-white rounded-full flex items-center gap-2 flex-shrink-0",
-                    isMobile ? "text-sm px-3 py-2" : "text-sm px-4 py-2"
-                  )}
-                >
-                  <Plus className="h-4 w-4" />
-                  {!isMobile && "Create Event"}
-                </Button>
-              )}
-
-              {isAuthenticated && user ? (
-                <>
-                  {isAdmin && !isMobile && (
-                    <Button 
-                      asChild 
-                      variant="ghost" 
-                      size="sm" 
-                      className="hidden md:inline-flex text-gray-700 hover:text-gray-900"
-                    >
-                      <Link to="/admin">Admin</Link>
-                    </Button>
-                  )}
-                  <div className="flex-shrink-0">
-                    <UserMenu 
-                      user={user} 
-                      profile={profile} 
-                      handleSignOut={signOut} 
-                      canCreateEvents={canCreateEvents} 
-                    />
-                  </div>
-                </>
-              ) : (
-                <div className={cn(
-                  "flex items-center",
-                  isMobile ? "gap-1" : "gap-2"
-                )}>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={handleSignInClick} 
-                    className={cn(
-                      "text-gray-700 hover:text-gray-900 hover:bg-gray-100 flex-shrink-0",
-                      isMobile ? "text-sm px-2 py-2" : "text-sm px-4"
-                    )}
-                  >
-                    Sign in
-                  </Button>
-                  {/* Remove sign up button on mobile */}
-                  {!isMobile && (
-                    <Button 
-                      size="sm" 
-                      onClick={() => navigate('/login', { state: { initialMode: 'register' } })} 
-                      className="bg-gray-900 hover:bg-gray-800 text-white rounded-full text-sm px-6 flex-shrink-0"
-                    >
-                      Sign Up
-                    </Button>
-                  )}
-                </div>
-              )}
-            </div>
+            {/* Right side - Actions */}
+            <NavActions 
+              toggleMobileSearch={toggleMobileSearch}
+              onAuthRequired={handleAuthRequired}
+            />
           </div>
           
-          {/* Mobile search bar with proper spacing */}
-          {isMobile && showMobileSearch && (
-            <div className="h-14 px-4 py-2 bg-white flex items-center border-t border-gray-200">
-              <NavbarSearch />
-            </div>
-          )}
+          {/* Mobile search bar */}
+          <MobileSearch showMobileSearch={showMobileSearch} />
         </div>
       </header>
 
-      {/* Auth Overlay for non-authenticated users clicking Create Event */}
-      {showAuthOverlay && !isAuthenticated && (
+      {/* Auth Overlay */}
+      {showAuthOverlay && (
         <AuthOverlay
           title="Join to Create Events"
           description="Sign up or log in to create and organize your own events!"
           browseEventsButton={true}
           onClose={handleCloseAuthOverlay}
-          onBrowseEvents={handleBrowseEvents}
+          onBrowseEvents={handleCloseAuthOverlay}
         >
           <></>
         </AuthOverlay>

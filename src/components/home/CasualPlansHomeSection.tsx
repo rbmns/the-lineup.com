@@ -2,18 +2,17 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Coffee, Clock, MapPin, Users, Calendar } from 'lucide-react';
+import { Coffee, Clock, MapPin } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCasualPlans } from '@/hooks/useCasualPlans';
-import { formatFeaturedDate, formatTime } from '@/utils/date-formatting';
-import { CategoryPill } from '@/components/ui/category-pill';
+import { CasualPlanPreviewCard } from './CasualPlanPreviewCard';
+import { CasualPlansMockData } from './CasualPlansMockData';
 
 export const CasualPlansHomeSection = () => {
   const { isAuthenticated } = useAuth();
   const { plans, isLoading } = useCasualPlans();
   const navigate = useNavigate();
 
-  // Get first 3 plans for preview
   const previewPlans = plans.slice(0, 3);
 
   const handlePlanClick = (planId: string) => {
@@ -88,208 +87,16 @@ export const CasualPlansHomeSection = () => {
                 ) : previewPlans.length > 0 ? (
                   <div className="space-y-3">
                     {previewPlans.map((plan) => (
-                      <div 
-                        key={plan.id} 
-                        className="border border-gray-200 rounded-lg p-3 md:p-4 cursor-pointer hover:border-gray-300 transition-colors"
-                        onClick={() => handlePlanClick(plan.id)}
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-center gap-2 flex-1 min-w-0">
-                            {isAuthenticated ? (
-                              <CategoryPill 
-                                category={plan.vibe} 
-                                size="sm"
-                                className="capitalize text-xs px-2 py-1 flex-shrink-0"
-                              />
-                            ) : (
-                              <div className="bg-gray-200 text-gray-400 px-2 py-1 rounded text-xs flex-shrink-0">
-                                ••••••
-                              </div>
-                            )}
-                            <h4 className="font-medium text-gray-900 text-sm truncate">{plan.title}</h4>
-                          </div>
-                          <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
-                            {formatFeaturedDate(plan.date)}
-                          </span>
-                        </div>
-                        
-                        <div className="flex items-center gap-3 md:gap-4 text-xs text-gray-500 mb-2 flex-wrap">
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            <span>{formatTime(plan.time)}</span>
-                          </div>
-                          <div className="flex items-center gap-1 min-w-0">
-                            <MapPin className="h-3 w-3 flex-shrink-0" />
-                            {isAuthenticated ? (
-                              <span className="truncate">{plan.location}</span>
-                            ) : (
-                              <span className="text-gray-300">••••••••••••••••</span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Users className="h-3 w-3" />
-                            {isAuthenticated ? (
-                              <span>{plan.attendee_count || 0} interested</span>
-                            ) : (
-                              <span className="text-gray-300">••• interested</span>
-                            )}
-                          </div>
-                        </div>
-                        
-                        {/* Only show description for authenticated users */}
-                        {isAuthenticated && plan.description && (
-                          <p className="text-sm text-gray-600 line-clamp-1">{plan.description}</p>
-                        )}
-                      </div>
+                      <CasualPlanPreviewCard
+                        key={plan.id}
+                        plan={plan}
+                        isAuthenticated={isAuthenticated}
+                        onClick={handlePlanClick}
+                      />
                     ))}
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    {/* Mock data for non-authenticated users or when no plans */}
-                    <div 
-                      className="border border-gray-200 rounded-lg p-3 md:p-4 cursor-pointer hover:border-gray-300 transition-colors"
-                      onClick={() => navigate('/casual-plans')}
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          {isAuthenticated ? (
-                            <CategoryPill 
-                              category="beach" 
-                              size="sm"
-                              className="capitalize text-xs px-2 py-1 flex-shrink-0"
-                            />
-                          ) : (
-                            <div className="bg-gray-200 text-gray-400 px-2 py-1 rounded text-xs flex-shrink-0">
-                              ••••••
-                            </div>
-                          )}
-                          <h4 className="font-medium text-gray-900 text-sm truncate">Beach Walk & Coffee</h4>
-                        </div>
-                        <span className="text-xs text-gray-500 flex-shrink-0 ml-2">Today 6pm</span>
-                      </div>
-                      <div className="flex items-center gap-3 md:gap-4 text-xs text-gray-500 mb-2 flex-wrap">
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          <span>18:00</span>
-                        </div>
-                        <div className="flex items-center gap-1 min-w-0">
-                          <MapPin className="h-3 w-3 flex-shrink-0" />
-                          {isAuthenticated ? (
-                            <span className="truncate">Zandvoort Beach</span>
-                          ) : (
-                            <span className="text-gray-300">••••••••••••••••</span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Users className="h-3 w-3" />
-                          {isAuthenticated ? (
-                            <span>3 interested</span>
-                          ) : (
-                            <span className="text-gray-300">••• interested</span>
-                          )}
-                        </div>
-                      </div>
-                      {isAuthenticated && (
-                        <p className="text-sm text-gray-600 line-clamp-1">Anyone up for a sunset walk on the beach followed by coffee?</p>
-                      )}
-                    </div>
-                    
-                    <div 
-                      className="border border-gray-200 rounded-lg p-3 md:p-4 cursor-pointer hover:border-gray-300 transition-colors"
-                      onClick={() => navigate('/casual-plans')}
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          {isAuthenticated ? (
-                            <CategoryPill 
-                              category="food" 
-                              size="sm"
-                              className="capitalize text-xs px-2 py-1 flex-shrink-0"
-                            />
-                          ) : (
-                            <div className="bg-gray-200 text-gray-400 px-2 py-1 rounded text-xs flex-shrink-0">
-                              ••••••
-                            </div>
-                          )}
-                          <h4 className="font-medium text-gray-900 text-sm truncate">Local Food Tour</h4>
-                        </div>
-                        <span className="text-xs text-gray-500 flex-shrink-0 ml-2">Tomorrow 7pm</span>
-                      </div>
-                      <div className="flex items-center gap-3 md:gap-4 text-xs text-gray-500 mb-2 flex-wrap">
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          <span>19:00</span>
-                        </div>
-                        <div className="flex items-center gap-1 min-w-0">
-                          <MapPin className="h-3 w-3 flex-shrink-0" />
-                          {isAuthenticated ? (
-                            <span className="truncate">City Center</span>
-                          ) : (
-                            <span className="text-gray-300">••••••••••••••••</span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Users className="h-3 w-3" />
-                          {isAuthenticated ? (
-                            <span>5 interested</span>
-                          ) : (
-                            <span className="text-gray-300">••• interested</span>
-                          )}
-                        </div>
-                      </div>
-                      {isAuthenticated && (
-                        <p className="text-sm text-gray-600 line-clamp-1">Let's explore the best local spots for dinner!</p>
-                      )}
-                    </div>
-                    
-                    <div 
-                      className="border border-gray-200 rounded-lg p-3 md:p-4 cursor-pointer hover:border-gray-300 transition-colors"
-                      onClick={() => navigate('/casual-plans')}
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          {isAuthenticated ? (
-                            <CategoryPill 
-                              category="surf" 
-                              size="sm"
-                              className="capitalize text-xs px-2 py-1 flex-shrink-0"
-                            />
-                          ) : (
-                            <div className="bg-gray-200 text-gray-400 px-2 py-1 rounded text-xs flex-shrink-0">
-                              ••••••
-                            </div>
-                          )}
-                          <h4 className="font-medium text-gray-900 text-sm truncate">Morning Surf Check</h4>
-                        </div>
-                        <span className="text-xs text-gray-500 flex-shrink-0 ml-2">Sat 7am</span>
-                      </div>
-                      <div className="flex items-center gap-3 md:gap-4 text-xs text-gray-500 mb-2 flex-wrap">
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          <span>07:00</span>
-                        </div>
-                        <div className="flex items-center gap-1 min-w-0">
-                          <MapPin className="h-3 w-3 flex-shrink-0" />
-                          {isAuthenticated ? (
-                            <span className="truncate">South Beach</span>
-                          ) : (
-                            <span className="text-gray-300">••••••••••••••••</span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Users className="h-3 w-3" />
-                          {isAuthenticated ? (
-                            <span>2 interested</span>
-                          ) : (
-                            <span className="text-gray-300">••• interested</span>
-                          )}
-                        </div>
-                      </div>
-                      {isAuthenticated && (
-                        <p className="text-sm text-gray-600 line-clamp-1">Early morning surf session if conditions are good</p>
-                      )}
-                    </div>
-                  </div>
+                  <CasualPlansMockData isAuthenticated={isAuthenticated} />
                 )}
                 
                 {!isAuthenticated && (
