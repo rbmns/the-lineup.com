@@ -93,6 +93,7 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const isNoneSelected = selectedCategories.length === 0;
   const hasAdvancedFilters = selectedVenues.length > 0 || !!dateRange || !!selectedDateFilter || selectedVibes.length > 0;
+  // Only consider it an active filter if categories are specifically selected (not empty = show all)
   const hasActiveFilters = selectedCategories.length > 0 || hasAdvancedFilters;
 
   return (

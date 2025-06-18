@@ -44,17 +44,13 @@ export const EventsResultsDisplay: React.FC<EventsResultsDisplayProps> = ({
     return <EventsLoadingState />;
   }
 
-  // Show empty state when no filters are selected
-  if (isNoneSelected) {
-    return <EventsEmptyState resetFilters={selectAll} hasActiveFilters={false} />;
-  }
-
   // Show no results state when filters are active but no events match
+  // Note: isNoneSelected means no categories are selected, which should show ALL events, not empty state
   if (hasActiveFilters && filteredEvents.length === 0) {
     return <NoResultsFound resetFilters={selectAll} />;
   }
 
-  // Show events list - only pass RSVP functionality if showRsvpButtons is true
+  // Show events list - the isNoneSelected case should still show events if they exist
   return (
     <EventsList
       events={filteredEvents}
