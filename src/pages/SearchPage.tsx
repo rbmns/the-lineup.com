@@ -3,33 +3,17 @@ import React, { useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useSearch } from '@/contexts/SearchContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, MapPin } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Event } from '@/types';
 import { CasualPlan } from '@/types/casual-plans';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EventCard } from '@/components/EventCard';
 import { CasualPlanCard } from '@/components/casual-plans/CasualPlanCard';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCasualPlansMutations } from '@/hooks/casual-plans/useCasualPlansMutations';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useScrollToTop } from '@/hooks/useScrollToTop';
 import { filterUpcomingEvents } from '@/utils/date-filtering';
-
-const VenueResultCard = ({ result, navigate }: { result: any; navigate: ReturnType<typeof useNavigate> }) => (
-    <Card 
-        className="cursor-pointer hover:shadow-lg transition-shadow h-full"
-        onClick={() => navigate(`/venues/${result.slug || result.id}`)}
-    >
-        <CardHeader>
-            <CardTitle className="line-clamp-2">{result.title || result.name}</CardTitle>
-            {result.location && <CardDescription>{result.location}</CardDescription>}
-        </CardHeader>
-        <CardContent>
-            <p className="text-sm text-muted-foreground flex items-center"><MapPin className="h-4 w-4 mr-2" />Venue</p>
-        </CardContent>
-    </Card>
-);
 
 const SearchPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -94,15 +78,17 @@ const SearchPage: React.FC = () => {
     }
   };
 
-  // Filter search results to only show upcoming events
-  const filteredSearchResults = searchResults.map(result => {
-    if (result.type === 'event') {
-      // Filter out past events
-      const upcomingEvents = filterUpcomingEvents([result as unknown as Event]);
-      return upcomingEvents.length > 0 ? result : null;
-    }
-    return result;
-  }).filter(Boolean);
+  // Filter search results to only show events and casual plans (no venues)
+  const filteredSearchResults = searchResults
+    .filter(result => result.type === 'event' || result.type === 'casual_plan')
+    .map(result => {
+      if (result.type === 'event') {
+        // Filter out past events
+        const upcomingEvents = filterUpcomingEvents([result as unknown as Event]);
+        return upcomingEvents.length > 0 ? result : null;
+      }
+      return result;
+    }).filter(Boolean);
 
   return (
     <div className={`${isMobile ? 'px-3 py-4' : 'container mx-auto px-4 py-8'} min-h-screen`}>
@@ -149,9 +135,6 @@ const SearchPage: React.FC = () => {
                   loadingPlanId={loadingPlanId}
                 />
               );
-            }
-            if (result.type === 'venue') {
-              return <VenueResultCard key={result.id} result={result} navigate={navigate} />;
             }
             return null;
           })}
