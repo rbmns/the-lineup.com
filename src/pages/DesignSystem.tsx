@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CategoryPill } from '@/components/ui/category-pill';
@@ -149,7 +148,7 @@ const DesignSystem = () => {
                       <div className="h-12 bg-black rounded"></div>
                       <div className="text-sm">
                         <div className="font-medium">Primary</div>
-                        <div className="text-gray-500">#121212</div>
+                        <div className="text-gray-500">#000000</div>
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -183,20 +182,19 @@ const DesignSystem = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Button Variants</CardTitle>
-                  <CardDescription>Updated button styles matching the new design system</CardDescription>
+                  <CardDescription>Clean, modern button styles with less rounded corners - matching the new design system</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-8">
                   <div>
                     <h4 className="text-sm font-medium text-gray-700 mb-4">Button Variants</h4>
                     <div className="flex flex-wrap gap-4">
                       <Button variant="default">Default</Button>
-                      <Button variant="primary">Primary</Button>
                       <Button variant="outline">Outline</Button>
                       <Button variant="secondary">Secondary</Button>
                       <Button variant="ghost">Ghost</Button>
                       <Button variant="link">Link</Button>
-                      <Button variant="dark">Dark</Button>
                     </div>
+                    <p className="text-sm text-gray-600 mt-2">Note: Default button is now black as per the new design system</p>
                   </div>
                   
                   <div>
@@ -232,6 +230,15 @@ const DesignSystem = () => {
                       <Button><Plus className="h-4 w-4 mr-2" />Create</Button>
                       <Button variant="outline"><Search className="h-4 w-4 mr-2" />Search</Button>
                       <Button size="icon"><Heart className="h-4 w-4" /></Button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-4">Design Notes</h4>
+                    <div className="text-sm space-y-2 bg-blue-50 p-4 rounded-md">
+                      <p><strong>Border Radius:</strong> Changed from rounded-lg to rounded-md for less rounded appearance</p>
+                      <p><strong>Default Color:</strong> Now black (#000000) instead of primary theme color</p>
+                      <p><strong>Consistency:</strong> All buttons across the app now use this updated design</p>
                     </div>
                   </div>
                 </CardContent>
