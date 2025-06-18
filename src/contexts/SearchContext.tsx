@@ -106,11 +106,10 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     
     setIsSearching(true);
     try {
-      console.log('Performing search with term:', term);
+      console.log('Performing comprehensive search with term:', term);
       
       await trackSearch(term);
       
-      // Enhanced search to cover more fields and use OR conditions properly
       const searchPattern = `%${term.toLowerCase()}%`;
       
       // Search events with comprehensive field coverage
@@ -118,11 +117,12 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         .from('events')
         .select(`
           *,
-          venue_id(*),
+          venue_id:venues(*),
           creator:profiles(id, username, avatar_url, email, location, status, tagline),
           event_rsvps(id, user_id, status)
         `)
-        .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},destination.ilike.${searchPattern},vibe.ilike.${searchPattern},event_category.ilike.${searchPattern},tags.cs.{${term}},specific_venue.ilike.${searchPattern}`)
+        .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},destination.ilike.${searchPattern},vibe.ilike.${searchPattern},event_category.ilike.${searchPattern},tags.ilike.${searchPattern},area.ilike.${searchPattern},organiser_name.ilike.${searchPattern}`)
+        .eq('status', 'published')
         .order('start_date', { ascending: true });
 
       console.log('Event search query result:', eventData?.length || 0, 'events found');
@@ -134,7 +134,8 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const { data: venueData, error: venueError } = await supabase
         .from('venues')
         .select('*')
-        .or(`name.ilike.${searchPattern},city.ilike.${searchPattern}`)
+        .or(`name.ilike.${searchPattern},city.ilike.${searchPattern},street.ilike.${searchPattern}`)
+        .limit(20);
 
       console.log('Venue search result:', venueData?.length || 0, 'venues found');
       if (venueError) {
@@ -146,18 +147,44 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         .from('casual_plans')
         .select('*, creator_profile:profiles(id, username, avatar_url)')
         .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},vibe.ilike.${searchPattern},location.ilike.${searchPattern}`)
+        .limit(20);
 
       console.log('Casual plan search result:', casualPlanData?.length || 0, 'plans found');
       if (casualPlanError) {
         console.error('Casual plan search error:', casualPlanError);
       }
 
-      // Format results
+      // Search event categories
+      const { data: categoryData, error: categoryError } = await supabase
+        .from('event_categories')
+        .select('*')
+        .ilike('name', searchPattern)
+        .limit(10);
+
+      console.log('Category search result:', categoryData?.length || 0, 'categories found');
+      if (categoryError) {
+        console.error('Category search error:', categoryError);
+      }
+
+      // Search event vibes
+      const { data: vibeData, error: vibeError } = await supabase
+        .from('event_vibe')
+        .select('*')
+        .ilike('name', searchPattern)
+        .limit(10);
+
+      console.log('Vibe search result:', vibeData?.length || 0, 'vibes found');
+      if (vibeError) {
+        console.error('Vibe search error:', vibeError);
+      }
+
+      // Format event results
       const eventResults = (eventData || []).map(event => ({
         ...event,
         type: 'event' as const,
       }));
 
+      // Format venue results
       const venueResults = (venueData || []).map(venue => ({
         ...venue,
         type: 'venue' as const,
@@ -165,16 +192,79 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         location: venue.city,
       }));
 
+      // Format casual plan results
       const casualPlanResults = (casualPlanData || []).map(plan => ({
         ...plan,
         type: 'casual_plan' as const,
       }));
+
+      // If we found matching categories, also search for events in those categories
+      let categoryEventResults: SearchResult[] = [];
+      if (categoryData && categoryData.length > 0) {
+        const categoryNames = categoryData.map(cat => cat.name);
+        const { data: catEventData, error: catEventError } = await supabase
+          .from('events')
+          .select(`
+            *,
+            venue_id:venues(*),
+            creator:profiles(id, username, avatar_url, email, location, status, tagline),
+            event_rsvps(id, user_id, status)
+          `)
+          .in('event_category', categoryNames)
+          .eq('status', 'published')
+          .order('start_date', { ascending: true })
+          .limit(10);
+
+        if (!catEventError && catEventData) {
+          categoryEventResults = catEventData.map(event => ({
+            ...event,
+            type: 'event' as const,
+          }));
+        }
+      }
+
+      // If we found matching vibes, also search for events with those vibes
+      let vibeEventResults: SearchResult[] = [];
+      if (vibeData && vibeData.length > 0) {
+        const vibeNames = vibeData.map(vibe => vibe.name);
+        const { data: vibeEventData, error: vibeEventError } = await supabase
+          .from('events')
+          .select(`
+            *,
+            venue_id:venues(*),
+            creator:profiles(id, username, avatar_url, email, location, status, tagline),
+            event_rsvps(id, user_id, status)
+          `)
+          .in('vibe', vibeNames)
+          .eq('status', 'published')
+          .order('start_date', { ascending: true })
+          .limit(10);
+
+        if (!vibeEventError && vibeEventData) {
+          vibeEventResults = vibeEventData.map(event => ({
+            ...event,
+            type: 'event' as const,
+          }));
+        }
+      }
       
-      const results: SearchResult[] = [...eventResults, ...venueResults, ...casualPlanResults];
+      // Combine all results and remove duplicates
+      const allResults = [
+        ...eventResults,
+        ...venueResults,
+        ...casualPlanResults,
+        ...categoryEventResults,
+        ...vibeEventResults
+      ];
+
+      // Remove duplicates based on id and type
+      const uniqueResults = allResults.filter((result, index, self) =>
+        index === self.findIndex((r) => r.id === result.id && r.type === result.type)
+      );
       
-      console.log('Total search results found:', results.length);
-      setSearchResults(results);
-      return results;
+      console.log('Total unique search results found:', uniqueResults.length);
+      setSearchResults(uniqueResults);
+      return uniqueResults;
     } catch (error) {
       console.error('Error in performSearch:', error);
       toast.error('Search failed', {
@@ -212,6 +302,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           event_rsvps(id, user_id, status)
         `)
         .eq('event_category', asEqParam(category))
+        .eq('status', 'published')
         .order('start_date', { ascending: true });
         
       if (error) throw error;
@@ -265,7 +356,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         creator:profiles(id, username, avatar_url, email, location, location_category, status, tagline),
         venues:venue_id(*),
         event_rsvps(id, user_id, status)
-      `);
+      `).eq('status', 'published');
       
       if (params.term) {
         const searchPattern = `%${params.term.toLowerCase()}%`;
