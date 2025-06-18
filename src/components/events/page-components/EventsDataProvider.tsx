@@ -175,12 +175,12 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     }
 
     const result = tempFilteredEvents.filter((event) => {
-      // Event type filter - show all events when all categories are selected OR none are selected
-      const isAllCategoriesSelected = selectedCategories.length === allEventTypes.length;
-      const isNoCategoriesSelected = selectedCategories.length === 0;
+      // Event type filter - simplified logic
+      // If we have categories available and some (but not all) are selected, filter by them
+      const hasAvailableCategories = allEventTypes.length > 0;
+      const someButNotAllSelected = selectedCategories.length > 0 && selectedCategories.length < allEventTypes.length;
       
-      if (!isAllCategoriesSelected && !isNoCategoriesSelected) {
-        // Only filter when some (but not all) categories are selected
+      if (hasAvailableCategories && someButNotAllSelected) {
         if (!selectedCategories.includes(event.event_category || '')) {
           return false;
         }
@@ -246,7 +246,7 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
       allEventTypes: allEventTypes.length,
       selectedVenues: selectedVenues.length,
       selectedVibes: selectedVibes?.length || 0,
-      isAllSelected: selectedCategories.length === allEventTypes.length
+      someButNotAllSelected: selectedCategories.length > 0 && selectedCategories.length < allEventTypes.length
     });
     
     return result;
