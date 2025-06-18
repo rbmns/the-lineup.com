@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useCallback } from 'react';
 import { Event, UserProfile, Venue } from '@/types';
 import { CasualPlan } from '@/types/casual-plans';
@@ -112,13 +111,13 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       const searchPattern = `%${term.toLowerCase()}%`;
       
-      // Search events with fixed relationship specification
+      // Search events with corrected relationship specification
       const { data: eventData, error: eventError } = await supabase
         .from('events')
         .select(`
           *,
           venues!events_venue_id_fkey(*),
-          creator:profiles(id, username, avatar_url, email, location, status, tagline),
+          creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, status, tagline),
           event_rsvps(id, user_id, status)
         `)
         .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},destination.ilike.${searchPattern},vibe.ilike.${searchPattern},event_category.ilike.${searchPattern},tags.ilike.${searchPattern},area.ilike.${searchPattern},organiser_name.ilike.${searchPattern}`)
@@ -149,19 +148,38 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         console.error('Venue search error:', venueError);
       }
 
-      // Search casual plans with fixed relationship
+      // Search casual plans - simplified query without the problematic relationship
       const { data: casualPlanData, error: casualPlanError } = await supabase
         .from('casual_plans')
-        .select(`
-          *,
-          creator_profile:profiles!casual_plans_creator_id_fkey(id, username, avatar_url)
-        `)
+        .select('*')
         .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},vibe.ilike.${searchPattern},location.ilike.${searchPattern}`)
         .limit(20);
 
       console.log('Casual plan search result:', casualPlanData?.length || 0, 'plans found');
       if (casualPlanError) {
         console.error('Casual plan search error:', casualPlanError);
+      }
+
+      // If we have casual plans, fetch their creator profiles separately
+      let casualPlanResults: SearchResult[] = [];
+      if (casualPlanData && casualPlanData.length > 0) {
+        const creatorIds = casualPlanData.map(plan => plan.creator_id).filter(Boolean);
+        let creatorProfiles: any[] = [];
+        
+        if (creatorIds.length > 0) {
+          const { data: profilesData } = await supabase
+            .from('profiles')
+            .select('id, username, avatar_url')
+            .in('id', creatorIds);
+          
+          creatorProfiles = profilesData || [];
+        }
+
+        casualPlanResults = casualPlanData.map(plan => ({
+          ...plan,
+          type: 'casual_plan' as const,
+          creator_profile: creatorProfiles.find(profile => profile.id === plan.creator_id)
+        }));
       }
 
       // Search event categories
@@ -202,12 +220,6 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         location: venue.city,
       }));
 
-      // Format casual plan results
-      const casualPlanResults = (casualPlanData || []).map(plan => ({
-        ...plan,
-        type: 'casual_plan' as const,
-      }));
-
       // If we found matching categories, also search for events in those categories
       let categoryEventResults: SearchResult[] = [];
       if (categoryData && categoryData.length > 0) {
@@ -218,7 +230,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           .select(`
             *,
             venues!events_venue_id_fkey(*),
-            creator:profiles(id, username, avatar_url, email, location, status, tagline),
+            creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, status, tagline),
             event_rsvps(id, user_id, status)
           `)
           .in('event_category', categoryNames)
@@ -245,7 +257,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           .select(`
             *,
             venues!events_venue_id_fkey(*),
-            creator:profiles(id, username, avatar_url, email, location, status, tagline),
+            creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, status, tagline),
             event_rsvps(id, user_id, status)
           `)
           .in('vibe', vibeNames)
@@ -317,7 +329,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         .from('events')
         .select(`
           *,
-          creator:profiles(id, username, avatar_url, email, location, location_category, status, tagline),
+          creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, location_category, status, tagline),
           venues:venue_id(*),
           event_rsvps(id, user_id, status)
         `)
@@ -373,7 +385,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       let query = supabase.from('events').select(`
         *,
-        creator:profiles(id, username, avatar_url, email, location, location_category, status, tagline),
+        creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, location_category, status, tagline),
         venues:venue_id(*),
         event_rsvps(id, user_id, status)
       `).eq('status', 'published');
