@@ -12,21 +12,15 @@ export interface UseEventsResult {
   refetch: () => Promise<any>;
 }
 
-export const useEvents = (
-  userId: string | undefined = undefined, 
-  options: { 
-    includePastEvents?: boolean;
-    includeAllStatuses?: boolean;
-  } = {}
-): UseEventsResult => {
+export const useEvents = (userId: string | undefined = undefined, options: { includePastEvents?: boolean } = {}): UseEventsResult => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['events', userId, options],
     queryFn: async () => {
       try {
         console.log('Fetching events for user:', userId, 'with options:', options);
         
-        // Build the query
-        let query = supabase
+        // Simplified query to avoid the foreign key relationship issues
+        const { data, error } = await supabase
           .from('events')
           .select(`
             *,
@@ -35,13 +29,6 @@ export const useEvents = (
           `)
           .order('start_date', { ascending: true })
           .order('start_time', { ascending: true });
-
-        // If not including all statuses (admin view), filter to published events only
-        if (!options.includeAllStatuses) {
-          query = query.eq('status', 'published');
-        }
-        
-        const { data, error } = await query;
         
         if (error) {
           console.error('Error fetching events:', error);
