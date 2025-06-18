@@ -35,8 +35,8 @@ export const EventSchema = z.object({
   organizer_link: urlSchema,
   fee: z.string().or(z.number().min(0, "Fee must be a positive number").transform(val => val.toString())),
   booking_link: urlSchema,
-  extra_info: z.string().optional(),
-  tags: z.string().optional(),
+  extra_info: z.string().optional().default(""),
+  tags: z.string().optional().default(""),
   vibe: z.string().nullable().optional(),
 });
 

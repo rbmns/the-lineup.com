@@ -122,6 +122,7 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
         ...data,
         organizer_link: data.organizer_link ? ensureHttpProtocol(data.organizer_link) : '',
         booking_link: data.booking_link ? ensureHttpProtocol(data.booking_link) : '',
+        extra_info: data.extra_info || '', // Ensure extra_info is always a string
       };
 
       const processedEventData = processFormData(processedData, user.id);
@@ -139,6 +140,8 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
             errorMessage = "An event with this title already exists. Please choose a different title.";
           } else if (error.message?.includes('invalid input')) {
             errorMessage = "Please check your input data and try again.";
+          } else if (error.message?.includes('extra_info')) {
+            errorMessage = "There was an issue with the additional information field. Please try again.";
           } else if (error.message) {
             errorMessage = error.message;
           }
@@ -176,6 +179,8 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
             errorMessage = "Please check your input data and try again.";
           } else if (error.message?.includes('venue_id')) {
             errorMessage = "Please select a valid venue for your event.";
+          } else if (error.message?.includes('extra_info')) {
+            errorMessage = "There was an issue with the additional information field. Please try again.";
           } else if (error.message) {
             errorMessage = error.message;
           }
@@ -208,6 +213,8 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
       let errorMessage = "Failed to save event. Please try again.";
       if (error?.message?.includes('Network')) {
         errorMessage = "Network error. Please check your connection and try again.";
+      } else if (error?.message?.includes('extra_info')) {
+        errorMessage = "There was an issue with the additional information field. Please try again.";
       } else if (error?.message) {
         errorMessage = error.message;
       }
