@@ -4,14 +4,11 @@ import { Link } from 'react-router-dom';
 import { BrandLogo } from '@/components/ui/brand-logo';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { NavbarSearch } from './nav/NavbarSearch';
 import { AuthOverlay } from '@/components/auth/AuthOverlay';
-import { MobileSearch } from './nav/MobileSearch';
 import { NavActions } from './nav/NavActions';
 
 const MainNav = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [showAuthOverlay, setShowAuthOverlay] = useState(false);
   const isMobile = useIsMobile();
 
@@ -23,10 +20,6 @@ const MainNav = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const toggleMobileSearch = () => {
-    setShowMobileSearch(!showMobileSearch);
-  };
-
   const handleCloseAuthOverlay = () => {
     setShowAuthOverlay(false);
   };
@@ -35,7 +28,7 @@ const MainNav = () => {
     setShowAuthOverlay(true);
   };
 
-  const mobileHeaderHeight = isMobile ? (showMobileSearch ? 'h-[112px]' : 'h-16') : 'h-16';
+  const mobileHeaderHeight = 'h-16';
 
   return (
     <>
@@ -73,22 +66,11 @@ const MainNav = () => {
               />
             </div>
 
-            {/* Center-Right - Search Bar for desktop */}
-            {!isMobile && (
-              <div className="flex-1 flex justify-end max-w-md mr-4">
-                <NavbarSearch />
-              </div>
-            )}
-
             {/* Right side - Actions */}
             <NavActions 
-              toggleMobileSearch={toggleMobileSearch}
               onAuthRequired={handleAuthRequired}
             />
           </div>
-          
-          {/* Mobile search bar */}
-          <MobileSearch showMobileSearch={showMobileSearch} />
         </div>
       </header>
 

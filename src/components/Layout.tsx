@@ -10,7 +10,7 @@ import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
 
-const TOP_NAV_HEIGHT_MOBILE = 112; // 56px main nav + 56px search on mobile
+const TOP_NAV_HEIGHT_MOBILE = 64; // Single nav height
 const TOP_NAV_HEIGHT_DESKTOP = 64; // Desktop nav height
 const LEFT_SIDEBAR_WIDTH = 80; // px, matches w-20
 const MOBILE_BOTTOM_NAV_HEIGHT = 80; // Increased for better iPhone compatibility
