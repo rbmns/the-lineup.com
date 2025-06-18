@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss"
 
 const config = {
@@ -25,50 +26,98 @@ const config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#F3F4F6", // Updated app-wide background
-        foreground: "#1F1F1F",
+        background: "#F4E7D3", // Updated to Sand Beige
+        foreground: "#005F73", // Updated to Ocean Deep
         primary: {
-          DEFAULT: "#00A6A6",
+          DEFAULT: "#005F73", // Ocean Deep - Primary brand color
+          75: "#337D8D", // Lighter shade of Ocean Deep
+          50: "#669BA7", // Even lighter shade
+          25: "#99B9C1", // Very light shade
+          10: "#E6EEF0", // Almost white with a hint of Ocean Deep
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#F9FAFB", // Sidebar and containers
-          foreground: "#1F1F1F",
+          DEFAULT: "#F4E7D3", // Sand Beige - Background color
+          50: "#F9F3E9", // Lighter Sand Beige
+          25: "#FCF9F4", // Even lighter Sand Beige
+          10: "#FEFCFA", // Almost white with a hint of Sand Beige
+          foreground: "#005F73",
+        },
+        vibrant: {
+          sunset: "#FF9933", // Sunset Orange - Accent color
+          coral: "#FF6B4A", // Alternative accent
+          sand: "#F4E7D3", // Sand Beige
+          seafoam: "#66B2B2", // Complementary to Ocean Deep
+        },
+        nature: {
+          ocean: "#005F73", // Ocean Deep
+          sand: "#F4E7D3", // Sand Beige
+          coral: "#FF6B4A", // Coral accent
+          seafoam: "#66B2B2", // Seafoam accent
+        },
+        neutral: {
+          DEFAULT: "#8C8C89", // Driftwood Gray - Text color
+          75: "#A3A3A1", // Lighter Driftwood
+          50: "#BABAB8", // Even lighter Driftwood
+          25: "#D1D1D0", // Very light Driftwood
+          10: "#E8E8E7", // Almost white with a hint of Driftwood
+        },
+        status: {
+          success: "#66B2B2", // Seafoam for success
+          warning: "#FF9933", // Sunset Orange for warning
+          error: "#FF6B4A", // Coral for error
+          info: "#005F73", // Ocean Deep for info
+        },
+        extended: {
+          oceanDeep: {
+            950: "#004A5A",
+            900: "#005366",
+            800: "#005F73", // Base Ocean Deep
+            700: "#006B80",
+            600: "#00778D",
+            500: "#00839A",
+            400: "#1A8FA5",
+            300: "#339BB0",
+            200: "#4DA7BB",
+            100: "#66B3C5",
+            50: "#B2D9E2",
+          },
         },
         destructive: {
-          DEFAULT: "#FF5C57",
+          DEFAULT: "#FF6B4A", // Updated to Coral
           foreground: "#FFFFFF",
         },
         muted: {
-          DEFAULT: "#6B7280",
-          foreground: "#374151",
+          DEFAULT: "#8C8C89", // Updated to Driftwood Gray
+          foreground: "#005F73",
         },
         accent: {
-          DEFAULT: "#4ADEDE",
-          foreground: "#00A6A6",
+          DEFAULT: "#66B2B2", // Updated to Seafoam
+          foreground: "#005F73",
         },
-        'brand-turquoise': '#00A6A6',
-        'brand-seafoam': '#4ADEDE',
-        'brand-neutral-bg': '#F3F4F6',
-        'brand-text-primary': '#1F1F1F',
-        'brand-text-secondary': '#374151',
-        'brand-muted': '#6B7280',
-        'brand-online-green': '#22C55E',
-        'brand-away-orange': '#F97316',
-        'ocean-deep': '#0C3B5C',
-        'sunset-yellow': '#FFCB6B',
-        'seafoam-green': '#80D8DA',
+        // Legacy colors for backwards compatibility
+        'brand-turquoise': '#66B2B2',
+        'brand-seafoam': '#66B2B2',
+        'brand-neutral-bg': '#F4E7D3',
+        'brand-text-primary': '#005F73',
+        'brand-text-secondary': '#8C8C89',
+        'brand-muted': '#8C8C89',
+        'brand-online-green': '#66B2B2',
+        'brand-away-orange': '#FF9933',
+        'ocean-deep': '#005F73',
+        'sunset-yellow': '#FF9933',
+        'seafoam-green': '#66B2B2',
         'clay-earth': '#A17C6B',
-        'pastel-turquoise': '#E0F7F7',
-        'pastel-coral': '#FFEDE8',
+        'pastel-turquoise': '#E6EEF0',
+        'pastel-coral': '#F9F3E9',
       },
       boxShadow: {
-        'turquoise': '0 4px 24px 0 rgba(0,166,166,0.08)',
-        'card-lg': '0 8px 40px 0 rgba(0,166,166,0.10)',
+        'turquoise': '0 4px 24px 0 rgba(0,95,115,0.08)',
+        'card-lg': '0 8px 40px 0 rgba(0,95,115,0.10)',
       },
       backgroundImage: {
-        'accent-gradient': 'linear-gradient(135deg, #00A6A6, #4ADEDE)',
-        'zone-main': 'linear-gradient(to bottom, #F3F4F6 0%, #FFFFFF 100%)',
+        'accent-gradient': 'linear-gradient(135deg, #005F73, #66B2B2)',
+        'zone-main': 'linear-gradient(to bottom, #F4E7D3 0%, #FFFFFF 100%)',
       },
       fontFamily: {
         'inter': ['Inter', 'sans-serif'],
@@ -77,7 +126,7 @@ const config = {
         lg: "1rem",
         md: "0.75rem",
         sm: "0.5rem",
-        xl: "0.75rem", // LESS ROUND (was 1.5rem)
+        xl: "0.75rem",
       },
       transitionProperty: {
         'coastal': 'box-shadow, background-color, color, transform',
