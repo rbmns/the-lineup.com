@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState, useEffect } from 'react';
 import { useEvents } from '@/hooks/useEvents';
 import { useVenues } from '@/hooks/useVenues';
@@ -175,8 +174,8 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     }
 
     const result = tempFilteredEvents.filter((event) => {
-      // Event type filter
-      if (selectedCategories.length > 0 && !selectedCategories.includes(event.event_category || '')) {
+      // Event type filter - only filter if categories are specifically selected (not when none are selected)
+      if (selectedCategories.length > 0 && !isNoneSelected && !selectedCategories.includes(event.event_category || '')) {
         return false;
       }
       
@@ -243,7 +242,7 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     });
     
     return result;
-  }, [allEvents, selectedCategories, selectedVenues, selectedVibes, dateRange, selectedDateFilter, userLocation]);
+  }, [allEvents, selectedCategories, selectedVenues, selectedVibes, dateRange, selectedDateFilter, userLocation, isNoneSelected]);
 
   // Format venues for the component
   const formattedVenues = venues.map(venue => ({
