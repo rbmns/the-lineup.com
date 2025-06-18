@@ -45,7 +45,6 @@ export const NavActions: React.FC<NavActionsProps> = ({
               asChild 
               variant="ghost" 
               size="sm" 
-              className="hidden md:inline-flex text-gray-700 hover:text-gray-900"
             >
               <Link to="/admin">Admin</Link>
             </Button>
@@ -69,7 +68,7 @@ export const NavActions: React.FC<NavActionsProps> = ({
             size="sm"
             onClick={handleSignInClick} 
             className={cn(
-              "text-gray-700 hover:text-gray-900 hover:bg-gray-100 flex-shrink-0",
+              "flex-shrink-0",
               isMobile ? "text-sm px-2 py-2" : "text-sm px-4"
             )}
           >
@@ -79,7 +78,7 @@ export const NavActions: React.FC<NavActionsProps> = ({
             <Button 
               size="sm" 
               onClick={() => navigate('/login', { state: { initialMode: 'register' } })} 
-              className="bg-gray-900 hover:bg-gray-800 text-white rounded-full text-sm px-6 flex-shrink-0"
+              className="flex-shrink-0"
             >
               Sign Up
             </Button>
