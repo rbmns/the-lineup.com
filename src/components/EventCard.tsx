@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Event } from '@/types';
-import { Calendar, MapPin, Users } from 'lucide-react';
+import { Calendar, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
@@ -12,7 +12,6 @@ import { formatEventCardDateTime } from '@/utils/date-formatting';
 import { LineupImage } from '@/components/ui/lineup-image';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface EventCardProps {
   event: Event;
@@ -28,7 +27,7 @@ interface EventCardProps {
 export const EventCard: React.FC<EventCardProps> = ({
   event,
   compact = false,
-  showRsvpButtons = false,
+  showRsvpButtons = true,
   showRsvpStatus = false,
   onRsvp,
   className,
@@ -38,14 +37,13 @@ export const EventCard: React.FC<EventCardProps> = ({
   const { isAuthenticated } = useAuth();
   const { navigateToEvent } = useEventNavigation();
   const { getEventImageUrl } = useEventImages();
-  const isMobile = useIsMobile();
   const imageUrl = getEventImageUrl(event);
 
   // Only show RSVP functionality if user is authenticated AND showRsvpButtons is true
   const shouldShowRsvp = isAuthenticated && showRsvpButtons;
 
   const handleClick = (e: React.MouseEvent) => {
-    // More thorough check for RSVP-related elements
+    // Check for RSVP-related elements
     const target = e.target as HTMLElement;
     const isRsvpElement = 
       target.closest('[data-rsvp-container="true"]') || 
@@ -65,7 +63,6 @@ export const EventCard: React.FC<EventCardProps> = ({
     }
     
     try {
-      // Use hook for consistent navigation
       navigateToEvent(event);
     } catch (error) {
       console.error("Error navigating to event:", error);
@@ -77,13 +74,11 @@ export const EventCard: React.FC<EventCardProps> = ({
     }
   };
 
-  // Handle RSVP and ensure we always return a Promise<boolean>
   const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp || !shouldShowRsvp) return false;
     
     try {
       const result = await onRsvp(event.id, status);
-      // Convert any result (including void) to a boolean
       return result === undefined ? true : !!result;
     } catch (error) {
       console.error('Error in EventCard RSVP handler:', error);
@@ -91,23 +86,17 @@ export const EventCard: React.FC<EventCardProps> = ({
     }
   };
 
-  // Get venue display name with proper fallback
   const getVenueDisplay = (): string => {
-    // First priority: venue name from venues table
     if (event.venues?.name) {
       return event.venues.name;
     }
     
-    // Second priority: location field (legacy)
     if (event.location) {
       return event.location;
     }
     
-    // Fallback
     return 'Location TBD';
   };
-
-  const totalAttendees = (event.going_count || 0) + (event.interested_count || 0);
 
   return (
     <Card 
@@ -118,16 +107,15 @@ export const EventCard: React.FC<EventCardProps> = ({
       onClick={handleClick}
       data-event-id={event.id}
     >
-      {/* Image with better mobile sizing */}
-      <div className={cn(
-        "relative w-full overflow-hidden bg-gray-100 flex-shrink-0",
-        isMobile ? "h-48" : "h-56"
-      )}>
+      {/* Image with category and vibe pills */}
+      <div className="relative w-full h-48 overflow-hidden bg-gray-100 flex-shrink-0">
         <LineupImage
           src={imageUrl}
           alt={event.title}
           aspectRatio="video"
-          className="w-full h-full object-cover"
+          treatment="subtle-overlay"
+          overlayVariant="ocean"
+          className="w-full h-full"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (!target.src.includes('/img/default.jpg')) {
@@ -137,60 +125,47 @@ export const EventCard: React.FC<EventCardProps> = ({
           }}
         />
         
-        {/* Event category pill */}
+        {/* Category pill - top left */}
         {event.event_category && (
           <div className="absolute top-3 left-3 z-10">
             <CategoryPill 
               category={event.event_category} 
-              size="sm" 
-              showIcon={false} 
+              size="sm"
             />
           </div>
         )}
+
+        {/* Vibe pill - top right (placeholder for future implementation) */}
+        {/* TODO: Add vibe pill when vibe data is available */}
       </div>
       
-      {/* Content with better mobile spacing */}
-      <div className={cn(
-        "flex flex-col flex-1 justify-between",
-        isMobile ? "p-4" : "p-5"
-      )}>
-        <div className="space-y-3">
-          {/* Title */}
-          <h3 className="font-semibold text-gray-900 text-lg leading-tight line-clamp-2">
-            {event.title}
-          </h3>
-          
-          {/* Date and Time */}
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
-            <span className="font-medium">
-              {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
-            </span>
-          </div>
-          
-          {/* Location */}
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
-            <span className="truncate">
-              {getVenueDisplay()}
-            </span>
-          </div>
-
-          {/* Attendees count */}
-          {totalAttendees > 0 && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Users className="h-4 w-4 text-gray-400 flex-shrink-0" />
-              <span>
-                {totalAttendees} {totalAttendees === 1 ? 'person' : 'people'} interested
-              </span>
-            </div>
-          )}
+      {/* Content */}
+      <div className="flex flex-col flex-1 p-4 space-y-3">
+        {/* Title */}
+        <h3 className="font-semibold text-gray-900 text-lg leading-tight line-clamp-2">
+          {event.title}
+        </h3>
+        
+        {/* Date and Time */}
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
+          <span className="font-medium">
+            {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
+          </span>
         </div>
         
+        {/* Location */}
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
+          <span className="truncate">
+            {getVenueDisplay()}
+          </span>
+        </div>
+
         {/* RSVP Buttons - only show if authenticated */}
         {shouldShowRsvp && onRsvp && (
           <div 
-            className="mt-4 pt-3 border-t border-gray-100" 
+            className="mt-auto pt-3" 
             data-rsvp-container="true" 
             onClick={(e) => e.stopPropagation()}
           >
