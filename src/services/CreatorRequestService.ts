@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase';
 
 interface CreatorRequestDetails {
@@ -13,6 +14,19 @@ interface UserProfileDetails {
 
 export const CreatorRequestService = {
   async requestCreatorAccess(userId: string, details: CreatorRequestDetails): Promise<{ data: any; error: any }> {
+    // First, get user profile information
+    const { data: userProfile, error: profileError } = await supabase
+      .from('profiles')
+      .select('username, email')
+      .eq('id', userId)
+      .single();
+
+    if (profileError) {
+      console.error('Error fetching user profile:', profileError);
+      return { data: null, error: profileError };
+    }
+
+    // Create the creator request
     const { data, error } = await supabase
       .from('creator_requests')
       .insert({ 
@@ -27,8 +41,16 @@ export const CreatorRequestService = {
 
     if (error) {
       console.error('Error requesting creator access:', error);
+      return { data: null, error };
     }
-    return { data, error };
+
+    // Send admin notification (both in-app and email)
+    await this.notifyAdminOfCreatorRequest(userId, details, {
+      username: userProfile.username || 'Unknown',
+      email: userProfile.email || 'No email'
+    });
+
+    return { data, error: null };
   },
 
   async getCreatorRequestStatus(userId: string): Promise<{ data: { status: string } | null; error: any }> {
@@ -48,6 +70,7 @@ export const CreatorRequestService = {
   },
 
   async notifyAdminOfCreatorRequest(userId: string, requestDetails: CreatorRequestDetails, userProfile: UserProfileDetails): Promise<{ error: any }> {
+    // Create in-app notification
     const { error: notificationError } = await supabase
       .from('admin_notifications')
       .insert({
@@ -64,18 +87,19 @@ export const CreatorRequestService = {
       console.error('Error creating admin notification for creator request:', notificationError);
     }
     
-    // Invoke the edge function to send an email notification
+    // Send email notification via edge function
     const { error: functionError } = await supabase.functions.invoke('notify-admin-creator-request', {
         body: {
           username: userProfile.username,
           user_email: userProfile.email,
-          ...requestDetails,
+          reason: requestDetails.reason,
+          contact_email: requestDetails.contact_email,
+          contact_phone: requestDetails.contact_phone,
         }
     });
 
     if (functionError) {
       console.error('Error invoking email notification function:', functionError);
-      // We don't block the user's flow if email fails. The in-app notification is the primary source.
     }
     
     return { error: notificationError || functionError };

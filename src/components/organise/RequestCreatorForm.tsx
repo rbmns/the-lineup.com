@@ -27,15 +27,19 @@ export const RequestCreatorForm: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      await CreatorRequestService.requestCreatorAccess(user.id, {
+      const { error } = await CreatorRequestService.requestCreatorAccess(user.id, {
         reason: formData.reason,
         contact_email: formData.contactEmail || undefined,
         contact_phone: formData.contactPhone || undefined,
       });
 
+      if (error) {
+        throw error;
+      }
+
       toast({
-        title: "Request Submitted",
-        description: "Your dashboard access request has been submitted for review.",
+        title: "Request Submitted Successfully! 🎉",
+        description: "Your dashboard access request has been submitted and our admin team has been notified. You'll receive an email once it's been reviewed.",
       });
 
       setFormData({
@@ -43,11 +47,11 @@ export const RequestCreatorForm: React.FC = () => {
         contactEmail: '',
         contactPhone: ''
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting creator request:', error);
       toast({
-        title: "Error",
-        description: "Failed to submit request. Please try again.",
+        title: "Submission Failed",
+        description: error.message || "Failed to submit request. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -73,7 +77,7 @@ export const RequestCreatorForm: React.FC = () => {
               </div>
               <h3 className="text-lg font-medium mb-2">Your Request is Being Reviewed</h3>
               <p className="text-gray-600">
-                We're reviewing your dashboard access request. You'll receive an email once it's been processed.
+                We're reviewing your dashboard access request. Our admin team has been notified and you'll receive an email once it's been processed.
               </p>
             </div>
           </CardContent>
@@ -94,7 +98,7 @@ export const RequestCreatorForm: React.FC = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="reason">Why do you want to organize events?</Label>
+              <Label htmlFor="reason">Why do you want to organize events? *</Label>
               <Textarea
                 id="reason"
                 value={formData.reason}
@@ -129,7 +133,7 @@ export const RequestCreatorForm: React.FC = () => {
 
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !formData.reason.trim()}
               className="w-full"
             >
               {isSubmitting ? 'Submitting Request...' : 'Submit Request'}
