@@ -135,8 +135,14 @@ export const EventCard: React.FC<EventCardProps> = ({
           </div>
         )}
 
-        {/* Vibe pill - top right (placeholder for future implementation) */}
-        {/* TODO: Add vibe pill when vibe data is available */}
+        {/* Vibe pill - top right */}
+        {event.tags && event.tags.length > 0 && (
+          <div className="absolute top-3 right-3 z-10">
+            <span className="inline-flex items-center rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5">
+              {event.tags[0]}
+            </span>
+          </div>
+        )}
       </div>
       
       {/* Content */}
@@ -145,6 +151,13 @@ export const EventCard: React.FC<EventCardProps> = ({
         <h3 className="font-semibold text-gray-900 text-lg leading-tight line-clamp-2">
           {event.title}
         </h3>
+        
+        {/* Organizer info */}
+        {event.organiser_name && (
+          <p className="text-sm text-gray-600">
+            By {event.organiser_name}
+          </p>
+        )}
         
         {/* Date and Time */}
         <div className="flex items-center gap-2 text-sm text-gray-600">
