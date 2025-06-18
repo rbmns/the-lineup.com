@@ -99,6 +99,9 @@ export const EventCard: React.FC<EventCardProps> = ({
     return 'Location TBD';
   };
 
+  // Debug: Log the vibe value to help identify the issue
+  console.log('Event vibe for event', event.id, ':', event.vibe, typeof event.vibe);
+
   return (
     <Card 
       className={cn(
@@ -136,15 +139,13 @@ export const EventCard: React.FC<EventCardProps> = ({
           </div>
         )}
 
-        {/* Event vibe pill - top right */}
-        {event.vibe && (
-          <div className="absolute top-3 right-3 z-10">
-            <EventVibeLabel 
-              vibe={event.vibe} 
-              size="sm"
-            />
-          </div>
-        )}
+        {/* Event vibe pill - top right - show for ALL events, even if vibe is empty/null */}
+        <div className="absolute top-3 right-3 z-10">
+          <EventVibeLabel 
+            vibe={event.vibe || 'general'} 
+            size="sm"
+          />
+        </div>
       </div>
       
       {/* Content */}
