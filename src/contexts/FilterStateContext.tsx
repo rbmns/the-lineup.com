@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { DateRange } from 'react-day-picker';
 import { useEvents } from '@/hooks/useEvents';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSearchParams } from 'react-router-dom';
 
 interface FilterStateContextType {
   selectedCategories: string[];
@@ -34,6 +35,7 @@ const FilterStateContext = createContext<FilterStateContextType | undefined>(und
 export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const { data: events = [] } = useEvents(user?.id);
+  const [searchParams, setSearchParams] = useSearchParams();
   
   // Get all unique event categories
   const allCategories = React.useMemo(() => {
@@ -45,7 +47,7 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
     )).sort();
   }, [events]);
 
-  // Initialize with empty array (show all by default)
+  // Initialize with URL params or empty array (show all by default)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
@@ -53,6 +55,26 @@ export const FilterStateProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [selectedVenues, setSelectedVenues] = useState<string[]>([]);
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
+
+  // Initialize from URL parameters on mount
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam) {
+      console.log('Setting category from URL:', categoryParam);
+      setSelectedCategories([categoryParam]);
+    }
+  }, [searchParams]);
+
+  // Update URL when categories change (but only if we have specific categories selected)
+  useEffect(() => {
+    if (selectedCategories.length === 1) {
+      searchParams.set('category', selectedCategories[0]);
+      setSearchParams(searchParams, { replace: true });
+    } else if (selectedCategories.length === 0) {
+      searchParams.delete('category');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [selectedCategories, searchParams, setSearchParams]);
 
   const toggleCategory = (category: string) => {
     setSelectedCategories(prev => 

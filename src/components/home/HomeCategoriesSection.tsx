@@ -107,11 +107,11 @@ export const HomeCategoriesSection: React.FC<HomeCategoriesSectionProps> = ({
       categoryKey: "sports",
     },
     {
-      name: "Wellness",
+      name: "Culture",
       icon: <GlobeIcon className="h-6 w-6" />,
-      href: "/events?category=wellness",
+      href: "/events?category=culture",
       color: "bg-emerald-50 text-emerald-600",
-      categoryKey: "wellness",
+      categoryKey: "culture",
     },
   ];
 
@@ -125,6 +125,8 @@ export const HomeCategoriesSection: React.FC<HomeCategoriesSectionProps> = ({
         .filter(Boolean)
         .map(cat => cat.toLowerCase())
     );
+    
+    console.log('Available event categories:', Array.from(eventCategories));
     
     const filteredCategories = allCategories.filter(category => 
       eventCategories.has(category.categoryKey)
@@ -141,6 +143,7 @@ export const HomeCategoriesSection: React.FC<HomeCategoriesSectionProps> = ({
       });
     }
     
+    console.log('Filtered categories:', filteredCategories.map(c => c.name));
     return filteredCategories;
   }, [events]);
 

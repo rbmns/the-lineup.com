@@ -69,17 +69,17 @@ export const useEventImages = (event?: Event | null): EventImageResult => {
         }
       }
       
-      // Validate the URL
+      // Return the uploaded image URL directly (treatments will be applied by LineupImage component)
       if (imageUrl && imageUrl.startsWith('http')) {
-        console.log(`[EventImage] Found valid DB image: ${imageUrl}`);
+        console.log(`[EventImage] Found valid uploaded image: ${imageUrl}`);
         return imageUrl;
       } else if (imageUrl) {
-        console.warn(`[EventImage] Invalid DB image URL: ${imageUrl}`);
+        console.warn(`[EventImage] Invalid uploaded image URL: ${imageUrl}`);
       }
     }
     
     // Use fallback based on event category
-    console.log(`[EventImage] No valid DB image. Falling back on category: "${eventData.event_category}"`);
+    console.log(`[EventImage] No valid uploaded image. Using fallback for category: "${eventData.event_category}"`);
     const fallbackImage = getEventFallbackImage(eventData.event_category);
     console.log(`[EventImage] Fallback image is: ${fallbackImage}`);
     return fallbackImage;
