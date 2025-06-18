@@ -102,7 +102,7 @@ export const EventCard: React.FC<EventCardProps> = ({
   return (
     <Card 
       className={cn(
-        "flex flex-col h-full overflow-hidden cursor-pointer transition-all duration-300 ease-in-out hover:shadow-xl bg-white border border-gray-200 rounded-lg",
+        "flex flex-col h-full overflow-hidden cursor-pointer transition-all duration-300 ease-in-out hover:shadow-xl bg-white border border-gray-200 rounded-sm",
         className
       )}
       onClick={handleClick}
@@ -116,7 +116,7 @@ export const EventCard: React.FC<EventCardProps> = ({
           aspectRatio="video"
           treatment="subtle-overlay"
           overlayVariant="ocean"
-          className="w-full h-full rounded-t-lg"
+          className="w-full h-full"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (!target.src.includes('/img/default.jpg')) {

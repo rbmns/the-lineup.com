@@ -52,7 +52,7 @@ export const LineupImage: React.FC<LineupImageProps> = ({
 }) => {
   return (
     <div className={cn(
-      'relative overflow-hidden rounded-md',
+      'relative overflow-hidden rounded-t-sm',
       aspectRatioClasses[aspectRatio],
       className
     )}>
@@ -70,7 +70,7 @@ export const LineupImage: React.FC<LineupImageProps> = ({
       {/* Subtle brand overlay for treatment */}
       {treatment === 'subtle-overlay' && overlayVariant !== 'none' && (
         <div className={cn(
-          'absolute inset-0 rounded-md',
+          'absolute inset-0 rounded-t-sm',
           overlayClasses[overlayVariant]
         )} />
       )}
