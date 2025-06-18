@@ -1,32 +1,25 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-
 export const HomeCasualPlansSection: React.FC = () => {
-  const casualPlans = [
-    {
-      id: 1,
-      title: 'Sunset watch & beers',
-      date: 'Thu, 26 Jun',
-      time: '12:00',
-      interested: 3,
-      avatar: '••••••'
-    },
-    {
-      id: 2,
-      title: 'guitar and campfire',
-      date: 'Tue, 1 Jul',
-      time: '20:30',
-      interested: 3,
-      avatar: '••••••'
-    }
-  ];
-
-  return (
-    <section className="py-8 md:py-12 bg-white">
+  const casualPlans = [{
+    id: 1,
+    title: 'Sunset watch & beers',
+    date: 'Thu, 26 Jun',
+    time: '12:00',
+    interested: 3,
+    avatar: '••••••'
+  }, {
+    id: 2,
+    title: 'guitar and campfire',
+    date: 'Tue, 1 Jul',
+    time: '20:30',
+    interested: 3,
+    avatar: '••••••'
+  }];
+  return <section className="py-8 md:py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="space-y-6 md:space-y-8">
           {/* Header */}
@@ -51,8 +44,7 @@ export const HomeCasualPlansSection: React.FC = () => {
 
           {/* Casual Plans Grid - properly spaced */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {casualPlans.map(plan => (
-              <Card key={plan.id} className="hover:shadow-md transition-shadow bg-white border border-gray-200">
+            {casualPlans.map(plan => <Card key={plan.id} className="hover:shadow-md transition-shadow bg-white border border-gray-200">
                 <CardContent className="p-4 md:p-6">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
@@ -76,8 +68,7 @@ export const HomeCasualPlansSection: React.FC = () => {
                     </Button>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
 
           {/* Sign in prompt */}
@@ -91,14 +82,10 @@ export const HomeCasualPlansSection: React.FC = () => {
           {/* Create Plan CTA */}
           <div className="text-center">
             <Button asChild size="lg" className="rounded-full bg-gray-900 hover:bg-gray-800">
-              <Link to="/casual-plans" className="flex items-center gap-2">
-                <Plus className="h-5 w-5" />
-                Create a Plan
-              </Link>
+              
             </Button>
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
