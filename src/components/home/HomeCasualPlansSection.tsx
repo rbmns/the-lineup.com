@@ -1,10 +1,8 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-
 export const HomeCasualPlansSection: React.FC = () => {
   const casualPlans = [{
     id: 1,
@@ -21,9 +19,7 @@ export const HomeCasualPlansSection: React.FC = () => {
     interested: 3,
     avatar: '🎸'
   }];
-
-  return (
-    <section className="py-16 bg-gradient-to-br from-secondary-50 via-white to-secondary-25 relative overflow-hidden">
+  return <section className="py-16 bg-gradient-to-br from-secondary-50 via-white to-secondary-25 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-16 left-20 w-28 h-28 bg-vibrant-sunset/30 rounded-full blur-3xl"></div>
@@ -54,8 +50,7 @@ export const HomeCasualPlansSection: React.FC = () => {
 
           {/* Casual Plans Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {casualPlans.map(plan => (
-              <Card key={plan.id} className="hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm border-neutral-25 hover:border-primary/20 transform hover:scale-105">
+            {casualPlans.map(plan => <Card key={plan.id} className="hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm border-neutral-25 hover:border-primary/20 transform hover:scale-105">
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
@@ -80,8 +75,7 @@ export const HomeCasualPlansSection: React.FC = () => {
                     </Button>
                   </div>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
 
           {/* Sign in prompt */}
@@ -95,14 +89,10 @@ export const HomeCasualPlansSection: React.FC = () => {
           {/* Create Plan CTA */}
           <div className="text-center">
             <Button asChild size="lg" className="rounded-full bg-gradient-to-r from-primary to-extended-oceanDeep-600 hover:from-primary/90 hover:to-extended-oceanDeep-700 text-white shadow-xl transform hover:scale-105 transition-all duration-300">
-              <Link to="/casual-plans/create" className="flex items-center gap-2 px-8 py-4">
-                <Plus className="h-5 w-5" />
-                Create Your Own Plan
-              </Link>
+              
             </Button>
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
