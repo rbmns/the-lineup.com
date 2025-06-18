@@ -77,11 +77,13 @@ const SearchPage: React.FC = () => {
         await trackClick(query, event.id, 'event');
       }
       
-      // Navigate directly to event detail page using the event ID
-      navigate(`/events/${event.id}`);
+      // Navigate to event detail page - force using ID-based route
+      const eventPath = `/events/${event.id}`;
+      console.log('Navigating to:', eventPath);
+      navigate(eventPath);
     } catch (error) {
       console.error('Error handling event click:', error);
-      // Still navigate even if tracking fails
+      // Still navigate even if tracking fails - use fallback
       navigate(`/events/${event.id}`);
     }
   };

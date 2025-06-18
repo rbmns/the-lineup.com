@@ -1,6 +1,8 @@
 
 import React from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 /**
  * Home page hero section with clean white styling
@@ -25,12 +27,25 @@ const HomePageHeaderSection = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <button className={`bg-black text-white ${isMobile ? 'px-6 py-3 text-base' : 'px-8 py-4 text-lg'} rounded-full font-semibold hover:bg-gray-800 transition-all duration-300 transform hover:scale-105 shadow-lg`}>
-              Explore Events
-            </button>
-            <button className={`border-2 border-gray-300 text-black ${isMobile ? 'px-6 py-3 text-base' : 'px-8 py-4 text-lg'} rounded-full font-semibold hover:bg-gray-50 transition-all duration-300`}>
-              Create Plans
-            </button>
+            <Button 
+              asChild
+              size={isMobile ? "default" : "lg"}
+              className={`${isMobile ? 'px-6 py-3 text-base' : 'px-8 py-4 text-lg'} font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg`}
+            >
+              <Link to="/events">
+                Explore Events
+              </Link>
+            </Button>
+            <Button 
+              asChild
+              variant="outline"
+              size={isMobile ? "default" : "lg"}
+              className={`${isMobile ? 'px-6 py-3 text-base' : 'px-8 py-4 text-lg'} font-semibold transition-all duration-300`}
+            >
+              <Link to="/casual-plans/create">
+                Create Plans
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
