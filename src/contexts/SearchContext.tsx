@@ -113,13 +113,13 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // Enhanced search to cover more fields and use OR conditions properly
       const searchPattern = `%${term.toLowerCase()}%`;
       
-      // Search events with comprehensive field coverage and status filter
+      // Search events with comprehensive field coverage and status filter - fix the relationship issue
       const { data: eventData, error: eventError } = await supabase
         .from('events')
         .select(`
           *,
           venues!events_venue_id_fkey(*),
-          creator:profiles(id, username, avatar_url, email, location, status, tagline),
+          creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, status, tagline),
           event_rsvps(id, user_id, status)
         `)
         .eq('status', 'published') // Only show published events in search
@@ -142,10 +142,10 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         console.error('Venue search error:', venueError);
       }
 
-      // Search casual plans
+      // Search casual plans - fix the relationship issue
       const { data: casualPlanData, error: casualPlanError } = await supabase
         .from('casual_plans')
-        .select('*, creator_profile:profiles!casual_plans_creator_fkey(id, username, avatar_url)')
+        .select('*, creator_profile:profiles!casual_plans_creator_id_fkey(id, username, avatar_url)')
         .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},vibe.ilike.${searchPattern},location.ilike.${searchPattern}`)
 
       console.log('Casual plan search result:', casualPlanData?.length || 0, 'plans found');
@@ -208,7 +208,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         .from('events')
         .select(`
           *,
-          creator:profiles(id, username, avatar_url, email, location, location_category, status, tagline),
+          creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, location_category, status, tagline),
           venues!events_venue_id_fkey(*),
           event_rsvps(id, user_id, status)
         `)
@@ -264,7 +264,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       let query = supabase.from('events').select(`
         *,
-        creator:profiles(id, username, avatar_url, email, location, location_category, status, tagline),
+        creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, location_category, status, tagline),
         venues!events_venue_id_fkey(*),
         event_rsvps(id, user_id, status)
       `).eq('status', 'published'); // Only show published events
