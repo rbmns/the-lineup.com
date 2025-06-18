@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CategoryPill } from '@/components/ui/category-pill';
@@ -68,9 +67,7 @@ const DesignSystem = () => {
 
           {/* Main Content */}
           <div className="lg:col-span-9 space-y-12">
-            {/* All doc/demo sections receive left-aligned titles and consistent paddings */}
-            {/* For each section, harmonize the section container and headings */}
-            {/* Only code shown for representative section - repeat pattern for each */}
+            {/* Typography */}
             <section id="typography" className="scroll-mt-24">
               <Card>
                 <CardHeader>
@@ -180,35 +177,45 @@ const DesignSystem = () => {
               </Card>
             </section>
 
-            {/* Buttons */}
+            {/* Updated Buttons Section */}
             <section id="buttons">
               <Card>
                 <CardHeader>
-                  <CardTitle>Buttons</CardTitle>
-                  <CardDescription>Button variants and states</CardDescription>
+                  <CardTitle>Button Variants</CardTitle>
+                  <CardDescription>Updated button styles matching the new design system</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-8">
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Primary Actions</h4>
-                    <div className="flex flex-wrap gap-3">
-                      <Button>Default</Button>
-                      <Button size="sm">Small</Button>
-                      <Button size="lg">Large</Button>
-                      <Button disabled>Disabled</Button>
+                    <h4 className="text-sm font-medium text-gray-700 mb-4">Button Variants</h4>
+                    <div className="flex flex-wrap gap-4">
+                      <Button variant="default">Default</Button>
+                      <Button variant="outline">Outline</Button>
+                      <Button variant="secondary">Secondary</Button>
+                      <Button variant="ghost">Ghost</Button>
+                      <Button variant="link">Link</Button>
                     </div>
                   </div>
                   
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Secondary Actions</h4>
-                    <div className="flex flex-wrap gap-3">
-                      <Button variant="outline">Outline</Button>
-                      <Button variant="ghost">Ghost</Button>
-                      <Button variant="secondary">Secondary</Button>
+                    <h4 className="text-sm font-medium text-gray-700 mb-4">Button Sizes</h4>
+                    <div className="flex flex-wrap items-center gap-4">
+                      <Button size="sm">Small</Button>
+                      <Button size="default">Default</Button>
+                      <Button size="lg">Large</Button>
+                      <Button size="icon">+</Button>
                     </div>
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Special States</h4>
+                    <h4 className="text-sm font-medium text-gray-700 mb-4">Disabled State</h4>
+                    <div className="flex flex-wrap gap-4">
+                      <Button disabled>Default</Button>
+                      <Button disabled variant="outline">Outline</Button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-4">Special States</h4>
                     <div className="flex flex-wrap gap-3">
                       <Button className="bg-green-600 hover:bg-green-700">Going</Button>
                       <Button variant="outline" className="text-blue-600 border-blue-200 hover:bg-blue-50 bg-blue-50">Interested</Button>
@@ -217,7 +224,7 @@ const DesignSystem = () => {
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Icon Buttons</h4>
+                    <h4 className="text-sm font-medium text-gray-700 mb-4">Icon Buttons</h4>
                     <div className="flex flex-wrap gap-3">
                       <Button><Plus className="h-4 w-4 mr-2" />Create</Button>
                       <Button variant="outline"><Search className="h-4 w-4 mr-2" />Search</Button>
