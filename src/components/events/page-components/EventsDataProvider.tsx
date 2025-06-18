@@ -53,7 +53,14 @@ interface EventsDataProviderProps {
 
 export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children }) => {
   const { user } = useAuth();
-  const { data: events = [], isLoading: eventsLoading } = useEvents(user?.id);
+  // Main events query - temporarily include all statuses to debug the filtering issue
+  const { 
+    data: allEvents = [], 
+    isLoading: eventsLoading, 
+    error: eventsError,
+    refetch: refetchEvents 
+  } = useEvents(user?.id, { includeAllStatuses: true });
+
   const { venues = [], isLoading: isVenuesLoading } = useVenues();
   const { data: vibes = [], isLoading: vibesLoading } = useEventVibes();
   const { handleRsvp, loading: rsvpLoading } = useRsvpActions(user?.id);
@@ -91,7 +98,7 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
       return;
     }
 
-    const eventAtVenue = events.find(e => e.venue_id === selectedLocationId && e.coordinates);
+    const eventAtVenue = allEvents.find(e => e.venue_id === selectedLocationId && e.coordinates);
     if (eventAtVenue && eventAtVenue.coordinates) {
       const venueName = venues.find(v => v.id === selectedLocationId)?.name || 'selected area';
       const [longitude, latitude] = eventAtVenue.coordinates;
@@ -103,17 +110,17 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     } else {
       setUserLocation(null);
     }
-  }, [selectedLocationId, events, venues]);
+  }, [selectedLocationId, allEvents, venues]);
 
   // Get all unique event types
   const allEventTypes = useMemo(() => {
-    if (!events) return [];
+    if (!allEvents) return [];
     return Array.from(new Set(
-      events
+      allEvents
         .filter(event => event.event_category)
         .map(event => event.event_category as string)
     )).sort();
-  }, [events]);
+  }, [allEvents]);
 
   // Enhanced RSVP handler
   const enhancedHandleRsvp = async (eventId: string, status: 'Going' | 'Interested') => {
@@ -127,9 +134,9 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
 
   // Filter events based on all selected filters including vibes
   const filteredEvents = useMemo(() => {
-    if (!events) return [];
+    if (!allEvents) return [];
     
-    let tempFilteredEvents = [...events];
+    let tempFilteredEvents = [...allEvents];
 
     // New location filter
     if (userLocation && userLocation.latitude && userLocation.longitude) {
@@ -210,7 +217,7 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
       
       return true;
     });
-  }, [events, selectedCategories, selectedVenues, selectedVibes, dateRange, selectedDateFilter, userLocation]);
+  }, [allEvents, selectedCategories, selectedVenues, selectedVibes, dateRange, selectedDateFilter, userLocation]);
 
   // Format venues for the component
   const formattedVenues = venues.map(venue => ({
