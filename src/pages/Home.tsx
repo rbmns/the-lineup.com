@@ -4,6 +4,7 @@ import { useEvents } from '@/hooks/useEvents';
 import { HomeUpcomingEventsSection } from '@/components/home/HomeUpcomingEventsSection';
 import HomeHowItWorksSection from '@/components/home/HomeHowItWorksSection';
 import { HomeCasualPlansSection } from '@/components/home/HomeCasualPlansSection';
+import { HomeCategoriesSection } from '@/components/home/HomeCategoriesSection';
 import { OrganizerCtaSection } from '@/components/home/OrganizerCtaSection';
 import HomeCtaSection from '@/components/home/HomeCtaSection';
 
@@ -15,6 +16,9 @@ const Home = () => {
     <div className="w-full bg-white">
       {/* Upcoming Events Section with Vibe Filters */}
       <HomeUpcomingEventsSection events={events} isLoading={isLoading} />
+
+      {/* Categories Section */}
+      <HomeCategoriesSection events={events} />
 
       {/* How It Works Section */}
       <HomeHowItWorksSection />
