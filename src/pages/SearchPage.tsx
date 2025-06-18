@@ -70,12 +70,14 @@ const SearchPage: React.FC = () => {
   // Handle event card click with proper navigation and tracking
   const handleEventClick = async (event: Event) => {
     try {
+      console.log('Search page - handling event click for event:', event.id);
+      
       // Track the click
       if (query) {
         await trackClick(query, event.id, 'event');
       }
       
-      // Navigate to event detail page using the event ID
+      // Navigate directly to event detail page using the event ID
       navigate(`/events/${event.id}`);
     } catch (error) {
       console.error('Error handling event click:', error);

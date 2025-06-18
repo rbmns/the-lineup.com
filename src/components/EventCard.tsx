@@ -59,13 +59,16 @@ export const EventCard: React.FC<EventCardProps> = ({
       return;
     }
     
+    // Use custom onClick handler if provided (for search results)
     if (onClick) {
+      console.log('EventCard - using custom onClick handler for event:', event.id);
       onClick(event);
       return;
     }
     
+    // Fallback to default navigation
     try {
-      // Use hook for consistent navigation
+      console.log('EventCard - using default navigation for event:', event.id);
       navigateToEvent(event);
     } catch (error) {
       console.error("Error navigating to event:", error);
@@ -149,7 +152,7 @@ export const EventCard: React.FC<EventCardProps> = ({
       {/* Content Section */}
       <div className="flex flex-col flex-1 p-4 text-left">
         {/* Title */}
-        <h3 className="font-semibold text-gray-900 text-base leading-tight mb-2 line-clamp-2">
+        <h3 className="font-semibold text-black text-base leading-tight mb-2 line-clamp-2">
           {event.title}
         </h3>
         
