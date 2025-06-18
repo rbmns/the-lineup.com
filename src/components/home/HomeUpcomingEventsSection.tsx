@@ -16,18 +16,18 @@ interface HomeUpcomingEventsSectionProps {
 
 const getVibeColor = (vibe: string): string => {
   const vibeColors: Record<string, string> = {
-    party: '#F43F5E',
-    chill: '#10B981',
-    wellness: '#8B5CF6',
-    active: '#F59E0B',
-    social: '#EC4899',
-    creative: '#6366F1',
-    adventure: '#059669',
-    mindful: '#84CC16',
-    relaxed: '#F97316',
-    spiritual: '#A855F7'
+    party: '#FF6B4A',
+    chill: '#66B2B2',
+    wellness: '#FF9933',
+    active: '#005F73',
+    social: '#FF6B4A',
+    creative: '#66B2B2',
+    adventure: '#005F73',
+    mindful: '#FF9933',
+    relaxed: '#66B2B2',
+    spiritual: '#FF9933'
   };
-  return vibeColors[vibe.toLowerCase()] || '#6B7280';
+  return vibeColors[vibe.toLowerCase()] || '#005F73';
 };
 
 export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps> = ({
@@ -38,12 +38,19 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
   const {
     navigateToEvent
   } = useEventNavigation();
-  const {
-    data: vibes = [],
-    isLoading: vibesLoading
-  } = useEventVibes();
   const isMobile = useIsMobile();
   const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
+
+  // Get available vibes from the actual events, not the database
+  const availableVibes = useMemo(() => {
+    if (!events) return [];
+    const vibes = events
+      .map(event => event.vibe)
+      .filter(Boolean)
+      .filter((vibe, index, array) => array.indexOf(vibe) === index) // Remove duplicates
+      .sort();
+    return vibes as string[];
+  }, [events]);
 
   // Filter events by selected vibe
   const filteredEvents = useMemo(() => {
@@ -68,10 +75,10 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
   
   if (isLoading) {
     return (
-      <div className="py-16 bg-white">
+      <div className="py-16 bg-gradient-to-br from-secondary-10 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-gray-600" />
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         </div>
       </div>
@@ -79,77 +86,79 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
   }
 
   return (
-    <section className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-16 bg-gradient-to-br from-secondary-10 to-white relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-20 left-10 w-32 h-32 bg-vibrant-seafoam/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-20 w-40 h-40 bg-vibrant-coral/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 h-60 bg-vibrant-sunset/10 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
-        <div className="mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold mb-3 text-gray-900">
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3 text-primary">
             Upcoming Events
           </h2>
-          <p className="text-lg max-w-2xl text-gray-700">
+          <p className="text-lg max-w-2xl mx-auto text-neutral">
             Discover events that match your energy — from sunrise yoga to sunset gatherings
           </p>
         </div>
 
-        {/* Vibe Filter Pills */}
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Find your vibe</h3>
-          <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-            <button 
-              onClick={() => handleVibeClick(null)} 
-              className={cn(
-                "flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
-                !selectedVibe 
-                  ? "bg-gray-900 text-white shadow-md" 
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              )}
-            >
-              All Vibes
-            </button>
-            {vibesLoading ? (
-              // Loading state for vibes
-              <>
-                {[1, 2, 3, 4, 5].map(i => (
-                  <div key={i} className="flex-shrink-0 h-9 bg-gray-200 rounded-full w-20 animate-pulse"></div>
-                ))}
-              </>
-            ) : (
-              vibes.map(vibe => {
-                const color = getVibeColor(vibe);
-                const isSelected = selectedVibe === vibe;
-                return (
-                  <button 
-                    key={vibe} 
-                    onClick={() => handleVibeClick(vibe)} 
-                    className={cn(
-                      "flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 capitalize border",
-                      isSelected 
-                        ? "text-white shadow-md border-transparent" 
-                        : "bg-white text-gray-700 hover:shadow-sm border-gray-200"
-                    )}
-                    style={isSelected ? {
-                      backgroundColor: color,
-                      boxShadow: `0 4px 12px ${color}20`
-                    } : {}}
-                  >
-                    {vibe}
-                  </button>
-                );
-              })
-            )}
+        {/* Only show vibe filters if there are available vibes */}
+        {availableVibes.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-xl font-semibold text-primary mb-4 text-center">Find your vibe</h3>
+            <div className="flex justify-center">
+              <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar max-w-full">
+                <button 
+                  onClick={() => handleVibeClick(null)} 
+                  className={cn(
+                    "flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
+                    !selectedVibe 
+                      ? "bg-primary text-white shadow-lg transform scale-105" 
+                      : "bg-white text-neutral-75 hover:bg-secondary-25 border border-neutral-25"
+                  )}
+                >
+                  All Vibes
+                </button>
+                {availableVibes.map(vibe => {
+                  const color = getVibeColor(vibe);
+                  const isSelected = selectedVibe === vibe;
+                  return (
+                    <button 
+                      key={vibe} 
+                      onClick={() => handleVibeClick(vibe)} 
+                      className={cn(
+                        "flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 capitalize border transform",
+                        isSelected 
+                          ? "text-white shadow-lg scale-105 border-transparent" 
+                          : "bg-white text-neutral-75 hover:shadow-md border-neutral-25 hover:scale-102"
+                      )}
+                      style={isSelected ? {
+                        backgroundColor: color,
+                        boxShadow: `0 8px 25px ${color}30`
+                      } : {}}
+                    >
+                      {vibe}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-        </div>
+        )}
         
         {/* Events Grid */}
         {displayEvents.length === 0 && !isLoading ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600 text-lg mb-4">
+          <div className="text-center py-12 bg-white/50 rounded-2xl backdrop-blur-sm">
+            <p className="text-neutral text-lg mb-4">
               {selectedVibe ? `No ${selectedVibe} events found at the moment` : 'No upcoming events found.'}
             </p>
             {selectedVibe && (
               <button 
                 onClick={() => handleVibeClick(null)} 
-                className="text-gray-900 hover:text-gray-700 font-semibold"
+                className="text-primary hover:text-primary/80 font-semibold"
               >
                 Show all events
               </button>
@@ -164,7 +173,7 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
                   <UpcomingEventCard 
                     event={event} 
                     onClick={handleEventClick} 
-                    className="h-full" 
+                    className="h-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" 
                   />
                 </div>
               ))}
@@ -178,7 +187,7 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
                 key={event.id} 
                 event={event} 
                 onClick={handleEventClick} 
-                className="h-full" 
+                className="h-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" 
               />
             ))}
           </div>
@@ -186,13 +195,13 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
 
         {/* View All Button - Below Events */}
         {displayEvents.length > 0 && (
-          <div className="text-center mt-8">
+          <div className="text-center mt-12">
             <button 
               onClick={handleViewAllClick} 
-              className="inline-flex items-center gap-2 text-gray-900 hover:text-gray-700 font-semibold text-lg transition-colors group"
+              className="inline-flex items-center gap-3 bg-primary text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 group hover:bg-primary/90 hover:shadow-xl transform hover:scale-105"
             >
               View All Events
-              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="h-5 w-5 group-hover:translate-x-2 transition-transform" />
             </button>
           </div>
         )}
