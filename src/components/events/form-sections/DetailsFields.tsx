@@ -17,13 +17,16 @@ export const DetailsFields: React.FC<DetailsFieldsProps> = ({ register, errors }
       <Input
         id="organizer_link"
         type="url"
-        placeholder="https://organizer.com"
+        placeholder="organizer.com (http:// will be added automatically)"
         {...register("organizer_link")}
         aria-invalid={errors.organizer_link ? "true" : "false"}
       />
       {errors.organizer_link && (
         <p className="text-red-500 text-sm mt-1">{errors.organizer_link.message}</p>
       )}
+      <p className="text-xs text-gray-500 mt-1">
+        You can enter just the domain name - we'll add http:// automatically if needed
+      </p>
     </div>
 
     <div>
@@ -45,13 +48,16 @@ export const DetailsFields: React.FC<DetailsFieldsProps> = ({ register, errors }
       <Input
         id="booking_link"
         type="url"
-        placeholder="https://booking.com"
+        placeholder="booking.com (http:// will be added automatically)"
         {...register("booking_link")}
         aria-invalid={errors.booking_link ? "true" : "false"}
       />
       {errors.booking_link && (
         <p className="text-red-500 text-sm mt-1">{errors.booking_link.message}</p>
       )}
+      <p className="text-xs text-gray-500 mt-1">
+        You can enter just the domain name - we'll add http:// automatically if needed
+      </p>
     </div>
   </>
 );

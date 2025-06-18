@@ -1,10 +1,11 @@
+
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 import { Event, Venue } from '@/types';
 import { FormValues } from '@/components/events/form/EventFormTypes';
@@ -19,6 +20,21 @@ interface UseEventFormProps {
   isEditMode?: boolean;
   initialData?: Event;
 }
+
+// Helper function to ensure URL has protocol
+const ensureHttpProtocol = (url: string): string => {
+  if (!url) return url;
+  const trimmedUrl = url.trim();
+  if (!trimmedUrl) return trimmedUrl;
+  
+  // If URL already has a protocol, return as is
+  if (trimmedUrl.match(/^https?:\/\//i)) {
+    return trimmedUrl;
+  }
+  
+  // Add http:// if missing
+  return `http://${trimmedUrl}`;
+};
 
 export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEventFormProps) => {
   const navigate = useNavigate();
@@ -90,14 +106,25 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
     console.log('Form submission started with data:', data);
     
     if (!user) {
-      toast.error("You must be logged in to create an event.");
+      toast({
+        title: "Authentication Required",
+        description: "You must be logged in to create an event.",
+        variant: "destructive",
+      });
       return;
     }
     
     setIsSubmitting(true);
     
     try {
-      const processedEventData = processFormData(data, user.id);
+      // Process URLs to ensure they have proper protocol
+      const processedData = {
+        ...data,
+        organizer_link: data.organizer_link ? ensureHttpProtocol(data.organizer_link) : '',
+        booking_link: data.booking_link ? ensureHttpProtocol(data.booking_link) : '',
+      };
+
+      const processedEventData = processFormData(processedData, user.id);
       console.log('Processed event data for submission:', JSON.stringify(processedEventData, null, 2));
       
       if (isEditMode && eventId) {
@@ -106,12 +133,27 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
         if (error) {
           console.error("Failed to update event", error);
           console.error("Supabase error details:", JSON.stringify(error, null, 2));
-          toast.error(error.message || "Failed to update event");
+          
+          let errorMessage = "Failed to update event";
+          if (error.message?.includes('duplicate key')) {
+            errorMessage = "An event with this title already exists. Please choose a different title.";
+          } else if (error.message?.includes('invalid input')) {
+            errorMessage = "Please check your input data and try again.";
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+          
+          toast({
+            title: "Update Failed",
+            description: errorMessage,
+            variant: "destructive",
+          });
           return;
         }
         console.log("Event updated successfully");
-        toast.success('Event updated successfully! 🎉', {
-          description: 'Your event changes have been saved.',
+        toast({
+          title: 'Event Updated! 🎉',
+          description: 'Your event changes have been saved successfully.',
         });
         
         // Force refetch of events data
@@ -119,18 +161,35 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
         await queryClient.invalidateQueries({ queryKey: ['event-details', eventId] });
         await queryClient.refetchQueries({ queryKey: ['events'] });
         
-        navigate('/events');
+        navigate('/organise');
       } else {
         console.log('Creating new event');
         const { data: createdEvent, error } = await createEvent(processedEventData as any);
         if (error) {
           console.error("Failed to create event", error);
           console.error("Supabase error details:", JSON.stringify(error, null, 2));
-          toast.error(error.message || "Failed to create event");
+          
+          let errorMessage = "Failed to create event";
+          if (error.message?.includes('duplicate key')) {
+            errorMessage = "An event with this title already exists. Please choose a different title.";
+          } else if (error.message?.includes('invalid input')) {
+            errorMessage = "Please check your input data and try again.";
+          } else if (error.message?.includes('venue_id')) {
+            errorMessage = "Please select a valid venue for your event.";
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+          
+          toast({
+            title: "Creation Failed",
+            description: errorMessage,
+            variant: "destructive",
+          });
           return;
         }
         console.log("Event created successfully in DB:", createdEvent);
-        toast.success('Event created successfully! 🎉', {
+        toast({
+          title: 'Event Created! 🎉',
           description: 'Your new event is now live and ready for RSVPs.',
         });
         
@@ -138,14 +197,26 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
         await queryClient.invalidateQueries({ queryKey: ['events'] });
         await queryClient.refetchQueries({ queryKey: ['events'] });
         
-        // Navigate after a short delay to ensure data is refreshed
+        // Navigate to organise dashboard
         setTimeout(() => {
-          navigate('/events');
+          navigate('/organise');
         }, 500);
       }
     } catch (error: any) {
       console.error("Form submission error", error);
-      toast.error(error.message || "Failed to save event. Please check the form data.");
+      
+      let errorMessage = "Failed to save event. Please try again.";
+      if (error?.message?.includes('Network')) {
+        errorMessage = "Network error. Please check your connection and try again.";
+      } else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -153,20 +224,21 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
 
   const onInvalid = (errors: FieldErrors<FormValues>) => {
     console.log('Form validation errors:', errors);
-    const errorList = Object.entries(errors).map(([fieldName, error]) => {
-      const formattedFieldName = fieldName
-        .replace(/_/g, " ")
-        .replace(/\b\w/g, (l) => l.toUpperCase());
-      return (
-        <div key={fieldName}>
-          <strong>{formattedFieldName}:</strong> {error.message}
-        </div>
-      );
+    const errorFields = Object.keys(errors);
+    const firstError = errors[errorFields[0] as keyof FormValues];
+    
+    toast({
+      title: "Form Validation Error",
+      description: firstError?.message || "Please correct the errors in the form",
+      variant: "destructive",
     });
 
-    toast.error("Please correct the errors in the form", {
-      description: <div className="flex flex-col gap-1 mt-2">{errorList}</div>,
-    });
+    // Scroll to first error field
+    const firstErrorField = document.querySelector(`[name="${errorFields[0]}"]`) as HTMLElement;
+    if (firstErrorField) {
+      firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      firstErrorField.focus();
+    }
   };
 
   return {
