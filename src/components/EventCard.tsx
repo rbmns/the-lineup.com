@@ -12,6 +12,7 @@ import { formatEventCardDateTime } from '@/utils/date-formatting';
 import { LineupImage } from '@/components/ui/lineup-image';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
+import EventVibeLabel from '@/components/polymet/event-vibe-label';
 
 interface EventCardProps {
   event: Event;
@@ -101,7 +102,7 @@ export const EventCard: React.FC<EventCardProps> = ({
   return (
     <Card 
       className={cn(
-        "flex flex-col h-full overflow-hidden cursor-pointer transition-all duration-300 ease-in-out hover:shadow-xl bg-white border border-gray-200 rounded-xl",
+        "flex flex-col h-full overflow-hidden cursor-pointer transition-all duration-300 ease-in-out hover:shadow-xl bg-white border border-gray-200 rounded-lg",
         className
       )}
       onClick={handleClick}
@@ -115,7 +116,7 @@ export const EventCard: React.FC<EventCardProps> = ({
           aspectRatio="video"
           treatment="subtle-overlay"
           overlayVariant="ocean"
-          className="w-full h-full"
+          className="w-full h-full rounded-t-lg"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (!target.src.includes('/img/default.jpg')) {
@@ -135,12 +136,13 @@ export const EventCard: React.FC<EventCardProps> = ({
           </div>
         )}
 
-        {/* Vibe pill - top right */}
-        {event.tags && event.tags.length > 0 && (
+        {/* Event vibe pill - top right */}
+        {event.event_vibe && (
           <div className="absolute top-3 right-3 z-10">
-            <span className="inline-flex items-center rounded-full bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5">
-              {event.tags[0]}
-            </span>
+            <EventVibeLabel 
+              vibe={event.event_vibe} 
+              size="sm"
+            />
           </div>
         )}
       </div>
