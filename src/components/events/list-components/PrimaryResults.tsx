@@ -1,20 +1,15 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Event } from '@/types';
-import { EventGrid } from './EventGrid';
-
-// Number of events to load initially and on each load more
-const EVENTS_PER_PAGE = 12;
+import { EventCard } from '@/components/EventCard';
+import { EventGrid } from '@/components/events/list-components/EventGrid';
+import { EventsLoadingState } from '@/components/events/list-components/EventsLoadingState';
 
 interface PrimaryResultsProps {
   events: Event[];
-  searchQuery?: string;
   isLoading: boolean;
   onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<void>;
   showRsvpButtons?: boolean;
-  visibleCount?: number;
-  hasMore?: boolean;
-  onLoadMore?: () => void;
   loadingEventId?: string | null;
   hideCount?: boolean;
   compact?: boolean;
@@ -22,87 +17,47 @@ interface PrimaryResultsProps {
 
 export const PrimaryResults: React.FC<PrimaryResultsProps> = ({
   events,
-  searchQuery,
   isLoading,
   onRsvp,
-  showRsvpButtons = true,
-  visibleCount: externalVisibleCount,
-  hasMore: externalHasMore,
-  onLoadMore: externalOnLoadMore,
+  showRsvpButtons = false,
   loadingEventId,
-  hideCount,
-  compact
+  hideCount = false,
+  compact = false
 }) => {
-  const [internalVisibleCount, setInternalVisibleCount] = useState(EVENTS_PER_PAGE);
-  const [internalHasMore, setInternalHasMore] = useState(true);
-  const [initialized, setInitialized] = useState(false);
-  
-  // Use external or internal state management
-  const visibleCount = externalVisibleCount !== undefined ? externalVisibleCount : internalVisibleCount;
-  const hasMore = externalHasMore !== undefined ? externalHasMore : internalHasMore;
-  
-  // Reset visible count when search query or events change
-  useEffect(() => {
-    if (externalVisibleCount === undefined) {
-      setInternalVisibleCount(EVENTS_PER_PAGE);
-    }
-  }, [searchQuery, events, externalVisibleCount]);
-  
-  // Update hasMore state when event count changes
-  useEffect(() => {
-    if (externalHasMore === undefined) {
-      setInternalHasMore(visibleCount < events.length);
-    }
-    
-    // Mark as initialized after first render
-    if (!initialized) {
-      setInitialized(true);
-    }
-  }, [visibleCount, events.length, externalHasMore, initialized]);
-  
-  const loadMore = () => {
-    if (externalOnLoadMore) {
-      externalOnLoadMore();
-    } else {
-      setInternalVisibleCount(prev => prev + EVENTS_PER_PAGE);
-    }
-  };
+  if (isLoading) {
+    return <EventsLoadingState />;
+  }
 
-  // Safely handle RSVP with propagation prevention
-  const handleRsvp = async (eventId: string, status: 'Going' | 'Interested') => {
-    if (!onRsvp) return;
-    try {
-      console.log('PrimaryResults - Handling RSVP:', { eventId, status });
-      await onRsvp(eventId, status);
-    } catch (error) {
-      console.error('PrimaryResults - RSVP Error:', error);
-    }
-  };
+  if (events.length === 0) {
+    return null;
+  }
 
-  // If no events and not initialized yet, don't render anything
-  // This prevents flash of "no results" during initial load
-  if (events.length === 0 && !initialized) return null;
+  // Convert onRsvp to the format expected by EventCard
+  const handleRsvp = onRsvp ? async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean | void> => {
+    await onRsvp(eventId, status);
+    return true;
+  } : undefined;
 
   return (
-    <div>
-      {searchQuery && events.length > 0 && !hideCount && (
-        <h3 className="text-lg font-medium text-gray-900 mb-6">
-          {events.length} {events.length === 1 ? 'result' : 'results'}
-          {searchQuery ? ` for "${searchQuery}"` : ''}
+    <div className="space-y-6">
+      {!hideCount && (
+        <h3 className="text-lg font-medium text-gray-900">
+          {events.length} {events.length === 1 ? 'event' : 'events'}
         </h3>
       )}
       
-      <EventGrid 
-        events={events}
-        visibleCount={visibleCount}
-        hasMore={hasMore}
-        isLoading={isLoading}
-        onLoadMore={loadMore}
-        onRsvp={onRsvp ? handleRsvp : undefined}
-        showRsvpButtons={showRsvpButtons}
-        loadingEventId={loadingEventId}
-        compact={compact}
-      />
+      <EventGrid>
+        {events.map((event) => (
+          <EventCard
+            key={event.id}
+            event={event}
+            compact={compact}
+            showRsvpButtons={showRsvpButtons}
+            onRsvp={handleRsvp}
+            loadingEventId={loadingEventId}
+          />
+        ))}
+      </EventGrid>
     </div>
   );
 };
