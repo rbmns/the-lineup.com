@@ -54,7 +54,7 @@ export const LoginFormFields: React.FC<LoginFormFieldsProps> = ({
       <Button 
         type="submit"
         disabled={loading || rateLimited} 
-        variant="primary"
+        variant="default"
         className="w-full"
       >
         {loading ? 'Logging in...' : 'Login'}

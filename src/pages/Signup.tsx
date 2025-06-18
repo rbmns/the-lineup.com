@@ -8,13 +8,13 @@ const Signup = () => {
   const navigate = useNavigate();
   
   return (
-    <div className="container max-w-xl py-8 animate-fade-in">
-      <Card className="border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300">
-        <CardHeader className="flex flex-col items-center">
-          <CardTitle className="text-2xl font-semibold">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold text-center">
             Create an Account
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-center">
             Sign up to access all features
           </CardDescription>
         </CardHeader>

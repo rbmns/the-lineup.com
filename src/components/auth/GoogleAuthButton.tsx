@@ -21,19 +21,7 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
     type="button"
     variant="outline"
     size="lg"
-    className={`
-      w-full 
-      bg-white 
-      border border-gray-300 
-      text-[#3c4043] 
-      font-medium 
-      flex items-center justify-center gap-2 
-      shadow-sm
-      hover:bg-gray-50 hover:border-gray-400
-      transition-all
-      ${className}
-    `}
-    style={{ boxShadow: '0 1px 2px rgba(60,64,67,0.10)' }}
+    className={`w-full ${className}`}
     onClick={onClick}
     disabled={loading || disabled}
   >

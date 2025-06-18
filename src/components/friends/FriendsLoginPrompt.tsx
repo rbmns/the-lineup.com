@@ -17,14 +17,14 @@ export const FriendsLoginPrompt: React.FC = () => {
           <div className="space-y-3">
             <Button 
               onClick={() => navigate('/signup')} 
-              variant="primary"
+              variant="default"
               className="w-full"
             >
               Sign Up
             </Button>
             <Button 
               onClick={() => navigate('/login')} 
-              variant="default"
+              variant="outline"
               className="w-full"
             >
               Log In
