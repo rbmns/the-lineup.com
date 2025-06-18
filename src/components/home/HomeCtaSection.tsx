@@ -3,16 +3,15 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Search, UserCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import { typography } from "@/components/polymet/brand-typography";
 
 const HomeCtaSection = () => (
   <section className="py-16 w-full bg-white">
     <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
       <div className="max-w-4xl mx-auto">
-        <h2 className={`${typography.h2} text-gray-900 mb-4`}>
+        <h2 className="text-3xl font-semibold tracking-tight text-gray-900 mb-4">
           Ready to Find Your Next <span className="text-gray-700">Adventure?</span>
         </h2>
-        <p className={`${typography.lead} text-gray-700 mb-8`}>
+        <p className="text-xl text-gray-700 leading-relaxed mb-8">
           Join our community and start discovering events that match your interests and vibe.
         </p>
 

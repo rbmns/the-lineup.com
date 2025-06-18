@@ -1,7 +1,6 @@
 
 import React from "react";
 import AppPageHeader from "@/components/ui/AppPageHeader";
-import { typography } from "@/components/polymet/brand-typography";
 
 const HomeHeaderSection = () => {
   return (
@@ -10,7 +9,7 @@ const HomeHeaderSection = () => {
         <AppPageHeader className="text-primary mt-0 mb-2">
           What's Happening?
         </AppPageHeader>
-        <p className={`${typography.lead} mt-0`}>
+        <p className="text-xl text-muted-foreground leading-relaxed mt-0">
           Discover the best events around you – from festivals to chill yoga, markets, and more.
         </p>
       </div>

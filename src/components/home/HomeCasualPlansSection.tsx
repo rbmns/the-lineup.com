@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { typography } from '@/components/polymet/brand-typography';
 
 export const HomeCasualPlansSection: React.FC = () => {
   const casualPlans = [
@@ -32,8 +31,8 @@ export const HomeCasualPlansSection: React.FC = () => {
         <div className="space-y-6 md:space-y-8">
           {/* Header */}
           <div>
-            <h2 className={`${typography.h2} mb-4 text-gray-900`}>Create Spontaneous Plans</h2>
-            <p className={`${typography.body} text-gray-700 mb-6 max-w-3xl`}>
+            <h2 className="text-3xl font-semibold tracking-tight mb-4 text-gray-900">Create Spontaneous Plans</h2>
+            <p className="text-base leading-7 text-gray-700 mb-6 max-w-3xl">
               Beyond organized events, create and join casual plans with fellow travelers and locals. 
               From impromptu beach walks to coffee meetups, make spontaneous connections happen.
             </p>
@@ -41,7 +40,7 @@ export const HomeCasualPlansSection: React.FC = () => {
 
           {/* Recent Plans Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <h3 className={`${typography.h3} text-gray-900`}>Recent Casual Plans</h3>
+            <h3 className="text-2xl font-semibold text-gray-900">Recent Casual Plans</h3>
             <Button asChild variant="ghost" className="self-start sm:self-auto text-gray-700 hover:text-gray-900">
               <Link to="/casual-plans" className="flex items-center gap-2">
                 See all

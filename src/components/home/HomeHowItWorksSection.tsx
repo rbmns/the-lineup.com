@@ -1,7 +1,6 @@
 
 import React from "react";
 import { Calendar, Users, Search } from "lucide-react";
-import { typography } from "@/components/polymet/brand-typography";
 
 const steps = [
   {
@@ -29,10 +28,10 @@ const HomeHowItWorksSection = () => (
     <div className="w-full px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className={`${typography.h2} text-gray-900 mb-4`}>
+          <h2 className="text-3xl font-semibold tracking-tight text-gray-900 mb-4">
             How The Lineup Works
           </h2>
-          <p className={`${typography.body} text-gray-700`}>
+          <p className="text-base leading-7 text-gray-700">
             Discover, connect, and experience amazing events in your area with just a few taps.
           </p>
         </div>
@@ -42,7 +41,7 @@ const HomeHowItWorksSection = () => (
               <div className={`w-20 h-20 ${step.bg} rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-105 transition-transform duration-300`}>
                 {step.icon}
               </div>
-              <h3 className={`${typography.h4} text-gray-900 mb-3`}>{step.label}</h3>
+              <h3 className="text-xl font-medium text-gray-900 mb-3">{step.label}</h3>
               <p className="text-gray-700">{step.desc}</p>
             </div>
           ))}

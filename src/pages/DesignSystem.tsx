@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CategoryPill } from '@/components/ui/category-pill';
@@ -9,7 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar, MapPin, Users, Clock, Search, Plus, Heart, Star } from 'lucide-react';
 import AppPageHeader from '@/components/ui/AppPageHeader';
-import { typography } from '@/components/polymet/brand-typography';
 
 const DesignSystem = () => {
   // All category pills from the image
@@ -43,7 +43,7 @@ const DesignSystem = () => {
 
         <div className="mb-8">
           <AppPageHeader>Design System</AppPageHeader>
-          <p className={`${typography.lead}`}>The lineup's comprehensive design guidelines and components</p>
+          <p className="text-xl text-muted-foreground leading-relaxed">The lineup's comprehensive design guidelines and components</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
