@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState, useEffect } from 'react';
 import { useEvents } from '@/hooks/useEvents';
 import { useVenues } from '@/hooks/useVenues';
@@ -92,6 +93,17 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     setLoadingEventId
   } = useFilterState();
 
+  // Debug log to track events
+  useEffect(() => {
+    console.log('🔍 EventsDataProvider - allEvents:', allEvents.length);
+    console.log('🔍 EventsDataProvider - sample events:', allEvents.slice(0, 3).map(e => ({
+      id: e.id,
+      title: e.title,
+      status: e.status,
+      event_category: e.event_category
+    })));
+  }, [allEvents]);
+
   useEffect(() => {
     if (!selectedLocationId) {
       setUserLocation(null);
@@ -115,11 +127,13 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
   // Get all unique event types
   const allEventTypes = useMemo(() => {
     if (!allEvents) return [];
-    return Array.from(new Set(
+    const types = Array.from(new Set(
       allEvents
         .filter(event => event.event_category)
         .map(event => event.event_category as string)
     )).sort();
+    console.log('🔍 EventsDataProvider - allEventTypes:', types);
+    return types;
   }, [allEvents]);
 
   // Enhanced RSVP handler
@@ -135,6 +149,8 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
   // Filter events based on all selected filters including vibes
   const filteredEvents = useMemo(() => {
     if (!allEvents) return [];
+    
+    console.log('🔍 Starting filteredEvents calculation with', allEvents.length, 'events');
     
     let tempFilteredEvents = [...allEvents];
 
@@ -158,7 +174,7 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
       });
     }
 
-    return tempFilteredEvents.filter((event) => {
+    const result = tempFilteredEvents.filter((event) => {
       // Event type filter
       if (selectedCategories.length > 0 && !selectedCategories.includes(event.event_category || '')) {
         return false;
@@ -217,6 +233,16 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
       
       return true;
     });
+    
+    console.log('🔍 filteredEvents result:', result.length, 'events');
+    console.log('🔍 Filter state:', {
+      selectedCategories: selectedCategories.length,
+      selectedVenues: selectedVenues.length,
+      selectedVibes: selectedVibes?.length || 0,
+      isNoneSelected
+    });
+    
+    return result;
   }, [allEvents, selectedCategories, selectedVenues, selectedVibes, dateRange, selectedDateFilter, userLocation]);
 
   // Format venues for the component
