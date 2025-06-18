@@ -1,3 +1,4 @@
+
 import React, { useMemo, useState, useEffect } from 'react';
 import { useEvents } from '@/hooks/useEvents';
 import { useVenues } from '@/hooks/useVenues';
@@ -174,9 +175,15 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     }
 
     const result = tempFilteredEvents.filter((event) => {
-      // Event type filter - only filter if categories are specifically selected (not when none are selected)
-      if (selectedCategories.length > 0 && !isNoneSelected && !selectedCategories.includes(event.event_category || '')) {
-        return false;
+      // Event type filter - show all events when all categories are selected OR none are selected
+      const isAllCategoriesSelected = selectedCategories.length === allEventTypes.length;
+      const isNoCategoriesSelected = selectedCategories.length === 0;
+      
+      if (!isAllCategoriesSelected && !isNoCategoriesSelected) {
+        // Only filter when some (but not all) categories are selected
+        if (!selectedCategories.includes(event.event_category || '')) {
+          return false;
+        }
       }
       
       // Venue filter
@@ -236,13 +243,14 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     console.log('🔍 filteredEvents result:', result.length, 'events');
     console.log('🔍 Filter state:', {
       selectedCategories: selectedCategories.length,
+      allEventTypes: allEventTypes.length,
       selectedVenues: selectedVenues.length,
       selectedVibes: selectedVibes?.length || 0,
-      isNoneSelected
+      isAllSelected: selectedCategories.length === allEventTypes.length
     });
     
     return result;
-  }, [allEvents, selectedCategories, selectedVenues, selectedVibes, dateRange, selectedDateFilter, userLocation, isNoneSelected]);
+  }, [allEvents, selectedCategories, selectedVenues, selectedVibes, dateRange, selectedDateFilter, userLocation, allEventTypes]);
 
   // Format venues for the component
   const formattedVenues = venues.map(venue => ({
