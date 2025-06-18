@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Calendar, Users, Star, Home, Plus } from 'lucide-react';
@@ -53,20 +52,7 @@ const LeftSidebar: React.FC = () => {
   }
 
   const handleOrganiseClick = () => {
-    if (!isAuthenticated) {
-      setShowAuthOverlay(true);
-      return;
-    }
-    
-    if (isCreatorStatusLoading) return;
-    
-    const hasPermission = canCreateEvents || creatorRequestStatus === 'approved';
-    
-    if (hasPermission) {
-      navigate('/events/create');
-    } else {
-      navigate('/events');
-    }
+    navigate('/organise');
   };
 
   const handleCloseAuthOverlay = () => {
