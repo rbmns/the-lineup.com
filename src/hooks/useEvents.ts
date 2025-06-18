@@ -59,6 +59,15 @@ export const useEvents = (
           return [];
         }
         
+        // Debug: Let's see what statuses we have in the database
+        if (data.length > 0) {
+          const statusCounts = data.reduce((acc, event) => {
+            acc[event.status || 'null'] = (acc[event.status || 'null'] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>);
+          console.log('📊 Event status distribution:', statusCounts);
+        }
+        
         // Now fetch creator profiles separately to avoid the foreign key conflict
         const eventIds = data.map(event => event.id);
         const creatorIds = data.map(event => event.creator).filter(Boolean);
@@ -108,7 +117,8 @@ export const useEvents = (
   console.log('🎯 useEvents hook result:', { 
     dataLength: data?.length || 0, 
     isLoading, 
-    hasError: !!error 
+    hasError: !!error,
+    errorMessage: error?.message
   });
 
   return {
