@@ -112,12 +112,12 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       
       const searchPattern = `%${term.toLowerCase()}%`;
       
-      // Search events with comprehensive field coverage
+      // Search events with fixed relationship specification
       const { data: eventData, error: eventError } = await supabase
         .from('events')
         .select(`
           *,
-          venue_id:venues(*),
+          venues!events_venue_id_fkey(*),
           creator:profiles(id, username, avatar_url, email, location, status, tagline),
           event_rsvps(id, user_id, status)
         `)
@@ -142,10 +142,13 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         console.error('Venue search error:', venueError);
       }
 
-      // Search casual plans
+      // Search casual plans with fixed relationship
       const { data: casualPlanData, error: casualPlanError } = await supabase
         .from('casual_plans')
-        .select('*, creator_profile:profiles(id, username, avatar_url)')
+        .select(`
+          *,
+          creator_profile:profiles!casual_plans_creator_id_fkey(id, username, avatar_url)
+        `)
         .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},vibe.ilike.${searchPattern},location.ilike.${searchPattern}`)
         .limit(20);
 
@@ -206,7 +209,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           .from('events')
           .select(`
             *,
-            venue_id:venues(*),
+            venues!events_venue_id_fkey(*),
             creator:profiles(id, username, avatar_url, email, location, status, tagline),
             event_rsvps(id, user_id, status)
           `)
@@ -231,7 +234,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           .from('events')
           .select(`
             *,
-            venue_id:venues(*),
+            venues!events_venue_id_fkey(*),
             creator:profiles(id, username, avatar_url, email, location, status, tagline),
             event_rsvps(id, user_id, status)
           `)
