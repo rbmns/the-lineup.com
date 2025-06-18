@@ -25,6 +25,7 @@ import CookiePolicy from '@/pages/CookiePolicy';
 import NotFound from '@/pages/NotFound';
 import DesignSystem from '@/pages/DesignSystem';
 import SearchPage from '@/pages/SearchPage';
+import OrganisePage from '@/pages/OrganisePage';
 import { SearchProvider } from '@/contexts/SearchContext';
 import AdminPage from '@/pages/AdminPage';
 
@@ -49,6 +50,7 @@ function App() {
                   <Route path="friends" element={<Friends />} />
                   <Route path="profile" element={<ProfilePage />} />
                   <Route path="profile/edit" element={<ProfileEdit />} />
+                  <Route path="organise" element={<OrganisePage />} />
                   <Route path="search" element={<SearchPage />} />
                   <Route path="admin" element={<AdminPage />} />
                   <Route path="login" element={<Login />} />
