@@ -130,6 +130,13 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         console.error('Event search error:', eventError);
       }
 
+      // Log some details about found events for debugging
+      if (eventData) {
+        eventData.forEach(event => {
+          console.log('Found event:', event.title, 'start_date:', event.start_date, 'category:', event.event_category);
+        });
+      }
+
       // Search venues
       const { data: venueData, error: venueError } = await supabase
         .from('venues')
@@ -205,6 +212,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       let categoryEventResults: SearchResult[] = [];
       if (categoryData && categoryData.length > 0) {
         const categoryNames = categoryData.map(cat => cat.name);
+        console.log('Searching for events in matching categories:', categoryNames);
         const { data: catEventData, error: catEventError } = await supabase
           .from('events')
           .select(`
@@ -219,6 +227,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           .limit(10);
 
         if (!catEventError && catEventData) {
+          console.log('Found', catEventData.length, 'events in matching categories');
           categoryEventResults = catEventData.map(event => ({
             ...event,
             type: 'event' as const,
@@ -230,6 +239,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       let vibeEventResults: SearchResult[] = [];
       if (vibeData && vibeData.length > 0) {
         const vibeNames = vibeData.map(vibe => vibe.name);
+        console.log('Searching for events with matching vibes:', vibeNames);
         const { data: vibeEventData, error: vibeEventError } = await supabase
           .from('events')
           .select(`
@@ -244,6 +254,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           .limit(10);
 
         if (!vibeEventError && vibeEventData) {
+          console.log('Found', vibeEventData.length, 'events with matching vibes');
           vibeEventResults = vibeEventData.map(event => ({
             ...event,
             type: 'event' as const,
@@ -266,6 +277,12 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       );
       
       console.log('Total unique search results found:', uniqueResults.length);
+      console.log('Result breakdown:', {
+        events: uniqueResults.filter(r => r.type === 'event').length,
+        venues: uniqueResults.filter(r => r.type === 'venue').length,
+        casualPlans: uniqueResults.filter(r => r.type === 'casual_plan').length
+      });
+      
       setSearchResults(uniqueResults);
       return uniqueResults;
     } catch (error) {

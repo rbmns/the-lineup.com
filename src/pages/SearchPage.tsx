@@ -34,6 +34,7 @@ const SearchPage: React.FC = () => {
 
   useEffect(() => {
     if (query) {
+      console.log('SearchPage: Performing search for query:', query);
       performSearch(query);
     } else {
         setSearchResults([]);
@@ -78,17 +79,26 @@ const SearchPage: React.FC = () => {
     }
   };
 
-  // Filter search results to only show events and casual plans (no venues)
+  // Filter search results and add better debugging
   const filteredSearchResults = searchResults
-    .filter(result => result.type === 'event' || result.type === 'casual_plan')
+    .filter(result => {
+      const isValidType = result.type === 'event' || result.type === 'casual_plan';
+      console.log('SearchPage: Filtering result:', result.id, 'type:', result.type, 'isValidType:', isValidType);
+      return isValidType;
+    })
     .map(result => {
       if (result.type === 'event') {
         // Filter out past events
         const upcomingEvents = filterUpcomingEvents([result as unknown as Event]);
-        return upcomingEvents.length > 0 ? result : null;
+        const isUpcoming = upcomingEvents.length > 0;
+        console.log('SearchPage: Event', result.id, 'isUpcoming:', isUpcoming, 'title:', result.title);
+        return isUpcoming ? result : null;
       }
       return result;
     }).filter(Boolean);
+
+  console.log('SearchPage: Final filtered results count:', filteredSearchResults.length);
+  console.log('SearchPage: Raw search results count:', searchResults.length);
 
   return (
     <div className={`${isMobile ? 'px-3 py-4' : 'container mx-auto px-4 py-8'} min-h-screen`}>
@@ -143,7 +153,15 @@ const SearchPage: React.FC = () => {
         !isSearching && query && (
           <div className="text-center py-12">
             <h2 className="text-xl font-medium text-gray-900">No results found</h2>
-            <p className="text-gray-600 mt-2">Try a different search term.</p>
+            <p className="text-gray-600 mt-2">
+              {searchResults.length > 0 
+                ? "No upcoming events found. Try searching for events happening later."
+                : "Try a different search term or check your spelling."
+              }
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              Found {searchResults.length} total results, {filteredSearchResults.length} upcoming
+            </p>
           </div>
         )
       )}
