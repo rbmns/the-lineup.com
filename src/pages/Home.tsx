@@ -4,6 +4,7 @@ import { useEvents } from '@/hooks/useEvents';
 import { HomeUpcomingEventsSection } from '@/components/home/HomeUpcomingEventsSection';
 import HomeHowItWorksSection from '@/components/home/HomeHowItWorksSection';
 import { HomeCasualPlansSection } from '@/components/home/HomeCasualPlansSection';
+import { OrganizerCtaSection } from '@/components/home/OrganizerCtaSection';
 import HomeCtaSection from '@/components/home/HomeCtaSection';
 
 const Home = () => {
@@ -19,6 +20,9 @@ const Home = () => {
       
       {/* Casual Plans Section */}
       <HomeCasualPlansSection />
+      
+      {/* Organizer CTA Section */}
+      <OrganizerCtaSection />
       
       {/* CTA Section */}
       <HomeCtaSection />
