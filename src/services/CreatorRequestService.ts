@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 
 interface CreatorRequestDetails {
@@ -32,6 +31,24 @@ export const CreatorRequestService = {
       }
 
       console.log('CreatorRequestService: User profile fetched:', userProfile);
+
+      // Check if request already exists for this user
+      console.log('CreatorRequestService: Checking for existing request...');
+      const { data: existingRequest, error: checkError } = await supabase
+        .from('creator_requests')
+        .select('id, status')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error('CreatorRequestService: Error checking existing request:', checkError);
+        return { data: null, error: checkError };
+      }
+
+      if (existingRequest) {
+        console.log('CreatorRequestService: Found existing request:', existingRequest);
+        return { data: existingRequest, error: null };
+      }
 
       // Create the creator request
       console.log('CreatorRequestService: Creating creator request...');
@@ -185,6 +202,7 @@ export const CreatorRequestService = {
       console.error('Error fetching creator requests for admin:', error);
     } else {
       console.log('Admin creator requests fetched:', data?.length || 0, 'requests');
+      console.log('Admin creator requests details:', data);
     }
     
     return { data, error };

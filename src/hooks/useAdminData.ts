@@ -34,6 +34,20 @@ export const useAdminData = () => {
         throw new Error('Failed to fetch creator requests');
       }
       console.log('Creator requests fetched:', data?.length || 0);
+      console.log('Creator requests data:', data);
+      
+      // Let's also check if there are any creator_requests in the database directly
+      const { data: directRequests, error: directError } = await supabase
+        .from('creator_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (directError) {
+        console.error('Error fetching direct creator requests:', directError);
+      } else {
+        console.log('Direct creator_requests table data:', directRequests);
+      }
+      
       return data || [];
     },
     enabled: !!isAdmin,
