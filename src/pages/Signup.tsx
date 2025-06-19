@@ -15,7 +15,7 @@ const Signup = () => {
             Create an Account
           </CardTitle>
           <CardDescription>
-            Sign up to access all features
+            Join us to discover events and connect with your community
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
