@@ -59,31 +59,17 @@ export const NavActions: React.FC<NavActionsProps> = ({
           </div>
         </>
       ) : (
-        <div className={cn(
-          "flex items-center",
-          isMobile ? "gap-1" : "gap-2"
-        )}>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={handleSignInClick} 
-            className={cn(
-              "flex-shrink-0",
-              isMobile ? "text-sm px-2 py-2" : "text-sm px-4"
-            )}
-          >
-            Sign in
-          </Button>
-          {!isMobile && (
-            <Button 
-              size="sm" 
-              onClick={() => navigate('/login', { state: { initialMode: 'register' } })} 
-              className="flex-shrink-0"
-            >
-              Sign Up
-            </Button>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={handleSignInClick} 
+          className={cn(
+            "flex-shrink-0",
+            isMobile ? "text-sm px-2 py-2" : "text-sm px-4"
           )}
-        </div>
+        >
+          Sign in
+        </Button>
       )}
     </div>
   );
