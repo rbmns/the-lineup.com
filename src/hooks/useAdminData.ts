@@ -69,8 +69,8 @@ export const useAdminData = () => {
         is_read: request.status !== 'pending', // Mark as read if not pending
         data: {
           user_id: request.user_id,
-          username: request.profiles?.username || 'Unknown',
-          user_email: request.profiles?.email || 'No email',
+          username: request.profiles?.[0]?.username || 'Unknown',
+          user_email: request.profiles?.[0]?.email || 'No email',
           reason: request.reason || 'No reason provided',
           contact_email: request.contact_email,
           contact_phone: request.contact_phone,
