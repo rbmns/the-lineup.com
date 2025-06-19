@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase';
 
 interface CreatorRequestDetails {
@@ -78,20 +79,24 @@ export const CreatorRequestService = {
   async getCreatorRequestStatus(userId: string): Promise<{ data: { status: string } | null; error: any }> {
     console.log('CreatorRequestService: Checking status for userId:', userId);
     
-    const { data, error } = await supabase
-      .from('creator_requests')
-      .select('status')
-      .eq('user_id', userId)
-      .single();
-    
-    // PGRST116: No rows found, which is a valid state (user hasn't made a request yet).
-    if (error && error.code !== 'PGRST116') {
+    try {
+      const { data, error } = await supabase
+        .from('creator_requests')
+        .select('status')
+        .eq('user_id', userId)
+        .maybeSingle();
+      
+      if (error) {
         console.error('Error fetching creator request status:', error);
         return { data: null, error };
-    }
+      }
 
-    console.log('CreatorRequestService: Status check result:', data);
-    return { data, error: null };
+      console.log('CreatorRequestService: Status check result:', data);
+      return { data, error: null };
+    } catch (unexpectedError) {
+      console.error('CreatorRequestService: Unexpected error in getCreatorRequestStatus:', unexpectedError);
+      return { data: null, error: unexpectedError };
+    }
   },
 
   async notifyAdminOfCreatorRequest(userId: string, requestDetails: CreatorRequestDetails, userProfile: UserProfileDetails): Promise<{ error: any }> {
@@ -110,7 +115,9 @@ export const CreatorRequestService = {
           user_id: userId,
           username: userProfile.username,
           user_email: userProfile.email,
-          ...requestDetails,
+          reason: requestDetails.reason,
+          contact_email: requestDetails.contact_email,
+          contact_phone: requestDetails.contact_phone,
         }
       };
       

@@ -1,6 +1,5 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
 
 // Get environment variables
 const resendApiKey = Deno.env.get("RESEND_API_KEY");
@@ -31,24 +30,33 @@ const handler = async (req: Request): Promise<Response> => {
   // Validate environment variables
   if (!resendApiKey) {
     console.error("RESEND_API_KEY environment variable is not set.");
-    return new Response(JSON.stringify({ error: "Server configuration error: Missing Resend API key." }), {
-      status: 500,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
-    });
-  }
-
-  const resend = new Resend(resendApiKey);
-  const adminEmailList = adminEmailsEnv.split(',').map(email => email.trim()).filter(Boolean);
-
-  if (adminEmailList.length === 0) {
-    console.error("No valid admin email addresses found.");
-    return new Response(JSON.stringify({ error: "Server configuration error: No valid admin email addresses found." }), {
-      status: 500,
+    return new Response(JSON.stringify({ 
+      error: "Server configuration error: Missing Resend API key.",
+      success: false 
+    }), {
+      status: 200, // Return 200 to avoid blocking the main flow
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   }
 
   try {
+    // Dynamically import Resend
+    const { Resend } = await import("npm:resend@2.0.0");
+    const resend = new Resend(resendApiKey);
+    
+    const adminEmailList = adminEmailsEnv.split(',').map(email => email.trim()).filter(Boolean);
+
+    if (adminEmailList.length === 0) {
+      console.error("No valid admin email addresses found.");
+      return new Response(JSON.stringify({ 
+        error: "Server configuration error: No valid admin email addresses found.",
+        success: false 
+      }), {
+        status: 200, // Return 200 to avoid blocking the main flow
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
     const payload: CreatorRequestPayload = await req.json();
     const { username, user_email, reason, contact_email, contact_phone } = payload;
     
@@ -101,7 +109,13 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (error) {
       console.error("Resend API error:", JSON.stringify(error, null, 2));
-      throw new Error(`Failed to send notification email: ${error.message}`);
+      return new Response(JSON.stringify({ 
+        error: `Failed to send notification email: ${error.message}`,
+        success: false 
+      }), {
+        status: 200, // Return 200 to avoid blocking the main flow
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
     }
 
     console.log(`Admin notification email sent successfully to: ${adminEmailList.join(', ')}`);
@@ -109,7 +123,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     return new Response(JSON.stringify({ 
       message: "Notification sent successfully.",
-      emailId: data?.id 
+      emailId: data?.id,
+      success: true 
     }), {
       status: 200,
       headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -117,9 +132,10 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     console.error("Error in notify-admin-creator-request function:", error);
     return new Response(JSON.stringify({ 
-      error: error.message || "Failed to send notification" 
+      error: error.message || "Failed to send notification",
+      success: false 
     }), {
-      status: 500,
+      status: 200, // Return 200 to avoid blocking the main flow
       headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   }
