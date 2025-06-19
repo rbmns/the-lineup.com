@@ -85,6 +85,8 @@ export const EventsTable = () => {
     includeAllStatuses: true 
   });
 
+  console.log('Admin EventsTable - Events loaded:', events?.length || 0);
+
   if (isLoading) {
     return <Skeleton className="h-96 w-full" />;
   }

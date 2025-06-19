@@ -17,6 +17,7 @@ export const useAdminData = () => {
         console.error('Error checking admin role:', error);
         return false;
       }
+      console.log('Admin check result:', data);
       return data;
     },
     enabled: !!userId,
@@ -25,14 +26,22 @@ export const useAdminData = () => {
   const { data: requests, isLoading: requestsLoading, refetch } = useQuery<any[], Error>({
     queryKey: ['creator-requests'],
     queryFn: async () => {
+      console.log('Fetching creator requests for admin...');
       const { data, error } = await CreatorRequestService.getCreatorRequestsForAdmin();
       if (error) {
+        console.error('Error fetching creator requests:', error);
         throw new Error('Failed to fetch creator requests');
       }
+      console.log('Creator requests fetched:', data?.length || 0);
       return data || [];
     },
     enabled: !!isAdmin,
   });
 
-  return { isAdmin, requests, isLoading: isAdminLoading || (isAdmin && requestsLoading), refetchRequests: refetch };
+  return { 
+    isAdmin, 
+    requests, 
+    isLoading: isAdminLoading || (isAdmin && requestsLoading), 
+    refetchRequests: refetch 
+  };
 };

@@ -57,8 +57,13 @@ export const CreatorRequestsDashboard: React.FC<CreatorRequestsDashboardProps> =
     }
   });
 
+  // Filter requests properly - pending are those not read/handled
   const pendingRequests = requests.filter(r => !r.is_read);
   const handledRequests = requests.filter(r => r.is_read);
+
+  console.log('Creator Requests Dashboard - Total requests:', requests.length);
+  console.log('Pending requests:', pendingRequests.length);
+  console.log('Handled requests:', handledRequests.length);
 
   if (requests.length === 0) {
     return (

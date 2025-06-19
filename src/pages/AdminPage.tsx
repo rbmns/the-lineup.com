@@ -34,6 +34,7 @@ const AdminPage = () => {
     );
   }
 
+  // Count truly pending requests (not read/handled)
   const pendingRequestsCount = requests?.filter(r => !r.is_read).length || 0;
 
   return (
