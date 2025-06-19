@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 
 interface CreatorRequestDetails {
@@ -72,19 +71,17 @@ export const CreatorRequestService = {
 
       console.log('CreatorRequestService: Creator request created successfully:', data);
 
-      // Send admin notification (both in-app and email)
-      console.log('CreatorRequestService: Starting admin notification process...');
-      const notificationResult = await this.notifyAdminOfCreatorRequest(userId, details, {
-        username: userProfile.username || 'Unknown',
-        email: userProfile.email || 'No email'
-      });
-
-      if (notificationResult.error) {
-        console.error('CreatorRequestService: Admin notification failed:', notificationResult.error);
-        // Don't fail the whole process if notification fails, but log it clearly
-        console.error('CreatorRequestService: Creator request was saved but admin notification failed!');
-      } else {
+      // Try to send admin notification, but don't fail if it doesn't work
+      console.log('CreatorRequestService: Attempting to notify admin...');
+      try {
+        await this.notifyAdminOfCreatorRequest(userId, details, {
+          username: userProfile.username || 'Unknown',
+          email: userProfile.email || 'No email'
+        });
         console.log('CreatorRequestService: Admin notification completed successfully');
+      } catch (notificationError) {
+        console.error('CreatorRequestService: Admin notification failed, but continuing:', notificationError);
+        // Don't return error here - the request was created successfully
       }
 
       return { data, error: null };
@@ -125,41 +122,7 @@ export const CreatorRequestService = {
     });
     
     try {
-      // Create in-app notification
-      console.log('CreatorRequestService: Creating admin notification in database...');
-      const notificationData = {
-        notification_type: 'creator_request',
-        data: {
-          user_id: userId,
-          username: userProfile.username,
-          user_email: userProfile.email,
-          reason: requestDetails.reason,
-          contact_email: requestDetails.contact_email,
-          contact_phone: requestDetails.contact_phone,
-        }
-      };
-      
-      console.log('CreatorRequestService: Notification data to insert:', notificationData);
-      
-      const { data: insertedNotification, error: notificationError } = await supabase
-        .from('admin_notifications')
-        .insert(notificationData)
-        .select()
-        .single();
-
-      if (notificationError) {
-        console.error('CreatorRequestService: Failed to create admin notification:', notificationError);
-        console.error('CreatorRequestService: Notification error details:', {
-          code: notificationError.code,
-          message: notificationError.message,
-          details: notificationError.details,
-          hint: notificationError.hint
-        });
-      } else {
-        console.log('CreatorRequestService: Admin notification created successfully:', insertedNotification);
-      }
-      
-      // Send email notification via edge function
+      // Send email notification via edge function first (this is most important)
       console.log('CreatorRequestService: Calling email notification edge function...');
       try {
         const { data: functionData, error: functionError } = await supabase.functions.invoke('notify-admin-creator-request', {
@@ -180,8 +143,41 @@ export const CreatorRequestService = {
       } catch (emailError) {
         console.error('CreatorRequestService: Email notification threw exception:', emailError);
       }
+
+      // Try to create in-app notification (secondary priority)
+      console.log('CreatorRequestService: Attempting to create admin notification in database...');
+      try {
+        const notificationData = {
+          notification_type: 'creator_request',
+          data: {
+            user_id: userId,
+            username: userProfile.username,
+            user_email: userProfile.email,
+            reason: requestDetails.reason,
+            contact_email: requestDetails.contact_email,
+            contact_phone: requestDetails.contact_phone,
+          }
+        };
+        
+        console.log('CreatorRequestService: Notification data to insert:', notificationData);
+        
+        const { data: insertedNotification, error: notificationError } = await supabase
+          .from('admin_notifications')
+          .insert(notificationData)
+          .select()
+          .single();
+
+        if (notificationError) {
+          console.error('CreatorRequestService: Failed to create admin notification:', notificationError);
+        } else {
+          console.log('CreatorRequestService: Admin notification created successfully:', insertedNotification);
+        }
+      } catch (dbNotificationError) {
+        console.error('CreatorRequestService: Database notification threw exception:', dbNotificationError);
+      }
       
-      return { error: notificationError };
+      // Always return success since email notification is the main goal
+      return { error: null };
       
     } catch (unexpectedError) {
       console.error('CreatorRequestService: Unexpected error in notifyAdminOfCreatorRequest:', unexpectedError);

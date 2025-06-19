@@ -37,19 +37,10 @@ export const useAdminData = () => {
         console.log('Notification-based requests fetched:', notificationRequests?.length || 0);
       }
       
-      // Also get all creator requests directly from the creator_requests table
-      // Fix the query by removing the incorrect foreign key reference
+      // Get all creator requests directly from the creator_requests table
       const { data: directRequests, error: directError } = await supabase
         .from('creator_requests')
-        .select(`
-          id,
-          user_id,
-          status,
-          reason,
-          contact_email,
-          contact_phone,
-          created_at
-        `)
+        .select('id, user_id, status, reason, contact_email, contact_phone, created_at')
         .order('created_at', { ascending: false });
       
       if (directError) {
@@ -59,24 +50,29 @@ export const useAdminData = () => {
       
       console.log('Direct creator_requests table data:', directRequests);
       
-      // Get user profiles separately to avoid the foreign key issue
+      // Get user profiles separately
       const userIds = directRequests?.map(req => req.user_id) || [];
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, username, email')
-        .in('id', userIds);
-      
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
+      let profiles = [];
+      if (userIds.length > 0) {
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, username, email')
+          .in('id', userIds);
+        
+        if (profilesError) {
+          console.error('Error fetching profiles:', profilesError);
+        } else {
+          profiles = profilesData || [];
+        }
       }
       
       // Convert direct requests to the same format as notification requests
       const formattedDirectRequests = directRequests?.map(request => {
-        const userProfile = profiles?.find(p => p.id === request.user_id);
+        const userProfile = profiles.find(p => p.id === request.user_id);
         return {
-          id: `creator_request_${request.id}`, // Prefix to distinguish from notification IDs
+          id: `creator_request_${request.id}`,
           created_at: request.created_at,
-          is_read: request.status !== 'pending', // Mark as read if not pending
+          is_read: request.status !== 'pending',
           data: {
             user_id: request.user_id,
             username: userProfile?.username || 'Unknown',
@@ -85,7 +81,7 @@ export const useAdminData = () => {
             contact_email: request.contact_email,
             contact_phone: request.contact_phone,
           },
-          original_request_id: request.id, // Store the original creator_requests ID
+          original_request_id: request.id,
           status: request.status
         };
       }) || [];
