@@ -1,28 +1,42 @@
 
 import React from 'react';
 import { MapPin, Users, Calendar } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 export const WhoIsItForSection: React.FC = () => {
+  const navigate = useNavigate();
+
   const personas = [
     {
       title: "Explorers",
       description: "New in town? Join something real, no pressure.",
       icon: MapPin,
-      gradient: "from-blue-500 to-cyan-500"
+      gradient: "from-blue-500 to-cyan-500",
+      buttonText: "Explore Events",
+      path: "/events"
     },
     {
       title: "Locals", 
       description: "Stay in the loop. Discover or share what's happening.",
       icon: Users,
-      gradient: "from-green-500 to-emerald-500"
+      gradient: "from-green-500 to-emerald-500",
+      buttonText: "Browse Events",
+      path: "/events"
     },
     {
       title: "Organizers",
       description: "Hosting an event? Share it with people who'll show up.",
       icon: Calendar,
-      gradient: "from-purple-500 to-pink-500"
+      gradient: "from-purple-500 to-pink-500",
+      buttonText: "Organise Dashboard",
+      path: "/organise"
     }
   ];
+
+  const handleButtonClick = (path: string) => {
+    navigate(path);
+  };
 
   return (
     <section className="py-16 bg-white">
@@ -59,9 +73,19 @@ export const WhoIsItForSection: React.FC = () => {
                   </h3>
                   
                   {/* Description */}
-                  <p className="text-lg text-gray-600 leading-relaxed flex-grow">
+                  <p className="text-lg text-gray-600 leading-relaxed flex-grow mb-6">
                     {persona.description}
                   </p>
+
+                  {/* Button */}
+                  <Button
+                    onClick={() => handleButtonClick(persona.path)}
+                    variant="outline"
+                    className="w-full"
+                    radius="sm"
+                  >
+                    {persona.buttonText}
+                  </Button>
                 </div>
 
                 {/* Subtle hover effect */}
