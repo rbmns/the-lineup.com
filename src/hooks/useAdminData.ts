@@ -38,6 +38,7 @@ export const useAdminData = () => {
       }
       
       // Also get all creator requests directly from the creator_requests table
+      // Fix the query by removing the incorrect foreign key reference
       const { data: directRequests, error: directError } = await supabase
         .from('creator_requests')
         .select(`
@@ -47,11 +48,7 @@ export const useAdminData = () => {
           reason,
           contact_email,
           contact_phone,
-          created_at,
-          profiles!creator_requests_user_id_fkey (
-            username,
-            email
-          )
+          created_at
         `)
         .order('created_at', { ascending: false });
       
@@ -62,22 +59,36 @@ export const useAdminData = () => {
       
       console.log('Direct creator_requests table data:', directRequests);
       
+      // Get user profiles separately to avoid the foreign key issue
+      const userIds = directRequests?.map(req => req.user_id) || [];
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, username, email')
+        .in('id', userIds);
+      
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+      }
+      
       // Convert direct requests to the same format as notification requests
-      const formattedDirectRequests = directRequests?.map(request => ({
-        id: `creator_request_${request.id}`, // Prefix to distinguish from notification IDs
-        created_at: request.created_at,
-        is_read: request.status !== 'pending', // Mark as read if not pending
-        data: {
-          user_id: request.user_id,
-          username: request.profiles?.[0]?.username || 'Unknown',
-          user_email: request.profiles?.[0]?.email || 'No email',
-          reason: request.reason || 'No reason provided',
-          contact_email: request.contact_email,
-          contact_phone: request.contact_phone,
-        },
-        original_request_id: request.id, // Store the original creator_requests ID
-        status: request.status
-      })) || [];
+      const formattedDirectRequests = directRequests?.map(request => {
+        const userProfile = profiles?.find(p => p.id === request.user_id);
+        return {
+          id: `creator_request_${request.id}`, // Prefix to distinguish from notification IDs
+          created_at: request.created_at,
+          is_read: request.status !== 'pending', // Mark as read if not pending
+          data: {
+            user_id: request.user_id,
+            username: userProfile?.username || 'Unknown',
+            user_email: userProfile?.email || 'No email',
+            reason: request.reason || 'No reason provided',
+            contact_email: request.contact_email,
+            contact_phone: request.contact_phone,
+          },
+          original_request_id: request.id, // Store the original creator_requests ID
+          status: request.status
+        };
+      }) || [];
       
       // Combine both sources, preferring notification-based requests
       const notificationUserIds = new Set(notificationRequests?.map(req => req.data?.user_id) || []);
