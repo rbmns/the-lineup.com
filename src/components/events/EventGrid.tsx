@@ -4,7 +4,6 @@ import { Event } from '@/types';
 import PolymetEventCard from '@/components/polymet/event-card';
 import { EventCard } from '@/components/EventCard';
 import { cn } from '@/lib/utils';
-import { EventGrid as InfiniteEventGrid } from './list-components/EventGrid';
 
 // Helper function to map Event to PolymetEventCard props
 const mapEventToPolymetCard = (event: Event) => ({
@@ -42,12 +41,6 @@ interface EventGridProps {
   className?: string;
   style?: React.CSSProperties;
   loadingEventId?: string | null;
-  visibleCount?: number;
-  hasMore?: boolean;
-  isLoading?: boolean;
-  onLoadMore?: () => void;
-  showSignupTeaser?: boolean;
-  eventsBeforeTeaserCount?: number;
   compact?: boolean;
 }
 
@@ -58,40 +51,8 @@ export const EventGrid: React.FC<EventGridProps> = ({
   className,
   style,
   loadingEventId,
-  visibleCount,
-  hasMore,
-  isLoading,
-  onLoadMore,
-  showSignupTeaser = false,
-  eventsBeforeTeaserCount = 6,
   compact
 }) => {
-  // If we have the lazy loading props, use the InfiniteEventGrid as before
-  if (
-    visibleCount !== undefined &&
-    hasMore !== undefined &&
-    isLoading !== undefined &&
-    onLoadMore !== undefined
-  ) {
-    return (
-      <InfiniteEventGrid
-        events={events}
-        visibleCount={visibleCount}
-        hasMore={hasMore}
-        isLoading={isLoading}
-        onLoadMore={onLoadMore}
-        onRsvp={onRsvp}
-        showRsvpButtons={showRsvpButtons}
-        className={className}
-        style={style}
-        loadingEventId={loadingEventId}
-        showSignupTeaser={showSignupTeaser}
-        eventsBeforeTeaserCount={eventsBeforeTeaserCount}
-        compact={compact}
-      />
-    );
-  }
-
   // Optimized grid for all viewport sizes - better tablet experience
   return (
     <div

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useEvents } from '@/hooks/useEvents';
+import { HomeHeroSection } from '@/components/home/HomeHeroSection';
 import { HomeUpcomingEventsSection } from '@/components/home/HomeUpcomingEventsSection';
 import HomeHowItWorksSection from '@/components/home/HomeHowItWorksSection';
 import { HomeCasualPlansSection } from '@/components/home/HomeCasualPlansSection';
@@ -14,6 +15,9 @@ const Home = () => {
 
   return (
     <div className="w-full bg-white">
+      {/* Homepage Hero Section */}
+      <HomeHeroSection />
+
       {/* Upcoming Events Section with Vibe Filters */}
       <HomeUpcomingEventsSection events={events} isLoading={isLoading} />
 
