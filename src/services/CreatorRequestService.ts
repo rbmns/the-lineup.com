@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase';
 
 interface CreatorRequestDetails {
@@ -232,14 +233,16 @@ export const CreatorRequestService = {
       return { error: requestError };
     }
 
-    // 3. Mark notification as read
-    const { error: notificationError } = await supabase
-      .from('admin_notifications')
-      .update({ is_read: true })
-      .eq('id', notificationId);
-      
-    if (notificationError) {
-        console.error('Error updating notification status:', notificationError);
+    // 3. Mark notification as read (if it exists)
+    if (!notificationId.startsWith('creator_request_')) {
+      const { error: notificationError } = await supabase
+        .from('admin_notifications')
+        .update({ is_read: true })
+        .eq('id', notificationId);
+        
+      if (notificationError) {
+          console.error('Error updating notification status:', notificationError);
+      }
     }
 
     console.log('Creator request approved successfully');
@@ -260,14 +263,16 @@ export const CreatorRequestService = {
       return { error: requestError };
     }
 
-    // 2. Mark notification as read
-    const { error: notificationError } = await supabase
-      .from('admin_notifications')
-      .update({ is_read: true })
-      .eq('id', notificationId);
-      
-    if (notificationError) {
-        console.error('Error updating notification status:', notificationError);
+    // 2. Mark notification as read (if it exists)
+    if (!notificationId.startsWith('creator_request_')) {
+      const { error: notificationError } = await supabase
+        .from('admin_notifications')
+        .update({ is_read: true })
+        .eq('id', notificationId);
+        
+      if (notificationError) {
+          console.error('Error updating notification status:', notificationError);
+      }
     }
 
     console.log('Creator request denied successfully');
