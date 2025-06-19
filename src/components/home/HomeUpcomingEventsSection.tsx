@@ -96,11 +96,11 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
-        <div className="mb-8 text-center">
+        <div className="mb-8 text-left">
           <h2 className="text-3xl md:text-4xl font-bold mb-3 text-primary">
             Upcoming Events
           </h2>
-          <p className="text-lg max-w-2xl mx-auto text-neutral">
+          <p className="text-lg max-w-2xl text-neutral">
             Discover events that match your energy — from sunrise yoga to sunset gatherings
           </p>
         </div>
@@ -108,13 +108,13 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
         {/* Only show vibe filters if there are available vibes */}
         {availableVibes.length > 0 && (
           <div className="mb-8">
-            <h3 className="text-xl font-semibold text-primary mb-4 text-center">Find your vibe</h3>
-            <div className="flex justify-center">
+            <h3 className="text-xl font-semibold text-primary mb-4 text-left">Find your vibe</h3>
+            <div className="flex justify-start">
               <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar max-w-full">
                 <button 
                   onClick={() => handleVibeClick(null)} 
                   className={cn(
-                    "flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200",
+                    "flex-shrink-0 rounded-full px-3 py-1.5 text-sm font-medium transition-all duration-200",
                     !selectedVibe 
                       ? "bg-primary text-white shadow-lg transform scale-105" 
                       : "bg-white text-neutral-75 hover:bg-secondary-25 border border-neutral-25"
@@ -130,7 +130,7 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
                       key={vibe} 
                       onClick={() => handleVibeClick(vibe)} 
                       className={cn(
-                        "flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 capitalize border transform",
+                        "flex-shrink-0 rounded-full px-3 py-1.5 text-sm font-medium transition-all duration-200 capitalize border transform",
                         isSelected 
                           ? "text-white shadow-lg scale-105 border-transparent" 
                           : "bg-white text-neutral-75 hover:shadow-md border-neutral-25 hover:scale-102"
