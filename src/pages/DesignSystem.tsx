@@ -10,6 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar, MapPin, Users, Clock, Search, Plus, Heart, Star } from 'lucide-react';
 import AppPageHeader from '@/components/ui/AppPageHeader';
+import { ButtonShowcase } from '@/components/ui/ButtonShowcase';
+import { type BorderRadiusToken, designTokens } from '@/constants/design-tokens';
 
 const DesignSystem = () => {
   // All category pills from the image
@@ -29,7 +31,7 @@ const DesignSystem = () => {
             <p className="text-base leading-7 text-gray-700">
               This page documents all design tokens, components, and usage guidelines for this app.
               <br />
-              <strong>To change the design system:</strong> Edit <code>src/pages/DesignSystem.tsx</code> for documentation/examples, or update individual UI components in <code>src/components/ui/</code>.<br />
+              <strong>To change the design system:</strong> Edit design tokens in <code>src/constants/design-tokens.ts</code> or individual UI components in <code>src/components/ui/</code>.<br />
               All designers and developers should reference this page to ensure consistency—this is the <span className="font-semibold text-primary">single source of truth</span> for visual design.
             </p>
             <ul className="list-disc list-inside text-sm text-muted-foreground mt-2">
@@ -54,6 +56,7 @@ const DesignSystem = () => {
                 <CardTitle className="text-lg">Components</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
+                <a href="#design-tokens" className="block text-sm hover:text-blue-600">Design Tokens</a>
                 <a href="#typography" className="block text-sm hover:text-blue-600">Typography</a>
                 <a href="#colors" className="block text-sm hover:text-blue-600">Colors</a>
                 <a href="#buttons" className="block text-sm hover:text-blue-600">Buttons</a>
@@ -68,9 +71,60 @@ const DesignSystem = () => {
 
           {/* Main Content */}
           <div className="lg:col-span-9 space-y-12">
-            {/* All doc/demo sections receive left-aligned titles and consistent paddings */}
-            {/* For each section, harmonize the section container and headings */}
-            {/* Only code shown for representative section - repeat pattern for each */}
+            
+            {/* Design Tokens */}
+            <section id="design-tokens" className="scroll-mt-24">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Design Tokens</CardTitle>
+                  <CardDescription>Centralized design values that ensure consistency across the platform</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Border Radius Tokens</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      {Object.entries(designTokens.borderRadius).map(([key, value]) => (
+                        <div key={key} className="space-y-2">
+                          <div className={`h-12 w-full bg-gray-200 border-2 border-gray-400 ${value}`}></div>
+                          <div className="text-xs">
+                            <div className="font-medium">{key}</div>
+                            <code className="text-gray-500">{value}</code>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 mb-3">Usage in Code</h4>
+                    <div className="bg-gray-900 text-gray-100 p-4 rounded-lg text-sm">
+                      <pre>{`import { getBorderRadiusClass } from '@/constants/design-tokens';
+
+// Use in components
+<Button radius="sm">My Button</Button>
+
+// Or get the class directly
+const radiusClass = getBorderRadiusClass('md');`}</pre>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* Buttons - Now with comprehensive examples */}
+            <section id="buttons">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Button System</CardTitle>
+                  <CardDescription>Comprehensive button variants, sizes, and radius options with usage guidelines</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ButtonShowcase />
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* Typography */}
             <section id="typography" className="scroll-mt-24">
               <Card>
                 <CardHeader>

@@ -45,7 +45,8 @@ export const HomeHeroSection: React.FC = () => {
           <Button
             onClick={handleExploreEvents}
             size="lg"
-            className="bg-black text-white hover:bg-gray-800 px-8 py-4 text-lg rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+            radius="sm"
+            className="bg-black text-white hover:bg-gray-800 px-8 py-4 text-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
             Explore Events
           </Button>
@@ -53,7 +54,8 @@ export const HomeHeroSection: React.FC = () => {
             onClick={handleSignUp}
             variant="outline"
             size="lg"
-            className="border-2 border-gray-300 text-gray-900 hover:bg-gray-50 px-8 py-4 text-lg rounded-full font-semibold transition-all duration-300"
+            radius="sm"
+            className="border-2 border-gray-300 text-gray-900 hover:bg-gray-50 px-8 py-4 text-lg font-semibold transition-all duration-300"
           >
             {isAuthenticated ? 'Browse Events' : 'Sign Up'}
           </Button>

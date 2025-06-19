@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,7 @@ export const AdvancedFiltersButton: React.FC<AdvancedFiltersButtonProps> = ({
         <Button 
           variant={hasActiveFilters ? "dark" : "outline"} 
           size="sm"
+          radius="sm"
           onClick={() => onOpen && onOpen(!isOpen)}
           className={cn("w-9 h-9 p-0")}
         >
@@ -55,6 +57,7 @@ export const AdvancedFiltersButton: React.FC<AdvancedFiltersButtonProps> = ({
         <Button 
           variant={hasActiveFilters ? "dark" : "outline"} 
           size="sm"
+          radius="sm"
           className={cn(
             "w-9 h-9 p-0", 
             className

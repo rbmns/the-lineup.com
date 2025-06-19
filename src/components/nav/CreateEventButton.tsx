@@ -49,8 +49,9 @@ export const CreateEventButton: React.FC<CreateEventButtonProps> = ({
     <Button
       onClick={handleCreateEventClick}
       disabled={isCreatorStatusLoading}
+      radius="sm"
       className={cn(
-        "bg-gray-900 hover:bg-gray-800 text-white rounded-full flex items-center gap-2 flex-shrink-0",
+        "bg-gray-900 hover:bg-gray-800 text-white flex items-center gap-2 flex-shrink-0",
         isMobile ? "text-sm px-3 py-2" : "text-sm px-4 py-2"
       )}
     >
