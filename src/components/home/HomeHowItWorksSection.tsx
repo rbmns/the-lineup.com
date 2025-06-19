@@ -1,28 +1,42 @@
 
 import React from "react";
-import { Calendar, Users, Search } from "lucide-react";
+import { Calendar, Users, Search, Heart, Eye } from "lucide-react";
 
 const steps = [
   {
     icon: <Search className="h-12 w-12 text-white" />,
-    label: "Discover Events",
-    desc: "Browse events happening near you, from yoga sessions to beach parties and everything in between.",
+    label: "Pick your vibe",
+    desc: "Filter events by what you're into — surf, live music, yoga, food, or just something low-key.",
     bgGradient: "bg-gradient-to-br from-vibrant-seafoam to-primary",
     shadowColor: "shadow-vibrant-seafoam/30",
   },
   {
     icon: <Calendar className="h-12 w-12 text-white" />,
-    label: "RSVP & Plan",
-    desc: "Show interest or commit to going. Keep track of your plans and never miss out on what matters to you.",
+    label: "See what's on",
+    desc: "Browse upcoming events and casual plans posted by locals and other travelers.",
     bgGradient: "bg-gradient-to-br from-vibrant-sunset to-vibrant-coral",
     shadowColor: "shadow-vibrant-sunset/30",
   },
   {
-    icon: <Users className="h-12 w-12 text-white" />,
-    label: "Connect & Enjoy",
-    desc: "Meet like-minded people at events and build meaningful connections in your community.",
+    icon: <Eye className="h-12 w-12 text-white" />,
+    label: "Check who's going",
+    desc: "See who's already in — locals, nomads, familiar faces. No guessing the crowd.",
     bgGradient: "bg-gradient-to-br from-primary to-extended-oceanDeep-600",
     shadowColor: "shadow-primary/30",
+  },
+  {
+    icon: <Users className="h-12 w-12 text-white" />,
+    label: "Join in",
+    desc: "RSVP with one tap. Or jump into casual plans, no commitment needed.",
+    bgGradient: "bg-gradient-to-br from-vibrant-coral to-vibrant-sunset",
+    shadowColor: "shadow-vibrant-coral/30",
+  },
+  {
+    icon: <Heart className="h-12 w-12 text-white" />,
+    label: "Stay connected",
+    desc: "Follow people you meet, get updates on new plans, and build your local scene.",
+    bgGradient: "bg-gradient-to-br from-extended-oceanDeep-600 to-primary",
+    shadowColor: "shadow-extended-oceanDeep-600/30",
   },
 ];
 
@@ -45,7 +59,7 @@ const HomeHowItWorksSection = () => (
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 lg:gap-6">
           {steps.map((step, index) => (
             <div className="text-center group" key={step.label}>
               <div className={`w-24 h-24 ${step.bgGradient} rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-all duration-500 ${step.shadowColor} shadow-2xl`}>
@@ -55,11 +69,6 @@ const HomeHowItWorksSection = () => (
                 <h3 className="text-xl font-semibold text-primary mb-4">{step.label}</h3>
                 <p className="text-neutral leading-relaxed text-base">{step.desc}</p>
               </div>
-              
-              {/* Step connector line for desktop */}
-              {index < steps.length - 1 && (
-                <div className="hidden md:block absolute top-12 left-1/2 w-24 h-0.5 bg-gradient-to-r from-neutral-25 to-transparent transform translate-x-12"></div>
-              )}
             </div>
           ))}
         </div>
