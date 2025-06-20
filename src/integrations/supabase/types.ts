@@ -329,7 +329,7 @@ export type Database = {
           end_date: string | null
           end_time: string | null
           event_category: string | null
-          "Extra info": string | null
+          extra_info: string | null
           fee: string | null
           fixed_start_time: boolean | null
           google_maps: string | null
@@ -361,7 +361,7 @@ export type Database = {
           end_date?: string | null
           end_time?: string | null
           event_category?: string | null
-          "Extra info"?: string | null
+          extra_info?: string | null
           fee?: string | null
           fixed_start_time?: boolean | null
           google_maps?: string | null
@@ -393,7 +393,7 @@ export type Database = {
           end_date?: string | null
           end_time?: string | null
           event_category?: string | null
-          "Extra info"?: string | null
+          extra_info?: string | null
           fee?: string | null
           fixed_start_time?: boolean | null
           google_maps?: string | null
