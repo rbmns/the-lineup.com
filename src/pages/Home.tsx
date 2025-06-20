@@ -11,8 +11,8 @@ import { OrganizerCtaSection } from '@/components/home/OrganizerCtaSection';
 import HomeCtaSection from '@/components/home/HomeCtaSection';
 
 const Home = () => {
-  // For the home page, we want to show published events only
-  const { data: events, isLoading } = useEvents(undefined, { includeAllStatuses: false });
+  // For the home page, we want to show published events only, but let's temporarily include all statuses to debug
+  const { data: events, isLoading } = useEvents(undefined, { includeAllStatuses: true });
 
   return (
     <div className="w-full bg-white">

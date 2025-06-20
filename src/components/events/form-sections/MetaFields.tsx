@@ -14,10 +14,10 @@ interface MetaFieldsProps {
 export const MetaFields: React.FC<MetaFieldsProps> = ({ register, errors }) => (
   <>
     <div>
-      <Label htmlFor="extra_info">Extra Info <span className="text-sm text-muted-foreground">(optional)</span></Label>
+      <Label htmlFor="extra_info">Extra Info</Label>
       <Textarea
         id="extra_info"
-        placeholder="Any additional information about your event..."
+        placeholder="Extra information"
         {...register("extra_info")}
         aria-invalid={errors.extra_info ? "true" : "false"}
       />
@@ -27,11 +27,11 @@ export const MetaFields: React.FC<MetaFieldsProps> = ({ register, errors }) => (
     </div>
 
     <div>
-      <Label htmlFor="tags">Tags <span className="text-sm text-muted-foreground">(optional)</span></Label>
+      <Label htmlFor="tags">Tags</Label>
       <Input
         id="tags"
         type="text"
-        placeholder="e.g., beach, sunset, community (separate with commas)"
+        placeholder="tag1, tag2, tag3"
         {...register("tags")}
         aria-invalid={errors.tags ? "true" : "false"}
       />

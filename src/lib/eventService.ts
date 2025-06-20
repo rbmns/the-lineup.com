@@ -15,17 +15,7 @@ export const fetchEventById = async (eventId: string, userId: string | undefined
       .from('events')
       .select(`
         *,
-        venues:venue_id(
-          id,
-          name,
-          street,
-          postal_code,
-          city,
-          website,
-          google_maps,
-          region,
-          tags
-        ),
+        venues!events_venue_id_fkey(*),
         event_rsvps(id, user_id, status)
       `)
       .eq('id', eventId)
@@ -208,22 +198,12 @@ export const fetchSimilarEvents = async (
   userId: string | undefined = undefined
 ): Promise<Event[]> => {
   try {
-    // Construct the base query with explicit venue join
+    // Construct the base query
     let query = supabase
       .from('events')
       .select(`
         *,
-        venues:venue_id(
-          id,
-          name,
-          street,
-          postal_code,
-          city,
-          website,
-          google_maps,
-          region,
-          tags
-        ),
+        venues!events_venue_id_fkey(*),
         event_rsvps(id, user_id, status)
       `)
       .neq('id', currentEventId) // Exclude the current event
@@ -312,22 +292,12 @@ export const searchEvents = async (query: string, userId: string | undefined = u
 
     const searchTerm = query.trim();
     
-    // Search events by title, description, or tags with explicit venue join
+    // Search events by title, description, or tags
     const { data, error } = await supabase
       .from('events')
       .select(`
         *,
-        venues:venue_id(
-          id,
-          name,
-          street,
-          postal_code,
-          city,
-          website,
-          google_maps,
-          region,
-          tags
-        ),
+        venues!events_venue_id_fkey(*),
         event_rsvps(id, user_id, status)
       `)
       .eq('status', 'published') // Only show published events

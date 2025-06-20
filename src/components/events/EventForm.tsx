@@ -7,10 +7,11 @@ import { DescriptionField } from './form-sections/DescriptionField';
 import { CategoryField } from './form-sections/CategoryField';
 import { DateTimeFields } from './form-sections/DateTimeFields';
 import { VenueField } from './form-sections/VenueField';
-import { OptionalDetailsFields } from './form-sections/OptionalDetailsFields';
+import { DetailsFields } from './form-sections/DetailsFields';
+import { MetaFields } from './form-sections/MetaFields';
+import { VibeField } from './form-sections/VibeField';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Event } from '@/types';
 
 interface EventFormProps {
@@ -40,57 +41,34 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
   return (
     <>
       <Form {...form}>
-        <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-6">
-          {/* Required Fields Section */}
-          <div className="space-y-6">
-            <TitleField register={register} errors={errors} />
-            <DescriptionField register={register} errors={errors} />
-            <CategoryField watch={watch} setValue={setValue} errors={errors} />
-            <DateTimeFields register={register} watch={watch} setValue={setValue} errors={errors} />
-            <VenueField 
-              watch={watch} 
-              setValue={setValue} 
-              errors={errors} 
-              venues={venues} 
-              isLoadingVenues={isLoadingVenues} 
-              onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)}
-            />
-          </div>
+        <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-8">
+          <TitleField register={register} errors={errors} />
+          <DescriptionField register={register} errors={errors} />
+          <CategoryField watch={watch} setValue={setValue} errors={errors} />
+          <DateTimeFields register={register} watch={watch} setValue={setValue} errors={errors} />
+          <VenueField 
+            watch={watch} 
+            setValue={setValue} 
+            errors={errors} 
+            venues={venues} 
+            isLoadingVenues={isLoadingVenues} 
+            onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)}
+          />
+          <DetailsFields register={register} errors={errors} />
+          <MetaFields register={register} errors={errors} />
+          <VibeField control={control} />
 
-          {/* Optional Fields Accordion */}
-          <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="optional-details" className="border rounded-lg px-4">
-              <AccordionTrigger className="text-lg font-medium hover:no-underline py-4">
-                Optional Additional Info
-                <span className="text-sm text-muted-foreground ml-2 font-normal">
-                  (Expand to add more details)
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="pb-4">
-                <div className="space-y-6 pt-2">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    These fields are optional but can help provide more information about your event.
-                  </p>
-                  <OptionalDetailsFields register={register} control={control} errors={errors} />
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-
-          <div className="pt-4">
-            <Button 
-              type="submit" 
-              variant="primary" 
-              disabled={isSubmitting}
-              className="w-full sm:w-auto"
-              onClick={() => {
-                console.log('Submit button clicked, isSubmitting:', isSubmitting);
-                console.log('Current form values:', form.getValues());
-              }}
-            >
-              {isSubmitting ? "Submitting..." : isEditMode ? "Update Event" : "Create Event"}
-            </Button>
-          </div>
+          <Button 
+            type="submit" 
+            variant="primary" 
+            disabled={isSubmitting}
+            onClick={() => {
+              console.log('Submit button clicked, isSubmitting:', isSubmitting);
+              console.log('Current form values:', form.getValues());
+            }}
+          >
+            {isSubmitting ? "Submitting..." : isEditMode ? "Update Event" : "Create Event"}
+          </Button>
         </form>
       </Form>
       <CreateVenueModal 

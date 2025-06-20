@@ -40,7 +40,7 @@ export const useUserEvents = (userId: string | undefined): UseUserEventsResult =
         // Get the event IDs the user has RSVPed to
         const eventIds = rsvpData.map(rsvp => rsvp.event_id);
 
-        // Fetch the events the user has RSVPed to (only published events) with explicit venue join
+        // Fetch the events the user has RSVPed to (only published events)
         const { data: eventsData, error: eventsError } = await supabase
           .from('events')
           .select(`
