@@ -42,21 +42,37 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
     <>
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-8">
-          <TitleField register={register} errors={errors} />
-          <DescriptionField register={register} errors={errors} />
-          <CategoryField watch={watch} setValue={setValue} errors={errors} />
-          <DateTimeFields register={register} watch={watch} setValue={setValue} errors={errors} />
-          <VenueField 
-            watch={watch} 
-            setValue={setValue} 
-            errors={errors} 
-            venues={venues} 
-            isLoadingVenues={isLoadingVenues} 
-            onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)}
-          />
-          <DetailsFields register={register} errors={errors} />
-          <MetaFields register={register} errors={errors} />
-          <VibeField control={control} />
+          {/* Required Fields Section */}
+          <div className="space-y-8">
+            <TitleField register={register} errors={errors} />
+            <DescriptionField register={register} errors={errors} />
+            <CategoryField watch={watch} setValue={setValue} errors={errors} />
+            <DateTimeFields register={register} watch={watch} setValue={setValue} errors={errors} />
+            <VenueField 
+              watch={watch} 
+              setValue={setValue} 
+              errors={errors} 
+              venues={venues} 
+              isLoadingVenues={isLoadingVenues} 
+              onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)}
+            />
+            <DetailsFields register={register} errors={errors} />
+          </div>
+
+          {/* Optional Fields Section */}
+          <div className="border-t pt-8 mt-8">
+            <div className="mb-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Optional Details</h3>
+              <p className="text-sm text-muted-foreground">
+                These fields are optional but can help provide more information about your event.
+              </p>
+            </div>
+            
+            <div className="space-y-6">
+              <VibeField control={control} />
+              <MetaFields register={register} errors={errors} />
+            </div>
+          </div>
 
           <Button 
             type="submit" 
