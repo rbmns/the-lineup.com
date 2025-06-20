@@ -13,7 +13,6 @@ import { RequestCreatorModal } from './RequestCreatorModal';
 import { CreatorRequestsManager } from './CreatorRequestsManager';
 import { CreatorRequestService } from '@/services/CreatorRequestService';
 import { toast } from "sonner";
-import { supabase } from '@/lib/supabase';
 import { useQuery } from '@tanstack/react-query';
 import { useCreatorStatus } from '@/hooks/useCreatorStatus';
 import { SidebarToggleButton } from './SidebarToggleButton';
@@ -108,27 +107,6 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
       toast.error("There was an issue submitting your request. Please try again.");
     } else {
       toast.success("Your request has been submitted!");
-      
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('username, email')
-        .eq('id', user.id)
-        .single();
-      
-      if (profile) {
-        const { error: notificationError } = await CreatorRequestService.notifyAdminOfCreatorRequest(
-          user.id, 
-          formData, 
-          {
-            username: profile.username || 'N/A',
-            email: profile.email || user.email || 'N/A',
-          }
-        );
-
-        if(notificationError){
-            console.error("Failed to create admin notification", notificationError);
-        }
-      }
     }
   };
 
