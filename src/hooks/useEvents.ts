@@ -30,7 +30,17 @@ export const useEvents = (
           .from('events')
           .select(`
             *,
-            venues:venue_id(*),
+            venues:venue_id(
+              id,
+              name,
+              street,
+              postal_code,
+              city,
+              website,
+              google_maps,
+              region,
+              tags
+            ),
             event_rsvps(id, user_id, status)
           `)
           .order('start_date', { ascending: true })
@@ -44,24 +54,23 @@ export const useEvents = (
           console.log('🔍 Including all event statuses');
         }
         
-        const { data, error } = await query;
+        const { data: eventsData, error } = await query;
         
         if (error) {
           console.error('❌ Error fetching events:', error);
           throw error;
         }
 
-        console.log('📊 Raw events data from database:', data?.length || 0, 'events');
-        console.log('📊 Sample event statuses:', data?.slice(0, 3).map(e => ({ id: e.id, title: e.title, status: e.status })));
+        console.log('📊 Raw events data from database:', eventsData?.length || 0, 'events');
 
-        if (!data) {
+        if (!eventsData) {
           console.log('⚠️ No data returned from query');
           return [];
         }
         
         // Debug: Let's see what statuses we have in the database
-        if (data.length > 0) {
-          const statusCounts = data.reduce((acc, event) => {
+        if (eventsData.length > 0) {
+          const statusCounts = eventsData.reduce((acc, event) => {
             acc[event.status || 'null'] = (acc[event.status || 'null'] || 0) + 1;
             return acc;
           }, {} as Record<string, number>);
@@ -69,8 +78,7 @@ export const useEvents = (
         }
         
         // Now fetch creator profiles separately to avoid the foreign key conflict
-        const eventIds = data.map(event => event.id);
-        const creatorIds = data.map(event => event.creator).filter(Boolean);
+        const creatorIds = eventsData.map(event => event.creator).filter(Boolean);
         
         let creatorsData = [];
         if (creatorIds.length > 0) {
@@ -85,7 +93,7 @@ export const useEvents = (
         }
         
         // Combine the data manually
-        const eventsWithCreators = data.map(event => ({
+        const eventsWithCreators = eventsData.map(event => ({
           ...event,
           creator: creatorsData.find(creator => creator.id === event.creator) || null
         }));

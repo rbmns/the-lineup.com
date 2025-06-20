@@ -15,7 +15,17 @@ export const fetchEventById = async (eventId: string, userId: string | undefined
       .from('events')
       .select(`
         *,
-        venues:venue_id(*),
+        venues:venue_id(
+          id,
+          name,
+          street,
+          postal_code,
+          city,
+          website,
+          google_maps,
+          region,
+          tags
+        ),
         event_rsvps(id, user_id, status)
       `)
       .eq('id', eventId)
@@ -203,7 +213,17 @@ export const fetchSimilarEvents = async (
       .from('events')
       .select(`
         *,
-        venues:venue_id(*),
+        venues:venue_id(
+          id,
+          name,
+          street,
+          postal_code,
+          city,
+          website,
+          google_maps,
+          region,
+          tags
+        ),
         event_rsvps(id, user_id, status)
       `)
       .neq('id', currentEventId) // Exclude the current event
@@ -297,7 +317,17 @@ export const searchEvents = async (query: string, userId: string | undefined = u
       .from('events')
       .select(`
         *,
-        venues:venue_id(*),
+        venues:venue_id(
+          id,
+          name,
+          street,
+          postal_code,
+          city,
+          website,
+          google_maps,
+          region,
+          tags
+        ),
         event_rsvps(id, user_id, status)
       `)
       .eq('status', 'published') // Only show published events
