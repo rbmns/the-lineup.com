@@ -11,7 +11,7 @@ interface VibeFieldProps {
 }
 
 export const VibeField: React.FC<VibeFieldProps> = ({ control }) => {
-  const { vibes, isLoading } = useEventVibes();
+  const { data: vibes, isLoading } = useEventVibes();
 
   return (
     <div>
@@ -29,7 +29,7 @@ export const VibeField: React.FC<VibeFieldProps> = ({ control }) => {
               <SelectValue placeholder="Select an event vibe" />
             </SelectTrigger>
             <SelectContent>
-              {vibes.map((vibe) => (
+              {vibes?.map((vibe) => (
                 <SelectItem key={vibe} value={vibe}>
                   {vibe.charAt(0).toUpperCase() + vibe.slice(1)}
                 </SelectItem>
