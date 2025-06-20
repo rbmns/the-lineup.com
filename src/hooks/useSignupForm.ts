@@ -29,7 +29,7 @@ export const useSignupForm = () => {
     password: false,
     confirmPassword: false,
   });
-  const { loginWithGoogle, loginWithFacebook, loading: authLoading } = useAuth();
+  const { loginWithGoogle, loading: authLoading } = useAuth();
   
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(formSchema),
@@ -44,11 +44,6 @@ export const useSignupForm = () => {
   const handleGoogleLogin = async () => {
     if (loading || authLoading) return;
     await loginWithGoogle();
-  };
-
-  const handleFacebookLogin = async () => {
-    if (loading || authLoading) return;
-    await loginWithFacebook();
   };
 
   const handleFieldBlur = (fieldName: string) => {
@@ -131,7 +126,6 @@ export const useSignupForm = () => {
     nextStep,
     prevStep,
     handleGoogleLogin,
-    handleFacebookLogin,
     handleFieldBlur,
   };
 };

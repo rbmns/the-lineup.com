@@ -26,11 +26,11 @@ export const WhoIsItForSection: React.FC = () => {
     },
     {
       title: "Organizers",
-      description: "Hosting events? Login & Create Events or share with events@the-lineup.com",
+      description: "Hosting an event? Share it with people who'll show up.",
       icon: Calendar,
       gradient: "from-purple-500 to-pink-500",
-      buttonText: "Login & Create",
-      path: "/events/create"
+      buttonText: "Event Dashboard",
+      path: "/organise"
     }
   ];
 

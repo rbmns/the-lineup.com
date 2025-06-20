@@ -9,7 +9,6 @@ import { SignupSuccess } from './signup/SignupSuccess';
 import { SignupStep1 } from './signup/SignupStep1';
 import { SignupStep2 } from './signup/SignupStep2';
 import GoogleAuthButton from './GoogleAuthButton';
-import FacebookAuthButton from './FacebookAuthButton';
 
 export default function SignupForm({ onToggleMode }: { onToggleMode: () => void }) {
   const {
@@ -25,7 +24,6 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
     nextStep,
     prevStep,
     handleGoogleLogin,
-    handleFacebookLogin,
     handleFieldBlur,
   } = useSignupForm();
 
@@ -80,21 +78,12 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
         </div>
       </div>
       
-      <div className="grid grid-cols-2 gap-3">
-        <GoogleAuthButton 
-          onClick={handleGoogleLogin}
-          loading={loading || authLoading}
-        >
-          Google
-        </GoogleAuthButton>
-        
-        <FacebookAuthButton 
-          onClick={handleFacebookLogin}
-          loading={loading || authLoading}
-        >
-          Facebook
-        </FacebookAuthButton>
-      </div>
+      <GoogleAuthButton 
+        onClick={handleGoogleLogin}
+        loading={loading || authLoading}
+      >
+        Sign up with Google
+      </GoogleAuthButton>
 
       <div className="text-center text-sm">
         Already have an account?{" "}
@@ -104,4 +93,4 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
       </div>
     </div>
   );
-};
+}
