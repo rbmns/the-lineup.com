@@ -22,15 +22,15 @@ export const WhoIsItForSection: React.FC = () => {
       icon: Users,
       gradient: "from-green-500 to-emerald-500",
       buttonText: "Browse Events",
-      path: "/events"
+      path: "/events/"
     },
     {
       title: "Organizers",
-      description: "Hosting an event? Share it with people who'll show up.",
+      description: "Hosting events? Create events or send your planning to events@the-lineup.com",
       icon: Calendar,
       gradient: "from-purple-500 to-pink-500",
       buttonText: "Event Dashboard",
-      path: "/organise"
+      path: "/events/create"
     }
   ];
 
