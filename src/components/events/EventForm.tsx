@@ -7,11 +7,11 @@ import { DescriptionField } from './form-sections/DescriptionField';
 import { CategoryField } from './form-sections/CategoryField';
 import { DateTimeFields } from './form-sections/DateTimeFields';
 import { VenueField } from './form-sections/VenueField';
-import { DetailsFields } from './form-sections/DetailsFields';
-import { MetaFields } from './form-sections/MetaFields';
-import { VibeField } from './form-sections/VibeField';
+import { RequiredDetailsFields } from './form-sections/RequiredDetailsFields';
+import { OptionalDetailsFields } from './form-sections/OptionalDetailsFields';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Event } from '@/types';
 
 interface EventFormProps {
@@ -41,9 +41,9 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
   return (
     <>
       <Form {...form}>
-        <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-8">
+        <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-6">
           {/* Required Fields Section */}
-          <div className="space-y-8">
+          <div className="space-y-6">
             <TitleField register={register} errors={errors} />
             <DescriptionField register={register} errors={errors} />
             <CategoryField watch={watch} setValue={setValue} errors={errors} />
@@ -56,35 +56,42 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
               isLoadingVenues={isLoadingVenues} 
               onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)}
             />
-            <DetailsFields register={register} errors={errors} />
           </div>
 
-          {/* Optional Fields Section */}
-          <div className="border-t pt-8 mt-8">
-            <div className="mb-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Optional Details</h3>
-              <p className="text-sm text-muted-foreground">
-                These fields are optional but can help provide more information about your event.
-              </p>
-            </div>
-            
-            <div className="space-y-6">
-              <VibeField control={control} />
-              <MetaFields register={register} errors={errors} />
-            </div>
-          </div>
+          {/* Optional Fields Accordion */}
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="optional-details" className="border rounded-lg px-4">
+              <AccordionTrigger className="text-lg font-medium hover:no-underline py-4">
+                Optional Additional Info
+                <span className="text-sm text-muted-foreground ml-2 font-normal">
+                  (Expand to add more details)
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4">
+                <div className="space-y-6 pt-2">
+                  <p className="text-sm text-muted-foreground mb-4">
+                    These fields are optional but can help provide more information about your event.
+                  </p>
+                  <OptionalDetailsFields register={register} control={control} errors={errors} />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
 
-          <Button 
-            type="submit" 
-            variant="primary" 
-            disabled={isSubmitting}
-            onClick={() => {
-              console.log('Submit button clicked, isSubmitting:', isSubmitting);
-              console.log('Current form values:', form.getValues());
-            }}
-          >
-            {isSubmitting ? "Submitting..." : isEditMode ? "Update Event" : "Create Event"}
-          </Button>
+          <div className="pt-4">
+            <Button 
+              type="submit" 
+              variant="primary" 
+              disabled={isSubmitting}
+              className="w-full sm:w-auto"
+              onClick={() => {
+                console.log('Submit button clicked, isSubmitting:', isSubmitting);
+                console.log('Current form values:', form.getValues());
+              }}
+            >
+              {isSubmitting ? "Submitting..." : isEditMode ? "Update Event" : "Create Event"}
+            </Button>
+          </div>
         </form>
       </Form>
       <CreateVenueModal 

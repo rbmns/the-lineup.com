@@ -15,7 +15,10 @@ export const VibeField: React.FC<VibeFieldProps> = ({ control }) => {
 
   return (
     <div>
-      <Label htmlFor="vibe">Event Vibe <span className="text-sm text-muted-foreground">(optional)</span></Label>
+      <Label htmlFor="vibe">
+        Event Vibe 
+        <span className="text-sm text-muted-foreground ml-1">(optional)</span>
+      </Label>
       <Controller
         name="vibe"
         control={control}
