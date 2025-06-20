@@ -10,10 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 export const OrganiseContent: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
   const { 
-    isCreator, 
-    hasRequestPending, 
+    canCreateEvents, 
+    creatorRequestStatus, 
     isLoading: statusLoading 
-  } = useCreatorStatus(user?.id);
+  } = useCreatorStatus();
 
   if (!isAuthenticated) {
     return (
@@ -37,6 +37,8 @@ export const OrganiseContent: React.FC = () => {
     );
   }
 
+  const hasRequestPending = creatorRequestStatus === 'pending';
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-6xl mx-auto">
@@ -53,7 +55,7 @@ export const OrganiseContent: React.FC = () => {
           </TabsContent>
           
           <TabsContent value="create" className="mt-6">
-            {isCreator ? (
+            {canCreateEvents ? (
               <CreatorDashboard />
             ) : hasRequestPending ? (
               <div className="text-center py-8">
