@@ -4,7 +4,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ProfilePageLayout } from '@/components/profile/ProfilePageLayout';
 import { useProfileData } from '@/hooks/useProfileData';
-import { UserCreatedEvents } from '@/components/profile/UserCreatedEvents';
 import { UserRsvpedEvents } from '@/components/profile/UserRsvpedEvents';
 import { UserCreatedVenues } from '@/components/venues/UserCreatedVenues';
 import { useAdminData } from '@/hooks/useAdminData';
@@ -64,13 +63,13 @@ const ProfilePage: React.FC = () => {
     );
   }
   
+  // For creators: just "My Venues" and "Admin" tab if they are an admin.
+  // For regular users: just "My RSVPs".
   let numTabs: number;
   if (canCreateEvents) {
-    // For creators: "My Events", "My Venues", and "Admin" tab if they are an admin.
-    numTabs = 2 + (isAdmin ? 1 : 0);
+    numTabs = 1 + (isAdmin ? 1 : 0); // Just venues + admin if applicable
   } else {
-    // For regular users: just "My RSVPs".
-    numTabs = 1;
+    numTabs = 1; // Just RSVPs
   }
   const gridColsClass = `grid-cols-${numTabs}`;
 
@@ -81,11 +80,11 @@ const ProfilePage: React.FC = () => {
   let defaultTab: string;
 
   if (canCreateEvents) {
-    validTabs.push('created', 'venues');
+    validTabs.push('venues');
     if (isAdmin) {
       validTabs.push('admin');
     }
-    defaultTab = 'created';
+    defaultTab = 'venues';
   } else {
     validTabs.push('rsvps');
     defaultTab = 'rsvps';
@@ -95,24 +94,15 @@ const ProfilePage: React.FC = () => {
     defaultTab = tabQueryParam;
   }
 
-
   return (
     <>
-      {!canCreateEvents && (
-        <ProfilePageLayout
-          profile={profile}
-          isOwnProfile={true}
-          showSettings={showSettings}
-          onToggleSettings={() => setShowSettings(!showSettings)}
-        />
-      )}
+      <ProfilePageLayout
+        profile={profile}
+        isOwnProfile={true}
+        showSettings={showSettings}
+        onToggleSettings={() => setShowSettings(!showSettings)}
+      />
       <div className="container mx-auto px-4 py-8 max-w-5xl">
-        {canCreateEvents && (
-          <div className="mb-8 pt-8">
-            <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
-            <p className="text-xl text-muted-foreground leading-relaxed mt-2">Manage your events, venues, and admin tasks.</p>
-          </div>
-        )}
         <Tabs defaultValue={defaultTab} className="w-full">
           <TabsList className={`grid w-full ${gridColsClass}`}>
               {!canCreateEvents && (
@@ -121,14 +111,9 @@ const ProfilePage: React.FC = () => {
                 </TabsTrigger>
               )}
               {canCreateEvents && (
-                  <>
-                      <TabsTrigger value="created">
-                          My Events
-                      </TabsTrigger>
-                      <TabsTrigger value="venues">
-                          My Venues
-                      </TabsTrigger>
-                  </>
+                <TabsTrigger value="venues">
+                  My Venues
+                </TabsTrigger>
               )}
               {isAdmin && (
                 <TabsTrigger value="admin">
@@ -142,14 +127,9 @@ const ProfilePage: React.FC = () => {
             </TabsContent>
           )}
           {canCreateEvents && (
-              <>
-                  <TabsContent value="created" className="mt-8">
-                      <UserCreatedEvents />
-                  </TabsContent>
-                  <TabsContent value="venues" className="mt-8">
-                      <UserCreatedVenues />
-                  </TabsContent>
-              </>
+            <TabsContent value="venues" className="mt-8">
+              <UserCreatedVenues />
+            </TabsContent>
           )}
           {isAdmin && (
             <TabsContent value="admin" className="mt-8">

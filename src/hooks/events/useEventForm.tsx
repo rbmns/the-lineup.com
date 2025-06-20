@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -164,7 +163,7 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
         await queryClient.invalidateQueries({ queryKey: ['event-details', eventId] });
         await queryClient.refetchQueries({ queryKey: ['events'] });
         
-        navigate('/organise');
+        navigate('/events');
       } else {
         console.log('Creating new event');
         const { data: createdEvent, error } = await createEvent(processedEventData as any);
@@ -198,13 +197,13 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
           description: 'Your new event is now live and ready for RSVPs.',
         });
         
-        // Force refetch of events data and navigate after a short delay
+        // Force refetch of events data and navigate to events page
         await queryClient.invalidateQueries({ queryKey: ['events'] });
         await queryClient.refetchQueries({ queryKey: ['events'] });
         
-        // Navigate to organise dashboard
+        // Navigate to events page instead of organise dashboard
         setTimeout(() => {
-          navigate('/organise');
+          navigate('/events');
         }, 500);
       }
     } catch (error: any) {

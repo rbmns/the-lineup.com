@@ -2,10 +2,13 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCreatorStatus } from '@/hooks/useCreatorStatus';
-import { CreatorDashboard } from './CreatorDashboard';
 import { RequestCreatorForm } from './RequestCreatorForm';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { Plus } from 'lucide-react';
 
 export const OrganiseContent: React.FC = () => {
+  const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const { 
     canCreateEvents, 
@@ -39,13 +42,25 @@ export const OrganiseContent: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-2xl mx-auto text-center">
         <h1 className="text-3xl font-bold mb-8">Organize Events</h1>
         
         {canCreateEvents ? (
-          <CreatorDashboard />
+          <div className="space-y-6">
+            <p className="text-lg text-gray-600 mb-8">
+              Ready to create your next event? Start organizing and bring people together.
+            </p>
+            <Button 
+              onClick={() => navigate('/events/create')}
+              size="lg"
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-5 w-5" />
+              Create New Event
+            </Button>
+          </div>
         ) : hasRequestPending ? (
-          <div className="text-center py-8">
+          <div className="py-8">
             <h2 className="text-xl font-semibold mb-4">Request Pending</h2>
             <p className="text-gray-600">
               Your request for creator access is being reviewed. We'll notify you once it's approved.

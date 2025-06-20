@@ -82,7 +82,6 @@ export const WhoIsItForSection: React.FC = () => {
                     onClick={() => handleButtonClick(persona.path)}
                     variant="outline"
                     className="w-full"
-                    radius="sm"
                   >
                     {persona.buttonText}
                   </Button>

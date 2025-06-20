@@ -7,9 +7,7 @@ import { DescriptionField } from './form-sections/DescriptionField';
 import { CategoryField } from './form-sections/CategoryField';
 import { DateTimeFields } from './form-sections/DateTimeFields';
 import { VenueField } from './form-sections/VenueField';
-import { DetailsFields } from './form-sections/DetailsFields';
-import { MetaFields } from './form-sections/MetaFields';
-import { VibeField } from './form-sections/VibeField';
+import { OptionalFieldsSection } from './form-sections/OptionalFieldsSection';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { Event } from '@/types';
@@ -41,34 +39,49 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
   return (
     <>
       <Form {...form}>
-        <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-8">
-          <TitleField register={register} errors={errors} />
-          <DescriptionField register={register} errors={errors} />
-          <CategoryField watch={watch} setValue={setValue} errors={errors} />
-          <DateTimeFields register={register} watch={watch} setValue={setValue} errors={errors} />
-          <VenueField 
-            watch={watch} 
-            setValue={setValue} 
-            errors={errors} 
-            venues={venues} 
-            isLoadingVenues={isLoadingVenues} 
-            onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)}
-          />
-          <DetailsFields register={register} errors={errors} />
-          <MetaFields register={register} errors={errors} />
-          <VibeField control={control} />
+        <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-6">
+          {/* Required Fields */}
+          <div className="space-y-6">
+            <TitleField register={register} errors={errors} />
+            <DescriptionField register={register} errors={errors} />
+            <CategoryField watch={watch} setValue={setValue} errors={errors} />
+            <DateTimeFields register={register} watch={watch} setValue={setValue} errors={errors} />
+            <VenueField 
+              watch={watch} 
+              setValue={setValue} 
+              errors={errors} 
+              venues={venues} 
+              isLoadingVenues={isLoadingVenues} 
+              onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)}
+            />
+          </div>
 
-          <Button 
-            type="submit" 
-            variant="primary" 
-            disabled={isSubmitting}
-            onClick={() => {
-              console.log('Submit button clicked, isSubmitting:', isSubmitting);
-              console.log('Current form values:', form.getValues());
-            }}
-          >
-            {isSubmitting ? "Submitting..." : isEditMode ? "Update Event" : "Create Event"}
-          </Button>
+          {/* Optional Fields */}
+          <div className="pt-4">
+            <OptionalFieldsSection 
+              register={register} 
+              errors={errors} 
+              control={control}
+              watch={watch}
+              setValue={setValue}
+            />
+          </div>
+
+          {/* Submit Button */}
+          <div className="pt-6">
+            <Button 
+              type="submit" 
+              variant="default"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto"
+              onClick={() => {
+                console.log('Submit button clicked, isSubmitting:', isSubmitting);
+                console.log('Current form values:', form.getValues());
+              }}
+            >
+              {isSubmitting ? "Submitting..." : isEditMode ? "Update Event" : "Create Event"}
+            </Button>
+          </div>
         </form>
       </Form>
       <CreateVenueModal 
