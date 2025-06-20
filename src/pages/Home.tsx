@@ -24,16 +24,11 @@ const Home = () => {
       {/* Upcoming Events Section with Vibe Filters */}
       <HomeUpcomingEventsSection events={events} isLoading={isLoading} />
 
-      {/* Categories Section */}
-      <HomeCategoriesSection events={events} />
-
-      {/* How It Works Section */}
-      <HomeHowItWorksSection />
-      
-      {/* Casual Plans Section */}
+            {/* Casual Plans Section */}
       <HomeCasualPlansSection />
       
- 
+      {/* Categories Section */}
+      <HomeCategoriesSection events={events} />
       
       {/* CTA Section */}
       <HomeCtaSection />
