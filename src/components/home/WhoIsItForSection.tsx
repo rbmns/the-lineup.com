@@ -29,7 +29,7 @@ export const WhoIsItForSection: React.FC = () => {
       description: "Hosting events? Create events or send your planning to events@the-lineup.com",
       icon: Calendar,
       gradient: "from-purple-500 to-pink-500",
-      buttonText: "Event Dashboard",
+      buttonText: "Create Event",
       path: "/events/create"
     }
   ];
