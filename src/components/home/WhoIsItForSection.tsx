@@ -10,7 +10,7 @@ export const WhoIsItForSection: React.FC = () => {
   const personas = [
     {
       title: "Explorers",
-      description: "New in town? Join something real, no pressure.",
+      description: "New in town? Find new events and get recommendations.",
       icon: MapPin,
       gradient: "from-blue-500 to-cyan-500",
       buttonText: "Explore Events",
@@ -18,7 +18,7 @@ export const WhoIsItForSection: React.FC = () => {
     },
     {
       title: "Locals", 
-      description: "Stay in the loop. Discover or share what's happening.",
+      description: "Stay in the loop. See what's happening and who's going.",
       icon: Users,
       gradient: "from-green-500 to-emerald-500",
       buttonText: "Browse Events",
