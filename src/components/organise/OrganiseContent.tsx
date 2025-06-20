@@ -4,8 +4,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCreatorStatus } from '@/hooks/useCreatorStatus';
 import { CreatorDashboard } from './CreatorDashboard';
 import { RequestCreatorForm } from './RequestCreatorForm';
-import { EventbriteEventsList } from '@/components/eventbrite/EventbriteEventsList';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export const OrganiseContent: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
@@ -44,31 +42,18 @@ export const OrganiseContent: React.FC = () => {
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">Organize Events</h1>
         
-        <Tabs defaultValue="eventbrite" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="eventbrite">Import from Eventbrite</TabsTrigger>
-            <TabsTrigger value="create">Create Events</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="eventbrite" className="mt-6">
-            <EventbriteEventsList />
-          </TabsContent>
-          
-          <TabsContent value="create" className="mt-6">
-            {canCreateEvents ? (
-              <CreatorDashboard />
-            ) : hasRequestPending ? (
-              <div className="text-center py-8">
-                <h2 className="text-xl font-semibold mb-4">Request Pending</h2>
-                <p className="text-gray-600">
-                  Your request for creator access is being reviewed. We'll notify you once it's approved.
-                </p>
-              </div>
-            ) : (
-              <RequestCreatorForm />
-            )}
-          </TabsContent>
-        </Tabs>
+        {canCreateEvents ? (
+          <CreatorDashboard />
+        ) : hasRequestPending ? (
+          <div className="text-center py-8">
+            <h2 className="text-xl font-semibold mb-4">Request Pending</h2>
+            <p className="text-gray-600">
+              Your request for creator access is being reviewed. We'll notify you once it's approved.
+            </p>
+          </div>
+        ) : (
+          <RequestCreatorForm />
+        )}
       </div>
     </div>
   );
