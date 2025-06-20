@@ -15,6 +15,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   loginWithEmail: (email: string) => Promise<{ error: any }>;
   loginWithGoogle: () => Promise<{ error: any }>;
+  loginWithFacebook: () => Promise<{ error: any }>;
   logout: () => Promise<void>;
   forgotPassword: (email: string) => Promise<{ error: any }>;
   resetPassword: (password: string) => Promise<{ error: any }>;
@@ -34,6 +35,7 @@ export const AuthContext = createContext<AuthContextType>({
   signOut: async () => {},
   loginWithEmail: async () => ({ error: null }),
   loginWithGoogle: async () => ({ error: null }),
+  loginWithFacebook: async () => ({ error: null }),
   logout: async () => {},
   forgotPassword: async () => ({ error: null }),
   resetPassword: async () => ({ error: null }),
@@ -308,6 +310,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const loginWithFacebook = async () => {
+    try {
+      console.log("Attempting Facebook login");
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'facebook',
+      });
+
+      if (error) {
+        console.error("Facebook login error:", error);
+        return { error };
+      }
+
+      return { error: null };
+    } catch (error) {
+      console.error("Unexpected error during Facebook login:", error);
+      return { error };
+    }
+  };
+
   const forgotPassword = async (email: string) => {
     try {
         console.log("Attempting to send forgot password email to:", email);
@@ -521,6 +542,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         signOut,
         loginWithEmail,
         loginWithGoogle,
+        loginWithFacebook,
         logout,
         forgotPassword,
         resetPassword,

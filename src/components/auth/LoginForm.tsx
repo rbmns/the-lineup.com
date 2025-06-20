@@ -8,6 +8,7 @@ import { LoginFormFields } from '@/components/auth/LoginFormFields';
 import { LoginFooter } from '@/components/auth/LoginFooter';
 import { useAuth } from '@/contexts/AuthContext';
 import GoogleAuthButton from './GoogleAuthButton';
+import FacebookAuthButton from './FacebookAuthButton';
 
 interface LoginFormProps {
   onToggleMode?: () => void;
@@ -36,21 +37,35 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     handleSubmit,
   } = useLoginForm({ suppressSuccessToast });
   
-  const { loginWithGoogle, loading: authLoading } = useAuth();
+  const { loginWithGoogle, loginWithFacebook, loading: authLoading } = useAuth();
 
   const handleGoogleLogin = async () => {
     if (loading || authLoading) return;
     await loginWithGoogle();
   };
 
+  const handleFacebookLogin = async () => {
+    if (loading || authLoading) return;
+    await loginWithFacebook();
+  };
+
   return (
     <>
-      <GoogleAuthButton 
-        onClick={handleGoogleLogin} 
-        loading={loading || authLoading}
-      >
-        Sign in with Google
-      </GoogleAuthButton>
+      <div className="grid grid-cols-2 gap-3">
+        <GoogleAuthButton 
+          onClick={handleGoogleLogin} 
+          loading={loading || authLoading}
+        >
+          Google
+        </GoogleAuthButton>
+        
+        <FacebookAuthButton 
+          onClick={handleFacebookLogin} 
+          loading={loading || authLoading}
+        >
+          Facebook
+        </FacebookAuthButton>
+      </div>
 
       <div className="relative my-4">
         <div className="absolute inset-0 flex items-center">
