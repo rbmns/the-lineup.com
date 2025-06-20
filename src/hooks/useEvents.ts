@@ -25,12 +25,12 @@ export const useEvents = (
       try {
         console.log('🔍 Fetching events for user:', userId, 'with options:', options);
         
-        // Build the query
+        // Build the query with explicit venue join
         let query = supabase
           .from('events')
           .select(`
             *,
-            venues!events_venue_id_fkey(*),
+            venues:venue_id(*),
             event_rsvps(id, user_id, status)
           `)
           .order('start_date', { ascending: true })
