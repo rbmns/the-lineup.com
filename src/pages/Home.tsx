@@ -7,7 +7,6 @@ import { HomeUpcomingEventsSection } from '@/components/home/HomeUpcomingEventsS
 import HomeHowItWorksSection from '@/components/home/HomeHowItWorksSection';
 import { HomeCasualPlansSection } from '@/components/home/HomeCasualPlansSection';
 import { HomeCategoriesSection } from '@/components/home/HomeCategoriesSection';
-import { OrganizerCtaSection } from '@/components/home/OrganizerCtaSection';
 import HomeCtaSection from '@/components/home/HomeCtaSection';
 
 const Home = () => {
@@ -34,8 +33,7 @@ const Home = () => {
       {/* Casual Plans Section */}
       <HomeCasualPlansSection />
       
-      {/* Organizer CTA Section */}
-      <OrganizerCtaSection />
+ 
       
       {/* CTA Section */}
       <HomeCtaSection />
