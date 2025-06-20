@@ -28,6 +28,51 @@ serve(async (req) => {
 
     console.log('Fetching events from Eventbrite API...')
     
+    // First, let's try to get user info to validate the token
+    const userResponse = await fetch(
+      'https://www.eventbriteapi.com/v3/users/me/',
+      {
+        headers: {
+          'Authorization': `Bearer ${eventbriteToken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    if (!userResponse.ok) {
+      console.error(`Eventbrite user API error: ${userResponse.status} ${userResponse.statusText}`)
+      const errorText = await userResponse.text()
+      console.error('User API error response:', errorText)
+      
+      if (userResponse.status === 401) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'Invalid Eventbrite API token',
+            details: 'Please check your API token and make sure it has the correct permissions' 
+          }),
+          { 
+            status: 401, 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+          }
+        )
+      }
+      
+      return new Response(
+        JSON.stringify({ 
+          error: 'Failed to validate Eventbrite API token',
+          details: errorText 
+        }),
+        { 
+          status: userResponse.status, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
+    }
+
+    const userData = await userResponse.json()
+    console.log('User data received:', JSON.stringify(userData, null, 2))
+    
+    // Now fetch events
     const eventbriteResponse = await fetch(
       'https://www.eventbriteapi.com/v3/users/me/events/?expand=venue,logo&status=live',
       {
@@ -39,9 +84,9 @@ serve(async (req) => {
     )
 
     if (!eventbriteResponse.ok) {
-      console.error(`Eventbrite API error: ${eventbriteResponse.status} ${eventbriteResponse.statusText}`)
+      console.error(`Eventbrite events API error: ${eventbriteResponse.status} ${eventbriteResponse.statusText}`)
       const errorText = await eventbriteResponse.text()
-      console.error('Error response:', errorText)
+      console.error('Events API error response:', errorText)
       return new Response(
         JSON.stringify({ 
           error: 'Failed to fetch events from Eventbrite',
@@ -55,7 +100,7 @@ serve(async (req) => {
     }
 
     const eventbriteData = await eventbriteResponse.json()
-    console.log('Eventbrite data received:', JSON.stringify(eventbriteData, null, 2))
+    console.log('Eventbrite events data received:', JSON.stringify(eventbriteData, null, 2))
 
     // Transform Eventbrite events to the requested format
     const transformedEvents = eventbriteData.events?.map((event: any) => ({
@@ -75,7 +120,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         events: transformedEvents,
-        count: transformedEvents.length 
+        count: transformedEvents.length,
+        user: userData.name || userData.email || 'Unknown user'
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
