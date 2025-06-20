@@ -7,7 +7,6 @@ import { DescriptionField } from './form-sections/DescriptionField';
 import { CategoryField } from './form-sections/CategoryField';
 import { DateTimeFields } from './form-sections/DateTimeFields';
 import { VenueField } from './form-sections/VenueField';
-import { RequiredDetailsFields } from './form-sections/RequiredDetailsFields';
 import { OptionalDetailsFields } from './form-sections/OptionalDetailsFields';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';

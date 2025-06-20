@@ -9,7 +9,11 @@ interface RequiredDetailsFieldsProps {
 }
 
 export const RequiredDetailsFields: React.FC<RequiredDetailsFieldsProps> = ({ register, errors }) => {
-  // Currently no required detail fields beyond the main ones
-  // This component is ready for future required fields
-  return null;
+  // This component is currently empty as all required fields are handled in the main EventForm
+  // This component exists for future expansion of required fields beyond the main ones
+  return (
+    <div className="space-y-6">
+      {/* Future required fields can be added here */}
+    </div>
+  );
 };
