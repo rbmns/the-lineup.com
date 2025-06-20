@@ -72,35 +72,55 @@ serve(async (req) => {
     const userData = await userResponse.json()
     console.log('User data received:', JSON.stringify(userData, null, 2))
     
-    // Now fetch events
-    const eventbriteResponse = await fetch(
+    // Try different event endpoints to find one that works
+    const eventEndpoints = [
       'https://www.eventbriteapi.com/v3/users/me/events/?expand=venue,logo&status=live',
-      {
+      'https://www.eventbriteapi.com/v3/users/me/events/?expand=venue,logo',
+      `https://www.eventbriteapi.com/v3/users/${userData.id}/events/?expand=venue,logo&status=live`,
+      `https://www.eventbriteapi.com/v3/users/${userData.id}/events/?expand=venue,logo`
+    ]
+
+    let eventbriteData = null
+    let successfulEndpoint = null
+
+    for (const endpoint of eventEndpoints) {
+      console.log(`Trying endpoint: ${endpoint}`)
+      
+      const eventbriteResponse = await fetch(endpoint, {
         headers: {
           'Authorization': `Bearer ${eventbriteToken}`,
           'Content-Type': 'application/json',
         },
-      }
-    )
+      })
 
-    if (!eventbriteResponse.ok) {
-      console.error(`Eventbrite events API error: ${eventbriteResponse.status} ${eventbriteResponse.statusText}`)
-      const errorText = await eventbriteResponse.text()
-      console.error('Events API error response:', errorText)
+      if (eventbriteResponse.ok) {
+        eventbriteData = await eventbriteResponse.json()
+        successfulEndpoint = endpoint
+        console.log(`Success with endpoint: ${endpoint}`)
+        break
+      } else {
+        console.error(`Failed with endpoint ${endpoint}: ${eventbriteResponse.status} ${eventbriteResponse.statusText}`)
+        const errorText = await eventbriteResponse.text()
+        console.error('Error response:', errorText)
+      }
+    }
+
+    if (!eventbriteData) {
+      console.error('All event endpoints failed')
       return new Response(
         JSON.stringify({ 
-          error: 'Failed to fetch events from Eventbrite',
-          details: errorText 
+          error: 'Failed to fetch events from any Eventbrite endpoint',
+          details: 'All attempted endpoints returned errors. This might be a permissions issue or your account may not have any events.',
+          user_id: userData.id
         }),
         { 
-          status: eventbriteResponse.status, 
+          status: 404, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
     }
 
-    const eventbriteData = await eventbriteResponse.json()
-    console.log('Eventbrite events data received:', JSON.stringify(eventbriteData, null, 2))
+    console.log(`Eventbrite events data received from ${successfulEndpoint}:`, JSON.stringify(eventbriteData, null, 2))
 
     // Transform Eventbrite events to the requested format
     const transformedEvents = eventbriteData.events?.map((event: any) => ({
@@ -121,7 +141,8 @@ serve(async (req) => {
       JSON.stringify({ 
         events: transformedEvents,
         count: transformedEvents.length,
-        user: userData.name || userData.email || 'Unknown user'
+        user: userData.name || userData.email || 'Unknown user',
+        endpoint_used: successfulEndpoint
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
