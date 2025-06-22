@@ -1,18 +1,15 @@
-
 import React from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
-
 interface EventsPageLayoutProps {
   children: React.ReactNode;
 }
-
-export const EventsPageLayout: React.FC<EventsPageLayoutProps> = ({ children }) => {
+export const EventsPageLayout: React.FC<EventsPageLayoutProps> = ({
+  children
+}) => {
   const isMobile = useIsMobile();
-  
-  return (
-    <div className="min-h-screen w-full bg-gradient-to-b from-secondary-25 to-white">
+  return <div className="min-h-screen w-full bg-gradient-to-b from-secondary-25 to-white">
       {/* Hero Section - Much larger like casual plans page */}
-      <section className="py-24 md:py-40 lg:py-48 bg-gradient-to-b from-secondary-25 to-white">
+      <section className="py-24 lg:py-48 bg-gradient-to-b from-secondary-25 to-white md:py-[100px]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className={`${isMobile ? 'text-4xl' : 'text-5xl md:text-6xl lg:text-7xl'} font-bold text-primary mb-8 leading-tight`}>
             Find events that fit your <span className="text-accent">vibe</span>
@@ -38,6 +35,5 @@ export const EventsPageLayout: React.FC<EventsPageLayoutProps> = ({ children }) 
           {children}
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
