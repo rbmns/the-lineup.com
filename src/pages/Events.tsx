@@ -2,7 +2,10 @@
 import React from 'react';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
 import { useAuth } from '@/contexts/AuthContext';
-import { EventsPageContent } from '@/components/events/EventsPageContent';
+import { EventsVibeSection } from '@/components/events/page-sections/EventsVibeSection';
+import { EventsAdvancedSection } from '@/components/events/page-sections/EventsAdvancedSection';
+import { LazyEventsList } from '@/components/events/LazyEventsList';
+import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
 
 const Events = () => {
   const { user } = useAuth();
@@ -13,6 +16,8 @@ const Events = () => {
     setSelectedEventTypes,
     selectedVenues,
     setSelectedVenues,
+    selectedVibes,
+    setSelectedVibes,
     dateRange,
     setDateRange,
     selectedDateFilter,
@@ -22,41 +27,29 @@ const Events = () => {
     resetFilters,
     enhancedHandleRsvp,
     loadingEventId,
+    vibes,
+    vibesLoading,
     allEventTypes
   } = useEventsPageData();
 
-  // Create available event types and venues options
-  const availableEventTypes = allEventTypes.map(type => ({
-    value: type,
-    label: type
-  }));
-
-  // For now, using empty venues array - this should be replaced with actual venue data
-  const availableVenues: Array<{value: string, label: string}> = [];
-
-  // Filter handlers
-  const handleRemoveEventType = (type: string) => {
-    setSelectedEventTypes(selectedEventTypes.filter(t => t !== type));
+  const handleAdvancedFilterChange = (filters: any) => {
+    console.log('Advanced filter change:', filters);
+    
+    if (filters.eventTypes) {
+      setSelectedEventTypes(filters.eventTypes);
+    }
+    if (filters.venues) {
+      setSelectedVenues(filters.venues);
+    }
+    if (filters.date) {
+      setDateRange({ from: filters.date, to: filters.date });
+    }
+    if (filters.dateFilter && filters.dateFilter !== 'Any Date') {
+      setSelectedDateFilter(filters.dateFilter.toLowerCase());
+    }
   };
 
-  const handleRemoveVenue = (venue: string) => {
-    setSelectedVenues(selectedVenues.filter(v => v !== venue));
-  };
-
-  const handleClearDateFilter = () => {
-    setDateRange(undefined);
-    setSelectedDateFilter('');
-  };
-
-  // Filter visibility states
-  const [showEventTypeFilter, setShowEventTypeFilter] = React.useState(false);
-  const [showVenueFilter, setShowVenueFilter] = React.useState(false);
-  const [showDateFilter, setShowDateFilter] = React.useState(false);
-
-  // For now, we'll assume all events are exact matches and no similar events
-  const exactMatches = filteredEvents || [];
-  const similarEvents: any[] = [];
-  const showNoExactMatchesMessage = hasActiveFilters && exactMatches.length === 0;
+  const showNoExactMatchesMessage = hasActiveFilters && filteredEvents.length === 0;
 
   return (
     <div className="w-full bg-gradient-to-b from-secondary-25 to-white min-h-screen">
@@ -79,38 +72,45 @@ const Events = () => {
         </div>
       </section>
 
-      {/* Events Content */}
+      {/* Content */}
       <div className="bg-white">
-        <EventsPageContent
-          showEventTypeFilter={showEventTypeFilter}
-          setShowEventTypeFilter={setShowEventTypeFilter}
-          showVenueFilter={showVenueFilter}
-          setShowVenueFilter={setShowVenueFilter}
-          showDateFilter={showDateFilter}
-          setShowDateFilter={setShowDateFilter}
-          selectedEventTypes={selectedEventTypes}
-          setSelectedEventTypes={setSelectedEventTypes}
-          selectedVenues={selectedVenues}
-          setSelectedVenues={setSelectedVenues}
-          dateRange={dateRange}
-          setDateRange={setDateRange}
-          selectedDateFilter={selectedDateFilter}
-          setSelectedDateFilter={setSelectedDateFilter}
-          availableEventTypes={availableEventTypes}
-          availableVenues={availableVenues}
-          resetFilters={resetFilters}
-          hasActiveFilters={hasActiveFilters}
-          handleRemoveEventType={handleRemoveEventType}
-          handleRemoveVenue={handleRemoveVenue}
-          handleClearDateFilter={handleClearDateFilter}
-          showNoExactMatchesMessage={showNoExactMatchesMessage}
-          exactMatches={exactMatches}
-          similarEvents={similarEvents}
-          isLoading={eventsLoading}
-          isFilterLoading={isFilterLoading}
-          handleEventRsvp={enhancedHandleRsvp}
-          user={user}
-        />
+        <div className="space-y-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-12">
+          {/* Vibe Filter Section */}
+          <EventsVibeSection
+            selectedVibes={selectedVibes}
+            onVibeChange={setSelectedVibes}
+            vibes={vibes}
+            vibesLoading={vibesLoading}
+          />
+
+          {/* Advanced Filters Section */}
+          <EventsAdvancedSection
+            onFilterChange={handleAdvancedFilterChange}
+            selectedEventTypes={selectedEventTypes}
+            selectedVenues={selectedVenues}
+            selectedVibes={selectedVibes}
+            dateRange={dateRange}
+            selectedDateFilter={selectedDateFilter}
+            filteredEventsCount={filteredEvents.length}
+            allEventTypes={allEventTypes}
+          />
+
+          {/* No Results Message */}
+          {showNoExactMatchesMessage && (
+            <NoResultsFound resetFilters={resetFilters} />
+          )}
+
+          {/* Events List */}
+          <LazyEventsList 
+            mainEvents={filteredEvents}
+            relatedEvents={[]}
+            isLoading={eventsLoading || isFilterLoading}
+            onRsvp={user ? enhancedHandleRsvp : undefined}
+            showRsvpButtons={!!user}
+            hasActiveFilters={hasActiveFilters}
+            loadingEventId={loadingEventId}
+          />
+        </div>
       </div>
     </div>
   );
