@@ -5,8 +5,10 @@ import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { DateRange } from 'react-day-picker';
 import { useRsvpStateManager } from './useRsvpStateManager';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const useEventsPageData = () => {
+  const { user } = useAuth();
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
   const [selectedVenues, setSelectedVenues] = useState<string[]>([]);
@@ -101,8 +103,8 @@ export const useEventsPageData = () => {
     return true;
   }) || [];
 
-  // Use RSVP state manager with the filtered events
-  const rsvpManager = useRsvpStateManager(filteredEvents);
+  // Use RSVP state manager with the user ID
+  const rsvpManager = useRsvpStateManager(user?.id);
 
   const hasActiveFilters = selectedVibes.length > 0 || 
                           selectedEventTypes.length > 0 || 
