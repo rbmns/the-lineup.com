@@ -1,0 +1,162 @@
+
+import React from 'react';
+import { useCasualPlans } from '@/hooks/useCasualPlans';
+import { useAuth } from '@/contexts/AuthContext';
+import { CasualPlanCard } from './CasualPlanCard';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+import { LogIn, Plus } from 'lucide-react';
+
+export const CasualPlansContent: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+  const { plans, isLoading } = useCasualPlans();
+
+  // Mock data for non-authenticated users (only titles)
+  const mockPlansForNonAuth = [
+    { id: '1', title: 'Beach Volleyball Session' },
+    { id: '2', title: 'Morning Coffee Walk' },
+    { id: '3', title: 'Sunset Surf Session' },
+    { id: '4', title: 'Yoga in the Park' },
+    { id: '5', title: 'Local Food Tour' },
+  ];
+
+  if (isLoading && isAuthenticated) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="bg-white rounded-lg border border-gray-200 p-4 animate-pulse">
+              <div className="h-6 bg-gray-200 rounded mb-3"></div>
+              <div className="h-4 bg-gray-200 rounded mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Login Prompt Section */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-8 mb-8 text-center">
+          <LogIn className="h-12 w-12 text-vibrant-seafoam mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-primary mb-2">
+            Sign in to see full details
+          </h3>
+          <p className="text-neutral mb-6">
+            Join our community to view locations, times, and connect with other members
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild className="bg-vibrant-seafoam hover:bg-vibrant-seafoam/90">
+              <Link to="/login">
+                Sign In
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/signup">
+                Create Account
+              </Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* Preview Cards - Titles Only */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-semibold text-primary mb-6">Recent Casual Plans</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {mockPlansForNonAuth.map((plan) => (
+              <div key={plan.id} className="bg-white rounded-lg border border-gray-200 p-4 hover:border-gray-300 transition-colors">
+                <h3 className="font-medium text-gray-900 mb-3">{plan.title}</h3>
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center text-sm text-gray-300">
+                    <span>📅 ••••••••••</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-300">
+                    <span>⏰ ••••••••</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-300">
+                    <span>📍 ••••••••••••••••••••</span>
+                  </div>
+                </div>
+                <div className="pt-2 border-t border-gray-100 text-center">
+                  <p className="text-xs text-gray-500 mb-2">
+                    <Link to="/login" className="text-vibrant-seafoam hover:text-vibrant-seafoam/80 underline">
+                      Sign in
+                    </Link>{' '}
+                    to see full details
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="bg-secondary-25 rounded-2xl p-8 text-center">
+          <Plus className="h-12 w-12 text-primary mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-primary mb-2">
+            Have a casual plan in mind?
+          </h3>
+          <p className="text-neutral mb-6">
+            Create an account to post your own casual meetups and connect with locals
+          </p>
+          <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+            <Link to="/signup">
+              Get Started
+            </Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Authenticated user content
+  return (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Create Plan CTA */}
+      <div className="mb-8 text-center">
+        <Button asChild size="lg" className="bg-vibrant-seafoam hover:bg-vibrant-seafoam/90">
+          <Link to="/casual-plans/create">
+            <Plus className="h-5 w-5 mr-2" />
+            Create Casual Plan
+          </Link>
+        </Button>
+      </div>
+
+      {/* Plans Grid */}
+      {plans.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {plans.map((plan) => (
+            <CasualPlanCard
+              key={plan.id}
+              plan={plan}
+              onJoin={() => {}}
+              onLeave={() => {}}
+              isJoining={false}
+              isLeaving={false}
+              isAuthenticated={true}
+              onLoginPrompt={() => {}}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">🏖️</div>
+          <h3 className="text-xl font-semibold text-primary mb-2">
+            No casual plans yet
+          </h3>
+          <p className="text-neutral mb-6">
+            Be the first to create a casual meetup in your area
+          </p>
+          <Button asChild className="bg-vibrant-seafoam hover:bg-vibrant-seafoam/90">
+            <Link to="/casual-plans/create">
+              Create the First Plan
+            </Link>
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+};

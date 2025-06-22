@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FakeCasualPlansContent } from '@/components/fake-content/FakeCasualPlansContent';
+import { CasualPlansContent } from '@/components/casual-plans/CasualPlansContent';
 
 const CasualPlans: React.FC = () => {
   return (
@@ -26,7 +26,7 @@ const CasualPlans: React.FC = () => {
 
       {/* Content */}
       <div className="bg-white">
-        <FakeCasualPlansContent />
+        <CasualPlansContent />
       </div>
     </div>
   );
