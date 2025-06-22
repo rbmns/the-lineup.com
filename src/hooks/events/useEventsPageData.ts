@@ -53,23 +53,27 @@ export const useEventsPageData = () => {
     enabled: true
   });
 
-  // Keep vibes query unchanged
+  // Updated vibes query to use event_vibe table
   const { data: vibes = [], isLoading: vibesLoading } = useQuery({
     queryKey: ['vibes'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('events')
-        .select('event_category')
-        .not('event_category', 'is', null);
+        .from('event_vibe')
+        .select('name')
+        .order('name', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching vibes:', error);
+        throw error;
+      }
       
-      const uniqueVibes = [...new Set(data?.map(item => item.event_category).filter(Boolean) || [])];
+      const uniqueVibes = data?.map(item => item.name).filter(Boolean) || [];
+      console.log('Fetched vibes from event_vibe table:', uniqueVibes);
       return uniqueVibes;
     }
   });
 
-  // Keep event types query unchanged - using event_category instead of event_type
+  // Updated event types query to use event_category field from events table
   const { data: allEventTypes = [] } = useQuery({
     queryKey: ['event-types'],
     queryFn: async () => {
@@ -81,6 +85,7 @@ export const useEventsPageData = () => {
       if (error) throw error;
       
       const uniqueTypes = [...new Set(data?.map(item => item.event_category).filter(Boolean) || [])];
+      console.log('Fetched event types from events.event_category:', uniqueTypes);
       return uniqueTypes;
     }
   });
@@ -107,14 +112,14 @@ export const useEventsPageData = () => {
   const filteredEvents = useMemo(() => {
     let filtered = [...allEvents];
 
-    // Only apply vibe filtering if vibes are specifically selected
+    // Only apply vibe filtering if vibes are specifically selected - using 'vibe' field
     if (selectedVibes.length > 0) {
       filtered = filtered.filter(event => 
-        event.event_category && selectedVibes.includes(event.event_category)
+        event.vibe && selectedVibes.includes(event.vibe)
       );
     }
 
-    // Only apply event type filtering if types are specifically selected
+    // Only apply event type filtering if types are specifically selected - using 'event_category' field
     if (selectedEventTypes.length > 0) {
       filtered = filtered.filter(event => 
         event.event_category && selectedEventTypes.includes(event.event_category)

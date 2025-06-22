@@ -6,7 +6,7 @@ export const useEventVibes = () => {
   return useQuery({
     queryKey: ['event-vibes'],
     queryFn: async () => {
-      console.log('Fetching event vibes from Supabase...');
+      console.log('Fetching event vibes from event_vibe table...');
       const { data, error } = await supabase
         .from('event_vibe')
         .select('name')
@@ -22,7 +22,7 @@ export const useEventVibes = () => {
       const vibes = data?.map(item => item.name).filter(Boolean) as string[] || [];
 
       if (vibes.length === 0) {
-        console.warn('No event vibes found in the database. The "event_vibe" table might be empty.');
+        console.warn('No event vibes found in the event_vibe table. The table might be empty.');
         // Return default vibes if none found in database
         return ['party', 'chill', 'wellness', 'active', 'social', 'creative'];
       }
