@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { CategoryPill } from '@/components/ui/category-pill';
 import { Sparkles } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { getVibeColorClasses } from '@/utils/vibeColors';
 
 interface VibeFilterProps {
   vibes: string[];
@@ -37,6 +38,7 @@ export const VibeFilter: React.FC<VibeFilterProps> = ({
   };
 
   const isAllSelected = selectedVibes.length === vibes.length;
+  const noVibesSelected = selectedVibes.length === 0;
 
   if (isLoading) {
     return (
@@ -75,23 +77,36 @@ export const VibeFilter: React.FC<VibeFilterProps> = ({
       </div>
       
       <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
-        <CategoryPill 
-          category="All" 
-          active={isAllSelected} 
-          noBorder={true} 
-          onClick={handleSelectAll}
-          size="sm"
-        />
-        {vibes.map((vibe) => (
-          <CategoryPill 
-            key={vibe}
-            category={vibe} 
-            active={selectedVibes.includes(vibe)} 
-            noBorder={true} 
-            onClick={() => handleVibeToggle(vibe)}
-            size="sm"
-          />
-        ))}
+        {/* All button */}
+        <button
+          className={cn(
+            "flex-shrink-0 transition-all duration-200 font-medium rounded-full px-3 py-1 text-sm",
+            noVibesSelected
+              ? "bg-gray-800 text-white hover:bg-gray-700"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300"
+          )}
+          onClick={handleClearAll}
+        >
+          All
+        </button>
+        
+        {/* Individual vibe buttons with colors */}
+        {vibes.map((vibe) => {
+          const isSelected = selectedVibes.includes(vibe);
+          
+          return (
+            <button
+              key={vibe}
+              className={cn(
+                "flex-shrink-0 transition-all duration-200 capitalize",
+                getVibeColorClasses(vibe, isSelected, 'sm')
+              )}
+              onClick={() => handleVibeToggle(vibe)}
+            >
+              {vibe}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

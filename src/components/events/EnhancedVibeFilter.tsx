@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { getVibeColorClasses } from '@/utils/vibeColors';
 
 interface EnhancedVibeFilterProps {
   selectedVibes: string[];
@@ -28,7 +29,6 @@ export const EnhancedVibeFilter: React.FC<EnhancedVibeFilterProps> = ({
     }
   };
 
-  // FIXED: "All" button now shows all events (no filter applied)
   const handleAllClick = () => {
     onVibeChange([]); // Clear all vibe selections to show all events
   };
@@ -49,39 +49,33 @@ export const EnhancedVibeFilter: React.FC<EnhancedVibeFilterProps> = ({
   return (
     <div className={cn("flex gap-2 overflow-x-auto pb-2 scrollbar-hide", className)}>
       {/* All button - shows all events when selected */}
-      <Button
-        variant={noVibesSelected ? "default" : "outline"}
-        size="sm"
+      <button
         className={cn(
-          "flex-shrink-0 transition-all duration-200 font-medium",
+          "flex-shrink-0 transition-all duration-200 font-medium rounded-full px-3 py-1 text-sm",
           noVibesSelected
-            ? "bg-primary text-white hover:bg-primary/90"
-            : "border-primary/20 text-primary hover:bg-primary/5 hover:border-primary/30"
+            ? "bg-gray-800 text-white hover:bg-gray-700"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300"
         )}
         onClick={handleAllClick}
       >
-        All
-      </Button>
+        All Vibes
+      </button>
       
-      {/* Individual vibe buttons */}
+      {/* Individual vibe buttons with unique colors */}
       {vibes.map((vibe) => {
         const isSelected = selectedVibes.includes(vibe);
         
         return (
-          <Button
+          <button
             key={vibe}
-            variant={isSelected ? "default" : "outline"}
-            size="sm"
             className={cn(
-              "flex-shrink-0 transition-all duration-200 font-medium capitalize",
-              isSelected
-                ? "bg-vibrant-seafoam text-white hover:bg-vibrant-seafoam/90"
-                : "border-primary/20 text-primary hover:bg-primary/5 hover:border-primary/30"
+              "flex-shrink-0 transition-all duration-200 capitalize",
+              getVibeColorClasses(vibe, isSelected, 'md')
             )}
             onClick={() => handleVibeToggle(vibe)}
           >
             {vibe}
-          </Button>
+          </button>
         );
       })}
     </div>
