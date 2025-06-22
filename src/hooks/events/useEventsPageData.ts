@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
@@ -187,11 +188,11 @@ export const useEventsPageData = () => {
     }
   }, [user, handleRsvp]);
 
-  // Keep existing filter checking logic
+  // Fix the hasActiveFilters logic to properly handle boolean types
   const hasActiveFilters = selectedVibes.length > 0 || 
                           selectedEventTypes.length > 0 || 
                           selectedVenues.length > 0 || 
-                          dateRange?.from || 
+                          (dateRange?.from !== undefined) || 
                           selectedDateFilter !== 'anytime';
 
   const resetFilters = useCallback(() => {
