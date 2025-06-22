@@ -28,14 +28,12 @@ export const EnhancedVibeFilter: React.FC<EnhancedVibeFilterProps> = ({
     }
   };
 
-  // CRITICAL CHANGE: "All" button now deselects all vibes (showing no events)
+  // FIXED: "All" button now shows all events (no filter applied)
   const handleAllClick = () => {
-    onVibeChange([]); // Deselect all vibes
+    onVibeChange([]); // Clear all vibe selections to show all events
   };
 
-  // Check if all vibes are selected
-  const allVibesSelected = selectedVibes.length === vibes.length && vibes.length > 0;
-  // NEW: Check if no vibes are selected
+  // Check if no vibes are selected (showing all events)
   const noVibesSelected = selectedVibes.length === 0;
 
   if (isLoading) {
@@ -50,7 +48,7 @@ export const EnhancedVibeFilter: React.FC<EnhancedVibeFilterProps> = ({
 
   return (
     <div className={cn("flex gap-2 overflow-x-auto pb-2 scrollbar-hide", className)}>
-      {/* All button - NOW deselects all when clicked */}
+      {/* All button - shows all events when selected */}
       <Button
         variant={noVibesSelected ? "default" : "outline"}
         size="sm"

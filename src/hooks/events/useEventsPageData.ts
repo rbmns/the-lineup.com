@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
@@ -10,7 +9,7 @@ import { useRsvpStateManager } from './useRsvpStateManager';
 export const useEventsPageData = () => {
   const { user } = useAuth();
   
-  // Filter states - START WITH EMPTY VIBES to show no events initially
+  // Filter states - START WITH EMPTY to show all events initially
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
   const [selectedVenues, setSelectedVenues] = useState<string[]>([]);
@@ -82,35 +81,32 @@ export const useEventsPageData = () => {
     }
   });
 
-  // Enhanced filtering logic - ONLY show events when vibes are selected
+  // FIXED: Enhanced filtering logic - show all events by default, filter only when filters are applied
   const filteredEvents = useMemo(() => {
     let filtered = [...allEvents];
 
-    // CRITICAL CHANGE: If no vibes are selected, show NO events
-    if (selectedVibes.length === 0) {
-      return [];
-    }
-
-    // Vibe filtering - only apply if vibes are selected
+    // Only apply vibe filtering if vibes are specifically selected
     if (selectedVibes.length > 0) {
       filtered = filtered.filter(event => 
         event.event_category && selectedVibes.includes(event.event_category)
       );
     }
 
-    // Keep all other existing filtering logic unchanged
+    // Only apply event type filtering if types are specifically selected
     if (selectedEventTypes.length > 0) {
       filtered = filtered.filter(event => 
         event.event_category && selectedEventTypes.includes(event.event_category)
       );
     }
 
+    // Only apply venue filtering if venues are specifically selected
     if (selectedVenues.length > 0) {
       filtered = filtered.filter(event => 
         event.venues?.name && selectedVenues.includes(event.venues.name)
       );
     }
 
+    // Only apply date filtering if a date range or specific date filter is selected
     if (dateRange?.from) {
       const fromDate = dateRange.from.toISOString().split('T')[0];
       const toDate = dateRange.to ? dateRange.to.toISOString().split('T')[0] : fromDate;
