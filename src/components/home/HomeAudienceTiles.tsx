@@ -10,11 +10,11 @@ export const HomeAudienceTiles: React.FC = () => {
   const audienceTypes = [
     {
       title: "Explorer",
-      description: "New in town? Find something real and spontaneous to join.",
+      description: "New in town or visiting? Find something real and spontaneous to join.",
       icon: MapPin,
       color: "bg-vibrant-seafoam/10 border-vibrant-seafoam/20",
       iconColor: "text-vibrant-seafoam",
-      buttonText: "New in town or visiting?",
+      buttonText: "Explore Events",
       hasButton: true,
       route: "/events"
     },
@@ -24,7 +24,7 @@ export const HomeAudienceTiles: React.FC = () => {
       icon: Users,
       color: "bg-primary/10 border-primary/20",
       iconColor: "text-primary",
-      buttonText: "Explore Local Events",
+      buttonText: "See Local Events",
       hasButton: true,
       route: "/events"
     },
