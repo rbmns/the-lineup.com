@@ -50,8 +50,8 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
       )}
       onClick={handleClick}
     >
-      {/* Larger image with category and vibe pills */}
-      <div className="relative w-full h-56 overflow-hidden bg-gray-100 flex-shrink-0">
+      {/* Image with category and vibe pills */}
+      <div className="relative w-full h-48 overflow-hidden bg-gray-100 flex-shrink-0">
         <LineupImage
           src={imageUrl}
           alt={event.title}
@@ -69,7 +69,7 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
         
         {/* Category pill - top left */}
         {event.event_category && (
-          <div className="absolute top-4 left-4 z-10">
+          <div className="absolute top-3 left-3 z-10">
             <CategoryPill 
               category={event.event_category} 
               size="sm"
@@ -78,7 +78,7 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
         )}
 
         {/* Event vibe pill - top right */}
-        <div className="absolute top-4 right-4 z-10">
+        <div className="absolute top-3 right-3 z-10">
           <EventVibeLabel 
             vibe={event.vibe || 'general'} 
             size="sm"
@@ -86,32 +86,32 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
         </div>
       </div>
       
-      {/* Content with more padding */}
-      <div className="flex flex-col flex-1 p-6 space-y-4">
-        {/* Title - larger */}
-        <h3 className="font-bold text-primary text-xl leading-tight line-clamp-2">
+      {/* Content */}
+      <div className="flex flex-col flex-1 p-4 space-y-3">
+        {/* Title */}
+        <h3 className="font-semibold text-primary text-lg leading-tight line-clamp-2">
           {event.title}
         </h3>
         
         {/* Organizer info */}
         {event.organiser_name && (
-          <p className="text-base text-primary/70 font-medium">
+          <p className="text-sm text-primary/70">
             By {event.organiser_name}
           </p>
         )}
         
-        {/* Date and Time - larger */}
-        <div className="flex items-center gap-3 text-base text-primary/80">
-          <Calendar className="h-5 w-5 text-primary/60 flex-shrink-0" />
-          <span className="font-semibold">
+        {/* Date and Time */}
+        <div className="flex items-center gap-2 text-sm text-primary/80">
+          <Calendar className="h-4 w-4 text-primary/60 flex-shrink-0" />
+          <span className="font-medium">
             {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
           </span>
         </div>
         
-        {/* Location - larger */}
-        <div className="flex items-center gap-3 text-base text-primary/80">
-          <MapPin className="h-5 w-5 text-primary/60 flex-shrink-0" />
-          <span className="truncate font-medium">
+        {/* Location */}
+        <div className="flex items-center gap-2 text-sm text-primary/80">
+          <MapPin className="h-4 w-4 text-primary/60 flex-shrink-0" />
+          <span className="truncate">
             {getVenueDisplay()}
           </span>
         </div>
