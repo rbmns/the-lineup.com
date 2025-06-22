@@ -2,36 +2,26 @@
 import React from 'react';
 import { useEvents } from '@/hooks/useEvents';
 import { HomeHeroSection } from '@/components/home/HomeHeroSection';
-import { WhoIsItForSection } from '@/components/home/WhoIsItForSection';
-import { HomeUpcomingEventsSection } from '@/components/home/HomeUpcomingEventsSection';
-import HomeHowItWorksSection from '@/components/home/HomeHowItWorksSection';
+import { HomeAudienceTiles } from '@/components/home/HomeAudienceTiles';
+import { HomeEventsPreview } from '@/components/home/HomeEventsPreview';
 import { HomeCasualPlansSection } from '@/components/home/HomeCasualPlansSection';
-import { HomeCategoriesSection } from '@/components/home/HomeCategoriesSection';
-import HomeCtaSection from '@/components/home/HomeCtaSection';
 
 const Home = () => {
-  // For the home page, we want to show published events only, but let's temporarily include all statuses to debug
   const { data: events, isLoading } = useEvents(undefined, { includeAllStatuses: true });
 
   return (
-    <div className="w-full bg-white">
-      {/* Homepage Hero Section */}
+    <div className="w-full bg-gradient-to-b from-secondary-25 to-white min-h-screen">
+      {/* Hero Section */}
       <HomeHeroSection />
 
-      {/* Who's it for Section */}
-      <WhoIsItForSection />
+      {/* Audience Tiles */}
+      <HomeAudienceTiles />
 
-      {/* Upcoming Events Section with Vibe Filters */}
-      <HomeUpcomingEventsSection events={events} isLoading={isLoading} />
+      {/* Events Preview */}
+      <HomeEventsPreview events={events} isLoading={isLoading} />
 
-            {/* Casual Plans Section */}
+      {/* Casual Plans Section */}
       <HomeCasualPlansSection />
-      
-      {/* Categories Section */}
-      <HomeCategoriesSection events={events} />
-      
-      {/* CTA Section */}
-      <HomeCtaSection />
     </div>
   );
 };

@@ -1,98 +1,118 @@
+
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Coffee, Waves, Sun, Users } from 'lucide-react';
+
 export const HomeCasualPlansSection: React.FC = () => {
-  const casualPlans = [{
-    id: 1,
-    title: 'Sunset watch & beers',
-    date: 'Thu, 26 Jun',
-    time: '12:00',
-    interested: 3,
-    avatar: '🌅'
-  }, {
-    id: 2,
-    title: 'guitar and campfire',
-    date: 'Tue, 1 Jul',
-    time: '20:30',
-    interested: 3,
-    avatar: '🎸'
-  }];
-  return <section className="py-16 bg-gradient-to-br from-secondary-50 via-white to-secondary-25 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-16 left-20 w-28 h-28 bg-vibrant-sunset/30 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 right-16 w-36 h-36 bg-vibrant-seafoam/30 rounded-full blur-3xl"></div>
-      </div>
+  const navigate = useNavigate();
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="space-y-8">
-          {/* Header */}
-          <div className="text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary">Create Spontaneous Plans</h2>
-            <p className="text-lg text-neutral mb-6 max-w-3xl mx-auto leading-relaxed">
-              Beyond organized events, create and join casual plans with fellow travelers and locals. 
-              From impromptu beach walks to coffee meetups, make spontaneous connections happen.
-            </p>
-          </div>
+  const mockPlans = [
+    {
+      id: '1',
+      title: 'Beach Walk & Coffee',
+      time: 'Today 6pm',
+      location: 'Zandvoort Beach',
+      attendees: 3,
+      icon: Coffee,
+      vibe: '☕'
+    },
+    {
+      id: '2',
+      title: 'Sunset Surf Session',
+      time: 'Tomorrow 7pm',
+      location: 'South Beach',
+      attendees: 5,
+      icon: Waves,
+      vibe: '🏄'
+    },
+    {
+      id: '3',
+      title: 'Morning Yoga',
+      time: 'Sat 8am',
+      location: 'Beach Pavilion',
+      attendees: 2,
+      icon: Sun,
+      vibe: '🧘'
+    }
+  ];
 
-          {/* Recent Plans Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <h3 className="text-2xl font-semibold text-primary">Recent Casual Plans</h3>
-            <Button asChild variant="ghost" className="self-start sm:self-auto text-neutral hover:text-primary hover:bg-secondary-25">
-              <Link to="/casual-plans" className="flex items-center gap-2">
-                See all
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
+  return (
+    <section className="py-16 bg-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-primary mb-4">
+            Spontaneous plans? We've got those too.
+          </h2>
+          <p className="text-lg text-neutral max-w-2xl mx-auto">
+            See or post casual meetups from others nearby.
+          </p>
+        </div>
 
-          {/* Casual Plans Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {casualPlans.map(plan => <Card key={plan.id} className="hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm border-neutral-25 hover:border-primary/20 transform hover:scale-105">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-gradient-to-br from-secondary-25 to-secondary-50 rounded-full flex items-center justify-center text-2xl shadow-md">
-                        {plan.avatar}
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-primary text-lg">{plan.title}</h4>
-                        <p className="text-neutral text-sm">
-                          {plan.date} • {plan.time}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-neutral flex items-center gap-1">
-                      <span className="w-2 h-2 bg-vibrant-coral rounded-full"></span>
-                      {plan.interested} interested
+        {/* Plans Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {mockPlans.map((plan) => {
+            const IconComponent = plan.icon;
+            return (
+              <div 
+                key={plan.id}
+                className="bg-secondary-25 rounded-2xl p-6 border border-secondary-50 hover:shadow-lg transition-all duration-300 hover:scale-105"
+              >
+                {/* Icon and Vibe */}
+                <div className="flex items-center justify-between mb-4">
+                  <IconComponent className="h-6 w-6 text-vibrant-seafoam" />
+                  <span className="text-xl">{plan.vibe}</span>
+                </div>
+
+                {/* Title */}
+                <h3 className="font-semibold text-primary text-lg mb-2">
+                  {plan.title}
+                </h3>
+
+                {/* Time */}
+                <p className="text-neutral text-sm mb-2">
+                  {plan.time}
+                </p>
+
+                {/* Location */}
+                <p className="text-neutral text-sm mb-4">
+                  📍 {plan.location}
+                </p>
+
+                {/* Attendees */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-neutral" />
+                    <span className="text-sm text-neutral">
+                      {plan.attendees} going
                     </span>
-                    <Button size="sm" className="bg-primary hover:bg-primary/90 text-white shadow-md">
-                      Join
-                    </Button>
                   </div>
-                </CardContent>
-              </Card>)}
-          </div>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-primary hover:bg-primary/5"
+                    onClick={() => navigate('/casual-plans')}
+                  >
+                    Join
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
-          {/* Sign in prompt */}
-          <div className="text-center py-8 bg-white/60 backdrop-blur-sm rounded-2xl border border-neutral-25 shadow-lg">
-            <p className="text-neutral text-lg mb-4">Sign in to see full details and join plans</p>
-            <Button asChild className="bg-primary hover:bg-primary/90 text-white shadow-lg">
-              <Link to="/login">Sign in</Link>
-            </Button>
-          </div>
-
-          {/* Create Plan CTA */}
-          <div className="text-center">
-            <Button asChild size="lg" className="rounded-full bg-gradient-to-r from-primary to-extended-oceanDeep-600 hover:from-primary/90 hover:to-extended-oceanDeep-700 text-white shadow-xl transform hover:scale-105 transition-all duration-300">
-              
-            </Button>
-          </div>
+        {/* CTA Button */}
+        <div className="text-center">
+          <Button
+            onClick={() => navigate('/casual-plans')}
+            size="lg"
+            className="bg-vibrant-seafoam text-white hover:bg-vibrant-seafoam/90 px-8 shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            Post a Casual Plan
+          </Button>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
