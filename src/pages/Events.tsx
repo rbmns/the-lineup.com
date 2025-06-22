@@ -61,10 +61,10 @@ const Events = () => {
   return (
     <EventsPageLayout>
       <div className="space-y-4 sm:space-y-6">
-        {/* Main Filters - Desktop: Location above Vibe, Mobile: Stack */}
+        {/* Main Filters - Location always first, then Vibe */}
         <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 lg:grid-cols-2 gap-6'}`}>
-          {/* Location Filter - First on desktop, full width on mobile */}
-          <div className={`w-full ${isMobile ? 'order-2' : 'lg:order-1'}`}>
+          {/* Location Filter - Always first */}
+          <div className="w-full order-1">
             <LocationFilter
               availableLocations={locationCategories}
               selectedLocation={selectedLocation}
@@ -74,8 +74,8 @@ const Events = () => {
             />
           </div>
           
-          {/* Vibe Filter - Second on desktop, full width on mobile */}
-          <div className={`w-full ${isMobile ? 'order-1' : 'lg:order-2'}`}>
+          {/* Vibe Filter - Always second */}
+          <div className="w-full order-2">
             <EventsVibeSection
               selectedVibes={selectedVibes}
               onVibeChange={setSelectedVibes}

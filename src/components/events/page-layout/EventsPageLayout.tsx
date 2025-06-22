@@ -11,18 +11,18 @@ export const EventsPageLayout: React.FC<EventsPageLayoutProps> = ({ children }) 
   
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-secondary-25 to-white">
-      {/* Hero Section - Larger like casual plans page */}
-      <section className="py-20 md:py-32 bg-gradient-to-b from-secondary-25 to-white">
+      {/* Hero Section - Much larger like casual plans page */}
+      <section className="py-24 md:py-40 lg:py-48 bg-gradient-to-b from-secondary-25 to-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className={`${isMobile ? 'text-4xl' : 'text-4xl md:text-5xl lg:text-6xl'} font-bold text-primary mb-6 leading-tight`}>
+          <h1 className={`${isMobile ? 'text-4xl' : 'text-5xl md:text-6xl lg:text-7xl'} font-bold text-primary mb-8 leading-tight`}>
             Find events that fit your <span className="text-accent">vibe</span>
           </h1>
-          <p className={`${isMobile ? 'text-lg' : 'text-xl'} text-neutral max-w-3xl mx-auto leading-relaxed mb-8`}>
+          <p className={`${isMobile ? 'text-lg' : 'text-xl md:text-2xl'} text-neutral max-w-3xl mx-auto leading-relaxed mb-12`}>
             Discover what's happening nearby — from beach parties to chill yoga sessions. Join when you want, connect if you want.
           </p>
           
-          {/* Tagline with emojis */}
-          <div className="flex justify-center items-center gap-6 text-2xl opacity-60">
+          {/* Tagline with emojis - larger spacing */}
+          <div className="flex justify-center items-center gap-8 text-3xl md:text-4xl opacity-60">
             <span>🏄</span>
             <span>🎵</span>
             <span>🌅</span>
