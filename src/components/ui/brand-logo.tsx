@@ -16,7 +16,7 @@ export const BrandLogo = React.forwardRef<HTMLDivElement, BrandLogoProps>(
         <Link to="/" className="flex items-center group transition-all duration-300">
           <div className="flex items-center">
             {showText && (
-              <span className="text-xl md:text-2xl font-bold lowercase text-black group-hover:text-gray-700 transition-colors">
+              <span className="text-xl md:text-2xl font-bold lowercase text-primary group-hover:text-primary/80 transition-colors">
                 thelineup
               </span>
             )}

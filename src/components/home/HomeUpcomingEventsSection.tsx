@@ -4,7 +4,6 @@ import { Event } from '@/types';
 import { UpcomingEventCard } from '@/components/home/UpcomingEventCard';
 import { useNavigate } from 'react-router-dom';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
-import { useEventVibes } from '@/hooks/useEventVibes';
 import { Loader2, ArrowRight } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
@@ -35,19 +34,17 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
   isLoading
 }) => {
   const navigate = useNavigate();
-  const {
-    navigateToEvent
-  } = useEventNavigation();
+  const { navigateToEvent } = useEventNavigation();
   const isMobile = useIsMobile();
   const [selectedVibe, setSelectedVibe] = useState<string | null>(null);
 
-  // Get available vibes from the actual events, not the database
+  // Get available vibes from the actual events
   const availableVibes = useMemo(() => {
     if (!events) return [];
     const vibes = events
       .map(event => event.vibe)
       .filter(Boolean)
-      .filter((vibe, index, array) => array.indexOf(vibe) === index) // Remove duplicates
+      .filter((vibe, index, array) => array.indexOf(vibe) === index)
       .sort();
     return vibes as string[];
   }, [events]);
@@ -100,12 +97,12 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
           <h2 className="text-3xl md:text-4xl font-bold mb-3 text-primary">
             Upcoming Events
           </h2>
-          <p className="text-lg max-w-2xl text-neutral">
+          <p className="text-lg max-w-2xl text-primary/70">
             Discover events that match your energy — from sunrise yoga to sunset gatherings
           </p>
         </div>
 
-        {/* Only show vibe filters if there are available vibes */}
+        {/* Vibe filters */}
         {availableVibes.length > 0 && (
           <div className="mb-8">
             <h3 className="text-xl font-semibold text-primary mb-4 text-left">Find your vibe</h3>
@@ -117,7 +114,7 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
                     "flex-shrink-0 rounded-full px-3 py-1.5 text-sm font-medium transition-all duration-200",
                     !selectedVibe 
                       ? "bg-primary text-white shadow-lg transform scale-105" 
-                      : "bg-white text-neutral-75 hover:bg-secondary-25 border border-neutral-25"
+                      : "bg-white text-primary hover:bg-secondary-25 border border-neutral-25"
                   )}
                 >
                   All Vibes
@@ -133,7 +130,7 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
                         "flex-shrink-0 rounded-full px-3 py-1.5 text-sm font-medium transition-all duration-200 capitalize border transform",
                         isSelected 
                           ? "text-white shadow-lg scale-105 border-transparent" 
-                          : "bg-white text-neutral-75 hover:shadow-md border-neutral-25 hover:scale-102"
+                          : "bg-white text-primary hover:shadow-md border-neutral-25 hover:scale-102"
                       )}
                       style={isSelected ? {
                         backgroundColor: color,
@@ -152,7 +149,7 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
         {/* Events Grid */}
         {displayEvents.length === 0 && !isLoading ? (
           <div className="text-center py-12 bg-white/50 rounded-2xl backdrop-blur-sm">
-            <p className="text-neutral text-lg mb-4">
+            <p className="text-primary text-lg mb-4">
               {selectedVibe ? `No ${selectedVibe} events found at the moment` : 'No upcoming events found.'}
             </p>
             {selectedVibe && (
@@ -167,9 +164,9 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
         ) : isMobile ? (
           // Mobile: Horizontal scroll
           <div className="overflow-x-auto pb-4 -mx-4">
-            <div className="flex gap-4 px-4" style={{ width: 'max-content' }}>
+            <div className="flex gap-6 px-4" style={{ width: 'max-content' }}>
               {displayEvents.map(event => (
-                <div key={event.id} className="flex-none w-72">
+                <div key={event.id} className="flex-none w-80">
                   <UpcomingEventCard 
                     event={event} 
                     onClick={handleEventClick} 
@@ -180,8 +177,8 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
             </div>
           </div>
         ) : (
-          // Desktop: Grid
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          // Desktop: Grid with larger cards
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {displayEvents.map(event => (
               <UpcomingEventCard 
                 key={event.id} 
@@ -193,7 +190,7 @@ export const HomeUpcomingEventsSection: React.FC<HomeUpcomingEventsSectionProps>
           </div>
         )}
 
-        {/* View All Button - Below Events */}
+        {/* View All Button */}
         {displayEvents.length > 0 && (
           <div className="text-center mt-12">
             <button 

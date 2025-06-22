@@ -1,138 +1,121 @@
-import React from "react";
-import { Calendar, MapPin } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { CategoryPill } from "@/components/ui/category-pill";
-import { LineupImage } from "@/components/ui/lineup-image";
-import { formatEventCardDateTime } from "@/utils/date-formatting";
-import { Event } from "@/types";
-import { useEventImages } from "@/hooks/useEventImages";
-import { DEFAULT_FALLBACK_IMAGE_URL } from "@/utils/eventImages";
-import { useIsMobile } from "@/hooks/use-mobile";
+
+import React from 'react';
+import { Event } from '@/types';
+import { Calendar, MapPin } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useEventImages } from '@/hooks/useEventImages';
+import { CategoryPill } from '@/components/ui/category-pill';
+import { formatEventCardDateTime } from '@/utils/date-formatting';
+import { LineupImage } from '@/components/ui/lineup-image';
+import { Card } from '@/components/ui/card';
+import EventVibeLabel from '@/components/polymet/event-vibe-label';
 
 interface UpcomingEventCardProps {
   event: Event;
   onClick?: (event: Event) => void;
   className?: string;
-  showCategory?: boolean;
 }
 
 export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
   event,
   onClick,
-  className = "",
-  showCategory = true,
+  className,
 }) => {
   const { getEventImageUrl } = useEventImages();
-  const isMobile = useIsMobile();
   const imageUrl = getEventImageUrl(event);
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = () => {
     if (onClick) {
-      e.preventDefault();
       onClick(event);
     }
   };
 
+  const getVenueDisplay = (): string => {
+    if (event.venues?.name) {
+      return event.venues.name;
+    }
+    
+    if (event.location) {
+      return event.location;
+    }
+    
+    return 'Location TBD';
+  };
+
   return (
-    <div
+    <Card 
       className={cn(
-        "group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden border border-[#F4E7D3] hover:border-[#2A9D8F]/30 transform hover:-translate-y-1",
+        "flex flex-col h-full overflow-hidden cursor-pointer transition-all duration-300 ease-in-out hover:shadow-xl bg-white border border-gray-200 rounded-xl group",
         className
       )}
       onClick={handleClick}
-      tabIndex={0}
-      role="button"
     >
-      {/* Image Container */}
-      <div className="relative w-full h-48 md:h-56 overflow-hidden rounded-t-2xl bg-gradient-to-br from-[#F4E7D3] to-[#EDC46A]/30">
+      {/* Larger image with category and vibe pills */}
+      <div className="relative w-full h-56 overflow-hidden bg-gray-100 flex-shrink-0">
         <LineupImage
           src={imageUrl}
           alt={event.title}
           aspectRatio="video"
           treatment="subtle-overlay"
           overlayVariant="ocean"
-          className="h-full w-full group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full group-hover:scale-105 transition-transform duration-300"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            if (target.src !== DEFAULT_FALLBACK_IMAGE_URL) {
-              console.log(`[UpcomingEventCard] Image failed to load: ${target.src}. Falling back to default.`);
-              target.src = DEFAULT_FALLBACK_IMAGE_URL;
+            if (!target.src.includes('/img/default.jpg')) {
+              target.src = "/img/default.jpg";
             }
           }}
         />
         
-        {showCategory && event.event_category && (
-          <div className="absolute top-4 left-4 z-20">
+        {/* Category pill - top left */}
+        {event.event_category && (
+          <div className="absolute top-4 left-4 z-10">
             <CategoryPill 
               category={event.event_category} 
-              active={true} 
-              noBorder={true} 
-              size={isMobile ? "xs" : "sm"}
+              size="md"
             />
           </div>
         )}
-      </div>
 
-      {/* Content */}
-      <div className="p-5 md:p-6">
-        {/* Title */}
-        <h3 className="font-bold text-lg md:text-xl leading-tight mb-3 text-[#005F73] line-clamp-2 group-hover:text-[#2A9D8F] transition-colors">
+        {/* Event vibe pill - top right */}
+        <div className="absolute top-4 right-4 z-10">
+          <EventVibeLabel 
+            vibe={event.vibe || 'general'} 
+            size="md"
+          />
+        </div>
+      </div>
+      
+      {/* Content with more padding */}
+      <div className="flex flex-col flex-1 p-6 space-y-4">
+        {/* Title - larger */}
+        <h3 className="font-bold text-primary text-xl leading-tight line-clamp-2">
           {event.title}
         </h3>
         
-        {/* Event Details */}
-        <div className="space-y-2 mb-4">
-          {/* Date & Time */}
-          <div className="flex items-center gap-3 text-[#005F73]/70">
-            <Calendar className="h-4 w-4 text-[#2A9D8F] flex-shrink-0" />
-            <span className="text-sm font-medium">
-              {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
-            </span>
-          </div>
-
-          {/* Location */}
-          {(event.venues?.name || event.location) && (
-            <div className="flex items-center gap-3 text-[#005F73]/70">
-              <MapPin className="h-4 w-4 text-[#2A9D8F] flex-shrink-0" />
-              <span className="text-sm font-medium truncate">
-                {event.venues?.name || event.location}
-              </span>
-            </div>
-          )}
+        {/* Organizer info */}
+        {event.organiser_name && (
+          <p className="text-base text-primary/70 font-medium">
+            By {event.organiser_name}
+          </p>
+        )}
+        
+        {/* Date and Time - larger */}
+        <div className="flex items-center gap-3 text-base text-primary/80">
+          <Calendar className="h-5 w-5 text-primary/60 flex-shrink-0" />
+          <span className="font-semibold">
+            {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
+          </span>
         </div>
-
-        {/* Bottom accent */}
-        <div className="h-1 w-12 bg-gradient-to-r from-[#2A9D8F] to-[#00B4DB] rounded-full group-hover:w-16 transition-all duration-300" />
-      </div>
-    </div>
-  );
-};
-
-interface ViewAllCardProps {
-  onClick?: () => void;
-}
-
-export const ViewAllCard: React.FC<ViewAllCardProps> = ({ onClick }) => {
-  const isMobile = useIsMobile();
-  
-  return (
-    <div
-      className={cn(
-        "group bg-gradient-to-br from-[#F4E7D3] to-[#EDC46A]/30 rounded-2xl border-2 border-dashed border-[#2A9D8F]/40 hover:border-[#2A9D8F] transition-all duration-300 flex flex-col items-center justify-center cursor-pointer min-h-[280px] hover:shadow-lg transform hover:-translate-y-1",
-        isMobile ? "w-full" : "max-w-xs"
-      )}
-      onClick={onClick}
-      tabIndex={0}
-      role="button"
-      aria-label="View all events"
-    >
-      <div className="text-center p-6">
-        <div className="w-16 h-16 bg-[#2A9D8F] rounded-full flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
-          <span className="text-white text-2xl">→</span>
+        
+        {/* Location - larger */}
+        <div className="flex items-center gap-3 text-base text-primary/80">
+          <MapPin className="h-5 w-5 text-primary/60 flex-shrink-0" />
+          <span className="truncate font-medium">
+            {getVenueDisplay()}
+          </span>
         </div>
-        <h3 className="text-lg font-semibold text-[#005F73] mb-2">View All Events</h3>
-        <p className="text-[#005F73]/70 text-sm">Discover more experiences</p>
       </div>
-    </div>
+    </Card>
   );
 };

@@ -34,44 +34,57 @@
 
   html, body {
     background: linear-gradient(to bottom, #F4E7D3 0%, #FFFFFF 100%);
-    color: #003840; /* Updated to much darker teal */
+    color: #003840; /* Dark teal for all text */
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
   }
 
+  /* All text elements use dark teal by default */
+  * {
+    color: #003840 !important;
+  }
+
+  /* Page headers and section titles use a lighter teal */
   h1, h2, h3, h4, h5, h6 {
-    color: #003840 !important; /* Updated to much darker teal */
+    color: #005F73 !important; /* Lighter teal for headers */
     @apply font-semibold uppercase tracking-wide;
   }
 
+  /* Specific overrides for white text when needed */
+  .text-white,
+  button .text-white,
+  [class*="text-white"] {
+    color: #FFFFFF !important;
+  }
+
   .text-ocean {
-    color: #003840 !important; /* Updated to much darker teal */
+    color: #003840 !important;
   }
 }
 
 /* Utility classes for brand look */
 @layer utilities {
   .shadow-ocean {
-    box-shadow: 0 4px 24px 0 rgba(0,56,64,0.08) !important; /* Updated to darker teal */
+    box-shadow: 0 4px 24px 0 rgba(0,56,64,0.08) !important;
   }
   .shadow-card-lg {
-    box-shadow: 0 8px 40px 0 rgba(0,56,64,0.10) !important; /* Updated to darker teal */
+    box-shadow: 0 8px 40px 0 rgba(0,56,64,0.10) !important;
   }
   .bg-accent-gradient {
-    background: linear-gradient(135deg, #003840, #66B2B2) !important; /* Updated to darker teal */
+    background: linear-gradient(135deg, #003840, #66B2B2) !important;
   }
   .badge-pastel-ocean {
     background-color: #E6EEF0 !important;
-    color: #003840 !important; /* Updated to darker teal */
+    color: #003840 !important;
   }
   .badge-pastel-coral {
     background-color: #F9F3E9 !important;
     color: #FF6B4A !important;
   }
   .hover-soft-tint-ocean:hover {
-    background-color: rgba(0,56,64,0.08) !important; /* Updated to darker teal */
+    background-color: rgba(0,56,64,0.08) !important;
     transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
-    box-shadow: 0 2px 8px 0 rgba(0,56,64,0.07); /* Updated to darker teal */
+    box-shadow: 0 2px 8px 0 rgba(0,56,64,0.07);
   }
   .hover-soft-tint-coral:hover {
     background-color: rgba(255,107,74,0.08) !important;
@@ -93,12 +106,12 @@
 .input-search-coastal {
   background: #FFF !important;
   border: 1px solid #F9F3E9 !important;
-  box-shadow: 0 2px 8px 0 rgba(0,56,64,0.05); /* Updated to darker teal */
-  color: #003840; /* Updated to darker teal */
+  box-shadow: 0 2px 8px 0 rgba(0,56,64,0.05);
+  color: #003840;
   padding-left: 2.5rem !important;
   transition: border 0.15s, box-shadow 0.15s;
 }
 .input-search-coastal:focus {
-  border: 1.5px solid #003840 !important; /* Updated to darker teal */
+  border: 1.5px solid #003840 !important;
   box-shadow: 0 0 0 2px #66B2B255;
 }
