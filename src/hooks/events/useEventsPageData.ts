@@ -6,13 +6,14 @@ import { Event } from '@/types';
 import { DateRange } from 'react-day-picker';
 import { useRsvpStateManager } from './useRsvpStateManager';
 import { useAuth } from '@/contexts/AuthContext';
+import { getCitiesForCategory } from '@/utils/locationCategories';
 
 export const useEventsPageData = () => {
   const { user } = useAuth();
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
   const [selectedVenues, setSelectedVenues] = useState<string[]>([]);
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null); // Now stores category ID
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [selectedDateFilter, setSelectedDateFilter] = useState<string>('anytime');
 
@@ -84,9 +85,14 @@ export const useEventsPageData = () => {
       return false;
     }
 
-    // Location filter (by venue city)
-    if (selectedLocation && event.venues?.city !== selectedLocation) {
-      return false;
+    // Location category filter (by venue city)
+    if (selectedLocation && event.venues?.city) {
+      const citiesInCategory = getCitiesForCategory(selectedLocation);
+      if (!citiesInCategory.some(city => 
+        city.toLowerCase() === event.venues.city.toLowerCase()
+      )) {
+        return false;
+      }
     }
 
     // Date filter

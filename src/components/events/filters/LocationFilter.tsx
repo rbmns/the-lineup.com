@@ -3,11 +3,12 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { MapPin, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { LocationCategory } from '@/utils/locationCategories';
 
 interface LocationFilterProps {
-  availableLocations: string[];
+  availableLocations: LocationCategory[];
   selectedLocation: string | null;
-  onLocationChange: (location: string | null) => void;
+  onLocationChange: (categoryId: string | null) => void;
   isLoading?: boolean;
 }
 
@@ -64,23 +65,23 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
               : "border-gray-200 text-gray-700 hover:bg-gray-50"
           )}
         >
-          All
+          All Areas
         </Button>
         
-        {availableLocations.map(location => (
+        {availableLocations.map(category => (
           <Button
-            key={location}
-            variant={selectedLocation === location ? "default" : "outline"}
+            key={category.id}
+            variant={selectedLocation === category.id ? "default" : "outline"}
             size="sm"
-            onClick={() => onLocationChange(location)}
+            onClick={() => onLocationChange(category.id)}
             className={cn(
               "text-xs px-3 py-1.5 h-auto rounded-full",
-              selectedLocation === location 
+              selectedLocation === category.id 
                 ? "bg-primary text-white" 
                 : "border-gray-200 text-gray-700 hover:bg-gray-50"
             )}
           >
-            {location}
+            {category.displayName}
           </Button>
         ))}
       </div>

@@ -5,7 +5,7 @@ import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayo
 import { EventsResultsSection } from '@/components/events/page-sections/EventsResultsSection';
 import { EventsVibeSection } from '@/components/events/page-sections/EventsVibeSection';
 import { LocationFilter } from '@/components/events/filters/LocationFilter';
-import { useVenueLocations } from '@/hooks/useVenueLocations';
+import { useVenueLocationCategories } from '@/hooks/useVenueLocationCategories';
 import { EventsAdvancedSection } from '@/components/events/page-sections/EventsAdvancedSection';
 
 const Events = () => {
@@ -30,7 +30,7 @@ const Events = () => {
     resetAllFilters
   } = useEventsPageData();
 
-  const { data: venueLocations = [], isLoading: locationsLoading } = useVenueLocations();
+  const { data: locationCategories = [], isLoading: locationsLoading } = useVenueLocationCategories();
 
   const handleFilterChange = (filters: any) => {
     if (filters.eventTypes !== undefined) {
@@ -70,7 +70,7 @@ const Events = () => {
           
           {/* Location Filter */}
           <LocationFilter
-            availableLocations={venueLocations}
+            availableLocations={locationCategories}
             selectedLocation={selectedLocation}
             onLocationChange={setSelectedLocation}
             isLoading={locationsLoading}
