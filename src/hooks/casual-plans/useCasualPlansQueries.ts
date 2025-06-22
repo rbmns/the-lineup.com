@@ -5,13 +5,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { RawCasualPlanRsvp } from '@/types/casual-plans';
 
 export const useCasualPlansQueries = (includePublicData: boolean = true) => {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
-  // Fetch casual plans - now available to everyone
+  // Fetch casual plans - only for authenticated users
   const { data: rawPlans, isLoading: plansLoading, error: plansError } = useQuery({
     queryKey: ['casual-plans-raw'],
     queryFn: async () => {
-      if (!includePublicData) {
+      if (!isAuthenticated || !includePublicData) {
         return [];
       }
 
@@ -32,14 +32,14 @@ export const useCasualPlansQueries = (includePublicData: boolean = true) => {
       console.log('Raw plans data:', plansData);
       return plansData || [];
     },
-    enabled: includePublicData,
+    enabled: includePublicData && isAuthenticated,
   });
 
-  // Fetch casual plan RSVPs - now available to everyone
+  // Fetch casual plan RSVPs - only for authenticated users
   const { data: rawRsvps, isLoading: rsvpsLoading } = useQuery({
     queryKey: ['casual-plan-rsvps'],
     queryFn: async (): Promise<RawCasualPlanRsvp[]> => {
-      if (!includePublicData || !rawPlans?.length) {
+      if (!isAuthenticated || !includePublicData || !rawPlans?.length) {
         return [];
       }
 
@@ -60,14 +60,14 @@ export const useCasualPlansQueries = (includePublicData: boolean = true) => {
       console.log('Raw RSVPs data:', rsvpsData);
       return rsvpsData || [];
     },
-    enabled: includePublicData && !!rawPlans?.length,
+    enabled: includePublicData && isAuthenticated && !!rawPlans?.length,
   });
 
-  // Fetch profiles for all users - now available to everyone
+  // Fetch profiles for all users - only for authenticated users
   const { data: profiles, isLoading: profilesLoading } = useQuery({
     queryKey: ['casual-plans-profiles', rawPlans, rawRsvps],
     queryFn: async () => {
-      if (!includePublicData || (!rawPlans?.length && !rawRsvps?.length)) {
+      if (!isAuthenticated || !includePublicData || (!rawPlans?.length && !rawRsvps?.length)) {
         return [];
       }
 
@@ -101,7 +101,7 @@ export const useCasualPlansQueries = (includePublicData: boolean = true) => {
       console.log('Profiles data:', profilesData);
       return profilesData || [];
     },
-    enabled: includePublicData && (!!rawPlans?.length || !!rawRsvps?.length),
+    enabled: includePublicData && isAuthenticated && (!!rawPlans?.length || !!rawRsvps?.length),
   });
 
   return {

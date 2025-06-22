@@ -7,8 +7,8 @@ import { transformCasualPlansData } from './casual-plans/casualPlansTransformers
 export const useCasualPlans = () => {
   const { user, isAuthenticated } = useAuth();
 
-  // Fetch raw data - now works for both authenticated and non-authenticated users
-  const { rawPlans, rawRsvps, profiles, isLoading, error } = useCasualPlansQueries(true);
+  // Fetch raw data - only for authenticated users
+  const { rawPlans, rawRsvps, profiles, isLoading, error } = useCasualPlansQueries(isAuthenticated);
 
   // Get mutation functions (only work for authenticated users)
   const mutations = useCasualPlansMutations();
