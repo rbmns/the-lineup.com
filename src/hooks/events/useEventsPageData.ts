@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
@@ -21,7 +22,7 @@ export const useEventsPageData = () => {
   const { handleRsvp, isProcessing, loadingEventId } = useRsvpStateManager(user?.id);
   const rsvpInProgressRef = useRef<boolean>(false);
 
-  // Keep all existing queries unchanged
+  // Fixed events query - specify the correct foreign key relationship
   const { data: allEvents = [], isLoading: eventsLoading } = useQuery({
     queryKey: ['events'],
     queryFn: async () => {
@@ -29,13 +30,16 @@ export const useEventsPageData = () => {
         .from('events')
         .select(`
           *,
-          venues(*),
+          venues!events_venue_id_fkey(*),
           event_rsvps(status, user_id)
         `)
         .gte('start_date', new Date().toISOString().split('T')[0])
         .order('start_date', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching events:', error);
+        throw error;
+      }
 
       return (data || []).map(event => ({
         ...event,
@@ -81,6 +85,24 @@ export const useEventsPageData = () => {
     }
   });
 
+  // Load actual venues from the database
+  const { data: availableVenues = [] } = useQuery({
+    queryKey: ['venues'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('venues')
+        .select('*')
+        .order('name', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching venues:', error);
+        throw error;
+      }
+      
+      return data || [];
+    }
+  });
+
   // FIXED: Enhanced filtering logic - show all events by default, filter only when filters are applied
   const filteredEvents = useMemo(() => {
     let filtered = [...allEvents];
@@ -102,7 +124,7 @@ export const useEventsPageData = () => {
     // Only apply venue filtering if venues are specifically selected
     if (selectedVenues.length > 0) {
       filtered = filtered.filter(event => 
-        event.venues?.name && selectedVenues.includes(event.venues.name)
+        event.venue_id && selectedVenues.includes(event.venue_id)
       );
     }
 
@@ -219,6 +241,7 @@ export const useEventsPageData = () => {
     loadingEventId,
     vibes,
     vibesLoading,
-    allEventTypes
+    allEventTypes,
+    availableVenues
   };
 };

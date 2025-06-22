@@ -29,7 +29,8 @@ const Events = () => {
     loadingEventId,
     vibes,
     vibesLoading,
-    allEventTypes
+    allEventTypes,
+    availableVenues
   } = useEventsPageData();
 
   const handleAdvancedFilterChange = (filters: any) => {
@@ -94,6 +95,7 @@ const Events = () => {
             selectedDateFilter={selectedDateFilter}
             filteredEventsCount={filteredEvents.length}
             allEventTypes={allEventTypes}
+            availableVenues={availableVenues}
           />
 
           {/* No Results Message */}

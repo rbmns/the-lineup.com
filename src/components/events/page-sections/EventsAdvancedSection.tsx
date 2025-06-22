@@ -12,6 +12,7 @@ interface EventsAdvancedSectionProps {
   selectedDateFilter: string;
   filteredEventsCount: number;
   allEventTypes: string[];
+  availableVenues: any[];
 }
 
 export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
@@ -22,20 +23,20 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
   dateRange,
   selectedDateFilter,
   filteredEventsCount,
-  allEventTypes
+  allEventTypes,
+  availableVenues
 }) => {
   // Transform event types to the format expected by EventFilterSection
-  const availableEventTypes = allEventTypes.map(type => ({
+  const availableEventTypesFormatted = allEventTypes.map(type => ({
     value: type,
     label: type
   }));
 
-  // Mock venues data for now - this would come from a venues API
-  const availableVenues = [
-    { value: 'beach', label: 'Beach' },
-    { value: 'park', label: 'Park' },
-    { value: 'studio', label: 'Studio' }
-  ];
+  // Use actual venues from database instead of mock data
+  const availableVenuesFormatted = availableVenues.map(venue => ({
+    value: venue.id,
+    label: venue.name
+  }));
 
   const hasActiveFilters = selectedEventTypes.length > 0 || 
                           selectedVenues.length > 0 || 
@@ -86,8 +87,8 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
         setDateRange={(range) => onFilterChange({ date: range?.from })}
         selectedDateFilter={selectedDateFilter}
         setSelectedDateFilter={(filter) => onFilterChange({ dateFilter: filter })}
-        availableEventTypes={availableEventTypes}
-        availableVenues={availableVenues}
+        availableEventTypes={availableEventTypesFormatted}
+        availableVenues={availableVenuesFormatted}
         resetFilters={resetFilters}
         hasActiveFilters={hasActiveFilters}
       />
@@ -99,8 +100,8 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
           selectedVenues={selectedVenues}
           dateRange={dateRange}
           selectedDateFilter={selectedDateFilter}
-          eventTypeOptions={availableEventTypes}
-          venueOptions={availableVenues}
+          eventTypeOptions={availableEventTypesFormatted}
+          venueOptions={availableVenuesFormatted}
           onRemoveEventType={handleRemoveEventType}
           onRemoveVenue={handleRemoveVenue}
           onClearDateFilter={handleClearDateFilter}
