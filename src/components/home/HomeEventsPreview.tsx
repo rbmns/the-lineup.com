@@ -33,15 +33,15 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-primary mb-4">Upcoming Events</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
-                <div className="h-64 bg-gray-200"></div>
-                <div className="p-6">
-                  <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                <div className="h-48 bg-gray-200"></div>
+                <div className="p-4">
+                  <div className="h-4 bg-gray-200 rounded mb-3"></div>
                   <div className="h-3 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded mb-4"></div>
-                  <div className="h-8 bg-gray-200 rounded"></div>
+                  <div className="h-3 bg-gray-200 rounded mb-3"></div>
+                  <div className="h-6 bg-gray-200 rounded"></div>
                 </div>
               </div>
             ))}
@@ -61,7 +61,7 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {displayEvents.map((event) => {
             const EventCardContent = () => {
               const { getEventImageUrl } = useEventImages();
@@ -84,8 +84,8 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
                   className="flex flex-col h-full overflow-hidden cursor-pointer transition-all duration-300 ease-in-out hover:shadow-xl bg-white border border-gray-200 rounded-xl group"
                   onClick={() => navigate(`/events/${event.id}`)}
                 >
-                  {/* Image with vibe pill only - removed category pill */}
-                  <div className="relative w-full h-64 overflow-hidden bg-gray-100 flex-shrink-0">
+                  {/* Image with vibe pill only - reduced height */}
+                  <div className="relative w-full h-48 overflow-hidden bg-gray-100 flex-shrink-0">
                     <LineupImage
                       src={imageUrl}
                       alt={event.title}
@@ -110,9 +110,9 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
                     </div>
                   </div>
 
-                  <div className="flex flex-col flex-1 p-6 space-y-4">
+                  <div className="flex flex-col flex-1 p-4 space-y-3">
                     {/* Event Title */}
-                    <h3 className="font-semibold text-primary text-xl leading-tight line-clamp-2">
+                    <h3 className="font-semibold text-primary text-lg leading-tight line-clamp-2">
                       {event.title}
                     </h3>
 
@@ -125,7 +125,7 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
 
                     {/* Date & Time - using improved formatting for ongoing events */}
                     <div className="flex items-center gap-2 text-neutral">
-                      <Calendar className="h-5 w-5 text-primary/60" />
+                      <Calendar className="h-4 w-4 text-primary/60" />
                       <span className="text-sm font-medium">
                         {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
                       </span>
@@ -133,17 +133,17 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
 
                     {/* Location */}
                     <div className="flex items-center gap-2 text-neutral">
-                      <MapPin className="h-5 w-5 text-primary/60" />
+                      <MapPin className="h-4 w-4 text-primary/60" />
                       <span className="text-sm truncate">
                         {getVenueDisplay()}
                       </span>
                     </div>
 
-                    {/* Attendees and Join Button - removed "be the first to join" text */}
-                    <div className="flex items-center justify-between mt-auto pt-4">
+                    {/* Attendees and Join Button - reduced padding */}
+                    <div className="flex items-center justify-between mt-auto pt-2">
                       {(event.going_count || event.interested_count) ? (
                         <div className="flex items-center gap-2 text-neutral">
-                          <Users className="h-5 w-5 text-primary/60" />
+                          <Users className="h-4 w-4 text-primary/60" />
                           <span className="text-sm">
                             {(event.going_count || 0) + (event.interested_count || 0)} going
                           </span>

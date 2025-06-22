@@ -68,8 +68,17 @@ export const useEventsPageData = () => {
     ...new Set(eventsData?.map(event => event.event_category).filter(Boolean))
   ] as string[];
 
+  // Filter out past events first
+  const upcomingEvents = eventsData?.filter(event => {
+    if (!event.start_date) return true;
+    const eventDate = new Date(event.start_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset to start of day for comparison
+    return eventDate >= today;
+  }) || [];
+
   // Filter events based on all criteria
-  const filteredEvents = eventsData?.filter(event => {
+  const filteredEvents = upcomingEvents?.filter(event => {
     // Vibe filter
     if (selectedVibes.length > 0 && !selectedVibes.includes(event.vibe || 'general')) {
       return false;
@@ -85,11 +94,27 @@ export const useEventsPageData = () => {
       return false;
     }
 
-    // Location category filter (by venue city)
-    if (selectedLocation && event.venues?.city) {
+    // Location category filter (by venue city) - exclude TBD events when location is selected
+    if (selectedLocation) {
+      // If no venue city or location, exclude this event
+      if (!event.venues?.city && !event.location) {
+        return false;
+      }
+      
+      // If event has "Location TBD" or similar, exclude it
+      if (event.location && (
+        event.location.toLowerCase().includes('tbd') || 
+        event.location.toLowerCase().includes('to be determined') ||
+        event.location.toLowerCase().includes('location tbd')
+      )) {
+        return false;
+      }
+
       const citiesInCategory = getCitiesForCategory(selectedLocation);
-      if (!citiesInCategory.some(city => 
-        city.toLowerCase() === event.venues.city.toLowerCase()
+      const eventCity = event.venues?.city || event.location;
+      
+      if (eventCity && !citiesInCategory.some(city => 
+        city.toLowerCase() === eventCity.toLowerCase()
       )) {
         return false;
       }
@@ -130,7 +155,7 @@ export const useEventsPageData = () => {
 
   return {
     events: filteredEvents,
-    allEvents: eventsData, // Return unfiltered events for vibe detection
+    allEvents: upcomingEvents, // Return upcoming events only for vibe detection
     isLoading: eventsLoading,
     selectedVibes,
     selectedEventTypes,
