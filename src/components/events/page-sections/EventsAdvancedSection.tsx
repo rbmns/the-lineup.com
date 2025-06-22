@@ -1,20 +1,16 @@
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, Filter } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import AdvancedFilters from '@/components/polymet/advanced-filters';
-import { DateRange } from 'react-day-picker';
+import React from 'react';
+import { EventFilterSection } from '@/components/events/filters/EventFilterSection';
+import { FilterSummary } from '@/components/events/FilterSummary';
 
 interface EventsAdvancedSectionProps {
   onFilterChange: (filters: any) => void;
   selectedEventTypes: string[];
   selectedVenues: string[];
   selectedVibes: string[];
-  dateRange: DateRange | undefined;
+  dateRange: any;
   selectedDateFilter: string;
   filteredEventsCount: number;
-  showLocationFilter?: boolean;
   allEventTypes: string[];
 }
 
@@ -26,68 +22,95 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
   dateRange,
   selectedDateFilter,
   filteredEventsCount,
-  showLocationFilter = true,
   allEventTypes
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  // Transform event types to the format expected by EventFilterSection
+  const availableEventTypes = allEventTypes.map(type => ({
+    value: type,
+    label: type
+  }));
 
-  const handleAdvancedFilterChange = (filters: any) => {
-    console.log('EventsAdvancedSection - Filter change:', filters);
-    onFilterChange(filters);
+  // Mock venues data for now - this would come from a venues API
+  const availableVenues = [
+    { value: 'beach', label: 'Beach' },
+    { value: 'park', label: 'Park' },
+    { value: 'studio', label: 'Studio' }
+  ];
+
+  const hasActiveFilters = selectedEventTypes.length > 0 || 
+                          selectedVenues.length > 0 || 
+                          (dateRange?.from !== undefined) || 
+                          selectedDateFilter !== 'anytime';
+
+  const resetFilters = () => {
+    onFilterChange({
+      eventTypes: [],
+      venues: [],
+      date: undefined,
+      dateFilter: 'anytime'
+    });
   };
 
-  const hasAdvancedFilters = selectedEventTypes.length > 0 || 
-                            selectedVenues.length > 0 || 
-                            !!dateRange || 
-                            !!selectedDateFilter;
+  const handleRemoveEventType = (type: string) => {
+    const newTypes = selectedEventTypes.filter(t => t !== type);
+    onFilterChange({ eventTypes: newTypes });
+  };
+
+  const handleRemoveVenue = (venue: string) => {
+    const newVenues = selectedVenues.filter(v => v !== venue);
+    onFilterChange({ venues: newVenues });
+  };
+
+  const handleClearDateFilter = () => {
+    onFilterChange({ 
+      date: undefined,
+      dateFilter: 'anytime'
+    });
+  };
 
   return (
-    <div className="space-y-4">
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <div className="flex items-center justify-between">
-          <CollapsibleTrigger asChild>
-            <Button 
-              variant="outline" 
-              className="flex items-center gap-2 hover:bg-gray-50"
-            >
-              <Filter className="h-4 w-4" />
-              <span>Advanced Filters</span>
-              {hasAdvancedFilters && (
-                <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full">
-                  {[selectedEventTypes.length, selectedVenues.length, dateRange ? 1 : 0, selectedDateFilter ? 1 : 0]
-                    .filter(n => n > 0).length}
-                </span>
-              )}
-              {isOpen ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
-            </Button>
-          </CollapsibleTrigger>
-          
-          <div className="text-sm text-gray-600">
-            {filteredEventsCount} event{filteredEventsCount !== 1 ? 's' : ''} found
-          </div>
-        </div>
-        
-        <CollapsibleContent className="space-y-4">
-          <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-            <AdvancedFilters
-              onFilterChange={handleAdvancedFilterChange}
-              initialFilters={{
-                eventTypes: selectedEventTypes,
-                venues: selectedVenues,
-                eventVibes: selectedVibes,
-                date: dateRange?.from,
-                dateFilter: selectedDateFilter
-              }}
-              eventCategories={allEventTypes}
-              className="w-full"
-            />
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+    <div className="space-y-6">
+      {/* Filter Section */}
+      <EventFilterSection
+        showEventTypeFilter={false}
+        setShowEventTypeFilter={() => {}}
+        showVenueFilter={false}
+        setShowVenueFilter={() => {}}
+        showDateFilter={false}
+        setShowDateFilter={() => {}}
+        selectedEventTypes={selectedEventTypes}
+        setSelectedEventTypes={(types) => onFilterChange({ eventTypes: types })}
+        selectedVenues={selectedVenues}
+        setSelectedVenues={(venues) => onFilterChange({ venues: venues })}
+        dateRange={dateRange}
+        setDateRange={(range) => onFilterChange({ date: range?.from })}
+        selectedDateFilter={selectedDateFilter}
+        setSelectedDateFilter={(filter) => onFilterChange({ dateFilter: filter })}
+        availableEventTypes={availableEventTypes}
+        availableVenues={availableVenues}
+        resetFilters={resetFilters}
+        hasActiveFilters={hasActiveFilters}
+      />
+
+      {/* Filter Summary */}
+      {hasActiveFilters && (
+        <FilterSummary 
+          selectedEventTypes={selectedEventTypes}
+          selectedVenues={selectedVenues}
+          dateRange={dateRange}
+          selectedDateFilter={selectedDateFilter}
+          eventTypeOptions={availableEventTypes}
+          venueOptions={availableVenues}
+          onRemoveEventType={handleRemoveEventType}
+          onRemoveVenue={handleRemoveVenue}
+          onClearDateFilter={handleClearDateFilter}
+        />
+      )}
+
+      {/* Results Count */}
+      <div className="text-sm text-gray-600 text-center">
+        {filteredEventsCount} events found
+      </div>
     </div>
   );
 };
