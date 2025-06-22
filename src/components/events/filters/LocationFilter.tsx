@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { MapPin, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LocationCategory } from '@/utils/locationCategories';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface LocationFilterProps {
   availableLocations: LocationCategory[];
@@ -18,16 +19,18 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
   onLocationChange,
   isLoading = false
 }) => {
+  const isMobile = useIsMobile();
+
   if (isLoading) {
     return (
       <div className="space-y-3">
-        <h3 className="text-sm font-medium flex items-center gap-2">
+        <h3 className={`${isMobile ? 'text-base' : 'text-sm'} font-medium flex items-center gap-2`}>
           <MapPin className="h-4 w-4" />
           Location
         </h3>
         <div className="flex flex-wrap gap-2">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-8 w-20 bg-gray-200 rounded-full animate-pulse"></div>
+            <div key={i} className={`${isMobile ? 'h-9 w-24' : 'h-8 w-20'} bg-gray-200 rounded-full animate-pulse`}></div>
           ))}
         </div>
       </div>
@@ -37,7 +40,7 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium flex items-center gap-2">
+        <h3 className={`${isMobile ? 'text-base' : 'text-sm'} font-medium flex items-center gap-2`}>
           <MapPin className="h-4 w-4" />
           Location
         </h3>
@@ -59,7 +62,8 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
           size="sm"
           onClick={() => onLocationChange(null)}
           className={cn(
-            "text-xs px-3 py-1.5 h-auto rounded-full",
+            isMobile ? "text-xs px-3 py-2 h-9" : "text-xs px-3 py-1.5 h-auto",
+            "rounded-full",
             selectedLocation === null 
               ? "bg-primary text-white" 
               : "border-gray-200 text-gray-700 hover:bg-gray-50"
@@ -75,7 +79,8 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
             size="sm"
             onClick={() => onLocationChange(category.id)}
             className={cn(
-              "text-xs px-3 py-1.5 h-auto rounded-full",
+              isMobile ? "text-xs px-3 py-2 h-9" : "text-xs px-3 py-1.5 h-auto",
+              "rounded-full",
               selectedLocation === category.id 
                 ? "bg-primary text-white" 
                 : "border-gray-200 text-gray-700 hover:bg-gray-50"

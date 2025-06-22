@@ -7,8 +7,10 @@ import { EventsVibeSection } from '@/components/events/page-sections/EventsVibeS
 import { LocationFilter } from '@/components/events/filters/LocationFilter';
 import { useVenueLocationCategories } from '@/hooks/useVenueLocationCategories';
 import { EventsAdvancedSection } from '@/components/events/page-sections/EventsAdvancedSection';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Events = () => {
+  const isMobile = useIsMobile();
   const {
     events,
     isLoading,
@@ -57,48 +59,56 @@ const Events = () => {
 
   return (
     <EventsPageLayout>
-      <div className="space-y-6">
-        {/* Main Filters Row - Vibe and Location at same level */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Vibe Filter */}
-          <EventsVibeSection
-            selectedVibes={selectedVibes}
-            onVibeChange={setSelectedVibes}
-            vibes={['general', 'energetic', 'chill', 'social', 'cultural']}
-            vibesLoading={false}
-          />
+      <div className="space-y-4 sm:space-y-6">
+        {/* Main Filters - Mobile First Layout */}
+        <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 lg:grid-cols-2 gap-6'}`}>
+          {/* Vibe Filter - Full width on mobile */}
+          <div className="w-full">
+            <EventsVibeSection
+              selectedVibes={selectedVibes}
+              onVibeChange={setSelectedVibes}
+              vibes={['general', 'energetic', 'chill', 'social', 'cultural']}
+              vibesLoading={false}
+            />
+          </div>
           
-          {/* Location Filter */}
-          <LocationFilter
-            availableLocations={locationCategories}
-            selectedLocation={selectedLocation}
-            onLocationChange={setSelectedLocation}
-            isLoading={locationsLoading}
+          {/* Location Filter - Full width on mobile */}
+          <div className="w-full">
+            <LocationFilter
+              availableLocations={locationCategories}
+              selectedLocation={selectedLocation}
+              onLocationChange={setSelectedLocation}
+              isLoading={locationsLoading}
+            />
+          </div>
+        </div>
+
+        {/* Advanced Filters Section - Mobile Optimized */}
+        <div className="w-full">
+          <EventsAdvancedSection
+            onFilterChange={handleFilterChange}
+            selectedEventTypes={selectedEventTypes}
+            selectedVenues={selectedVenues}
+            selectedVibes={selectedVibes}
+            dateRange={dateRange}
+            selectedDateFilter={selectedDateFilter}
+            filteredEventsCount={filteredEventsCount}
+            allEventTypes={allEventTypes}
+            availableVenues={availableVenues}
           />
         </div>
 
-        {/* Advanced Filters Section */}
-        <EventsAdvancedSection
-          onFilterChange={handleFilterChange}
-          selectedEventTypes={selectedEventTypes}
-          selectedVenues={selectedVenues}
-          selectedVibes={selectedVibes}
-          dateRange={dateRange}
-          selectedDateFilter={selectedDateFilter}
-          filteredEventsCount={filteredEventsCount}
-          allEventTypes={allEventTypes}
-          availableVenues={availableVenues}
-        />
-
-        {/* Results Section */}
-        <EventsResultsSection
-          filteredEvents={events}
-          hasActiveFilters={hasActiveFilters}
-          resetFilters={resetAllFilters}
-          eventsLoading={isLoading}
-          isFilterLoading={false}
-          user={null}
-        />
+        {/* Results Section - Mobile Optimized */}
+        <div className="w-full">
+          <EventsResultsSection
+            filteredEvents={events}
+            hasActiveFilters={hasActiveFilters}
+            resetFilters={resetAllFilters}
+            eventsLoading={isLoading}
+            isFilterLoading={false}
+            user={null}
+          />
+        </div>
       </div>
     </EventsPageLayout>
   );
