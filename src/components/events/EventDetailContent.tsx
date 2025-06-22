@@ -1,4 +1,3 @@
-
 import React, { useMemo, useCallback } from 'react';
 import { Event } from '@/types';
 import { Separator } from '@/components/ui/separator';
@@ -90,9 +89,39 @@ const EventDetailContent = ({
     
     return addressParts.length > 0 ? addressParts.join(', ') : null;
   };
+
+  // Generate Google Maps URL for the venue
+  const getMapUrl = () => {
+    // First try the venue's Google Maps URL if available
+    if (event.venues?.google_maps) {
+      return event.venues.google_maps;
+    }
+    
+    // If venue has an address, create a Google Maps search URL
+    if (event.venues) {
+      const searchQuery = [
+        event.venues.name,
+        event.venues.street,
+        event.venues.city,
+        event.venues.postal_code
+      ].filter(Boolean).join(', ');
+      
+      if (searchQuery) {
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`;
+      }
+    }
+    
+    // Fallback to event location if available
+    if (event.location) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
+    }
+    
+    return null;
+  };
   
   const imageUrl = getEventImageUrl(event);
   const venueAddress = getVenueAddress();
+  const mapUrl = getMapUrl();
 
   return (
     <div className="w-full bg-white">
@@ -147,7 +176,7 @@ const EventDetailContent = ({
               </CardContent>
             </Card>
 
-            {/* Location Card - Enhanced with venue details */}
+            {/* Location Card - Enhanced with functional map button */}
             <Card className="bg-gray-50 border-gray-200">
               <CardContent className="p-4 sm:p-5">
                 <div className="flex items-start gap-3">
@@ -159,32 +188,30 @@ const EventDetailContent = ({
                       <p className="font-inter text-xs text-gray-500">{venueAddress}</p>
                     )}
                     {/* Venue links */}
-                    {event.venues && (event.venues.website || event.venues.google_maps) && (
-                      <div className="flex gap-3 mt-2">
-                        {event.venues.website && (
-                          <a
-                            href={event.venues.website}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-inter flex items-center gap-1"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                            Website
-                          </a>
-                        )}
-                        {event.venues.google_maps && (
-                          <a
-                            href={event.venues.google_maps}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-inter flex items-center gap-1"
-                          >
-                            <ExternalLink className="h-3 w-3" />
-                            View on Maps
-                          </a>
-                        )}
-                      </div>
-                    )}
+                    <div className="flex gap-3 mt-2">
+                      {event.venues?.website && (
+                        <a
+                          href={event.venues.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-inter flex items-center gap-1"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          Website
+                        </a>
+                      )}
+                      {mapUrl && (
+                        <a
+                          href={mapUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-inter flex items-center gap-1"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          View on Maps
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               </CardContent>
