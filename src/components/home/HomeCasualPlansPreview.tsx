@@ -2,13 +2,54 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { CasualPlanCard } from '@/components/casual-plans/CasualPlanCard';
 import { CasualPlan } from '@/types/casual-plans';
+import { Card } from '@/components/ui/card';
+import { MapPin, Clock, Users } from 'lucide-react';
+import { formatTime } from '@/utils/date-formatting';
 
 interface HomeCasualPlansPreviewProps {
   plans: CasualPlan[] | undefined;
   isLoading: boolean;
 }
+
+// Simple preview card for home page
+const SimpleCasualPlanCard: React.FC<{ plan: CasualPlan }> = ({ plan }) => {
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  return (
+    <Card className="p-4 hover:shadow-md transition-shadow">
+      <div className="space-y-3">
+        <h3 className="font-semibold text-lg leading-tight">{plan.title}</h3>
+        
+        <div className="space-y-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            <span>{formatDate(plan.date)} • {formatTime(plan.time)}</span>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <MapPin className="h-4 w-4" />
+            <span className="truncate">{plan.location}</span>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            <span>{plan.going_count || 0} going</span>
+          </div>
+        </div>
+        
+        {plan.description && (
+          <p className="text-sm text-gray-600 line-clamp-2">{plan.description}</p>
+        )}
+      </div>
+    </Card>
+  );
+};
 
 export const HomeCasualPlansPreview: React.FC<HomeCasualPlansPreviewProps> = ({
   plans,
@@ -72,7 +113,9 @@ export const HomeCasualPlansPreview: React.FC<HomeCasualPlansPreviewProps> = ({
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {plans.slice(0, 3).map((plan) => (
-            <CasualPlanCard key={plan.id} plan={plan} />
+            <Link key={plan.id} to={`/casual-plans/${plan.id}`}>
+              <SimpleCasualPlanCard plan={plan} />
+            </Link>
           ))}
         </div>
         
