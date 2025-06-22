@@ -5,15 +5,15 @@ import { EnhancedVibeFilter } from '@/components/events/EnhancedVibeFilter';
 interface EventsVibeSectionProps {
   selectedVibes: string[];
   onVibeChange: (vibes: string[]) => void;
-  vibes: string[];
-  vibesLoading: boolean;
+  vibes?: string[];
+  vibesLoading?: boolean;
 }
 
 export const EventsVibeSection: React.FC<EventsVibeSectionProps> = ({
   selectedVibes,
   onVibeChange,
-  vibes,
-  vibesLoading,
+  vibes = ['general', 'energetic', 'chill', 'social', 'cultural'],
+  vibesLoading = false,
 }) => {
   if (vibesLoading) {
     return (

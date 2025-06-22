@@ -63,7 +63,9 @@ const Events = () => {
           {/* Vibe Filter */}
           <EventsVibeSection
             selectedVibes={selectedVibes}
-            onVibesChange={setSelectedVibes}
+            onVibeChange={setSelectedVibes}
+            vibes={[]}
+            vibesLoading={false}
           />
           
           {/* Location Filter */}
@@ -90,7 +92,7 @@ const Events = () => {
 
         {/* Results Section */}
         <EventsResultsSection
-          events={events}
+          eventsList={events}
           isLoading={isLoading}
           hasActiveFilters={hasActiveFilters}
           onResetFilters={resetAllFilters}

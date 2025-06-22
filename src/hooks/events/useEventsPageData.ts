@@ -101,7 +101,8 @@ export const useEventsPageData = () => {
     return true;
   }) || [];
 
-  const { updateEventRsvp } = useRsvpStateManager(filteredEvents);
+  // Use RSVP state manager with the filtered events
+  const rsvpManager = useRsvpStateManager(filteredEvents);
 
   const hasActiveFilters = selectedVibes.length > 0 || 
                           selectedEventTypes.length > 0 || 
@@ -138,6 +139,6 @@ export const useEventsPageData = () => {
     availableVenues,
     hasActiveFilters,
     resetAllFilters,
-    updateEventRsvp
+    updateEventRsvp: rsvpManager.handleRsvp
   };
 };
