@@ -13,6 +13,7 @@ const Events = () => {
   const isMobile = useIsMobile();
   const {
     events,
+    allEvents, // Add this to get all events for vibe filtering
     isLoading,
     selectedVibes,
     selectedEventTypes,
@@ -62,13 +63,13 @@ const Events = () => {
       <div className="space-y-4 sm:space-y-6">
         {/* Main Filters - Mobile First Layout */}
         <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 lg:grid-cols-2 gap-6'}`}>
-          {/* Vibe Filter - Full width on mobile */}
+          {/* Vibe Filter - Full width on mobile, pass all events data */}
           <div className="w-full">
             <EventsVibeSection
               selectedVibes={selectedVibes}
               onVibeChange={setSelectedVibes}
-              vibes={['general', 'energetic', 'chill', 'social', 'cultural']}
-              vibesLoading={false}
+              events={allEvents || []} // Pass all events to get available vibes
+              vibesLoading={isLoading}
             />
           </div>
           

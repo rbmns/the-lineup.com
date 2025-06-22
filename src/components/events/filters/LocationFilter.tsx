@@ -24,7 +24,7 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
   if (isLoading) {
     return (
       <div className="space-y-3">
-        <h3 className={`${isMobile ? 'text-base' : 'text-sm'} font-medium flex items-center gap-2`}>
+        <h3 className={`${isMobile ? 'text-base' : 'text-sm'} font-medium flex items-center gap-2 text-primary`}>
           <MapPin className="h-4 w-4" />
           Location
         </h3>
@@ -40,7 +40,7 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h3 className={`${isMobile ? 'text-base' : 'text-sm'} font-medium flex items-center gap-2`}>
+        <h3 className={`${isMobile ? 'text-base' : 'text-sm'} font-medium flex items-center gap-2 text-primary`}>
           <MapPin className="h-4 w-4" />
           Location
         </h3>
@@ -49,7 +49,7 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
             variant="ghost"
             size="sm"
             onClick={() => onLocationChange(null)}
-            className="h-6 w-6 p-0 hover:bg-gray-100"
+            className="h-6 w-6 p-0 hover:bg-primary/10"
           >
             <X className="h-3 w-3" />
           </Button>
@@ -63,10 +63,10 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
           onClick={() => onLocationChange(null)}
           className={cn(
             isMobile ? "text-xs px-3 py-2 h-9" : "text-xs px-3 py-1.5 h-auto",
-            "rounded-full",
+            "rounded-full transition-coastal",
             selectedLocation === null 
-              ? "bg-primary text-white" 
-              : "border-gray-200 text-gray-700 hover:bg-gray-50"
+              ? "bg-primary text-white hover:bg-primary/90" 
+              : "border-gray-200 text-neutral hover:bg-primary/5"
           )}
         >
           All Areas
@@ -80,10 +80,10 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
             onClick={() => onLocationChange(category.id)}
             className={cn(
               isMobile ? "text-xs px-3 py-2 h-9" : "text-xs px-3 py-1.5 h-auto",
-              "rounded-full",
+              "rounded-full transition-coastal",
               selectedLocation === category.id 
-                ? "bg-primary text-white" 
-                : "border-gray-200 text-gray-700 hover:bg-gray-50"
+                ? "bg-primary text-white hover:bg-primary/90" 
+                : "border-gray-200 text-neutral hover:bg-primary/5"
             )}
           >
             {category.displayName}

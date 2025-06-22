@@ -130,6 +130,7 @@ export const useEventsPageData = () => {
 
   return {
     events: filteredEvents,
+    allEvents: eventsData, // Return unfiltered events for vibe detection
     isLoading: eventsLoading,
     selectedVibes,
     selectedEventTypes,

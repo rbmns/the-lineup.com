@@ -2,27 +2,39 @@
 import React from 'react';
 import { EnhancedVibeFilter } from '@/components/events/EnhancedVibeFilter';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Event } from '@/types';
 
 interface EventsVibeSectionProps {
   selectedVibes: string[];
   onVibeChange: (vibes: string[]) => void;
-  vibes?: string[];
+  events?: Event[];
   vibesLoading?: boolean;
 }
 
 export const EventsVibeSection: React.FC<EventsVibeSectionProps> = ({
   selectedVibes,
   onVibeChange,
-  vibes = ['general', 'energetic', 'chill', 'social', 'cultural'],
+  events = [],
   vibesLoading = false,
 }) => {
   const isMobile = useIsMobile();
+
+  // Get unique vibes from actual events data
+  const availableVibes = React.useMemo(() => {
+    const vibesSet = new Set<string>();
+    events.forEach(event => {
+      if (event.vibe) {
+        vibesSet.add(event.vibe);
+      }
+    });
+    return Array.from(vibesSet).sort();
+  }, [events]);
 
   if (vibesLoading) {
     return (
       <div className="space-y-3 sm:space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className={`${isMobile ? 'text-xl' : 'text-2xl md:text-3xl'} font-semibold tracking-tight`}>Find your vibe</h2>
+          <h2 className={`${isMobile ? 'text-xl' : 'text-2xl md:text-3xl'} font-semibold tracking-tight text-primary`}>Find your vibe</h2>
         </div>
         <div className="animate-pulse">
           <div className="flex gap-2 overflow-hidden">
@@ -38,16 +50,16 @@ export const EventsVibeSection: React.FC<EventsVibeSectionProps> = ({
   // Update the count display logic
   const getCountDisplay = () => {
     if (selectedVibes.length === 0) {
-      return `Showing all events (${vibes.length} vibes available)`;
+      return `Showing all events (${availableVibes.length} vibes available)`;
     }
-    return `${selectedVibes.length} of ${vibes.length} vibes selected`;
+    return `${selectedVibes.length} of ${availableVibes.length} vibes selected`;
   };
 
   return (
     <div className="space-y-3 sm:space-y-4 md:space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className={`${isMobile ? 'text-xl' : 'text-2xl md:text-3xl'} font-semibold tracking-tight`}>Find your vibe</h2>
-        <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-600`}>
+        <h2 className={`${isMobile ? 'text-xl' : 'text-2xl md:text-3xl'} font-semibold tracking-tight text-primary`}>Find your vibe</h2>
+        <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-neutral-50`}>
           {getCountDisplay()}
         </div>
       </div>
@@ -56,7 +68,7 @@ export const EventsVibeSection: React.FC<EventsVibeSectionProps> = ({
         <EnhancedVibeFilter
           selectedVibes={selectedVibes}
           onVibeChange={onVibeChange}
-          vibes={vibes}
+          vibes={availableVibes}
           isLoading={vibesLoading}
           className="w-full"
         />
