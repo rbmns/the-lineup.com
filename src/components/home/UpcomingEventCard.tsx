@@ -72,7 +72,7 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
           <div className="absolute top-4 left-4 z-10">
             <CategoryPill 
               category={event.event_category} 
-              size="md"
+              size="sm"
             />
           </div>
         )}
@@ -81,7 +81,7 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
         <div className="absolute top-4 right-4 z-10">
           <EventVibeLabel 
             vibe={event.vibe || 'general'} 
-            size="md"
+            size="sm"
           />
         </div>
       </div>

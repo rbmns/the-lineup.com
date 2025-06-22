@@ -2,7 +2,7 @@
 import React from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { CategoryPill } from "@/components/ui/category-pill";
-import { UpcomingEventCard, ViewAllCard } from "./UpcomingEventCard";
+import { UpcomingEventCard } from "./UpcomingEventCard";
 import { Event } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -72,13 +72,19 @@ export const UpcomingEventsSection: React.FC<UpcomingEventsSectionProps> = ({
                   key={event.id}
                   event={event}
                   onClick={handleEventClick}
-                  showCategory={true}
                   className="shrink-0"
                 />
               ))}
-              {/* Instead of an event, last card is "View All" if there are more events */}
+              {/* View All button if there are more events */}
               {filteredEvents.length > 4 && (
-                <ViewAllCard onClick={() => navigate("/events")} />
+                <div className="shrink-0 flex items-center justify-center min-w-[300px] p-6">
+                  <button 
+                    onClick={() => navigate("/events")}
+                    className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                  >
+                    View All Events
+                  </button>
+                </div>
               )}
             </>
           ) : (
