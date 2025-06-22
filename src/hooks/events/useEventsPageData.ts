@@ -65,18 +65,18 @@ export const useEventsPageData = () => {
     }
   });
 
-  // Keep event types query unchanged
+  // Keep event types query unchanged - using event_category instead of event_type
   const { data: allEventTypes = [] } = useQuery({
     queryKey: ['event-types'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('events')
-        .select('event_type')
-        .not('event_type', 'is', null);
+        .select('event_category')
+        .not('event_category', 'is', null);
 
       if (error) throw error;
       
-      const uniqueTypes = [...new Set(data?.map(item => item.event_type).filter(Boolean) || [])];
+      const uniqueTypes = [...new Set(data?.map(item => item.event_category).filter(Boolean) || [])];
       return uniqueTypes;
     }
   });
@@ -100,7 +100,7 @@ export const useEventsPageData = () => {
     // Keep all other existing filtering logic unchanged
     if (selectedEventTypes.length > 0) {
       filtered = filtered.filter(event => 
-        event.event_type && selectedEventTypes.includes(event.event_type)
+        event.event_category && selectedEventTypes.includes(event.event_category)
       );
     }
 
