@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -53,11 +54,11 @@ const EventDetail = () => {
   }
 
   if (error) {
-    return <EventDetailErrorState message={error.message} />;
+    return <EventDetailErrorState />;
   }
 
   if (!event) {
-    return <EventDetailErrorState message="Event not found" />;
+    return <EventDetailErrorState />;
   }
 
   return (
