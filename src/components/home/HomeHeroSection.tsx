@@ -23,13 +23,13 @@ export const HomeHeroSection: React.FC = () => {
 
   const handleScrollDown = () => {
     window.scrollTo({ 
-      top: window.innerHeight, 
+      top: window.innerHeight * 0.9, 
       behavior: 'smooth' 
     });
   };
 
   return (
-    <section className="relative py-20 md:py-32 min-h-screen flex flex-col justify-between overflow-hidden">
+    <section className="relative min-h-[100svh] flex flex-col justify-between overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
@@ -42,24 +42,24 @@ export const HomeHeroSection: React.FC = () => {
       {/* Coral Overlay */}
       <div className="absolute inset-0 z-10 bg-vibrant-coral/20"></div>
 
-      {/* Content */}
-      <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex-1 flex flex-col justify-center">
-        {/* Main heading */}
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
+      {/* Content - Optimized for mobile viewport */}
+      <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex-1 flex flex-col justify-center pt-4 pb-8">
+        {/* Main heading - Responsive text sizing */}
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight drop-shadow-lg">
           Find events and plans that fit your vibe
         </h1>
 
         {/* Subtitle */}
-        <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed mb-8 drop-shadow-md">
+        <p className="text-lg sm:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed mb-6 sm:mb-8 drop-shadow-md">
           Discover what's happening nearby — join events, see who's going, and stay connected after.
         </p>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+        {/* CTA Buttons - Consistent styling */}
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
           <Button
             onClick={handleExploreEvents}
             size="lg"
-            className="bg-primary text-white hover:bg-primary/90 px-8 py-4 text-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+            className="w-full sm:w-auto bg-primary text-white hover:bg-primary/90 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl border-0"
           >
             Explore Events
           </Button>
@@ -67,22 +67,22 @@ export const HomeHeroSection: React.FC = () => {
             onClick={handleCreateProfile}
             variant="outline"
             size="lg"
-            className="border-2 border-white/30 text-white bg-white/10 backdrop-blur-sm hover:bg-white/20 px-8 py-4 text-lg font-medium transition-all duration-300"
+            className="w-full sm:w-auto border-2 border-white/30 text-white bg-white/10 backdrop-blur-sm hover:bg-white/20 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium transition-all duration-300"
           >
             {isAuthenticated ? 'View Profile' : 'Create Profile'}
           </Button>
         </div>
       </div>
 
-      {/* Scroll Down Arrow */}
-      <div className="relative z-20 flex justify-center pb-8">
+      {/* Scroll Down Arrow - Only show on larger screens */}
+      <div className="relative z-20 hidden sm:flex justify-center pb-6 sm:pb-8">
         <button
           onClick={handleScrollDown}
           className="flex flex-col items-center text-white/80 hover:text-white transition-colors duration-300 group"
           aria-label="Scroll down"
         >
-          <ChevronDown className="h-8 w-8 animate-bounce group-hover:animate-none transition-all duration-300" />
-          <span className="text-sm mt-1 opacity-80">Scroll down</span>
+          <ChevronDown className="h-6 w-6 sm:h-8 sm:w-8 animate-bounce group-hover:animate-none transition-all duration-300" />
+          <span className="text-xs sm:text-sm mt-1 opacity-80">Scroll down</span>
         </button>
       </div>
     </section>

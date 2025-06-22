@@ -13,7 +13,7 @@ import { useScrollToTop } from "@/hooks/useScrollToTop";
 const TOP_NAV_HEIGHT_MOBILE = 64; // Single nav height
 const TOP_NAV_HEIGHT_DESKTOP = 64; // Desktop nav height
 const LEFT_SIDEBAR_WIDTH = 80; // px, matches w-20
-const MOBILE_BOTTOM_NAV_HEIGHT = 80; // Increased for better iPhone compatibility
+const MOBILE_BOTTOM_NAV_HEIGHT = 88; // Fixed height for consistency
 
 const Layout = () => {
   const { user, loading } = useAuth();
@@ -24,6 +24,14 @@ const Layout = () => {
 
   // Scroll to top on route changes (except for RSVP actions)
   useScrollToTop();
+
+  // Add viewport meta tag optimization
+  useEffect(() => {
+    const viewportMeta = document.querySelector('meta[name="viewport"]');
+    if (viewportMeta) {
+      viewportMeta.setAttribute('content', 'width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=0');
+    }
+  }, []);
 
   const topNavHeight = isMobile ? TOP_NAV_HEIGHT_MOBILE : TOP_NAV_HEIGHT_DESKTOP;
 
@@ -61,6 +69,7 @@ const Layout = () => {
               : {
                   paddingTop: topNavHeight,
                   paddingBottom: MOBILE_BOTTOM_NAV_HEIGHT,
+                  minHeight: `calc(100vh - ${topNavHeight + MOBILE_BOTTOM_NAV_HEIGHT}px)`,
                 }
           }
         >
@@ -75,13 +84,14 @@ const Layout = () => {
         </div>
       </div>
 
-      {/* Mobile Navigation - Fixed to bottom without border */}
+      {/* Mobile Navigation - Fixed to bottom with consistent height */}
       {isMobile && (
         <div 
-          className="fixed bottom-0 left-0 right-0 bg-white z-50"
+          className="fixed bottom-0 left-0 right-0 bg-white z-50 border-t border-gray-100"
           style={{ 
             height: MOBILE_BOTTOM_NAV_HEIGHT,
-            paddingBottom: 'env(safe-area-inset-bottom, 20px)'
+            paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+            minHeight: MOBILE_BOTTOM_NAV_HEIGHT
           }}
         >
           <LeftSidebar />

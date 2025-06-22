@@ -1,121 +1,103 @@
 
 import React from 'react';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
-import { useAuth } from '@/contexts/AuthContext';
+import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayout';
+import { EventsResultsSection } from '@/components/events/page-sections/EventsResultsSection';
 import { EventsVibeSection } from '@/components/events/page-sections/EventsVibeSection';
+import { LocationFilter } from '@/components/events/filters/LocationFilter';
+import { useVenueLocations } from '@/hooks/useVenueLocations';
 import { EventsAdvancedSection } from '@/components/events/page-sections/EventsAdvancedSection';
-import { LazyEventsList } from '@/components/events/LazyEventsList';
-import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
 
 const Events = () => {
-  const { user } = useAuth();
   const {
-    filteredEvents,
-    eventsLoading,
-    selectedEventTypes,
-    setSelectedEventTypes,
-    selectedVenues,
-    setSelectedVenues,
+    events,
+    isLoading,
     selectedVibes,
-    setSelectedVibes,
+    selectedEventTypes,
+    selectedVenues,
+    selectedLocation,
     dateRange,
-    setDateRange,
     selectedDateFilter,
+    setSelectedVibes,
+    setSelectedEventTypes,
+    setSelectedVenues,
+    setSelectedLocation,
+    setDateRange,
     setSelectedDateFilter,
-    isFilterLoading,
-    hasActiveFilters,
-    resetFilters,
-    enhancedHandleRsvp,
-    loadingEventId,
-    vibes,
-    vibesLoading,
     allEventTypes,
-    availableVenues
+    availableVenues,
+    hasActiveFilters,
+    resetAllFilters
   } = useEventsPageData();
 
-  const handleAdvancedFilterChange = (filters: any) => {
-    console.log('Advanced filter change:', filters);
-    
-    if (filters.eventTypes) {
+  const { data: venueLocations = [], isLoading: locationsLoading } = useVenueLocations();
+
+  const handleFilterChange = (filters: any) => {
+    if (filters.eventTypes !== undefined) {
       setSelectedEventTypes(filters.eventTypes);
     }
-    if (filters.venues) {
+    if (filters.venues !== undefined) {
       setSelectedVenues(filters.venues);
     }
-    if (filters.date) {
-      // Fix: Properly handle Date to DateRange conversion
-      setDateRange({ from: filters.date, to: filters.date });
+    if (filters.vibes !== undefined) {
+      setSelectedVibes(filters.vibes);
     }
-    if (filters.dateFilter && filters.dateFilter !== 'Any Date') {
-      setSelectedDateFilter(filters.dateFilter.toLowerCase());
+    if (filters.location !== undefined) {
+      setSelectedLocation(filters.location);
+    }
+    if (filters.date !== undefined) {
+      setDateRange(filters.date);
+    }
+    if (filters.dateFilter !== undefined) {
+      setSelectedDateFilter(filters.dateFilter);
     }
   };
 
-  const showNoExactMatchesMessage = hasActiveFilters && filteredEvents.length === 0;
+  const filteredEventsCount = events?.length || 0;
 
   return (
-    <div className="w-full bg-gradient-to-b from-secondary-25 to-white min-h-screen">
-      {/* Hero Section */}
-      <section className="py-20 md:py-32 bg-gradient-to-b from-white to-secondary-25">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary mb-6 leading-tight">
-            Find events that fit your <span className="text-vibrant-seafoam">vibe</span>
-          </h1>
-          <p className="text-xl text-neutral max-w-3xl mx-auto leading-relaxed mb-8">
-            Discover what's happening nearby — from beach parties to chill yoga sessions. Join when you want, connect if you want.
-          </p>
-          <div className="flex justify-center items-center gap-6 text-2xl opacity-60">
-            <span>🌊</span>
-            <span>🧘</span>
-            <span>🎶</span>
-            <span>🏖️</span>
-            <span>🎨</span>
-          </div>
-        </div>
-      </section>
-
-      {/* Content */}
-      <div className="bg-white">
-        <div className="space-y-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto py-12">
-          {/* Vibe Filter Section */}
+    <EventsPageLayout>
+      <div className="space-y-6">
+        {/* Main Filters Row - Vibe and Location at same level */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Vibe Filter */}
           <EventsVibeSection
             selectedVibes={selectedVibes}
-            onVibeChange={setSelectedVibes}
-            vibes={vibes}
-            vibesLoading={vibesLoading}
+            onVibesChange={setSelectedVibes}
           />
-
-          {/* Advanced Filters Section */}
-          <EventsAdvancedSection
-            onFilterChange={handleAdvancedFilterChange}
-            selectedEventTypes={selectedEventTypes}
-            selectedVenues={selectedVenues}
-            selectedVibes={selectedVibes}
-            dateRange={dateRange}
-            selectedDateFilter={selectedDateFilter}
-            filteredEventsCount={filteredEvents.length}
-            allEventTypes={allEventTypes}
-            availableVenues={availableVenues}
-          />
-
-          {/* No Results Message */}
-          {showNoExactMatchesMessage && (
-            <NoResultsFound resetFilters={resetFilters} />
-          )}
-
-          {/* Events List */}
-          <LazyEventsList 
-            mainEvents={filteredEvents}
-            relatedEvents={[]}
-            isLoading={eventsLoading || isFilterLoading}
-            onRsvp={user ? enhancedHandleRsvp : undefined}
-            showRsvpButtons={!!user}
-            hasActiveFilters={hasActiveFilters}
-            loadingEventId={loadingEventId}
+          
+          {/* Location Filter */}
+          <LocationFilter
+            availableLocations={venueLocations}
+            selectedLocation={selectedLocation}
+            onLocationChange={setSelectedLocation}
+            isLoading={locationsLoading}
           />
         </div>
+
+        {/* Advanced Filters Section */}
+        <EventsAdvancedSection
+          onFilterChange={handleFilterChange}
+          selectedEventTypes={selectedEventTypes}
+          selectedVenues={selectedVenues}
+          selectedVibes={selectedVibes}
+          dateRange={dateRange}
+          selectedDateFilter={selectedDateFilter}
+          filteredEventsCount={filteredEventsCount}
+          allEventTypes={allEventTypes}
+          availableVenues={availableVenues}
+        />
+
+        {/* Results Section */}
+        <EventsResultsSection
+          events={events}
+          isLoading={isLoading}
+          hasActiveFilters={hasActiveFilters}
+          onResetFilters={resetAllFilters}
+          filteredEventsCount={filteredEventsCount}
+        />
       </div>
-    </div>
+    </EventsPageLayout>
   );
 };
 

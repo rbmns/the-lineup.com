@@ -8,7 +8,6 @@ import { format } from 'date-fns';
 import { useEventImages } from '@/hooks/useEventImages';
 import { LineupImage } from '@/components/ui/lineup-image';
 import { useAuth } from '@/contexts/AuthContext';
-import { CategoryPill } from '@/components/ui/category-pill';
 import EventVibeLabel from '@/components/polymet/event-vibe-label';
 import { formatEventCardDateTime } from '@/utils/date-formatting';
 import { Card } from '@/components/ui/card';
@@ -85,7 +84,7 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
                   className="flex flex-col h-full overflow-hidden cursor-pointer transition-all duration-300 ease-in-out hover:shadow-xl bg-white border border-gray-200 rounded-xl group"
                   onClick={() => navigate(`/events/${event.id}`)}
                 >
-                  {/* Image with category and vibe pills - larger than events page */}
+                  {/* Image with vibe pill only - removed category pill */}
                   <div className="relative w-full h-64 overflow-hidden bg-gray-100 flex-shrink-0">
                     <LineupImage
                       src={imageUrl}
@@ -101,18 +100,8 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
                         }
                       }}
                     />
-                    
-                    {/* Category pill - top left */}
-                    {event.event_category && (
-                      <div className="absolute top-3 left-3 z-10">
-                        <CategoryPill 
-                          category={event.event_category} 
-                          size="sm"
-                        />
-                      </div>
-                    )}
 
-                    {/* Event vibe pill - top right */}
+                    {/* Event vibe pill - top right only */}
                     <div className="absolute top-3 right-3 z-10">
                       <EventVibeLabel 
                         vibe={event.vibe || 'general'} 
@@ -150,7 +139,7 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
                       </span>
                     </div>
 
-                    {/* Attendees and Join Button */}
+                    {/* Attendees and Join Button - removed "be the first to join" text */}
                     <div className="flex items-center justify-between mt-auto pt-4">
                       {(event.going_count || event.interested_count) ? (
                         <div className="flex items-center gap-2 text-neutral">
@@ -160,7 +149,7 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
                           </span>
                         </div>
                       ) : (
-                        <span className="text-sm text-neutral">Be the first to join</span>
+                        <div></div>
                       )}
                       
                       {/* Only show join button for authenticated users */}
@@ -187,7 +176,7 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
           })}
         </div>
 
-        {/* View All Button */}
+        {/* View All Button - Consistent styling */}
         <div className="text-center">
           <Button
             onClick={() => navigate('/events')}

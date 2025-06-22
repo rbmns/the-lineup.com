@@ -2,3 +2,38 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Global button consistency */
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary/90 border-0 font-medium transition-all duration-300;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-primary/20 text-primary hover:bg-primary/5 font-medium transition-all duration-300;
+  }
+  
+  .btn-ghost {
+    @apply text-primary hover:bg-primary/5 font-medium transition-all duration-300;
+  }
+}
+
+/* iOS Safari viewport fix */
+@supports (-webkit-touch-callout: none) {
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Mobile viewport optimization */
+@media screen and (max-width: 768px) {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+  }
+  
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
