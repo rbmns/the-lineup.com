@@ -38,7 +38,7 @@ export const EnhancedVibeFilter: React.FC<EnhancedVibeFilterProps> = ({
 
   if (isLoading) {
     return (
-      <div className={cn("flex flex-wrap gap-2", className)}>
+      <div className={cn("flex gap-2 overflow-x-auto pb-2", className)}>
         {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="h-10 bg-gray-200 rounded-full w-20 flex-shrink-0 animate-pulse"></div>
         ))}
@@ -47,7 +47,7 @@ export const EnhancedVibeFilter: React.FC<EnhancedVibeFilterProps> = ({
   }
 
   return (
-    <div className={cn("flex flex-wrap gap-2", className)}>
+    <div className={cn("flex gap-2 overflow-x-auto pb-2 scrollbar-hide", className)}>
       {/* All button - shows all events when selected */}
       <button
         className={cn(

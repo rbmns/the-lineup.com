@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
 import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayout';
@@ -7,20 +8,9 @@ import { LocationFilter } from '@/components/events/filters/LocationFilter';
 import { useVenueLocationCategories } from '@/hooks/useVenueLocationCategories';
 import { EventsAdvancedSection } from '@/components/events/page-sections/EventsAdvancedSection';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useMetaTags } from '@/hooks/useMetaTags';
 
 const Events = () => {
   const isMobile = useIsMobile();
-
-  // Set meta tags for events page
-  useMetaTags({
-    title: 'Discover Local Events & Activities | the lineup',
-    description: 'Explore a variety of local events, from surf and yoga to community-driven activities. Join exciting experiences and connect with others.',
-    image: 'https://vbxhcqlcbusqwsqesoxw.supabase.co/storage/v1/object/public/branding//OG%20Image.png',
-    url: `${window.location.origin}/events`,
-    type: 'website'
-  });
-
   const {
     events,
     allEvents,
