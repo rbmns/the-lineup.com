@@ -5,6 +5,9 @@ import { Event } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Calendar, Clock, MapPin, Users } from 'lucide-react';
 import { format } from 'date-fns';
+import { useEventImages } from '@/hooks/useEventImages';
+import { LineupImage } from '@/components/ui/lineup-image';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface HomeEventsPreviewProps {
   events: Event[] | undefined;
@@ -16,6 +19,7 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
   isLoading
 }) => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const displayEvents = events?.slice(0, 6) || [];
 
@@ -28,11 +32,14 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl p-6 animate-pulse">
-                <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                <div className="h-3 bg-gray-200 rounded mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded mb-4"></div>
-                <div className="h-8 bg-gray-200 rounded"></div>
+              <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
+                <div className="h-48 bg-gray-200"></div>
+                <div className="p-6">
+                  <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                  <div className="h-3 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-3 bg-gray-200 rounded mb-4"></div>
+                  <div className="h-8 bg-gray-200 rounded"></div>
+                </div>
               </div>
             ))}
           </div>
@@ -52,70 +59,101 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {displayEvents.map((event) => (
-            <div 
-              key={event.id}
-              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer border border-gray-100"
-              onClick={() => navigate(`/events/${event.id}`)}
-            >
-              {/* Event Title */}
-              <h3 className="font-semibold text-primary text-lg mb-3 line-clamp-2">
-                {event.title}
-              </h3>
+          {displayEvents.map((event) => {
+            const EventCardContent = () => {
+              const { getEventImageUrl } = useEventImages();
+              const imageUrl = getEventImageUrl(event);
 
-              {/* Date & Time */}
-              <div className="flex items-center gap-2 text-neutral mb-2">
-                <Calendar className="h-4 w-4" />
-                <span className="text-sm">
-                  {event.start_date ? format(new Date(event.start_date), 'MMM d') : 'TBD'}
-                  {event.start_time && ` at ${event.start_time.substring(0, 5)}`}
-                </span>
-              </div>
-
-              {/* Location */}
-              {(event.venues?.name || event.location) && (
-                <div className="flex items-center gap-2 text-neutral mb-3">
-                  <MapPin className="h-4 w-4" />
-                  <span className="text-sm truncate">
-                    {event.venues?.name || event.location}
-                  </span>
-                </div>
-              )}
-
-              {/* Vibe/Category */}
-              {event.event_category && (
-                <div className="inline-block px-3 py-1 bg-vibrant-seafoam/10 text-vibrant-seafoam rounded-full text-xs font-medium mb-3">
-                  {event.event_category}
-                </div>
-              )}
-
-              {/* Attendees */}
-              <div className="flex items-center justify-between">
-                {(event.going_count || event.interested_count) ? (
-                  <div className="flex items-center gap-2 text-neutral">
-                    <Users className="h-4 w-4" />
-                    <span className="text-sm">
-                      {(event.going_count || 0) + (event.interested_count || 0)} going
-                    </span>
-                  </div>
-                ) : (
-                  <span className="text-sm text-neutral">Be the first to join</span>
-                )}
-                
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-primary/20 text-primary hover:bg-primary/5"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/events/${event.id}`);
-                  }}
+              return (
+                <div 
+                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer border border-gray-100"
+                  onClick={() => navigate(`/events/${event.id}`)}
                 >
-                  Join
-                </Button>
-              </div>
-            </div>
-          ))}
+                  {/* Event Image */}
+                  <div className="relative h-48 overflow-hidden">
+                    <LineupImage
+                      src={imageUrl}
+                      alt={event.title}
+                      aspectRatio="video"
+                      treatment="subtle-overlay"
+                      overlayVariant="ocean"
+                      className="w-full h-full"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        if (!target.src.includes('/img/default.jpg')) {
+                          target.src = "/img/default.jpg";
+                        }
+                      }}
+                    />
+                  </div>
+
+                  <div className="p-6">
+                    {/* Event Title */}
+                    <h3 className="font-semibold text-primary text-lg mb-3 line-clamp-2">
+                      {event.title}
+                    </h3>
+
+                    {/* Date & Time */}
+                    <div className="flex items-center gap-2 text-neutral mb-2">
+                      <Calendar className="h-4 w-4" />
+                      <span className="text-sm">
+                        {event.start_date ? format(new Date(event.start_date), 'MMM d') : 'TBD'}
+                        {event.start_time && ` at ${event.start_time.substring(0, 5)}`}
+                      </span>
+                    </div>
+
+                    {/* Location */}
+                    {(event.venues?.name || event.location) && (
+                      <div className="flex items-center gap-2 text-neutral mb-3">
+                        <MapPin className="h-4 w-4" />
+                        <span className="text-sm truncate">
+                          {event.venues?.name || event.location}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Vibe/Category */}
+                    {event.event_category && (
+                      <div className="inline-block px-3 py-1 bg-vibrant-seafoam/10 text-vibrant-seafoam rounded-full text-xs font-medium mb-3">
+                        {event.event_category}
+                      </div>
+                    )}
+
+                    {/* Attendees and Join Button */}
+                    <div className="flex items-center justify-between">
+                      {(event.going_count || event.interested_count) ? (
+                        <div className="flex items-center gap-2 text-neutral">
+                          <Users className="h-4 w-4" />
+                          <span className="text-sm">
+                            {(event.going_count || 0) + (event.interested_count || 0)} going
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-sm text-neutral">Be the first to join</span>
+                      )}
+                      
+                      {/* Only show join button for authenticated users */}
+                      {isAuthenticated && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-primary/20 text-primary hover:bg-primary/5"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/events/${event.id}`);
+                          }}
+                        >
+                          Join
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            };
+
+            return <EventCardContent key={event.id} />;
+          })}
         </div>
 
         {/* View All Button */}
