@@ -32,14 +32,20 @@ export const EventsVibeSection: React.FC<EventsVibeSectionProps> = ({
     );
   }
 
+  // Update the count display logic
+  const getCountDisplay = () => {
+    if (selectedVibes.length === 0) {
+      return `Select vibes to see events (${vibes.length} available)`;
+    }
+    return `${selectedVibes.length} of ${vibes.length} vibes selected`;
+  };
+
   return (
     <div className="space-y-4 md:space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">Find your vibe</h2>
         <div className="text-sm text-gray-600">
-          {selectedVibes.length === vibes.length || selectedVibes.length === 0 
-            ? `All vibes (${vibes.length})` 
-            : `${selectedVibes.length} of ${vibes.length} vibes`}
+          {getCountDisplay()}
         </div>
       </div>
       
