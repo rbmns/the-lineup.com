@@ -33,7 +33,7 @@ const Login = () => {
         {/* Welcome Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-            Welcome back
+            Sign in to your account
           </h1>
           <p className="text-lg text-neutral">
             Ready to find your next adventure?
@@ -57,12 +57,6 @@ const Login = () => {
               onToggleMode={handleToggleMode}
               onForgotPassword={handleForgotPassword}
             />
-            <p className="text-center text-sm text-neutral">
-              Don't have an account?{' '}
-              <Link to="/signup" className="font-medium text-vibrant-seafoam hover:text-vibrant-seafoam/80 transition-colors">
-                Sign up
-              </Link>
-            </p>
           </CardContent>
         </Card>
       </div>

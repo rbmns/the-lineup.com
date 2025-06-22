@@ -5,9 +5,10 @@ import { LoginErrorDisplay } from '@/components/auth/LoginErrorDisplay';
 import { RateLimitWarning } from '@/components/auth/RateLimitWarning';
 import { DebugInfo } from '@/components/auth/DebugInfo';
 import { LoginFormFields } from '@/components/auth/LoginFormFields';
-import { LoginFooter } from '@/components/auth/LoginFooter';
 import { useAuth } from '@/contexts/AuthContext';
 import GoogleAuthButton from './GoogleAuthButton';
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 interface LoginFormProps {
   onToggleMode?: () => void;
@@ -89,12 +90,29 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         onSubmit={handleSubmit}
       />
       
-      {(onToggleMode || onForgotPassword) && (
-        <LoginFooter
-          onToggleMode={onToggleMode || (() => {})}
-          onForgotPassword={onForgotPassword || (() => {})}
-        />
-      )}
+      <div className="text-sm text-center text-gray-500 space-y-2 mt-4">
+        <p>
+          Don't have an account?{' '}
+          <button 
+            onClick={onToggleMode}
+            className="text-vibrant-seafoam hover:text-vibrant-seafoam/80 font-medium transition-colors"
+            type="button"
+          >
+            Sign up
+          </button>
+        </p>
+        {onForgotPassword && (
+          <p>
+            <button 
+              onClick={onForgotPassword}
+              className="text-vibrant-seafoam hover:text-vibrant-seafoam/80 transition-colors"
+              type="button"
+            >
+              Forgot password?
+            </button>
+          </p>
+        )}
+      </div>
     </>
   );
 };
