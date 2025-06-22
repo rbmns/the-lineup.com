@@ -5,73 +5,73 @@
 @layer base {
   :root {
     --background: 244 231 211; /* #F4E7D3 - Sand Beige */
-    --foreground: 0 95 115; /* #005F73 - Ocean Deep */
+    --foreground: 0 56 64; /* #003840 - Much darker Ocean Deep */
 
     --card: 255 255 255; /* #FFFFFF */
-    --card-foreground: 0 95 115;
+    --card-foreground: 0 56 64;
     
-    --primary: 0 95 115; /* #005F73 - Ocean Deep */
+    --primary: 0 56 64; /* #003840 - Much darker Ocean Deep */
     --primary-foreground: 255 255 255;
 
     --secondary: 244 231 211; /* #F4E7D3 - Sand Beige */
-    --secondary-foreground: 0 95 115;
+    --secondary-foreground: 0 56 64;
 
-    --muted: 140 140 137; /* #8C8C89 - Driftwood Gray */
-    --muted-foreground: 0 95 115;
+    --muted: 74 74 72; /* #4A4A48 - Much darker Driftwood Gray */
+    --muted-foreground: 0 56 64;
 
     --accent: 102 178 178; /* #66B2B2 - Seafoam */
-    --accent-foreground: 0 95 115;
+    --accent-foreground: 0 56 64;
 
     --destructive: 255 107 74; /* #FF6B4A - Coral */
     --destructive-foreground: 255 255 255;
 
     --border: 249 243 233; /* #F9F3E9 - Lighter Sand Beige */
     --input: 249 243 233;
-    --ring: 0 95 115;
+    --ring: 0 56 64;
 
     --radius: 1rem;
   }
 
   html, body {
     background: linear-gradient(to bottom, #F4E7D3 0%, #FFFFFF 100%);
-    color: #005F73;
+    color: #003840; /* Updated to much darker teal */
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    color: #005F73;
+    color: #003840 !important; /* Updated to much darker teal */
     @apply font-semibold uppercase tracking-wide;
   }
 
   .text-ocean {
-    color: #005F73 !important;
+    color: #003840 !important; /* Updated to much darker teal */
   }
 }
 
 /* Utility classes for brand look */
 @layer utilities {
   .shadow-ocean {
-    box-shadow: 0 4px 24px 0 rgba(0,95,115,0.08) !important;
+    box-shadow: 0 4px 24px 0 rgba(0,56,64,0.08) !important; /* Updated to darker teal */
   }
   .shadow-card-lg {
-    box-shadow: 0 8px 40px 0 rgba(0,95,115,0.10) !important;
+    box-shadow: 0 8px 40px 0 rgba(0,56,64,0.10) !important; /* Updated to darker teal */
   }
   .bg-accent-gradient {
-    background: linear-gradient(135deg, #005F73, #66B2B2) !important;
+    background: linear-gradient(135deg, #003840, #66B2B2) !important; /* Updated to darker teal */
   }
   .badge-pastel-ocean {
     background-color: #E6EEF0 !important;
-    color: #005F73 !important;
+    color: #003840 !important; /* Updated to darker teal */
   }
   .badge-pastel-coral {
     background-color: #F9F3E9 !important;
     color: #FF6B4A !important;
   }
   .hover-soft-tint-ocean:hover {
-    background-color: rgba(0,95,115,0.08) !important;
+    background-color: rgba(0,56,64,0.08) !important; /* Updated to darker teal */
     transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
-    box-shadow: 0 2px 8px 0 rgba(0,95,115,0.07);
+    box-shadow: 0 2px 8px 0 rgba(0,56,64,0.07); /* Updated to darker teal */
   }
   .hover-soft-tint-coral:hover {
     background-color: rgba(255,107,74,0.08) !important;
@@ -93,12 +93,12 @@
 .input-search-coastal {
   background: #FFF !important;
   border: 1px solid #F9F3E9 !important;
-  box-shadow: 0 2px 8px 0 rgba(0,95,115,0.05);
-  color: #005F73;
+  box-shadow: 0 2px 8px 0 rgba(0,56,64,0.05); /* Updated to darker teal */
+  color: #003840; /* Updated to darker teal */
   padding-left: 2.5rem !important;
   transition: border 0.15s, box-shadow 0.15s;
 }
 .input-search-coastal:focus {
-  border: 1.5px solid #005F73 !important;
+  border: 1.5px solid #003840 !important; /* Updated to darker teal */
   box-shadow: 0 0 0 2px #66B2B255;
 }

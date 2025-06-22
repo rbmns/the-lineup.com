@@ -14,13 +14,19 @@ export const HomeAudienceTiles: React.FC = () => {
       icon: MapPin,
       color: "bg-vibrant-seafoam/10 border-vibrant-seafoam/20",
       iconColor: "text-vibrant-seafoam",
+      buttonText: "New in town or visiting?",
+      hasButton: true,
+      route: "/events"
     },
     {
-      title: "Local Enthusiast", 
+      title: "Locals", 
       description: "Stay in the loop with events and casual plans around you.",
       icon: Users,
       color: "bg-primary/10 border-primary/20",
       iconColor: "text-primary",
+      buttonText: "Explore Local Events",
+      hasButton: true,
+      route: "/events"
     },
     {
       title: "Event Organizer",
@@ -28,7 +34,9 @@ export const HomeAudienceTiles: React.FC = () => {
       icon: Calendar,
       color: "bg-vibrant-sunset/10 border-vibrant-sunset/20",
       iconColor: "text-vibrant-sunset",
+      buttonText: "Create an Event",
       hasButton: true,
+      route: "/events/create"
     }
   ];
 
@@ -58,14 +66,20 @@ export const HomeAudienceTiles: React.FC = () => {
                   {type.description}
                 </p>
 
-                {/* Button for Organizer */}
+                {/* Button */}
                 {type.hasButton && (
                   <Button
-                    onClick={() => navigate('/events/create')}
+                    onClick={() => navigate(type.route)}
                     variant="outline"
-                    className="w-full border-vibrant-sunset/30 text-vibrant-sunset hover:bg-vibrant-sunset/5"
+                    className={`w-full ${
+                      type.title === "Event Organizer" 
+                        ? "border-vibrant-sunset/30 text-vibrant-sunset hover:bg-vibrant-sunset/5"
+                        : type.title === "Explorer"
+                        ? "border-vibrant-seafoam/30 text-vibrant-seafoam hover:bg-vibrant-seafoam/5"
+                        : "border-primary/30 text-primary hover:bg-primary/5"
+                    }`}
                   >
-                    Create an Event
+                    {type.buttonText}
                   </Button>
                 )}
               </div>

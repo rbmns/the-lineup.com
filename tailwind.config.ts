@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss"
 
 const config = {
@@ -27,12 +26,12 @@ const config = {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "#F4E7D3", // Updated to Sand Beige
-        foreground: "#005F73", // Updated to Ocean Deep
+        foreground: "#003840", // Updated to much darker teal (almost black)
         primary: {
-          DEFAULT: "#005F73", // Ocean Deep - Primary brand color
-          75: "#337D8D", // Lighter shade of Ocean Deep
-          50: "#669BA7", // Even lighter shade
-          25: "#99B9C1", // Very light shade
+          DEFAULT: "#003840", // Much darker Ocean Deep - almost black teal
+          75: "#005F73", // Original Ocean Deep as lighter shade
+          50: "#337D8D", // Lighter shade of Ocean Deep
+          25: "#669BA7", // Even lighter shade
           10: "#E6EEF0", // Almost white with a hint of Ocean Deep
           foreground: "#FFFFFF",
         },
@@ -41,7 +40,7 @@ const config = {
           50: "#F9F3E9", // Lighter Sand Beige
           25: "#FCF9F4", // Even lighter Sand Beige
           10: "#FEFCFA", // Almost white with a hint of Sand Beige
-          foreground: "#005F73",
+          foreground: "#003840", // Updated to darker teal
         },
         vibrant: {
           sunset: "#FF9933", // Sunset Orange - Accent color
@@ -50,15 +49,15 @@ const config = {
           seafoam: "#66B2B2", // Complementary to Ocean Deep
         },
         nature: {
-          ocean: "#005F73", // Ocean Deep
+          ocean: "#003840", // Updated to darker teal
           sand: "#F4E7D3", // Sand Beige
           coral: "#FF6B4A", // Coral accent
           seafoam: "#66B2B2", // Seafoam accent
         },
         neutral: {
-          DEFAULT: "#8C8C89", // Driftwood Gray - Text color
-          75: "#A3A3A1", // Lighter Driftwood
-          50: "#BABAB8", // Even lighter Driftwood
+          DEFAULT: "#4A4A48", // Much darker Driftwood Gray - Text color
+          75: "#6B6B69", // Darker Driftwood
+          50: "#8C8C89", // Original Driftwood Gray
           25: "#D1D1D0", // Very light Driftwood
           10: "#E8E8E7", // Almost white with a hint of Driftwood
         },
@@ -66,16 +65,16 @@ const config = {
           success: "#66B2B2", // Seafoam for success
           warning: "#FF9933", // Sunset Orange for warning
           error: "#FF6B4A", // Coral for error
-          info: "#005F73", // Ocean Deep for info
+          info: "#003840", // Darker teal for info
         },
         extended: {
           oceanDeep: {
-            950: "#004A5A",
-            900: "#005366",
-            800: "#005F73", // Base Ocean Deep
-            700: "#006B80",
-            600: "#00778D",
-            500: "#00839A",
+            950: "#001F26", // Much darker
+            900: "#002B33", // Darker
+            800: "#003840", // New base darker Ocean Deep
+            700: "#004A5A", // Original darkest
+            600: "#005366", // Original darker
+            500: "#005F73", // Original Ocean Deep
             400: "#1A8FA5",
             300: "#339BB0",
             200: "#4DA7BB",
@@ -88,23 +87,23 @@ const config = {
           foreground: "#FFFFFF",
         },
         muted: {
-          DEFAULT: "#8C8C89", // Updated to Driftwood Gray
-          foreground: "#005F73",
+          DEFAULT: "#4A4A48", // Updated to darker Driftwood Gray
+          foreground: "#003840", // Updated to darker teal
         },
         accent: {
           DEFAULT: "#66B2B2", // Updated to Seafoam
-          foreground: "#005F73",
+          foreground: "#003840", // Updated to darker teal
         },
-        // Legacy colors for backwards compatibility
+        // Legacy colors for backwards compatibility - updated to darker variants
         'brand-turquoise': '#66B2B2',
         'brand-seafoam': '#66B2B2',
         'brand-neutral-bg': '#F4E7D3',
-        'brand-text-primary': '#005F73',
-        'brand-text-secondary': '#8C8C89',
-        'brand-muted': '#8C8C89',
+        'brand-text-primary': '#003840', // Updated to darker teal
+        'brand-text-secondary': '#4A4A48', // Updated to darker gray
+        'brand-muted': '#4A4A48', // Updated to darker gray
         'brand-online-green': '#66B2B2',
         'brand-away-orange': '#FF9933',
-        'ocean-deep': '#005F73',
+        'ocean-deep': '#003840', // Updated to darker teal
         'sunset-yellow': '#FF9933',
         'seafoam-green': '#66B2B2',
         'clay-earth': '#A17C6B',
@@ -112,11 +111,11 @@ const config = {
         'pastel-coral': '#F9F3E9',
       },
       boxShadow: {
-        'turquoise': '0 4px 24px 0 rgba(0,95,115,0.08)',
-        'card-lg': '0 8px 40px 0 rgba(0,95,115,0.10)',
+        'turquoise': '0 4px 24px 0 rgba(0,56,64,0.08)', // Updated to darker teal
+        'card-lg': '0 8px 40px 0 rgba(0,56,64,0.10)', // Updated to darker teal
       },
       backgroundImage: {
-        'accent-gradient': 'linear-gradient(135deg, #005F73, #66B2B2)',
+        'accent-gradient': 'linear-gradient(135deg, #003840, #66B2B2)', // Updated to darker teal
         'zone-main': 'linear-gradient(to bottom, #F4E7D3 0%, #FFFFFF 100%)',
       },
       fontFamily: {
