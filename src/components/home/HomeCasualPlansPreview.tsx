@@ -3,14 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { CasualPlanCard } from '@/components/casual-plans/CasualPlanCard';
-
-interface CasualPlan {
-  id: string;
-  title: string;
-  description: string;
-  created_at: string;
-  creator_id: string;
-}
+import { CasualPlan } from '@/types/casual-plans';
 
 interface HomeCasualPlansPreviewProps {
   plans: CasualPlan[] | undefined;

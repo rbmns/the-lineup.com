@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,6 +14,7 @@ const EventDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   const { data: event, error, isLoading } = useQuery({
     queryKey: ['event', id],
@@ -49,16 +50,20 @@ const EventDetail = () => {
   // Set meta tags for this specific event
   useEventMetaTags(event);
 
+  const handleBackToEvents = () => {
+    navigate('/events');
+  };
+
   if (isLoading) {
     return <EventDetailLoadingState />;
   }
 
   if (error) {
-    return <EventDetailErrorState />;
+    return <EventDetailErrorState error={error} onBackToEvents={handleBackToEvents} />;
   }
 
   if (!event) {
-    return <EventDetailErrorState />;
+    return <EventDetailErrorState error={null} onBackToEvents={handleBackToEvents} notFound={true} />;
   }
 
   return (
