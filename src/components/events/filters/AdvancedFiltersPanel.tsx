@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { DateRangeFilter } from '@/components/events/DateRangeFilter';
 import { VenueFilter } from '@/components/events/VenueFilter';
 import { EventCategoryFilters } from '@/components/events/filters/EventCategoryFilters';
@@ -53,14 +53,36 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
   selectedLocationId,
   onLocationChange
 }) => {
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Handle click outside to close the panel
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
-    <div className={cn(
-      "fixed inset-x-4 top-20 z-50 max-h-[80vh] overflow-y-auto border rounded-lg bg-white shadow-lg",
-      "md:relative md:inset-x-0 md:top-0 md:max-h-none md:overflow-visible",
-      className
-    )}>
+    <div 
+      ref={panelRef}
+      className={cn(
+        "fixed inset-x-4 top-20 z-50 max-h-[80vh] overflow-y-auto border rounded-lg bg-white shadow-lg",
+        "md:relative md:inset-x-0 md:top-0 md:max-h-none md:overflow-visible",
+        className
+      )}
+    >
       <div className="p-4 md:p-6">
         {/* Close button */}
         <Button 
