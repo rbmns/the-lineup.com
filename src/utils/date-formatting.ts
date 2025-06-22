@@ -90,15 +90,16 @@ export const isMultiDayEvent = (startDate: string, endDate?: string | null): boo
 };
 
 /**
- * Format date range for multi-day events
+ * Format date range for multi-day events - improved for ongoing events
  */
 export const formatMultiDayRange = (startDate: string, endDate: string): string => {
   try {
     const start = new Date(startDate);
     const end = new Date(endDate);
     
-    const startFormatted = formatInTimeZone(start, AMSTERDAM_TIMEZONE, "EEE, d MMM");
-    const endFormatted = formatInTimeZone(end, AMSTERDAM_TIMEZONE, "EEE, d MMM");
+    // For ongoing events, use a cleaner format: "May 31 - June 15"
+    const startFormatted = formatInTimeZone(start, AMSTERDAM_TIMEZONE, "MMM d");
+    const endFormatted = formatInTimeZone(end, AMSTERDAM_TIMEZONE, "MMM d");
     
     return `${startFormatted} - ${endFormatted}`;
   } catch (error) {
@@ -108,12 +109,12 @@ export const formatMultiDayRange = (startDate: string, endDate: string): string 
 };
 
 /**
- * Formats event date and time for cards, e.g. "Sun, 25 May, 20:30" or "Sat, 31 May - Sun, 1 Jun" for multi-day events
+ * Formats event date and time for cards, e.g. "Sun, 25 May, 20:30" or "May 31 - June 15" for multi-day events
  */
 export const formatEventCardDateTime = (startDate: string, startTime?: string | null, endDate?: string | null): string => {
   if (!startDate) return '';
   
-  // Check if it's a multi-day event
+  // Check if it's a multi-day event - show date range without time for ongoing events
   if (isMultiDayEvent(startDate, endDate)) {
     return formatMultiDayRange(startDate, endDate!);
   }

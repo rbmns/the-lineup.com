@@ -8,6 +8,10 @@ import { format } from 'date-fns';
 import { useEventImages } from '@/hooks/useEventImages';
 import { LineupImage } from '@/components/ui/lineup-image';
 import { useAuth } from '@/contexts/AuthContext';
+import { CategoryPill } from '@/components/ui/category-pill';
+import EventVibeLabel from '@/components/polymet/event-vibe-label';
+import { formatEventCardDateTime } from '@/utils/date-formatting';
+import { Card } from '@/components/ui/card';
 
 interface HomeEventsPreviewProps {
   events: Event[] | undefined;
@@ -26,14 +30,14 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
   if (isLoading) {
     return (
       <section className="py-16 bg-secondary-25">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-primary mb-4">Upcoming Events</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
-                <div className="h-48 bg-gray-200"></div>
+                <div className="h-64 bg-gray-200"></div>
                 <div className="p-6">
                   <div className="h-4 bg-gray-200 rounded mb-4"></div>
                   <div className="h-3 bg-gray-200 rounded mb-2"></div>
@@ -50,7 +54,7 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
 
   return (
     <section className="py-16 bg-secondary-25">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-primary mb-4">Upcoming Events</h2>
           <p className="text-lg text-neutral max-w-2xl mx-auto">
@@ -58,26 +62,38 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
           {displayEvents.map((event) => {
             const EventCardContent = () => {
               const { getEventImageUrl } = useEventImages();
               const imageUrl = getEventImageUrl(event);
 
+              const getVenueDisplay = (): string => {
+                if (event.venues?.name) {
+                  return event.venues.name;
+                }
+                
+                if (event.location) {
+                  return event.location;
+                }
+                
+                return 'Location TBD';
+              };
+
               return (
-                <div 
-                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer border border-gray-100"
+                <Card 
+                  className="flex flex-col h-full overflow-hidden cursor-pointer transition-all duration-300 ease-in-out hover:shadow-xl bg-white border border-gray-200 rounded-xl group"
                   onClick={() => navigate(`/events/${event.id}`)}
                 >
-                  {/* Event Image */}
-                  <div className="relative h-48 overflow-hidden">
+                  {/* Image with category and vibe pills - larger than events page */}
+                  <div className="relative w-full h-64 overflow-hidden bg-gray-100 flex-shrink-0">
                     <LineupImage
                       src={imageUrl}
                       alt={event.title}
                       aspectRatio="video"
                       treatment="subtle-overlay"
                       overlayVariant="ocean"
-                      className="w-full h-full"
+                      className="w-full h-full group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         if (!target.src.includes('/img/default.jpg')) {
@@ -85,45 +101,60 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
                         }
                       }}
                     />
+                    
+                    {/* Category pill - top left */}
+                    {event.event_category && (
+                      <div className="absolute top-3 left-3 z-10">
+                        <CategoryPill 
+                          category={event.event_category} 
+                          size="sm"
+                        />
+                      </div>
+                    )}
+
+                    {/* Event vibe pill - top right */}
+                    <div className="absolute top-3 right-3 z-10">
+                      <EventVibeLabel 
+                        vibe={event.vibe || 'general'} 
+                        size="sm"
+                      />
+                    </div>
                   </div>
 
-                  <div className="p-6">
+                  <div className="flex flex-col flex-1 p-6 space-y-4">
                     {/* Event Title */}
-                    <h3 className="font-semibold text-primary text-lg mb-3 line-clamp-2">
+                    <h3 className="font-semibold text-primary text-xl leading-tight line-clamp-2">
                       {event.title}
                     </h3>
 
-                    {/* Date & Time */}
-                    <div className="flex items-center gap-2 text-neutral mb-2">
-                      <Calendar className="h-4 w-4" />
-                      <span className="text-sm">
-                        {event.start_date ? format(new Date(event.start_date), 'MMM d') : 'TBD'}
-                        {event.start_time && ` at ${event.start_time.substring(0, 5)}`}
+                    {/* Organizer info */}
+                    {event.organiser_name && (
+                      <p className="text-sm text-primary/70">
+                        By {event.organiser_name}
+                      </p>
+                    )}
+
+                    {/* Date & Time - using improved formatting for ongoing events */}
+                    <div className="flex items-center gap-2 text-neutral">
+                      <Calendar className="h-5 w-5 text-primary/60" />
+                      <span className="text-sm font-medium">
+                        {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
                       </span>
                     </div>
 
                     {/* Location */}
-                    {(event.venues?.name || event.location) && (
-                      <div className="flex items-center gap-2 text-neutral mb-3">
-                        <MapPin className="h-4 w-4" />
-                        <span className="text-sm truncate">
-                          {event.venues?.name || event.location}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Vibe/Category */}
-                    {event.event_category && (
-                      <div className="inline-block px-3 py-1 bg-vibrant-seafoam/10 text-vibrant-seafoam rounded-full text-xs font-medium mb-3">
-                        {event.event_category}
-                      </div>
-                    )}
+                    <div className="flex items-center gap-2 text-neutral">
+                      <MapPin className="h-5 w-5 text-primary/60" />
+                      <span className="text-sm truncate">
+                        {getVenueDisplay()}
+                      </span>
+                    </div>
 
                     {/* Attendees and Join Button */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mt-auto pt-4">
                       {(event.going_count || event.interested_count) ? (
                         <div className="flex items-center gap-2 text-neutral">
-                          <Users className="h-4 w-4" />
+                          <Users className="h-5 w-5 text-primary/60" />
                           <span className="text-sm">
                             {(event.going_count || 0) + (event.interested_count || 0)} going
                           </span>
@@ -148,7 +179,7 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
                       )}
                     </div>
                   </div>
-                </div>
+                </Card>
               );
             };
 
