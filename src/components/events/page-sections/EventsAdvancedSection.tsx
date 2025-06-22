@@ -26,12 +26,6 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
   allEventTypes,
   availableVenues
 }) => {
-  // Transform event types to the format expected by EventFilterSection
-  const availableEventTypesFormatted = allEventTypes.map(type => ({
-    value: type,
-    label: type
-  }));
-
   // Use actual venues from database instead of mock data
   const availableVenuesFormatted = availableVenues.map(venue => ({
     value: venue.id,
@@ -71,7 +65,7 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Filter Section */}
+      {/* Filter Section - Hide event type filter, show event categories in advanced */}
       <EventFilterSection
         showEventTypeFilter={false}
         setShowEventTypeFilter={() => {}}
@@ -87,10 +81,21 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
         setDateRange={(range) => onFilterChange({ date: range?.from })}
         selectedDateFilter={selectedDateFilter}
         setSelectedDateFilter={(filter) => onFilterChange({ dateFilter: filter })}
-        availableEventTypes={availableEventTypesFormatted}
+        availableEventTypes={[]} // Don't show event types in main filter
         availableVenues={availableVenuesFormatted}
         resetFilters={resetFilters}
         hasActiveFilters={hasActiveFilters}
+        // Pass event categories for advanced filters
+        allEventTypes={allEventTypes}
+        selectedCategories={selectedEventTypes}
+        toggleCategory={(type) => {
+          const newTypes = selectedEventTypes.includes(type)
+            ? selectedEventTypes.filter(t => t !== type)
+            : [...selectedEventTypes, type];
+          onFilterChange({ eventTypes: newTypes });
+        }}
+        selectAll={() => onFilterChange({ eventTypes: allEventTypes })}
+        deselectAll={() => onFilterChange({ eventTypes: [] })}
       />
 
       {/* Filter Summary */}
@@ -100,7 +105,7 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
           selectedVenues={selectedVenues}
           dateRange={dateRange}
           selectedDateFilter={selectedDateFilter}
-          eventTypeOptions={availableEventTypesFormatted}
+          eventTypeOptions={allEventTypes.map(type => ({ value: type, label: type }))}
           venueOptions={availableVenuesFormatted}
           onRemoveEventType={handleRemoveEventType}
           onRemoveVenue={handleRemoveVenue}
