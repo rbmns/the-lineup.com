@@ -1,16 +1,13 @@
-
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useLocation } from 'react-router-dom';
-import { useFilterState } from '@/contexts/FilterStateContext';
 
 export const useRsvpStateManager = (userId: string | undefined) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [loadingEventId, setLoadingEventId] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const location = useLocation();
-  const { resetFilters } = useFilterState();
   
   // Add listener for URL changes that might happen during RSVP
   useEffect(() => {
