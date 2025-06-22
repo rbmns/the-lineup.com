@@ -64,7 +64,7 @@ const Events = () => {
           <EventsVibeSection
             selectedVibes={selectedVibes}
             onVibeChange={setSelectedVibes}
-            vibes={[]}
+            vibes={['general', 'energetic', 'chill', 'social', 'cultural']}
             vibesLoading={false}
           />
           
@@ -92,11 +92,12 @@ const Events = () => {
 
         {/* Results Section */}
         <EventsResultsSection
-          eventsList={events}
-          isLoading={isLoading}
+          filteredEvents={events}
           hasActiveFilters={hasActiveFilters}
-          onResetFilters={resetAllFilters}
-          filteredEventsCount={filteredEventsCount}
+          resetFilters={resetAllFilters}
+          eventsLoading={isLoading}
+          isFilterLoading={false}
+          user={null}
         />
       </div>
     </EventsPageLayout>
