@@ -42,6 +42,7 @@ const Events = () => {
       setSelectedVenues(filters.venues);
     }
     if (filters.date) {
+      // Fix: Properly handle Date to DateRange conversion
       setDateRange({ from: filters.date, to: filters.date });
     }
     if (filters.dateFilter && filters.dateFilter !== 'Any Date') {
