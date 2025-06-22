@@ -33,7 +33,7 @@ export const NavActions: React.FC<NavActionsProps> = ({
   return (
     <div className={cn(
       "flex items-center flex-shrink-0",
-      isMobile ? "gap-1" : "gap-2 lg:gap-3"
+      isMobile ? "gap-2" : "gap-3 lg:gap-4"
     )}>
       {/* Create Event Button */}
       <CreateEventButton onAuthRequired={onAuthRequired} />
@@ -44,7 +44,8 @@ export const NavActions: React.FC<NavActionsProps> = ({
             <Button 
               asChild 
               variant="ghost" 
-              size="sm" 
+              size="sm"
+              className="text-primary hover:text-primary hover:bg-primary/10 transition-colors duration-200"
             >
               <Link to="/admin">Admin</Link>
             </Button>
@@ -64,8 +65,8 @@ export const NavActions: React.FC<NavActionsProps> = ({
           size="sm"
           onClick={handleSignInClick} 
           className={cn(
-            "flex-shrink-0",
-            isMobile ? "text-sm px-2 py-2" : "text-sm px-4"
+            "flex-shrink-0 text-primary hover:text-primary hover:bg-primary/10 transition-all duration-200 font-medium",
+            isMobile ? "text-sm px-3 py-2" : "text-sm px-4"
           )}
         >
           Sign in
