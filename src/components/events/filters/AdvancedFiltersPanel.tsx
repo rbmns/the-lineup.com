@@ -72,121 +72,152 @@ export const AdvancedFiltersPanel: React.FC<AdvancedFiltersPanelProps> = ({
     };
   }, [isOpen, onClose]);
 
+  // Handle escape key to close
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscapeKey);
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
-    <div 
-      ref={panelRef}
-      className={cn(
-        "fixed inset-x-4 top-20 z-50 max-h-[80vh] overflow-y-auto border rounded-lg bg-white shadow-lg",
-        "md:relative md:inset-x-0 md:top-0 md:max-h-none md:overflow-visible",
-        className
-      )}
-    >
-      <div className="p-4 md:p-6">
-        {/* Close button */}
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={onClose}
-          className="absolute top-2 right-2 md:top-4 md:right-4 h-8 w-8 p-0 z-10"
-        >
-          <X className="h-4 w-4" />
-          <span className="sr-only">Close advanced filters</span>
-        </Button>
+    <>
+      {/* Mobile backdrop */}
+      <div 
+        className="fixed inset-0 bg-black/20 z-40 md:hidden"
+        onClick={onClose}
+      />
+      
+      <div 
+        ref={panelRef}
+        className={cn(
+          "fixed inset-x-4 top-20 z-50 max-h-[80vh] overflow-hidden border rounded-lg bg-white shadow-lg",
+          "md:relative md:inset-x-0 md:top-0 md:max-h-none md:shadow-md",
+          className
+        )}
+      >
+        {/* Header with close button */}
+        <div className="flex items-center justify-between p-4 md:p-6 border-b bg-white sticky top-0 z-10">
+          <h2 className="font-semibold text-lg text-primary">Advanced Filters</h2>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onClose}
+            className="h-8 w-8 p-0 hover:bg-gray-100"
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close advanced filters</span>
+          </Button>
+        </div>
         
-        <h2 className="font-medium mb-4 md:mb-6 text-lg pr-8">Advanced Filters</h2>
-        
-        <div className="space-y-6 md:grid md:grid-cols-1 lg:grid-cols-3 md:gap-6 md:space-y-0">
-          {/* Event Categories Section */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium">Event Categories</h3>
-            <div className="border rounded-md p-3 max-h-48 overflow-y-auto">
-              <EventCategoryFilters
-                allEventTypes={allEventTypes}
-                selectedEventTypes={selectedCategories}
-                onToggleEventType={toggleCategory}
-                onSelectAll={selectAll}
-                onDeselectAll={deselectAll}
-                className="space-y-2"
-              />
-            </div>
-          </div>
+        {/* Scrollable content */}
+        <ScrollArea className="max-h-[calc(80vh-80px)] md:max-h-none">
+          <div className="p-4 md:p-6 space-y-6">
+            <div className="space-y-6 md:grid md:grid-cols-1 lg:grid-cols-3 md:gap-6 md:space-y-0">
+              {/* Event Categories Section */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-primary">Event Categories</h3>
+                <div className="border border-gray-200 rounded-md p-3 bg-gray-50/50">
+                  <ScrollArea className="max-h-48">
+                    <EventCategoryFilters
+                      allEventTypes={allEventTypes}
+                      selectedEventTypes={selectedCategories}
+                      onToggleEventType={toggleCategory}
+                      onSelectAll={selectAll}
+                      onDeselectAll={deselectAll}
+                      className="space-y-2"
+                    />
+                  </ScrollArea>
+                </div>
+              </div>
 
-          {/* Date Range Section */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium">Date Range</h3>
-            <div className="border rounded-md p-3">
-              <DateRangeFilter
-                dateRange={dateRange}
-                onDateRangeChange={onDateRangeChange}
-                onReset={() => onDateRangeChange(undefined)}
-                selectedDateFilter={selectedDateFilter}
-                onDateFilterChange={onDateFilterChange}
-              />
-            </div>
-          </div>
-
-          {/* Venue Section */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium">Venue</h3>
-            <div className="border rounded-md p-1">
-              <ScrollArea className="h-[180px] pr-3">
-                <div className="p-2">
-                  <VenueFilter
-                    venues={venues}
-                    selectedVenues={selectedVenues}
-                    onVenueChange={onVenueChange}
-                    onReset={() => onVenueChange([])}
+              {/* Date Range Section */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-primary">Date Range</h3>
+                <div className="border border-gray-200 rounded-md p-3 bg-gray-50/50">
+                  <DateRangeFilter
+                    dateRange={dateRange}
+                    onDateRangeChange={onDateRangeChange}
+                    onReset={() => onDateRangeChange(undefined)}
+                    selectedDateFilter={selectedDateFilter}
+                    onDateFilterChange={onDateFilterChange}
                   />
                 </div>
-              </ScrollArea>
-            </div>
-          </div>
-        </div>
+              </div>
 
-        {/* All Venues Selector - Mobile optimized */}
-        {locations.length > 0 && (
-          <div className="mt-6 space-y-3">
-            <h3 className="text-sm font-medium">Filter by Venue Location</h3>
-            <div className="relative">
-              <Select
-                value={selectedLocationId || 'all-venues'}
-                onValueChange={(value) => {
-                  if (onLocationChange) {
-                    onLocationChange(value === 'all-venues' ? null : value);
-                  }
-                }}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Filter by venue..." />
-                </SelectTrigger>
-                <SelectContent 
-                  className="bg-white shadow-lg border border-gray-200 z-50 max-h-60"
-                  position="popper"
-                  sideOffset={4}
-                >
-                  <SelectItem value="all-venues">All Venues</SelectItem>
-                  {locations.map(loc => (
-                    <SelectItem key={loc.value} value={loc.value}>{loc.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {selectedLocationId && onLocationChange && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-8 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
-                  onClick={() => onLocationChange(null)}
-                  aria-label="Clear venue filter"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
+              {/* Venue Section */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-primary">Venue</h3>
+                <div className="border border-gray-200 rounded-md p-1 bg-gray-50/50">
+                  <ScrollArea className="h-[180px] pr-3">
+                    <div className="p-2">
+                      <VenueFilter
+                        venues={venues}
+                        selectedVenues={selectedVenues}
+                        onVenueChange={onVenueChange}
+                        onReset={() => onVenueChange([])}
+                      />
+                    </div>
+                  </ScrollArea>
+                </div>
+              </div>
             </div>
+
+            {/* All Venues Selector - Mobile optimized */}
+            {locations.length > 0 && (
+              <div className="space-y-3 pt-2 border-t border-gray-200">
+                <h3 className="text-sm font-semibold text-primary">Filter by Venue Location</h3>
+                <div className="relative">
+                  <Select
+                    value={selectedLocationId || 'all-venues'}
+                    onValueChange={(value) => {
+                      if (onLocationChange) {
+                        onLocationChange(value === 'all-venues' ? null : value);
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="w-full bg-white">
+                      <SelectValue placeholder="Filter by venue..." />
+                    </SelectTrigger>
+                    <SelectContent 
+                      className="bg-white shadow-lg border border-gray-200 z-50 max-h-60"
+                      position="popper"
+                      sideOffset={4}
+                    >
+                      <SelectItem value="all-venues">All Venues</SelectItem>
+                      {locations.map(loc => (
+                        <SelectItem key={loc.value} value={loc.value}>{loc.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selectedLocationId && onLocationChange && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-8 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
+                      onClick={() => onLocationChange(null)}
+                      aria-label="Clear venue filter"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </ScrollArea>
       </div>
-    </div>
+    </>
   );
 };
