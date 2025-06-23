@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -172,6 +173,42 @@ const EventDetail: React.FC<EventDetailProps> = ({
   // Get event image with fallback
   const eventImage = getEventImage(event);
 
+  // FIXED: Get proper Google Maps URL
+  const getGoogleMapsUrl = () => {
+    // First priority: use venue's direct Google Maps URL
+    if (event.venues?.google_maps) {
+      console.log('Using venue Google Maps URL:', event.venues.google_maps);
+      return event.venues.google_maps;
+    }
+    
+    // Second priority: create search URL from venue details
+    if (event.venues) {
+      const searchQuery = [
+        event.venues.name,
+        event.venues.street,
+        event.venues.city,
+        event.venues.postal_code
+      ].filter(Boolean).join(', ');
+      
+      if (searchQuery) {
+        const searchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`;
+        console.log('Generated Google Maps search URL:', searchUrl);
+        return searchUrl;
+      }
+    }
+    
+    // Fallback: use event location
+    if (event.location) {
+      const fallbackUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
+      console.log('Using fallback location URL:', fallbackUrl);
+      return fallbackUrl;
+    }
+    
+    return null;
+  };
+
+  const googleMapsUrl = getGoogleMapsUrl();
+
   return (
     <div className="min-h-screen bg-white">
       <Helmet>
@@ -341,9 +378,20 @@ const EventDetail: React.FC<EventDetailProps> = ({
                   <div className="text-left">
                     <h3 className="font-medium text-gray-900 mb-1 text-left">Location</h3>
                     <p className="text-sm text-gray-600 text-left">{eventLocation}</p>
-                    <Button variant="link" className="p-0 h-auto text-sm text-blue-600">
-                      View on map
-                    </Button>
+                    {googleMapsUrl && (
+                      <a
+                        href={googleMapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block mt-2 text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                        onClick={(e) => {
+                          console.log('Google Maps link clicked from sidebar:', googleMapsUrl);
+                          // The link will open normally, this is just for debugging
+                        }}
+                      >
+                        View on map
+                      </a>
+                    )}
                   </div>
                 </div>
               </CardContent>

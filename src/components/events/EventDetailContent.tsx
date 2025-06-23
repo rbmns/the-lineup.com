@@ -1,3 +1,4 @@
+
 import React, { useMemo, useCallback } from 'react';
 import { Event } from '@/types';
 import { Separator } from '@/components/ui/separator';
@@ -90,14 +91,15 @@ const EventDetailContent = ({
     return addressParts.length > 0 ? addressParts.join(', ') : null;
   };
 
-  // Generate Google Maps URL for the venue
+  // Generate Google Maps URL for the venue - FIXED VERSION
   const getMapUrl = () => {
-    // First try the venue's Google Maps URL if available
+    // First priority: use the venue's direct Google Maps URL if available
     if (event.venues?.google_maps) {
+      console.log('Using venue Google Maps URL:', event.venues.google_maps);
       return event.venues.google_maps;
     }
     
-    // If venue has an address, create a Google Maps search URL
+    // Second priority: create a search URL from venue details
     if (event.venues) {
       const searchQuery = [
         event.venues.name,
@@ -107,15 +109,20 @@ const EventDetailContent = ({
       ].filter(Boolean).join(', ');
       
       if (searchQuery) {
-        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`;
+        const searchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`;
+        console.log('Generated Google Maps search URL:', searchUrl);
+        return searchUrl;
       }
     }
     
-    // Fallback to event location if available
+    // Fallback: use event location if available
     if (event.location) {
-      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
+      const fallbackUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
+      console.log('Using fallback location URL:', fallbackUrl);
+      return fallbackUrl;
     }
     
+    console.log('No location data available for Google Maps');
     return null;
   };
   
@@ -206,6 +213,10 @@ const EventDetailContent = ({
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-inter flex items-center gap-1"
+                          onClick={(e) => {
+                            console.log('Google Maps link clicked:', mapUrl);
+                            // The link will open normally, this is just for debugging
+                          }}
                         >
                           <ExternalLink className="h-3 w-3" />
                           View on Maps
