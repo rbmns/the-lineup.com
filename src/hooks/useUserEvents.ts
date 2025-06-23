@@ -22,23 +22,30 @@ export const useUserEvents = (userId: string | undefined): UseUserEventsResult =
       }
 
       try {
-        // First get the user's RSVPs
+        console.log('Fetching user events for userId:', userId);
+        
+        // First get the user's RSVPs with "Going" or "Interested" status
         const { data: rsvpData, error: rsvpError } = await supabase
           .from('event_rsvps')
           .select('event_id, status')
-          .eq('user_id', userId);
+          .eq('user_id', userId)
+          .in('status', ['Going', 'Interested']); // Only get Going and Interested RSVPs
 
         if (rsvpError) {
           console.error('Error fetching user RSVPs:', rsvpError);
           throw rsvpError;
         }
 
+        console.log('Found RSVPs:', rsvpData?.length || 0, rsvpData);
+
         if (!rsvpData || rsvpData.length === 0) {
+          console.log('No RSVPs found for user');
           return { pastEvents: [], upcomingEvents: [] };
         }
 
         // Get the event IDs the user has RSVPed to
         const eventIds = rsvpData.map(rsvp => rsvp.event_id);
+        console.log('Event IDs to fetch:', eventIds);
 
         // Fetch the events the user has RSVPed to (only published events)
         const { data: eventsData, error: eventsError } = await supabase
@@ -59,17 +66,22 @@ export const useUserEvents = (userId: string | undefined): UseUserEventsResult =
           throw eventsError;
         }
 
+        console.log('Fetched events:', eventsData?.length || 0);
+
         if (!eventsData) {
           return { pastEvents: [], upcomingEvents: [] };
         }
 
         const allEvents = processEventsData(eventsData, userId);
+        console.log('Processed events:', allEvents.length);
         
         const pastEvents = filterPastEvents(allEvents);
         const sortedPastEvents = sortEventsByDate(pastEvents);
         
         const upcomingEvents = filterUpcomingEvents(allEvents);
         const sortedUpcomingEvents = sortEventsByDate(upcomingEvents);
+
+        console.log('Final result - Past:', sortedPastEvents.length, 'Upcoming:', sortedUpcomingEvents.length);
 
         return { pastEvents: sortedPastEvents, upcomingEvents: sortedUpcomingEvents };
       } catch (err) {

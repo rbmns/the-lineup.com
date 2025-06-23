@@ -1,20 +1,19 @@
 
 import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Event, UserProfile } from '@/types';
-import { Button } from '@/components/ui/button';
-import { ProfileEventCard } from './ProfileEventCard';
-import { Calendar, History } from 'lucide-react';
+import { Event } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
+import { Calendar, History, Users } from 'lucide-react';
+import EventCardList from '@/components/events/EventCardList';
 
 interface ProfileEventsSectionProps {
   canViewEvents: boolean;
   upcomingEvents: Event[];
   pastEvents: Event[];
   eventsLoading: boolean;
-  isCurrentUser: boolean;
+  isCurrentUser?: boolean;
   username?: string;
-  handleAddFriend: () => void;
-  friendshipStatus: 'none' | 'pending' | 'accepted';
+  handleAddFriend?: () => void;
+  friendshipStatus?: string;
 }
 
 export const ProfileEventsSection: React.FC<ProfileEventsSectionProps> = ({
@@ -22,104 +21,112 @@ export const ProfileEventsSection: React.FC<ProfileEventsSectionProps> = ({
   upcomingEvents,
   pastEvents,
   eventsLoading,
-  isCurrentUser,
-  username = '',
+  isCurrentUser = false,
+  username = 'User',
   handleAddFriend,
-  friendshipStatus
+  friendshipStatus = 'none'
 }) => {
   if (!canViewEvents) {
     return (
-      <div className="text-center p-6 bg-gray-50 rounded-lg mt-6">
-        <p className="text-gray-600 text-sm">
-          Connect with {username || 'this user'} to see their events
-        </p>
-        {friendshipStatus === 'none' && (
-          <Button onClick={handleAddFriend} className="mt-3" size="sm">
-            Add Friend
-          </Button>
-        )}
+      <div className="bg-white rounded-lg shadow-sm border border-secondary p-6">
+        <div className="text-center py-12">
+          <Users className="h-12 w-12 text-neutral-50 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-primary mb-2">
+            {friendshipStatus === 'none' ? 'Connect to See Events' : 'Events Hidden'}
+          </h3>
+          <p className="text-neutral-50 mb-4">
+            {friendshipStatus === 'none' 
+              ? `Add ${username} as a friend to see their event activity`
+              : `${username}'s events are private`
+            }
+          </p>
+          {friendshipStatus === 'none' && handleAddFriend && (
+            <button 
+              onClick={handleAddFriend}
+              className="bg-primary hover:bg-primary-75 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+            >
+              Add Friend
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (eventsLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-lg shadow-sm border border-secondary p-6">
+          <div className="space-y-4">
+            <div className="h-6 bg-gray-200 rounded animate-pulse"></div>
+            <div className="space-y-3">
+              <div className="h-20 bg-gray-100 rounded animate-pulse"></div>
+              <div className="h-20 bg-gray-100 rounded animate-pulse"></div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
-      <div className="p-6 border-b border-gray-200">
-        <h2 className="text-xl font-semibold">My Events</h2>
+    <div className="space-y-6">
+      {/* Upcoming Events */}
+      <div className="bg-white rounded-lg shadow-sm border border-secondary p-6">
+        <h2 className="text-xl font-semibold mb-4 flex items-center text-primary">
+          <Calendar className="h-5 w-5 mr-2" />
+          {isCurrentUser ? "Your Upcoming Events" : `${username}'s Upcoming Events`}
+        </h2>
+        
+        {upcomingEvents.length > 0 ? (
+          <div className="space-y-3">
+            {upcomingEvents.map(event => (
+              <EventCardList
+                key={event.id}
+                event={event}
+                showRsvpStatus={true}
+              />
+            ))}
+          </div>
+        ) : (
+          <Card className="border border-gray-100">
+            <CardContent className="p-4 text-center text-gray-500">
+              <p className="text-sm">
+                {isCurrentUser ? "No upcoming events" : `${username} has no upcoming events`}
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
-      
-      <Tabs defaultValue="upcoming" className="w-full">
-        <div className="border-b border-gray-200">
-          <TabsList className="w-full rounded-none bg-transparent h-auto p-0 grid grid-cols-2">
-            <TabsTrigger 
-              value="upcoming" 
-              className="flex-1 rounded-none border-b-2 border-transparent py-3 data-[state=active]:border-blue-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-            >
-              <Calendar className="h-4 w-4 mr-2" />
-              Upcoming
-            </TabsTrigger>
-            <TabsTrigger 
-              value="past"
-              className="flex-1 rounded-none border-b-2 border-transparent py-3 data-[state=active]:border-blue-500 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-            >
-              <History className="h-4 w-4 mr-2" />
-              Past
-            </TabsTrigger>
-          </TabsList>
-        </div>
+
+      {/* Past Events */}
+      <div className="bg-white rounded-lg shadow-sm border border-secondary p-6">
+        <h2 className="text-xl font-semibold mb-4 flex items-center text-primary">
+          <History className="h-5 w-5 mr-2" />
+          {isCurrentUser ? "Your Past Events" : `${username}'s Past Events`}
+        </h2>
         
-        <TabsContent value="upcoming" className="p-0">
-          <div className="p-6">
-            {eventsLoading ? (
-              <div className="space-y-4">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
-                ))}
-              </div>
-            ) : upcomingEvents.length > 0 ? (
-              <div className="space-y-4">
-                {upcomingEvents.map(event => (
-                  <ProfileEventCard key={event.id} event={event} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-600">No upcoming events</p>
-                <p className="text-sm text-gray-500 mt-1">
-                  {isCurrentUser ? "You haven't joined any upcoming events yet" : `${username} hasn't joined any upcoming events yet`}
-                </p>
-              </div>
-            )}
+        {pastEvents.length > 0 ? (
+          <div className="space-y-3">
+            {pastEvents.map(event => (
+              <EventCardList
+                key={event.id}
+                event={event}
+                showRsvpStatus={true}
+                showRsvpButtons={false}
+              />
+            ))}
           </div>
-        </TabsContent>
-        
-        <TabsContent value="past" className="p-0">
-          <div className="p-6">
-            {eventsLoading ? (
-              <div className="space-y-4">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="h-20 bg-gray-100 rounded-lg animate-pulse"></div>
-                ))}
-              </div>
-            ) : pastEvents.length > 0 ? (
-              <div className="space-y-4">
-                {pastEvents.map(event => (
-                  <ProfileEventCard key={event.id} event={event} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <History className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-600">No past events</p>
-                <p className="text-sm text-gray-500 mt-1">
-                  {isCurrentUser ? "You haven't attended any events yet" : `${username} hasn't attended any events yet`}
-                </p>
-              </div>
-            )}
-          </div>
-        </TabsContent>
-      </Tabs>
+        ) : (
+          <Card className="border border-gray-100">
+            <CardContent className="p-4 text-center text-gray-500">
+              <p className="text-sm">
+                {isCurrentUser ? "No past events" : `${username} has no past events`}
+              </p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 };
