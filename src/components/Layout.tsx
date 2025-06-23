@@ -12,8 +12,8 @@ import { useScrollToTop } from "@/hooks/useScrollToTop";
 
 const TOP_NAV_HEIGHT_MOBILE = 64; // Single nav height
 const TOP_NAV_HEIGHT_DESKTOP = 64; // Desktop nav height
-const LEFT_SIDEBAR_WIDTH = 80; // px, matches w-20
-const MOBILE_BOTTOM_NAV_HEIGHT = 88; // Fixed height for consistency
+const LEFT_SIDEBAR_WIDTH = 64; // Reduced from 80 to 64px
+const MOBILE_BOTTOM_NAV_HEIGHT = 68; // Reduced from 88 to 68px
 
 const Layout = () => {
   const { user, loading } = useAuth();
@@ -39,7 +39,7 @@ const Layout = () => {
     <div className="min-h-screen w-full overflow-x-hidden bg-white">
       <MainNav />
       <div className="flex w-full min-h-screen">
-        {/* Left sidebar - Desktop only, start below navbar */}
+        {/* Left sidebar - Desktop only, start below navbar - more compact */}
         {!isMobile && (
           <div
             className="fixed left-0 bg-gray-50"
@@ -84,7 +84,7 @@ const Layout = () => {
         </div>
       </div>
 
-      {/* Mobile Navigation - Fixed to bottom with consistent height */}
+      {/* Mobile Navigation - Fixed to bottom with reduced height */}
       {isMobile && (
         <div 
           className="fixed bottom-0 left-0 right-0 bg-white z-50 border-t border-gray-100"

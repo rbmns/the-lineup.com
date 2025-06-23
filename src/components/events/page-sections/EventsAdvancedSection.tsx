@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { EventsAdvancedFilters } from '@/components/events/page-components/EventsAdvancedFilters';
 import { Button } from '@/components/ui/button';
@@ -104,19 +105,19 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
   }
 
   return (
-    <div className="space-y-3 sm:space-y-4">
-      {/* Main Filter Row - Location Selector and Advanced Filters Toggle */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3 flex-1">
-          {/* Location Selector */}
-          <div className="flex items-center gap-2">
+    <div className="space-y-2 sm:space-y-4">
+      {/* Main Filter Row - More compact on mobile */}
+      <div className="flex items-center justify-between gap-2 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-3 flex-1">
+          {/* Location Selector - More compact on mobile */}
+          <div className="flex items-center gap-1 sm:gap-2">
             <MapPin className="h-4 w-4 text-gray-500" />
             <Select
               value={selectedLocation || 'all'}
               onValueChange={(value) => onFilterChange({ location: value === 'all' ? null : value })}
               disabled={areasLoading || !isLocationLoaded}
             >
-              <SelectTrigger className={`${isMobile ? 'w-40' : 'w-48'} bg-white border-gray-200`}>
+              <SelectTrigger className={`${isMobile ? 'w-32 text-sm' : 'w-48'} bg-white border-gray-200`}>
                 <SelectValue placeholder="Select area..." />
               </SelectTrigger>
               <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
@@ -149,22 +150,26 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
             </Select>
           </div>
 
-          {/* Advanced Filters Toggle */}
+          {/* Advanced Filters Toggle - Compact on mobile */}
           <Button
             variant={showAdvancedFilters ? "default" : "outline"}
             size={isMobile ? "sm" : "default"}
             onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            className="flex items-center gap-2"
+            className={`flex items-center gap-1 sm:gap-2 ${isMobile ? 'px-2 h-9 text-sm' : ''}`}
           >
             <Filter className="h-4 w-4" />
-            {!isMobile && <span>More Filters</span>}
-            {showAdvancedFilters ? (
-              <ChevronUp className="h-4 w-4" />
+            {isMobile ? (
+              <span className="text-xs">More</span>
             ) : (
-              <ChevronDown className="h-4 w-4" />
+              <span>More Filters</span>
+            )}
+            {showAdvancedFilters ? (
+              <ChevronUp className="h-3 w-3 sm:h-4 sm:w-4" />
+            ) : (
+              <ChevronDown className="h-3 w-3 sm:h-4 sm:w-4" />
             )}
             {(hasActiveAdvancedFilters || hasActiveLocationFilter) && (
-              <span className="ml-1 bg-white text-primary rounded-full px-2 py-0.5 text-xs font-medium">
+              <span className={`ml-1 bg-white text-primary rounded-full px-1.5 py-0.5 font-medium ${isMobile ? 'text-xs' : 'text-xs px-2'}`}>
                 {[
                   selectedEventTypes.length > 0 ? selectedEventTypes.length : 0,
                   selectedVenues.length > 0 ? selectedVenues.length : 0,
@@ -185,7 +190,7 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
 
       {/* Advanced Filters Panel */}
       {showAdvancedFilters && (
-        <div className="border border-gray-200 rounded-lg p-4 bg-white">
+        <div className="border border-gray-200 rounded-lg p-3 sm:p-4 bg-white">
           <EventsAdvancedFilters
             onFilterChange={onFilterChange}
             selectedEventTypes={selectedEventTypes}
