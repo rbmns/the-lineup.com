@@ -6,14 +6,13 @@ import { Event } from '@/types';
 import { DateRange } from 'react-day-picker';
 import { useRsvpStateManager } from './useRsvpStateManager';
 import { useAuth } from '@/contexts/AuthContext';
-import { getCitiesForCategory } from '@/utils/locationCategories';
 
 export const useEventsPageData = () => {
   const { user } = useAuth();
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
   const [selectedVenues, setSelectedVenues] = useState<string[]>([]);
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null); // Now stores category ID
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null); // Now stores area ID
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [selectedDateFilter, setSelectedDateFilter] = useState<string>('anytime');
 
@@ -63,6 +62,23 @@ export const useEventsPageData = () => {
     },
   });
 
+  // Fetch venue city areas for area filtering
+  const { data: cityAreas = [] } = useQuery({
+    queryKey: ['venue-city-areas'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('venue_city_areas')
+        .select('area_id, city_name');
+
+      if (error) {
+        console.error('Error fetching venue city areas:', error);
+        throw error;
+      }
+
+      return data || [];
+    },
+  });
+
   // Get all event types/categories for advanced filtering
   const allEventTypes = [
     ...new Set(eventsData?.map(event => event.event_category).filter(Boolean))
@@ -76,6 +92,13 @@ export const useEventsPageData = () => {
     today.setHours(0, 0, 0, 0); // Reset to start of day for comparison
     return eventDate >= today;
   }) || [];
+
+  // Helper function to get cities for a selected area
+  const getCitiesForSelectedArea = (areaId: string): string[] => {
+    return cityAreas
+      .filter(cityArea => cityArea.area_id === areaId)
+      .map(cityArea => cityArea.city_name);
+  };
 
   // Filter events based on all criteria
   const filteredEvents = upcomingEvents?.filter(event => {
@@ -94,7 +117,7 @@ export const useEventsPageData = () => {
       return false;
     }
 
-    // Location category filter (by venue city) - exclude TBD events when location is selected
+    // Area-based location filter
     if (selectedLocation) {
       // If no venue city or location, exclude this event
       if (!event.venues?.city && !event.location) {
@@ -110,10 +133,10 @@ export const useEventsPageData = () => {
         return false;
       }
 
-      const citiesInCategory = getCitiesForCategory(selectedLocation);
+      const citiesInArea = getCitiesForSelectedArea(selectedLocation);
       const eventCity = event.venues?.city || event.location;
       
-      if (eventCity && !citiesInCategory.some(city => 
+      if (eventCity && !citiesInArea.some(city => 
         city.toLowerCase() === eventCity.toLowerCase()
       )) {
         return false;

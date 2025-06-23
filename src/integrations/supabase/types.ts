@@ -816,6 +816,56 @@ export type Database = {
         }
         Relationships: []
       }
+      venue_areas: {
+        Row: {
+          created_at: string | null
+          display_order: number | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      venue_city_areas: {
+        Row: {
+          area_id: string | null
+          city_name: string
+          created_at: string | null
+          id: string
+        }
+        Insert: {
+          area_id?: string | null
+          city_name: string
+          created_at?: string | null
+          id?: string
+        }
+        Update: {
+          area_id?: string | null
+          city_name?: string
+          created_at?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_city_areas_area_id_fkey"
+            columns: ["area_id"]
+            isOneToOne: false
+            referencedRelation: "venue_areas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       venues: {
         Row: {
           city: string | null

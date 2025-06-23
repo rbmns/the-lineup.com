@@ -5,7 +5,7 @@ import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayo
 import { EventsResultsSection } from '@/components/events/page-sections/EventsResultsSection';
 import { EventsVibeSection } from '@/components/events/page-sections/EventsVibeSection';
 import { LocationFilter } from '@/components/events/filters/LocationFilter';
-import { useVenueLocationCategories } from '@/hooks/useVenueLocationCategories';
+import { useVenueAreas } from '@/hooks/useVenueAreas';
 import { EventsAdvancedSection } from '@/components/events/page-sections/EventsAdvancedSection';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -33,7 +33,7 @@ const Events = () => {
     resetAllFilters
   } = useEventsPageData();
 
-  const { data: locationCategories = [], isLoading: locationsLoading } = useVenueLocationCategories();
+  const { data: venueAreas = [], isLoading: areasLoading } = useVenueAreas();
 
   const handleFilterChange = (filters: any) => {
     if (filters.eventTypes !== undefined) {
@@ -66,10 +66,10 @@ const Events = () => {
           {/* Location Filter - Always first */}
           <div className="w-full order-1">
             <LocationFilter
-              availableLocations={locationCategories}
+              availableLocations={venueAreas}
               selectedLocation={selectedLocation}
               onLocationChange={setSelectedLocation}
-              isLoading={locationsLoading}
+              isLoading={areasLoading}
               events={allEvents || []}
             />
           </div>

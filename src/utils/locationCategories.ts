@@ -1,5 +1,5 @@
 
-// Location categories mapping - groups nearby cities into logical areas
+// Location categories mapping - now using areas from database
 export interface LocationCategory {
   id: string;
   name: string;
@@ -7,83 +7,38 @@ export interface LocationCategory {
   displayName: string;
 }
 
-export const LOCATION_CATEGORIES: LocationCategory[] = [
-  {
-    id: 'zandvoort-area',
-    name: 'Zandvoort Area',
-    displayName: 'Zandvoort Area',
-    cities: ['Zandvoort', 'Bloemendaal', 'Overveen', 'Bentveld']
-  },
-  {
-    id: 'amsterdam',
-    name: 'Amsterdam',
-    displayName: 'Amsterdam',
-    cities: ['Amsterdam', 'Amsterdam-Noord', 'Amsterdam-West', 'Amsterdam-Zuid', 'Amsterdam-Oost']
-  },
-  {
-    id: 'haarlem-area',
-    name: 'Haarlem Area',
-    displayName: 'Haarlem Area',
-    cities: ['Haarlem', 'Heemstede', 'Aerdenhout']
-  },
-  {
-    id: 'leiden-area',
-    name: 'Leiden Area',
-    displayName: 'Leiden Area',
-    cities: ['Leiden', 'Leiderdorp', 'Voorschoten']
-  },
-  {
-    id: 'den-haag-area',
-    name: 'Den Haag Area',
-    displayName: 'Den Haag Area',
-    cities: ['Den Haag', 'The Hague', 'Scheveningen', 'Wassenaar']
-  }
-];
-
-// Get category for a given city
-export const getCategoryForCity = (city: string): LocationCategory | null => {
-  return LOCATION_CATEGORIES.find(category => 
-    category.cities.some(categoryCity => 
-      categoryCity.toLowerCase() === city.toLowerCase()
-    )
-  ) || null;
+// Get category for a given city by checking venue_city_areas
+export const getCategoryForCity = async (city: string): Promise<LocationCategory | null> => {
+  // This will be handled by the hook that fetches from database
+  return null;
 };
 
-// Get all cities that belong to a category
-export const getCitiesForCategory = (categoryId: string): string[] => {
-  const category = LOCATION_CATEGORIES.find(cat => cat.id === categoryId);
-  return category ? category.cities : [];
+// Get all cities that belong to an area
+export const getCitiesForArea = (areaId: string, cityAreas: any[]): string[] => {
+  return cityAreas
+    .filter(cityArea => cityArea.area_id === areaId)
+    .map(cityArea => cityArea.city_name);
 };
 
-// Get category by ID
-export const getCategoryById = (categoryId: string): LocationCategory | null => {
-  return LOCATION_CATEGORIES.find(cat => cat.id === categoryId) || null;
+// Get area by ID
+export const getAreaById = (areaId: string, areas: any[]): LocationCategory | null => {
+  const area = areas.find(area => area.id === areaId);
+  if (!area) return null;
+  
+  return {
+    id: area.id,
+    name: area.name,
+    displayName: area.name,
+    cities: [] // Will be populated by the hook
+  };
 };
 
-// Convert individual cities to categories, removing duplicates
-export const citiesToCategories = (cities: string[]): LocationCategory[] => {
-  const categorySet = new Set<string>();
-  const categories: LocationCategory[] = [];
-
-  cities.forEach(city => {
-    const category = getCategoryForCity(city);
-    if (category && !categorySet.has(category.id)) {
-      categorySet.add(category.id);
-      categories.push(category);
-    } else if (!category) {
-      // For cities not in any category, create a standalone category
-      const standaloneCategory: LocationCategory = {
-        id: city.toLowerCase().replace(/\s+/g, '-'),
-        name: city,
-        displayName: city,
-        cities: [city]
-      };
-      if (!categorySet.has(standaloneCategory.id)) {
-        categorySet.add(standaloneCategory.id);
-        categories.push(standaloneCategory);
-      }
-    }
-  });
-
-  return categories.sort((a, b) => a.displayName.localeCompare(b.displayName));
+// Convert database areas and city mappings to LocationCategory format
+export const convertAreasToCategories = (areas: any[], cityAreas: any[]): LocationCategory[] => {
+  return areas.map(area => ({
+    id: area.id,
+    name: area.name,
+    displayName: area.name,
+    cities: getCitiesForArea(area.id, cityAreas)
+  })).sort((a, b) => a.displayName.localeCompare(b.displayName));
 };

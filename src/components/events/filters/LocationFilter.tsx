@@ -3,14 +3,14 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { MapPin, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { LocationCategory, getCitiesForCategory } from '@/utils/locationCategories';
+import { LocationCategory } from '@/utils/locationCategories';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Event } from '@/types';
 
 interface LocationFilterProps {
   availableLocations: LocationCategory[];
   selectedLocation: string | null;
-  onLocationChange: (categoryId: string | null) => void;
+  onLocationChange: (areaId: string | null) => void;
   isLoading?: boolean;
   events?: Event[];
 }
@@ -26,10 +26,10 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
 
   // Filter locations to only show those that have events
   const locationsWithEvents = React.useMemo(() => {
-    if (!events || events.length === 0) return [];
+    if (!events || events.length === 0) return availableLocations;
     
-    return availableLocations.filter(category => {
-      const citiesInCategory = getCitiesForCategory(category.id);
+    return availableLocations.filter(area => {
+      const citiesInArea = area.cities;
       return events.some(event => {
         if (!event.venues?.city && !event.location) return false;
         
@@ -43,7 +43,7 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
         }
         
         const eventCity = event.venues?.city || event.location;
-        return eventCity && citiesInCategory.some(city => 
+        return eventCity && citiesInArea.some(city => 
           city.toLowerCase() === eventCity.toLowerCase()
         );
       });
@@ -63,11 +63,7 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
     );
   }
 
-  // Don't render if no locations have events
-  if (locationsWithEvents.length === 0) {
-    return null;
-  }
-
+  // Always show the filter section, even if no areas have events yet
   return (
     <div className="space-y-3 sm:space-y-4 md:space-y-6">
       <div className="flex items-center justify-between">
@@ -100,21 +96,21 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
           All Areas
         </Button>
         
-        {locationsWithEvents.map(category => (
+        {availableLocations.map(area => (
           <Button
-            key={category.id}
-            variant={selectedLocation === category.id ? "default" : "outline"}
+            key={area.id}
+            variant={selectedLocation === area.id ? "default" : "outline"}
             size="sm"
-            onClick={() => onLocationChange(category.id)}
+            onClick={() => onLocationChange(area.id)}
             className={cn(
               isMobile ? "text-xs px-3 py-2 h-9" : "text-xs px-3 py-1.5 h-auto",
               "rounded-full transition-coastal",
-              selectedLocation === category.id 
+              selectedLocation === area.id 
                 ? "bg-primary text-white hover:bg-primary/90" 
                 : "border-gray-200 text-neutral hover:bg-primary/5"
             )}
           >
-            {category.displayName}
+            {area.displayName}
           </Button>
         ))}
       </div>
