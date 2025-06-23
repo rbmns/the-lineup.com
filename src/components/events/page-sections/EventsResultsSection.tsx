@@ -26,10 +26,6 @@ export const EventsResultsSection: React.FC<EventsResultsSectionProps> = ({
 }) => {
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold tracking-tight">All Events</h2>
-      </div>
-
       <CategoryFilteredEventsContent 
         showNoExactMatchesMessage={filteredEvents.length === 0 && hasActiveFilters}
         resetFilters={resetFilters}

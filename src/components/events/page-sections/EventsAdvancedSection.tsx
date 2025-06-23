@@ -157,7 +157,7 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
             className="flex items-center gap-2"
           >
             <Filter className="h-4 w-4" />
-            <span>{isMobile ? "Advanced" : "More Filters"}</span>
+            {!isMobile && <span>More Filters</span>}
             {showAdvancedFilters ? (
               <ChevronUp className="h-4 w-4" />
             ) : (
@@ -182,16 +182,6 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
           </div>
         )}
       </div>
-
-      {/* Location Filter Status */}
-      {selectedArea && (
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <span>Showing events in {selectedArea.displayName}</span>
-          <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
-            {getEventCountForArea(selectedArea.id)} events
-          </span>
-        </div>
-      )}
 
       {/* Advanced Filters Panel */}
       {showAdvancedFilters && (
