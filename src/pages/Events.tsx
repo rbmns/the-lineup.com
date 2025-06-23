@@ -4,7 +4,7 @@ import { useEventsPageData } from '@/hooks/events/useEventsPageData';
 import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayout';
 import { EventsResultsSection } from '@/components/events/page-sections/EventsResultsSection';
 import { EventsVibeSection } from '@/components/events/page-sections/EventsVibeSection';
-import { LocationFilter } from '@/components/events/filters/LocationFilter';
+import { LocationSelector } from '@/components/events/location/LocationSelector';
 import { useVenueAreas } from '@/hooks/useVenueAreas';
 import { EventsAdvancedSection } from '@/components/events/page-sections/EventsAdvancedSection';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -30,7 +30,8 @@ const Events = () => {
     allEventTypes,
     availableVenues,
     hasActiveFilters,
-    resetAllFilters
+    resetAllFilters,
+    isLocationLoaded
   } = useEventsPageData();
 
   const { data: venueAreas = [], isLoading: areasLoading } = useVenueAreas();
@@ -61,21 +62,19 @@ const Events = () => {
   return (
     <EventsPageLayout>
       <div className="space-y-4 sm:space-y-6">
-        {/* Main Filters - Location always first, then Vibe */}
-        <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 lg:grid-cols-2 gap-6'}`}>
-          {/* Location Filter - Always first */}
-          <div className="w-full order-1">
-            <LocationFilter
-              availableLocations={venueAreas}
-              selectedLocation={selectedLocation}
-              onLocationChange={setSelectedLocation}
-              isLoading={areasLoading}
-              events={allEvents || []}
-            />
-          </div>
-          
-          {/* Vibe Filter - Always second */}
-          <div className="w-full order-2">
+        {/* Location Selector - Prominent placement at the top */}
+        <LocationSelector
+          availableAreas={venueAreas}
+          selectedAreaId={selectedLocation}
+          onAreaChange={setSelectedLocation}
+          events={allEvents || []}
+          isLoading={areasLoading || !isLocationLoaded}
+        />
+
+        {/* Main Filters - Vibe only now, since location is handled above */}
+        <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-1 gap-6'}`}>
+          {/* Vibe Filter */}
+          <div className="w-full">
             <EventsVibeSection
               selectedVibes={selectedVibes}
               onVibeChange={setSelectedVibes}

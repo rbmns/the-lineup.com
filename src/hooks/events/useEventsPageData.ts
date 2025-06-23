@@ -1,20 +1,36 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { DateRange } from 'react-day-picker';
 import { useRsvpStateManager } from './useRsvpStateManager';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLocationPreference } from '@/hooks/useLocationPreference';
 
 export const useEventsPageData = () => {
   const { user } = useAuth();
+  const { selectedAreaId, updateLocationPreference, isLoaded } = useLocationPreference();
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
   const [selectedVenues, setSelectedVenues] = useState<string[]>([]);
-  const [selectedLocation, setSelectedLocation] = useState<string | null>(null); // Now stores area ID
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [selectedDateFilter, setSelectedDateFilter] = useState<string>('anytime');
+
+  // Use the persistent location preference as the selected location
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+
+  // Sync with location preference when loaded
+  useEffect(() => {
+    if (isLoaded) {
+      setSelectedLocation(selectedAreaId);
+    }
+  }, [selectedAreaId, isLoaded]);
+
+  // Custom location change handler that persists the preference
+  const handleLocationChange = (areaId: string | null) => {
+    setSelectedLocation(areaId);
+    updateLocationPreference(areaId);
+  };
 
   // Fetch events
   const { data: eventsData, isLoading: eventsLoading } = useQuery({
@@ -171,7 +187,7 @@ export const useEventsPageData = () => {
     setSelectedVibes([]);
     setSelectedEventTypes([]);
     setSelectedVenues([]);
-    setSelectedLocation(null);
+    handleLocationChange(null);
     setDateRange(undefined);
     setSelectedDateFilter('anytime');
   };
@@ -189,13 +205,14 @@ export const useEventsPageData = () => {
     setSelectedVibes,
     setSelectedEventTypes,
     setSelectedVenues,
-    setSelectedLocation,
+    setSelectedLocation: handleLocationChange,
     setDateRange,
     setSelectedDateFilter,
     allEventTypes,
     availableVenues,
     hasActiveFilters,
     resetAllFilters,
-    updateEventRsvp: rsvpManager.handleRsvp
+    updateEventRsvp: rsvpManager.handleRsvp,
+    isLocationLoaded: isLoaded
   };
 };

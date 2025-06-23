@@ -13,6 +13,7 @@ interface LocationFilterProps {
   onLocationChange: (areaId: string | null) => void;
   isLoading?: boolean;
   events?: Event[];
+  showTitle?: boolean;
 }
 
 export const LocationFilter: React.FC<LocationFilterProps> = ({
@@ -20,7 +21,8 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
   selectedLocation,
   onLocationChange,
   isLoading = false,
-  events = []
+  events = [],
+  showTitle = true
 }) => {
   const isMobile = useIsMobile();
 
@@ -53,7 +55,9 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
   if (isLoading) {
     return (
       <div className="space-y-3 sm:space-y-4">
-        <h2 className={`${isMobile ? 'text-xl' : 'text-2xl md:text-3xl'} font-semibold tracking-tight text-primary`}>Location</h2>
+        {showTitle && (
+          <h2 className={`${isMobile ? 'text-xl' : 'text-2xl md:text-3xl'} font-semibold tracking-tight text-primary`}>Location</h2>
+        )}
         <div className="flex flex-wrap gap-2">
           {[...Array(3)].map((_, i) => (
             <div key={i} className={`${isMobile ? 'h-9 w-24' : 'h-8 w-20'} bg-gray-200 rounded-full animate-pulse`}></div>
@@ -66,19 +70,21 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
   // Always show the filter section, even if no areas have events yet
   return (
     <div className="space-y-3 sm:space-y-4 md:space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className={`${isMobile ? 'text-xl' : 'text-2xl md:text-3xl'} font-semibold tracking-tight text-primary`}>Location</h2>
-        {selectedLocation && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onLocationChange(null)}
-            className="h-6 w-6 p-0 hover:bg-primary/10"
-          >
-            <X className="h-3 w-3" />
-          </Button>
-        )}
-      </div>
+      {showTitle && (
+        <div className="flex items-center justify-between">
+          <h2 className={`${isMobile ? 'text-xl' : 'text-2xl md:text-3xl'} font-semibold tracking-tight text-primary`}>Location</h2>
+          {selectedLocation && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onLocationChange(null)}
+              className="h-6 w-6 p-0 hover:bg-primary/10"
+            >
+              <X className="h-3 w-3" />
+            </Button>
+          )}
+        </div>
+      )}
       
       <div className="flex flex-wrap gap-2">
         <Button
