@@ -9,9 +9,8 @@ import { PrivacySettings } from '@/components/profile/PrivacySettings';
 import { DataManagement } from '@/components/profile/DataManagement';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MapPin, Edit3, User, Shield, CalendarDays, Database } from 'lucide-react';
+import { MapPin, Edit3, User, Shield, Database } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
-import EventCardList from '@/components/events/EventCardList';
 
 export const ProfileMainContent: React.FC = () => {
   const { user } = useAuth();
@@ -54,28 +53,28 @@ export const ProfileMainContent: React.FC = () => {
         return (
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-bold text-primary mb-2">Personal Information</h2>
-              <p className="text-neutral-50 mb-6">Manage your profile details and preferences</p>
+              <h2 className="text-2xl md:text-3xl font-bold text-primary mb-2">Personal Information</h2>
+              <p className="text-neutral-50 mb-6 text-sm md:text-base">Manage your profile details and preferences</p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-primary">Email</label>
-                <p className="text-neutral bg-secondary-25 rounded-lg px-4 py-3 border border-secondary">{user?.email}</p>
+                <p className="text-neutral bg-secondary-25 rounded-lg px-4 py-3 border border-secondary text-sm md:text-base">{user?.email}</p>
               </div>
               
               <div className="space-y-2">
                 <label className="text-sm font-medium text-primary">Location</label>
                 <div className="flex items-center bg-secondary-25 rounded-lg px-4 py-3 border border-secondary">
                   <MapPin className="h-4 w-4 mr-3 text-vibrant-seafoam" />
-                  <span className="text-neutral">{profile?.location || 'Not set'}</span>
+                  <span className="text-neutral text-sm md:text-base">{profile?.location || 'Not set'}</span>
                 </div>
               </div>
 
               {profile?.tagline && (
                 <div className="space-y-2 md:col-span-2">
                   <label className="text-sm font-medium text-primary">About</label>
-                  <p className="text-neutral bg-secondary-25 rounded-lg px-4 py-3 border border-secondary italic">
+                  <p className="text-neutral bg-secondary-25 rounded-lg px-4 py-3 border border-secondary italic text-sm md:text-base">
                     "{profile.tagline}"
                   </p>
                 </div>
@@ -84,7 +83,7 @@ export const ProfileMainContent: React.FC = () => {
             
             <Button 
               onClick={handleEditProfile} 
-              className="bg-primary hover:bg-primary-75 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+              className="bg-primary hover:bg-primary-75 text-white px-6 py-3 rounded-lg font-medium transition-colors w-full md:w-auto"
             >
               <Edit3 className="h-4 w-4 mr-2" />
               Edit Profile
@@ -107,28 +106,28 @@ export const ProfileMainContent: React.FC = () => {
     <div className="min-h-screen bg-background">
       {/* Hero Header with Ocean Gradient */}
       <div className="bg-gradient-to-br from-primary to-nature-seafoam text-white">
-        <div className="max-w-4xl mx-auto px-4 py-12 md:py-16">
+        <div className="max-w-4xl mx-auto px-4 py-8 md:py-16">
           <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
             <div className="flex-shrink-0">
               <ProfileAvatar 
                 profile={profile} 
                 size="xl" 
-                className="w-32 h-32 md:w-40 md:h-40 border-4 border-white/20 shadow-lg" 
+                className="w-24 h-24 md:w-40 md:h-40 border-4 border-white/20 shadow-lg" 
               />
             </div>
             <div className="text-center md:text-left flex-1">
-              <h1 className="text-3xl md:text-4xl font-bold mb-3">{displayName}</h1>
+              <h1 className="text-2xl md:text-4xl font-bold mb-3">{displayName}</h1>
               {profile?.tagline && (
-                <p className="text-lg text-white/90 italic mb-4 font-light">"{profile.tagline}"</p>
+                <p className="text-base md:text-lg text-white/90 italic mb-4 font-light">"{profile.tagline}"</p>
               )}
               <div className="flex items-center justify-center md:justify-start mb-6 text-white/80">
-                <MapPin className="h-5 w-5 mr-2" />
-                <span className="text-lg">{profile?.location || 'Location not set'}</span>
+                <MapPin className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                <span className="text-sm md:text-lg">{profile?.location || 'Location not set'}</span>
               </div>
               <Button 
                 onClick={handleEditProfile}
                 variant="secondary"
-                className="bg-white/10 hover:bg-white/20 text-white border-white/30 px-6 py-3 rounded-lg font-medium transition-colors backdrop-blur-sm"
+                className="bg-white/10 hover:bg-white/20 text-white border-white/30 px-4 md:px-6 py-2 md:py-3 rounded-lg font-medium transition-colors backdrop-blur-sm w-full md:w-auto"
               >
                 <Edit3 className="h-4 w-4 mr-2" />
                 Edit Profile
@@ -140,12 +139,12 @@ export const ProfileMainContent: React.FC = () => {
 
       {/* Stats Section */}
       <div className="bg-white border-b border-secondary">
-        <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-3 gap-8">
+        <div className="max-w-4xl mx-auto px-4 py-6 md:py-8">
+          <div className="grid grid-cols-3 gap-4 md:gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-primary mb-2">{stat.value}</div>
-                <div className="text-sm md:text-base text-neutral-50 font-medium">{stat.label}</div>
+                <div className="text-2xl md:text-4xl font-bold text-primary mb-1 md:mb-2">{stat.value}</div>
+                <div className="text-xs md:text-base text-neutral-50 font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -163,7 +162,7 @@ export const ProfileMainContent: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-4 md:px-6 py-4 border-b-3 transition-all whitespace-nowrap text-sm md:text-base min-w-0 font-medium ${
+                  className={`flex items-center space-x-2 px-3 md:px-6 py-3 md:py-4 border-b-3 transition-all whitespace-nowrap text-xs md:text-base min-w-0 font-medium ${
                     isActive 
                       ? 'border-primary text-primary bg-primary/5' 
                       : 'border-transparent text-neutral-50 hover:text-primary hover:bg-primary/5'
@@ -180,8 +179,8 @@ export const ProfileMainContent: React.FC = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
-        <div className="bg-white rounded-lg shadow-sm border border-secondary p-6 md:p-8">
+      <div className="max-w-4xl mx-auto px-4 py-6 md:py-12">
+        <div className="bg-white rounded-lg shadow-sm border border-secondary p-4 md:p-8">
           {renderTabContent()}
         </div>
       </div>

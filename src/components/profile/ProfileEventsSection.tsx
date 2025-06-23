@@ -26,25 +26,15 @@ export const ProfileEventsSection: React.FC<ProfileEventsSectionProps> = ({
   handleAddFriend,
   friendshipStatus = 'none'
 }) => {
-  console.log('ProfileEventsSection: Rendering with', {
-    canViewEvents,
-    upcomingEventsCount: upcomingEvents.length,
-    pastEventsCount: pastEvents.length,
-    eventsLoading,
-    isCurrentUser,
-    username,
-    friendshipStatus
-  });
-
   if (!canViewEvents) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-secondary p-6">
+      <div className="bg-white rounded-lg shadow-sm border border-secondary p-6 md:p-8">
         <div className="text-center py-12">
           <Users className="h-12 w-12 text-neutral-50 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-primary mb-2">
+          <h3 className="text-lg md:text-xl font-semibold text-primary mb-3">
             {friendshipStatus === 'none' ? 'Connect to See Events' : 'Events Hidden'}
           </h3>
-          <p className="text-neutral-50 mb-4">
+          <p className="text-neutral-50 mb-6 text-sm md:text-base max-w-md mx-auto">
             {friendshipStatus === 'none' 
               ? `Add ${username} as a friend to see their event activity`
               : `${username}'s events are private`
@@ -53,7 +43,7 @@ export const ProfileEventsSection: React.FC<ProfileEventsSectionProps> = ({
           {friendshipStatus === 'none' && handleAddFriend && (
             <button 
               onClick={handleAddFriend}
-              className="bg-primary hover:bg-primary-75 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              className="bg-primary hover:bg-primary-75 text-white px-6 py-3 rounded-lg font-medium transition-colors"
             >
               Add Friend
             </button>
@@ -66,7 +56,7 @@ export const ProfileEventsSection: React.FC<ProfileEventsSectionProps> = ({
   if (eventsLoading) {
     return (
       <div className="space-y-6">
-        <div className="bg-white rounded-lg shadow-sm border border-secondary p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-secondary p-6 md:p-8">
           <div className="space-y-4">
             <div className="h-6 bg-gray-200 rounded animate-pulse"></div>
             <div className="space-y-3">
@@ -81,19 +71,10 @@ export const ProfileEventsSection: React.FC<ProfileEventsSectionProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Debug Information - Remove in production */}
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm">
-        <p><strong>Debug Info:</strong></p>
-        <p>Upcoming Events: {upcomingEvents.length}</p>
-        <p>Past Events: {pastEvents.length}</p>
-        <p>Loading: {eventsLoading ? 'Yes' : 'No'}</p>
-        <p>Can View Events: {canViewEvents ? 'Yes' : 'No'}</p>
-      </div>
-
       {/* Upcoming Events */}
-      <div className="bg-white rounded-lg shadow-sm border border-secondary p-6">
-        <h2 className="text-xl font-semibold mb-4 flex items-center text-primary">
-          <Calendar className="h-5 w-5 mr-2" />
+      <div className="bg-white rounded-lg shadow-sm border border-secondary p-6 md:p-8">
+        <h2 className="text-xl md:text-2xl font-semibold mb-6 flex items-center text-primary">
+          <Calendar className="h-5 w-5 md:h-6 md:w-6 mr-3" />
           {isCurrentUser ? "Your Upcoming Events" : `${username}'s Upcoming Events`}
         </h2>
         
@@ -109,8 +90,8 @@ export const ProfileEventsSection: React.FC<ProfileEventsSectionProps> = ({
           </div>
         ) : (
           <Card className="border border-gray-100">
-            <CardContent className="p-4 text-center text-gray-500">
-              <p className="text-sm">
+            <CardContent className="p-6 md:p-8 text-center text-gray-500">
+              <p className="text-sm md:text-base">
                 {isCurrentUser ? "No upcoming events" : `${username} has no upcoming events`}
               </p>
             </CardContent>
@@ -119,9 +100,9 @@ export const ProfileEventsSection: React.FC<ProfileEventsSectionProps> = ({
       </div>
 
       {/* Past Events */}
-      <div className="bg-white rounded-lg shadow-sm border border-secondary p-6">
-        <h2 className="text-xl font-semibold mb-4 flex items-center text-primary">
-          <History className="h-5 w-5 mr-2" />
+      <div className="bg-white rounded-lg shadow-sm border border-secondary p-6 md:p-8">
+        <h2 className="text-xl md:text-2xl font-semibold mb-6 flex items-center text-primary">
+          <History className="h-5 w-5 md:h-6 md:w-6 mr-3" />
           {isCurrentUser ? "Your Past Events" : `${username}'s Past Events`}
         </h2>
         
@@ -138,8 +119,8 @@ export const ProfileEventsSection: React.FC<ProfileEventsSectionProps> = ({
           </div>
         ) : (
           <Card className="border border-gray-100">
-            <CardContent className="p-4 text-center text-gray-500">
-              <p className="text-sm">
+            <CardContent className="p-6 md:p-8 text-center text-gray-500">
+              <p className="text-sm md:text-base">
                 {isCurrentUser ? "No past events" : `${username} has no past events`}
               </p>
             </CardContent>
