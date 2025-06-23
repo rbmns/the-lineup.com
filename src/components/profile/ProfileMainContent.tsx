@@ -41,9 +41,9 @@ export const ProfileMainContent: React.FC = () => {
     { label: 'Friends', value: '—' }
   ];
 
+  // Updated tabs - removed 'events' tab since it's now in the main profile page
   const tabs = [
     { id: 'personal', label: 'Personal Info', icon: User, shortLabel: 'Personal' },
-    { id: 'events', label: 'My Events', icon: CalendarDays, shortLabel: 'Events' },
     { id: 'privacy', label: 'Privacy', icon: Shield, shortLabel: 'Privacy' },
     { id: 'data', label: 'Data Management', icon: Database, shortLabel: 'Data' }
   ];
@@ -89,97 +89,6 @@ export const ProfileMainContent: React.FC = () => {
               <Edit3 className="h-4 w-4 mr-2" />
               Edit Profile
             </Button>
-          </div>
-        );
-        
-      case 'events':
-        return (
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-2xl font-bold text-primary mb-2">My Events</h2>
-              <p className="text-neutral-50 mb-6">Events you've RSVP'd to and your activity history</p>
-            </div>
-            
-            <Tabs defaultValue="upcoming" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-8 bg-secondary-25 rounded-lg p-1">
-                <TabsTrigger 
-                  value="upcoming" 
-                  className="text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm rounded-md"
-                >
-                  Upcoming Events ({upcomingEvents.length})
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="past" 
-                  className="text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm rounded-md"
-                >
-                  Past Events ({pastEvents.length})
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="upcoming" className="space-y-0">
-                <div className="space-y-6">
-                  {eventsLoading ? (
-                    <div className="space-y-4">
-                      <div className="h-24 bg-secondary-25 rounded-lg animate-pulse"></div>
-                      <div className="h-24 bg-secondary-25 rounded-lg animate-pulse"></div>
-                    </div>
-                  ) : upcomingEvents.length > 0 ? (
-                    <div className="space-y-4">
-                      {upcomingEvents.map(event => (
-                        <div key={event.id} className="bg-white rounded-lg border border-secondary p-4 hover:shadow-md transition-shadow">
-                          <EventCardList
-                            event={event}
-                            showRsvpStatus={true}
-                            showRsvpButtons={false}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-12 bg-secondary-25 rounded-lg border border-secondary">
-                      <CalendarDays className="h-12 w-12 mx-auto mb-4 text-neutral-25" />
-                      <h3 className="text-lg font-semibold text-primary mb-2">No upcoming events</h3>
-                      <p className="text-neutral-50 mb-4">You haven't RSVP'd to any upcoming events yet</p>
-                      <Button 
-                        onClick={() => navigate('/events')}
-                        className="bg-primary hover:bg-primary-75 text-white px-6 py-2 rounded-lg"
-                      >
-                        Discover Events
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-
-              <TabsContent value="past" className="space-y-0">
-                <div className="space-y-6">
-                  {eventsLoading ? (
-                    <div className="space-y-4">
-                      <div className="h-24 bg-secondary-25 rounded-lg animate-pulse"></div>
-                      <div className="h-24 bg-secondary-25 rounded-lg animate-pulse"></div>
-                    </div>
-                  ) : pastEvents.length > 0 ? (
-                    <div className="space-y-4">
-                      {pastEvents.map(event => (
-                        <div key={event.id} className="bg-white rounded-lg border border-secondary p-4 opacity-75">
-                          <EventCardList
-                            event={event}
-                            showRsvpStatus={true}
-                            showRsvpButtons={false}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-12 bg-secondary-25 rounded-lg border border-secondary">
-                      <CalendarDays className="h-12 w-12 mx-auto mb-4 text-neutral-25" />
-                      <h3 className="text-lg font-semibold text-primary mb-2">No past events</h3>
-                      <p className="text-neutral-50">Your event history will appear here</p>
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-            </Tabs>
           </div>
         );
         

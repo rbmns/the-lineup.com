@@ -5,11 +5,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { ProfilePageLayout } from '@/components/profile/ProfilePageLayout';
 import { useProfileData } from '@/hooks/useProfileData';
 import { UserRsvpedEvents } from '@/components/profile/UserRsvpedEvents';
-import { UserCreatedVenues } from '@/components/venues/UserCreatedVenues';
 import { useAdminData } from '@/hooks/useAdminData';
 import { CreatorRequestsDashboard } from '@/components/admin/CreatorRequestsDashboard';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useCreatorStatus } from '@/hooks/useCreatorStatus';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const ProfilePage: React.FC = () => {
@@ -26,7 +24,6 @@ const ProfilePage: React.FC = () => {
   } = useProfileData(user?.id);
   
   const { isAdmin, requests, isLoading: isAdminLoading } = useAdminData();
-  const { canCreateEvents, isLoading: isCreatorStatusLoading } = useCreatorStatus();
 
   // Redirect to login if not authenticated
   React.useEffect(() => {
@@ -39,9 +36,7 @@ const ProfilePage: React.FC = () => {
     return null; // Will redirect in the effect
   }
 
-  const loading = profileLoading || isCreatorStatusLoading;
-
-  if (loading) {
+  if (profileLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -63,33 +58,20 @@ const ProfilePage: React.FC = () => {
     );
   }
   
-  // For creators: just "My Venues" and "Admin" tab if they are an admin.
-  // For regular users: just "My RSVPs".
-  let numTabs: number;
-  if (canCreateEvents) {
-    numTabs = 1 + (isAdmin ? 1 : 0); // Just venues + admin if applicable
-  } else {
-    numTabs = 1; // Just RSVPs
-  }
+  // Show only RSVPs tab for regular users, add admin tab if user is admin
+  const showAdminTab = isAdmin;
+  const numTabs = showAdminTab ? 2 : 1;
   const gridColsClass = `grid-cols-${numTabs}`;
 
   const searchParams = new URLSearchParams(location.search);
   const tabQueryParam = searchParams.get('tab');
 
-  const validTabs: string[] = [];
-  let defaultTab: string;
-
-  if (canCreateEvents) {
-    validTabs.push('venues');
-    if (isAdmin) {
-      validTabs.push('admin');
-    }
-    defaultTab = 'venues';
-  } else {
-    validTabs.push('rsvps');
-    defaultTab = 'rsvps';
+  const validTabs: string[] = ['rsvps'];
+  if (showAdminTab) {
+    validTabs.push('admin');
   }
 
+  let defaultTab = 'rsvps';
   if (tabQueryParam && validTabs.includes(tabQueryParam)) {
     defaultTab = tabQueryParam;
   }
@@ -105,33 +87,21 @@ const ProfilePage: React.FC = () => {
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         <Tabs defaultValue={defaultTab} className="w-full">
           <TabsList className={`grid w-full ${gridColsClass}`}>
-              {!canCreateEvents && (
-                <TabsTrigger value="rsvps">
-                    My RSVPs
-                </TabsTrigger>
-              )}
-              {canCreateEvents && (
-                <TabsTrigger value="venues">
-                  My Venues
-                </TabsTrigger>
-              )}
-              {isAdmin && (
-                <TabsTrigger value="admin">
-                  Creator Requests
-                </TabsTrigger>
-              )}
+            <TabsTrigger value="rsvps">
+              My RSVPs
+            </TabsTrigger>
+            {showAdminTab && (
+              <TabsTrigger value="admin">
+                Creator Requests
+              </TabsTrigger>
+            )}
           </TabsList>
-          {!canCreateEvents && (
-            <TabsContent value="rsvps" className="mt-8">
-                <UserRsvpedEvents userId={user.id} />
-            </TabsContent>
-          )}
-          {canCreateEvents && (
-            <TabsContent value="venues" className="mt-8">
-              <UserCreatedVenues />
-            </TabsContent>
-          )}
-          {isAdmin && (
+          
+          <TabsContent value="rsvps" className="mt-8">
+            <UserRsvpedEvents userId={user.id} />
+          </TabsContent>
+          
+          {showAdminTab && (
             <TabsContent value="admin" className="mt-8">
               {isAdminLoading ? (
                 <div className="space-y-4">
