@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLocationPreference } from '@/hooks/useLocationPreference';
 
 export const useEventsPageData = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { selectedAreaId, updateLocationPreference, isLoaded } = useLocationPreference();
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
@@ -94,6 +94,40 @@ export const useEventsPageData = () => {
       return data || [];
     },
   });
+
+  // Fetch venue areas
+  const { data: venueAreas = [] } = useQuery({
+    queryKey: ['venue-areas'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('venue_areas')
+        .select('id, name')
+        .order('display_order', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching venue areas:', error);
+        throw error;
+      }
+
+      return data || [];
+    },
+  });
+
+  // Auto-set location based on user's profile location
+  useEffect(() => {
+    if (user && profile && profile.location && isLoaded && !selectedAreaId && venueAreas.length > 0 && cityAreas.length > 0) {
+      // Find if user's location matches any city in the venue areas
+      const userCity = profile.location;
+      const matchingCityArea = cityAreas.find(cityArea => 
+        cityArea.city_name.toLowerCase() === userCity.toLowerCase()
+      );
+      
+      if (matchingCityArea) {
+        console.log('Auto-setting location filter based on user profile:', userCity, 'to area:', matchingCityArea.area_id);
+        handleLocationChange(matchingCityArea.area_id);
+      }
+    }
+  }, [user, profile, isLoaded, selectedAreaId, venueAreas, cityAreas]);
 
   // Get all event types/categories for advanced filtering
   const allEventTypes = [
