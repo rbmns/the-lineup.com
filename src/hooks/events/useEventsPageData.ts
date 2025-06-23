@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
@@ -6,6 +7,7 @@ import { DateRange } from 'react-day-picker';
 import { useRsvpStateManager } from './useRsvpStateManager';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLocationPreference } from '@/hooks/useLocationPreference';
+import { convertAreasToCategories } from '@/utils/locationCategories';
 
 export const useEventsPageData = () => {
   const { user, profile } = useAuth();
@@ -95,21 +97,33 @@ export const useEventsPageData = () => {
     },
   });
 
-  // Fetch venue areas
+  // Fetch venue areas and convert to proper format with cities
   const { data: venueAreas = [] } = useQuery({
-    queryKey: ['venue-areas'],
+    queryKey: ['venue-areas-with-cities'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch areas
+      const { data: areas, error: areasError } = await supabase
         .from('venue_areas')
         .select('id, name')
         .order('display_order', { ascending: true });
 
-      if (error) {
-        console.error('Error fetching venue areas:', error);
-        throw error;
+      if (areasError) {
+        console.error('Error fetching venue areas:', areasError);
+        throw areasError;
       }
 
-      return data || [];
+      // Fetch city mappings
+      const { data: cityMappings, error: cityError } = await supabase
+        .from('venue_city_areas')
+        .select('area_id, city_name');
+
+      if (cityError) {
+        console.error('Error fetching venue city areas:', cityError);
+        throw cityError;
+      }
+
+      // Convert to LocationCategory format with cities
+      return convertAreasToCategories(areas || [], cityMappings || []);
     },
   });
 
@@ -145,9 +159,8 @@ export const useEventsPageData = () => {
 
   // Helper function to get cities for a selected area
   const getCitiesForSelectedArea = (areaId: string): string[] => {
-    return cityAreas
-      .filter(cityArea => cityArea.area_id === areaId)
-      .map(cityArea => cityArea.city_name);
+    const area = venueAreas.find(area => area.id === areaId);
+    return area ? area.cities : [];
   };
 
   // Filter events based on all criteria
