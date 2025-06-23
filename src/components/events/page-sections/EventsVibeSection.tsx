@@ -47,8 +47,10 @@ export const EventsVibeSection: React.FC<EventsVibeSectionProps> = ({
     );
   }
 
-  // Update the count display logic
+  // Update the count display logic - hide on mobile
   const getCountDisplay = () => {
+    if (isMobile) return null;
+    
     if (selectedVibes.length === 0) {
       return `Showing all events (${availableVibes.length} vibes available)`;
     }
@@ -59,9 +61,11 @@ export const EventsVibeSection: React.FC<EventsVibeSectionProps> = ({
     <div className="space-y-3 sm:space-y-4 md:space-y-6">
       <div className="flex items-center justify-between">
         <h2 className={`${isMobile ? 'text-xl' : 'text-2xl md:text-3xl'} font-semibold tracking-tight text-primary`}>Find your vibe</h2>
-        <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-neutral-50`}>
-          {getCountDisplay()}
-        </div>
+        {!isMobile && (
+          <div className="text-sm text-neutral-50">
+            {getCountDisplay()}
+          </div>
+        )}
       </div>
       
       <div className="w-full">

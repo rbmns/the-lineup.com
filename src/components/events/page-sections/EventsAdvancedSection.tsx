@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { EventsAdvancedFilters } from '@/components/events/page-components/EventsAdvancedFilters';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Filter, ChevronDown, ChevronUp, MapPin, Users } from 'lucide-react';
+import { Filter, ChevronDown, ChevronUp, MapPin } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Event } from '@/types';
 import { LocationCategory } from '@/utils/locationCategories';
@@ -124,10 +123,11 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
                 <SelectItem value="all" className="hover:bg-gray-50">
                   <div className="flex items-center justify-between w-full">
                     <span>All Areas</span>
-                    <span className="text-xs text-gray-500 ml-2 flex items-center gap-1">
-                      <Users className="h-3 w-3" />
-                      {totalEvents}
-                    </span>
+                    {!isMobile && (
+                      <span className="text-xs text-gray-500 ml-2">
+                        {totalEvents}
+                      </span>
+                    )}
                   </div>
                 </SelectItem>
                 {venueAreas.map(area => {
@@ -136,10 +136,11 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
                     <SelectItem key={area.id} value={area.id} className="hover:bg-gray-50">
                       <div className="flex items-center justify-between w-full">
                         <span>{area.displayName}</span>
-                        <span className="text-xs text-gray-500 ml-2 flex items-center gap-1">
-                          <Users className="h-3 w-3" />
-                          {eventCount}
-                        </span>
+                        {!isMobile && (
+                          <span className="text-xs text-gray-500 ml-2">
+                            {eventCount}
+                          </span>
+                        )}
                       </div>
                     </SelectItem>
                   );
@@ -156,7 +157,7 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
             className="flex items-center gap-2"
           >
             <Filter className="h-4 w-4" />
-            <span>More Filters</span>
+            <span>{isMobile ? "Advanced" : "More Filters"}</span>
             {showAdvancedFilters ? (
               <ChevronUp className="h-4 w-4" />
             ) : (
@@ -175,9 +176,11 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
           </Button>
         </div>
         
-        <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-neutral-50`}>
-          {filteredEventsCount} events found
-        </div>
+        {!isMobile && (
+          <div className="text-sm text-neutral-50">
+            {filteredEventsCount} events found
+          </div>
+        )}
       </div>
 
       {/* Location Filter Status */}
