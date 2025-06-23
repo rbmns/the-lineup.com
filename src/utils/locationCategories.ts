@@ -37,6 +37,12 @@ export const LOCATION_CATEGORIES: LocationCategory[] = [
     name: 'Den Haag Area',
     displayName: 'Den Haag Area',
     cities: ['Den Haag', 'The Hague', 'Scheveningen', 'Wassenaar']
+  },
+  {
+    id: 'ericeira-area',
+    name: 'Ericeira Area',
+    displayName: 'Ericeira Area',
+    cities: ['Ericeira', 'Mafra', 'Torres Vedras']
   }
 ];
 

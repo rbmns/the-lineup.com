@@ -26,7 +26,7 @@ export const useVenueLocationCategories = () => {
 
       if (uniqueCities.length === 0) {
         console.warn('No venue locations found in the venues table.');
-        return citiesToCategories(['Zandvoort', 'Amsterdam', 'Haarlem']); // Default categories
+        return citiesToCategories(['Zandvoort', 'Amsterdam', 'Haarlem', 'Ericeira']); // Include Ericeira in defaults
       }
       
       // Convert cities to categories
