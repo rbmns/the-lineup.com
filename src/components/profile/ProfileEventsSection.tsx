@@ -26,6 +26,16 @@ export const ProfileEventsSection: React.FC<ProfileEventsSectionProps> = ({
   handleAddFriend,
   friendshipStatus = 'none'
 }) => {
+  console.log('ProfileEventsSection: Rendering with', {
+    canViewEvents,
+    upcomingEventsCount: upcomingEvents.length,
+    pastEventsCount: pastEvents.length,
+    eventsLoading,
+    isCurrentUser,
+    username,
+    friendshipStatus
+  });
+
   if (!canViewEvents) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-secondary p-6">
@@ -71,6 +81,15 @@ export const ProfileEventsSection: React.FC<ProfileEventsSectionProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Debug Information - Remove in production */}
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm">
+        <p><strong>Debug Info:</strong></p>
+        <p>Upcoming Events: {upcomingEvents.length}</p>
+        <p>Past Events: {pastEvents.length}</p>
+        <p>Loading: {eventsLoading ? 'Yes' : 'No'}</p>
+        <p>Can View Events: {canViewEvents ? 'Yes' : 'No'}</p>
+      </div>
+
       {/* Upcoming Events */}
       <div className="bg-white rounded-lg shadow-sm border border-secondary p-6">
         <h2 className="text-xl font-semibold mb-4 flex items-center text-primary">
