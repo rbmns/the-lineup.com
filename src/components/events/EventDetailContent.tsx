@@ -157,11 +157,11 @@ const EventDetailContent = ({
         {/* Hero content overlay - Better positioned */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-8 lg:p-12 xl:p-16">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-6xl mx-auto text-center">
             <h1 className="font-sans font-bold text-4xl sm:text-5xl lg:text-6xl xl:text-7xl text-white leading-tight mb-6">
               {event.title}
             </h1>
-            <div className="flex items-center text-white/90 text-lg lg:text-xl">
+            <div className="flex items-center justify-center text-white/90 text-lg lg:text-xl">
               <Calendar className="h-6 w-6 mr-4" />
               <span>
                 {event.start_date && formatDate(event.start_date)}
@@ -190,11 +190,11 @@ const EventDetailContent = ({
                 />
               </div>
               
-              {/* About Section */}
+              {/* About Section - Centered on desktop */}
               {event.description && (
-                <div className="space-y-6">
+                <div className="space-y-6 text-center lg:text-center">
                   <h2 className="font-sans font-bold text-3xl lg:text-4xl text-gray-900">About this event</h2>
-                  <div className="prose prose-lg lg:prose-xl max-w-none">
+                  <div className="prose prose-lg lg:prose-xl max-w-none mx-auto">
                     <p className="text-gray-700 leading-relaxed whitespace-pre-line text-lg lg:text-xl">
                       {event.description}
                     </p>
@@ -204,20 +204,24 @@ const EventDetailContent = ({
               
               {/* Tags */}
               {event.tags && event.tags.length > 0 && (
-                <div className="space-y-6">
+                <div className="space-y-6 text-center lg:text-center">
                   <h3 className="font-sans font-semibold text-2xl text-gray-900">Tags</h3>
-                  <EventTagsSection tags={event.tags} />
+                  <div className="flex justify-center">
+                    <EventTagsSection tags={event.tags} />
+                  </div>
                 </div>
               )}
               
               {/* Friends attending section */}
               {friendAttendees && (friendAttendees.going.length > 0 || friendAttendees.interested.length > 0) && (
-                <div className="space-y-6">
+                <div className="space-y-6 text-center lg:text-center">
                   <h3 className="font-sans font-semibold text-2xl text-gray-900">Friends Attending</h3>
-                  <EventFriendRsvps 
-                    going={friendAttendees.going}
-                    interested={friendAttendees.interested}
-                  />
+                  <div className="flex justify-center">
+                    <EventFriendRsvps 
+                      going={friendAttendees.going}
+                      interested={friendAttendees.interested}
+                    />
+                  </div>
                 </div>
               )}
             </div>

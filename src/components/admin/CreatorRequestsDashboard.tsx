@@ -21,6 +21,8 @@ interface Request {
     contact_email?: string;
     contact_phone?: string;
   };
+  original_request_id?: string;
+  status?: string;
 }
 
 interface CreatorRequestsDashboardProps {
@@ -33,14 +35,23 @@ export const CreatorRequestsDashboard: React.FC<CreatorRequestsDashboardProps> =
   const mutationOptions = {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['creator-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['user-role'] });
     },
     onError: (error: any) => {
+      console.error('Mutation error:', error);
       toast.error(error.message || 'An error occurred.');
     },
   };
 
   const approveMutation = useMutation({
-    mutationFn: ({ userId, notificationId }: { userId: string, notificationId: string }) => CreatorRequestService.approveCreatorRequest(userId, notificationId),
+    mutationFn: async ({ userId, notificationId }: { userId: string, notificationId: string }) => {
+      console.log('Approving creator request:', { userId, notificationId });
+      const result = await CreatorRequestService.approveCreatorRequest(userId, notificationId);
+      if (result.error) {
+        throw new Error(result.error.message || 'Failed to approve request');
+      }
+      return result;
+    },
     ...mutationOptions,
     onSuccess: () => {
       toast.success('Creator request approved! User has been granted event creator access.');
@@ -49,7 +60,14 @@ export const CreatorRequestsDashboard: React.FC<CreatorRequestsDashboardProps> =
   });
 
   const denyMutation = useMutation({
-    mutationFn: ({ userId, notificationId }: { userId: string, notificationId: string }) => CreatorRequestService.denyCreatorRequest(userId, notificationId),
+    mutationFn: async ({ userId, notificationId }: { userId: string, notificationId: string }) => {
+      console.log('Denying creator request:', { userId, notificationId });
+      const result = await CreatorRequestService.denyCreatorRequest(userId, notificationId);
+      if (result.error) {
+        throw new Error(result.error.message || 'Failed to deny request');
+      }
+      return result;
+    },
     ...mutationOptions,
     onSuccess: () => {
       toast.info('Creator request denied.');
@@ -58,8 +76,8 @@ export const CreatorRequestsDashboard: React.FC<CreatorRequestsDashboardProps> =
   });
 
   // Filter requests properly - pending are those not read/handled
-  const pendingRequests = requests.filter(r => !r.is_read);
-  const handledRequests = requests.filter(r => r.is_read);
+  const pendingRequests = requests.filter(r => !r.is_read && r.status !== 'approved' && r.status !== 'denied');
+  const handledRequests = requests.filter(r => r.is_read || r.status === 'approved' || r.status === 'denied');
 
   console.log('Creator Requests Dashboard - Total requests:', requests.length);
   console.log('Pending requests:', pendingRequests.length);
@@ -77,81 +95,101 @@ export const CreatorRequestsDashboard: React.FC<CreatorRequestsDashboardProps> =
     );
   }
 
-  const RequestCard = ({ request, isPending }: { request: Request, isPending: boolean }) => (
-    <Card key={request.id} className={isPending ? "border-orange-200 bg-orange-50/50" : ""}>
-      <CardHeader>
-        <CardTitle className="flex justify-between items-start">
-          <div>
-            <span className="text-lg">{request.data.username}</span>
-            <p className="text-sm text-muted-foreground font-normal flex items-center gap-1 mt-1">
-              <Mail className="h-3 w-3" />
-              {request.data.user_email}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge variant={isPending ? 'destructive' : 'secondary'}>
-              {isPending ? 'Pending' : 'Handled'}
-            </Badge>
-          </div>
-        </CardTitle>
-        <CardDescription>
-          Submitted {formatDistanceToNow(new Date(request.created_at), { addSuffix: true })}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <h4 className="font-medium mb-2">Reason for Request:</h4>
-          <blockquote className="pl-4 border-l-2 border-muted italic text-muted-foreground">
-            "{request.data.reason}"
-          </blockquote>
-        </div>
-        
-        {(request.data.contact_email || request.data.contact_phone) && (
-          <div>
-            <h4 className="font-medium mb-2">Additional Contact Information:</h4>
-            <div className="space-y-1 text-sm">
-              {request.data.contact_email && (
-                <p className="flex items-center gap-2">
-                  <Mail className="h-3 w-3" />
-                  {request.data.contact_email}
-                </p>
-              )}
-              {request.data.contact_phone && (
-                <p className="flex items-center gap-2">
-                  <Phone className="h-3 w-3" />
-                  {request.data.contact_phone}
-                </p>
-              )}
+  const RequestCard = ({ request, isPending }: { request: Request, isPending: boolean }) => {
+    const isProcessing = approveMutation.isPending || denyMutation.isPending;
+    
+    const handleApprove = () => {
+      console.log('Approve button clicked for request:', request);
+      approveMutation.mutate({ 
+        userId: request.data.user_id, 
+        notificationId: request.id 
+      });
+    };
+
+    const handleDeny = () => {
+      console.log('Deny button clicked for request:', request);
+      denyMutation.mutate({ 
+        userId: request.data.user_id, 
+        notificationId: request.id 
+      });
+    };
+
+    return (
+      <Card key={request.id} className={isPending ? "border-orange-200 bg-orange-50/50" : ""}>
+        <CardHeader>
+          <CardTitle className="flex justify-between items-start">
+            <div>
+              <span className="text-lg">{request.data.username}</span>
+              <p className="text-sm text-muted-foreground font-normal flex items-center gap-1 mt-1">
+                <Mail className="h-3 w-3" />
+                {request.data.user_email}
+              </p>
             </div>
+            <div className="flex items-center gap-2">
+              <Badge variant={isPending ? 'destructive' : 'secondary'}>
+                {isPending ? 'Pending' : 'Handled'}
+              </Badge>
+            </div>
+          </CardTitle>
+          <CardDescription>
+            Submitted {formatDistanceToNow(new Date(request.created_at), { addSuffix: true })}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <h4 className="font-medium mb-2">Reason for Request:</h4>
+            <blockquote className="pl-4 border-l-2 border-muted italic text-muted-foreground">
+              "{request.data.reason}"
+            </blockquote>
           </div>
-        )}
-        
-        {isPending && (
-          <div className="flex gap-2 pt-4 border-t">
-            <Button 
-              size="sm" 
-              onClick={() => approveMutation.mutate({ userId: request.data.user_id, notificationId: request.id })}
-              disabled={approveMutation.isPending || denyMutation.isPending}
-              className="flex items-center gap-1"
-            >
-              <CheckCircle className="h-3 w-3" />
-              {approveMutation.isPending ? 'Approving...' : 'Approve'}
-            </Button>
-            <Button 
-              size="sm" 
-              variant="destructive" 
-              onClick={() => denyMutation.mutate({ userId: request.data.user_id, notificationId: request.id })}
-              disabled={approveMutation.isPending || denyMutation.isPending}
-              className="flex items-center gap-1"
-            >
-              <XCircle className="h-3 w-3" />
-              {denyMutation.isPending ? 'Denying...' : 'Deny'}
-            </Button>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
+          
+          {(request.data.contact_email || request.data.contact_phone) && (
+            <div>
+              <h4 className="font-medium mb-2">Additional Contact Information:</h4>
+              <div className="space-y-1 text-sm">
+                {request.data.contact_email && (
+                  <p className="flex items-center gap-2">
+                    <Mail className="h-3 w-3" />
+                    {request.data.contact_email}
+                  </p>
+                )}
+                {request.data.contact_phone && (
+                  <p className="flex items-center gap-2">
+                    <Phone className="h-3 w-3" />
+                    {request.data.contact_phone}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {isPending && (
+            <div className="flex gap-2 pt-4 border-t">
+              <Button 
+                size="sm" 
+                onClick={handleApprove}
+                disabled={isProcessing}
+                className="flex items-center gap-1"
+              >
+                <CheckCircle className="h-3 w-3" />
+                {approveMutation.isPending ? 'Approving...' : 'Approve'}
+              </Button>
+              <Button 
+                size="sm" 
+                variant="destructive" 
+                onClick={handleDeny}
+                disabled={isProcessing}
+                className="flex items-center gap-1"
+              >
+                <XCircle className="h-3 w-3" />
+                {denyMutation.isPending ? 'Denying...' : 'Deny'}
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <div className="space-y-8">
