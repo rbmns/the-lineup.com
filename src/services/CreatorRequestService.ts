@@ -225,15 +225,15 @@ export const CreatorRequestService = {
     console.log('CreatorRequestService: Denying request for userId:', userId, 'notificationId:', notificationId);
     
     try {
-      // 1. Update request status to denied
-      console.log('CreatorRequestService: Updating request status to denied...');
+      // 1. Update request status to rejected (not denied!)
+      console.log('CreatorRequestService: Updating request status to rejected...');
       const { error: requestError } = await supabase
         .from('creator_requests')
-        .update({ status: 'denied' })
+        .update({ status: 'rejected' })
         .eq('user_id', userId);
 
       if (requestError) {
-        console.error('Error updating creator request status to denied:', requestError);
+        console.error('Error updating creator request status to rejected:', requestError);
         return { error: requestError };
       }
 
@@ -250,7 +250,7 @@ export const CreatorRequestService = {
         }
       }
 
-      console.log('Creator request denied successfully');
+      console.log('Creator request rejected successfully');
       return { error: null };
     } catch (error) {
       console.error('CreatorRequestService: Error in denyCreatorRequest:', error);

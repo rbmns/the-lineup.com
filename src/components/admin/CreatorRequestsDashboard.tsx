@@ -75,9 +75,9 @@ export const CreatorRequestsDashboard: React.FC<CreatorRequestsDashboardProps> =
     }
   });
 
-  // Filter requests properly - pending are those not read/handled
-  const pendingRequests = requests.filter(r => !r.is_read && r.status !== 'approved' && r.status !== 'denied');
-  const handledRequests = requests.filter(r => r.is_read || r.status === 'approved' || r.status === 'denied');
+  // Filter requests properly - pending are those not read/handled and with pending status
+  const pendingRequests = requests.filter(r => !r.is_read && r.status !== 'approved' && r.status !== 'rejected');
+  const handledRequests = requests.filter(r => r.is_read || r.status === 'approved' || r.status === 'rejected');
 
   console.log('Creator Requests Dashboard - Total requests:', requests.length);
   console.log('Pending requests:', pendingRequests.length);
