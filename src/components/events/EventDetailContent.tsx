@@ -139,7 +139,7 @@ const EventDetailContent = ({
           alt={event.title}
           aspectRatio="hero"
           overlayVariant="sunset"
-          className="w-full h-72 sm:h-80 lg:h-[28rem]"
+          className="w-full h-72 sm:h-80 lg:h-[32rem]"
           loading="eager"
         />
         
@@ -148,7 +148,7 @@ const EventDetailContent = ({
           <div className="absolute top-6 left-6 z-30">
             <CategoryPill 
               category={event.event_category}
-              size="md"
+              size="lg"
               showIcon={true}
             />       
           </div>
@@ -156,13 +156,13 @@ const EventDetailContent = ({
         
         {/* Hero content overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-6 lg:p-12">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="font-inter font-bold text-3xl sm:text-4xl lg:text-5xl text-white leading-tight mb-4">
+        <div className="absolute bottom-0 left-0 right-0 p-6 lg:p-16">
+          <div className="max-w-7xl mx-auto">
+            <h1 className="font-inter font-bold text-4xl sm:text-5xl lg:text-6xl text-white leading-tight mb-6">
               {event.title}
             </h1>
-            <div className="flex items-center text-white/90 text-lg">
-              <Calendar className="h-5 w-5 mr-3" />
+            <div className="flex items-center text-white/90 text-xl">
+              <Calendar className="h-6 w-6 mr-4" />
               <span>
                 {event.start_date && formatDate(event.start_date)}
                 {event.start_time && ` • ${formatEventTime(event.start_time, event.end_time)}`}
@@ -173,16 +173,16 @@ const EventDetailContent = ({
       </div>
 
       {/* Main Content */}
-      <div className="w-full px-6 lg:px-12 py-8 lg:py-12">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+      <div className="w-full px-6 lg:px-16 py-12 lg:py-16">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
             
             {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-8">
+            <div className="lg:col-span-8 space-y-12">
               
               {/* RSVP Section */}
               <Card className="bg-white border-0 shadow-sm">
-                <CardContent className="p-6 lg:p-8">
+                <CardContent className="p-8 lg:p-10">
                   <EventRsvpSection 
                     isOwner={isOwner}
                     onRsvp={handleRsvp}
@@ -195,10 +195,10 @@ const EventDetailContent = ({
               {/* About Section */}
               {event.description && (
                 <Card className="bg-white border-0 shadow-sm">
-                  <CardContent className="p-6 lg:p-8">
-                    <h2 className="font-inter font-semibold text-xl lg:text-2xl text-gray-900 mb-6">About this event</h2>
-                    <div className="prose prose-gray max-w-none">
-                      <p className="text-gray-700 leading-relaxed whitespace-pre-line text-base lg:text-lg">
+                  <CardContent className="p-8 lg:p-10">
+                    <h2 className="font-inter font-semibold text-2xl lg:text-3xl text-gray-900 mb-8">About this event</h2>
+                    <div className="prose prose-gray prose-lg max-w-none">
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-line text-lg lg:text-xl">
                         {event.description}
                       </p>
                     </div>
@@ -209,7 +209,7 @@ const EventDetailContent = ({
               {/* Tags */}
               {event.tags && event.tags.length > 0 && (
                 <Card className="bg-white border-0 shadow-sm">
-                  <CardContent className="p-6 lg:p-8">
+                  <CardContent className="p-8 lg:p-10">
                     <EventTagsSection tags={event.tags} />
                   </CardContent>
                 </Card>
@@ -218,8 +218,8 @@ const EventDetailContent = ({
               {/* Friends attending section */}
               {friendAttendees && (friendAttendees.going.length > 0 || friendAttendees.interested.length > 0) && (
                 <Card className="bg-white border-0 shadow-sm">
-                  <CardContent className="p-6 lg:p-8">
-                    <h3 className="font-inter font-semibold text-lg text-gray-900 mb-6">Friends Attending</h3>
+                  <CardContent className="p-8 lg:p-10">
+                    <h3 className="font-inter font-semibold text-xl text-gray-900 mb-8">Friends Attending</h3>
                     <EventFriendRsvps 
                       going={friendAttendees.going}
                       interested={friendAttendees.interested}
@@ -230,20 +230,20 @@ const EventDetailContent = ({
             </div>
             
             {/* Right Column - Event Details Sidebar */}
-            <div className="space-y-6">
+            <div className="lg:col-span-4 space-y-8">
               
               {/* Event Details Card */}
               <Card className="bg-white border-0 shadow-sm">
-                <CardContent className="p-6">
-                  <h3 className="font-inter font-semibold text-lg text-gray-900 mb-6">Event Details</h3>
+                <CardContent className="p-8">
+                  <h3 className="font-inter font-semibold text-xl text-gray-900 mb-8">Event Details</h3>
                   
-                  <div className="space-y-6">
+                  <div className="space-y-8">
                     {/* Date & Time */}
                     <div className="flex items-start gap-4">
-                      <Calendar className="h-5 w-5 text-gray-500 mt-1 flex-shrink-0" />
+                      <Calendar className="h-6 w-6 text-gray-500 mt-1 flex-shrink-0" />
                       <div>
-                        <p className="font-medium text-gray-900 mb-1">Date</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="font-medium text-gray-900 mb-2 text-lg">Date</p>
+                        <p className="text-gray-600">
                           {event.start_date && formatDate(event.start_date)}
                         </p>
                       </div>
@@ -252,10 +252,10 @@ const EventDetailContent = ({
                     {/* Time */}
                     {event.start_time && (
                       <div className="flex items-start gap-4">
-                        <Clock className="h-5 w-5 text-gray-500 mt-1 flex-shrink-0" />
+                        <Clock className="h-6 w-6 text-gray-500 mt-1 flex-shrink-0" />
                         <div>
-                          <p className="font-medium text-gray-900 mb-1">Time</p>
-                          <p className="text-sm text-gray-600">
+                          <p className="font-medium text-gray-900 mb-2 text-lg">Time</p>
+                          <p className="text-gray-600">
                             {formatEventTime(event.start_time, event.end_time)}
                           </p>
                         </div>
@@ -264,24 +264,24 @@ const EventDetailContent = ({
                     
                     {/* Venue */}
                     <div className="flex items-start gap-4">
-                      <MapPin className="h-5 w-5 text-gray-500 mt-1 flex-shrink-0" />
+                      <MapPin className="h-6 w-6 text-gray-500 mt-1 flex-shrink-0" />
                       <div className="flex-1">
-                        <p className="font-medium text-gray-900 mb-1">Venue</p>
-                        <p className="text-sm text-gray-600 mb-2">{eventLocation}</p>
+                        <p className="font-medium text-gray-900 mb-2 text-lg">Venue</p>
+                        <p className="text-gray-600 mb-2">{eventLocation}</p>
                         {venueAddress && (
-                          <p className="text-xs text-gray-500 mb-3">{venueAddress}</p>
+                          <p className="text-sm text-gray-500 mb-4">{venueAddress}</p>
                         )}
                         
                         {/* Venue links */}
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-3">
                           {event.venues?.website && (
                             <a
                               href={event.venues.website}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center gap-2"
+                              className="text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center gap-2"
                             >
-                              <ExternalLink className="h-3 w-3" />
+                              <ExternalLink className="h-4 w-4" />
                               Website
                             </a>
                           )}
@@ -290,9 +290,9 @@ const EventDetailContent = ({
                               href={mapUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center gap-2"
+                              className="text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center gap-2"
                             >
-                              <ExternalLink className="h-3 w-3" />
+                              <ExternalLink className="h-4 w-4" />
                               View on Maps
                             </a>
                           )}
@@ -303,10 +303,10 @@ const EventDetailContent = ({
                     {/* Entrance Fee */}
                     {event.fee && (
                       <div className="flex items-start gap-4">
-                        <Euro className="h-5 w-5 text-gray-500 mt-1 flex-shrink-0" />
+                        <Euro className="h-6 w-6 text-gray-500 mt-1 flex-shrink-0" />
                         <div>
-                          <p className="font-medium text-gray-900 mb-1">Entrance Fee</p>
-                          <p className="text-sm text-gray-600">€{event.fee}</p>
+                          <p className="font-medium text-gray-900 mb-2 text-lg">Entrance Fee</p>
+                          <p className="text-gray-600">€{event.fee}</p>
                         </div>
                       </div>
                     )}
@@ -316,10 +316,10 @@ const EventDetailContent = ({
               
               {/* Attendees Summary */}
               <Card className="bg-white border-0 shadow-sm">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Users className="h-5 w-5 text-gray-500" />
-                    <h3 className="font-inter font-semibold text-lg text-gray-900">Attendees</h3>
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <Users className="h-6 w-6 text-gray-500" />
+                    <h3 className="font-inter font-semibold text-xl text-gray-900">Attendees</h3>
                   </div>
                   <EventAttendeesSummary 
                     goingCount={attendees?.going?.length || event.attendees?.going || 0}
@@ -331,7 +331,7 @@ const EventDetailContent = ({
               {/* External link if available */}
               {bookingLink && (
                 <Card className="bg-orange-50 border-orange-200">
-                  <CardContent className="p-6">
+                  <CardContent className="p-8">
                     <EventExternalLink url={bookingLink} />
                   </CardContent>
                 </Card>
