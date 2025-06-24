@@ -8,7 +8,7 @@ export const useEventRsvpHandler = (eventId: string) => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const [rsvpLoading, setRsvpLoading] = useState<boolean>(false);
-  const { updateRSVP } = useEventRSVP();
+  const { updateRSVP, getUserEventRSVP } = useEventRSVP();
 
   // Add cleanup for transition effects
   useEffect(() => {
@@ -45,7 +45,6 @@ export const useEventRsvpHandler = (eventId: string) => {
       }
       
       // First check current RSVP status to determine the action
-      const { getUserEventRSVP } = useEventRSVP();
       const currentRsvp = await getUserEventRSVP(user.id, eventId);
       
       let newStatus: 'Going' | 'Interested' | null = status;
