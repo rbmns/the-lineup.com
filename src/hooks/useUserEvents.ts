@@ -48,12 +48,12 @@ export const useUserEvents = (userId: string | undefined): UseUserEventsResult =
         const eventIds = rsvpData.map(rsvp => rsvp.event_id);
         console.log('useUserEvents: Event IDs to fetch:', eventIds);
 
-        // Simplified approach: fetch events by IDs and then filter
+        // Use specific foreign key relationship to avoid ambiguity
         const { data: eventsData, error: eventsError } = await supabase
           .from('events')
           .select(`
             *,
-            venues:venue_id(*)
+            venues!events_venue_id_fkey(*)
           `)
           .eq('status', 'published')
           .in('id', eventIds)
