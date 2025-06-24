@@ -312,22 +312,11 @@ const EventDetail: React.FC<EventDetailProps> = ({
                     </span>
                   </div>
                   <div>
-                    {event.organiser_name && (
-                      <p className="font-medium text-left">{event.organiser_name}</p>
-                    )}
-                    {event.organizer_link && (
-                      <a
-                        href={event.organizer_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                      >
+                    {event.organiser_name && <p className="font-medium text-left">{event.organiser_name}</p>}
+                    {event.organizer_link && <a href={event.organizer_link} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:text-blue-800 hover:underline">
                         Visit organizer website
-                      </a>
-                    )}
-                    {!event.organiser_name && !event.organizer_link && (
-                      <p className="text-sm text-gray-600 text-left">Event Organizer</p>
-                    )}
+                      </a>}
+                    {!event.organiser_name && !event.organizer_link && <p className="text-sm text-gray-600 text-left">Event Organizer</p>}
                   </div>
                 </div>
               </div>}
@@ -361,25 +350,14 @@ const EventDetail: React.FC<EventDetailProps> = ({
                     <div className="text-left">
                       <h3 className="font-medium text-gray-900 mb-3 text-left">Booking Info</h3>
                       
-                      {event.fee && (
-                        <div className="mb-3">
+                      {event.fee && <div className="mb-3">
                           <span className="text-sm text-gray-600">Entry fee: </span>
                           <span className="font-medium">€{event.fee}</span>
-                        </div>
-                      )}
+                        </div>}
                       
-                      {event.booking_link && (
-                        <div>
-                          <a
-                            href={event.booking_link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                          >
-                            Book tickets
-                          </a>
-                        </div>
-                      )}
+                      {event.booking_link && <div>
+                          <a href={event.booking_link} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:text-blue-800 hover:underline">Booking</a>
+                        </div>}
                     </div>
                   </div>
                 </CardContent>
