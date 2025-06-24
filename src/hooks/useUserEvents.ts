@@ -48,17 +48,17 @@ export const useUserEvents = (userId: string | undefined): UseUserEventsResult =
         const eventIds = rsvpData.map(rsvp => rsvp.event_id);
         console.log('useUserEvents: Event IDs to fetch:', eventIds);
 
-        // Fetch the events the user has RSVPed to (only published events)
+        // Fetch the events the user has RSVPed to with proper joins
         const { data: eventsData, error: eventsError } = await supabase
           .from('events')
           .select(`
             *,
-            creator:profiles!events_creator_fkey(id, username, avatar_url, email, location, status, tagline),
             venues:venue_id(*),
-            event_rsvps(id, user_id, status)
+            event_rsvps!inner(id, user_id, status)
           `)
           .eq('status', 'published')
-          .in('id', eventIds)
+          .eq('event_rsvps.user_id', userId)
+          .in('event_rsvps.status', ['Going', 'Interested'])
           .order('start_date', { ascending: true })
           .order('start_time', { ascending: true });
 
@@ -74,11 +74,32 @@ export const useUserEvents = (userId: string | undefined): UseUserEventsResult =
           return { pastEvents: [], upcomingEvents: [] };
         }
 
+        // Now fetch creator profiles separately to avoid foreign key issues
+        const creatorIds = eventsData.map(event => event.creator).filter(Boolean);
+        
+        let creatorsData = [];
+        if (creatorIds.length > 0) {
+          const { data: creators, error: creatorsError } = await supabase
+            .from('profiles')
+            .select('id, username, avatar_url, email, location, status, tagline')
+            .in('id', creatorIds);
+            
+          if (!creatorsError && creators) {
+            creatorsData = creators;
+          }
+        }
+        
+        // Combine the data manually
+        const eventsWithCreators = eventsData.map(event => ({
+          ...event,
+          creator: creatorsData.find(creator => creator.id === event.creator) || null
+        }));
+
         // Process the events data
-        const allEvents = processEventsData(eventsData, userId);
+        const allEvents = processEventsData(eventsWithCreators, userId);
         console.log('useUserEvents: Processed events:', allEvents.length, allEvents);
         
-        // Add RSVP status to each event
+        // Add RSVP status to each event from the original RSVP data
         const eventsWithRsvp = allEvents.map(event => {
           const rsvp = rsvpData.find(r => r.event_id === event.id);
           return {

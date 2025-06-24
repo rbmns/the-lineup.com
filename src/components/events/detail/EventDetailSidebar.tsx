@@ -2,7 +2,7 @@
 import React from 'react';
 import { Event } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, Users, ExternalLink } from 'lucide-react';
+import { MapPin, Users, ExternalLink, Ticket } from 'lucide-react';
 
 interface EventDetailSidebarProps {
   event: Event;
@@ -76,6 +76,7 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
         <Card>
           <CardContent className="p-4">
             <div className="flex items-start gap-3">
+              <Ticket className="h-5 w-5 text-gray-600 mt-0.5" />
               <div className="text-left">
                 <h3 className="font-medium text-gray-900 mb-3 text-left">Booking Info</h3>
                 
