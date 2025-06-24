@@ -220,6 +220,30 @@ export type Database = {
         }
         Relationships: []
       }
+      event_organisers: {
+        Row: {
+          contact_person: string | null
+          created_at: string
+          name: string | null
+          social: string | null
+          uuid: string
+        }
+        Insert: {
+          contact_person?: string | null
+          created_at?: string
+          name?: string | null
+          social?: string | null
+          uuid?: string
+        }
+        Update: {
+          contact_person?: string | null
+          created_at?: string
+          name?: string | null
+          social?: string | null
+          uuid?: string
+        }
+        Relationships: []
+      }
       event_rsvps: {
         Row: {
           created_at: string | null

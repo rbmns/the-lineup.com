@@ -235,6 +235,38 @@ const EventDetailContent = ({
                   </div>
                 </div>
               )}
+
+              {/* Hosted by - FIXED: Now shows organizer_link */}
+              {(event.organiser_name || event.organizer_link) && (
+                <div className="space-y-4">
+                  <h3 className="font-sans font-semibold text-xl text-gray-900">Hosted by</h3>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                      <span className="text-lg font-medium text-gray-600">
+                        {event.organiser_name ? event.organiser_name.charAt(0).toUpperCase() : 'O'}
+                      </span>
+                    </div>
+                    <div>
+                      {event.organiser_name && (
+                        <p className="font-medium text-left">{event.organiser_name}</p>
+                      )}
+                      {event.organizer_link && (
+                        <a
+                          href={event.organizer_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                        >
+                          Visit organizer website
+                        </a>
+                      )}
+                      {!event.organiser_name && !event.organizer_link && (
+                        <p className="text-sm text-gray-600 text-left">Event Organizer</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
             
             {/* Right Column - Event Details Sidebar (FIXED: Now takes 1/4 instead of 2/5) */}
@@ -311,35 +343,7 @@ const EventDetailContent = ({
                 </CardContent>
               </Card>
 
-              {/* Organizer Info Card */}
-              {(event.organiser_name || event.organizer_link) && (
-                <Card className="bg-white border border-gray-100 shadow-sm rounded-2xl">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <Building2 className="h-5 w-5 text-gray-500" />
-                      <h3 className="font-sans font-bold text-xl text-gray-900">Organizer</h3>
-                    </div>
-                    <div className="space-y-3">
-                      {event.organiser_name && (
-                        <p className="text-gray-700 text-base font-medium">{event.organiser_name}</p>
-                      )}
-                      {event.organizer_link && (
-                        <a
-                          href={event.organizer_link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center gap-2 text-xs"
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                          Organizer Website
-                        </a>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Booking Info */}
+              {/* Booking Info - FIXED: Show booking_link and correct fee format */}
               {(event.fee || event.booking_link) && (
                 <Card className="bg-white border border-gray-100 shadow-sm rounded-2xl">
                   <CardContent className="p-6">
@@ -347,8 +351,8 @@ const EventDetailContent = ({
                     <div className="space-y-3">
                       {event.fee && (
                         <div>
-                          <p className="text-gray-600 text-xs mb-1">Entry Fee</p>
-                          <p className="text-gray-900 text-base font-medium">€{event.fee}</p>
+                          <span className="text-sm text-gray-600">Entry fee: </span>
+                          <span className="font-medium">€{event.fee}</span>
                         </div>
                       )}
                       {event.booking_link && (

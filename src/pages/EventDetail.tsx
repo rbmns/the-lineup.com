@@ -302,18 +302,32 @@ const EventDetail: React.FC<EventDetailProps> = ({
                 </div>
               </div>}
 
-            {/* Hosted by */}
-            {event.organiser_name && <div className="text-left">
+            {/* Hosted by - FIXED: Now shows organizer_link */}
+            {(event.organiser_name || event.organizer_link) && <div className="text-left">
                 <h2 className="text-xl font-semibold mb-4 text-left">Hosted by</h2>
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
                     <span className="text-lg font-medium text-gray-600">
-                      {event.organiser_name.charAt(0).toUpperCase()}
+                      {event.organiser_name ? event.organiser_name.charAt(0).toUpperCase() : 'O'}
                     </span>
                   </div>
                   <div>
-                    <p className="font-medium text-left">{event.organiser_name}</p>
-                    <p className="text-sm text-gray-600 text-left">Event Organizer</p>
+                    {event.organiser_name && (
+                      <p className="font-medium text-left">{event.organiser_name}</p>
+                    )}
+                    {event.organizer_link && (
+                      <a
+                        href={event.organizer_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                      >
+                        Visit organizer website
+                      </a>
+                    )}
+                    {!event.organiser_name && !event.organizer_link && (
+                      <p className="text-sm text-gray-600 text-left">Event Organizer</p>
+                    )}
                   </div>
                 </div>
               </div>}
@@ -340,20 +354,32 @@ const EventDetail: React.FC<EventDetailProps> = ({
               </CardContent>
             </Card>
 
-            {/* Booking Info */}
-            {event.fee && <Card>
+            {/* Booking Info - FIXED: Show booking_link and correct fee format */}
+            {(event.fee || event.booking_link) && <Card>
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
-                    <Euro className="h-5 w-5 text-gray-600 mt-0.5" />
                     <div className="text-left">
-                      <h3 className="font-medium text-gray-900 mb-1 text-left">Booking Info</h3>
-                      <p className="text-sm text-gray-600 mb-2 text-left">Entry fee</p>
-                      <p className="font-medium text-left">€{event.fee}</p>
-                      {event.organizer_link && <Button variant="link" className="p-0 h-auto text-sm text-blue-600 mt-2" asChild>
-                          <a href={event.organizer_link} target="_blank" rel="noopener noreferrer">
-                            Organizer website
+                      <h3 className="font-medium text-gray-900 mb-3 text-left">Booking Info</h3>
+                      
+                      {event.fee && (
+                        <div className="mb-3">
+                          <span className="text-sm text-gray-600">Entry fee: </span>
+                          <span className="font-medium">€{event.fee}</span>
+                        </div>
+                      )}
+                      
+                      {event.booking_link && (
+                        <div>
+                          <a
+                            href={event.booking_link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                          >
+                            Book tickets
                           </a>
-                        </Button>}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>
