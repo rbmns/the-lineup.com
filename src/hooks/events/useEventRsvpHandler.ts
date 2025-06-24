@@ -2,12 +2,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { useEventRSVP } from '@/hooks/useEventRSVP';
 
 export const useEventRsvpHandler = (eventId: string) => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const [rsvpLoading, setRsvpLoading] = useState<boolean>(false);
+  const { updateRSVP } = useEventRSVP();
 
   // Add cleanup for transition effects
   useEffect(() => {
@@ -43,43 +44,21 @@ export const useEventRsvpHandler = (eventId: string) => {
         mainContent.classList.add('event-content-refreshing');
       }
       
-      // First check if the user already has an RSVP for this event
-      const { data: existingRsvp } = await supabase
-        .from('event_rsvps')
-        .select('*')
-        .eq('event_id', eventId)
-        .eq('user_id', user.id)
-        .single();
-
-      let result = false;
-
-      if (existingRsvp) {
-        // Update the existing RSVP if the status is different
-        if (existingRsvp.status !== status) {
-          const { error } = await supabase
-            .from('event_rsvps')
-            .update({ status })
-            .eq('id', existingRsvp.id);
-
-          result = !error;
-        } else {
-          // If clicking the same status, remove the RSVP
-          const { error } = await supabase
-            .from('event_rsvps')
-            .delete()
-            .eq('id', existingRsvp.id);
-
-          result = !error;
-        }
-      } else {
-        // Create a new RSVP
-        const { error } = await supabase
-          .from('event_rsvps')
-          .insert([{ event_id: eventId, user_id: user.id, status }]);
-
-        result = !error;
+      // First check current RSVP status to determine the action
+      const { getUserEventRSVP } = useEventRSVP();
+      const currentRsvp = await getUserEventRSVP(user.id, eventId);
+      
+      let newStatus: 'Going' | 'Interested' | null = status;
+      
+      // If user already has this status, toggle it off
+      if (currentRsvp && currentRsvp.status === status) {
+        newStatus = null; // Remove RSVP
       }
       
+      // Perform the RSVP update
+      const result = await updateRSVP(user.id, eventId, newStatus);
+      
+      console.log(`RSVP operation result: ${result}, new status: ${newStatus}`);
       return result;
     } catch (err) {
       console.error('Error in RSVP process:', err);

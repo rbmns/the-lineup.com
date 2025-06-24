@@ -1,4 +1,3 @@
-
 import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
@@ -266,177 +265,79 @@ export const useEventRSVP = () => {
     try {
       console.log(`Updating RSVP: userId=${userId}, eventId=${eventId}, status=${status}`);
       
-      // Check for existing RSVP
-      const { data: existingRsvp, error: fetchError } = await supabase
+      // Check if the user already has an RSVP for this event
+      const { data: existingRsvp, error: checkError } = await supabase
         .from('event_rsvps')
-        .select('id, status')
+        .select('*')
         .eq('user_id', userId)
         .eq('event_id', eventId)
         .maybeSingle();
-      
-      if (fetchError) throw fetchError;
-      
-      console.log('Existing RSVP:', existingRsvp);
-      
-      let oldStatus = existingRsvp?.status;
-      
+
+      if (checkError) {
+        console.error("Error checking existing RSVP:", checkError);
+        return false;
+      }
+
       if (status === null) {
         // Remove RSVP if status is null
         if (existingRsvp) {
-          const { error } = await supabase
+          const { error: deleteError } = await supabase
             .from('event_rsvps')
             .delete()
             .eq('id', existingRsvp.id);
-          
-          if (error) throw error;
+            
+          if (deleteError) {
+            console.error("Error deleting RSVP:", deleteError);
+            return false;
+          }
+          console.log("RSVP removed successfully");
         }
       } else if (existingRsvp) {
         // Update existing RSVP
-        const { error } = await supabase
+        const { error: updateError } = await supabase
           .from('event_rsvps')
           .update({ status })
           .eq('id', existingRsvp.id);
-        
-        if (error) throw error;
+          
+        if (updateError) {
+          console.error("Error updating RSVP:", updateError);
+          return false;
+        }
+        console.log(`RSVP updated to ${status}`);
       } else {
         // Create new RSVP
-        const { error } = await supabase
+        const { error: insertError } = await supabase
           .from('event_rsvps')
-          .insert({
-            user_id: userId,
-            event_id: eventId,
-            status
-          });
-        
-        if (error) throw error;
+          .insert([{ 
+            user_id: userId, 
+            event_id: eventId, 
+            status 
+          }]);
+          
+        if (insertError) {
+          console.error("Error creating RSVP:", insertError);
+          return false;
+        }
+        console.log(`New RSVP created with status ${status}`);
       }
       
-      // Update caches directly instead of invalidating
-      updateCaches(eventId, userId, status, oldStatus);
-      
-      // Only invalidate the attendees query
+      // Invalidate related queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] });
       queryClient.invalidateQueries({ queryKey: ['event-attendees', eventId] });
+      queryClient.invalidateQueries({ queryKey: ['userEvents', userId] });
       
       return true;
     } catch (error) {
-      console.error('Error updating RSVP:', error);
+      console.error("Error updating RSVP:", error);
       return false;
     }
   }, [queryClient]);
-  
-  // Helper function to update all relevant caches
-  const updateCaches = (
-    eventId: string,
-    userId: string,
-    newStatus: 'Going' | 'Interested' | null,
-    oldStatus?: string
-  ) => {
-    // Update the events list cache
-    queryClient.setQueriesData({ queryKey: ['events'] }, (oldData: Event[] | undefined) => {
-      if (!oldData) return oldData;
-      
-      return oldData.map(event => {
-        if (event.id === eventId) {
-          const updatedEvent = { ...event };
-          
-          // Update the RSVP status
-          updatedEvent.rsvp_status = newStatus as any;
-          
-          // Update attendee counts
-          if (!updatedEvent.attendees) {
-            updatedEvent.attendees = { going: 0, interested: 0 };
-          }
-          
-          // Adjust counts based on status changes
-          if (oldStatus === 'Going' && newStatus !== 'Going') {
-            updatedEvent.attendees.going = Math.max(0, updatedEvent.attendees.going - 1);
-          }
-          if (oldStatus === 'Interested' && newStatus !== 'Interested') {
-            updatedEvent.attendees.interested = Math.max(0, updatedEvent.attendees.interested - 1);
-          }
-          if (newStatus === 'Going' && oldStatus !== 'Going') {
-            updatedEvent.attendees.going += 1;
-          }
-          if (newStatus === 'Interested' && oldStatus !== 'Interested') {
-            updatedEvent.attendees.interested += 1;
-          }
-          
-          return updatedEvent;
-        }
-        return event;
-      });
-    });
-    
-    // Update specific event cache
-    queryClient.setQueryData(['event', eventId], (oldData: any) => {
-      if (!oldData) return oldData;
-      
-      return {
-        ...oldData,
-        rsvp_status: newStatus,
-        attendees: {
-          ...(oldData.attendees || { going: 0, interested: 0 }),
-          going: calculateAttendeeCount(oldData, 'going', oldStatus, newStatus),
-          interested: calculateAttendeeCount(oldData, 'interested', oldStatus, newStatus)
-        }
-      };
-    });
-    
-    // Update user events cache if it exists
-    queryClient.setQueriesData({ queryKey: ['user-events'] }, (oldData: any) => {
-      if (!oldData) return oldData;
-      
-      // Handle different data shapes based on the query
-      if (Array.isArray(oldData)) {
-        return oldData.map(item => {
-          if (
-            (item.event && item.event.id === eventId) || 
-            (item.id === eventId)
-          ) {
-            return {
-              ...item,
-              rsvp_status: newStatus,
-              status: newStatus,
-            };
-          }
-          return item;
-        });
-      }
-      
-      return oldData;
-    });
-  };
-  
-  // Helper function to calculate new attendee counts
-  const calculateAttendeeCount = (
-    event: any, 
-    type: 'going' | 'interested',
-    oldStatus?: string,
-    newStatus?: 'Going' | 'Interested' | null
-  ) => {
-    const currentCount = event.attendees?.[type] || 0;
-    
-    if (oldStatus === capitalizeFirst(type) && newStatus !== capitalizeFirst(type)) {
-      return Math.max(0, currentCount - 1);
-    }
-    
-    if (newStatus === capitalizeFirst(type) && oldStatus !== capitalizeFirst(type)) {
-      return currentCount + 1;
-    }
-    
-    return currentCount;
-  };
-  
-  // Helper to capitalize first letter
-  const capitalizeFirst = (str: string): string => {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  };
 
   return {
     getAttendeesForEvent,
     getFriendAttendeesForEvent,
     getUserEventRSVP,
     getUserRsvpedEvents,
-    updateRSVP
+    updateRSVP,
   };
 };

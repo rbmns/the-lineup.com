@@ -1,80 +1,85 @@
 
-import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { fetchEventById, fetchEventAttendees } from '@/lib/eventService';
+import { useEventRSVP } from '@/hooks/useEventRSVP';
+import { useAuth } from '@/contexts/AuthContext';
 import { Event } from '@/types';
-import { processEventsData } from '@/utils/eventProcessorUtils';
 
-export const useEventDetails = (eventId: string | undefined, userId: string | undefined) => {
-  const [event, setEvent] = useState<Event | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export const useEventDetails = (eventId: string | null) => {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const { getUserEventRSVP } = useEventRSVP();
 
-  useEffect(() => {
-    if (!eventId) {
-      setLoading(false);
-      return;
-    }
-
-    const fetchEvent = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const { data, error: fetchError } = await supabase
-          .from('events')
-          .select(`
-            *,
-            venues:venue_id(*),
-            event_rsvps(id, user_id, status)
-          `)
-          .eq('id', eventId)
-          .maybeSingle();
-
-        if (fetchError) {
-          console.error('Error fetching event:', fetchError);
-          setError('Failed to load event details');
-          return;
-        }
-
-        if (!data) {
-          setError('Event not found');
-          return;
-        }
-
-        // Fetch creator separately
-        let creatorData = null;
-        if (data.creator) {
-          const { data: creator, error: creatorError } = await supabase
-            .from('profiles')
-            .select('id, username, avatar_url, email, location, status, tagline')
-            .eq('id', data.creator)
-            .single();
-            
-          if (!creatorError && creator) {
-            creatorData = creator;
-          }
-        }
-        
-        // Combine event with creator data
-        const eventWithCreator = {
-          ...data,
-          creator: creatorData
+  // Fetch event details
+  const {
+    data: event,
+    isLoading: eventLoading,
+    error: eventError,
+    refetch: refetchEvent
+  } = useQuery({
+    queryKey: ['event', eventId],
+    queryFn: async () => {
+      if (!eventId) return null;
+      const eventData = await fetchEventById(eventId, user?.id);
+      
+      // If we have event data and a user, get the current RSVP status
+      if (eventData && user?.id) {
+        const rsvpData = await getUserEventRSVP(user.id, eventId);
+        return {
+          ...eventData,
+          rsvp_status: rsvpData?.status || null
         };
-
-        // Process the event data using the same utility function
-        const processedEvents = processEventsData([eventWithCreator], userId);
-        setEvent(processedEvents[0] || null);
-
-      } catch (err) {
-        console.error('Unexpected error:', err);
-        setError('An unexpected error occurred');
-      } finally {
-        setLoading(false);
       }
-    };
+      
+      return eventData;
+    },
+    enabled: !!eventId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
 
-    fetchEvent();
-  }, [eventId, userId]);
+  // Fetch event attendees
+  const {
+    data: attendees,
+    isLoading: attendeesLoading,
+    refetch: refetchAttendees
+  } = useQuery({
+    queryKey: ['event-attendees', eventId],
+    queryFn: () => eventId ? fetchEventAttendees(eventId) : Promise.resolve({ going: [], interested: [] }),
+    enabled: !!eventId,
+    staleTime: 1000 * 60 * 2, // 2 minutes
+  });
 
-  return { event, loading, error };
+  // Helper function to refresh event data after RSVP changes
+  const refreshEventData = async () => {
+    console.log('Refreshing event data after RSVP change...');
+    await Promise.all([
+      refetchEvent(),
+      refetchAttendees()
+    ]);
+  };
+
+  // Update cache after RSVP changes
+  const updateEventRsvpStatus = (newStatus: 'Going' | 'Interested' | null) => {
+    if (!eventId || !event) return;
+    
+    console.log(`Updating event cache with new RSVP status: ${newStatus}`);
+    
+    // Update the event query cache
+    queryClient.setQueryData(['event', eventId], (oldData: Event | null) => {
+      if (!oldData) return oldData;
+      return {
+        ...oldData,
+        rsvp_status: newStatus
+      };
+    });
+  };
+
+  return {
+    event,
+    attendees,
+    isLoading: eventLoading || attendeesLoading,
+    error: eventError,
+    refreshEventData,
+    updateEventRsvpStatus
+  };
 };
