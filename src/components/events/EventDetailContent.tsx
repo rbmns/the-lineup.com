@@ -13,7 +13,7 @@ import { EventExternalLink } from './detail-sections/EventExternalLink';
 import { EventFriendRsvps } from './EventFriendRsvps';
 import { extractEventCoordinates } from './detail-sections/EventCoordinatesExtractor';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, MapPin, Clock, Euro, ExternalLink } from 'lucide-react';
+import { Calendar, MapPin, Clock, Euro, ExternalLink, Users } from 'lucide-react';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { useEventImages } from '@/hooks/useEventImages';
@@ -131,178 +131,213 @@ const EventDetailContent = ({
   const mapUrl = getMapUrl();
 
   return (
-    <div className="w-full bg-white">
-      {/* Full width image header with category pill on top */}
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section - Full width */}
       <div className="relative w-full">
         <LineupImage
           src={imageUrl}
           alt={event.title}
           aspectRatio="hero"
           overlayVariant="sunset"
-          className="w-full h-64 sm:h-80 lg:h-96"
+          className="w-full h-72 sm:h-80 lg:h-[28rem]"
           loading="eager"
         />
         
         {/* Category pill on top of image */}
         {event.event_category && (
-          <div className="absolute top-4 left-4 z-30">
+          <div className="absolute top-6 left-6 z-30">
             <CategoryPill 
               category={event.event_category}
-              size="sm"
+              size="md"
               showIcon={true}
-            />
+            />       
           </div>
         )}
-      </div>
-
-      {/* Content area with structured layout */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <div className="max-w-4xl mx-auto space-y-8">
-          {/* Title Section */}
-          <div>
-            <h1 className="font-inter font-bold text-2xl sm:text-3xl lg:text-4xl text-gray-900 leading-tight mb-4">
+        
+        {/* Hero content overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-6 lg:p-12">
+          <div className="max-w-6xl mx-auto">
+            <h1 className="font-inter font-bold text-3xl sm:text-4xl lg:text-5xl text-white leading-tight mb-4">
               {event.title}
             </h1>
+            <div className="flex items-center text-white/90 text-lg">
+              <Calendar className="h-5 w-5 mr-3" />
+              <span>
+                {event.start_date && formatDate(event.start_date)}
+                {event.start_time && ` • ${formatEventTime(event.start_time, event.end_time)}`}
+              </span>
+            </div>
           </div>
-          
-          {/* Key Details Grid */}
-          <div className="grid gap-4 sm:gap-6">
-            {/* Date & Time Card */}
-            <Card className="bg-gray-50 border-gray-200">
-              <CardContent className="p-4 sm:p-5">
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-gray-500 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-inter font-semibold text-gray-900 mb-1">Date & Time</h3>
-                    <p className="font-inter text-sm text-gray-600">
-                      {event.start_date && formatDate(event.start_date)}
-                      {event.start_time && ` • ${formatEventTime(event.start_time, event.end_time)}`}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+        </div>
+      </div>
 
-            {/* Location Card - Enhanced with functional map button */}
-            <Card className="bg-gray-50 border-gray-200">
-              <CardContent className="p-4 sm:p-5">
-                <div className="flex items-start gap-3">
-                  <MapPin className="h-5 w-5 text-gray-500 flex-shrink-0 mt-1" />
-                  <div className="flex-1">
-                    <h3 className="font-inter font-semibold text-gray-900 mb-1">Venue</h3>
-                    <p className="font-inter text-sm text-gray-600 mb-1">{eventLocation}</p>
-                    {venueAddress && (
-                      <p className="font-inter text-xs text-gray-500">{venueAddress}</p>
+      {/* Main Content */}
+      <div className="w-full px-6 lg:px-12 py-8 lg:py-12">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+            
+            {/* Left Column - Main Content */}
+            <div className="lg:col-span-2 space-y-8">
+              
+              {/* RSVP Section */}
+              <Card className="bg-white border-0 shadow-sm">
+                <CardContent className="p-6 lg:p-8">
+                  <EventRsvpSection 
+                    isOwner={isOwner}
+                    onRsvp={handleRsvp}
+                    isRsvpLoading={isRsvpLoading || rsvpLoading}
+                    currentStatus={event.rsvp_status || null}
+                  />
+                </CardContent>
+              </Card>
+              
+              {/* About Section */}
+              {event.description && (
+                <Card className="bg-white border-0 shadow-sm">
+                  <CardContent className="p-6 lg:p-8">
+                    <h2 className="font-inter font-semibold text-xl lg:text-2xl text-gray-900 mb-6">About this event</h2>
+                    <div className="prose prose-gray max-w-none">
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-line text-base lg:text-lg">
+                        {event.description}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              
+              {/* Tags */}
+              {event.tags && event.tags.length > 0 && (
+                <Card className="bg-white border-0 shadow-sm">
+                  <CardContent className="p-6 lg:p-8">
+                    <EventTagsSection tags={event.tags} />
+                  </CardContent>
+                </Card>
+              )}
+              
+              {/* Friends attending section */}
+              {friendAttendees && (friendAttendees.going.length > 0 || friendAttendees.interested.length > 0) && (
+                <Card className="bg-white border-0 shadow-sm">
+                  <CardContent className="p-6 lg:p-8">
+                    <h3 className="font-inter font-semibold text-lg text-gray-900 mb-6">Friends Attending</h3>
+                    <EventFriendRsvps 
+                      going={friendAttendees.going}
+                      interested={friendAttendees.interested}
+                    />
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+            
+            {/* Right Column - Event Details Sidebar */}
+            <div className="space-y-6">
+              
+              {/* Event Details Card */}
+              <Card className="bg-white border-0 shadow-sm">
+                <CardContent className="p-6">
+                  <h3 className="font-inter font-semibold text-lg text-gray-900 mb-6">Event Details</h3>
+                  
+                  <div className="space-y-6">
+                    {/* Date & Time */}
+                    <div className="flex items-start gap-4">
+                      <Calendar className="h-5 w-5 text-gray-500 mt-1 flex-shrink-0" />
+                      <div>
+                        <p className="font-medium text-gray-900 mb-1">Date</p>
+                        <p className="text-sm text-gray-600">
+                          {event.start_date && formatDate(event.start_date)}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Time */}
+                    {event.start_time && (
+                      <div className="flex items-start gap-4">
+                        <Clock className="h-5 w-5 text-gray-500 mt-1 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium text-gray-900 mb-1">Time</p>
+                          <p className="text-sm text-gray-600">
+                            {formatEventTime(event.start_time, event.end_time)}
+                          </p>
+                        </div>
+                      </div>
                     )}
-                    {/* Venue links */}
-                    <div className="flex gap-3 mt-2">
-                      {event.venues?.website && (
-                        <a
-                          href={event.venues.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-inter flex items-center gap-1"
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                          Website
-                        </a>
-                      )}
-                      {mapUrl && (
-                        <a
-                          href={mapUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-blue-600 hover:text-blue-800 hover:underline font-inter flex items-center gap-1"
-                          onClick={(e) => {
-                            console.log('Google Maps link clicked:', mapUrl);
-                            // The link will open normally, this is just for debugging
-                          }}
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                          View on Maps
-                        </a>
-                      )}
+                    
+                    {/* Venue */}
+                    <div className="flex items-start gap-4">
+                      <MapPin className="h-5 w-5 text-gray-500 mt-1 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900 mb-1">Venue</p>
+                        <p className="text-sm text-gray-600 mb-2">{eventLocation}</p>
+                        {venueAddress && (
+                          <p className="text-xs text-gray-500 mb-3">{venueAddress}</p>
+                        )}
+                        
+                        {/* Venue links */}
+                        <div className="flex flex-col gap-2">
+                          {event.venues?.website && (
+                            <a
+                              href={event.venues.website}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center gap-2"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              Website
+                            </a>
+                          )}
+                          {mapUrl && (
+                            <a
+                              href={mapUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center gap-2"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                              View on Maps
+                            </a>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Entrance Fee Card - only show if fee exists */}
-            {event.fee && (
-              <Card className="bg-gray-50 border-gray-200">
-                <CardContent className="p-4 sm:p-5">
-                  <div className="flex items-center gap-3">
-                    <Euro className="h-5 w-5 text-gray-500 flex-shrink-0" />
-                    <div>
-                      <h3 className="font-inter font-semibold text-gray-900 mb-1">Entrance Fee</h3>
-                      <p className="font-inter text-sm text-gray-600">€{event.fee}</p>
-                    </div>
+                    
+                    {/* Entrance Fee */}
+                    {event.fee && (
+                      <div className="flex items-start gap-4">
+                        <Euro className="h-5 w-5 text-gray-500 mt-1 flex-shrink-0" />
+                        <div>
+                          <p className="font-medium text-gray-900 mb-1">Entrance Fee</p>
+                          <p className="text-sm text-gray-600">€{event.fee}</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
-            )}
+              
+              {/* Attendees Summary */}
+              <Card className="bg-white border-0 shadow-sm">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Users className="h-5 w-5 text-gray-500" />
+                    <h3 className="font-inter font-semibold text-lg text-gray-900">Attendees</h3>
+                  </div>
+                  <EventAttendeesSummary 
+                    goingCount={attendees?.going?.length || event.attendees?.going || 0}
+                    interestedCount={attendees?.interested?.length || event.attendees?.interested || 0}
+                  />
+                </CardContent>
+              </Card>
+              
+              {/* External link if available */}
+              {bookingLink && (
+                <Card className="bg-orange-50 border-orange-200">
+                  <CardContent className="p-6">
+                    <EventExternalLink url={bookingLink} />
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </div>
-          
-          {/* RSVP Section */}
-          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-            <CardContent className="p-4 sm:p-6">
-              <EventRsvpSection 
-                isOwner={isOwner}
-                onRsvp={handleRsvp}
-                isRsvpLoading={isRsvpLoading || rsvpLoading}
-                currentStatus={event.rsvp_status || null}
-              />
-            </CardContent>
-          </Card>
-          
-          <Separator className="my-8" />
-          
-          {/* Description */}
-          {event.description && (
-            <div className="prose max-w-none">
-              <EventDescriptionSection description={event.description} />
-            </div>
-          )}
-          
-          {/* Attendees summary */}
-          <Card className="bg-gray-50 border-gray-200">
-            <CardContent className="p-4 sm:p-6">
-              <EventAttendeesSummary 
-                goingCount={attendees?.going?.length || event.attendees?.going || 0}
-                interestedCount={attendees?.interested?.length || event.attendees?.interested || 0}
-              />
-            </CardContent>
-          </Card>
-          
-          {/* Friends attending section */}
-          {friendAttendees && (friendAttendees.going.length > 0 || friendAttendees.interested.length > 0) && (
-            <Card className="bg-green-50 border-green-200">
-              <CardContent className="p-4 sm:p-6">
-                <h3 className="font-inter font-semibold text-gray-900 mb-4">Friends Attending</h3>
-                <EventFriendRsvps 
-                  going={friendAttendees.going}
-                  interested={friendAttendees.interested}
-                />
-              </CardContent>
-            </Card>
-          )}
-          
-          {/* External link if available */}
-          {bookingLink && (
-            <Card className="bg-orange-50 border-orange-200">
-              <CardContent className="p-4 sm:p-6">
-                <EventExternalLink url={bookingLink} />
-              </CardContent>
-            </Card>
-          )}
-          
-          {/* Tags */}
-          {event.tags && event.tags.length > 0 && (
-            <div>
-              <EventTagsSection tags={event.tags} />
-            </div>
-          )}
         </div>
       </div>
     </div>
