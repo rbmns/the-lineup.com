@@ -13,7 +13,7 @@ import { EventExternalLink } from './detail-sections/EventExternalLink';
 import { EventFriendRsvps } from './EventFriendRsvps';
 import { extractEventCoordinates } from './detail-sections/EventCoordinatesExtractor';
 import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, MapPin, Clock, Euro, ExternalLink, Users } from 'lucide-react';
+import { Calendar, MapPin, Clock, Euro, ExternalLink, Users, Building2 } from 'lucide-react';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { useEventImages } from '@/hooks/useEventImages';
@@ -177,7 +177,7 @@ const EventDetailContent = ({
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-16 xl:gap-20">
             
-            {/* Left Column - Main Content (wider on desktop) */}
+            {/* Left Column - Main Content (wider on desktop for better alignment) */}
             <div className="lg:col-span-3 space-y-12 lg:space-y-16">
               
               {/* RSVP Section */}
@@ -190,13 +190,25 @@ const EventDetailContent = ({
                 />
               </div>
               
-              {/* About Section - Centered on desktop */}
+              {/* About Section - Better aligned with image width */}
               {event.description && (
-                <div className="space-y-6 text-center lg:text-center">
+                <div className="space-y-6">
                   <h2 className="font-sans font-bold text-3xl lg:text-4xl text-gray-900">About this event</h2>
-                  <div className="prose prose-lg lg:prose-xl max-w-none mx-auto">
+                  <div className="prose prose-lg lg:prose-xl max-w-none">
                     <p className="text-gray-700 leading-relaxed whitespace-pre-line text-lg lg:text-xl">
                       {event.description}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Extra Info Section */}
+              {event.extra_info && (
+                <div className="space-y-6">
+                  <h2 className="font-sans font-bold text-3xl lg:text-4xl text-gray-900">Additional Information</h2>
+                  <div className="prose prose-lg lg:prose-xl max-w-none">
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-line text-lg lg:text-xl">
+                      {event.extra_info}
                     </p>
                   </div>
                 </div>
@@ -204,9 +216,9 @@ const EventDetailContent = ({
               
               {/* Tags */}
               {event.tags && event.tags.length > 0 && (
-                <div className="space-y-6 text-center lg:text-center">
+                <div className="space-y-6">
                   <h3 className="font-sans font-semibold text-2xl text-gray-900">Tags</h3>
-                  <div className="flex justify-center">
+                  <div className="flex justify-start">
                     <EventTagsSection tags={event.tags} />
                   </div>
                 </div>
@@ -214,9 +226,9 @@ const EventDetailContent = ({
               
               {/* Friends attending section */}
               {friendAttendees && (friendAttendees.going.length > 0 || friendAttendees.interested.length > 0) && (
-                <div className="space-y-6 text-center lg:text-center">
+                <div className="space-y-6">
                   <h3 className="font-sans font-semibold text-2xl text-gray-900">Friends Attending</h3>
-                  <div className="flex justify-center">
+                  <div className="flex justify-start">
                     <EventFriendRsvps 
                       going={friendAttendees.going}
                       interested={friendAttendees.interested}
@@ -226,7 +238,7 @@ const EventDetailContent = ({
               )}
             </div>
             
-            {/* Right Column - Event Details Sidebar (narrower, better spaced) */}
+            {/* Right Column - Event Details Sidebar */}
             <div className="lg:col-span-2 space-y-8">
               
               {/* Event Details Card */}
@@ -296,20 +308,65 @@ const EventDetailContent = ({
                         </div>
                       </div>
                     </div>
-                    
-                    {/* Entrance Fee */}
-                    {event.fee && (
-                      <div className="flex items-start gap-4">
-                        <Euro className="h-6 w-6 text-gray-500 mt-1 flex-shrink-0" />
-                        <div>
-                          <p className="font-semibold text-gray-900 mb-2 text-lg">Entrance Fee</p>
-                          <p className="text-gray-600 text-base">€{event.fee}</p>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Organizer Info Card */}
+              {(event.organiser_name || event.organizer_link) && (
+                <Card className="bg-white border border-gray-100 shadow-sm rounded-2xl">
+                  <CardContent className="p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <Building2 className="h-6 w-6 text-gray-500" />
+                      <h3 className="font-sans font-bold text-2xl text-gray-900">Organizer</h3>
+                    </div>
+                    <div className="space-y-4">
+                      {event.organiser_name && (
+                        <p className="text-gray-700 text-lg font-medium">{event.organiser_name}</p>
+                      )}
+                      {event.organizer_link && (
+                        <a
+                          href={event.organizer_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center gap-2 text-sm"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          Organizer Website
+                        </a>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Booking Info */}
+              {(event.fee || event.booking_link) && (
+                <Card className="bg-white border border-gray-100 shadow-sm rounded-2xl">
+                  <CardContent className="p-8">
+                    <h3 className="font-sans font-bold text-2xl text-gray-900 mb-6">Booking Info</h3>
+                    <div className="space-y-4">
+                      {event.fee && (
+                        <div>
+                          <p className="text-gray-600 text-sm mb-1">Entry Fee</p>
+                          <p className="text-gray-900 text-lg font-medium">€{event.fee}</p>
+                        </div>
+                      )}
+                      {event.booking_link && (
+                        <a
+                          href={event.booking_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 hover:underline font-medium flex items-center gap-2 text-sm"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          Book tickets
+                        </a>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
               
               {/* Attendees Summary */}
               <Card className="bg-white border border-gray-100 shadow-sm rounded-2xl">
@@ -324,15 +381,6 @@ const EventDetailContent = ({
                   />
                 </CardContent>
               </Card>
-              
-              {/* External link if available */}
-              {bookingLink && (
-                <Card className="bg-orange-50 border-orange-200 rounded-2xl">
-                  <CardContent className="p-8">
-                    <EventExternalLink url={bookingLink} />
-                  </CardContent>
-                </Card>
-              )}
             </div>
           </div>
         </div>
