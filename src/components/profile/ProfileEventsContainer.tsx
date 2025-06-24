@@ -25,6 +25,8 @@ export const ProfileEventsContainer: React.FC<ProfileEventsContainerProps> = ({
   // Use the profileId if provided, otherwise fall back to current user
   const userIdToFetch = profileId || user?.id;
   
+  console.log('ProfileEventsContainer: userIdToFetch:', userIdToFetch, 'isOwnProfile:', isOwnProfile);
+  
   // Fetch user events using the hook
   const { 
     pastEvents, 
@@ -32,6 +34,13 @@ export const ProfileEventsContainer: React.FC<ProfileEventsContainerProps> = ({
     isLoading: eventsLoading,
     error: eventsError
   } = useUserEvents(userIdToFetch);
+
+  console.log('ProfileEventsContainer: Events loaded:', {
+    pastEvents: pastEvents.length,
+    upcomingEvents: upcomingEvents.length,
+    isLoading: eventsLoading,
+    error: eventsError
+  });
 
   if (eventsError) {
     console.error('ProfileEventsContainer: Error fetching events:', eventsError);
