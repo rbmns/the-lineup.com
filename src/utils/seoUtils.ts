@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { OgTags } from '@/types/seo';
 
@@ -36,7 +35,7 @@ export const getEventOgTags = async (event: { title: string; description?: strin
       };
     }
 
-    // Use the default OG image instead of generating a dynamic one
+    // Use the new default OG image
     console.log("No event image available, using default OG image");
     return {
       title: `${event.title} | the lineup`,
@@ -60,7 +59,7 @@ export const defaultSeoTags = {
   description: "Find events, connect with locals and friends, and join the flow of every place you land.",
   ogTitle: "Join the Flow — Connect with Locals and Friends | the lineup",
   ogDescription: "Find events, connect with locals and friends, and join the flow of every place you land.",
-  ogImage: "https://vbxhcqlcbusqwsqesoxw.supabase.co/storage/v1/object/public/branding//logo_transp.png",
+  ogImage: "/lovable-uploads/1dac6acf-bbe4-45ae-95a7-dae6832cdf73.png", // Updated to use the uploaded image
   tagline: "Join the Flow."
 };
 

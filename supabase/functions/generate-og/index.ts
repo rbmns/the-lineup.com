@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { renderJpeg } from "https://deno.land/x/resvg_wasm@0.2.0/mod.ts";
 import { html } from "https://deno.land/x/html@v1.2.0/mod.ts";
@@ -8,8 +7,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Default OG image URL
-const DEFAULT_OG_IMAGE = "https://vbxhcqlcbusqwsqesoxw.supabase.co/storage/v1/object/public/branding//OG%20Image.png";
+// Updated default OG image URL to use the uploaded image
+const DEFAULT_OG_IMAGE = "/lovable-uploads/1dac6acf-bbe4-45ae-95a7-dae6832cdf73.png";
 
 // Handle CORS preflight requests
 const handleCors = (req: Request) => {

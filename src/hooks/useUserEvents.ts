@@ -28,7 +28,7 @@ export const useUserEvents = (userId: string | undefined): UseUserEventsResult =
         // First get the user's RSVPs with "Going" or "Interested" status
         const { data: rsvpData, error: rsvpError } = await supabase
           .from('event_rsvps')
-          .select('event_id, status')
+          .select('event_id, status, created_at')
           .eq('user_id', userId)
           .in('status', ['Going', 'Interested']);
 
@@ -78,14 +78,25 @@ export const useUserEvents = (userId: string | undefined): UseUserEventsResult =
         const allEvents = processEventsData(eventsData, userId);
         console.log('useUserEvents: Processed events:', allEvents.length, allEvents);
         
+        // Add RSVP status to each event
+        const eventsWithRsvp = allEvents.map(event => {
+          const rsvp = rsvpData.find(r => r.event_id === event.id);
+          return {
+            ...event,
+            rsvp_status: rsvp?.status as 'Going' | 'Interested' | null
+          };
+        });
+        
         // Filter and sort events
-        const pastEvents = filterPastEvents(allEvents);
+        const pastEvents = filterPastEvents(eventsWithRsvp);
         const sortedPastEvents = sortEventsByDate(pastEvents);
         
-        const upcomingEvents = filterUpcomingEvents(allEvents);
+        const upcomingEvents = filterUpcomingEvents(eventsWithRsvp);
         const sortedUpcomingEvents = sortEventsByDate(upcomingEvents);
 
         console.log('useUserEvents: Final result - Past:', sortedPastEvents.length, 'Upcoming:', sortedUpcomingEvents.length);
+        console.log('useUserEvents: Past events:', sortedPastEvents.map(e => ({ id: e.id, title: e.title, rsvp: e.rsvp_status })));
+        console.log('useUserEvents: Upcoming events:', sortedUpcomingEvents.map(e => ({ id: e.id, title: e.title, rsvp: e.rsvp_status })));
 
         return { pastEvents: sortedPastEvents, upcomingEvents: sortedUpcomingEvents };
       } catch (err) {
@@ -98,7 +109,6 @@ export const useUserEvents = (userId: string | undefined): UseUserEventsResult =
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
 
-  // Create a wrapper for refetch that returns a void promise
   const refetch = async () => {
     await originalRefetch();
   };
