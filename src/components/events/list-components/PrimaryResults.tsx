@@ -39,7 +39,7 @@ export const PrimaryResults: React.FC<PrimaryResultsProps> = ({
             event={event}
             onRsvp={onRsvp}
             showRsvpButtons={showRsvpButtons}
-            isLoading={loadingEventId === event.id}
+            loadingEventId={loadingEventId}
             compact={compact}
           />
         ))}
