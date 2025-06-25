@@ -6,7 +6,6 @@ import { Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { navigateToEvent } from '@/utils/navigationUtils';
 import EventCardList from '@/components/events/EventCardList';
-import { useUserEvents } from '@/hooks/useUserEvents';
 
 interface UserRsvpedEventsProps {
   events?: Event[];
@@ -37,10 +36,8 @@ export const UserRsvpedEvents: React.FC<UserRsvpedEventsProps> = ({
 }) => {
   const navigate = useNavigate();
   
-  const { upcomingEvents, pastEvents, isLoading: hookIsLoading } = useUserEvents(userId);
-  
-  const eventsToDisplay = propEvents !== undefined ? propEvents : [...upcomingEvents, ...pastEvents];
-  const isLoading = propIsLoading || hookIsLoading;
+  const eventsToDisplay = propEvents || [];
+  const isLoading = propIsLoading;
 
   // Filter out matching RSVPs to avoid duplicate display
   const regularEvents = matchingRsvps.length > 0 
@@ -69,10 +66,12 @@ export const UserRsvpedEvents: React.FC<UserRsvpedEventsProps> = ({
 
   return (
     <div className="mt-4 sm:mt-6">
-      <h2 className="text-lg font-semibold mb-2 sm:mb-3 flex items-center">
-        <Calendar className="mr-2 h-4 w-4 text-purple" />
-        {title || (isCurrentUser ? "Your RSVPs" : `${username}'s RSVPs`)}
-      </h2>
+      {title && (
+        <h2 className="text-lg font-semibold mb-2 sm:mb-3 flex items-center">
+          <Calendar className="mr-2 h-4 w-4 text-purple" />
+          {title}
+        </h2>
+      )}
       
       {/* Display matching RSVPs first if available */}
       {matchingRsvps.length > 0 && !isCurrentUser && (

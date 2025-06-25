@@ -9,6 +9,7 @@ import { useAdminData } from '@/hooks/useAdminData';
 import { CreatorRequestsDashboard } from '@/components/admin/CreatorRequestsDashboard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useUserEvents } from '@/hooks/useUserEvents';
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
@@ -22,6 +23,7 @@ const ProfilePage: React.FC = () => {
   } = useProfileData(user?.id);
   
   const { isAdmin, requests, isLoading: isAdminLoading } = useAdminData();
+  const { upcomingEvents, pastEvents, isLoading: eventsLoading } = useUserEvents(user?.id);
 
   // Redirect to login if not authenticated
   React.useEffect(() => {
@@ -85,7 +87,36 @@ const ProfilePage: React.FC = () => {
           </TabsList>
           
           <TabsContent value="rsvps" className="mt-8">
-            <UserRsvpedEvents userId={user.id} />
+            <Tabs defaultValue="upcoming" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="upcoming">
+                  Upcoming Events ({upcomingEvents.length})
+                </TabsTrigger>
+                <TabsTrigger value="past">
+                  Past Events ({pastEvents.length})
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="upcoming" className="mt-6">
+                <UserRsvpedEvents 
+                  userId={user.id} 
+                  events={upcomingEvents}
+                  isLoading={eventsLoading}
+                  emptyMessage="No upcoming RSVPs"
+                  title="Your Upcoming RSVPs"
+                />
+              </TabsContent>
+              
+              <TabsContent value="past" className="mt-6">
+                <UserRsvpedEvents 
+                  userId={user.id} 
+                  events={pastEvents}
+                  isLoading={eventsLoading}
+                  emptyMessage="No past RSVPs"
+                  title="Your Past RSVPs"
+                />
+              </TabsContent>
+            </Tabs>
           </TabsContent>
           
           {showAdminTab && (
