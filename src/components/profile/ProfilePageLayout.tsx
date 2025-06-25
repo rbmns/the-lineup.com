@@ -7,8 +7,6 @@ import { MapPin, Edit } from 'lucide-react';
 import { SettingsPanel } from './SettingsPanel';
 import { ProfileAvatar } from './ProfileAvatar';
 import { useNavigate } from 'react-router-dom';
-import { useUserEvents } from '@/hooks/useUserEvents';
-import { ProfileEventsContainer } from './ProfileEventsContainer';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
@@ -30,9 +28,6 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
   const isMobile = useIsMobile();
   
   const displayName = profile?.username || user?.email?.split('@')[0] || 'User';
-
-  // Fetch user's events using the real hook
-  const { pastEvents, upcomingEvents, isLoading: eventsLoading } = useUserEvents(user?.id);
 
   const handleEditProfile = () => {
     navigate('/profile/edit');
@@ -96,23 +91,14 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
               <SettingsPanel userId={user.id} />
             )}
 
-            {/* About and Events - Mobile */}
+            {/* About Section - Mobile */}
             {!showSettings && (
-              <>
-                <div className="bg-white rounded-lg p-4 mb-6 shadow-sm text-left border border-secondary">
-                  <h2 className="text-base md:text-lg font-semibold mb-2 text-primary">About</h2>
-                  <p className="text-neutral text-xs md:text-sm">
-                    {profile?.tagline || "Explorer and local enthusiast. Love discovering new places and meeting new people."}
-                  </p>
-                </div>
-
-                <ProfileEventsContainer
-                  profileId={user?.id}
-                  profile={profile}
-                  isLoading={eventsLoading}
-                  isOwnProfile={isOwnProfile}
-                />
-              </>
+              <div className="bg-white rounded-lg p-4 mb-6 shadow-sm text-left border border-secondary">
+                <h2 className="text-base md:text-lg font-semibold mb-2 text-primary">About</h2>
+                <p className="text-neutral text-xs md:text-sm">
+                  {profile?.tagline || "Explorer and local enthusiast. Love discovering new places and meeting new people."}
+                </p>
+              </div>
             )}
           </div>
         )}
@@ -173,22 +159,12 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
 
                 {/* About Section */}
                 {!showSettings && (
-                  <>
-                    <div className="bg-white rounded-lg p-6 shadow-sm border border-secondary">
-                      <h2 className="text-lg md:text-xl font-semibold mb-4 text-primary">About</h2>
-                      <p className="text-neutral text-sm md:text-base">
-                        {profile?.tagline || "Explorer and local enthusiast. Love discovering new places and meeting new people."}
-                      </p>
-                    </div>
-
-                    {/* Events Section */}
-                    <ProfileEventsContainer
-                      profileId={user?.id}
-                      profile={profile}
-                      isLoading={eventsLoading}
-                      isOwnProfile={isOwnProfile}
-                    />
-                  </>
+                  <div className="bg-white rounded-lg p-6 shadow-sm border border-secondary">
+                    <h2 className="text-lg md:text-xl font-semibold mb-4 text-primary">About</h2>
+                    <p className="text-neutral text-sm md:text-base">
+                      {profile?.tagline || "Explorer and local enthusiast. Love discovering new places and meeting new people."}
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
