@@ -39,8 +39,6 @@ const SearchPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   const { 
-    joinPlan, 
-    leavePlan, 
     rsvpToPlan,
     loadingPlanId,
   } = useCasualPlansMutations();
@@ -66,6 +64,11 @@ const SearchPage: React.FC = () => {
 
   const handleLoginPrompt = () => {
     navigate('/login');
+  };
+
+  const handleRsvp = async (planId: string, status: 'Going' | 'Interested') => {
+    const success = await rsvpToPlan(planId, status);
+    return success;
   };
 
   // Filter search results to only show upcoming events
@@ -105,14 +108,9 @@ const SearchPage: React.FC = () => {
                 <CasualPlanCard 
                   key={plan.id} 
                   plan={plan}
-                  onJoin={joinPlan}
-                  onLeave={leavePlan}
-                  onRsvp={rsvpToPlan}
-                  isJoining={loadingPlanId === plan.id}
-                  isLeaving={loadingPlanId === plan.id}
-                  isAuthenticated={isAuthenticated}
-                  onLoginPrompt={handleLoginPrompt}
-                  loadingPlanId={loadingPlanId}
+                  onRsvp={isAuthenticated ? handleRsvp : undefined}
+                  showRsvpButtons={isAuthenticated}
+                  isLoading={loadingPlanId === plan.id}
                 />
               );
             }

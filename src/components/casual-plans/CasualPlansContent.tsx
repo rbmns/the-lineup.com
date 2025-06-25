@@ -9,7 +9,7 @@ import { LogIn, Plus } from 'lucide-react';
 
 export const CasualPlansContent: React.FC = () => {
   const { isAuthenticated } = useAuth();
-  const { plans, isLoading } = useCasualPlans();
+  const { plans, isLoading, rsvpToPlan, loadingPlanId } = useCasualPlans();
 
   // Mock data for non-authenticated users (only titles)
   const mockPlansForNonAuth = [
@@ -19,6 +19,11 @@ export const CasualPlansContent: React.FC = () => {
     { id: '4', title: 'Yoga in the Park' },
     { id: '5', title: 'Local Food Tour' },
   ];
+
+  const handleRsvp = async (planId: string, status: 'Going' | 'Interested') => {
+    const success = await rsvpToPlan(planId, status);
+    return success;
+  };
 
   if (isLoading && isAuthenticated) {
     return (
@@ -132,12 +137,9 @@ export const CasualPlansContent: React.FC = () => {
             <CasualPlanCard
               key={plan.id}
               plan={plan}
-              onJoin={() => {}}
-              onLeave={() => {}}
-              isJoining={false}
-              isLeaving={false}
-              isAuthenticated={true}
-              onLoginPrompt={() => {}}
+              onRsvp={handleRsvp}
+              showRsvpButtons={true}
+              isLoading={loadingPlanId === plan.id}
             />
           ))}
         </div>
