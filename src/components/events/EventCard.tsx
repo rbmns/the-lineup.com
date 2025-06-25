@@ -47,35 +47,50 @@ export const EventCard: React.FC<EventCardProps> = ({
 
   // Handle image_urls - it could be a string or array
   const getImageUrl = (): string => {
-    if (event.image_urls) {
-      if (Array.isArray(event.image_urls)) {
-        // If it's already an array, get the first valid URL
-        const firstImage = event.image_urls.find(url => 
-          typeof url === 'string' && url.trim().length > 0
-        );
-        if (firstImage) return firstImage;
-      } else if (typeof event.image_urls === 'string') {
-        const urlString = event.image_urls.trim();
-        if (urlString.startsWith('[') && urlString.endsWith(']')) {
-          // Try to parse as JSON array
-          try {
-            const parsed = JSON.parse(urlString);
-            if (Array.isArray(parsed)) {
-              const firstImage = parsed.find(url => 
-                typeof url === 'string' && url.trim().length > 0
-              );
-              if (firstImage) return firstImage;
+    if (!event.image_urls) {
+      return getDefaultImage();
+    }
+
+    // Handle array case
+    if (Array.isArray(event.image_urls)) {
+      const firstValidUrl = event.image_urls.find(url => 
+        typeof url === 'string' && url.trim().length > 0
+      );
+      if (firstValidUrl) {
+        return firstValidUrl;
+      }
+      return getDefaultImage();
+    }
+
+    // Handle string case
+    if (typeof event.image_urls === 'string') {
+      const urlString = event.image_urls.trim();
+      
+      // Check if it's a JSON array string
+      if (urlString.startsWith('[') && urlString.endsWith(']')) {
+        try {
+          const parsed = JSON.parse(urlString);
+          if (Array.isArray(parsed)) {
+            const firstValidUrl = parsed.find(url => 
+              typeof url === 'string' && url.trim().length > 0
+            );
+            if (firstValidUrl) {
+              return firstValidUrl;
             }
-          } catch (e) {
-            console.warn('Failed to parse image_urls JSON:', urlString);
           }
-        } else if (urlString.length > 0) {
-          // Treat as a single URL
-          return urlString;
+        } catch (e) {
+          console.warn('Failed to parse image_urls JSON:', urlString);
         }
+      } else if (urlString.length > 0) {
+        // Treat as a single URL
+        return urlString;
       }
     }
     
+    return getDefaultImage();
+  };
+
+  const getDefaultImage = (): string => {
     // Use fallback image based on category
     const categoryImages: Record<string, string> = {
       'music': '/img/categories/music.jpg',
