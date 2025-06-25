@@ -1,76 +1,77 @@
 
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import { useAdminData } from '@/hooks/useAdminData';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import { useCreatorStatus } from '@/hooks/useCreatorStatus';
+import { useProfileData } from '@/hooks/useProfileData';
 import UserMenu from './UserMenu';
-import { CreateEventButton } from './CreateEventButton';
 
 interface NavActionsProps {
-  onAuthRequired: () => void;
+  onAuthRequired?: () => void;
 }
 
-export const NavActions: React.FC<NavActionsProps> = ({
-  onAuthRequired
-}) => {
-  const {
-    isAuthenticated,
-    user,
-    profile,
-    signOut
-  } = useAuth();
-  const { isAdmin } = useAdminData();
-  const isMobile = useIsMobile();
+export const NavActions: React.FC<NavActionsProps> = ({ onAuthRequired }) => {
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { canCreateEvents, isAdmin } = useCreatorStatus();
+  const { profile } = useProfileData(user?.id);
 
-  const handleSignInClick = () => {
-    navigate('/login');
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  };
+
+  const handleCreateEvent = () => {
+    if (!user) {
+      onAuthRequired?.();
+      return;
+    }
+    
+    if (!canCreateEvents) {
+      navigate('/organise');
+      return;
+    }
+    
+    navigate('/events/create');
   };
 
   return (
-    <div className={cn(
-      "flex items-center flex-shrink-0",
-      isMobile ? "gap-2" : "gap-3 lg:gap-4"
-    )}>
+    <div className="flex items-center gap-2 md:gap-3">
       {/* Create Event Button */}
-      <CreateEventButton onAuthRequired={onAuthRequired} />
+      <Button
+        onClick={handleCreateEvent}
+        size="sm"
+        className="bg-primary hover:bg-primary/90 text-white px-3 py-2 text-xs md:text-sm font-medium transition-colors flex items-center gap-1 md:gap-2"
+      >
+        <Plus className="h-3 w-3 md:h-4 md:w-4" />
+        <span className="hidden sm:inline">Create Event</span>
+        <span className="sm:hidden">Create</span>
+      </Button>
 
-      {isAuthenticated && user ? (
-        <>
-          {isAdmin && !isMobile && (
-            <Button 
-              asChild 
-              variant="ghost" 
-              size="sm"
-              className="text-primary hover:text-primary hover:bg-primary/10 transition-colors duration-200"
-            >
-              <Link to="/admin">Admin</Link>
-            </Button>
-          )}
-          <div className="flex-shrink-0">
-            <UserMenu 
-              user={user} 
-              profile={profile} 
-              handleSignOut={signOut} 
-              canCreateEvents={false}
-            />
-          </div>
-        </>
+      {/* User Actions */}
+      {user ? (
+        <UserMenu 
+          user={user} 
+          profile={profile} 
+          handleSignOut={handleSignOut}
+          canCreateEvents={canCreateEvents}
+          isAdmin={isAdmin}
+        />
       ) : (
-        <Button 
-          variant="ghost" 
-          size="sm"
-          onClick={handleSignInClick} 
-          className={cn(
-            "flex-shrink-0 text-primary hover:text-primary hover:bg-primary/10 transition-all duration-200 font-medium",
-            isMobile ? "text-sm px-3 py-2" : "text-sm px-4"
-          )}
-        >
-          Sign in
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button asChild variant="ghost" size="sm" className="text-xs md:text-sm">
+            <Link to="/login">Login</Link>
+          </Button>
+          <Button asChild size="sm" className="text-xs md:text-sm">
+            <Link to="/signup">Sign Up</Link>
+          </Button>
+        </div>
       )}
     </div>
   );

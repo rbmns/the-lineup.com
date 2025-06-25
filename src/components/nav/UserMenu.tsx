@@ -21,9 +21,10 @@ export interface UserMenuProps {
   profile: UserProfile | null;
   handleSignOut: () => Promise<void>;
   canCreateEvents?: boolean;
+  isAdmin?: boolean;
 }
 
-const UserMenu = ({ user, profile, handleSignOut, canCreateEvents }: UserMenuProps) => {
+const UserMenu = ({ user, profile, handleSignOut, canCreateEvents, isAdmin }: UserMenuProps) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
@@ -38,6 +39,8 @@ const UserMenu = ({ user, profile, handleSignOut, canCreateEvents }: UserMenuPro
       console.error("UserMenu: error during sign out:", error);
     }
   };
+
+  const showDashboard = canCreateEvents || isAdmin;
 
   return (
     <DropdownMenu>
@@ -64,12 +67,14 @@ const UserMenu = ({ user, profile, handleSignOut, canCreateEvents }: UserMenuPro
             <span>Profile</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/organise" className="w-full cursor-pointer">
-            <LayoutDashboard className="mr-2 h-4 w-4" />
-            <span>Dashboard</span>
-          </Link>
-        </DropdownMenuItem>
+        {showDashboard && (
+          <DropdownMenuItem asChild>
+            <Link to="/organise" className="w-full cursor-pointer">
+              <LayoutDashboard className="mr-2 h-4 w-4" />
+              <span>Dashboard</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
         {canCreateEvents && (
             <DropdownMenuItem asChild>
               <Link to="/profile?tab=created" className="w-full cursor-pointer">
