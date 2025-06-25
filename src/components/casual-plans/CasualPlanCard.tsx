@@ -45,9 +45,8 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
     return false;
   };
 
-  // Determine current RSVP status - this would need to be passed from the parent
-  // For now, we'll assume it's null
-  const currentRsvpStatus = plan.user_rsvp_status || null;
+  // Use the correct property name from CasualPlan type
+  const currentRsvpStatus = plan.rsvp_status || null;
 
   return (
     <Card 

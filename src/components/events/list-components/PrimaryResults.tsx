@@ -3,7 +3,7 @@ import React from 'react';
 import { Event } from '@/types';
 import { EventCountDisplay } from '@/components/events/EventCountDisplay';
 import { EventCard } from '@/components/events/EventCard';
-import { EventsLoadingSkeleton } from '@/components/events/EventsLoadingSkeleton';
+import { EventsLoadingState } from '@/components/events/list-components/EventsLoadingState';
 
 interface PrimaryResultsProps {
   events: Event[];
@@ -25,7 +25,7 @@ export const PrimaryResults: React.FC<PrimaryResultsProps> = ({
   compact = false
 }) => {
   if (isLoading) {
-    return <EventsLoadingSkeleton />;
+    return <EventsLoadingState />;
   }
 
   return (

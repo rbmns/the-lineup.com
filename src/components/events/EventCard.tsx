@@ -5,7 +5,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, MapPin, Clock, Users } from 'lucide-react';
 import { EventCardActions } from './EventCardActions';
-import { formatEventDate, formatEventTime } from '@/utils/dateUtils';
+import { formatEventTime } from '@/utils/dateUtils';
+import { formatEventDate } from '@/utils/date-formatting';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -44,6 +45,9 @@ export const EventCard: React.FC<EventCardProps> = ({
     return true;
   };
 
+  // Handle image_urls - it could be a string or array
+  const imageUrl = Array.isArray(event.image_urls) ? event.image_urls[0] : event.image_urls;
+
   return (
     <Card 
       className={cn(
@@ -56,10 +60,10 @@ export const EventCard: React.FC<EventCardProps> = ({
     >
       <CardContent className="p-4 h-full flex flex-col">
         {/* Event Image */}
-        {event.image_urls && (
+        {imageUrl && (
           <div className="mb-4 rounded-lg overflow-hidden">
             <img
-              src={event.image_urls}
+              src={imageUrl}
               alt={event.title}
               className="w-full h-32 object-cover"
             />
