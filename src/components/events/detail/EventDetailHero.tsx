@@ -41,9 +41,11 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
           </div>
         )}
         
-        {/* Share button - Top right */}
+        {/* Share button - Top right with custom styling */}
         <div className="absolute top-3 sm:top-4 right-3 sm:right-4">
-          <EventShareButton event={event} variant="outline" />
+          <div className="[&>button]:bg-transparent [&>button]:text-white [&>button]:border [&>button]:border-white/50 [&>button]:backdrop-blur-sm [&>button]:hover:bg-white [&>button]:hover:text-[#003840] [&>button]:transition-all [&>button]:duration-200">
+            <EventShareButton event={event} variant="outline" />
+          </div>
         </div>
         
         {/* Desktop: Event title overlay - hidden on mobile */}
@@ -69,11 +71,11 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
 
       {/* Mobile: Content below image */}
       <div className="block sm:hidden px-4 py-4 bg-white">
-        <h1 className="text-xl font-bold text-[#005F73] mb-2 leading-tight">
+        <h1 className="text-xl font-bold text-[#003840] mb-2 leading-tight">
           {event.title}
         </h1>
-        <div className="flex items-center text-[#005F73]/80 text-sm mb-2">
-          <Calendar className="h-4 w-4 mr-2 flex-shrink-0 text-[#2A9D8F]" />
+        <div className="flex items-center text-[#003840]/80 text-sm mb-2">
+          <Calendar className="h-4 w-4 mr-2 flex-shrink-0 text-[#66B2B2]" />
           <span className="font-medium">
             {event.start_date && formatDate(event.start_date)}
             {event.start_time && `, ${formatEventTime(event.start_time, event.end_time)}`}
@@ -81,8 +83,8 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
         </div>
         {/* Organizer info without gradient background */}
         {event.organiser_name && (
-          <p className="text-[#005F73]/70 text-sm font-medium">
-            By <span className="text-[#2A9D8F]">{event.organiser_name}</span>
+          <p className="text-[#003840]/70 text-sm font-medium">
+            By <span className="text-[#66B2B2]">{event.organiser_name}</span>
           </p>
         )}
       </div>
