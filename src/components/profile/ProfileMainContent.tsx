@@ -9,8 +9,9 @@ import { PrivacySettings } from '@/components/profile/PrivacySettings';
 import { DataManagement } from '@/components/profile/DataManagement';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MapPin, Edit3, User, Shield, Database } from 'lucide-react';
+import { MapPin, Edit3, User, Shield, Database, Calendar } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
+import { UserRsvpedEvents } from '@/components/profile/UserRsvpedEvents';
 
 export const ProfileMainContent: React.FC = () => {
   const { user } = useAuth();
@@ -36,15 +37,15 @@ export const ProfileMainContent: React.FC = () => {
 
   const stats = [
     { label: 'Events Attended', value: pastEvents.length.toString() },
-    { label: 'Upcoming Events', value: upcomingEvents.length.toString() },
+    { label: 'Interested In', value: upcomingEvents.length.toString() },
     { label: 'Friends', value: '—' }
   ];
 
-  // Updated tabs - removed 'events' tab since it's now in the main profile page
+  // Updated tabs - now includes 'events' tab for RSVPs
   const tabs = [
     { id: 'personal', label: 'Personal Info', icon: User, shortLabel: 'Personal' },
-    { id: 'privacy', label: 'Privacy', icon: Shield, shortLabel: 'Privacy' },
-    { id: 'data', label: 'Data Management', icon: Database, shortLabel: 'Data' }
+    { id: 'events', label: 'My Events', icon: Calendar, shortLabel: 'Events' },
+    { id: 'privacy', label: 'Preferences', icon: Shield, shortLabel: 'Privacy' }
   ];
 
   const renderTabContent = () => {
@@ -79,6 +80,16 @@ export const ProfileMainContent: React.FC = () => {
                   </p>
                 </div>
               )}
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-primary">Member Since</label>
+                <p className="text-neutral bg-secondary-25 rounded-lg px-4 py-3 border border-secondary text-sm md:text-base">
+                  {user?.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long' 
+                  }) : 'Unknown'}
+                </p>
+              </div>
             </div>
             
             <Button 
@@ -90,12 +101,20 @@ export const ProfileMainContent: React.FC = () => {
             </Button>
           </div>
         );
+
+      case 'events':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold text-primary mb-2">My Events</h2>
+              <p className="text-neutral-50 mb-6 text-sm md:text-base">Events you've RSVPed to</p>
+            </div>
+            <UserRsvpedEvents userId={user?.id} />
+          </div>
+        );
         
       case 'privacy':
         return <PrivacySettings userId={user?.id} />;
-        
-      case 'data':
-        return <DataManagement />;
         
       default:
         return null;
@@ -137,9 +156,10 @@ export const ProfileMainContent: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats Section */}
+      {/* Activity Stats Section */}
       <div className="bg-white border-b border-secondary">
         <div className="max-w-4xl mx-auto px-4 py-6 md:py-8">
+          <h2 className="text-xl font-semibold mb-4 text-left">Activity</h2>
           <div className="grid grid-cols-3 gap-4 md:gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
