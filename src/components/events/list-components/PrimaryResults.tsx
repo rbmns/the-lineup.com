@@ -29,10 +29,15 @@ export const PrimaryResults: React.FC<PrimaryResultsProps> = ({
   }
 
   return (
-    <div className="space-y-6">
-      {!hideCount && <EventCountDisplay count={events.length} />}
+    <div className="space-y-8">
+      {!hideCount && (
+        <div className="text-center">
+          <EventCountDisplay count={events.length} />
+          <div className="mt-2 h-1 w-24 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full mx-auto"></div>
+        </div>
+      )}
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {events.map((event) => (
           <EventCard
             key={event.id}
@@ -41,6 +46,7 @@ export const PrimaryResults: React.FC<PrimaryResultsProps> = ({
             showRsvpButtons={showRsvpButtons}
             loadingEventId={loadingEventId}
             compact={compact}
+            className="transform transition-all duration-300 hover:scale-[1.02]"
           />
         ))}
       </div>

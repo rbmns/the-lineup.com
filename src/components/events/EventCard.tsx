@@ -102,21 +102,22 @@ export const EventCard: React.FC<EventCardProps> = ({
   return (
     <Card 
       className={cn(
-        "flex flex-col h-full overflow-hidden cursor-pointer transition-all duration-300 ease-in-out hover:shadow-xl bg-white border border-gray-200 rounded-xl",
+        "group flex flex-col h-full overflow-hidden cursor-pointer transition-all duration-500 ease-out hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-2 bg-white border border-gray-100 rounded-2xl",
+        "bg-gradient-to-b from-white to-gray-50/30",
         className
       )}
       onClick={handleClick}
       data-event-id={event.id}
     >
       {/* Image with category and vibe pills */}
-      <div className="relative w-full h-48 overflow-hidden bg-gray-100 flex-shrink-0">
+      <div className="relative w-full h-52 overflow-hidden bg-gradient-to-br from-blue-100 to-emerald-100 flex-shrink-0">
         <LineupImage
           src={imageUrl}
           alt={event.title}
           aspectRatio="video"
           treatment="subtle-overlay"
           overlayVariant="ocean"
-          className="w-full h-full"
+          className="w-full h-full transition-transform duration-700 group-hover:scale-110"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (!target.src.includes('/img/default.jpg')) {
@@ -126,51 +127,56 @@ export const EventCard: React.FC<EventCardProps> = ({
           }}
         />
         
+        {/* Gradient overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/10"></div>
+        
         {/* Category pill - top left */}
         {event.event_category && (
-          <div className="absolute top-3 left-3 z-10">
+          <div className="absolute top-4 left-4 z-10">
             <CategoryPill 
               category={event.event_category} 
               size="sm"
+              className="backdrop-blur-sm bg-white/90 border border-white/20 shadow-lg"
             />
           </div>
         )}
 
         {/* Event vibe pill - top right */}
-        <div className="absolute top-3 right-3 z-10">
+        <div className="absolute top-4 right-4 z-10">
           <EventVibeLabel 
             vibe={event.vibe || 'general'} 
             size="sm"
+            className="backdrop-blur-sm bg-white/90 border border-white/20 shadow-lg"
           />
         </div>
       </div>
       
       {/* Content */}
-      <div className="flex flex-col flex-1 p-4 space-y-3">
+      <div className="flex flex-col flex-1 p-6 space-y-4">
         {/* Title */}
-        <h3 className="font-semibold text-gray-900 text-lg leading-tight line-clamp-2">
+        <h3 className="font-bold text-gray-900 text-xl leading-tight line-clamp-2 tracking-tight group-hover:text-blue-600 transition-colors duration-300">
           {event.title}
         </h3>
         
         {/* Organizer info */}
         {event.organiser_name && (
-          <p className="text-sm text-gray-600">
-            By {event.organiser_name}
+          <p className="text-sm text-gray-600 font-medium">
+            By <span className="text-emerald-600">{event.organiser_name}</span>
           </p>
         )}
         
         {/* Date and Time */}
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
-          <span className="font-medium">
+        <div className="flex items-center gap-3 text-sm text-gray-700">
+          <Calendar className="h-4 w-4 text-blue-500 flex-shrink-0" />
+          <span className="font-semibold">
             {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
           </span>
         </div>
         
         {/* Location */}
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
-          <span className="truncate">
+        <div className="flex items-center gap-3 text-sm text-gray-700">
+          <MapPin className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+          <span className="truncate font-medium">
             {getVenueDisplay()}
           </span>
         </div>
@@ -178,7 +184,7 @@ export const EventCard: React.FC<EventCardProps> = ({
         {/* RSVP Buttons - only show if authenticated */}
         {shouldShowRsvp && onRsvp && (
           <div 
-            className="mt-auto pt-3" 
+            className="mt-auto pt-4 border-t border-gray-100" 
             data-rsvp-container="true" 
             onClick={(e) => e.stopPropagation()}
           >
@@ -188,6 +194,7 @@ export const EventCard: React.FC<EventCardProps> = ({
               size="sm"
               isLoading={loadingEventId === event.id}
               showStatusOnly={!shouldShowRsvp && showRsvpStatus}
+              className="w-full"
             />
           </div>
         )}
