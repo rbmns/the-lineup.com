@@ -1,194 +1,197 @@
 
 import React from 'react';
 import { Event } from '@/types';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { CalendarDays, MapPin, Clock, Users } from 'lucide-react';
-import { EventCardActions } from './EventCardActions';
-import { formatEventTime } from '@/utils/dateUtils';
-import { formatDate } from '@/utils/date-formatting';
-import { useNavigate } from 'react-router-dom';
+import { Calendar, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useEventNavigation } from '@/hooks/useEventNavigation';
+import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
+import { useEventImages } from '@/hooks/useEventImages';
+import { CategoryPill } from '@/components/ui/category-pill';
+import { toast } from '@/hooks/use-toast';
+import { formatEventCardDateTime } from '@/utils/date-formatting';
+import { LineupImage } from '@/components/ui/lineup-image';
+import { useAuth } from '@/contexts/AuthContext';
+import { Card } from '@/components/ui/card';
+import EventVibeLabel from '@/components/polymet/event-vibe-label';
 
 interface EventCardProps {
   event: Event;
-  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<void>;
-  showRsvpButtons?: boolean;
-  isLoading?: boolean;
   compact?: boolean;
+  showRsvpButtons?: boolean;
+  showRsvpStatus?: boolean;
+  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   className?: string;
+  onClick?: (event: Event) => void;
+  loadingEventId?: string | null;
 }
 
 export const EventCard: React.FC<EventCardProps> = ({
   event,
-  onRsvp,
-  showRsvpButtons = false,
-  isLoading = false,
   compact = false,
-  className
+  showRsvpButtons = true,
+  showRsvpStatus = false,
+  onRsvp,
+  className,
+  onClick,
+  loadingEventId,
 }) => {
-  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { navigateToEvent } = useEventNavigation();
+  const { getEventImageUrl } = useEventImages();
+  const imageUrl = getEventImageUrl(event);
 
-  const handleCardClick = (e: React.MouseEvent) => {
-    // Don't navigate if clicking on RSVP buttons or other interactive elements
+  // Only show RSVP functionality if user is authenticated AND showRsvpButtons is true
+  const shouldShowRsvp = isAuthenticated && showRsvpButtons;
+
+  const handleClick = (e: React.MouseEvent) => {
+    // Check for RSVP-related elements
     const target = e.target as HTMLElement;
-    if (target.closest('[data-no-navigation="true"]') || target.closest('button')) {
+    const isRsvpElement = 
+      target.closest('[data-rsvp-container="true"]') || 
+      target.closest('[data-rsvp-button="true"]') ||
+      target.hasAttribute('data-rsvp-button') ||
+      target.closest('button[data-status]');
+    
+    if (isRsvpElement) {
+      e.stopPropagation();
+      e.preventDefault();
       return;
     }
-    navigate(`/events/${event.id}`);
-  };
-
-  const handleRsvp = async (eventId: string, status: 'Going' | 'Interested') => {
-    if (onRsvp) {
-      await onRsvp(eventId, status);
-    }
-    return true;
-  };
-
-  // Handle image_urls - it could be a string or array
-  const getImageUrl = (): string => {
-    if (!event.image_urls) {
-      return getDefaultImage();
-    }
-
-    // Handle array case
-    if (Array.isArray(event.image_urls)) {
-      const firstValidUrl = event.image_urls.find((url) => 
-        typeof url === 'string' && url.trim().length > 0
-      );
-      if (firstValidUrl) {
-        return firstValidUrl;
-      }
-      return getDefaultImage();
-    }
-
-    // Handle string case
-    if (typeof event.image_urls === 'string') {
-      const urlString = event.image_urls.trim();
-      
-      // Check if it's a JSON array string
-      if (urlString.startsWith('[') && urlString.endsWith(']')) {
-        try {
-          const parsed = JSON.parse(urlString);
-          if (Array.isArray(parsed)) {
-            const firstValidUrl = parsed.find((url) => 
-              typeof url === 'string' && url.trim().length > 0
-            );
-            if (firstValidUrl) {
-              return firstValidUrl;
-            }
-          }
-        } catch (e) {
-          console.warn('Failed to parse image_urls JSON:', urlString);
-        }
-      } else if (urlString.length > 0) {
-        // Treat as a single URL
-        return urlString;
-      }
+    
+    if (onClick) {
+      onClick(event);
+      return;
     }
     
-    return getDefaultImage();
+    try {
+      navigateToEvent(event);
+    } catch (error) {
+      console.error("Error navigating to event:", error);
+      toast({
+        title: "Navigation Error",
+        description: "Could not navigate to event page",
+        variant: "destructive",
+      });
+    }
   };
 
-  const getDefaultImage = (): string => {
-    // Use fallback image based on category
-    const categoryImages: Record<string, string> = {
-      'music': '/img/categories/music.jpg',
-      'arts': '/img/categories/arts.jpg',
-      'food': '/img/categories/food.jpg',
-      'sports': '/img/categories/sports.jpg',
-      'nightlife': '/img/categories/nightlife.jpg',
-      'wellness': '/img/categories/wellness.jpg',
-      'tech': '/img/categories/tech.jpg',
-      'business': '/img/categories/business.jpg',
-      'community': '/img/categories/community.jpg',
-      'other': '/img/default.jpg'
-    };
+  const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    if (!onRsvp || !shouldShowRsvp) return false;
     
-    return categoryImages[event.event_category || 'other'] || '/img/default.jpg';
+    try {
+      const result = await onRsvp(event.id, status);
+      return result === undefined ? true : !!result;
+    } catch (error) {
+      console.error('Error in EventCard RSVP handler:', error);
+      return false;
+    }
   };
 
-  const imageUrl = getImageUrl();
+  const getVenueDisplay = (): string => {
+    if (event.venues?.name) {
+      return event.venues.name;
+    }
+    
+    if (event.location) {
+      return event.location;
+    }
+    
+    return 'Location TBD';
+  };
 
   return (
     <Card 
       className={cn(
-        "cursor-pointer hover:shadow-lg transition-all duration-200 h-full",
-        isLoading && "opacity-50",
+        "flex flex-col h-full overflow-hidden cursor-pointer transition-all duration-300 ease-in-out hover:shadow-xl bg-white border border-gray-200 rounded-xl",
         className
       )}
-      onClick={handleCardClick}
+      onClick={handleClick}
       data-event-id={event.id}
     >
-      <CardContent className="p-4 h-full flex flex-col">
-        {/* Event Image */}
-        <div className="mb-4 rounded-lg overflow-hidden">
-          <img
-            src={imageUrl}
-            alt={event.title}
-            className="w-full h-32 object-cover"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              if (!target.src.includes('/img/default.jpg')) {
-                console.log('Image failed to load, using default');
-                target.src = "/img/default.jpg";
-              }
-            }}
-          />
-        </div>
-
-        {/* Event Details */}
-        <div className="flex-1 space-y-3">
-          {/* Title and Vibe */}
-          <div className="space-y-2">
-            <h3 className="font-semibold text-lg line-clamp-2">{event.title}</h3>
-            {event.vibe && (
-              <Badge variant="secondary" className="text-xs">
-                {event.vibe}
-              </Badge>
-            )}
+      {/* Image with category and vibe pills */}
+      <div className="relative w-full h-48 overflow-hidden bg-gray-100 flex-shrink-0">
+        <LineupImage
+          src={imageUrl}
+          alt={event.title}
+          aspectRatio="video"
+          treatment="subtle-overlay"
+          overlayVariant="ocean"
+          className="w-full h-full"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            if (!target.src.includes('/img/default.jpg')) {
+              console.log('Image failed to load, using default');
+              target.src = "/img/default.jpg";
+            }
+          }}
+        />
+        
+        {/* Category pill - top left */}
+        {event.event_category && (
+          <div className="absolute top-3 left-3 z-10">
+            <CategoryPill 
+              category={event.event_category} 
+              size="sm"
+            />
           </div>
-
-          {/* Date and Time */}
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <CalendarDays className="h-4 w-4" />
-            <span>{formatDate(event.start_date)}</span>
-            {event.start_time && (
-              <>
-                <Clock className="h-4 w-4 ml-2" />
-                <span>{formatEventTime(event.start_time)}</span>
-              </>
-            )}
-          </div>
-
-          {/* Location */}
-          {event.destination && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <MapPin className="h-4 w-4" />
-              <span className="line-clamp-1">{event.destination}</span>
-            </div>
-          )}
-
-          {/* Description */}
-          {event.description && !compact && (
-            <p className="text-sm text-gray-600 line-clamp-2">
-              {event.description}
-            </p>
-          )}
-        </div>
-
-        {/* RSVP Actions */}
-        {showRsvpButtons && (
-          <EventCardActions
-            eventId={event.id}
-            currentRsvpStatus={event.rsvp_status}
-            showRsvpButtons={true}
-            onRsvp={handleRsvp}
-            isLoading={isLoading}
-            onClick={(e) => e.stopPropagation()}
-          />
         )}
-      </CardContent>
+
+        {/* Event vibe pill - top right */}
+        <div className="absolute top-3 right-3 z-10">
+          <EventVibeLabel 
+            vibe={event.vibe || 'general'} 
+            size="sm"
+          />
+        </div>
+      </div>
+      
+      {/* Content */}
+      <div className="flex flex-col flex-1 p-4 space-y-3">
+        {/* Title */}
+        <h3 className="font-semibold text-gray-900 text-lg leading-tight line-clamp-2">
+          {event.title}
+        </h3>
+        
+        {/* Organizer info */}
+        {event.organiser_name && (
+          <p className="text-sm text-gray-600">
+            By {event.organiser_name}
+          </p>
+        )}
+        
+        {/* Date and Time */}
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
+          <span className="font-medium">
+            {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
+          </span>
+        </div>
+        
+        {/* Location */}
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
+          <span className="truncate">
+            {getVenueDisplay()}
+          </span>
+        </div>
+
+        {/* RSVP Buttons - only show if authenticated */}
+        {shouldShowRsvp && onRsvp && (
+          <div 
+            className="mt-auto pt-3" 
+            data-rsvp-container="true" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <EventRsvpButtons
+              currentStatus={event.rsvp_status || null}
+              onRsvp={handleRsvp}
+              size="sm"
+              isLoading={loadingEventId === event.id}
+              showStatusOnly={!shouldShowRsvp && showRsvpStatus}
+            />
+          </div>
+        )}
+      </div>
     </Card>
   );
 };
