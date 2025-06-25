@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Event } from '@/types';
 import { EventRsvpSection } from '@/components/events/detail-sections/EventRsvpSection';
 
@@ -23,6 +23,13 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
   rsvpFeedback,
   onRsvp
 }) => {
+  const navigate = useNavigate();
+
+  const handleUserClick = (userId: string) => {
+    // Use /user/{id} route instead of /profile/{id}
+    navigate(`/user/${userId}`);
+  };
+
   return (
     <div className="lg:col-span-2 space-y-6">
       {/* RSVP Section - only show if authenticated */}
@@ -67,16 +74,16 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {attendees.going.map(attendee => (
-                    <Link
+                    <button
                       key={attendee.id}
-                      to={`/profile/${attendee.id}`}
-                      className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1 hover:bg-gray-200 transition-colors"
+                      onClick={() => handleUserClick(attendee.id)}
+                      className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1 hover:bg-gray-200 transition-colors cursor-pointer"
                     >
                       <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-xs">
                         {attendee.username?.charAt(0).toUpperCase()}
                       </div>
                       <span className="text-sm">{attendee.username}</span>
-                    </Link>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -89,16 +96,16 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   {attendees.interested.map(attendee => (
-                    <Link
+                    <button
                       key={attendee.id}
-                      to={`/profile/${attendee.id}`}
-                      className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1 hover:bg-gray-200 transition-colors"
+                      onClick={() => handleUserClick(attendee.id)}
+                      className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1 hover:bg-gray-200 transition-colors cursor-pointer"
                     >
                       <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center text-xs">
                         {attendee.username?.charAt(0).toUpperCase()}
                       </div>
                       <span className="text-sm">{attendee.username}</span>
-                    </Link>
+                    </button>
                   ))}
                 </div>
               </div>

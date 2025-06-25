@@ -12,6 +12,10 @@ const CasualPlans = () => {
   const { user } = useAuth();
   const { plans, isLoading, rsvpToPlan, loadingPlanId } = useCasualPlans();
 
+  console.log('CasualPlans component - plans:', plans);
+  console.log('CasualPlans component - isLoading:', isLoading);
+  console.log('CasualPlans component - user:', user);
+
   const handleRsvp = async (planId: string, status: 'Going' | 'Interested') => {
     const success = await rsvpToPlan(planId, status);
     return success;
@@ -44,34 +48,36 @@ const CasualPlans = () => {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {plans?.map((plan) => (
-            <CasualPlanCard
-              key={plan.id}
-              plan={plan}
-              onRsvp={user ? handleRsvp : undefined}
-              showRsvpButtons={!!user}
-              isLoading={loadingPlanId === plan.id}
-            />
-          ))}
-        </div>
-      )}
-
-      {!isLoading && (!plans || plans.length === 0) && (
-        <div className="text-center py-12">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            No casual plans yet
-          </h3>
-          <p className="text-gray-600 mb-4">
-            Be the first to create a spontaneous meetup!
-          </p>
-          {user && (
-            <Button onClick={() => navigate('/casual-plans/create')}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Your First Plan
-            </Button>
+        <>
+          {plans && plans.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {plans.map((plan) => (
+                <CasualPlanCard
+                  key={plan.id}
+                  plan={plan}
+                  onRsvp={user ? handleRsvp : undefined}
+                  showRsvpButtons={!!user}
+                  isLoading={loadingPlanId === plan.id}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No casual plans yet
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Be the first to create a spontaneous meetup!
+              </p>
+              {user && (
+                <Button onClick={() => navigate('/casual-plans/create')}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Your First Plan
+                </Button>
+              )}
+            </div>
           )}
-        </div>
+        </>
       )}
     </div>
   );

@@ -1,42 +1,92 @@
 
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase';
-import { CasualPlan } from '@/types/casual-plans';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { CasualPlan } from '@/types/casual-plans';
 
 export const useCasualPlansQuery = () => {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   const { data: plans, isLoading, error } = useQuery({
-    queryKey: ['casual-plans', user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
+    queryKey: ['casual-plans'],
+    queryFn: async (): Promise<CasualPlan[]> => {
+      console.log('Fetching casual plans...');
+      
+      if (!isAuthenticated) {
+        console.log('User not authenticated, returning empty array');
+        return [];
+      }
+
+      // Get current date for filtering
+      const today = new Date().toISOString().split('T')[0];
+      
+      const { data: plansData, error: plansError } = await supabase
         .from('casual_plans')
         .select(`
           *,
-          creator_profile:profiles!casual_plans_creator_id_fkey (
-            id, username, avatar_url
-          ),
-          rsvps:casual_plan_rsvps (
-            id, user_id, status
+          creator_profile:profiles!creator_id(
+            id,
+            username,
+            avatar_url
           )
         `)
-        .gte('date', new Date().toISOString().split('T')[0])
-        .order('date', { ascending: true });
+        .gte('date', today)
+        .order('date', { ascending: true })
+        .order('time', { ascending: true });
 
-      if (error) throw error;
+      if (plansError) {
+        console.error('Error fetching casual plans:', plansError);
+        throw plansError;
+      }
 
-      return data?.map((plan: any) => ({
-        ...plan,
-        attendee_count: plan.rsvps?.filter((r: any) => r.status === 'Going').length || 0,
-        user_rsvp_status: user ? plan.rsvps?.find((r: any) => r.user_id === user.id)?.status || null : null
-      })) as CasualPlan[];
+      console.log('Raw casual plans data:', plansData);
+
+      if (!plansData || plansData.length === 0) {
+        console.log('No casual plans found');
+        return [];
+      }
+
+      // Get all RSVPs for these plans
+      const planIds = plansData.map(plan => plan.id);
+      
+      const { data: rsvpsData, error: rsvpsError } = await supabase
+        .from('casual_plan_rsvps')
+        .select('*')
+        .in('plan_id', planIds);
+
+      if (rsvpsError) {
+        console.error('Error fetching RSVPs:', rsvpsError);
+        // Continue without RSVPs rather than failing
+      }
+
+      console.log('RSVPs data:', rsvpsData);
+
+      // Process the plans with RSVP data
+      const processedPlans: CasualPlan[] = plansData.map(plan => {
+        const planRsvps = rsvpsData?.filter(rsvp => rsvp.plan_id === plan.id) || [];
+        const userRsvp = planRsvps.find(rsvp => rsvp.user_id === user?.id);
+
+        const goingCount = planRsvps.filter(rsvp => rsvp.status === 'Going').length;
+        const interestedCount = planRsvps.filter(rsvp => rsvp.status === 'Interested').length;
+
+        return {
+          ...plan,
+          rsvp_status: userRsvp?.status as 'Going' | 'Interested' | null || null,
+          going_count: goingCount,
+          interested_count: interestedCount,
+          attendee_count: goingCount + interestedCount,
+          creator_profile: plan.creator_profile || undefined
+        };
+      });
+
+      console.log('Processed casual plans:', processedPlans);
+      return processedPlans;
     },
-    enabled: true,
+    enabled: isAuthenticated,
   });
 
   return {
-    plans,
+    plans: plans || [],
     isLoading,
     error
   };
