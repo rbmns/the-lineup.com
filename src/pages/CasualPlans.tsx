@@ -23,31 +23,34 @@ const CasualPlans = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4E7D3]">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#003840]">Casual Plans</h1>
-            <p className="text-[#4A4A48] mt-2 text-sm sm:text-base">
-              Spontaneous meetups and activities with fellow travelers
-            </p>
-          </div>
+    <div className="min-h-screen bg-white">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-b from-[#F9F3E9] to-white py-12 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#005F73] mb-4 leading-tight">
+            Casual <span className="text-[#2A9D8F]">Plans</span>
+          </h1>
+          <p className="text-lg sm:text-xl text-[#4A4A48] max-w-3xl mx-auto leading-relaxed mb-6">
+            Spontaneous meetups and activities with fellow travelers
+          </p>
           
           {isAuthenticated && (
             <Button 
               onClick={() => navigate('/casual-plans/create')}
-              className="bg-[#66B2B2] hover:bg-[#66B2B2]/90 text-white"
+              className="bg-[#2A9D8F] hover:bg-[#2A9D8F]/90 text-white"
             >
               <Plus className="h-4 w-4 mr-2" />
               Create Plan
             </Button>
           )}
         </div>
+      </div>
 
+      <div className="container mx-auto px-4 py-8">
         {/* Login prompt for non-authenticated users */}
         {!isAuthenticated && (
-          <div className="bg-white border border-[#66B2B2]/20 rounded-xl p-6 mb-8 shadow-sm">
-            <h3 className="text-lg font-semibold text-[#003840] mb-2">
+          <div className="bg-white border border-[#2A9D8F]/20 rounded-xl p-6 mb-8 shadow-sm">
+            <h3 className="text-lg font-semibold text-[#005F73] mb-2">
               Join the community to see full details
             </h3>
             <p className="text-[#4A4A48] mb-4">
@@ -56,14 +59,14 @@ const CasualPlans = () => {
             <div className="flex flex-col sm:flex-row gap-3">
               <Button 
                 onClick={() => navigate('/login')}
-                className="bg-[#66B2B2] hover:bg-[#66B2B2]/90 text-white"
+                className="bg-[#2A9D8F] hover:bg-[#2A9D8F]/90 text-white"
               >
                 Sign In
               </Button>
               <Button 
                 variant="outline" 
                 onClick={() => navigate('/signup')}
-                className="border-[#66B2B2] text-[#003840] hover:bg-[#66B2B2]/10"
+                className="border-[#2A9D8F] text-[#005F73] hover:bg-[#2A9D8F]/10"
               >
                 Sign Up
               </Button>
@@ -97,7 +100,7 @@ const CasualPlans = () => {
             ) : (
               <div className="text-center py-12">
                 <div className="text-4xl sm:text-6xl mb-4">🏖️</div>
-                <h3 className="text-lg sm:text-xl font-medium text-[#003840] mb-2">
+                <h3 className="text-lg sm:text-xl font-medium text-[#005F73] mb-2">
                   No casual plans yet
                 </h3>
                 <p className="text-[#4A4A48] mb-4 text-sm sm:text-base">
@@ -109,7 +112,7 @@ const CasualPlans = () => {
                 {isAuthenticated && (
                   <Button 
                     onClick={() => navigate('/casual-plans/create')}
-                    className="bg-[#66B2B2] hover:bg-[#66B2B2]/90 text-white"
+                    className="bg-[#2A9D8F] hover:bg-[#2A9D8F]/90 text-white"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Create Your First Plan

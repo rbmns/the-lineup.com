@@ -1,10 +1,9 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 /* Global background and zoning */
 @layer base {
   :root {
-    --background: 244 231 211; /* #F4E7D3 - Sand Beige */
+    --background: 255 255 255; /* Changed to white instead of sand */
     --foreground: 0 56 64; /* #003840 - Much darker Ocean Deep */
 
     --card: 255 255 255; /* #FFFFFF */
@@ -13,7 +12,7 @@
     --primary: 0 56 64; /* #003840 - Much darker Ocean Deep */
     --primary-foreground: 255 255 255;
 
-    --secondary: 244 231 211; /* #F4E7D3 - Sand Beige */
+    --secondary: 249 243 233; /* Lighter Sand Beige - reduced prominence */
     --secondary-foreground: 0 56 64;
 
     --muted: 74 74 72; /* #4A4A48 - Much darker Driftwood Gray */
@@ -33,7 +32,7 @@
   }
 
   html, body {
-    background: linear-gradient(to bottom, #F4E7D3 0%, #FFFFFF 100%);
+    background: white; /* Changed from sand gradient to white */
     color: #003840; /* Dark teal for all text */
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
@@ -98,7 +97,7 @@
     background: #F9F3E9 !important;
   }
   .main-feed-gradient {
-    background: linear-gradient(to bottom, #F4E7D3 0%, #FFFFFF 100%) !important;
+    background: white !important; /* Changed from gradient to white */
   }
 }
 

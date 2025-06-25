@@ -72,53 +72,66 @@ const Events = () => {
   };
 
   return (
-    <EventsPageLayout>
-      <div className="space-y-4 sm:space-y-6">
-        {/* Vibe Filter */}
-        <div className="w-full">
-          <EventsVibeSection
-            selectedVibes={selectedVibes}
-            onVibeChange={setSelectedVibes}
-            events={allEvents || []}
-            vibesLoading={isLoading}
-          />
-        </div>
-
-        {/* Advanced Filters Section - Now includes location */}
-        <div className="w-full">
-          <EventsAdvancedSection
-            onFilterChange={handleFilterChange}
-            selectedEventTypes={selectedEventTypes}
-            selectedVenues={selectedVenues}
-            selectedVibes={selectedVibes}
-            selectedLocation={selectedLocation}
-            dateRange={dateRange}
-            selectedDateFilter={selectedDateFilter}
-            filteredEventsCount={filteredEventsCount}
-            allEventTypes={allEventTypes}
-            availableVenues={availableVenues}
-            events={allEvents || []}
-            venueAreas={venueAreas}
-            isLocationLoaded={isLocationLoaded}
-            areasLoading={areasLoading}
-          />
-        </div>
-
-        {/* Results Section */}
-        <div className="w-full">
-          <EventsResultsSection
-            filteredEvents={events}
-            hasActiveFilters={hasActiveFilters}
-            resetFilters={resetAllFilters}
-            eventsLoading={isLoading}
-            isFilterLoading={false}
-            user={user}
-            enhancedHandleRsvp={handleRsvpWrapper}
-            loadingEventId={rsvpLoading ? 'loading' : undefined}
-          />
+    <div className="min-h-screen bg-white">
+      <div className="bg-gradient-to-b from-[#F9F3E9] to-white py-12 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#005F73] mb-4 leading-tight">
+            Discover <span className="text-[#2A9D8F]">Events</span>
+          </h1>
+          <p className="text-lg sm:text-xl text-[#4A4A48] max-w-3xl mx-auto leading-relaxed">
+            Find amazing events, connect with like-minded people, and create unforgettable memories
+          </p>
         </div>
       </div>
-    </EventsPageLayout>
+
+      <EventsPageLayout>
+        <div className="space-y-4 sm:space-y-6">
+          {/* Vibe Filter */}
+          <div className="w-full">
+            <EventsVibeSection
+              selectedVibes={selectedVibes}
+              onVibeChange={setSelectedVibes}
+              events={allEvents || []}
+              vibesLoading={isLoading}
+            />
+          </div>
+
+          {/* Advanced Filters Section - Now includes location */}
+          <div className="w-full">
+            <EventsAdvancedSection
+              onFilterChange={handleFilterChange}
+              selectedEventTypes={selectedEventTypes}
+              selectedVenues={selectedVenues}
+              selectedVibes={selectedVibes}
+              selectedLocation={selectedLocation}
+              dateRange={dateRange}
+              selectedDateFilter={selectedDateFilter}
+              filteredEventsCount={filteredEventsCount}
+              allEventTypes={allEventTypes}
+              availableVenues={availableVenues}
+              events={allEvents || []}
+              venueAreas={venueAreas}
+              isLocationLoaded={isLocationLoaded}
+              areasLoading={areasLoading}
+            />
+          </div>
+
+          {/* Results Section */}
+          <div className="w-full">
+            <EventsResultsSection
+              filteredEvents={events}
+              hasActiveFilters={hasActiveFilters}
+              resetFilters={resetAllFilters}
+              eventsLoading={isLoading}
+              isFilterLoading={false}
+              user={user}
+              enhancedHandleRsvp={handleRsvpWrapper}
+              loadingEventId={rsvpLoading ? 'loading' : undefined}
+            />
+          </div>
+        </div>
+      </EventsPageLayout>
+    </div>
   );
 };
 
