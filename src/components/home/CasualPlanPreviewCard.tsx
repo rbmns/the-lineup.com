@@ -47,14 +47,14 @@ export const CasualPlanPreviewCard: React.FC<CasualPlanPreviewCardProps> = ({
           <h4 className="font-medium text-gray-900 text-sm truncate">{plan.title}</h4>
         </div>
         <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
-          {formatFeaturedDate(plan.date)}
+          {isAuthenticated ? formatFeaturedDate(plan.date) : "•••• ••"}
         </span>
       </div>
       
       <div className="flex items-center gap-3 md:gap-4 text-xs text-gray-500 mb-2 flex-wrap">
         <div className="flex items-center gap-1">
           <Clock className="h-3 w-3" />
-          <span>{formatTime(plan.time)}</span>
+          <span>{isAuthenticated ? formatTime(plan.time) : "••:•• ••"}</span>
         </div>
         <div className="flex items-center gap-1 min-w-0">
           <MapPin className="h-3 w-3 flex-shrink-0" />
@@ -74,8 +74,18 @@ export const CasualPlanPreviewCard: React.FC<CasualPlanPreviewCardProps> = ({
         </div>
       </div>
       
-      {isAuthenticated && plan.description && (
+      {isAuthenticated && plan.description ? (
         <p className="text-sm text-gray-600 line-clamp-1">{plan.description}</p>
+      ) : !isAuthenticated ? (
+        <p className="text-sm text-gray-300 line-clamp-1">••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••</p>
+      ) : null}
+      
+      {!isAuthenticated && (
+        <div className="mt-2 pt-2 border-t border-gray-100 text-center">
+          <p className="text-xs text-blue-600">
+            Sign in to see full details
+          </p>
+        </div>
       )}
     </div>
   );

@@ -9,12 +9,13 @@ import { CasualPlanCard } from '@/components/casual-plans/CasualPlanCard';
 
 const CasualPlans = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { plans, isLoading, rsvpToPlan, loadingPlanId } = useCasualPlans();
 
   console.log('CasualPlans component - plans:', plans);
   console.log('CasualPlans component - isLoading:', isLoading);
   console.log('CasualPlans component - user:', user);
+  console.log('CasualPlans component - isAuthenticated:', isAuthenticated);
 
   const handleRsvp = async (planId: string, status: 'Going' | 'Interested') => {
     const success = await rsvpToPlan(planId, status);
@@ -31,13 +32,40 @@ const CasualPlans = () => {
           </p>
         </div>
         
-        {user && (
+        {isAuthenticated && (
           <Button onClick={() => navigate('/casual-plans/create')}>
             <Plus className="h-4 w-4 mr-2" />
             Create Plan
           </Button>
         )}
       </div>
+
+      {/* Login prompt for non-authenticated users */}
+      {!isAuthenticated && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+          <h3 className="text-lg font-semibold text-blue-900 mb-2">
+            Join the community to see full details
+          </h3>
+          <p className="text-blue-700 mb-4">
+            Sign up to view locations, times, and connect with other members creating casual plans.
+          </p>
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => navigate('/login')}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              Sign In
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/signup')}
+              className="border-blue-300 text-blue-700 hover:bg-blue-50"
+            >
+              Sign Up
+            </Button>
+          </div>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -55,9 +83,10 @@ const CasualPlans = () => {
                 <CasualPlanCard
                   key={plan.id}
                   plan={plan}
-                  onRsvp={user ? handleRsvp : undefined}
-                  showRsvpButtons={!!user}
+                  onRsvp={isAuthenticated ? handleRsvp : undefined}
+                  showRsvpButtons={isAuthenticated}
                   isLoading={loadingPlanId === plan.id}
+                  showBlurred={!isAuthenticated}
                 />
               ))}
             </div>
@@ -67,9 +96,12 @@ const CasualPlans = () => {
                 No casual plans yet
               </h3>
               <p className="text-gray-600 mb-4">
-                Be the first to create a spontaneous meetup!
+                {isAuthenticated 
+                  ? "Be the first to create a spontaneous meetup!"
+                  : "Sign in to see if there are any casual plans in your area."
+                }
               </p>
-              {user && (
+              {isAuthenticated && (
                 <Button onClick={() => navigate('/casual-plans/create')}>
                   <Plus className="h-4 w-4 mr-2" />
                   Create Your First Plan

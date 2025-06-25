@@ -13,6 +13,7 @@ interface CasualPlanCardProps {
   showRsvpButtons?: boolean;
   isLoading?: boolean;
   className?: string;
+  showBlurred?: boolean;
 }
 
 export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
@@ -20,7 +21,8 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
   onRsvp,
   showRsvpButtons = false,
   isLoading = false,
-  className
+  className,
+  showBlurred = false
 }) => {
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('en-US', {
@@ -62,51 +64,88 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
           {/* Title and Vibe */}
           <div className="space-y-2">
             <h3 className="font-semibold text-lg line-clamp-2">{plan.title}</h3>
-            <Badge variant="secondary" className="text-xs capitalize">
-              {plan.vibe}
-            </Badge>
+            {showBlurred ? (
+              <div className="bg-gray-200 text-gray-400 px-2 py-1 rounded text-xs w-fit">
+                ••••••
+              </div>
+            ) : (
+              <Badge variant="secondary" className="text-xs capitalize">
+                {plan.vibe}
+              </Badge>
+            )}
           </div>
 
           {/* Date and Time */}
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <CalendarDays className="h-4 w-4" />
-            <span>{formatDate(plan.date)}</span>
+            {showBlurred ? (
+              <span className="text-gray-300">•••• ••</span>
+            ) : (
+              <span>{formatDate(plan.date)}</span>
+            )}
             <Clock className="h-4 w-4 ml-2" />
-            <span>{formatTime(plan.time)}</span>
+            {showBlurred ? (
+              <span className="text-gray-300">••:•• ••</span>
+            ) : (
+              <span>{formatTime(plan.time)}</span>
+            )}
           </div>
 
           {/* Location */}
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <MapPin className="h-4 w-4" />
-            <span className="line-clamp-1">{plan.location}</span>
+            {showBlurred ? (
+              <span className="text-gray-300">••••••••••••••••••••</span>
+            ) : (
+              <span className="line-clamp-1">{plan.location}</span>
+            )}
           </div>
 
           {/* Description */}
           {plan.description && (
             <p className="text-sm text-gray-600 line-clamp-3">
-              {plan.description}
+              {showBlurred ? "••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••" : plan.description}
             </p>
           )}
 
           {/* Attendee Count */}
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Users className="h-4 w-4" />
-            <span>{plan.attendee_count || 0} attending</span>
-            {plan.max_attendees && (
-              <span className="text-gray-400">
-                (max {plan.max_attendees})
-              </span>
+            {showBlurred ? (
+              <span className="text-gray-300">••• attending</span>
+            ) : (
+              <>
+                <span>{plan.attendee_count || 0} attending</span>
+                {plan.max_attendees && (
+                  <span className="text-gray-400">
+                    (max {plan.max_attendees})
+                  </span>
+                )}
+              </>
             )}
           </div>
 
           {/* Creator Info */}
           <div className="text-xs text-gray-500">
-            Created by {plan.creator_profile?.username || 'Unknown'}
+            {showBlurred ? (
+              "Created by ••••••••"
+            ) : (
+              `Created by ${plan.creator_profile?.username || 'Unknown'}`
+            )}
           </div>
+
+          {/* Login message for non-authenticated users */}
+          {showBlurred && (
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-center">
+              <p className="text-xs text-blue-700 mb-2">
+                Sign in to see full details
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* RSVP Actions */}
-        {showRsvpButtons && (
+        {/* RSVP Actions - only show for authenticated users */}
+        {showRsvpButtons && !showBlurred && (
           <div className="mt-4 pt-4 border-t" data-no-navigation="true">
             <EventRsvpButtons
               currentStatus={currentRsvpStatus}

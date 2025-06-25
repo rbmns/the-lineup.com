@@ -12,15 +12,10 @@ export const useCasualPlansQuery = () => {
     queryFn: async (): Promise<CasualPlan[]> => {
       console.log('Fetching casual plans...');
       
-      if (!isAuthenticated) {
-        console.log('User not authenticated, returning empty array');
-        return [];
-      }
-
       // Get current date for filtering
       const today = new Date().toISOString().split('T')[0];
       
-      // First, fetch the casual plans
+      // First, fetch the casual plans - now for ALL users, not just authenticated
       const { data: plansData, error: plansError } = await supabase
         .from('casual_plans')
         .select('*')
@@ -56,17 +51,22 @@ export const useCasualPlansQuery = () => {
 
       console.log('Creator profiles data:', profilesData);
 
-      // Get all RSVPs for these plans
-      const planIds = plansData.map(plan => plan.id);
-      
-      const { data: rsvpsData, error: rsvpsError } = await supabase
-        .from('casual_plan_rsvps')
-        .select('*')
-        .in('plan_id', planIds);
+      // Get all RSVPs for these plans (only if authenticated)
+      let rsvpsData = null;
+      if (isAuthenticated) {
+        const planIds = plansData.map(plan => plan.id);
+        
+        const { data: rsvpResults, error: rsvpsError } = await supabase
+          .from('casual_plan_rsvps')
+          .select('*')
+          .in('plan_id', planIds);
 
-      if (rsvpsError) {
-        console.error('Error fetching RSVPs:', rsvpsError);
-        // Continue without RSVPs rather than failing
+        if (rsvpsError) {
+          console.error('Error fetching RSVPs:', rsvpsError);
+          // Continue without RSVPs rather than failing
+        }
+
+        rsvpsData = rsvpResults;
       }
 
       console.log('RSVPs data:', rsvpsData);
@@ -104,7 +104,7 @@ export const useCasualPlansQuery = () => {
       console.log('Processed casual plans:', processedPlans);
       return processedPlans;
     },
-    enabled: isAuthenticated,
+    // Remove the enabled condition so it fetches for all users
   });
 
   return {
