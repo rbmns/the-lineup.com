@@ -69,7 +69,7 @@ export const EventCard: React.FC<EventCardProps> = ({
       // Check if it's a JSON array string
       if (urlString.startsWith('[') && urlString.endsWith(']')) {
         try {
-          const parsed = JSON.parse(urlString);
+          const parsed = JSON.parse(urlString) as any[];
           if (Array.isArray(parsed)) {
             const firstValidUrl = parsed.find((url: any) => 
               typeof url === 'string' && (url as string).trim().length > 0
