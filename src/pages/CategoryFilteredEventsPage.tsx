@@ -62,6 +62,12 @@ const CategoryFilteredEventsPage = () => {
     !!dateRange || 
     !!selectedDateFilter;
 
+  // Wrapper function to match the expected signature
+  const handleRsvpWrapper = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
+    await handleEventRsvp(eventId, status);
+    return true;
+  };
+
   return (
     <div className="w-full px-3 sm:px-4 md:px-6 py-4 md:py-8">
       <div className="max-w-7xl mx-auto">
@@ -108,7 +114,7 @@ const CategoryFilteredEventsPage = () => {
             isLoading={isLoading} 
             isFilterLoading={isFilterLoading}
             hasActiveFilters={hasActiveFilters}
-            onRsvp={user ? handleEventRsvp : undefined}
+            onRsvp={user ? handleRsvpWrapper : undefined}
             loadingEventId={loadingEventId}
           />
         </div>

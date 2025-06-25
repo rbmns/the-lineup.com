@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { CalendarDays, MapPin, Clock, Users } from 'lucide-react';
 import { EventCardActions } from './EventCardActions';
 import { formatEventTime } from '@/utils/dateUtils';
-import { formatEventDate } from '@/utils/date-formatting';
+import { formatDate } from '@/utils/date-formatting';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -85,7 +85,7 @@ export const EventCard: React.FC<EventCardProps> = ({
           {/* Date and Time */}
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <CalendarDays className="h-4 w-4" />
-            <span>{formatEventDate(event.start_date)}</span>
+            <span>{formatDate(event.start_date)}</span>
             {event.start_time && (
               <>
                 <Clock className="h-4 w-4 ml-2" />
