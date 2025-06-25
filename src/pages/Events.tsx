@@ -65,6 +65,12 @@ const Events = () => {
 
   const filteredEventsCount = events?.length || 0;
 
+  // Wrapper function to match the expected signature and ensure proper return type
+  const handleRsvpWrapper = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
+    const result = await enhancedHandleRsvp(eventId, status);
+    return result;
+  };
+
   return (
     <EventsPageLayout>
       <div className="space-y-4 sm:space-y-6">
@@ -107,7 +113,7 @@ const Events = () => {
             eventsLoading={isLoading}
             isFilterLoading={false}
             user={user}
-            enhancedHandleRsvp={enhancedHandleRsvp}
+            enhancedHandleRsvp={handleRsvpWrapper}
             loadingEventId={rsvpLoading ? 'loading' : undefined}
           />
         </div>

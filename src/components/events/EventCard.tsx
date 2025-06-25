@@ -46,7 +46,54 @@ export const EventCard: React.FC<EventCardProps> = ({
   };
 
   // Handle image_urls - it could be a string or array
-  const imageUrl = Array.isArray(event.image_urls) ? event.image_urls[0] : event.image_urls;
+  const getImageUrl = (): string => {
+    if (event.image_urls) {
+      if (Array.isArray(event.image_urls)) {
+        // If it's already an array, get the first valid URL
+        const firstImage = event.image_urls.find(url => 
+          typeof url === 'string' && url.trim().length > 0
+        );
+        if (firstImage) return firstImage;
+      } else if (typeof event.image_urls === 'string') {
+        const urlString = event.image_urls.trim();
+        if (urlString.startsWith('[') && urlString.endsWith(']')) {
+          // Try to parse as JSON array
+          try {
+            const parsed = JSON.parse(urlString);
+            if (Array.isArray(parsed)) {
+              const firstImage = parsed.find(url => 
+                typeof url === 'string' && url.trim().length > 0
+              );
+              if (firstImage) return firstImage;
+            }
+          } catch (e) {
+            console.warn('Failed to parse image_urls JSON:', urlString);
+          }
+        } else if (urlString.length > 0) {
+          // Treat as a single URL
+          return urlString;
+        }
+      }
+    }
+    
+    // Use fallback image based on category
+    const categoryImages: Record<string, string> = {
+      'music': '/img/categories/music.jpg',
+      'arts': '/img/categories/arts.jpg',
+      'food': '/img/categories/food.jpg',
+      'sports': '/img/categories/sports.jpg',
+      'nightlife': '/img/categories/nightlife.jpg',
+      'wellness': '/img/categories/wellness.jpg',
+      'tech': '/img/categories/tech.jpg',
+      'business': '/img/categories/business.jpg',
+      'community': '/img/categories/community.jpg',
+      'other': '/img/default.jpg'
+    };
+    
+    return categoryImages[event.event_category || 'other'] || '/img/default.jpg';
+  };
+
+  const imageUrl = getImageUrl();
 
   return (
     <Card 
@@ -60,15 +107,20 @@ export const EventCard: React.FC<EventCardProps> = ({
     >
       <CardContent className="p-4 h-full flex flex-col">
         {/* Event Image */}
-        {imageUrl && (
-          <div className="mb-4 rounded-lg overflow-hidden">
-            <img
-              src={imageUrl}
-              alt={event.title}
-              className="w-full h-32 object-cover"
-            />
-          </div>
-        )}
+        <div className="mb-4 rounded-lg overflow-hidden">
+          <img
+            src={imageUrl}
+            alt={event.title}
+            className="w-full h-32 object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              if (!target.src.includes('/img/default.jpg')) {
+                console.log('Image failed to load, using default');
+                target.src = "/img/default.jpg";
+              }
+            }}
+          />
+        </div>
 
         {/* Event Details */}
         <div className="flex-1 space-y-3">
