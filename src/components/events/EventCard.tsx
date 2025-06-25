@@ -53,9 +53,9 @@ export const EventCard: React.FC<EventCardProps> = ({
 
     // Handle array case
     if (Array.isArray(event.image_urls)) {
-      const firstValidUrl = event.image_urls.find((url: any) => 
-        typeof url === 'string' && (url as string).trim().length > 0
-      ) as string | undefined;
+      const firstValidUrl = event.image_urls.find((url) => 
+        typeof url === 'string' && url.trim().length > 0
+      );
       if (firstValidUrl) {
         return firstValidUrl;
       }
@@ -69,11 +69,11 @@ export const EventCard: React.FC<EventCardProps> = ({
       // Check if it's a JSON array string
       if (urlString.startsWith('[') && urlString.endsWith(']')) {
         try {
-          const parsed = JSON.parse(urlString) as any[];
+          const parsed = JSON.parse(urlString);
           if (Array.isArray(parsed)) {
-            const firstValidUrl = parsed.find((url: any) => 
-              typeof url === 'string' && (url as string).trim().length > 0
-            ) as string | undefined;
+            const firstValidUrl = parsed.find((url) => 
+              typeof url === 'string' && url.trim().length > 0
+            );
             if (firstValidUrl) {
               return firstValidUrl;
             }
