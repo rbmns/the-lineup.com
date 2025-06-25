@@ -11,6 +11,7 @@ import EventDetail from '@/pages/EventDetail';
 import CreateEvent from '@/pages/events/create';
 import EditEvent from '@/pages/events/EditEventPage';
 import CasualPlans from '@/pages/CasualPlans';
+import CreateCasualPlanPage from '@/components/casual-plans/CreateCasualPlanPage';
 import Friends from '@/pages/Friends';
 import ProfilePage from '@/pages/ProfilePage';
 import ProfileEdit from '@/pages/ProfileEdit';
@@ -47,6 +48,7 @@ function App() {
                   {/* Add redirect from /event to /events */}
                   <Route path="event" element={<Navigate to="/events" replace />} />
                   <Route path="casual-plans" element={<CasualPlans />} />
+                  <Route path="casual-plans/create" element={<CreateCasualPlanPage />} />
                   <Route path="friends" element={<Friends />} />
                   <Route path="profile" element={<ProfilePage />} />
                   <Route path="profile/edit" element={<ProfileEdit />} />

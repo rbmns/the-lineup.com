@@ -139,19 +139,8 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
                       </span>
                     </div>
 
-                    {/* Attendees and Join Button - reduced padding */}
-                    <div className="flex items-center justify-between mt-auto pt-2">
-                      {(event.going_count || event.interested_count) ? (
-                        <div className="flex items-center gap-2 text-neutral">
-                          <Users className="h-4 w-4 text-primary/60" />
-                          <span className="text-sm">
-                            {(event.going_count || 0) + (event.interested_count || 0)} going
-                          </span>
-                        </div>
-                      ) : (
-                        <div></div>
-                      )}
-                      
+                    {/* Join Button - removed attendee count section */}
+                    <div className="flex items-center justify-end mt-auto pt-2">
                       {/* Only show join button for authenticated users */}
                       {isAuthenticated && (
                         <Button
