@@ -6,7 +6,6 @@ import { SecondaryResults } from '@/components/events/list-components/SecondaryR
 import { ResultsDivider } from '@/components/home/events-list/ResultsDivider';
 import { EventsSignupTeaser } from '@/components/events/list-components/EventsSignupTeaser';
 import { useAuth } from '@/contexts/AuthContext';
-import { RsvpHandler } from '@/components/events/rsvp/types';
 
 interface LazyEventsListProps {
   mainEvents: Event[];
@@ -25,7 +24,7 @@ export const LazyEventsList: React.FC<LazyEventsListProps> = ({
   relatedEvents,
   isLoading,
   onRsvp,
-  showRsvpButtons = false, // Default to false for safety
+  showRsvpButtons = false,
   hasActiveFilters = false,
   loadingEventId,
   compact = false,

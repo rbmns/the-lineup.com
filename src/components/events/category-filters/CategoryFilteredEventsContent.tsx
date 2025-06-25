@@ -1,18 +1,19 @@
 
 import React from 'react';
+import { Event } from '@/types';
+import { EventsList } from '@/components/events/EventsList';
 import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
-import { LazyEventsList } from '@/components/events/LazyEventsList';
 
 interface CategoryFilteredEventsContentProps {
   showNoExactMatchesMessage: boolean;
   resetFilters: () => void;
-  exactMatches: any[]; // Consider typing this more strictly if Event type is available
-  similarEvents: any[]; // Consider typing this
-  isLoading: boolean; // For initial list loading / skeleton
-  isFilterLoading: boolean; // For loading state when filters are applied
+  exactMatches: Event[];
+  similarEvents: Event[];
+  isLoading: boolean;
+  isFilterLoading: boolean;
   hasActiveFilters: boolean;
-  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>; // Changed boolean to boolean | void
-  loadingEventId?: string | null; // Added to pass to LazyEventsList
+  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
+  loadingEventId?: string;
 }
 
 export const CategoryFilteredEventsContent: React.FC<CategoryFilteredEventsContentProps> = ({
@@ -24,25 +25,27 @@ export const CategoryFilteredEventsContent: React.FC<CategoryFilteredEventsConte
   isFilterLoading,
   hasActiveFilters,
   onRsvp,
-  loadingEventId // Destructure new prop
+  loadingEventId
 }) => {
-  return (
-    <div className="space-y-16">
-      {/* No Exact Matches Message */}
-      {showNoExactMatchesMessage && (
-        <NoResultsFound resetFilters={resetFilters} />
-      )}
+  if (showNoExactMatchesMessage) {
+    return (
+      <NoResultsFound 
+        resetFilters={resetFilters}
+        message="No events match your current filters."
+      />
+    );
+  }
 
-      {/* Events List Section */}
-      <LazyEventsList 
-        mainEvents={exactMatches}
-        relatedEvents={similarEvents}
-        // Combine isLoading and isFilterLoading for the overall list loading state (skeletons)
-        isLoading={isLoading || isFilterLoading} 
+  return (
+    <div className="space-y-8">
+      <EventsList
+        events={exactMatches}
         onRsvp={onRsvp}
-        showRsvpButtons={!!onRsvp} // Show buttons if onRsvp handler is provided
+        showRsvpButtons={!!onRsvp}
+        isLoading={isLoading || isFilterLoading}
         hasActiveFilters={hasActiveFilters}
-        loadingEventId={loadingEventId} // Pass loadingEventId for individual card RSVP spinners
+        similarEvents={similarEvents}
+        loadingEventId={loadingEventId}
       />
     </div>
   );

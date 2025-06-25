@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { Event } from '@/types';
-import { EventCard } from '@/components/EventCard';
-import { EventGrid } from '@/components/events/list-components/EventGrid';
-import { EventsLoadingState } from '@/components/events/list-components/EventsLoadingState';
+import { EventCountDisplay } from '@/components/events/EventCountDisplay';
+import { EventCard } from '@/components/events/EventCard';
+import { EventsLoadingSkeleton } from '@/components/events/EventsLoadingSkeleton';
 
 interface PrimaryResultsProps {
   events: Event[];
@@ -25,39 +25,25 @@ export const PrimaryResults: React.FC<PrimaryResultsProps> = ({
   compact = false
 }) => {
   if (isLoading) {
-    return <EventsLoadingState />;
+    return <EventsLoadingSkeleton />;
   }
-
-  if (events.length === 0) {
-    return null;
-  }
-
-  // Convert onRsvp to the format expected by EventCard
-  const handleRsvp = onRsvp ? async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean | void> => {
-    await onRsvp(eventId, status);
-    return true;
-  } : undefined;
 
   return (
     <div className="space-y-6">
-      {!hideCount && (
-        <h3 className="text-lg font-medium text-gray-900">
-          {events.length} {events.length === 1 ? 'event' : 'events'}
-        </h3>
-      )}
+      {!hideCount && <EventCountDisplay count={events.length} />}
       
-      <EventGrid>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {events.map((event) => (
           <EventCard
             key={event.id}
             event={event}
-            compact={compact}
+            onRsvp={onRsvp}
             showRsvpButtons={showRsvpButtons}
-            onRsvp={handleRsvp}
-            loadingEventId={loadingEventId}
+            isLoading={loadingEventId === event.id}
+            compact={compact}
           />
         ))}
-      </EventGrid>
+      </div>
     </div>
   );
 };

@@ -1,229 +1,123 @@
 
 import React from 'react';
 import { CasualPlan } from '@/types/casual-plans';
-import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { MapPin, Clock, Users, Calendar, Heart } from 'lucide-react';
-import { formatFeaturedDate, formatTime } from '@/utils/date-formatting';
-import { CategoryPill } from '@/components/ui/category-pill';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Link } from 'react-router-dom';
-import { CasualPlanRsvpButtons } from './rsvp/CasualPlanRsvpButtons';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { CalendarDays, MapPin, Clock, Users } from 'lucide-react';
+import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { cn } from '@/lib/utils';
 
 interface CasualPlanCardProps {
   plan: CasualPlan;
-  onJoin: (planId: string) => void;
-  onLeave: (planId: string) => void;
-  onRsvp?: (planId: string, status: 'Going' | 'Interested' | null) => Promise<boolean>;
-  isJoining: boolean;
-  isLeaving: boolean;
-  isAuthenticated: boolean;
-  onLoginPrompt: () => void;
-  loadingPlanId?: string | null;
+  onRsvp?: (planId: string, status: 'Going' | 'Interested') => Promise<boolean>;
+  showRsvpButtons?: boolean;
+  isLoading?: boolean;
+  className?: string;
 }
 
 export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
   plan,
-  onJoin,
-  onLeave,
   onRsvp,
-  isJoining,
-  isLeaving,
-  isAuthenticated,
-  onLoginPrompt,
-  loadingPlanId
+  showRsvpButtons = false,
+  isLoading = false,
+  className
 }) => {
-  const isMobile = useIsMobile();
-
-  const handleJoinLeave = () => {
-    if (!isAuthenticated) {
-      onLoginPrompt();
-      return;
-    }
-    if (plan.user_attending) {
-      onLeave(plan.id);
-    } else {
-      onJoin(plan.id);
-    }
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric'
+    });
   };
 
-  const handleRsvp = async (planId: string, status: 'Going' | 'Interested' | null) => {
-    if (!isAuthenticated) {
-      onLoginPrompt();
-      return false;
-    }
+  const formatTime = (timeStr: string) => {
+    return new Date(`2000-01-01T${timeStr}`).toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  };
+
+  const handleRsvp = async (status: 'Going' | 'Interested') => {
     if (onRsvp) {
-      return await onRsvp(planId, status);
+      return await onRsvp(plan.id, status);
     }
-
-    // Fallback to old system
-    if (status === 'Going') {
-      onJoin(planId);
-    } else if (status === null && plan.user_attending) {
-      onLeave(planId);
-    }
-    return true;
+    return false;
   };
 
-  const formattedDate = formatFeaturedDate(plan.date);
-  const formattedTime = formatTime(plan.time);
-  const isLoadingThisPlan = loadingPlanId === plan.id;
+  // Determine current RSVP status - this would need to be passed from the parent
+  // For now, we'll assume it's null
+  const currentRsvpStatus = plan.user_rsvp_status || null;
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 hover:shadow-sm">
-      <div className="p-4">
-        {/* Header with vibe pill and attendee count */}
-        <div className="flex items-center justify-between mb-3">
-          {isAuthenticated ? (
-            <CategoryPill 
-              category={plan.vibe} 
-              size="sm" 
-              className="capitalize text-xs px-2 py-1" 
-            />
-          ) : (
-            <div className="bg-gray-200 text-gray-400 px-2 py-1 rounded text-xs">
-              ••••••
-            </div>
+    <Card 
+      className={cn(
+        "h-full transition-all duration-200",
+        isLoading && "opacity-50",
+        className
+      )}
+      data-plan-id={plan.id}
+    >
+      <CardContent className="p-6 h-full flex flex-col">
+        <div className="flex-1 space-y-4">
+          {/* Title and Vibe */}
+          <div className="space-y-2">
+            <h3 className="font-semibold text-lg line-clamp-2">{plan.title}</h3>
+            <Badge variant="secondary" className="text-xs capitalize">
+              {plan.vibe}
+            </Badge>
+          </div>
+
+          {/* Date and Time */}
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <CalendarDays className="h-4 w-4" />
+            <span>{formatDate(plan.date)}</span>
+            <Clock className="h-4 w-4 ml-2" />
+            <span>{formatTime(plan.time)}</span>
+          </div>
+
+          {/* Location */}
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <MapPin className="h-4 w-4" />
+            <span className="line-clamp-1">{plan.location}</span>
+          </div>
+
+          {/* Description */}
+          {plan.description && (
+            <p className="text-sm text-gray-600 line-clamp-3">
+              {plan.description}
+            </p>
           )}
-          
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            {/* Going count */}
-            <div className="flex items-center bg-green-50 px-2 py-1 rounded">
-              <Users className="h-3 w-3 mr-1 text-green-600" />
-              {isAuthenticated ? (
-                <>
-                  <span className="font-medium text-green-700">{plan.going_count || 0}</span>
-                  {plan.max_attendees && (
-                    <span className="text-green-500">/{plan.max_attendees}</span>
-                  )}
-                </>
-              ) : (
-                <span className="font-medium text-gray-300">•/••</span>
-              )}
-            </div>
-            
-            {/* Interested count */}
-            {(plan.interested_count || 0) > 0 && (
-              <div className="flex items-center bg-blue-50 px-2 py-1 rounded">
-                <Heart className="h-3 w-3 mr-1 text-blue-600" />
-                <span className="font-medium text-blue-700">{plan.interested_count}</span>
-              </div>
+
+          {/* Attendee Count */}
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Users className="h-4 w-4" />
+            <span>{plan.attendee_count || 0} attending</span>
+            {plan.max_attendees && (
+              <span className="text-gray-400">
+                (max {plan.max_attendees})
+              </span>
             )}
           </div>
-        </div>
-        
-        {/* Title */}
-        <h3 className="font-semibold text-base mb-2 line-clamp-2 leading-tight text-gray-900 text-left">
-          {plan.title}
-        </h3>
-        
-        {/* Date and time - single line */}
-        <div className="flex items-center text-sm text-gray-600 mb-1">
-          <Calendar className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
-          <span>{formattedDate}</span>
-          <span className="mx-2 text-gray-400">•</span>
-          <Clock className="h-3.5 w-3.5 mr-1.5 text-gray-400" />
-          <span>{formattedTime}</span>
-        </div>
-        
-        {/* Location */}
-        <div className="flex items-center text-sm mb-4">
-          <MapPin className="h-3.5 w-3.5 mr-1.5 text-gray-400 flex-shrink-0" />
-          {isAuthenticated ? (
-            <span className="text-gray-600 truncate">{plan.location}</span>
-          ) : (
-            <span className="text-gray-300 truncate">••••••••••••••••••••••••••</span>
-          )}
-        </div>
-        
-        {/* Description if available */}
-        {plan.description && (
-          <p className="text-sm text-gray-600 mb-4 line-clamp-2 leading-relaxed text-left">
-            {plan.description}
-          </p>
-        )}
-        
-        {/* Footer with creator and action */}
-        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
-          <div className="flex items-center min-w-0 flex-1">
-            {isAuthenticated ? (
-              <>
-                <Avatar className="h-6 w-6 mr-2 flex-shrink-0">
-                  <AvatarImage 
-                    src={plan.creator_profile?.avatar_url?.[0]} 
-                    alt={plan.creator_profile?.username} 
-                  />
-                  <AvatarFallback className="text-xs bg-gray-100">
-                    {plan.creator_profile?.username?.[0]?.toUpperCase() || 'U'}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <span className="text-sm text-gray-600 truncate">
-                    {plan.creator_profile?.username || 'Anonymous'}
-                  </span>
-                  <div className="text-xs text-gray-400">Organizer</div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="h-6 w-6 mr-2 flex-shrink-0 bg-gray-200 rounded-full"></div>
-                <div>
-                  <span className="text-sm text-gray-300 truncate">••••••</span>
-                  <div className="text-xs text-gray-300">Organizer</div>
-                </div>
-              </>
-            )}
+
+          {/* Creator Info */}
+          <div className="text-xs text-gray-500">
+            Created by {plan.creator_profile?.username || 'Unknown'}
           </div>
         </div>
-        
-        {/* RSVP Buttons */}
-        {isAuthenticated ? (
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            <CasualPlanRsvpButtons 
-              planId={plan.id} 
-              currentStatus={plan.rsvp_status} 
-              goingCount={plan.going_count} 
-              interestedCount={plan.interested_count} 
-              onRsvp={handleRsvp} 
-              isLoading={isLoadingThisPlan} 
-              compact 
+
+        {/* RSVP Actions */}
+        {showRsvpButtons && (
+          <div className="mt-4 pt-4 border-t" data-no-navigation="true">
+            <EventRsvpButtons
+              currentStatus={currentRsvpStatus}
+              onRsvp={handleRsvp}
+              isLoading={isLoading}
+              size="sm"
             />
           </div>
-        ) : (
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            {/* Blurred RSVP buttons for non-authenticated users */}
-            <div className="relative">
-              <div className="flex gap-2 filter blur-sm pointer-events-none">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="flex-1 text-green-600 border-green-200"
-                >
-                  <Users className="h-3 w-3 mr-1" />
-                  Join
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="flex-1 text-blue-600 border-blue-200"
-                >
-                  <Heart className="h-3 w-3 mr-1" />
-                  Interested
-                </Button>
-              </div>
-              {/* Overlay with login prompt */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <p className="text-xs text-gray-500 text-center px-2">
-                  <Link to="/login" className="text-blue-600 hover:text-blue-800 underline">
-                    Sign in
-                  </Link> to RSVP
-                </p>
-              </div>
-            </div>
-          </div>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };

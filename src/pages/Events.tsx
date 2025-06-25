@@ -7,9 +7,16 @@ import { EventsVibeSection } from '@/components/events/page-sections/EventsVibeS
 import { useVenueAreas } from '@/hooks/useVenueAreas';
 import { EventsAdvancedSection } from '@/components/events/page-sections/EventsAdvancedSection';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRsvpWithScrollPreservation } from '@/hooks/event-rsvp/useRsvpWithScrollPreservation';
 
 const Events = () => {
   const isMobile = useIsMobile();
+  const { user } = useAuth();
+  
+  // Initialize RSVP handler with scroll preservation
+  const { handleRsvp: enhancedHandleRsvp, loading: rsvpLoading } = useRsvpWithScrollPreservation(user?.id);
+  
   const {
     events,
     allEvents,
@@ -99,7 +106,9 @@ const Events = () => {
             resetFilters={resetAllFilters}
             eventsLoading={isLoading}
             isFilterLoading={false}
-            user={null}
+            user={user}
+            enhancedHandleRsvp={enhancedHandleRsvp}
+            loadingEventId={rsvpLoading ? 'loading' : undefined}
           />
         </div>
       </div>
