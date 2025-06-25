@@ -6,6 +6,8 @@ import { Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { navigateToEvent } from '@/utils/navigationUtils';
 import EventCardList from '@/components/events/EventCardList';
+import MobileEventListItem from './MobileEventListItem';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface UserRsvpedEventsProps {
   events?: Event[];
@@ -35,6 +37,7 @@ export const UserRsvpedEvents: React.FC<UserRsvpedEventsProps> = ({
   emptyMessage = "No RSVPs yet"
 }) => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   const eventsToDisplay = propEvents || [];
   const isLoading = propIsLoading;
@@ -51,8 +54,8 @@ export const UserRsvpedEvents: React.FC<UserRsvpedEventsProps> = ({
 
   if (isLoading) {
     return (
-      <div className="mt-4 sm:mt-6">
-        <h2 className="text-lg font-semibold mb-2 sm:mb-3 flex items-center">
+      <div className="mt-3 sm:mt-6">
+        <h2 className="text-base sm:text-lg font-semibold mb-2 sm:mb-3 flex items-center px-1">
           <Calendar className="mr-2 h-4 w-4 text-purple" />
           {title || (isCurrentUser ? "Your RSVPs" : `${username}'s RSVPs`)}
         </h2>
@@ -65,9 +68,9 @@ export const UserRsvpedEvents: React.FC<UserRsvpedEventsProps> = ({
   }
 
   return (
-    <div className="mt-4 sm:mt-6">
+    <div className="mt-3 sm:mt-6">
       {title && (
-        <h2 className="text-lg font-semibold mb-2 sm:mb-3 flex items-center">
+        <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center px-1">
           <Calendar className="mr-2 h-4 w-4 text-purple" />
           {title}
         </h2>
@@ -75,15 +78,22 @@ export const UserRsvpedEvents: React.FC<UserRsvpedEventsProps> = ({
       
       {/* Display matching RSVPs first if available */}
       {matchingRsvps.length > 0 && !isCurrentUser && (
-        <div className="mb-3 sm:mb-4">
-          <h3 className="text-sm font-medium mb-2 text-purple-600 px-1">Events you're both attending:</h3>
-          <div className="space-y-2 sm:space-y-2.5">
+        <div className="mb-4 sm:mb-6">
+          <h3 className="text-sm font-medium mb-3 text-purple-600 px-1">Events you're both attending:</h3>
+          <div className="space-y-2 sm:space-y-3">
             {matchingRsvps.map(event => (
               <div key={event.id} className="relative">
-                <EventCardList
-                  event={event}
-                  showRsvpStatus={true}
-                />
+                {isMobile ? (
+                  <MobileEventListItem
+                    event={event}
+                    showRsvpStatus={true}
+                  />
+                ) : (
+                  <EventCardList
+                    event={event}
+                    showRsvpStatus={true}
+                  />
+                )}
                 <div className="mt-1 px-2 py-1 bg-purple-50 text-purple-700 rounded-md text-xs mx-1">
                   You and {friendUsername} are both {event.rsvp_status?.toLowerCase() || 'going'} to this event
                 </div>
@@ -94,19 +104,27 @@ export const UserRsvpedEvents: React.FC<UserRsvpedEventsProps> = ({
       )}
       
       {regularEvents.length > 0 ? (
-        <div className="space-y-2 sm:space-y-2.5">
+        <div className="space-y-2 sm:space-y-3">
           {regularEvents.map(event => (
-            <EventCardList
-              key={event.id}
-              event={event}
-              showRsvpStatus={true}
-            />
+            isMobile ? (
+              <MobileEventListItem
+                key={event.id}
+                event={event}
+                showRsvpStatus={true}
+              />
+            ) : (
+              <EventCardList
+                key={event.id}
+                event={event}
+                showRsvpStatus={true}
+              />
+            )
           ))}
         </div>
       ) : (
         !matchingRsvps.length && (
           <Card className="border border-gray-100 shadow-sm">
-            <CardContent className="p-3 sm:p-4 text-center text-gray-500">
+            <CardContent className="p-4 sm:p-6 text-center text-gray-500">
               <p className="text-sm">{emptyMessage}</p>
             </CardContent>
           </Card>

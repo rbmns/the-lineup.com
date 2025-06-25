@@ -1,0 +1,110 @@
+
+import React from 'react';
+import { Event } from '@/types';
+import { Calendar, MapPin } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useEventNavigation } from '@/hooks/useEventNavigation';
+import { CategoryPill } from '@/components/ui/category-pill';
+import { formatEventCardDateTime } from '@/utils/date-formatting';
+import { Card } from '@/components/ui/card';
+
+interface MobileEventListItemProps {
+  event: Event;
+  showRsvpStatus?: boolean;
+  className?: string;
+  onClick?: (event: Event) => void;
+}
+
+const MobileEventListItem: React.FC<MobileEventListItemProps> = ({
+  event,
+  showRsvpStatus = false,
+  className,
+  onClick,
+}) => {
+  const { navigateToEvent } = useEventNavigation();
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (onClick) {
+      onClick(event);
+      return;
+    }
+    
+    try {
+      navigateToEvent(event);
+    } catch (error) {
+      console.error("Error navigating to event:", error);
+    }
+  };
+
+  const getVenueDisplay = (): string => {
+    if (event.venues?.name) {
+      return event.venues.name;
+    }
+    
+    if (event.location) {
+      return event.location;
+    }
+    
+    return 'Location TBD';
+  };
+
+  const getRsvpStatusDisplay = () => {
+    if (!showRsvpStatus || !event.rsvp_status) return null;
+    
+    const status = event.rsvp_status.toLowerCase();
+    const statusColor = status === 'going' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800';
+    
+    return (
+      <span className={cn('inline-flex items-center px-2 py-1 rounded-full text-xs font-medium', statusColor)}>
+        {event.rsvp_status}
+      </span>
+    );
+  };
+
+  return (
+    <Card 
+      className={cn(
+        "p-3 hover:shadow-md transition-shadow cursor-pointer border border-gray-200 bg-white",
+        className
+      )}
+      onClick={handleClick}
+    >
+      <div className="space-y-2">
+        {/* Title and Category */}
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 flex-1">
+            {event.title}
+          </h3>
+          {event.event_category && (
+            <CategoryPill 
+              category={event.event_category} 
+              size="xs"
+              showIcon={false}
+            />
+          )}
+        </div>
+        
+        {/* Date and Time */}
+        <div className="flex items-center gap-2 text-xs text-gray-600">
+          <Calendar className="h-3 w-3 text-gray-400 flex-shrink-0" />
+          <span className="font-medium">
+            {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
+          </span>
+        </div>
+        
+        {/* Location and RSVP Status */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-xs text-gray-600 flex-1 min-w-0">
+            <MapPin className="h-3 w-3 text-gray-400 flex-shrink-0" />
+            <span className="font-medium truncate">
+              {getVenueDisplay()}
+            </span>
+          </div>
+          {getRsvpStatusDisplay()}
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+export default MobileEventListItem;
