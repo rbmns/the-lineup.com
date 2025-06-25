@@ -28,8 +28,10 @@ export const useCasualPlansMutations = () => {
 
       if (error) throw error;
 
-      // Invalidate queries to refresh the plans list
-      queryClient.invalidateQueries({ queryKey: ['casual-plans'] });
+      // Invalidate all related queries to refresh the plans list
+      queryClient.invalidateQueries({ queryKey: ['casual-plans-raw'] });
+      queryClient.invalidateQueries({ queryKey: ['casual-plan-rsvps'] });
+      queryClient.invalidateQueries({ queryKey: ['casual-plans-profiles'] });
       console.log('Casual plan created successfully');
     } catch (error) {
       console.error('Error creating casual plan:', error);
@@ -50,7 +52,7 @@ export const useCasualPlansMutations = () => {
     
     if (success) {
       // Invalidate queries to refresh the plans list
-      queryClient.invalidateQueries({ queryKey: ['casual-plans'] });
+      queryClient.invalidateQueries({ queryKey: ['casual-plans-raw'] });
       queryClient.invalidateQueries({ queryKey: ['casual-plan-rsvps'] });
     }
     
@@ -68,7 +70,7 @@ export const useCasualPlansMutations = () => {
     
     if (success) {
       // Invalidate queries to refresh the plans list
-      queryClient.invalidateQueries({ queryKey: ['casual-plans'] });
+      queryClient.invalidateQueries({ queryKey: ['casual-plans-raw'] });
       queryClient.invalidateQueries({ queryKey: ['casual-plan-rsvps'] });
     }
     
@@ -86,7 +88,7 @@ export const useCasualPlansMutations = () => {
     
     if (success) {
       // Invalidate queries to refresh the plans list
-      queryClient.invalidateQueries({ queryKey: ['casual-plans'] });
+      queryClient.invalidateQueries({ queryKey: ['casual-plans-raw'] });
       queryClient.invalidateQueries({ queryKey: ['casual-plan-rsvps'] });
     }
     
