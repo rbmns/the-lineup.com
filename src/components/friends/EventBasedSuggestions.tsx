@@ -6,6 +6,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { UserPlus, X, Calendar, MapPin } from 'lucide-react';
 import { useEventBasedSuggestions } from '@/hooks/useEventBasedSuggestions';
+import { useFriendship } from '@/hooks/useFriendship';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/hooks/use-toast';
 
 interface EventBasedSuggestionsProps {
   currentUserId?: string;
@@ -21,6 +24,8 @@ export const EventBasedSuggestions: React.FC<EventBasedSuggestionsProps> = ({
   onDismiss
 }) => {
   const { suggestions, isLoading } = useEventBasedSuggestions(currentUserId, friendIds);
+  const { user } = useAuth();
+  const { initiateFriendRequest, isLoading: isRequestLoading } = useFriendship(user?.id);
 
   const getInitials = (username: string) => {
     return username.substring(0, 2).toUpperCase();
@@ -39,6 +44,38 @@ export const EventBasedSuggestions: React.FC<EventBasedSuggestionsProps> = ({
       month: 'short',
       day: 'numeric'
     });
+  };
+
+  const handleAddFriend = async (friendId: string, suggestion: any) => {
+    try {
+      const success = await initiateFriendRequest(friendId);
+      
+      if (success) {
+        const eventNames = suggestion.mutual_events.slice(0, 2).map((e: any) => e.title).join(', ');
+        const moreEvents = suggestion.mutual_events.length > 2 ? ` and ${suggestion.mutual_events.length - 2} more event${suggestion.mutual_events.length - 2 !== 1 ? 's' : ''}` : '';
+        
+        toast({
+          title: "Friend request sent!",
+          description: `You sent a friend request to ${suggestion.username}. You both attended: ${eventNames}${moreEvents}.`
+        });
+        
+        // Call the parent callback if provided  
+        onAddFriend?.(friendId);
+      } else {
+        toast({
+          title: "Failed to send request",
+          description: "Unable to send friend request. Please try again.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error sending friend request:', error);
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   if (isLoading) {
@@ -131,7 +168,8 @@ export const EventBasedSuggestions: React.FC<EventBasedSuggestionsProps> = ({
                 <div className="flex space-x-2 flex-shrink-0">
                   <Button
                     size="sm"
-                    onClick={() => onAddFriend?.(suggestion.id)}
+                    onClick={() => handleAddFriend(suggestion.id, suggestion)}
+                    disabled={isRequestLoading}
                     className="bg-blue-600 hover:bg-blue-700"
                   >
                     <UserPlus className="h-4 w-4" />

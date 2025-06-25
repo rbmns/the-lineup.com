@@ -7,6 +7,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UserPlus, X } from 'lucide-react';
 import { StatusBadgeRenderer } from './StatusBadgeRenderer';
 import { EventBasedSuggestions } from './EventBasedSuggestions';
+import { useFriendship } from '@/hooks/useFriendship';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/hooks/use-toast';
 
 interface SuggestedFriendsTabContentProps {
   suggestedFriends: UserProfile[];
@@ -25,6 +28,9 @@ export const SuggestedFriendsTabContent: React.FC<SuggestedFriendsTabContentProp
   currentUserId,
   friendIds = []
 }) => {
+  const { user } = useAuth();
+  const { initiateFriendRequest, isLoading: isRequestLoading } = useFriendship(user?.id);
+
   const getInitials = (username: string | null) => {
     if (!username) return '?';
     return username.substring(0, 2).toUpperCase();
@@ -43,6 +49,35 @@ export const SuggestedFriendsTabContent: React.FC<SuggestedFriendsTabContentProp
 
   const handleEventBasedDismiss = (friendId: string) => {
     onDismiss(friendId);
+  };
+
+  const handleRegularAddFriend = async (friendId: string, username: string) => {
+    try {
+      const success = await initiateFriendRequest(friendId);
+      
+      if (success) {
+        toast({
+          title: "Friend request sent!",
+          description: `You sent a friend request to ${username}.`
+        });
+        
+        // Call the parent callback
+        await onAddFriend(friendId);
+      } else {
+        toast({
+          title: "Failed to send request",
+          description: "Unable to send friend request. Please try again.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error sending friend request:', error);
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   if (loading) {
@@ -117,8 +152,8 @@ export const SuggestedFriendsTabContent: React.FC<SuggestedFriendsTabContentProp
                   <div className="flex space-x-2">
                     <Button
                       size="sm"
-                      onClick={() => onAddFriend(friend.id)}
-                      disabled={loading}
+                      onClick={() => handleRegularAddFriend(friend.id, friend.username || 'Unknown User')}
+                      disabled={isRequestLoading}
                       className="bg-blue-600 hover:bg-blue-700"
                     >
                       <UserPlus className="h-4 w-4" />
@@ -127,7 +162,6 @@ export const SuggestedFriendsTabContent: React.FC<SuggestedFriendsTabContentProp
                       size="sm"
                       variant="outline"
                       onClick={() => onDismiss(friend.id)}
-                      disabled={loading}
                     >
                       <X className="h-4 w-4" />
                     </Button>
