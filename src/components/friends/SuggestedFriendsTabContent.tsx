@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { UserProfile } from '@/types/index';
 import { Button } from '@/components/ui/button';
@@ -7,9 +6,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { UserPlus, X } from 'lucide-react';
 import { StatusBadgeRenderer } from './StatusBadgeRenderer';
 import { EventBasedSuggestions } from './EventBasedSuggestions';
-import { useFriendship } from '@/hooks/useFriendship';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
 interface SuggestedFriendsTabContentProps {
   suggestedFriends: UserProfile[];
@@ -29,7 +28,7 @@ export const SuggestedFriendsTabContent: React.FC<SuggestedFriendsTabContentProp
   friendIds = []
 }) => {
   const { user } = useAuth();
-  const { initiateFriendRequest, isLoading: isRequestLoading } = useFriendship(user?.id);
+  const [isRequestLoading, setIsRequestLoading] = React.useState(false);
 
   const getInitials = (username: string | null) => {
     if (!username) return '?';
@@ -52,24 +51,81 @@ export const SuggestedFriendsTabContent: React.FC<SuggestedFriendsTabContentProp
   };
 
   const handleRegularAddFriend = async (friendId: string, username: string) => {
+    if (!user?.id || isRequestLoading) return;
+    
+    setIsRequestLoading(true);
+    
     try {
-      const success = await initiateFriendRequest(friendId);
-      
-      if (success) {
-        toast({
-          title: "Friend request sent!",
-          description: `You sent a friend request to ${username}.`
-        });
+      // First check if a friendship already exists
+      const { data: existingFriendship, error: checkError } = await supabase
+        .from('friendships')
+        .select('*')
+        .or(`and(user_id.eq.${user.id},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${user.id})`)
+        .maybeSingle();
         
-        // Call the parent callback
-        await onAddFriend(friendId);
-      } else {
-        toast({
-          title: "Failed to send request",
-          description: "Unable to send friend request. Please try again.",
-          variant: "destructive"
-        });
+      if (checkError) {
+        console.error('Error checking existing friendship:', checkError);
+        throw checkError;
       }
+      
+      if (existingFriendship) {
+        if (existingFriendship.status === 'Accepted') {
+          toast({
+            title: "Already friends",
+            description: `You're already friends with ${username}.`,
+            variant: "destructive"
+          });
+          setIsRequestLoading(false);
+          return;
+        } else if (existingFriendship.status === 'Pending') {
+          toast({
+            title: "Request already sent",
+            description: `You've already sent a friend request to ${username}.`,
+            variant: "destructive"
+          });
+          setIsRequestLoading(false);
+          return;
+        } else if (existingFriendship.status === 'Removed') {
+          // Update the existing removed friendship to pending
+          const { error: updateError } = await supabase
+            .from('friendships')
+            .update({ 
+              status: 'Pending',
+              user_id: user.id,
+              friend_id: friendId,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', existingFriendship.id);
+            
+          if (updateError) {
+            console.error('Error updating friendship:', updateError);
+            throw updateError;
+          }
+        }
+      } else {
+        // Create new friendship
+        const { error: insertError } = await supabase
+          .from('friendships')
+          .insert({
+            user_id: user.id,
+            friend_id: friendId,
+            status: 'Pending'
+          });
+          
+        if (insertError) {
+          console.error('Error inserting friendship:', insertError);
+          throw insertError;
+        }
+      }
+      
+      toast({
+        title: "Friend request sent!",
+        description: `You sent a friend request to ${username}.`
+      });
+      
+      // Call the parent callback
+      await onAddFriend(friendId);
+      
     } catch (error) {
       console.error('Error sending friend request:', error);
       toast({
@@ -77,6 +133,8 @@ export const SuggestedFriendsTabContent: React.FC<SuggestedFriendsTabContentProp
         description: "Something went wrong. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsRequestLoading(false);
     }
   };
 

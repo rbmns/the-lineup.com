@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,9 +5,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { UserPlus, X, Calendar, MapPin } from 'lucide-react';
 import { useEventBasedSuggestions } from '@/hooks/useEventBasedSuggestions';
-import { useFriendship } from '@/hooks/useFriendship';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
 interface EventBasedSuggestionsProps {
   currentUserId?: string;
@@ -25,7 +24,7 @@ export const EventBasedSuggestions: React.FC<EventBasedSuggestionsProps> = ({
 }) => {
   const { suggestions, isLoading } = useEventBasedSuggestions(currentUserId, friendIds);
   const { user } = useAuth();
-  const { initiateFriendRequest, isLoading: isRequestLoading } = useFriendship(user?.id);
+  const [isRequestLoading, setIsRequestLoading] = React.useState(false);
 
   const getInitials = (username: string) => {
     return username.substring(0, 2).toUpperCase();
@@ -47,27 +46,84 @@ export const EventBasedSuggestions: React.FC<EventBasedSuggestionsProps> = ({
   };
 
   const handleAddFriend = async (friendId: string, suggestion: any) => {
+    if (!user?.id || isRequestLoading) return;
+    
+    setIsRequestLoading(true);
+    
     try {
-      const success = await initiateFriendRequest(friendId);
-      
-      if (success) {
-        const eventNames = suggestion.mutual_events.slice(0, 2).map((e: any) => e.title).join(', ');
-        const moreEvents = suggestion.mutual_events.length > 2 ? ` and ${suggestion.mutual_events.length - 2} more event${suggestion.mutual_events.length - 2 !== 1 ? 's' : ''}` : '';
+      // First check if a friendship already exists
+      const { data: existingFriendship, error: checkError } = await supabase
+        .from('friendships')
+        .select('*')
+        .or(`and(user_id.eq.${user.id},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${user.id})`)
+        .maybeSingle();
         
-        toast({
-          title: "Friend request sent!",
-          description: `You sent a friend request to ${suggestion.username}. You both attended: ${eventNames}${moreEvents}.`
-        });
-        
-        // Call the parent callback if provided  
-        onAddFriend?.(friendId);
-      } else {
-        toast({
-          title: "Failed to send request",
-          description: "Unable to send friend request. Please try again.",
-          variant: "destructive"
-        });
+      if (checkError) {
+        console.error('Error checking existing friendship:', checkError);
+        throw checkError;
       }
+      
+      if (existingFriendship) {
+        if (existingFriendship.status === 'Accepted') {
+          toast({
+            title: "Already friends",
+            description: `You're already friends with ${suggestion.username}.`,
+            variant: "destructive"
+          });
+          setIsRequestLoading(false);
+          return;
+        } else if (existingFriendship.status === 'Pending') {
+          toast({
+            title: "Request already sent",
+            description: `You've already sent a friend request to ${suggestion.username}.`,
+            variant: "destructive"
+          });
+          setIsRequestLoading(false);
+          return;
+        } else if (existingFriendship.status === 'Removed') {
+          // Update the existing removed friendship to pending
+          const { error: updateError } = await supabase
+            .from('friendships')
+            .update({ 
+              status: 'Pending',
+              user_id: user.id,
+              friend_id: friendId,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', existingFriendship.id);
+            
+          if (updateError) {
+            console.error('Error updating friendship:', updateError);
+            throw updateError;
+          }
+        }
+      } else {
+        // Create new friendship
+        const { error: insertError } = await supabase
+          .from('friendships')
+          .insert({
+            user_id: user.id,
+            friend_id: friendId,
+            status: 'Pending'
+          });
+          
+        if (insertError) {
+          console.error('Error inserting friendship:', insertError);
+          throw insertError;
+        }
+      }
+      
+      const eventNames = suggestion.mutual_events.slice(0, 2).map((e: any) => e.title).join(', ');
+      const moreEvents = suggestion.mutual_events.length > 2 ? ` and ${suggestion.mutual_events.length - 2} more event${suggestion.mutual_events.length - 2 !== 1 ? 's' : ''}` : '';
+      
+      toast({
+        title: "Friend request sent!",
+        description: `You sent a friend request to ${suggestion.username}. You both attended: ${eventNames}${moreEvents}.`
+      });
+      
+      // Call the parent callback if provided  
+      onAddFriend?.(friendId);
+      
     } catch (error) {
       console.error('Error sending friend request:', error);
       toast({
@@ -75,6 +131,8 @@ export const EventBasedSuggestions: React.FC<EventBasedSuggestionsProps> = ({
         description: "Something went wrong. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setIsRequestLoading(false);
     }
   };
 
