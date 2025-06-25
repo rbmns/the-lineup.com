@@ -4,9 +4,35 @@ import { useNavigate } from 'react-router-dom';
 import { CreateCasualPlanForm } from '@/components/casual-plans/CreateCasualPlanForm';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { useCasualPlans } from '@/hooks/useCasualPlans';
+import { CreateCasualPlanData } from '@/types/casual-plans';
+import { useToast } from '@/hooks/use-toast';
 
 export default function CreateCasualPlanPage() {
   const navigate = useNavigate();
+  const { createPlan, isCreating } = useCasualPlans();
+  const { toast } = useToast();
+
+  const handleSubmit = async (data: CreateCasualPlanData) => {
+    try {
+      console.log('Submitting casual plan:', data);
+      await createPlan(data);
+      
+      toast({
+        title: "Plan created!",
+        description: "Your casual plan has been created successfully.",
+      });
+      
+      navigate('/casual-plans');
+    } catch (error) {
+      console.error('Error creating plan:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create your plan. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
@@ -33,12 +59,9 @@ export default function CreateCasualPlanPage() {
       {/* Form */}
       <div className="bg-white rounded-lg border shadow-sm p-6">
         <CreateCasualPlanForm 
-          onSubmit={(data) => {
-            console.log('Plan created:', data);
-            navigate('/casual-plans');
-          }}
+          onSubmit={handleSubmit}
           onCancel={() => navigate('/casual-plans')}
-          isCreating={false}
+          isCreating={isCreating}
         />
       </div>
     </div>
