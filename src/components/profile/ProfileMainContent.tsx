@@ -3,15 +3,11 @@ import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useProfileData } from '@/hooks/useProfileData';
-import { useUserEvents } from '@/hooks/useUserEvents';
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { PrivacySettings } from '@/components/profile/PrivacySettings';
-import { DataManagement } from '@/components/profile/DataManagement';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MapPin, Edit3, User, Shield, Database, Calendar } from 'lucide-react';
+import { MapPin, Edit3, User, Shield } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
-import { UserRsvpedEvents } from '@/components/profile/UserRsvpedEvents';
 
 export const ProfileMainContent: React.FC = () => {
   const { user } = useAuth();
@@ -19,7 +15,6 @@ export const ProfileMainContent: React.FC = () => {
   const [activeTab, setActiveTab] = useState('personal');
   
   const { profile, loading } = useProfileData(user?.id);
-  const { pastEvents, upcomingEvents, isLoading: eventsLoading } = useUserEvents(user?.id);
 
   if (loading) {
     return (
@@ -35,16 +30,9 @@ export const ProfileMainContent: React.FC = () => {
     navigate('/profile/edit');
   };
 
-  const stats = [
-    { label: 'Events Attended', value: pastEvents.length.toString() },
-    { label: 'Interested In', value: upcomingEvents.length.toString() },
-    { label: 'Friends', value: '—' }
-  ];
-
-  // Updated tabs - now includes 'events' tab for RSVPs
+  // Only show personal info and privacy tabs - events are handled elsewhere
   const tabs = [
     { id: 'personal', label: 'Personal Info', icon: User, shortLabel: 'Personal' },
-    { id: 'events', label: 'My Events', icon: Calendar, shortLabel: 'Events' },
     { id: 'privacy', label: 'Preferences', icon: Shield, shortLabel: 'Privacy' }
   ];
 
@@ -101,17 +89,6 @@ export const ProfileMainContent: React.FC = () => {
             </Button>
           </div>
         );
-
-      case 'events':
-        return (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-primary mb-2">My Events</h2>
-              <p className="text-neutral-50 mb-6 text-sm md:text-base">Events you've RSVPed to</p>
-            </div>
-            <UserRsvpedEvents userId={user?.id} />
-          </div>
-        );
         
       case 'privacy':
         return <PrivacySettings userId={user?.id} />;
@@ -152,21 +129,6 @@ export const ProfileMainContent: React.FC = () => {
                 Edit Profile
               </Button>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Activity Stats Section */}
-      <div className="bg-white border-b border-secondary">
-        <div className="max-w-4xl mx-auto px-4 py-6 md:py-8">
-          <h2 className="text-xl font-semibold mb-4 text-left">Activity</h2>
-          <div className="grid grid-cols-3 gap-4 md:gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-2xl md:text-4xl font-bold text-primary mb-1 md:mb-2">{stat.value}</div>
-                <div className="text-xs md:text-base text-neutral-50 font-medium">{stat.label}</div>
-              </div>
-            ))}
           </div>
         </div>
       </div>

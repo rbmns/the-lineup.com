@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ProfilePageLayout } from '@/components/profile/ProfilePageLayout';
 import { useProfileData } from '@/hooks/useProfileData';
 import { UserRsvpedEvents } from '@/components/profile/UserRsvpedEvents';
@@ -13,8 +13,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [showSettings, setShowSettings] = useState(false);
 
   const {
     profile,
@@ -63,26 +61,15 @@ const ProfilePage: React.FC = () => {
   const numTabs = showAdminTab ? 2 : 1;
   const gridColsClass = `grid-cols-${numTabs}`;
 
-  const searchParams = new URLSearchParams(location.search);
-  const tabQueryParam = searchParams.get('tab');
-
-  const validTabs: string[] = ['rsvps'];
-  if (showAdminTab) {
-    validTabs.push('admin');
-  }
-
-  let defaultTab = 'rsvps';
-  if (tabQueryParam && validTabs.includes(tabQueryParam)) {
-    defaultTab = tabQueryParam;
-  }
+  const defaultTab = 'rsvps';
 
   return (
     <>
       <ProfilePageLayout
         profile={profile}
         isOwnProfile={true}
-        showSettings={showSettings}
-        onToggleSettings={() => setShowSettings(!showSettings)}
+        showSettings={false}
+        onToggleSettings={() => {}}
       />
       <div className="container mx-auto px-4 py-8 max-w-5xl">
         <Tabs defaultValue={defaultTab} className="w-full">
