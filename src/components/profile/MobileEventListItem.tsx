@@ -52,7 +52,7 @@ const MobileEventListItem: React.FC<MobileEventListItemProps> = ({
     if (!showRsvpStatus || !event.rsvp_status) return null;
     
     const status = event.rsvp_status.toLowerCase();
-    const statusColor = status === 'going' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800';
+    const statusColor = status === 'going' ? 'bg-[#2A9D8F]/10 text-[#2A9D8F]' : 'bg-[#00B4DB]/10 text-[#00B4DB]';
     
     return (
       <span className={cn('inline-flex items-center px-2 py-1 rounded-full text-xs font-medium', statusColor)}>
@@ -72,7 +72,7 @@ const MobileEventListItem: React.FC<MobileEventListItemProps> = ({
       <div className="space-y-2">
         {/* Title and Category */}
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 flex-1">
+          <h3 className="font-semibold text-[#005F73] text-sm leading-tight line-clamp-2 flex-1">
             {event.title}
           </h3>
           {event.event_category && (
@@ -80,13 +80,14 @@ const MobileEventListItem: React.FC<MobileEventListItemProps> = ({
               category={event.event_category} 
               size="xs"
               showIcon={false}
+              className="bg-white border border-gray-200"
             />
           )}
         </div>
         
         {/* Date and Time */}
-        <div className="flex items-center gap-2 text-xs text-gray-600">
-          <Calendar className="h-3 w-3 text-gray-400 flex-shrink-0" />
+        <div className="flex items-center gap-2 text-xs text-[#005F73]/80">
+          <Calendar className="h-3 w-3 text-[#2A9D8F] flex-shrink-0" />
           <span className="font-medium">
             {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
           </span>
@@ -94,8 +95,8 @@ const MobileEventListItem: React.FC<MobileEventListItemProps> = ({
         
         {/* Location and RSVP Status */}
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-xs text-gray-600 flex-1 min-w-0">
-            <MapPin className="h-3 w-3 text-gray-400 flex-shrink-0" />
+          <div className="flex items-center gap-2 text-xs text-[#005F73]/80 flex-1 min-w-0">
+            <MapPin className="h-3 w-3 text-[#2A9D8F] flex-shrink-0" />
             <span className="font-medium truncate">
               {getVenueDisplay()}
             </span>

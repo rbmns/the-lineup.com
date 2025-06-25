@@ -104,17 +104,17 @@ const EventCardList: React.FC<EventCardListProps> = ({
   };
 
   return (
-    <div className={cn("w-full px-4 sm:px-6 lg:px-8", className)}>
+    <div className={cn("w-full px-3 sm:px-4 lg:px-6", className)}>
       <Card 
         className={cn(
-          "flex flex-col sm:flex-row gap-4 hover:shadow-xl transition-all duration-300 ease-in-out cursor-pointer overflow-hidden text-left rounded-xl shadow-md border-gray-200 bg-white",
+          "flex flex-col sm:flex-row gap-3 sm:gap-4 hover:shadow-lg transition-all duration-300 ease-in-out cursor-pointer overflow-hidden text-left rounded-xl shadow-sm border-gray-200 bg-white",
           "min-h-[120px] sm:h-28",
           className
         )}
         onClick={handleClick}
         data-event-id={event.id}
       >
-        {/* Image with event type pill */}
+        {/* Image with event category pill */}
         <div className="relative h-[100px] sm:h-auto sm:w-[120px] overflow-hidden bg-gray-100 flex-shrink-0">
           <LineupImage
             src={imageUrl}
@@ -131,29 +131,39 @@ const EventCardList: React.FC<EventCardListProps> = ({
             }}
           />
           
-          {/* Event category pill */}
+          {/* Event category pill - only this pill */}
           {event.event_category && (
             <div className="absolute top-2 left-2 z-30">
               <CategoryPill 
                 category={event.event_category} 
                 size="xs" 
-                showIcon={false} 
+                showIcon={false}
+                className="bg-white/90 backdrop-blur-sm"
               />
+            </div>
+          )}
+
+          {/* Event type as white text - top right */}
+          {event.vibe && (
+            <div className="absolute top-2 right-2 z-30">
+              <span className="text-white text-xs font-medium px-1.5 py-0.5 bg-black/20 backdrop-blur-sm rounded">
+                {event.vibe}
+              </span>
             </div>
           )}
         </div>
         
-        {/* Content - Better structured */}
-        <div className="flex flex-col flex-1 p-4 sm:p-3 justify-center text-left gap-2">
+        {/* Content */}
+        <div className="flex flex-col flex-1 p-3 sm:p-3 justify-center text-left gap-2">
           {/* Title */}
-          <h3 className="font-inter font-semibold text-black text-base sm:text-lg line-clamp-1 text-left leading-tight">
+          <h3 className="font-semibold text-[#005F73] text-base sm:text-lg line-clamp-1 text-left leading-tight">
             {event.title}
           </h3>
             
           {/* Date and Time */}
-          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-            <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
-            <span className="font-inter">
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-[#005F73]/80">
+            <Calendar className="h-4 w-4 text-[#2A9D8F] flex-shrink-0" />
+            <span className="font-medium">
               {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
             </span>
           </div>
@@ -161,9 +171,9 @@ const EventCardList: React.FC<EventCardListProps> = ({
           {/* Bottom row with location and RSVP buttons */}
           <div className="flex items-center justify-between gap-3">
             {/* Location */}
-            <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 text-left flex-1 min-w-0">
-              <MapPin className="h-4 w-4 text-gray-400 flex-shrink-0" />
-              <span className="font-inter truncate">
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-[#005F73]/80 text-left flex-1 min-w-0">
+              <MapPin className="h-4 w-4 text-[#2A9D8F] flex-shrink-0" />
+              <span className="font-medium truncate">
                 {getVenueDisplay()}
               </span>
             </div>
