@@ -3,47 +3,28 @@ import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
-import { getBorderRadiusClass, type BorderRadiusToken, defaultRadius } from "@/constants/design-tokens";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-center select-none",
+  "inline-flex items-center justify-center font-body text-sm transition-colors focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default:
-          "bg-primary text-white hover:bg-primary/90",
-        outline:
-          "border border-primary/30 bg-white text-primary hover:bg-primary/5",
-        secondary:
-          "bg-gray-100 text-gray-900 hover:bg-gray-200",
-        ghost: "hover:bg-primary/10 hover:text-primary",
-        link: "text-primary underline-offset-4 hover:underline",
-        primary:
-          "bg-primary text-white hover:bg-primary/90",
-        destructive:
-          "bg-red-500 text-white hover:bg-red-600",
-        dark: "bg-primary text-white hover:bg-primary/90",
+        default: "bg-charcoal text-warm-neutral hover:bg-charcoal/90",
+        secondary: "bg-clay-muted text-charcoal hover:bg-clay-muted/80",
+        outline: "border border-clay bg-transparent text-charcoal hover:bg-clay-muted/30",
+        ghost: "text-charcoal hover:bg-clay-muted/30",
+        link: "text-charcoal hover:underline underline-offset-4",
       },
       size: {
-        default: "h-10 px-4 py-2 text-sm",
-        sm: "h-9 px-3 py-1.5 text-sm",
-        lg: "h-12 px-6 py-3 text-base",
+        default: "px-4 py-2",
+        sm: "px-3 py-1.5 text-sm",
+        lg: "px-6 py-3",
         icon: "h-10 w-10",
-      },
-      radius: {
-        none: "",
-        xs: "",
-        sm: "",
-        md: "",
-        lg: "",
-        xl: "",
-        full: "",
       },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
-      radius: defaultRadius.button,
     },
   }
 );
@@ -52,17 +33,15 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
-  radius?: BorderRadiusToken;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, radius = defaultRadius.button, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
-    const radiusClass = getBorderRadiusClass(radius);
     
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size }), radiusClass, className)}
+        className={cn(buttonVariants({ variant, size }), "rounded-sm", className)}
         ref={ref}
         {...props}
       />

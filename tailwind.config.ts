@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss"
 
 const config = {
@@ -12,7 +13,7 @@ const config = {
   theme: {
     container: {
       center: true,
-      padding: "1rem",
+      padding: "1.5rem",
       screens: {
         "2xl": "1400px",
       },
@@ -25,146 +26,68 @@ const config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "#F4E7D3", // Updated to Sand Beige
-        foreground: "#003840", // Updated to much darker teal (almost black)
+        background: "rgb(248 246 242)", // Warm neutral
+        foreground: "rgb(45 45 43)", // Dark charcoal
+        
+        // Editorial color palette
+        'charcoal': 'rgb(45 45 43)',
+        'warm-neutral': 'rgb(248 246 242)', 
+        'soft-neutral': 'rgb(252 251 249)',
+        'clay-muted': 'rgb(231 225 216)',
+        'overcast': 'rgb(180 178 174)',
+        'seafoam': 'rgb(162 180 178)',
+        'seafoam-soft': 'rgb(162 180 178 / 0.1)',
+        'clay': 'rgb(186 162 138)',
+        
         primary: {
-          DEFAULT: "#003840", // Much darker Ocean Deep - almost black teal
-          75: "#005F73", // Original Ocean Deep as lighter shade
-          50: "#337D8D", // Lighter shade of Ocean Deep
-          25: "#669BA7", // Even lighter shade
-          10: "#E6EEF0", // Almost white with a hint of Ocean Deep
-          foreground: "#FFFFFF",
+          DEFAULT: "rgb(45 45 43)", // Charcoal
+          foreground: "rgb(248 246 242)",
         },
         secondary: {
-          DEFAULT: "#F4E7D3", // Sand Beige - Background color
-          50: "#F9F3E9", // Lighter Sand Beige
-          25: "#FCF9F4", // Even lighter Sand Beige
-          10: "#FEFCFA", // Almost white with a hint of Sand Beige
-          foreground: "#003840", // Updated to darker teal
-        },
-        vibrant: {
-          sunset: "#FF9933", // Sunset Orange - Accent color
-          coral: "#FF6B4A", // Alternative accent
-          sand: "#F4E7D3", // Sand Beige
-          seafoam: "#66B2B2", // Complementary to Ocean Deep
-        },
-        nature: {
-          ocean: "#003840", // Updated to darker teal
-          sand: "#F4E7D3", // Sand Beige
-          coral: "#FF6B4A", // Coral accent
-          seafoam: "#66B2B2", // Seafoam accent
-        },
-        neutral: {
-          DEFAULT: "#4A4A48", // Much darker Driftwood Gray - Text color
-          75: "#6B6B69", // Darker Driftwood
-          50: "#8C8C89", // Original Driftwood Gray
-          25: "#D1D1D0", // Very light Driftwood
-          10: "#E8E8E7", // Almost white with a hint of Driftwood
-        },
-        status: {
-          success: "#66B2B2", // Seafoam for success
-          warning: "#FF9933", // Sunset Orange for warning
-          error: "#FF6B4A", // Coral for error
-          info: "#003840", // Darker teal for info
-        },
-        extended: {
-          oceanDeep: {
-            950: "#001F26", // Much darker
-            900: "#002B33", // Darker
-            800: "#003840", // New base darker Ocean Deep
-            700: "#004A5A", // Original darkest
-            600: "#005366", // Original darker
-            500: "#005F73", // Original Ocean Deep
-            400: "#1A8FA5",
-            300: "#339BB0",
-            200: "#4DA7BB",
-            100: "#66B3C5",
-            50: "#B2D9E2",
-          },
-        },
-        destructive: {
-          DEFAULT: "#FF6B4A", // Updated to Coral
-          foreground: "#FFFFFF",
+          DEFAULT: "rgb(231 225 216)", // Clay muted
+          foreground: "rgb(45 45 43)",
         },
         muted: {
-          DEFAULT: "#4A4A48", // Updated to darker Driftwood Gray
-          foreground: "#003840", // Updated to darker teal
+          DEFAULT: "rgb(180 178 174)", // Overcast
+          foreground: "rgb(45 45 43)",
         },
         accent: {
-          DEFAULT: "#66B2B2", // Updated to Seafoam
-          foreground: "#003840", // Updated to darker teal
+          DEFAULT: "rgb(162 180 178)", // Seafoam
+          foreground: "rgb(45 45 43)",
         },
-        // Legacy colors for backwards compatibility - updated to darker variants
-        'brand-turquoise': '#66B2B2',
-        'brand-seafoam': '#66B2B2',
-        'brand-neutral-bg': '#F4E7D3',
-        'brand-text-primary': '#003840', // Updated to darker teal
-        'brand-text-secondary': '#4A4A48', // Updated to darker gray
-        'brand-muted': '#4A4A48', // Updated to darker gray
-        'brand-online-green': '#66B2B2',
-        'brand-away-orange': '#FF9933',
-        'ocean-deep': '#003840', // Updated to darker teal
-        'sunset-yellow': '#FF9933',
-        'seafoam-green': '#66B2B2',
-        'clay-earth': '#A17C6B',
-        'pastel-turquoise': '#E6EEF0',
-        'pastel-coral': '#F9F3E9',
-      },
-      boxShadow: {
-        'turquoise': '0 4px 24px 0 rgba(0,56,64,0.08)', // Updated to darker teal
-        'card-lg': '0 8px 40px 0 rgba(0,56,64,0.10)', // Updated to darker teal
-      },
-      backgroundImage: {
-        'accent-gradient': 'linear-gradient(135deg, #003840, #66B2B2)', // Updated to darker teal
-        'zone-main': 'linear-gradient(to bottom, #F4E7D3 0%, #FFFFFF 100%)',
+        destructive: {
+          DEFAULT: "rgb(205 92 92)",
+          foreground: "rgb(248 246 242)",
+        },
+        card: {
+          DEFAULT: "rgb(252 251 249)",
+          foreground: "rgb(45 45 43)",
+        },
       },
       fontFamily: {
-        'inter': ['Inter', 'sans-serif'],
+        'display': ['Inter', 'sans-serif'],
+        'body': ['Inter', 'sans-serif'],
+        'mono': ['SF Mono', 'Consolas', 'Liberation Mono', 'Menlo', 'monospace'],
       },
       borderRadius: {
-        lg: "1rem",
-        md: "0.75rem",
-        sm: "0.5rem",
-        xl: "0.75rem",
-      },
-      transitionProperty: {
-        'coastal': 'box-shadow, background-color, color, transform',
+        lg: "0.125rem", // Minimal radius
+        md: "0.125rem",
+        sm: "0.125rem",
       },
       keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
-        },
         "fade-in": {
           "0%": {
             opacity: "0",
-            transform: "translateY(10px)"
+            transform: "translateY(8px)"
           },
           "100%": {
             opacity: "1",
             transform: "translateY(0)"
           }
         },
-        "scale-in": {
-          "0%": {
-            transform: "scale(0.95)",
-            opacity: "0"
-          },
-          "100%": {
-            transform: "scale(1)",
-            opacity: "1"
-          }
-        },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.3s ease-out",
-        "scale-in": "scale-in 0.2s ease-out",
+        "fade-in": "fade-in 0.4s ease-out",
       },
     },
   },

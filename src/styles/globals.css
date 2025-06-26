@@ -1,116 +1,136 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* Global background and zoning */
+/* Global background and editorial styling */
 @layer base {
   :root {
-    --background: 255 255 255; /* Changed to white instead of sand */
-    --foreground: 0 56 64; /* #003840 - Much darker Ocean Deep */
+    --background: 248 246 242; /* Warm neutral background */
+    --foreground: 45 45 43; /* Dark charcoal text */
 
-    --card: 255 255 255; /* #FFFFFF */
-    --card-foreground: 0 56 64;
+    --card: 252 251 249; /* Soft card background */
+    --card-foreground: 45 45 43;
     
-    --primary: 0 56 64; /* #003840 - Much darker Ocean Deep */
-    --primary-foreground: 255 255 255;
+    --primary: 45 45 43; /* Dark charcoal for primary actions */
+    --primary-foreground: 248 246 242;
 
-    --secondary: 249 243 233; /* Lighter Sand Beige - reduced prominence */
-    --secondary-foreground: 0 56 64;
+    --secondary: 231 225 216; /* Muted clay */
+    --secondary-foreground: 45 45 43;
 
-    --muted: 74 74 72; /* #4A4A48 - Much darker Driftwood Gray */
-    --muted-foreground: 0 56 64;
+    --muted: 180 178 174; /* Overcast gray */
+    --muted-foreground: 45 45 43;
 
-    --accent: 102 178 178; /* #66B2B2 - Seafoam */
-    --accent-foreground: 0 56 64;
+    --accent: 162 180 178; /* Seafoam accent */
+    --accent-foreground: 45 45 43;
 
-    --destructive: 255 107 74; /* #FF6B4A - Coral */
-    --destructive-foreground: 255 255 255;
+    --destructive: 205 92 92;
+    --destructive-foreground: 248 246 242;
 
-    --border: 249 243 233; /* #F9F3E9 - Lighter Sand Beige */
-    --input: 249 243 233;
-    --ring: 0 56 64;
+    --border: 231 225 216;
+    --input: 231 225 216;
+    --ring: 45 45 43;
 
-    --radius: 1rem;
+    --radius: 0.125rem; /* Minimal radius */
   }
 
   html, body {
-    background: white; /* Changed from sand gradient to white */
-    color: #003840; /* Dark teal for all text */
+    background: rgb(248 246 242); /* Warm neutral */
+    color: rgb(45 45 43); /* Dark charcoal */
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
+    font-weight: 400;
   }
 
-  /* All text elements use dark teal by default */
+  /* Typography system - editorial style */
+  .font-display {
+    font-weight: 600;
+    letter-spacing: -0.025em;
+  }
+
+  .font-body {
+    font-weight: 400;
+    line-height: 1.6;
+  }
+
+  .font-mono {
+    font-family: 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.875rem;
+    font-weight: 400;
+  }
+
+  /* Text colors for editorial hierarchy */
+  .text-charcoal {
+    color: rgb(45 45 43);
+  }
+
+  .text-overcast {
+    color: rgb(180 178 174);
+  }
+
+  .text-seafoam {
+    color: rgb(162 180 178);
+  }
+
+  .text-clay {
+    color: rgb(186 162 138);
+  }
+
+  /* Remove all default shadows and effects */
   * {
-    color: #003840 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
   }
 
-  /* Page headers and section titles use a lighter teal */
-  h1, h2, h3, h4, h5, h6 {
-    color: #005F73 !important; /* Lighter teal for headers */
-    @apply font-semibold uppercase tracking-wide;
+  /* Clean button resets */
+  button {
+    box-shadow: none !important;
+    transform: none !important;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  /* Specific overrides for white text when needed */
-  .text-white,
-  button .text-white,
-  [class*="text-white"] {
-    color: #FFFFFF !important;
-  }
-
-  .text-ocean {
-    color: #003840 !important;
+  button:hover {
+    transform: none !important;
   }
 }
 
-/* Utility classes for brand look */
+/* Editorial utility classes */
 @layer utilities {
-  .shadow-ocean {
-    box-shadow: 0 4px 24px 0 rgba(0,56,64,0.08) !important;
+  .bg-warm-neutral {
+    background-color: rgb(248 246 242);
   }
-  .shadow-card-lg {
-    box-shadow: 0 8px 40px 0 rgba(0,56,64,0.10) !important;
+  
+  .bg-soft-neutral {
+    background-color: rgb(252 251 249);
   }
-  .bg-accent-gradient {
-    background: linear-gradient(135deg, #003840, #66B2B2) !important;
+  
+  .bg-clay-muted {
+    background-color: rgb(231 225 216);
   }
-  .badge-pastel-ocean {
-    background-color: #E6EEF0 !important;
-    color: #003840 !important;
+  
+  .bg-seafoam-soft {
+    background-color: rgb(162 180 178 / 0.1);
   }
-  .badge-pastel-coral {
-    background-color: #F9F3E9 !important;
-    color: #FF6B4A !important;
+  
+  .border-clay {
+    border-color: rgb(231 225 216);
   }
-  .hover-soft-tint-ocean:hover {
-    background-color: rgba(0,56,64,0.08) !important;
-    transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
-    box-shadow: 0 2px 8px 0 rgba(0,56,64,0.07);
+  
+  /* Editorial spacing */
+  .spacing-editorial {
+    padding: 2rem 1.5rem;
   }
-  .hover-soft-tint-coral:hover {
-    background-color: rgba(255,107,74,0.08) !important;
-    transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
-    box-shadow: 0 2px 8px 0 rgba(255,107,74,0.07);
+  
+  .spacing-generous {
+    padding: 3rem 2rem;
   }
-  .transition-coastal {
-    transition: box-shadow 0.15s, background-color 0.15s, color 0.15s, transform 0.15s;
+  
+  /* Clean hover effects */
+  .hover-soft:hover {
+    background-color: rgb(231 225 216 / 0.5);
+    transition: background-color 0.2s ease;
   }
-  .sidebar-zoning {
-    background: #F9F3E9 !important;
+  
+  .hover-underline:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
   }
-  .main-feed-gradient {
-    background: white !important; /* Changed from gradient to white */
-  }
-}
-
-/* Focused search styling */
-.input-search-coastal {
-  background: #FFF !important;
-  border: 1px solid #F9F3E9 !important;
-  box-shadow: 0 2px 8px 0 rgba(0,56,64,0.05);
-  color: #003840;
-  padding-left: 2.5rem !important;
-  transition: border 0.15s, box-shadow 0.15s;
-}
-.input-search-coastal:focus {
-  border: 1.5px solid #003840 !important;
-  box-shadow: 0 0 0 2px #66B2B255;
 }

@@ -10,18 +10,26 @@ const Home = () => {
   const { data: events, isLoading } = useEvents(undefined, { includeAllStatuses: true });
 
   return (
-    <div className="w-full bg-gradient-to-b from-secondary-25 to-white min-h-screen">
+    <div className="w-full bg-warm-neutral min-h-screen">
       {/* Hero Section */}
-      <HomeHeroSection />
+      <div className="py-16 px-6">
+        <HomeHeroSection />
+      </div>
 
       {/* Audience Tiles */}
-      <HomeAudienceTiles />
+      <div className="py-12 px-6">
+        <HomeAudienceTiles />
+      </div>
 
       {/* Events Preview */}
-      <HomeEventsPreview events={events} isLoading={isLoading} />
+      <div className="py-12 px-6">
+        <HomeEventsPreview events={events} isLoading={isLoading} />
+      </div>
 
       {/* Casual Plans Section */}
-      <HomeCasualPlansSection />
+      <div className="py-12 px-6">
+        <HomeCasualPlansSection />
+      </div>
     </div>
   );
 };

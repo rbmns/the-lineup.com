@@ -2,7 +2,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { getCategoryIcon } from './category/category-icon-mapping';
-import { getCategoryColor, getCategoryColorState } from './category/category-color-mapping';
 import { CategoryPillProps } from './category/category-pill-types';
 export { AllCategoryPill } from './category/all-category-pill';
 
@@ -21,32 +20,25 @@ export const CategoryPill: React.FC<CategoryPillProps & {
   visuallyInactive = false
 }) => {
   const Icon = getCategoryIcon(category);
-  const colorState = getCategoryColorState(category);
   
-  // For event cards, always use active colors for category labels
-  // For filter pills, use appropriate colors based on selection state
-  const colorClasses = showIcon || (!visuallyInactive && active)
-    ? colorState.active
-    : colorState.inactive;
+  // Editorial pill styling - muted colors, minimal
+  const baseClasses = 'rounded-sm font-mono text-xs transition-colors flex items-center border-0';
   
-  // Base styles for all pills
-  const baseClasses = 'rounded-full font-medium transition-colors flex items-center';
+  // Simple color scheme - seafoam for active, clay for inactive
+  const colorClasses = active || showIcon
+    ? 'bg-seafoam-soft text-charcoal'
+    : 'bg-clay-muted text-overcast hover:bg-seafoam-soft hover:text-charcoal';
   
-  // Border styles - only apply if noBorder is false
-  const borderClasses = !noBorder ? 
-    (active ? 'border border-transparent shadow-sm' : 'border border-gray-300') : '';
-  
-  // Size classes
+  // Editorial sizing
   const sizeClasses = {
-    'xs': 'text-xs py-0.5 px-1.5',
-    'sm': 'text-xs py-1 px-2',
-    'default': 'text-sm py-1.5 px-3',
-    'lg': 'text-sm py-2 px-4 font-medium'
+    'xs': 'py-1 px-2',
+    'sm': 'py-1.5 px-3',
+    'default': 'py-2 px-4',
+    'lg': 'py-2.5 px-5'
   };
   
-  // Interactive classes
   const interactiveClasses = onClick 
-    ? 'cursor-pointer hover:shadow-sm' 
+    ? 'cursor-pointer' 
     : 'cursor-default';
   
   return (
@@ -54,14 +46,13 @@ export const CategoryPill: React.FC<CategoryPillProps & {
       className={cn(
         baseClasses,
         colorClasses,
-        borderClasses,
         sizeClasses[size],
         interactiveClasses,
         className
       )}
       onClick={onClick}
     >
-      {showIcon && Icon && <Icon className="mr-1.5 h-4 w-4" />}
+      {showIcon && Icon && <Icon className="mr-2 h-3 w-3" />}
       <span>{category}</span>
       {children}
     </div>

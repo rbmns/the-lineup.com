@@ -2,35 +2,33 @@
 export const designTokens = {
   borderRadius: {
     none: 'rounded-none',
-    xs: 'rounded-sm',
-    sm: 'rounded',
-    md: 'rounded-md',
-    lg: 'rounded-lg',
-    xl: 'rounded-xl',
-    full: 'rounded-full',
+    sm: 'rounded-sm',
+    DEFAULT: 'rounded-sm', // Default to minimal radius
   },
   spacing: {
-    xs: '0.125rem', // 2px
-    sm: '0.25rem',  // 4px
-    md: '0.5rem',   // 8px
-    lg: '0.75rem',  // 12px
-    xl: '1rem',     // 16px
-    '2xl': '1.5rem', // 24px
+    editorial: '2rem 1.5rem',
+    generous: '3rem 2rem',
+    card: '1.5rem',
+    tight: '1rem',
+  },
+  typography: {
+    display: 'font-display text-charcoal',
+    body: 'font-body text-charcoal',
+    mono: 'font-mono text-overcast',
   },
 } as const;
 
 export type BorderRadiusToken = keyof typeof designTokens.borderRadius;
 
-// Utility function to get border radius class
 export const getBorderRadiusClass = (radius: BorderRadiusToken): string => {
   return designTokens.borderRadius[radius];
 };
 
-// Default radius for different component types
+// Editorial-focused defaults
 export const defaultRadius = {
   button: 'sm' as BorderRadiusToken,
-  card: 'lg' as BorderRadiusToken,
-  input: 'md' as BorderRadiusToken,
-  categoryPill: 'full' as BorderRadiusToken,
-  badge: 'md' as BorderRadiusToken,
+  card: 'sm' as BorderRadiusToken,
+  input: 'sm' as BorderRadiusToken,
+  categoryPill: 'sm' as BorderRadiusToken,
+  badge: 'sm' as BorderRadiusToken,
 } as const;
