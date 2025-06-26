@@ -1,9 +1,9 @@
+
 import React, { useEffect, useState } from 'react';
-import { X, ExternalLink } from 'lucide-react';
+import { X, ExternalLink, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEventDetails } from '@/hooks/useEventDetails';
 import { EventDetailContent } from '@/components/events/EventDetailContent';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnifiedRsvp } from '@/hooks/useUnifiedRsvp';
 
@@ -49,7 +49,7 @@ export const EventSidePanel: React.FC<EventSidePanelProps> = ({
   if (eventLoading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <LoadingSpinner size="lg" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#005F73]" />
       </div>
     );
   }
