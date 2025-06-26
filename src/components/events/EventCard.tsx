@@ -111,7 +111,7 @@ export const EventCard: React.FC<EventCardProps> = ({
         <img
           src={imageUrl}
           alt={event.title}
-          className="w-full h-full object-cover brightness-90 contrast-110 saturate-105"
+          className="w-full h-full object-cover filter-cinematic"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (!target.src.includes('/img/default.jpg')) {
@@ -150,13 +150,6 @@ export const EventCard: React.FC<EventCardProps> = ({
           </span>
         </div>
       </div>
-
-      {/* Description preview */}
-      {event.description && (
-        <p className="text-sm text-midnight font-body leading-relaxed line-clamp-3 mb-4">
-          {event.description}
-        </p>
-      )}
 
       {/* Tags/Vibes and Category */}
       <div className="flex flex-wrap gap-2 mb-4">

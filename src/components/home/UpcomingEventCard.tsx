@@ -51,7 +51,7 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
         <img
           src={imageUrl}
           alt={event.title}
-          className="w-full h-full object-cover brightness-90 contrast-110 saturate-105"
+          className="w-full h-full object-cover filter-cinematic"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (!target.src.includes('/img/default.jpg')) {
