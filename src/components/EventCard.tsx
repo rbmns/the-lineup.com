@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin } from 'lucide-react';
@@ -10,7 +11,6 @@ import { toast } from '@/hooks/use-toast';
 import { formatEventCardDateTime } from '@/utils/date-formatting';
 import { LineupImage } from '@/components/ui/lineup-image';
 import { useAuth } from '@/contexts/AuthContext';
-import { Card } from '@/components/ui/card';
 import { getVibeColors } from '@/utils/vibeColors';
 
 interface EventCardProps {
@@ -98,27 +98,21 @@ export const EventCard: React.FC<EventCardProps> = ({
     return 'Location TBD';
   };
 
-  // Get vibe colors for the pill
-  const vibeColors = event.vibe ? getVibeColors(event.vibe) : null;
-
   return (
-    <Card 
+    <div 
       className={cn(
-        "group flex flex-col h-full overflow-hidden cursor-pointer transition-all duration-300 ease-in-out hover:shadow-lg bg-white border border-gray-200 rounded-xl",
+        "bg-ivory border border-overcast rounded-sm p-4 sm:p-6 cursor-pointer transition-colors hover:bg-coconut w-full",
         className
       )}
       onClick={handleClick}
       data-event-id={event.id}
     >
-      {/* Image with category pill only */}
-      <div className="relative w-full h-48 sm:h-52 overflow-hidden bg-gray-100 flex-shrink-0">
-        <LineupImage
+      {/* Image */}
+      <div className="w-full h-48 mb-4 overflow-hidden rounded-sm">
+        <img
           src={imageUrl}
           alt={event.title}
-          aspectRatio="video"
-          treatment="subtle-overlay"
-          overlayVariant="ocean"
-          className="w-full h-full transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-full object-cover brightness-90 contrast-110 saturate-105"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (!target.src.includes('/img/default.jpg')) {
@@ -127,79 +121,76 @@ export const EventCard: React.FC<EventCardProps> = ({
             }
           }}
         />
-        
-        {/* Subtle gradient overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
-        
-        {/* Category pill - top left only */}
-        {event.event_category && (
-          <div className="absolute top-3 left-3 z-10">
-            <CategoryPill 
-              category={event.event_category} 
-              size="sm"
-              className="bg-white/90 backdrop-blur-sm border border-white/20 shadow-sm"
-            />
-          </div>
-        )}
-
-        {/* Event vibe with proper colors - top right */}
-        {event.vibe && vibeColors && (
-          <div className="absolute top-3 right-3 z-10">
-            <span className={`text-xs font-medium px-2 py-1 rounded-full ${vibeColors.bg} ${vibeColors.text} shadow-sm`}>
-              {event.vibe}
-            </span>
-          </div>
-        )}
       </div>
       
-      {/* Content */}
-      <div className="flex flex-col flex-1 p-4 sm:p-5 space-y-3">
-        {/* Title */}
-        <h3 className="font-semibold text-[#005F73] text-lg sm:text-xl leading-tight line-clamp-2">
-          {event.title}
-        </h3>
-        
-        {/* Organizer info */}
-        {event.organiser_name && (
-          <p className="text-sm text-[#005F73]/70 font-medium">
-            By <span className="text-[#2A9D8F]">{event.organiser_name}</span>
-          </p>
-        )}
-        
-        {/* Date and Time */}
-        <div className="flex items-center gap-2 text-sm text-[#005F73]/80">
-          <Calendar className="h-4 w-4 text-[#2A9D8F] flex-shrink-0" />
-          <span className="font-medium">
+      {/* Title */}
+      <h3 className="font-display text-lg text-midnight mb-3 leading-tight">
+        {event.title}
+      </h3>
+      
+      {/* Organizer info */}
+      {event.organiser_name && (
+        <p className="font-mono text-xs text-overcast mb-3">
+          By {event.organiser_name}
+        </p>
+      )}
+      
+      {/* Metadata */}
+      <div className="font-mono text-xs text-overcast space-y-1 mb-4">
+        <div className="flex items-center space-x-2">
+          <Calendar className="h-3 w-3" />
+          <span>
             {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
           </span>
         </div>
         
-        {/* Location */}
-        <div className="flex items-center gap-2 text-sm text-[#005F73]/80">
-          <MapPin className="h-4 w-4 text-[#2A9D8F] flex-shrink-0" />
-          <span className="truncate font-medium">
+        <div className="flex items-center space-x-2">
+          <MapPin className="h-3 w-3" />
+          <span>
             {getVenueDisplay()}
           </span>
         </div>
+      </div>
 
-        {/* RSVP Buttons - only show if authenticated */}
-        {shouldShowRsvp && onRsvp && (
-          <div 
-            className="mt-auto pt-3 border-t border-gray-100" 
-            data-rsvp-container="true" 
-            onClick={(e) => e.stopPropagation()}
-          >
-            <EventRsvpButtons
-              currentStatus={event.rsvp_status || null}
-              onRsvp={handleRsvp}
-              size="sm"
-              isLoading={loadingEventId === event.id}
-              showStatusOnly={!shouldShowRsvp && showRsvpStatus}
-              className="w-full"
-            />
-          </div>
+      {/* Description preview */}
+      {event.description && (
+        <p className="text-sm text-midnight font-body leading-relaxed line-clamp-3 mb-4">
+          {event.description}
+        </p>
+      )}
+
+      {/* Tags/Vibes and Category */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {event.vibe && (
+          <span className="bg-sage text-midnight text-xs font-mono px-2 py-0.5 rounded lowercase">
+            {event.vibe}
+          </span>
+        )}
+        {event.event_category && (
+          <span className="bg-sage text-midnight text-xs font-mono px-2 py-0.5 rounded lowercase">
+            {event.event_category}
+          </span>
         )}
       </div>
-    </Card>
+
+      {/* RSVP Buttons - only show if authenticated */}
+      {shouldShowRsvp && onRsvp && (
+        <div 
+          data-rsvp-container="true" 
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            className="bg-clay text-midnight text-sm font-body px-4 py-2 rounded-sm hover:bg-seafoam transition-colors w-full"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRsvp('Going');
+            }}
+            disabled={loadingEventId === event.id}
+          >
+            {event.rsvp_status === 'Going' ? 'Going' : 'Join Event'}
+          </button>
+        </div>
+      )}
+    </div>
   );
 };

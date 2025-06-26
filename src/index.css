@@ -16,6 +16,11 @@
   .btn-ghost {
     @apply text-midnight hover:bg-primary/5 font-medium transition-all duration-300;
   }
+
+  /* Cinematic filter for coastal aesthetic */
+  .filter-cinematic {
+    @apply brightness-90 contrast-110 saturate-105;
+  }
 }
 
 /* iOS Safari viewport fix */
