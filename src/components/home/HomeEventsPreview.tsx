@@ -3,14 +3,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Event } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Calendar, Clock, MapPin, Users } from 'lucide-react';
-import { format } from 'date-fns';
+import { Calendar, MapPin } from 'lucide-react';
 import { useEventImages } from '@/hooks/useEventImages';
-import { LineupImage } from '@/components/ui/lineup-image';
 import { useAuth } from '@/contexts/AuthContext';
-import EventVibeLabel from '@/components/polymet/event-vibe-label';
 import { formatEventCardDateTime } from '@/utils/date-formatting';
-import { Card } from '@/components/ui/card';
+import { getVibeColors } from '@/utils/vibeColors';
 
 interface HomeEventsPreviewProps {
   events: Event[] | undefined;
@@ -28,20 +25,20 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
 
   if (isLoading) {
     return (
-      <section className="py-16 bg-secondary-25">
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-primary mb-4">Upcoming Events</h2>
+            <h2 className="font-display text-3xl text-midnight mb-4">Upcoming Events</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl overflow-hidden animate-pulse">
-                <div className="h-48 bg-gray-200"></div>
+              <div key={i} className="bg-ivory border border-overcast rounded-sm overflow-hidden animate-pulse">
+                <div className="h-48 bg-overcast/20"></div>
                 <div className="p-4">
-                  <div className="h-4 bg-gray-200 rounded mb-3"></div>
-                  <div className="h-3 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded mb-3"></div>
-                  <div className="h-6 bg-gray-200 rounded"></div>
+                  <div className="h-4 bg-overcast/20 rounded mb-3"></div>
+                  <div className="h-3 bg-overcast/20 rounded mb-2"></div>
+                  <div className="h-3 bg-overcast/20 rounded mb-3"></div>
+                  <div className="h-6 bg-overcast/20 rounded"></div>
                 </div>
               </div>
             ))}
@@ -52,11 +49,11 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
   }
 
   return (
-    <section className="py-16 bg-secondary-25">
+    <section className="py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-primary mb-4">Upcoming Events</h2>
-          <p className="text-lg text-neutral max-w-2xl mx-auto">
+          <h2 className="font-display text-3xl text-midnight mb-4">Upcoming Events</h2>
+          <p className="text-lg text-overcast max-w-2xl mx-auto font-body">
             Join others in experiences that match your interests
           </p>
         </div>
@@ -80,19 +77,16 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
               };
 
               return (
-                <Card 
-                  className="flex flex-col h-full overflow-hidden cursor-pointer transition-all duration-300 ease-in-out hover:shadow-xl bg-white border border-gray-200 rounded-xl group"
+                <div 
+                  className="bg-ivory border border-overcast rounded-sm p-4 sm:p-6 cursor-pointer transition-colors hover:bg-coconut w-full h-full flex flex-col"
                   onClick={() => navigate(`/events/${event.id}`)}
                 >
-                  {/* Image with vibe pill only - reduced height */}
-                  <div className="relative w-full h-48 overflow-hidden bg-gray-100 flex-shrink-0">
-                    <LineupImage
+                  {/* Image */}
+                  <div className="w-full h-48 mb-4 overflow-hidden rounded-sm relative">
+                    <img
                       src={imageUrl}
                       alt={event.title}
-                      aspectRatio="video"
-                      treatment="subtle-overlay"
-                      overlayVariant="ocean"
-                      className="w-full h-full group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover filter-cinematic"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         if (!target.src.includes('/img/default.jpg')) {
@@ -101,63 +95,82 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
                       }}
                     />
 
-                    {/* Event vibe pill - top right only */}
-                    <div className="absolute top-3 right-3 z-10">
-                      <EventVibeLabel 
-                        vibe={event.vibe || 'general'} 
-                        size="sm"
-                      />
-                    </div>
+                    {/* Event vibe pill - top right */}
+                    {event.vibe && (
+                      <div className="absolute top-3 right-3 z-10">
+                        <span 
+                          className="text-xs font-mono px-2 py-0.5 rounded lowercase"
+                          style={{
+                            backgroundColor: getVibeColors(event.vibe).bg,
+                            color: getVibeColors(event.vibe).text
+                          }}
+                        >
+                          {event.vibe}
+                        </span>
+                      </div>
+                    )}
                   </div>
 
-                  <div className="flex flex-col flex-1 p-4 space-y-3">
-                    {/* Event Title */}
-                    <h3 className="font-semibold text-primary text-lg leading-tight line-clamp-2">
-                      {event.title}
-                    </h3>
+                  {/* Title */}
+                  <h3 className="font-display text-lg text-midnight mb-3 leading-tight">
+                    {event.title}
+                  </h3>
 
-                    {/* Organizer info */}
-                    {event.organiser_name && (
-                      <p className="text-sm text-primary/70">
-                        By {event.organiser_name}
-                      </p>
-                    )}
+                  {/* Organizer info */}
+                  {event.organiser_name && (
+                    <p className="font-mono text-xs text-overcast mb-3">
+                      By {event.organiser_name}
+                    </p>
+                  )}
 
-                    {/* Date & Time - using improved formatting for ongoing events */}
-                    <div className="flex items-center gap-2 text-neutral">
-                      <Calendar className="h-4 w-4 text-primary/60" />
-                      <span className="text-sm font-medium">
+                  {/* Metadata */}
+                  <div className="font-mono text-xs text-overcast space-y-1 mb-4">
+                    <div className="flex items-center space-x-2">
+                      <Calendar className="h-3 w-3" />
+                      <span>
                         {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
                       </span>
                     </div>
-
-                    {/* Location */}
-                    <div className="flex items-center gap-2 text-neutral">
-                      <MapPin className="h-4 w-4 text-primary/60" />
-                      <span className="text-sm truncate">
+                    
+                    <div className="flex items-center space-x-2">
+                      <MapPin className="h-3 w-3" />
+                      <span>
                         {getVenueDisplay()}
                       </span>
                     </div>
-
-                    {/* Join Button - removed attendee count section */}
-                    <div className="flex items-center justify-end mt-auto pt-2">
-                      {/* Only show join button for authenticated users */}
-                      {isAuthenticated && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="border-primary/20 text-primary hover:bg-primary/5"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/events/${event.id}`);
-                          }}
-                        >
-                          Join
-                        </Button>
-                      )}
-                    </div>
                   </div>
-                </Card>
+
+                  {/* Description preview */}
+                  {event.description && (
+                    <p className="text-sm text-midnight font-body leading-relaxed line-clamp-3 mb-4 flex-1">
+                      {event.description}
+                    </p>
+                  )}
+
+                  {/* Tags/Vibes and Category */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {event.event_category && (
+                      <span className="bg-sage text-midnight text-xs font-mono px-2 py-0.5 rounded lowercase">
+                        {event.event_category}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Join Button - only show for authenticated users */}
+                  {isAuthenticated && (
+                    <div className="mt-auto">
+                      <button
+                        className="bg-clay text-midnight text-sm font-body px-4 py-2 rounded-sm hover:bg-seafoam transition-colors w-full"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/events/${event.id}`);
+                        }}
+                      >
+                        Join Event
+                      </button>
+                    </div>
+                  )}
+                </div>
               );
             };
 
@@ -165,13 +178,13 @@ export const HomeEventsPreview: React.FC<HomeEventsPreviewProps> = ({
           })}
         </div>
 
-        {/* View All Button - Consistent styling */}
+        {/* View All Button */}
         <div className="text-center">
           <Button
             onClick={() => navigate('/events')}
             size="lg"
             variant="outline"
-            className="border-2 border-primary/20 text-primary hover:bg-primary/5 px-8"
+            className="border-2 border-overcast/20 text-midnight hover:bg-coconut px-8 font-body"
           >
             View All Events
           </Button>
