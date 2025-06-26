@@ -1,6 +1,7 @@
+
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchEventById } from '@/lib/eventService';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
   const eventId = propEventId || paramId;
   const { user, isAuthenticated } = useAuth();
   const { handleRsvp, loadingEventId } = useUnifiedRsvp();
+  const queryClient = useQueryClient();
 
   // Enhanced event fetching with RSVP status from cache
   const {
@@ -36,28 +38,54 @@ const EventDetail: React.FC<EventDetailProps> = ({
     queryFn: async () => {
       if (!eventId) return null;
       
-      // Check if we have this event in the events list cache with RSVP status
-      const queryClient = (window as any).__REACT_QUERY_CLIENT__;
-      if (queryClient && user?.id) {
+      console.log(`Fetching event ${eventId} for detail page`);
+      
+      // Always check cache first for RSVP status
+      let cachedRsvpStatus = null;
+      
+      if (user?.id) {
+        // Check events list cache first
         const eventsListData = queryClient.getQueryData(['events', user.id]);
         if (eventsListData && Array.isArray(eventsListData)) {
           const cachedEvent = eventsListData.find((e: any) => e.id === eventId);
           if (cachedEvent && cachedEvent.rsvp_status !== undefined) {
-            console.log(`Using cached event with RSVP status: ${cachedEvent.rsvp_status}`);
-            // Fetch fresh event data but preserve RSVP status from cache
-            const freshEventData = await fetchEventById(eventId);
-            return {
-              ...freshEventData,
-              rsvp_status: cachedEvent.rsvp_status
-            };
+            cachedRsvpStatus = cachedEvent.rsvp_status;
+            console.log(`Found RSVP status in events list cache: ${cachedRsvpStatus}`);
           }
+        }
+        
+        // Also check individual event cache
+        const individualEventData = queryClient.getQueryData(['event', eventId]);
+        if (individualEventData && (individualEventData as any).rsvp_status !== undefined) {
+          cachedRsvpStatus = (individualEventData as any).rsvp_status;
+          console.log(`Found RSVP status in individual event cache: ${cachedRsvpStatus}`);
         }
       }
       
-      // Fallback to normal fetch
-      return fetchEventById(eventId);
+      // Fetch fresh event data
+      const freshEventData = await fetchEventById(eventId);
+      
+      if (freshEventData && user?.id) {
+        // Use cached RSVP status if available, otherwise use fresh data
+        const finalRsvpStatus = cachedRsvpStatus !== null ? cachedRsvpStatus : freshEventData.rsvp_status;
+        
+        const eventWithRsvp = {
+          ...freshEventData,
+          rsvp_status: finalRsvpStatus
+        };
+        
+        console.log(`Event ${eventId} detail page - Final RSVP status: ${finalRsvpStatus}`);
+        
+        // Update cache with the correct RSVP status
+        queryClient.setQueryData(['event', eventId], eventWithRsvp);
+        
+        return eventWithRsvp;
+      }
+      
+      return freshEventData;
     },
-    enabled: !!eventId
+    enabled: !!eventId,
+    staleTime: 1000 * 10, // 10 seconds
   });
 
   const {
@@ -69,7 +97,17 @@ const EventDetail: React.FC<EventDetailProps> = ({
 
   const handleRsvpClick = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!eventId) return false;
-    return await handleRsvp(eventId, status);
+    console.log(`RSVP button clicked: ${status} for event ${eventId}`);
+    const result = await handleRsvp(eventId, status);
+    
+    // Force refetch of event data to ensure consistency
+    if (result) {
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['event', eventId] });
+      }, 100);
+    }
+    
+    return result;
   };
 
   if (isLoading) {

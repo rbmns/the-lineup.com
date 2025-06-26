@@ -65,6 +65,8 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     
     if (isLoading || internalLoading) return false;
 
+    console.log(`EventRsvpButtons: Handling RSVP ${status}, current status: ${currentStatus}`);
+
     try {
       setActiveButton(status);
       setInternalLoading(true);
@@ -72,6 +74,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       // Call the provided onRsvp handler and wait for completion
       const result = await onRsvp(status);
       
+      console.log(`EventRsvpButtons: RSVP ${status} completed with result: ${result}`);
       return result;
     } catch (error) {
       console.error('Error in RSVP handler:', error);
@@ -80,6 +83,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       // Add slight delay for better UX
       setTimeout(() => {
         setInternalLoading(false);
+        setActiveButton(null);
       }, 300);
     }
   };
@@ -104,6 +108,8 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       </div>
     );
   }
+
+  console.log(`EventRsvpButtons: Rendering with currentStatus: ${currentStatus}, isGoing: ${isGoing}, isInterested: ${isInterested}`);
 
   // Use DefaultRsvpButtons for all cases
   return (
