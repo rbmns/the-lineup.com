@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { EventRsvpButtons } from './EventRsvpButtons';
 import { cn } from '@/lib/utils';
@@ -147,10 +146,10 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
           <Badge
             variant="outline"
             className={cn(
-              "py-1 px-3 text-xs font-medium transition-all duration-200",
+              "py-1 px-3 font-mono text-xs transition-all duration-200",
               localRsvpStatus === 'Going' 
-                ? "bg-green-50 text-green-700 border-green-200" 
-                : "bg-blue-50 text-blue-700 border-blue-200"
+                ? "bg-seafoam text-midnight border-overcast" 
+                : "bg-sage text-midnight border-overcast"
             )}
           >
             {localRsvpStatus}
@@ -160,8 +159,8 @@ export const EventCardActions: React.FC<EventCardActionsProps> = ({
 
       {/* Friend RSVP */}
       {showFriendRsvp && friendUsername && (
-        <div className="mt-2 flex items-center gap-1 text-xs text-gray-600 animate-fade-in" data-no-navigation="true">
-          <Users className="h-3 w-3" />
+        <div className="mt-2 flex items-center gap-1 font-mono text-overcast text-xs animate-fade-in" data-no-navigation="true">
+          <Users className="h-3 w-3 text-clay" />
           <span>{friendUsername} is {localRsvpStatus?.toLowerCase()}</span>
         </div>
       )}

@@ -44,7 +44,7 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
   return (
     <Card 
       className={cn(
-        "flex flex-col h-full overflow-hidden cursor-pointer transition-all duration-300 ease-in-out hover:shadow-lg bg-white border border-gray-200 rounded-xl group",
+        "flex flex-col h-full overflow-hidden cursor-pointer transition-all duration-300 ease-in-out hover:shadow-lg bg-coconut border border-overcast rounded-xl group",
         className
       )}
       onClick={handleClick}
@@ -72,15 +72,15 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
             <CategoryPill 
               category={event.event_category} 
               size="sm"
-              className="bg-white/90 backdrop-blur-sm border border-white/20 shadow-sm"
+              className="bg-seafoam text-midnight text-xs rounded-full border border-overcast"
             />
           </div>
         )}
 
-        {/* Event type as white text - top right */}
+        {/* Event type as accessible text - top right */}
         {event.vibe && (
           <div className="absolute top-3 right-3 z-10">
-            <span className="text-white text-xs font-medium px-2 py-1 bg-black/20 backdrop-blur-sm rounded-full">
+            <span className="text-midnight text-xs font-medium px-2 py-1 bg-sage rounded-full">
               {event.vibe}
             </span>
           </div>
@@ -90,29 +90,29 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
       {/* Content */}
       <div className="flex flex-col flex-1 p-4 space-y-3">
         {/* Title */}
-        <h3 className="font-semibold text-[#005F73] text-lg leading-tight line-clamp-2">
+        <h3 className="font-display text-midnight text-lg leading-tight line-clamp-2">
           {event.title}
         </h3>
         
         {/* Organizer info */}
         {event.organiser_name && (
-          <p className="text-sm text-[#005F73]/70 font-medium">
-            By <span className="text-[#2A9D8F]">{event.organiser_name}</span>
+          <p className="font-mono text-overcast text-xs">
+            By <span className="text-midnight">{event.organiser_name}</span>
           </p>
         )}
         
         {/* Date and Time */}
-        <div className="flex items-center gap-2 text-sm text-[#005F73]/80">
-          <Calendar className="h-4 w-4 text-[#2A9D8F] flex-shrink-0" />
-          <span className="font-medium">
+        <div className="flex items-center gap-2 font-mono text-overcast text-xs">
+          <Calendar className="h-4 w-4 text-clay flex-shrink-0" />
+          <span>
             {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
           </span>
         </div>
         
         {/* Location */}
-        <div className="flex items-center gap-2 text-sm text-[#005F73]/80">
-          <MapPin className="h-4 w-4 text-[#2A9D8F] flex-shrink-0" />
-          <span className="truncate font-medium">
+        <div className="flex items-center gap-2 font-mono text-overcast text-xs">
+          <MapPin className="h-4 w-4 text-clay flex-shrink-0" />
+          <span className="truncate">
             {getVenueDisplay()}
           </span>
         </div>

@@ -46,12 +46,12 @@ const LeftSidebar: React.FC = () => {
               className={cn(
                 "flex flex-col items-center justify-center py-3 px-3 transition-colors",
                 isActive
-                  ? "text-clay"
+                  ? "text-clay border-l-2 border-clay pl-2"
                   : "text-midnight hover:text-clay"
               )}
             >
               <Icon className="h-4 w-4 mb-1" />
-              <span className="font-mono text-xs leading-tight">
+              <span className="font-mono text-xs leading-tight text-midnight">
                 {item.label}
               </span>
             </Link>
@@ -75,12 +75,12 @@ const LeftSidebar: React.FC = () => {
               className={cn(
                 "flex flex-col items-center justify-center w-full transition-colors",
                 isActive
-                  ? "text-clay"
+                  ? "text-clay border-l-2 border-clay pl-2"
                   : "text-midnight hover:text-clay"
               )}
             >
               <Icon className="h-5 w-5 mb-2" />
-              <span className="font-mono text-sm text-center leading-tight">
+              <span className="font-mono text-sm text-center leading-tight text-midnight">
                 {item.label}
               </span>
             </Link>

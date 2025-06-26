@@ -71,7 +71,7 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
   const dateTimeInfo = formatDateTime(event.start_date, event.start_time, event.end_time);
 
   return (
-    <Card className="overflow-hidden border border-gray-200 shadow-md hover:shadow-xl transition-all duration-500 animate-fade-in">
+    <Card className="overflow-hidden border border-overcast shadow-md hover:shadow-xl transition-all duration-500 animate-fade-in bg-coconut">
       {/* Image header */}
       <EventDetailHeader
         event={event}
@@ -82,8 +82,8 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
         title={event?.title || 'Event'}
         onEventTypeClick={handleEventTypeClick}
         startTime={event?.start_time}
-        showTitleOverlay={!isMobile} // Only show overlay on desktop
-        dateTimeInfo={!isMobile ? dateTimeInfo : undefined} // Only on desktop
+        showTitleOverlay={!isMobile}
+        dateTimeInfo={!isMobile ? dateTimeInfo : undefined}
       />
 
       <CardContent className="p-0">
@@ -91,12 +91,12 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
           {/* Mobile: show title/date under image only on mobile */}
           {isMobile && (
             <div className="mb-2">
-              <h1 className="text-xl font-semibold leading-tight mb-1 text-gray-900">
+              <h1 className="font-display text-midnight text-xl leading-tight mb-1">
                 {event?.title || 'Event'}
               </h1>
               {dateTimeInfo && (
-                <div className="flex items-center gap-2 text-gray-700 text-sm mt-1 mb-2">
-                  <Calendar className="h-4 w-4" />
+                <div className="flex items-center gap-2 font-mono text-overcast text-xs mt-1 mb-2">
+                  <Calendar className="h-4 w-4 text-clay" />
                   <span>{dateTimeInfo}</span>
                 </div>
               )}
@@ -105,11 +105,11 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
 
           {/* RSVP buttons for desktop - under the image */}
           {isAuthenticated && !isMobile && (
-            <div className="animate-fade-in" style={{ animationDelay: '150ms' }}>
+            <div className="bg-sage text-midnight p-6 rounded-md animate-fade-in" style={{ animationDelay: '150ms' }}>
               <EventRsvpButtons 
                 currentStatus={event?.rsvp_status}
                 onRsvp={handleRsvpWrapped}
-                isLoading={rsvpLoading} /* Changed from loading to isLoading */
+                isLoading={rsvpLoading}
                 className="w-full"
                 size="lg"
               />

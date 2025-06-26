@@ -29,7 +29,7 @@ const EventDetailContent = ({
 }: EventDetailContentProps) => {
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-coconut">
       {/* Hero Section */}
       <EventDetailHero event={event} />
 

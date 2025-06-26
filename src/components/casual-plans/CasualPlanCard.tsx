@@ -47,13 +47,12 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
     return false;
   };
 
-  // Use the correct property name from CasualPlan type
   const currentRsvpStatus = plan.rsvp_status || null;
 
   return (
     <Card 
       className={cn(
-        "h-full transition-all duration-200 shadow-sm hover:shadow-md border-gray-200 bg-white rounded-xl",
+        "h-full transition-all duration-200 shadow-sm hover:shadow-md border-overcast bg-coconut rounded-xl",
         isLoading && "opacity-50",
         className
       )}
@@ -63,98 +62,63 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
         <div className="flex-1 space-y-4">
           {/* Title and Vibe */}
           <div className="space-y-2">
-            <h3 className="font-semibold text-[#003840] text-lg line-clamp-2">{plan.title}</h3>
+            <h3 className="font-display text-midnight text-lg line-clamp-2">{plan.title}</h3>
             {showBlurred ? (
               <div className="bg-gray-200 text-gray-400 px-2 py-1 rounded text-xs w-fit">
                 ••••••
               </div>
             ) : (
-              <Badge variant="secondary" className="text-xs capitalize bg-[#F4E7D3] text-[#003840] border-none">
+              <Badge variant="secondary" className="bg-seafoam text-midnight text-xs rounded-full capitalize">
                 {plan.vibe}
               </Badge>
             )}
           </div>
 
           {/* Date and Time */}
-          <div className="flex items-center gap-2 text-sm text-[#4A4A48]">
-            <CalendarDays className="h-4 w-4 text-[#66B2B2]" />
-            {showBlurred ? (
-              <span className="text-gray-300">•••• ••</span>
-            ) : (
-              <span>{formatDate(plan.date)}</span>
-            )}
-            <Clock className="h-4 w-4 ml-2 text-[#66B2B2]" />
-            {showBlurred ? (
-              <span className="text-gray-300">••:•• ••</span>
-            ) : (
-              <span>{formatTime(plan.time)}</span>
-            )}
+          <div className="flex items-center gap-2 font-mono text-overcast text-xs">
+            <CalendarDays className="h-4 w-4 text-clay flex-shrink-0" />
+            <span>
+              {formatDate(plan.date)}
+              {plan.time && ` • ${formatTime(plan.time)}`}
+            </span>
           </div>
 
           {/* Location */}
-          <div className="flex items-center gap-2 text-sm text-[#4A4A48]">
-            <MapPin className="h-4 w-4 text-[#66B2B2]" />
-            {showBlurred ? (
-              <span className="text-gray-300">••••••••••••••••••••</span>
-            ) : (
-              <span className="line-clamp-1">{plan.location}</span>
-            )}
-          </div>
+          {plan.location && (
+            <div className="flex items-center gap-2 font-mono text-overcast text-xs">
+              <MapPin className="h-4 w-4 text-clay flex-shrink-0" />
+              <span className="truncate">{plan.location}</span>
+            </div>
+          )}
 
           {/* Description */}
-          {plan.description && (
-            <p className="text-sm text-[#4A4A48] line-clamp-3">
-              {showBlurred ? "••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••" : plan.description}
+          {plan.description && !showBlurred && (
+            <p className="text-midnight text-sm line-clamp-3">
+              {plan.description}
             </p>
           )}
 
-          {/* Attendee Count */}
-          <div className="flex items-center gap-2 text-sm text-[#4A4A48]">
-            <Users className="h-4 w-4 text-[#66B2B2]" />
-            {showBlurred ? (
-              <span className="text-gray-300">••• attending</span>
-            ) : (
-              <>
-                <span>{plan.attendee_count || 0} attending</span>
-                {plan.max_attendees && (
-                  <span className="text-[#4A4A48]/70">
-                    (max {plan.max_attendees})
-                  </span>
-                )}
-              </>
-            )}
-          </div>
+          {/* RSVP Buttons */}
+          {showRsvpButtons && !showBlurred && (
+            <div className="bg-sage text-midnight p-4 rounded-md">
+              <EventRsvpButtons
+                currentStatus={currentRsvpStatus}
+                onRsvp={handleRsvp}
+                isLoading={isLoading}
+                size="sm"
+                className="w-full"
+              />
+            </div>
+          )}
 
-          {/* Creator Info */}
-          <div className="text-xs text-[#4A4A48]/70">
-            {showBlurred ? (
-              "Created by ••••••••"
-            ) : (
-              `Created by ${plan.creator_profile?.username || 'Unknown'}`
-            )}
-          </div>
-
-          {/* Login message for non-authenticated users */}
-          {showBlurred && (
-            <div className="mt-4 p-3 bg-[#F4E7D3] border border-[#66B2B2]/20 rounded-lg text-center">
-              <p className="text-xs text-[#003840] mb-2">
-                Sign in to see full details
-              </p>
+          {/* Attendee count */}
+          {plan.attendee_count && plan.attendee_count > 0 && (
+            <div className="flex items-center gap-2 font-mono text-overcast text-xs">
+              <Users className="h-4 w-4 text-clay flex-shrink-0" />
+              <span>{plan.attendee_count} attending</span>
             </div>
           )}
         </div>
-
-        {/* RSVP Actions - only show for authenticated users */}
-        {showRsvpButtons && !showBlurred && (
-          <div className="mt-4 pt-4 border-t border-gray-100" data-no-navigation="true">
-            <EventRsvpButtons
-              currentStatus={currentRsvpStatus}
-              onRsvp={handleRsvp}
-              isLoading={isLoading}
-              size="sm"
-            />
-          </div>
-        )}
       </CardContent>
     </Card>
   );

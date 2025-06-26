@@ -20,7 +20,7 @@ function EventVibeLabel({ vibe, size = "md" }: EventVibeLabel) {
   };
 
   return (
-    <span className={`inline-flex items-center rounded-full bg-purple-100 text-purple-800 font-medium ${sizeClasses[size]}`}>
+    <span className={`inline-flex items-center rounded-full bg-seafoam text-midnight font-medium ${sizeClasses[size]}`}>
       {vibe}
     </span>
   );
@@ -85,7 +85,7 @@ export default function EventCard({
   return (
     <Link
       to={eventUrl}
-      className={`group flex h-full flex-col overflow-hidden rounded-xl border border-secondary-50 bg-white shadow-md transition-shadow hover:shadow-lg font-inter ${className}`}
+      className={`group flex h-full flex-col overflow-hidden rounded-xl border border-overcast bg-coconut shadow-md transition-shadow hover:shadow-lg font-inter ${className}`}
     >
       {/* Image */}
       <div className="relative aspect-[16/9] w-full overflow-hidden">
@@ -118,17 +118,17 @@ export default function EventCard({
 
       {/* Content */}
       <div className="flex flex-1 flex-col p-4 items-start text-left font-inter">
-        <h3 className="mb-1 font-semibold text-black line-clamp-2 font-inter text-left w-full">
+        <h3 className="mb-1 font-display text-midnight line-clamp-2 font-inter text-left w-full">
           {title}
         </h3>
 
         {/* Host info */}
-        {host && <p className="mb-2 text-sm text-neutral-75 font-inter text-left w-full">By {host.name}</p>}
+        {host && <p className="mb-2 font-mono text-overcast text-xs font-inter text-left w-full">By {host.name}</p>}
 
         <div className="flex flex-col gap-1.5 mt-1 w-full">
           {/* Date and time */}
-          <div className="flex items-center text-sm text-neutral-75 font-inter text-left">
-            <CalendarIcon size={16} className="mr-2 flex-shrink-0" />
+          <div className="flex items-center font-mono text-overcast text-xs font-inter text-left">
+            <CalendarIcon size={16} className="mr-2 flex-shrink-0 text-clay" />
             <span>
               {date}
               {time && ` • ${time}`}
@@ -137,8 +137,8 @@ export default function EventCard({
 
           {/* Location */}
           {location && (
-            <div className="flex items-center text-sm text-neutral-75 font-inter text-left">
-              <MapPinIcon size={16} className="mr-2 flex-shrink-0" />
+            <div className="flex items-center font-mono text-overcast text-xs font-inter text-left">
+              <MapPinIcon size={16} className="mr-2 flex-shrink-0 text-clay" />
               <span className="line-clamp-1">{location}</span>
             </div>
           )}
@@ -153,11 +153,11 @@ export default function EventCard({
                   key={index}
                   src={avatar}
                   alt="Attendee"
-                  className="h-6 w-6 rounded-full border-2 border-white object-cover"
+                  className="h-6 w-6 rounded-full border-2 border-coconut object-cover"
                 />
               ))}
             </div>
-            <span className="ml-2 text-xs text-neutral-75 font-inter">
+            <span className="ml-2 font-mono text-overcast text-xs font-inter">
               {attendees.count}{" "}
               {attendees.count === 1 ? "attendee" : "attendees"}
             </span>
@@ -170,7 +170,7 @@ export default function EventCard({
             <Button
               variant="default"
               size="sm"
-              className="flex-1 font-inter"
+              className="flex-1 bg-clay text-midnight text-sm hover:bg-seafoam font-inter"
               onClick={handleRsvpGoing}
             >
               Going
@@ -178,7 +178,7 @@ export default function EventCard({
             <Button
               variant="outline"
               size="sm"
-              className="flex-1 font-inter"
+              className="flex-1 border-overcast text-midnight hover:bg-sage font-inter"
               onClick={handleRsvpInterested}
             >
               Interested
