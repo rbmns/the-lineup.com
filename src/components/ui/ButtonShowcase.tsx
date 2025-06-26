@@ -5,7 +5,7 @@ import { Plus, Search, ArrowRight } from 'lucide-react';
 import { type BorderRadiusToken } from '@/constants/design-tokens';
 
 export const ButtonShowcase: React.FC = () => {
-  const radiusOptions: BorderRadiusToken[] = ['none', 'xs', 'sm', 'md', 'lg', 'xl', 'full'];
+  const radiusOptions: BorderRadiusToken[] = ['none', 'sm', 'DEFAULT'];
   
   return (
     <div className="space-y-8 p-6">
@@ -38,9 +38,9 @@ export const ButtonShowcase: React.FC = () => {
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Button Sizes with Custom Radius</h2>
         <div className="flex flex-wrap items-center gap-4">
-          <Button size="sm" radius="md">Small</Button>
-          <Button size="default" radius="md">Medium</Button>
-          <Button size="lg" radius="md">Large</Button>
+          <Button size="sm" radius="sm">Small</Button>
+          <Button size="default" radius="sm">Medium</Button>
+          <Button size="lg" radius="sm">Large</Button>
         </div>
       </div>
 
@@ -71,7 +71,7 @@ export const ButtonShowcase: React.FC = () => {
               <ul className="space-y-1 text-gray-700">
                 <li>• Use default radius for most buttons</li>
                 <li>• Use "none" for completely square buttons</li>
-                <li>• Use "full" sparingly for special CTAs</li>
+                <li>• Use "sm" for slightly rounded buttons</li>
                 <li>• Keep radius consistent within a component</li>
               </ul>
             </div>
@@ -80,7 +80,7 @@ export const ButtonShowcase: React.FC = () => {
               <ul className="space-y-1 text-gray-700">
                 <li>• Mix different radius values randomly</li>
                 <li>• Override with className rounded-*</li>
-                <li>• Use full radius for large buttons</li>
+                <li>• Use inconsistent radius values</li>
                 <li>• Forget to specify radius for consistency</li>
               </ul>
             </div>

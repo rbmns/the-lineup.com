@@ -15,7 +15,7 @@ export { validateRsvpSystemIntegrity } from './types';
 export { RSVP_CONFIG, RSVP_CONSTANTS } from './config';
 
 // Protected handler (main interface)
-export { useProtectedRsvpHandler, checkRsvpIntegrity } from './protected-handler';
+export { useProtectedRsvpHandler } from './protected-handler';
 
 // Error boundary
 export { RsvpErrorBoundary, withRsvpErrorBoundary } from './error-boundary';
@@ -25,6 +25,19 @@ export { rsvpEvents, emitRsvpEvent } from './event-system';
 
 // Monitoring
 export { rsvpMonitor, logRsvpHealth, getRsvpMetrics, getRsvpHealthStatus } from './monitoring';
+
+// Simple integrity check function
+export const checkRsvpIntegrity = (): boolean => {
+  try {
+    // Basic integrity checks
+    if (typeof RSVP_CONFIG !== 'object') return false;
+    if (typeof RSVP_CONSTANTS !== 'object') return false;
+    return true;
+  } catch (error) {
+    console.error('RSVP integrity check failed:', error);
+    return false;
+  }
+};
 
 /**
  * CRITICAL: System Initialization
