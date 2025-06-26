@@ -43,7 +43,7 @@ export const NavActions: React.FC<NavActionsProps> = ({
           {isAdmin && !isMobile && (
             <Link 
               to="/admin"
-              className="text-charcoal hover:text-overcast transition-colors duration-200 font-body text-sm"
+              className="text-midnight hover:text-overcast transition-colors duration-200 font-body text-sm"
             >
               Admin
             </Link>
@@ -61,7 +61,7 @@ export const NavActions: React.FC<NavActionsProps> = ({
         <button 
           onClick={handleSignInClick} 
           className={cn(
-            "flex-shrink-0 text-charcoal hover:text-overcast transition-colors duration-200 font-body",
+            "flex-shrink-0 text-midnight hover:text-overcast transition-colors duration-200 font-body",
             isMobile ? "text-sm px-3 py-2" : "text-sm px-4"
           )}
         >

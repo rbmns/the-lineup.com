@@ -3,18 +3,18 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global button consistency */
+/* Global button consistency with improved accessibility */
 @layer components {
   .btn-primary {
-    @apply bg-primary text-white hover:bg-primary/90 border-0 font-medium transition-all duration-300;
+    @apply bg-primary text-midnight hover:bg-primary/90 border-0 font-medium transition-all duration-300;
   }
   
   .btn-outline {
-    @apply border-2 border-primary/20 text-primary hover:bg-primary/5 font-medium transition-all duration-300;
+    @apply border-2 border-primary/20 text-midnight hover:bg-primary/5 font-medium transition-all duration-300;
   }
   
   .btn-ghost {
-    @apply text-primary hover:bg-primary/5 font-medium transition-all duration-300;
+    @apply text-midnight hover:bg-primary/5 font-medium transition-all duration-300;
   }
 }
 

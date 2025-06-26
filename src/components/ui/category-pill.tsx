@@ -21,13 +21,13 @@ export const CategoryPill: React.FC<CategoryPillProps & {
 }) => {
   const Icon = getCategoryIcon(category);
   
-  // Coastal pill styling - soft colors, minimal
-  const baseClasses = 'rounded-sm font-mono text-xs transition-colors flex items-center border-0';
+  // Coastal pill styling with improved accessibility
+  const baseClasses = 'rounded-sm font-mono text-xs transition-colors flex items-center border border-overcast';
   
-  // Coastal color scheme
+  // Accessible color scheme with midnight text
   const colorClasses = active || showIcon
-    ? 'bg-seafoam text-charcoal'
-    : 'bg-sage text-overcast hover:bg-seafoam hover:text-charcoal';
+    ? 'bg-seafoam text-midnight border-overcast'
+    : 'bg-sage text-midnight hover:bg-seafoam hover:text-midnight border-overcast';
   
   // Coastal sizing
   const sizeClasses = {

@@ -17,19 +17,19 @@ export const Footer = () => {
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-6">
               <Link 
                 to="/privacy" 
-                className="text-overcast hover:text-charcoal transition-colors duration-200"
+                className="text-overcast hover:text-midnight transition-colors duration-200"
               >
                 Privacy Policy
               </Link>
               <Link 
                 to="/terms" 
-                className="text-overcast hover:text-charcoal transition-colors duration-200"
+                className="text-overcast hover:text-midnight transition-colors duration-200"
               >
                 Terms of Service
               </Link>
               <Link 
                 to="/cookies" 
-                className="text-overcast hover:text-charcoal transition-colors duration-200"
+                className="text-overcast hover:text-midnight transition-colors duration-200"
               >
                 Cookie Policy
               </Link>

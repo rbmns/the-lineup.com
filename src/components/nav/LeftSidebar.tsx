@@ -47,7 +47,7 @@ const LeftSidebar: React.FC = () => {
                 "flex flex-col items-center justify-center py-3 px-3 transition-colors",
                 isActive
                   ? "text-clay"
-                  : "text-charcoal hover:text-clay"
+                  : "text-midnight hover:text-clay"
               )}
             >
               <Icon className="h-4 w-4 mb-1" />
@@ -76,7 +76,7 @@ const LeftSidebar: React.FC = () => {
                 "flex flex-col items-center justify-center w-full transition-colors",
                 isActive
                   ? "text-clay"
-                  : "text-charcoal hover:text-clay"
+                  : "text-midnight hover:text-clay"
               )}
             >
               <Icon className="h-5 w-5 mb-2" />

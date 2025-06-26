@@ -5,22 +5,22 @@
 @layer base {
   :root {
     --background: 248 245 240; /* Sand background */
-    --foreground: 60 64 67; /* Charcoal text */
+    --foreground: 30 30 30; /* Midnight text for better contrast */
 
     --card: 252 250 247; /* Coconut card background */
-    --card-foreground: 60 64 67;
+    --card-foreground: 30 30 30;
     
     --primary: 201 181 162; /* Clay for primary actions */
-    --primary-foreground: 60 64 67;
+    --primary-foreground: 30 30 30;
 
     --secondary: 218 224 220; /* Sage */
-    --secondary-foreground: 60 64 67;
+    --secondary-foreground: 30 30 30;
 
-    --muted: 128 130 133; /* Overcast gray */
-    --muted-foreground: 60 64 67;
+    --muted: 106 122 131; /* Overcast gray - improved contrast */
+    --muted-foreground: 30 30 30;
 
     --accent: 162 180 178; /* Seafoam accent */
-    --accent-foreground: 60 64 67;
+    --accent-foreground: 30 30 30;
 
     --destructive: 205 92 92;
     --destructive-foreground: 252 250 247;
@@ -34,21 +34,23 @@
 
   html, body {
     background: rgb(248 245 240); /* Sand */
-    color: rgb(60 64 67); /* Charcoal */
+    color: rgb(30 30 30); /* Midnight for better accessibility */
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
     font-weight: 400;
   }
 
-  /* Typography system - coastal style */
+  /* Typography system - coastal style with improved accessibility */
   .font-display {
     font-weight: 600;
     letter-spacing: -0.01em;
+    color: rgb(30 30 30); /* Midnight for headings */
   }
 
   .font-body {
     font-weight: 400;
     line-height: 1.5;
+    color: rgb(30 30 30); /* Midnight for body text */
   }
 
   .font-mono {
@@ -56,15 +58,16 @@
     font-size: 0.75rem;
     font-weight: 400;
     text-transform: lowercase;
+    color: rgb(30 30 30); /* Midnight for mono text */
   }
 
-  /* Coastal color utilities */
-  .text-charcoal {
-    color: rgb(60 64 67);
+  /* Accessible color utilities */
+  .text-midnight {
+    color: rgb(30 30 30);
   }
 
   .text-overcast {
-    color: rgb(128 130 133);
+    color: rgb(106 122 131); /* Improved contrast */
   }
 
   .text-seafoam {
@@ -73,6 +76,11 @@
 
   .text-clay {
     color: rgb(201 181 162);
+  }
+
+  /* Legacy charcoal class now uses midnight */
+  .text-charcoal {
+    color: rgb(30 30 30);
   }
 
   /* Remove all shadows and effects for coastal simplicity */
@@ -120,7 +128,7 @@
   }
   
   .border-overcast {
-    border-color: rgb(128 130 133);
+    border-color: rgb(106 122 131);
   }
   
   .border-sage {

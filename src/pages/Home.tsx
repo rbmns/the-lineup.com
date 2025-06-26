@@ -10,18 +10,18 @@ const Home = () => {
   const { data: events, isLoading } = useEvents(undefined, { includeAllStatuses: true });
 
   return (
-    <div className="w-full bg-sand min-h-screen">
+    <div className="w-full bg-sand min-h-screen text-midnight">
       {/* Hero Section */}
       <div className="px-6 py-12">
         <HomeHeroSection />
       </div>
 
-      {/* Audience Tiles - Sage background */}
+      {/* Audience Tiles - Sage background with midnight text */}
       <div className="bg-sage px-6 py-12">
         <HomeAudienceTiles />
       </div>
 
-      {/* Events Preview - Ivory background */}
+      {/* Events Preview - Ivory background with midnight text */}
       <div className="bg-ivory px-6 py-12">
         <HomeEventsPreview events={events} isLoading={isLoading} />
       </div>

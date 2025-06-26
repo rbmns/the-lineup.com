@@ -40,7 +40,7 @@ const MainNav = () => {
               )}
               <BrandLogo 
                 showText={true} 
-                className="font-display text-xl text-charcoal hover:text-overcast transition-colors" 
+                className="font-display text-xl text-midnight hover:text-overcast transition-colors" 
               />
             </div>
 

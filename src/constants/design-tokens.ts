@@ -24,8 +24,9 @@ export const designTokens = {
     sage: 'rgb(218 224 220)',      // Accent sections
     clay: 'rgb(201 181 162)',      // Primary actions
     seafoam: 'rgb(162 180 178)',   // Secondary actions
-    overcast: 'rgb(128 130 133)',  // Muted text
-    charcoal: 'rgb(60 64 67)',     // Main text
+    overcast: 'rgb(106 122 131)',  // Muted text - improved contrast
+    charcoal: 'rgb(60 64 67)',     // Legacy text
+    midnight: 'rgb(30 30 30)',     // New primary text color
   }
 } as const;
 
