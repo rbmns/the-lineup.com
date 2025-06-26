@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin } from 'lucide-react';
@@ -12,6 +11,7 @@ import { formatEventCardDateTime } from '@/utils/date-formatting';
 import { LineupImage } from '@/components/ui/lineup-image';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
+import { getVibeColors } from '@/utils/vibeColors';
 
 interface EventCardProps {
   event: Event;
@@ -98,6 +98,9 @@ export const EventCard: React.FC<EventCardProps> = ({
     return 'Location TBD';
   };
 
+  // Get vibe colors for the pill
+  const vibeColors = event.vibe ? getVibeColors(event.vibe) : null;
+
   return (
     <Card 
       className={cn(
@@ -139,10 +142,10 @@ export const EventCard: React.FC<EventCardProps> = ({
           </div>
         )}
 
-        {/* Event type as white text - top right */}
-        {event.vibe && (
+        {/* Event vibe with proper colors - top right */}
+        {event.vibe && vibeColors && (
           <div className="absolute top-3 right-3 z-10">
-            <span className="text-white text-xs font-medium px-2 py-1 bg-black/20 backdrop-blur-sm rounded-full">
+            <span className={`text-xs font-medium px-2 py-1 rounded-full ${vibeColors.bg} ${vibeColors.text} shadow-sm`}>
               {event.vibe}
             </span>
           </div>

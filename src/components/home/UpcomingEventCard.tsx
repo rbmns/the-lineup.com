@@ -8,6 +8,7 @@ import { CategoryPill } from '@/components/ui/category-pill';
 import { formatEventCardDateTime } from '@/utils/date-formatting';
 import { LineupImage } from '@/components/ui/lineup-image';
 import { Card } from '@/components/ui/card';
+import { getVibeColors } from '@/utils/vibeColors';
 
 interface UpcomingEventCardProps {
   event: Event;
@@ -40,6 +41,9 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
     
     return 'Location TBD';
   };
+
+  // Get vibe colors for the pill
+  const vibeColors = event.vibe ? getVibeColors(event.vibe) : null;
 
   return (
     <Card 
@@ -77,10 +81,10 @@ export const UpcomingEventCard: React.FC<UpcomingEventCardProps> = ({
           </div>
         )}
 
-        {/* Event type as accessible text - top right */}
-        {event.vibe && (
+        {/* Event vibe with proper colors - top right */}
+        {event.vibe && vibeColors && (
           <div className="absolute top-3 right-3 z-10">
-            <span className="text-midnight text-xs font-medium px-2 py-1 bg-sage rounded-full">
+            <span className={`text-xs font-medium px-2 py-1 rounded-full ${vibeColors.bg} ${vibeColors.text} shadow-sm`}>
               {event.vibe}
             </span>
           </div>

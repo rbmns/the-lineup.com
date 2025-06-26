@@ -10,7 +10,7 @@ interface EventGridProps {
 export const EventGrid: React.FC<EventGridProps> = ({ children, className }) => {
   return (
     <div className={cn(
-      "w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6",
+      "w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6",
       className
     )}>
       {children}

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
 import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayout';
@@ -71,7 +70,7 @@ const Events = () => {
   return (
     <div className="min-h-screen w-full">
       {/* Header Section - Full width with controlled padding */}
-      <div className="w-full px-4 sm:px-6 lg:px-12 py-12 sm:py-16">
+      <div className="w-full px-2 sm:px-4 lg:px-8 py-12 sm:py-16">
         <div className="text-center">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#005F73] mb-4 leading-tight">
             Discover <span className="text-[#2A9D8F]">Events</span>
@@ -82,8 +81,8 @@ const Events = () => {
         </div>
       </div>
 
-      {/* Content - Full width with controlled padding */}
-      <div className="w-full px-4 sm:px-6 lg:px-12">
+      {/* Content - Full width with reduced mobile padding */}
+      <div className="w-full px-2 sm:px-4 lg:px-8">
         <div className="space-y-4 sm:space-y-6">
           {/* Vibe Filter */}
           <div className="w-full">
