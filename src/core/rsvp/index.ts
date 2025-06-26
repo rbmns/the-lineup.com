@@ -29,6 +29,9 @@ export { rsvpMonitor, logRsvpHealth, getRsvpMetrics, getRsvpHealthStatus } from 
 // Simple integrity check function
 export const checkRsvpIntegrity = (): boolean => {
   try {
+    // Import the constants within the function scope
+    const { RSVP_CONFIG, RSVP_CONSTANTS } = require('./config');
+    
     // Basic integrity checks
     if (typeof RSVP_CONFIG !== 'object') return false;
     if (typeof RSVP_CONSTANTS !== 'object') return false;
