@@ -34,7 +34,7 @@ const LeftSidebar: React.FC = () => {
 
   if (isMobile) {
     return (
-      <div className="flex items-center justify-around h-full px-2 bg-sand border-t border-overcast">
+      <div className="flex items-center justify-around h-full px-2 bg-coconut border-t border-overcast">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
@@ -44,14 +44,14 @@ const LeftSidebar: React.FC = () => {
               key={item.path}
               to={item.path}
               className={cn(
-                "flex flex-col items-center justify-center py-3 px-3 transition-colors rounded-sm",
+                "flex flex-col items-center justify-center py-3 px-3 transition-colors",
                 isActive
-                  ? "text-charcoal bg-sage"
-                  : "text-overcast hover:text-charcoal hover:bg-sage/30"
+                  ? "text-clay"
+                  : "text-charcoal hover:text-clay"
               )}
             >
               <Icon className="h-4 w-4 mb-1" />
-              <span className="font-body text-xs leading-tight">
+              <span className="font-mono text-xs leading-tight">
                 {item.label}
               </span>
             </Link>
@@ -62,8 +62,8 @@ const LeftSidebar: React.FC = () => {
   }
 
   return (
-    <div className="h-full flex flex-col w-20 bg-sand border-r border-overcast">
-      <div className="flex flex-col flex-1 items-center justify-start py-6 space-y-2 w-full">
+    <div className="h-full flex flex-col w-20 bg-coconut">
+      <div className="flex flex-col flex-1 items-start justify-start px-6 py-6 space-y-4 w-full">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
@@ -73,14 +73,14 @@ const LeftSidebar: React.FC = () => {
               key={item.path}
               to={item.path}
               className={cn(
-                "flex flex-col items-center justify-center w-full py-4 px-2 transition-colors rounded-sm",
+                "flex flex-col items-center justify-center w-full transition-colors",
                 isActive
-                  ? "bg-sage text-charcoal"
-                  : "text-overcast hover:text-charcoal hover:bg-sage/30"
+                  ? "text-clay"
+                  : "text-charcoal hover:text-clay"
               )}
             >
               <Icon className="h-5 w-5 mb-2" />
-              <span className="font-body text-xs text-center leading-tight">
+              <span className="font-mono text-sm text-center leading-tight">
                 {item.label}
               </span>
             </Link>

@@ -21,11 +21,11 @@ const MainNav = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-sand border-b border-overcast">
+      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-coconut border-b border-overcast">
         <div className="w-full flex flex-col">
           <div className={cn(
-            "w-full flex items-center justify-between h-16",
-            isMobile ? "px-4" : "px-6 lg:px-8"
+            "w-full flex items-center justify-between",
+            isMobile ? "px-4 py-3" : "px-6 py-4"
           )}>
             {/* Left side - Logo */}
             <div className="flex items-center h-full flex-shrink-0">
