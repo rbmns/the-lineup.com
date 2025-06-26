@@ -1,12 +1,11 @@
-
-import React, { useEffect } from 'react';
-import { X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { X, ExternalLink } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useEventDetails } from '@/hooks/useEventDetails';
-import { useEventRsvpHandler } from '@/hooks/events/useEventRsvpHandler';
+import { EventDetailContent } from '@/components/events/EventDetailContent';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useAuth } from '@/contexts/AuthContext';
-import { EventDetailContent } from './EventDetailContent';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useUnifiedRsvp } from '@/hooks/useUnifiedRsvp';
 
 interface EventSidePanelProps {
   eventId: string | null;
@@ -17,118 +16,90 @@ interface EventSidePanelProps {
 export const EventSidePanel: React.FC<EventSidePanelProps> = ({
   eventId,
   isOpen,
-  onClose,
+  onClose
 }) => {
   const { user } = useAuth();
-  const { event, attendees, isLoading, error, refreshEventData, updateEventRsvpStatus } = useEventDetails(eventId);
-  const { handleRsvp, rsvpLoading } = useEventRsvpHandler(eventId || '');
+  const { handleRsvp, loadingEventId } = useUnifiedRsvp();
+  const {
+    event,
+    attendees,
+    isLoading: eventLoading,
+    error: eventError
+  } = useEventDetails(eventId);
 
-  // Enhanced RSVP handler that updates cache and refreshes data
-  const handleRsvpWithRefresh = async (status: 'Going' | 'Interested'): Promise<boolean> => {
-    if (!eventId || !user) return false;
-    
-    console.log(`EventSidePanel: Handling RSVP for event ${eventId} with status ${status}`);
-    console.log(`EventSidePanel: Current RSVP status before action: ${event?.rsvp_status}`);
-    
-    try {
-      // Determine new status based on toggle behavior
-      let newStatus: 'Going' | 'Interested' | null = status;
-      if (event?.rsvp_status === status) {
-        // If clicking the same status, toggle it off
-        newStatus = null;
-      }
-      
-      // Optimistically update the cache
-      updateEventRsvpStatus(newStatus);
-      
-      // Perform the actual RSVP operation
-      const success = await handleRsvp(status);
-      
-      if (success) {
-        console.log(`EventSidePanel: RSVP successful, new status: ${newStatus}`);
-        // Refresh the data to ensure consistency
-        await refreshEventData();
-      } else {
-        console.log('EventSidePanel: RSVP failed, reverting cache');
-        // Revert the optimistic update if the operation failed
-        updateEventRsvpStatus(event?.rsvp_status || null);
-      }
-      
-      return success;
-    } catch (error) {
-      console.error('EventSidePanel: Error in RSVP handler:', error);
-      // Revert the optimistic update if there was an error
-      updateEventRsvpStatus(event?.rsvp_status || null);
-      return false;
+  useEffect(() => {
+    // Disable scrolling when the side panel is open
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
     }
+
+    // Cleanup when the component unmounts
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isOpen]);
+
+  const handleRsvpClick = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    if (!eventId) return false;
+    return await handleRsvp(eventId, status);
   };
 
-  // Close panel with escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
+  if (eventLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
 
-    if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden';
-    }
-
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
+  if (eventError) {
+    return (
+      <div className="flex items-center justify-center h-full text-red-500">
+        Error: {eventError.message}
+      </div>
+    );
+  }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/50" onClick={onClose}>
+    <>
+      {/* Backdrop */}
       <div 
-        className="fixed right-0 top-0 h-full w-full max-w-4xl bg-white shadow-xl overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="fixed top-4 right-4 z-10 p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors"
-        >
-          <X className="h-5 w-5" />
-        </button>
-
+        className={cn(
+          "fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300",
+          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        )}
+        onClick={onClose}
+      />
+      
+      {/* Side Panel */}
+      <div className={cn(
+        "fixed top-0 right-0 h-full w-full sm:w-[500px] md:w-[600px] lg:w-[700px] bg-white shadow-2xl z-50 transition-transform duration-300 ease-in-out overflow-hidden flex flex-col",
+        isOpen ? "translate-x-0" : "translate-x-full"
+      )}>
+        {/* Header */}
+        <div className="px-6 py-4 border-b">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Event Details</h2>
+            <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+        
         {/* Content */}
-        {isLoading && (
-          <div className="p-8 space-y-4">
-            <Skeleton className="h-64 w-full" />
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-2/3" />
-          </div>
-        )}
-
-        {error && (
-          <div className="p-8">
-            <Alert variant="destructive">
-              <AlertDescription>
-                Failed to load event details. Please try again.
-              </AlertDescription>
-            </Alert>
-          </div>
-        )}
-
-        {event && !isLoading && (
-          <EventDetailContent
-            event={event}
-            attendees={attendees}
-            onRsvp={handleRsvpWithRefresh}
-            isRsvpLoading={rsvpLoading}
-            isOwner={event.creator?.id === user?.id}
-          />
-        )}
+        <div className="flex-1 overflow-y-auto">
+          {event && (
+            <EventDetailContent
+              event={event}
+              attendees={attendees}
+              onRsvp={handleRsvpClick}
+              isRsvpLoading={loadingEventId === eventId}
+            />
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };

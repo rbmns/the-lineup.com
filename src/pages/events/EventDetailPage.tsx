@@ -15,12 +15,11 @@ const EventDetailPage: React.FC = () => {
   // Automatically scroll to top when navigating to event detail page
   useScrollToTop();
   
-  // Ensure we refresh the event data when navigating to detail page
+  // Ensure we have fresh event data when navigating to detail page
   useEffect(() => {
     if (eventId && user?.id) {
-      // Invalidate and refetch event data to ensure we have the latest RSVP status
-      queryClient.invalidateQueries({ queryKey: ['event', eventId] });
-      queryClient.invalidateQueries({ queryKey: ['events', user.id] });
+      // Refetch event data to ensure we have the latest RSVP status
+      queryClient.refetchQueries({ queryKey: ['event', eventId] });
     }
   }, [eventId, user?.id, queryClient]);
   

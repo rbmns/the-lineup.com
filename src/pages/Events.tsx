@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
 import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayout';
@@ -7,15 +8,12 @@ import { useVenueAreas } from '@/hooks/useVenueAreas';
 import { EventsAdvancedSection } from '@/components/events/page-sections/EventsAdvancedSection';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
-import { useEventRSVP } from '@/hooks/useEventRSVP';
-import { useQueryClient } from '@tanstack/react-query';
-import { toast } from '@/hooks/use-toast';
+import { useUnifiedRsvp } from '@/hooks/useUnifiedRsvp';
 
 const Events = () => {
   const isMobile = useIsMobile();
   const { user } = useAuth();
-  const queryClient = useQueryClient();
-  const { updateRSVP } = useEventRSVP();
+  const { handleRsvp, loadingEventId } = useUnifiedRsvp();
 
   const {
     events,
@@ -64,48 +62,6 @@ const Events = () => {
   };
 
   const filteredEventsCount = events?.length || 0;
-
-  // Use the existing RSVP system
-  const handleRsvp = async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
-    if (!user?.id) {
-      toast({
-        title: "Sign in required",
-        description: "Please sign in to RSVP to events",
-        variant: "destructive"
-      });
-      return false;
-    }
-
-    try {
-      console.log(`Handling RSVP: User ${user.id}, Event ${eventId}, Status ${status}`);
-      
-      const success = await updateRSVP(user.id, eventId, status);
-      
-      if (success) {
-        // The updateRSVP function already handles cache invalidation
-        toast({
-          title: "RSVP updated",
-          description: `You are now ${status.toLowerCase()} to this event`
-        });
-        return true;
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to update RSVP. Please try again.",
-          variant: "destructive"
-        });
-        return false;
-      }
-    } catch (error) {
-      console.error("Error RSVPing to event:", error);
-      toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive"
-      });
-      return false;
-    }
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -162,7 +118,7 @@ const Events = () => {
               isFilterLoading={false} 
               user={user} 
               enhancedHandleRsvp={handleRsvp} 
-              loadingEventId={undefined}
+              loadingEventId={loadingEventId}
             />
           </div>
         </div>
