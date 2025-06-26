@@ -69,9 +69,10 @@ const Events = () => {
   const filteredEventsCount = events?.length || 0;
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="bg-[#F9F3E9] py-12 sm:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div className="min-h-screen">
+      {/* Header Section - No background styling */}
+      <div className="max-w-screen-lg mx-auto px-6 py-12 sm:py-16">
+        <div className="text-center">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#005F73] mb-4 leading-tight">
             Discover <span className="text-[#2A9D8F]">Events</span>
           </h1>
@@ -81,7 +82,8 @@ const Events = () => {
         </div>
       </div>
 
-      <EventsPageLayout>
+      {/* Content - No wrapper containers */}
+      <div className="max-w-screen-lg mx-auto px-6">
         <div className="space-y-4 sm:space-y-6">
           {/* Vibe Filter */}
           <div className="w-full">
@@ -127,7 +129,7 @@ const Events = () => {
             />
           </div>
         </div>
-      </EventsPageLayout>
+      </div>
     </div>
   );
 };

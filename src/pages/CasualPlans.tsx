@@ -23,10 +23,10 @@ const CasualPlans = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-b from-[#F9F3E9] to-white py-12 sm:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div className="min-h-screen">
+      {/* Header Section - No background styling */}
+      <div className="max-w-screen-lg mx-auto px-6 py-12 sm:py-16">
+        <div className="text-center">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#005F73] mb-4 leading-tight">
             Casual <span className="text-[#2A9D8F]">Plans</span>
           </h1>
@@ -46,10 +46,10 @@ const CasualPlans = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-screen-lg mx-auto px-6 py-8">
         {/* Login prompt for non-authenticated users */}
         {!isAuthenticated && (
-          <div className="bg-white border border-[#2A9D8F]/20 rounded-xl p-6 mb-8 shadow-sm">
+          <div className="border border-[#2A9D8F]/20 rounded-xl p-6 mb-8">
             <h3 className="text-lg font-semibold text-[#005F73] mb-2">
               Join the community to see full details
             </h3>
@@ -78,7 +78,7 @@ const CasualPlans = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className="bg-white rounded-xl border border-gray-200 h-64 shadow-sm"></div>
+                <div className="border border-gray-200 rounded-xl h-64"></div>
               </div>
             ))}
           </div>

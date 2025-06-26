@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFriendData } from '@/hooks/useFriendData';
@@ -133,77 +134,71 @@ export const FriendsMainContent: React.FC = () => {
   const suggestedFriendsCount = suggestedFriends?.length || 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <FriendsHeader />
       
-      <div className="px-4">
+      <div className="max-w-screen-lg mx-auto px-6">
         <FriendsSearchSection 
           searchQuery={searchQuery}
           onSearchChange={handleSearchChange}
         />
       </div>
 
-      {/* Friends Content */}
-      <div className="container mx-auto px-4 pb-6 md:pb-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg shadow-sm p-3 md:p-6">
-            <FriendsTabsNew
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              pendingRequestsCount={pendingRequestsCount}
-              suggestedFriendsCount={suggestedFriendsCount}
-              allFriendsContent={
-                <FriendsTabContent
-                  friends={filteredFriends}
-                  loading={friendsLoading}
-                  requests={requests || []}
-                  onAcceptRequest={onAcceptRequest}
-                  onDeclineRequest={onDeclineRequest}
-                  showFriendRequests={false}
-                  // Remove searchQuery and onSearchChange to hide the duplicate search bar
-                  searchQuery={undefined}
-                  onSearchChange={undefined}
-                />
-              }
-              suggestionsContent={
-                <SuggestedFriendsTabContent
-                  suggestedFriends={suggestedFriends}
-                  loading={suggestedLoading}
-                  onAddFriend={handleAddSuggestedFriend}
-                  onDismiss={handleDismissSuggestion}
-                  currentUserId={user?.id}
-                  friendIds={friendIds}
-                />
-              }
-              requestsContent={
-                <FriendsTabContent
-                  friends={[]}
-                  loading={requestsLoading}
-                  requests={requests || []}
-                  onAcceptRequest={onAcceptRequest}
-                  onDeclineRequest={onDeclineRequest}
-                  showFriendRequests={true}
-                  // Remove searchQuery and onSearchChange to hide the duplicate search bar
-                  searchQuery={undefined}
-                  onSearchChange={undefined}
-                />
-              }
-              eventsContent={
-                <FriendsEventsTabContent 
-                  friendIds={friendIds}
-                  currentUserId={user.id}
-                  friends={friends || []}
-                />
-              }
-              casualPlansContent={
-                <FriendsCasualPlansTabContent 
-                  friendIds={friendIds}
-                  currentUserId={user.id}
-                />
-              }
+      {/* Friends Content - No wrapper containers */}
+      <div className="max-w-screen-lg mx-auto px-6 pb-6 md:pb-8">
+        <FriendsTabsNew
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          pendingRequestsCount={pendingRequestsCount}
+          suggestedFriendsCount={suggestedFriendsCount}
+          allFriendsContent={
+            <FriendsTabContent
+              friends={filteredFriends}
+              loading={friendsLoading}
+              requests={requests || []}
+              onAcceptRequest={onAcceptRequest}
+              onDeclineRequest={onDeclineRequest}
+              showFriendRequests={false}
+              searchQuery={undefined}
+              onSearchChange={undefined}
             />
-          </div>
-        </div>
+          }
+          suggestionsContent={
+            <SuggestedFriendsTabContent
+              suggestedFriends={suggestedFriends}
+              loading={suggestedLoading}
+              onAddFriend={handleAddSuggestedFriend}
+              onDismiss={handleDismissSuggestion}
+              currentUserId={user?.id}
+              friendIds={friendIds}
+            />
+          }
+          requestsContent={
+            <FriendsTabContent
+              friends={[]}
+              loading={requestsLoading}
+              requests={requests || []}
+              onAcceptRequest={onAcceptRequest}
+              onDeclineRequest={onDeclineRequest}
+              showFriendRequests={true}
+              searchQuery={undefined}
+              onSearchChange={undefined}
+            />
+          }
+          eventsContent={
+            <FriendsEventsTabContent 
+              friendIds={friendIds}
+              currentUserId={user.id}
+              friends={friends || []}
+            />
+          }
+          casualPlansContent={
+            <FriendsCasualPlansTabContent 
+              friendIds={friendIds}
+              currentUserId={user.id}
+            />
+          }
+        />
       </div>
     </div>
   );
