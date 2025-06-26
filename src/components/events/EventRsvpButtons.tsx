@@ -26,33 +26,32 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   variant = 'default',
   className
 }) => {
+  const [localStatus, setLocalStatus] = useState<RsvpStatus>(currentStatus);
   const [activeButton, setActiveButton] = useState<'Going' | 'Interested' | null>(null);
   const [internalLoading, setInternalLoading] = useState(false);
 
-  // Reset active button when external loading state changes or current status changes
+  // Sync local status with prop changes
   useEffect(() => {
-    if (!isLoading) {
+    setLocalStatus(currentStatus);
+  }, [currentStatus]);
+
+  // Reset active button when loading completes
+  useEffect(() => {
+    if (!isLoading && !internalLoading) {
       setActiveButton(null);
     }
-  }, [isLoading, currentStatus]);
+  }, [isLoading, internalLoading]);
 
-  const isGoing = currentStatus === 'Going';
-  const isInterested = currentStatus === 'Interested';
+  const isGoing = localStatus === 'Going';
+  const isInterested = localStatus === 'Interested';
 
-  // Enhanced RSVP handler with improved state management
+  // Enhanced RSVP handler with optimistic updates
   const handleRsvp = async (status: 'Going' | 'Interested', e?: React.MouseEvent) => {
     // Comprehensive event isolation
     if (e) {
       e.stopPropagation();
       e.preventDefault();
       e.nativeEvent.stopImmediatePropagation();
-      
-      // Mark this event as explicitly handled
-      const target = e.currentTarget as HTMLElement;
-      if (target) {
-        target.setAttribute('data-event-handled', 'true');
-        target.setAttribute('data-rsvp-action', status);
-      }
     }
     
     if (isLoading || internalLoading) return false;
@@ -61,12 +60,23 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       setActiveButton(status);
       setInternalLoading(true);
       
+      // Optimistic update - immediately update local state
+      const newStatus = localStatus === status ? null : status;
+      setLocalStatus(newStatus);
+      
       // Call the provided onRsvp handler
       const result = await onRsvp(status);
+      
+      // If the operation failed, revert the optimistic update
+      if (!result) {
+        setLocalStatus(currentStatus);
+      }
       
       return result;
     } catch (error) {
       console.error('Error in RSVP handler:', error);
+      // Revert optimistic update on error
+      setLocalStatus(currentStatus);
       return false;
     } finally {
       // Add slight delay for better UX
@@ -78,7 +88,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
 
   // If only showing status
   if (showStatusOnly) {
-    if (!currentStatus) return null;
+    if (!localStatus) return null;
     return (
       <div className="text-sm font-medium">
         {isGoing && (
@@ -110,7 +120,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       }}
     >
       <DefaultRsvpButtons
-        currentStatus={currentStatus}
+        currentStatus={localStatus}
         onRsvp={handleRsvp}
         isLoading={isLoading || internalLoading}
         className={className}

@@ -11,13 +11,13 @@ export const useUnifiedRsvp = () => {
   const { user } = useAuth();
 
   const updateEventCaches = useCallback((eventId: string, newStatus: 'Going' | 'Interested' | null) => {
-    // Update individual event cache
+    // Update individual event cache immediately
     queryClient.setQueryData(['event', eventId], (oldData: any) => {
       if (!oldData) return oldData;
       return { ...oldData, rsvp_status: newStatus };
     });
 
-    // Update events list cache
+    // Update events list cache immediately
     queryClient.setQueriesData({ queryKey: ['events'] }, (oldData: any) => {
       if (!oldData || !Array.isArray(oldData)) return oldData;
       
@@ -29,11 +29,14 @@ export const useUnifiedRsvp = () => {
       });
     });
 
-    // Update user events cache
-    if (user?.id) {
-      queryClient.invalidateQueries({ queryKey: ['userEvents', user.id] });
-      queryClient.invalidateQueries({ queryKey: ['event-attendees', eventId] });
-    }
+    // Force a re-render by invalidating queries after a short delay
+    setTimeout(() => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      if (user?.id) {
+        queryClient.invalidateQueries({ queryKey: ['userEvents', user.id] });
+        queryClient.invalidateQueries({ queryKey: ['event-attendees', eventId] });
+      }
+    }, 100);
   }, [queryClient, user?.id]);
 
   const handleRsvp = useCallback(async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
@@ -96,7 +99,7 @@ export const useUnifiedRsvp = () => {
         if (insertError) throw insertError;
       }
 
-      // Update all relevant caches
+      // Update all relevant caches immediately
       updateEventCaches(eventId, newStatus);
 
       toast({
