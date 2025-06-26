@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Check, Heart, Loader2 } from 'lucide-react';
@@ -27,6 +27,12 @@ export const DefaultRsvpButtons: React.FC<DefaultRsvpButtonsProps> = ({
   variant = 'default'
 }) => {
   const [localStatus, setLocalStatus] = useState<RsvpStatus>(currentStatus);
+
+  // Sync local state with prop changes
+  useEffect(() => {
+    setLocalStatus(currentStatus);
+  }, [currentStatus]);
+
   const goingLoading = isLoading && activeButton === 'Going';
   const interestedLoading = isLoading && activeButton === 'Interested';
 
@@ -34,16 +40,10 @@ export const DefaultRsvpButtons: React.FC<DefaultRsvpButtonsProps> = ({
     e.stopPropagation();
     e.preventDefault();
     
-    // Toggle off if clicking the same button
-    const updatedStatus = localStatus === status ? null : status;
-    setLocalStatus(updatedStatus);
-    
     const result = await onRsvp(status);
     
-    // Revert if failed
-    if (!result) {
-      setLocalStatus(currentStatus);
-    }
+    // The parent component will handle the state update through currentStatus prop
+    // so we don't need to update localStatus here
   };
 
   // Size-specific classes
