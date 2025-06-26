@@ -43,7 +43,9 @@ class RsvpMonitor {
       const startTime = this.operationStartTimes.get(event.eventId);
       if (startTime) {
         const duration = Date.now() - startTime;
-        this.updateMetrics(event.success, duration);
+        // Check if the event has success property (type guard)
+        const success = event.type === 'rsvp:completed' && 'success' in event ? event.success : true;
+        this.updateMetrics(success, duration);
         this.operationStartTimes.delete(event.eventId);
       }
     });
@@ -56,7 +58,9 @@ class RsvpMonitor {
         this.operationStartTimes.delete(event.eventId);
       }
       
-      console.warn('⚠️  RSVP Error Detected:', event.error);
+      // Check if the event has error property (type guard)
+      const error = event.type === 'rsvp:error' && 'error' in event ? event.error : 'Unknown error';
+      console.warn('⚠️  RSVP Error Detected:', error);
     });
   }
 
