@@ -44,14 +44,14 @@ const LeftSidebar: React.FC = () => {
               key={item.path}
               to={item.path}
               className={cn(
-                "flex flex-col items-center justify-center py-3 px-3 transition-colors",
+                "flex flex-col items-center justify-center py-2 px-2 transition-colors rounded-md",
                 isActive
-                  ? "text-clay border-l-2 border-clay pl-2"
-                  : "text-midnight hover:text-clay"
+                  ? "text-clay bg-sage/30"
+                  : "text-midnight hover:text-clay hover:bg-sage/20"
               )}
             >
               <Icon className="h-4 w-4 mb-1" />
-              <span className="font-mono text-xs leading-tight text-midnight">
+              <span className="font-mono text-xs leading-tight">
                 {item.label}
               </span>
             </Link>
@@ -63,7 +63,7 @@ const LeftSidebar: React.FC = () => {
 
   return (
     <div className="h-full flex flex-col w-20 bg-coconut">
-      <div className="flex flex-col flex-1 items-start justify-start px-6 py-6 space-y-4 w-full">
+      <div className="flex flex-col flex-1 items-center justify-start px-4 py-6 space-y-3 w-full">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
@@ -73,14 +73,14 @@ const LeftSidebar: React.FC = () => {
               key={item.path}
               to={item.path}
               className={cn(
-                "flex flex-col items-center justify-center w-full transition-colors",
+                "flex flex-col items-center justify-center w-full py-2 px-2 transition-colors rounded-md",
                 isActive
-                  ? "text-clay border-l-2 border-clay pl-2"
-                  : "text-midnight hover:text-clay"
+                  ? "text-clay bg-sage/30"
+                  : "text-midnight hover:text-clay hover:bg-sage/20"
               )}
             >
-              <Icon className="h-5 w-5 mb-2" />
-              <span className="font-mono text-sm text-center leading-tight text-midnight">
+              <Icon className="h-4 w-4 mb-1" />
+              <span className="font-mono text-xs text-center leading-tight">
                 {item.label}
               </span>
             </Link>

@@ -29,9 +29,9 @@ export const HomeHeroSection: React.FC = () => {
   };
 
   return (
-    <section className="relative min-h-[100svh] flex flex-col justify-between overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0 z-0">
+    <section className="relative min-h-[100svh] flex flex-col justify-between overflow-hidden w-full">
+      {/* Background Image - Full width */}
+      <div className="absolute inset-0 z-0 w-full">
         <img
           src="/lovable-uploads/51db736f-9219-471a-806c-7db86c226fd1.png"
           alt="Beach sunset background"
@@ -43,7 +43,7 @@ export const HomeHeroSection: React.FC = () => {
       <div className="absolute inset-0 z-10 bg-vibrant-coral/20"></div>
 
       {/* Content - Optimized for mobile viewport */}
-      <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex-1 flex flex-col justify-center pt-4 pb-8">
+      <div className="relative z-20 w-full px-4 sm:px-6 lg:px-12 text-center flex-1 flex flex-col justify-center pt-4 pb-8">
         {/* Main heading - Responsive text sizing */}
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight drop-shadow-lg">
           Find events and plans that fit your vibe
