@@ -2,7 +2,6 @@
 import { useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 
 export const useUnifiedRsvp = () => {
@@ -113,11 +112,7 @@ export const useUnifiedRsvp = () => {
 
   const handleRsvp = useCallback(async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!user?.id) {
-      toast({
-        title: "Sign in required",
-        description: "Please sign in to RSVP to events",
-        variant: "destructive"
-      });
+      console.log("User not authenticated for RSVP");
       return false;
     }
 
@@ -182,27 +177,9 @@ export const useUnifiedRsvp = () => {
       // Update all relevant caches immediately and synchronously
       updateEventCaches(eventId, newStatus);
 
-      // Show appropriate toast message
-      if (actionTaken === 'removed') {
-        toast({
-          title: "RSVP removed",
-          description: "You are no longer attending this event"
-        });
-      } else {
-        toast({
-          title: "RSVP updated",
-          description: `You are now ${newStatus?.toLowerCase()} to this event`
-        });
-      }
-
       return true;
     } catch (error) {
       console.error("Error updating RSVP:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update RSVP. Please try again.",
-        variant: "destructive"
-      });
       return false;
     } finally {
       setLoadingEventId(null);
