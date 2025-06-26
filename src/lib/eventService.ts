@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { processEventsData } from '@/utils/eventProcessorUtils';
@@ -11,28 +10,18 @@ import { AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
  */
 export const fetchEventById = async (eventId: string, userId: string | undefined = undefined): Promise<Event | null> => {
   try {
-    // Build the base query
-    let rsvpSelect = 'event_rsvps(id, user_id, status)';
+    console.log(`Fetching event ${eventId} with user ${userId}`);
     
-    // If we have a user ID, filter RSVPs to only include the current user's RSVP
-    if (userId) {
-      rsvpSelect = `event_rsvps!inner(id, user_id, status)`;
-    }
-
+    // Build the base query - use left join for RSVPs to avoid filtering out events
     const query = supabase
       .from('events')
       .select(`
         *,
         venues!events_venue_id_fkey(*),
-        ${rsvpSelect}
+        event_rsvps(id, user_id, status)
       `)
       .eq('id', eventId)
       .eq('status', 'published'); // Only fetch published events
-
-    // If we have a user ID, filter the RSVPs to only include this user's RSVP
-    if (userId) {
-      query.eq('event_rsvps.user_id', userId);
-    }
 
     const { data, error } = await query.single();
 
