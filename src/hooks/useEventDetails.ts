@@ -11,7 +11,7 @@ export const useEventDetails = (eventId: string | null) => {
   const queryClient = useQueryClient();
   const { getUserEventRSVP } = useEventRSVP();
 
-  // Fetch event details
+  // Fetch event details with consistent RSVP status
   const {
     data: event,
     isLoading: eventLoading,
@@ -35,7 +35,7 @@ export const useEventDetails = (eventId: string | null) => {
       return eventData;
     },
     enabled: !!eventId,
-    staleTime: 1000 * 30, // 30 seconds - shorter to ensure fresh data
+    staleTime: 1000 * 10, // Reduced stale time for fresher data
   });
 
   // Fetch event attendees
@@ -50,36 +50,23 @@ export const useEventDetails = (eventId: string | null) => {
     staleTime: 1000 * 60 * 2, // 2 minutes
   });
 
-  // Listen for RSVP changes in other parts of the app
+  // Listen for RSVP cache updates
   useEffect(() => {
     if (!eventId || !user?.id) return;
 
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === `rsvp_change_${eventId}`) {
-        console.log('RSVP change detected, refreshing event data...');
-        refetchEvent();
-        refetchAttendees();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Also listen for custom events
-    const handleRsvpChange = (e: CustomEvent) => {
+    const handleRsvpCacheUpdate = (e: CustomEvent) => {
       if (e.detail.eventId === eventId) {
-        console.log('Custom RSVP change event detected, refreshing...');
-        refetchEvent();
-        refetchAttendees();
+        console.log('RSVP cache update detected for event:', eventId);
+        // Don't refetch, just rely on the cache update
       }
     };
 
-    window.addEventListener('rsvpChanged', handleRsvpChange as EventListener);
+    window.addEventListener('rsvpCacheUpdated', handleRsvpCacheUpdate as EventListener);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('rsvpChanged', handleRsvpChange as EventListener);
+      window.removeEventListener('rsvpCacheUpdated', handleRsvpCacheUpdate as EventListener);
     };
-  }, [eventId, user?.id, refetchEvent, refetchAttendees]);
+  }, [eventId, user?.id]);
 
   // Helper function to refresh event data after RSVP changes
   const refreshEventData = async () => {
@@ -105,9 +92,8 @@ export const useEventDetails = (eventId: string | null) => {
       };
     });
 
-    // Broadcast the change to other tabs/components
-    localStorage.setItem(`rsvp_change_${eventId}`, Date.now().toString());
-    window.dispatchEvent(new CustomEvent('rsvpChanged', { 
+    // Broadcast the change to other components
+    window.dispatchEvent(new CustomEvent('rsvpCacheUpdated', { 
       detail: { eventId, newStatus } 
     }));
   };

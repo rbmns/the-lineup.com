@@ -11,32 +11,91 @@ export const useUnifiedRsvp = () => {
   const { user } = useAuth();
 
   const updateEventCaches = useCallback((eventId: string, newStatus: 'Going' | 'Interested' | null) => {
+    console.log(`Updating cache for event ${eventId} with status: ${newStatus}`);
+    
     // Update individual event cache immediately
     queryClient.setQueryData(['event', eventId], (oldData: any) => {
       if (!oldData) return oldData;
+      console.log(`Updated individual event cache for ${eventId}`);
       return { ...oldData, rsvp_status: newStatus };
     });
 
-    // Update events list cache immediately
+    // Update events list cache immediately - handle multiple formats
     queryClient.setQueriesData({ queryKey: ['events'] }, (oldData: any) => {
+      if (!oldData) return oldData;
+      
+      // Handle array format
+      if (Array.isArray(oldData)) {
+        return oldData.map((event: any) => {
+          if (event.id === eventId) {
+            console.log(`Updated event in array cache: ${eventId}`);
+            return { ...event, rsvp_status: newStatus };
+          }
+          return event;
+        });
+      }
+      
+      // Handle object format with data property
+      if (oldData.data && Array.isArray(oldData.data)) {
+        return {
+          ...oldData,
+          data: oldData.data.map((event: any) => {
+            if (event.id === eventId) {
+              console.log(`Updated event in object.data cache: ${eventId}`);
+              return { ...event, rsvp_status: newStatus };
+            }
+            return event;
+          })
+        };
+      }
+      
+      return oldData;
+    });
+
+    // Update filtered events cache
+    queryClient.setQueriesData({ queryKey: ['filtered-events'] }, (oldData: any) => {
       if (!oldData || !Array.isArray(oldData)) return oldData;
       
       return oldData.map((event: any) => {
         if (event.id === eventId) {
+          console.log(`Updated event in filtered cache: ${eventId}`);
           return { ...event, rsvp_status: newStatus };
         }
         return event;
       });
     });
 
-    // Force a re-render by invalidating queries after a short delay
-    setTimeout(() => {
-      queryClient.invalidateQueries({ queryKey: ['events'] });
-      if (user?.id) {
-        queryClient.invalidateQueries({ queryKey: ['userEvents', user.id] });
-        queryClient.invalidateQueries({ queryKey: ['event-attendees', eventId] });
-      }
-    }, 100);
+    // Update user events cache
+    if (user?.id) {
+      queryClient.setQueryData(['userEvents', user.id], (oldData: any) => {
+        if (!oldData) return oldData;
+        
+        const updateEventsList = (events: any[]) => {
+          if (!events || !Array.isArray(events)) return events;
+          return events.map((event: any) => {
+            if (event.id === eventId) {
+              console.log(`Updated event in user events cache: ${eventId}`);
+              return { ...event, rsvp_status: newStatus };
+            }
+            return event;
+          });
+        };
+
+        return {
+          ...oldData,
+          upcomingEvents: updateEventsList(oldData.upcomingEvents),
+          pastEvents: updateEventsList(oldData.pastEvents)
+        };
+      });
+    }
+
+    // Synchronously invalidate specific queries to ensure fresh data
+    queryClient.invalidateQueries({ queryKey: ['event-attendees', eventId] });
+    
+    // Broadcast cache update to other components
+    window.dispatchEvent(new CustomEvent('rsvpCacheUpdated', { 
+      detail: { eventId, newStatus } 
+    }));
   }, [queryClient, user?.id]);
 
   const handleRsvp = useCallback(async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {
@@ -99,7 +158,7 @@ export const useUnifiedRsvp = () => {
         if (insertError) throw insertError;
       }
 
-      // Update all relevant caches immediately
+      // Update all relevant caches immediately and synchronously
       updateEventCaches(eventId, newStatus);
 
       toast({

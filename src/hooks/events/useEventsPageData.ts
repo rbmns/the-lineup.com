@@ -34,11 +34,11 @@ export const useEventsPageData = () => {
     updateLocationPreference(areaId);
   };
 
-  // Fetch events
+  // Fetch events with RSVP status for authenticated users
   const { data: eventsData, isLoading: eventsLoading } = useQuery({
-    queryKey: ['events'],
+    queryKey: ['events', user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('events')
         .select(`
           *,
@@ -53,13 +53,38 @@ export const useEventsPageData = () => {
         .eq('status', 'published')
         .order('start_date', { ascending: true });
 
+      const { data, error } = await query;
+
       if (error) {
         console.error('Error fetching events:', error);
         throw error;
       }
 
-      return data;
+      // If user is authenticated, fetch RSVP status for each event
+      if (user?.id && data) {
+        const eventIds = data.map(event => event.id);
+        
+        if (eventIds.length > 0) {
+          const { data: rsvpData } = await supabase
+            .from('event_rsvps')
+            .select('event_id, status')
+            .eq('user_id', user.id)
+            .in('event_id', eventIds);
+
+          // Map RSVP status to events
+          return data.map(event => {
+            const rsvp = rsvpData?.find(r => r.event_id === event.id);
+            return {
+              ...event,
+              rsvp_status: rsvp?.status || null
+            };
+          });
+        }
+      }
+
+      return data || [];
     },
+    staleTime: 1000 * 30, // 30 seconds for fresh data
   });
 
   // Get available venues for filtering
