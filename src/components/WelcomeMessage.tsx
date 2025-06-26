@@ -22,7 +22,7 @@ export const WelcomeMessage = () => {
           Join the flow and discover local events, connect with people around you, and make the most of your experiences.
         </p>
         <div className="flex justify-center">
-          <Button asChild variant="dark">
+          <Button asChild variant="primary">
             <Link to="/profile/edit">Complete Your Profile</Link>
           </Button>
         </div>

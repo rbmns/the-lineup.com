@@ -30,7 +30,7 @@ export const AdvancedFiltersButton: React.FC<AdvancedFiltersButtonProps> = ({
     return (
       <div className={className}>
         <Button 
-          variant={hasActiveFilters ? "dark" : "outline"} 
+          variant={hasActiveFilters ? "primary" : "outline"} 
           size="sm"
           radius="sm"
           onClick={() => onOpen && onOpen(!isOpen)}
@@ -55,7 +55,7 @@ export const AdvancedFiltersButton: React.FC<AdvancedFiltersButtonProps> = ({
     <Popover open={isOpen} onOpenChange={onOpen}>
       <PopoverTrigger asChild>
         <Button 
-          variant={hasActiveFilters ? "dark" : "outline"} 
+          variant={hasActiveFilters ? "primary" : "outline"} 
           size="sm"
           radius="sm"
           className={cn(
