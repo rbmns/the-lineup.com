@@ -1,9 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Check, Star, Loader2 } from 'lucide-react';
-import { MinimalRsvpButtons } from './rsvp/MinimalRsvpButtons';
+import { Check, Heart, Loader2 } from 'lucide-react';
 import { DefaultRsvpButtons } from './rsvp/DefaultRsvpButtons';
 
 export type RsvpStatus = 'Going' | 'Interested' | null;
@@ -15,6 +13,7 @@ interface EventRsvpButtonsProps {
   isLoading?: boolean;
   showStatusOnly?: boolean;
   size?: 'sm' | 'default' | 'lg';
+  variant?: 'default' | 'subtle' | 'outline';
   className?: string;
 }
 
@@ -24,6 +23,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   isLoading = false,
   showStatusOnly = false,
   size = 'default',
+  variant = 'default',
   className
 }) => {
   const [activeButton, setActiveButton] = useState<'Going' | 'Interested' | null>(null);
@@ -76,34 +76,20 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     }
   };
 
-  // If minimal UI is requested, use the compact button version
-  if (size === 'sm') {
-    return (
-      <DefaultRsvpButtons
-        currentStatus={currentStatus}
-        onRsvp={handleRsvp}
-        isLoading={isLoading || internalLoading}
-        className={className}
-        activeButton={activeButton}
-        size="sm"
-      />
-    );
-  }
-
   // If only showing status
   if (showStatusOnly) {
     if (!currentStatus) return null;
     return (
       <div className="text-sm font-medium">
         {isGoing && (
-          <span className="flex items-center text-green-600">
+          <span className="flex items-center text-[#005F73]">
             <Check className="h-3 w-3 mr-1" />
             Going
           </span>
         )}
         {isInterested && (
-          <span className="flex items-center text-blue-600">
-            <Star className="h-3 w-3 mr-1" />
+          <span className="flex items-center text-[#EDC46A]">
+            <Heart className="h-3 w-3 mr-1" />
             Interested
           </span>
         )}
@@ -111,7 +97,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     );
   }
 
-  // Use DefaultRsvpButtons for default and larger sizes
+  // Use DefaultRsvpButtons for all cases
   return (
     <div 
       className={cn('', className)} 
@@ -129,7 +115,8 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         isLoading={isLoading || internalLoading}
         className={className}
         activeButton={activeButton}
-        size={size === 'lg' ? 'lg' : 'default'}
+        size={size}
+        variant={variant}
       />
     </div>
   );

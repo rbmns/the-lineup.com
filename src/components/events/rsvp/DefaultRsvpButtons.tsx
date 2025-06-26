@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Check, Star, Loader2 } from 'lucide-react';
+import { Check, Heart, Loader2 } from 'lucide-react';
 
 export type RsvpStatus = 'Going' | 'Interested' | null;
 export type RsvpHandler = (status: 'Going' | 'Interested') => Promise<boolean>;
@@ -14,6 +14,7 @@ interface DefaultRsvpButtonsProps {
   className?: string;
   activeButton?: 'Going' | 'Interested' | null;
   size?: 'sm' | 'default' | 'lg';
+  variant?: 'default' | 'subtle' | 'outline';
 }
 
 export const DefaultRsvpButtons: React.FC<DefaultRsvpButtonsProps> = ({
@@ -22,66 +23,130 @@ export const DefaultRsvpButtons: React.FC<DefaultRsvpButtonsProps> = ({
   isLoading = false,
   className,
   activeButton,
-  size = 'default'
+  size = 'default',
+  variant = 'default'
 }) => {
-  const isGoing = currentStatus === 'Going';
-  const isInterested = currentStatus === 'Interested';
+  const [localStatus, setLocalStatus] = useState<RsvpStatus>(currentStatus);
   const goingLoading = isLoading && activeButton === 'Going';
   const interestedLoading = isLoading && activeButton === 'Interested';
 
   const handleRsvp = async (status: 'Going' | 'Interested', e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    await onRsvp(status);
+    
+    // Toggle off if clicking the same button
+    const updatedStatus = localStatus === status ? null : status;
+    setLocalStatus(updatedStatus);
+    
+    const result = await onRsvp(status);
+    
+    // Revert if failed
+    if (!result) {
+      setLocalStatus(currentStatus);
+    }
   };
 
-  const buttonSizeClass = size === 'sm' ? 'px-3 py-1.5 text-sm' : size === 'lg' ? 'px-6 py-3 text-base' : 'px-4 py-2 text-sm';
+  // Size-specific classes
+  const sizeClasses = {
+    sm: "text-xs py-1 px-2 gap-1",
+    default: "text-sm py-1.5 px-3 gap-1.5",
+    lg: "text-base py-2 px-4 gap-2",
+  };
+
+  // Variant-specific classes
+  const getVariantClasses = (buttonType: 'Going' | 'Interested') => {
+    const isActive = localStatus === buttonType;
+
+    if (variant === 'default') {
+      if (buttonType === 'Going') {
+        return isActive
+          ? "bg-[#005F73] text-white hover:bg-[#005F73]/90"
+          : "bg-[#F9F3E9] hover:bg-[#F9F3E9]/80 text-[#005F73]";
+      } else {
+        return isActive
+          ? "bg-[#EDC46A] text-white hover:bg-[#EDC46A]/90"
+          : "bg-[#F9F3E9] hover:bg-[#F9F3E9]/80 text-[#005F73]";
+      }
+    } else if (variant === 'subtle') {
+      if (buttonType === 'Going') {
+        return isActive
+          ? "bg-[#005F73]/15 text-[#005F73] hover:bg-[#005F73]/20"
+          : "bg-[#F4E7D3] hover:bg-[#F9F3E9] text-[#005F73]";
+      } else {
+        return isActive
+          ? "bg-[#EDC46A]/15 text-[#EDC46A] hover:bg-[#EDC46A]/20"
+          : "bg-[#F4E7D3] hover:bg-[#F9F3E9] text-[#005F73]";
+      }
+    } else {
+      // outline variant
+      if (buttonType === 'Going') {
+        return isActive
+          ? "border-[#005F73] bg-[#005F73]/10 text-[#005F73] hover:bg-[#005F73]/15"
+          : "border-gray-300 hover:border-[#005F73] text-[#005F73]";
+      } else {
+        return isActive
+          ? "border-[#EDC46A] bg-[#EDC46A]/10 text-[#EDC46A] hover:bg-[#EDC46A]/15"
+          : "border-gray-300 hover:border-[#EDC46A] text-[#005F73]";
+      }
+    }
+  };
 
   return (
-    <div className={cn("flex gap-2", className)} data-no-navigation="true">
+    <div className={cn("flex w-full gap-2", className)} data-no-navigation="true">
       {/* Going Button */}
-      <Button
-        variant={isGoing ? "default" : "outline"}
-        className={cn(
-          buttonSizeClass,
-          "flex items-center gap-2 transition-all duration-200",
-          isGoing 
-            ? "bg-green-600 hover:bg-green-700 text-white border-green-600" 
-            : "border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300"
-        )}
+      <button
+        type="button"
         onClick={(e) => handleRsvp('Going', e)}
         disabled={isLoading}
+        className={cn(
+          "flex flex-1 items-center justify-center rounded-md font-medium transition-all",
+          sizeClasses[size],
+          variant === "outline" ? "border" : "",
+          getVariantClasses('Going'),
+          "disabled:opacity-60 disabled:cursor-not-allowed"
+        )}
         data-no-navigation="true"
       >
         {goingLoading ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
-          <Check className="h-4 w-4" />
+          <Check 
+            size={size === "sm" ? 14 : size === "lg" ? 18 : 16}
+            className={cn(
+              "transition-transform",
+              localStatus === "Going" ? "scale-110" : "scale-100"
+            )}
+          />
         )}
         Going
-      </Button>
+      </button>
 
       {/* Interested Button */}
-      <Button
-        variant={isInterested ? "default" : "outline"}
-        className={cn(
-          buttonSizeClass,
-          "flex items-center gap-2 transition-all duration-200",
-          isInterested 
-            ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600" 
-            : "border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300"
-        )}
+      <button
+        type="button"
         onClick={(e) => handleRsvp('Interested', e)}
         disabled={isLoading}
+        className={cn(
+          "flex flex-1 items-center justify-center rounded-md font-medium transition-all",
+          sizeClasses[size],
+          variant === "outline" ? "border" : "",
+          getVariantClasses('Interested')
+        )}
         data-no-navigation="true"
       >
         {interestedLoading ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
-          <Star className="h-4 w-4" />
+          <Heart 
+            size={size === "sm" ? 14 : size === "lg" ? 18 : 16}
+            className={cn(
+              "transition-transform",
+              localStatus === "Interested" ? "scale-110" : "scale-100"
+            )}
+          />
         )}
         Interested
-      </Button>
+      </button>
     </div>
   );
 };

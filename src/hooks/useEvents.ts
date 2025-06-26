@@ -25,13 +25,13 @@ export const useEvents = (
       try {
         console.log('🔍 Fetching events for user:', userId, 'with options:', options);
         
-        // Build the query
+        // Build the query with RSVP status if user is provided
         let query = supabase
           .from('events')
           .select(`
             *,
             venues!events_venue_id_fkey(*),
-            event_rsvps(id, user_id, status)
+            event_rsvps!left(id, user_id, status)
           `)
           .order('start_date', { ascending: true })
           .order('start_time', { ascending: true });
@@ -43,6 +43,11 @@ export const useEvents = (
         } else {
           console.log('🔍 Including all event statuses');
         }
+
+        // If user is provided, filter RSVPs to only include current user's RSVPs
+        if (userId) {
+          query = query.or(`user_id.eq.${userId},user_id.is.null`, { foreignTable: 'event_rsvps' });
+        }
         
         const { data, error } = await query;
         
@@ -52,20 +57,10 @@ export const useEvents = (
         }
 
         console.log('📊 Raw events data from database:', data?.length || 0, 'events');
-        console.log('📊 Sample event statuses:', data?.slice(0, 3).map(e => ({ id: e.id, title: e.title, status: e.status })));
 
         if (!data) {
           console.log('⚠️ No data returned from query');
           return [];
-        }
-        
-        // Debug: Let's see what statuses we have in the database
-        if (data.length > 0) {
-          const statusCounts = data.reduce((acc, event) => {
-            acc[event.status || 'null'] = (acc[event.status || 'null'] || 0) + 1;
-            return acc;
-          }, {} as Record<string, number>);
-          console.log('📊 Event status distribution:', statusCounts);
         }
         
         // Now fetch creator profiles separately to avoid the foreign key conflict
@@ -84,11 +79,19 @@ export const useEvents = (
           }
         }
         
-        // Combine the data manually
-        const eventsWithCreators = data.map(event => ({
-          ...event,
-          creator: creatorsData.find(creator => creator.id === event.creator) || null
-        }));
+        // Combine the data manually and add RSVP status
+        const eventsWithCreators = data.map(event => {
+          // Find the user's RSVP status for this event
+          const userRsvp = event.event_rsvps?.find((rsvp: any) => rsvp.user_id === userId);
+          
+          return {
+            ...event,
+            creator: creatorsData.find(creator => creator.id === event.creator) || null,
+            rsvp_status: userRsvp?.status || null,
+            // Remove the event_rsvps array to avoid confusion
+            event_rsvps: undefined
+          };
+        });
         
         // Process the events data
         const processedEvents = processEventsData(eventsWithCreators, userId);
