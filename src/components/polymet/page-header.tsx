@@ -21,7 +21,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   const isMobile = useIsMobile();
   
   return (
-    <div className="relative w-full min-h-[200px] md:min-h-[250px] overflow-hidden bg-gradient-to-br from-[#005F73] via-[#2A9D8F] to-[#00B4DB] m-0 p-0">
+    <div className="relative w-full min-h-[200px] md:min-h-[250px] overflow-hidden bg-[#005F73] m-0 p-0">
       {/* Background pattern overlay */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0" style={{

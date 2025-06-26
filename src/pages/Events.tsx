@@ -40,6 +40,11 @@ const Events = () => {
 
   const { data: venueAreas = [], isLoading: areasLoading } = useVenueAreas();
 
+  // Debug logging
+  console.log('Events page - venueAreas:', venueAreas);
+  console.log('Events page - selectedLocation:', selectedLocation);
+  console.log('Events page - isLocationLoaded:', isLocationLoaded);
+
   const handleFilterChange = (filters: any) => {
     if (filters.eventTypes !== undefined) {
       setSelectedEventTypes(filters.eventTypes);
@@ -65,7 +70,7 @@ const Events = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="bg-gradient-to-b from-[#F9F3E9] to-white py-12 sm:py-16">
+      <div className="bg-[#F9F3E9] py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#005F73] mb-4 leading-tight">
             Discover <span className="text-[#2A9D8F]">Events</span>

@@ -1,3 +1,4 @@
+
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { beachLifeColors } from "@/components/polymet/beach-life-color-palette";
@@ -27,13 +28,13 @@ export default function BeachThemeHeroSection({
   className,
   size = "default",
   variant = "default",
-}: BeachThemeHeroSectionProps) {
-  // Background gradient based on variant
-  const gradientOverlay = {
-    default: "bg-gradient-to-r from-[#0891B2]/90 to-[#22D3EE]/80",
-    ocean: "bg-gradient-to-r from-[#0891B2]/90 to-[#22D3EE]/80",
-    sunset: "bg-gradient-to-r from-[#F43F5E]/80 to-[#8B5CF6]/80",
-    tropical: "bg-gradient-to-r from-[#06B6D4]/80 to-[#4ADE80]/80",
+}: BeachThemeHeroSectionProps) => {
+  // Background solid color based on variant
+  const solidOverlay = {
+    default: "bg-[#0891B2]",
+    ocean: "bg-[#0891B2]",
+    sunset: "bg-[#F43F5E]",
+    tropical: "bg-[#06B6D4]",
   };
 
   // Background pattern based on selection
@@ -68,9 +69,9 @@ export default function BeachThemeHeroSection({
         />
       </div>
 
-      {/* Gradient Overlay */}
+      {/* Solid Overlay */}
       <div
-        className={cn("absolute inset-0 z-10", gradientOverlay[variant])}
+        className={cn("absolute inset-0 z-10 opacity-90", solidOverlay[variant])}
       ></div>
 
       {/* Pattern Overlay */}

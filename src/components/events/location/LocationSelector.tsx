@@ -24,7 +24,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
 }) => {
   const isMobile = useIsMobile();
 
-  // Count events per area
+  // Count events per area - don't filter out areas without events
   const getEventCountForArea = (areaId: string): number => {
     if (!events || events.length === 0) return 0;
     
@@ -46,7 +46,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
 
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100 rounded-lg p-4">
+      <div className="bg-[#F9F3E9] border border-blue-100 rounded-lg p-4">
         <div className="animate-pulse">
           <div className="h-4 bg-gray-200 rounded w-48 mb-2"></div>
           <div className="h-8 bg-gray-200 rounded w-64"></div>
@@ -55,12 +55,15 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
     );
   }
 
+  console.log('LocationSelector - Available areas:', availableAreas);
+  console.log('LocationSelector - Selected area ID:', selectedAreaId);
+
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100 rounded-lg p-4 mb-6">
+    <div className="bg-[#F9F3E9] border border-[#E8DCC6] rounded-lg p-4 mb-6">
       <div className="flex flex-col space-y-3">
         <div className="flex items-center gap-2">
-          <MapPin className="h-4 w-4 text-blue-600" />
-          <span className="text-sm font-medium text-gray-700">
+          <MapPin className="h-4 w-4 text-[#005F73]" />
+          <span className="text-sm font-medium text-[#003840]">
             Choose your area to see relevant events
           </span>
         </div>
@@ -68,13 +71,16 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
         <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-3 items-start`}>
           <Select
             value={selectedAreaId || 'all'}
-            onValueChange={(value) => onAreaChange(value === 'all' ? null : value)}
+            onValueChange={(value) => {
+              console.log('LocationSelector - Value selected:', value);
+              onAreaChange(value === 'all' ? null : value);
+            }}
           >
-            <SelectTrigger className={`${isMobile ? 'w-full' : 'w-64'} bg-white border-gray-200`}>
+            <SelectTrigger className={`${isMobile ? 'w-full' : 'w-64'} bg-white border-[#E8DCC6]`}>
               <SelectValue placeholder="Select your area..." />
             </SelectTrigger>
-            <SelectContent className="bg-white border border-gray-200 shadow-lg z-50">
-              <SelectItem value="all" className="hover:bg-gray-50">
+            <SelectContent className="bg-white border border-[#E8DCC6] shadow-lg z-50">
+              <SelectItem value="all" className="hover:bg-[#F9F3E9]">
                 <div className="flex items-center justify-between w-full">
                   <span>All Areas</span>
                   <span className="text-xs text-gray-500 ml-2 flex items-center gap-1">
@@ -85,8 +91,9 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
               </SelectItem>
               {availableAreas.map(area => {
                 const eventCount = getEventCountForArea(area.id);
+                console.log(`LocationSelector - Area ${area.displayName} (${area.id}) has ${eventCount} events`);
                 return (
-                  <SelectItem key={area.id} value={area.id} className="hover:bg-gray-50">
+                  <SelectItem key={area.id} value={area.id} className="hover:bg-[#F9F3E9]">
                     <div className="flex items-center justify-between w-full">
                       <span>{area.displayName}</span>
                       <span className="text-xs text-gray-500 ml-2 flex items-center gap-1">
@@ -105,7 +112,7 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
               variant="outline"
               size="sm"
               onClick={() => onAreaChange(null)}
-              className="text-gray-600 hover:text-gray-800"
+              className="text-[#003840] hover:text-[#005F73]"
             >
               Clear
             </Button>
@@ -113,9 +120,9 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
         </div>
         
         {selectedArea && (
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-[#003840]">
             <span>Showing events in {selectedArea.displayName}</span>
-            <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+            <span className="px-2 py-1 bg-[#005F73] text-white rounded-full text-xs font-medium">
               {getEventCountForArea(selectedArea.id)} events
             </span>
           </div>
