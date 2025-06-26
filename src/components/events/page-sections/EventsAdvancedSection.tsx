@@ -114,7 +114,11 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
             <MapPin className="h-4 w-4 text-gray-500" />
             <Select
               value={selectedLocation || 'all'}
-              onValueChange={(value) => onFilterChange({ location: value === 'all' ? null : value })}
+              onValueChange={(value) => {
+                console.log('EventsAdvancedSection - Location selected:', value);
+                const newValue = value === 'all' ? null : value;
+                onFilterChange({ location: newValue });
+              }}
               disabled={areasLoading || !isLocationLoaded}
             >
               <SelectTrigger className={`${isMobile ? 'w-32 text-sm' : 'w-48'} bg-white border-gray-200`}>
@@ -182,7 +186,7 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
         </div>
         
         {!isMobile && (
-          <div className="text-sm text-neutral-50">
+          <div className="text-sm text-neutral-50 font-mono">
             {filteredEventsCount} events found
           </div>
         )}
@@ -190,7 +194,7 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
 
       {/* Advanced Filters Panel */}
       {showAdvancedFilters && (
-        <div className="border border-gray-200 rounded-lg p-3 sm:p-4 bg-white">
+        <div className="border border-gray-200 rounded-none p-3 sm:p-4 bg-driftwood">
           <EventsAdvancedFilters
             onFilterChange={onFilterChange}
             selectedEventTypes={selectedEventTypes}

@@ -73,7 +73,8 @@ export const LocationSelector: React.FC<LocationSelectorProps> = ({
             value={selectedAreaId || 'all'}
             onValueChange={(value) => {
               console.log('LocationSelector - Value selected:', value);
-              onAreaChange(value === 'all' ? null : value);
+              const newValue = value === 'all' ? null : value;
+              onAreaChange(newValue);
             }}
           >
             <SelectTrigger className={`${isMobile ? 'w-full' : 'w-64'} bg-white border-[#E8DCC6]`}>
