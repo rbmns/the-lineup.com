@@ -19,7 +19,8 @@
 
   /* Cinematic filter for coastal aesthetic */
   .filter-cinematic {
-    @apply brightness-90 contrast-110 saturate-105;
+    @apply brightness-90 saturate-105;
+    filter: brightness(0.9) contrast(1.1) saturate(1.05);
   }
 }
 
