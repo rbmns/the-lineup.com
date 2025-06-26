@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -27,13 +26,37 @@ const EventDetail: React.FC<EventDetailProps> = ({
   const { user, isAuthenticated } = useAuth();
   const { handleRsvp, loadingEventId } = useUnifiedRsvp();
 
+  // Enhanced event fetching with RSVP status from cache
   const {
     data: event,
     isLoading,
     error
   } = useQuery({
     queryKey: ['event', eventId],
-    queryFn: () => fetchEventById(eventId!),
+    queryFn: async () => {
+      if (!eventId) return null;
+      
+      // Check if we have this event in the events list cache with RSVP status
+      const queryClient = (window as any).__REACT_QUERY_CLIENT__;
+      if (queryClient && user?.id) {
+        const eventsListData = queryClient.getQueryData(['events', user.id]);
+        if (eventsListData && Array.isArray(eventsListData)) {
+          const cachedEvent = eventsListData.find((e: any) => e.id === eventId);
+          if (cachedEvent && cachedEvent.rsvp_status !== undefined) {
+            console.log(`Using cached event with RSVP status: ${cachedEvent.rsvp_status}`);
+            // Fetch fresh event data but preserve RSVP status from cache
+            const freshEventData = await fetchEventById(eventId);
+            return {
+              ...freshEventData,
+              rsvp_status: cachedEvent.rsvp_status
+            };
+          }
+        }
+      }
+      
+      // Fallback to normal fetch
+      return fetchEventById(eventId);
+    },
     enabled: !!eventId
   });
 
@@ -82,6 +105,8 @@ const EventDetail: React.FC<EventDetailProps> = ({
   }
 
   const isOwner = user?.id === event.creator?.id;
+
+  console.log(`EventDetail rendering - Event RSVP status: ${event.rsvp_status}`);
 
   return (
     <div className="min-h-screen bg-white">

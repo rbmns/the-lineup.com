@@ -21,14 +21,32 @@ export const useEventDetails = (eventId: string | null) => {
     queryKey: ['event', eventId],
     queryFn: async () => {
       if (!eventId) return null;
+      
+      // First check if we have this event in the events list cache with RSVP status
+      const eventsListData = queryClient.getQueryData(['events', user?.id]);
+      let cachedEventWithRsvp = null;
+      
+      if (eventsListData && Array.isArray(eventsListData)) {
+        cachedEventWithRsvp = eventsListData.find((e: Event) => e.id === eventId);
+      }
+      
+      // Fetch fresh event data
       const eventData = await fetchEventById(eventId, user?.id);
       
-      // If we have event data and a user, get the current RSVP status
       if (eventData && user?.id) {
-        const rsvpData = await getUserEventRSVP(user.id, eventId);
+        // If we found cached RSVP status, use it; otherwise fetch fresh
+        let rsvpStatus = cachedEventWithRsvp?.rsvp_status;
+        
+        if (rsvpStatus === undefined) {
+          const rsvpData = await getUserEventRSVP(user.id, eventId);
+          rsvpStatus = rsvpData?.status || null;
+        }
+        
+        console.log(`Event ${eventId} RSVP status: ${rsvpStatus} (from cache: ${!!cachedEventWithRsvp?.rsvp_status})`);
+        
         return {
           ...eventData,
-          rsvp_status: rsvpData?.status || null
+          rsvp_status: rsvpStatus
         };
       }
       

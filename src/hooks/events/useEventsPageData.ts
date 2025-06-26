@@ -71,14 +71,19 @@ export const useEventsPageData = () => {
             .eq('user_id', user.id)
             .in('event_id', eventIds);
 
-          // Map RSVP status to events
-          return data.map(event => {
+          // Map RSVP status to events and log for debugging
+          const eventsWithRsvp = data.map(event => {
             const rsvp = rsvpData?.find(r => r.event_id === event.id);
-            return {
+            const eventWithRsvp = {
               ...event,
               rsvp_status: rsvp?.status || null
             };
+            
+            console.log(`Event ${event.id} (${event.title}) RSVP status set to: ${eventWithRsvp.rsvp_status}`);
+            return eventWithRsvp;
           });
+          
+          return eventsWithRsvp;
         }
       }
 
