@@ -99,17 +99,17 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
 
       {/* Friends Attending - only show if authenticated and there are friend attendees */}
       {isAuthenticated && (friendAttendees.going.length > 0 || friendAttendees.interested.length > 0) && (
-        <div className="text-left bg-gradient-to-r from-blue-50 to-emerald-50 rounded-2xl p-6 border border-blue-100">
-          <h2 className="text-2xl font-semibold mb-6 text-left tracking-tight text-gray-900 flex items-center">
-            <span className="bg-gradient-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
+        <div className="text-left bg-gradient-to-r from-sage/10 to-clay/10 rounded-2xl p-6 border border-sage/20">
+          <h2 className="text-2xl font-semibold mb-6 text-left tracking-tight text-midnight flex items-center">
+            <span className="bg-gradient-to-r from-midnight to-overcast bg-clip-text text-transparent">
               Friends Attending
             </span>
           </h2>
           <div className="space-y-6">
             {friendAttendees.going.length > 0 && (
               <div>
-                <h3 className="text-lg font-medium text-gray-800 mb-3 text-left flex items-center">
-                  <div className="w-3 h-3 bg-emerald-500 rounded-full mr-3"></div>
+                <h3 className="text-lg font-medium text-midnight mb-3 text-left flex items-center">
+                  <div className="w-3 h-3 bg-sage rounded-full mr-3"></div>
                   Going ({friendAttendees.going.length})
                 </h3>
                 <div className="flex flex-wrap gap-3">
@@ -117,12 +117,12 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
                     <button
                       key={attendee.id}
                       onClick={() => handleUserClick(attendee.id)}
-                      className="flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-full px-4 py-3 hover:bg-white hover:shadow-lg transition-all duration-200 cursor-pointer border border-white/50"
+                      className="flex items-center gap-3 bg-ivory/80 backdrop-blur-sm rounded-full px-4 py-3 hover:bg-coconut hover:shadow-lg transition-all duration-200 cursor-pointer border border-overcast/20"
                     >
-                      <div className="w-8 h-8 bg-gradient-to-r from-emerald-400 to-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                      <div className="w-8 h-8 bg-gradient-to-r from-sage to-clay rounded-full flex items-center justify-center text-midnight text-sm font-medium">
                         {attendee.username?.charAt(0).toUpperCase() || 'U'}
                       </div>
-                      <span className="text-sm font-medium text-gray-800">{attendee.username}</span>
+                      <span className="text-sm font-medium text-midnight">{attendee.username}</span>
                     </button>
                   ))}
                 </div>
@@ -131,8 +131,8 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
             
             {friendAttendees.interested.length > 0 && (
               <div>
-                <h3 className="text-lg font-medium text-gray-800 mb-3 text-left flex items-center">
-                  <div className="w-3 h-3 bg-sky-500 rounded-full mr-3"></div>
+                <h3 className="text-lg font-medium text-midnight mb-3 text-left flex items-center">
+                  <div className="w-3 h-3 bg-clay rounded-full mr-3"></div>
                   Interested ({friendAttendees.interested.length})
                 </h3>
                 <div className="flex flex-wrap gap-3">
@@ -140,12 +140,12 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
                     <button
                       key={attendee.id}
                       onClick={() => handleUserClick(attendee.id)}
-                      className="flex items-center gap-3 bg-white/80 backdrop-blur-sm rounded-full px-4 py-3 hover:bg-white hover:shadow-lg transition-all duration-200 cursor-pointer border border-white/50"
+                      className="flex items-center gap-3 bg-ivory/80 backdrop-blur-sm rounded-full px-4 py-3 hover:bg-coconut hover:shadow-lg transition-all duration-200 cursor-pointer border border-overcast/20"
                     >
-                      <div className="w-8 h-8 bg-gradient-to-r from-sky-400 to-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                      <div className="w-8 h-8 bg-gradient-to-r from-clay to-seafoam rounded-full flex items-center justify-center text-midnight text-sm font-medium">
                         {attendee.username?.charAt(0).toUpperCase() || 'U'}
                       </div>
-                      <span className="text-sm font-medium text-gray-800">{attendee.username}</span>
+                      <span className="text-sm font-medium text-midnight">{attendee.username}</span>
                     </button>
                   ))}
                 </div>
@@ -159,28 +159,28 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
       {(event.organiser_name || event.organizer_link) && (
         <div className="text-left">
           <h2 className="text-2xl font-semibold mb-4 text-left tracking-tight text-gray-900">Hosted by</h2>
-          <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
-            <div className="w-14 h-14 bg-gradient-to-r from-blue-500 to-emerald-500 rounded-full flex items-center justify-center shadow-md">
-              <span className="text-xl font-semibold text-white">
+          <div className="flex items-center gap-4 p-4 bg-sage/10 rounded-xl border border-sage/20">
+            <div className="w-14 h-14 bg-gradient-to-r from-sage to-clay rounded-full flex items-center justify-center shadow-md">
+              <span className="text-xl font-semibold text-midnight">
                 {event.organiser_name ? event.organiser_name.charAt(0).toUpperCase() : 'O'}
               </span>
             </div>
             <div>
               {event.organiser_name && (
-                <p className="font-semibold text-lg text-left text-gray-900">{event.organiser_name}</p>
+                <p className="font-semibold text-lg text-left text-midnight">{event.organiser_name}</p>
               )}
               {event.organizer_link && (
                 <a
                   href={event.organizer_link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-base text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                  className="text-base text-clay hover:text-midnight hover:underline transition-colors"
                 >
                   Visit organizer website
                 </a>
               )}
               {!event.organiser_name && !event.organizer_link && (
-                <p className="text-base text-gray-600 text-left">Event Organizer</p>
+                <p className="text-base text-overcast text-left">Event Organizer</p>
               )}
             </div>
           </div>

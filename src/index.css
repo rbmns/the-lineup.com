@@ -18,8 +18,10 @@
   }
 
   /* Cinematic filter for coastal aesthetic */
-  .filter-cinematic {
-    filter: brightness(0.9) contrast(1.1) saturate(1.05);
+  .filter-cinematic,
+  .img-cinematic {
+    @apply brightness-[0.95] contrast-[1.1] saturate-[1.05] rounded-sm;
+    filter: sepia(2%) hue-rotate(-2deg);
   }
 }
 

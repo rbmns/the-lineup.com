@@ -6,11 +6,12 @@ import { cn } from '@/lib/utils';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { useEventImages } from '@/hooks/useEventImages';
+import { CategoryPill } from '@/components/ui/category-pill';
 import { toast } from '@/hooks/use-toast';
 import { formatEventCardDateTime } from '@/utils/date-formatting';
 import { LineupImage } from '@/components/ui/lineup-image';
 import { useAuth } from '@/contexts/AuthContext';
-import EventVibeLabel from '@/components/polymet/event-vibe-label';
+import { getVibeColors } from '@/utils/vibeColors';
 
 interface EventCardProps {
   event: Event;
@@ -111,7 +112,7 @@ export const EventCard: React.FC<EventCardProps> = ({
         <img
           src={imageUrl}
           alt={event.title}
-          className="w-full h-full object-cover filter-cinematic"
+          className="w-full h-full object-cover img-cinematic"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (!target.src.includes('/img/default.jpg')) {
@@ -165,22 +166,19 @@ export const EventCard: React.FC<EventCardProps> = ({
         )}
       </div>
 
-      {/* RSVP Buttons - only show if authenticated */}
+      {/* RSVP Buttons - show both Going and Interested buttons if authenticated */}
       {shouldShowRsvp && onRsvp && (
         <div 
           data-rsvp-container="true" 
           onClick={(e) => e.stopPropagation()}
         >
-          <button
-            className="bg-clay text-midnight text-sm font-body px-4 py-2 rounded-sm hover:bg-seafoam transition-colors w-full"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleRsvp('Going');
-            }}
-            disabled={loadingEventId === event.id}
-          >
-            {event.rsvp_status === 'Going' ? 'Going' : 'Join Event'}
-          </button>
+          <EventRsvpButtons
+            currentStatus={event.rsvp_status}
+            onRsvp={handleRsvp}
+            isLoading={loadingEventId === event.id}
+            className="w-full"
+            size="default"
+          />
         </div>
       )}
     </div>
