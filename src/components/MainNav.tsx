@@ -21,7 +21,7 @@ const MainNav = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-warm-neutral border-b border-clay">
+      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-sand border-b border-overcast">
         <div className="w-full flex flex-col">
           <div className={cn(
             "w-full flex items-center justify-between h-16",

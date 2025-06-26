@@ -41,14 +41,12 @@ export const NavActions: React.FC<NavActionsProps> = ({
       {isAuthenticated && user ? (
         <>
           {isAdmin && !isMobile && (
-            <Button 
-              asChild 
-              variant="ghost" 
-              size="sm"
-              className="text-primary hover:text-primary hover:bg-primary/10 transition-colors duration-200"
+            <Link 
+              to="/admin"
+              className="text-charcoal hover:text-overcast transition-colors duration-200 font-body text-sm"
             >
-              <Link to="/admin">Admin</Link>
-            </Button>
+              Admin
+            </Link>
           )}
           <div className="flex-shrink-0">
             <UserMenu 
@@ -60,17 +58,15 @@ export const NavActions: React.FC<NavActionsProps> = ({
           </div>
         </>
       ) : (
-        <Button 
-          variant="ghost" 
-          size="sm"
+        <button 
           onClick={handleSignInClick} 
           className={cn(
-            "flex-shrink-0 text-primary hover:text-primary hover:bg-primary/10 transition-all duration-200 font-medium",
+            "flex-shrink-0 text-charcoal hover:text-overcast transition-colors duration-200 font-body",
             isMobile ? "text-sm px-3 py-2" : "text-sm px-4"
           )}
         >
           Sign in
-        </Button>
+        </button>
       )}
     </div>
   );

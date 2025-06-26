@@ -1,69 +1,70 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
-/* Global background and editorial styling */
+/* Coastal styling foundation */
 @layer base {
   :root {
-    --background: 248 246 242; /* Warm neutral background */
-    --foreground: 45 45 43; /* Dark charcoal text */
+    --background: 248 245 240; /* Sand background */
+    --foreground: 60 64 67; /* Charcoal text */
 
-    --card: 252 251 249; /* Soft card background */
-    --card-foreground: 45 45 43;
+    --card: 252 250 247; /* Coconut card background */
+    --card-foreground: 60 64 67;
     
-    --primary: 45 45 43; /* Dark charcoal for primary actions */
-    --primary-foreground: 248 246 242;
+    --primary: 201 181 162; /* Clay for primary actions */
+    --primary-foreground: 60 64 67;
 
-    --secondary: 231 225 216; /* Muted clay */
-    --secondary-foreground: 45 45 43;
+    --secondary: 218 224 220; /* Sage */
+    --secondary-foreground: 60 64 67;
 
-    --muted: 180 178 174; /* Overcast gray */
-    --muted-foreground: 45 45 43;
+    --muted: 128 130 133; /* Overcast gray */
+    --muted-foreground: 60 64 67;
 
     --accent: 162 180 178; /* Seafoam accent */
-    --accent-foreground: 45 45 43;
+    --accent-foreground: 60 64 67;
 
     --destructive: 205 92 92;
-    --destructive-foreground: 248 246 242;
+    --destructive-foreground: 252 250 247;
 
-    --border: 231 225 216;
-    --input: 231 225 216;
-    --ring: 45 45 43;
+    --border: 218 224 220; /* Sage for borders */
+    --input: 218 224 220;
+    --ring: 201 181 162; /* Clay for focus rings */
 
     --radius: 0.125rem; /* Minimal radius */
   }
 
   html, body {
-    background: rgb(248 246 242); /* Warm neutral */
-    color: rgb(45 45 43); /* Dark charcoal */
+    background: rgb(248 245 240); /* Sand */
+    color: rgb(60 64 67); /* Charcoal */
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
     font-weight: 400;
   }
 
-  /* Typography system - editorial style */
+  /* Typography system - coastal style */
   .font-display {
     font-weight: 600;
-    letter-spacing: -0.025em;
+    letter-spacing: -0.01em;
   }
 
   .font-body {
     font-weight: 400;
-    line-height: 1.6;
+    line-height: 1.5;
   }
 
   .font-mono {
     font-family: 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     font-weight: 400;
+    text-transform: lowercase;
   }
 
-  /* Text colors for editorial hierarchy */
+  /* Coastal color utilities */
   .text-charcoal {
-    color: rgb(45 45 43);
+    color: rgb(60 64 67);
   }
 
   .text-overcast {
-    color: rgb(180 178 174);
+    color: rgb(128 130 133);
   }
 
   .text-seafoam {
@@ -71,10 +72,10 @@
   }
 
   .text-clay {
-    color: rgb(186 162 138);
+    color: rgb(201 181 162);
   }
 
-  /* Remove all default shadows and effects */
+  /* Remove all shadows and effects for coastal simplicity */
   * {
     box-shadow: none !important;
     text-shadow: none !important;
@@ -92,45 +93,57 @@
   }
 }
 
-/* Editorial utility classes */
+/* Coastal utility classes */
 @layer utilities {
-  .bg-warm-neutral {
-    background-color: rgb(248 246 242);
+  .bg-sand {
+    background-color: rgb(248 245 240);
   }
   
-  .bg-soft-neutral {
-    background-color: rgb(252 251 249);
+  .bg-coconut {
+    background-color: rgb(252 250 247);
   }
   
-  .bg-clay-muted {
-    background-color: rgb(231 225 216);
+  .bg-ivory {
+    background-color: rgb(250 248 245);
   }
   
-  .bg-seafoam-soft {
-    background-color: rgb(162 180 178 / 0.1);
+  .bg-sage {
+    background-color: rgb(218 224 220);
+  }
+
+  .bg-clay {
+    background-color: rgb(201 181 162);
+  }
+
+  .bg-seafoam {
+    background-color: rgb(162 180 178);
   }
   
-  .border-clay {
-    border-color: rgb(231 225 216);
+  .border-overcast {
+    border-color: rgb(128 130 133);
   }
   
-  /* Editorial spacing */
-  .spacing-editorial {
-    padding: 2rem 1.5rem;
+  .border-sage {
+    border-color: rgb(218 224 220);
   }
   
-  .spacing-generous {
-    padding: 3rem 2rem;
+  /* Coastal spacing */
+  .spacing-section {
+    padding: 3rem 1.5rem;
   }
   
-  /* Clean hover effects */
-  .hover-soft:hover {
-    background-color: rgb(231 225 216 / 0.5);
+  .spacing-card {
+    padding: 1.5rem;
+  }
+  
+  /* Clean hover effects - subtle color shifts only */
+  .hover-clay:hover {
+    background-color: rgb(201 181 162);
     transition: background-color 0.2s ease;
   }
   
-  .hover-underline:hover {
-    text-decoration: underline;
-    text-underline-offset: 4px;
+  .hover-seafoam:hover {
+    background-color: rgb(162 180 178);
+    transition: background-color 0.2s ease;
   }
 }

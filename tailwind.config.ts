@@ -26,42 +26,42 @@ const config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "rgb(248 246 242)", // Warm neutral
-        foreground: "rgb(45 45 43)", // Dark charcoal
+        background: "rgb(248 245 240)", // Sand
+        foreground: "rgb(60 64 67)", // Charcoal
         
-        // Editorial color palette
-        'charcoal': 'rgb(45 45 43)',
-        'warm-neutral': 'rgb(248 246 242)', 
-        'soft-neutral': 'rgb(252 251 249)',
-        'clay-muted': 'rgb(231 225 216)',
-        'overcast': 'rgb(180 178 174)',
+        // Coastal color palette
+        'sand': 'rgb(248 245 240)',
+        'coconut': 'rgb(252 250 247)', 
+        'ivory': 'rgb(250 248 245)',
+        'sage': 'rgb(218 224 220)',
+        'clay': 'rgb(201 181 162)',
         'seafoam': 'rgb(162 180 178)',
-        'seafoam-soft': 'rgb(162 180 178 / 0.1)',
-        'clay': 'rgb(186 162 138)',
+        'overcast': 'rgb(128 130 133)',
+        'charcoal': 'rgb(60 64 67)',
         
         primary: {
-          DEFAULT: "rgb(45 45 43)", // Charcoal
-          foreground: "rgb(248 246 242)",
+          DEFAULT: "rgb(201 181 162)", // Clay
+          foreground: "rgb(60 64 67)",
         },
         secondary: {
-          DEFAULT: "rgb(231 225 216)", // Clay muted
-          foreground: "rgb(45 45 43)",
+          DEFAULT: "rgb(218 224 220)", // Sage
+          foreground: "rgb(60 64 67)",
         },
         muted: {
-          DEFAULT: "rgb(180 178 174)", // Overcast
-          foreground: "rgb(45 45 43)",
+          DEFAULT: "rgb(128 130 133)", // Overcast
+          foreground: "rgb(60 64 67)",
         },
         accent: {
           DEFAULT: "rgb(162 180 178)", // Seafoam
-          foreground: "rgb(45 45 43)",
+          foreground: "rgb(60 64 67)",
         },
         destructive: {
           DEFAULT: "rgb(205 92 92)",
-          foreground: "rgb(248 246 242)",
+          foreground: "rgb(252 250 247)",
         },
         card: {
-          DEFAULT: "rgb(252 251 249)",
-          foreground: "rgb(45 45 43)",
+          DEFAULT: "rgb(252 250 247)", // Coconut
+          foreground: "rgb(60 64 67)",
         },
       },
       fontFamily: {
@@ -78,7 +78,7 @@ const config = {
         "fade-in": {
           "0%": {
             opacity: "0",
-            transform: "translateY(8px)"
+            transform: "translateY(4px)"
           },
           "100%": {
             opacity: "1",
@@ -87,7 +87,7 @@ const config = {
         },
       },
       animation: {
-        "fade-in": "fade-in 0.4s ease-out",
+        "fade-in": "fade-in 0.3s ease-out",
       },
     },
   },

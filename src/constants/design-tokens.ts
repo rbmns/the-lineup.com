@@ -6,16 +6,27 @@ export const designTokens = {
     DEFAULT: 'rounded-sm', // Default to minimal radius
   },
   spacing: {
-    editorial: '2rem 1.5rem',
-    generous: '3rem 2rem',
-    card: '1.5rem',
-    tight: '1rem',
+    section: 'px-6 py-12',
+    card: 'p-6',
+    tight: 'p-4',
+    generous: 'px-6 py-16',
   },
   typography: {
-    display: 'font-display text-charcoal',
-    body: 'font-body text-charcoal',
-    mono: 'font-mono text-overcast',
+    display: 'font-display',
+    body: 'font-body',
+    mono: 'font-mono',
   },
+  colors: {
+    // Coastal palette
+    sand: 'rgb(248 245 240)',      // Main background
+    coconut: 'rgb(252 250 247)',   // Card backgrounds
+    ivory: 'rgb(250 248 245)',     // Alternate sections
+    sage: 'rgb(218 224 220)',      // Accent sections
+    clay: 'rgb(201 181 162)',      // Primary actions
+    seafoam: 'rgb(162 180 178)',   // Secondary actions
+    overcast: 'rgb(128 130 133)',  // Muted text
+    charcoal: 'rgb(60 64 67)',     // Main text
+  }
 } as const;
 
 export type BorderRadiusToken = keyof typeof designTokens.borderRadius;
@@ -24,7 +35,7 @@ export const getBorderRadiusClass = (radius: BorderRadiusToken): string => {
   return designTokens.borderRadius[radius];
 };
 
-// Editorial-focused defaults
+// Coastal-focused defaults
 export const defaultRadius = {
   button: 'sm' as BorderRadiusToken,
   card: 'sm' as BorderRadiusToken,

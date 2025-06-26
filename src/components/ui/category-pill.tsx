@@ -21,15 +21,15 @@ export const CategoryPill: React.FC<CategoryPillProps & {
 }) => {
   const Icon = getCategoryIcon(category);
   
-  // Editorial pill styling - muted colors, minimal
+  // Coastal pill styling - soft colors, minimal
   const baseClasses = 'rounded-sm font-mono text-xs transition-colors flex items-center border-0';
   
-  // Simple color scheme - seafoam for active, clay for inactive
+  // Coastal color scheme
   const colorClasses = active || showIcon
-    ? 'bg-seafoam-soft text-charcoal'
-    : 'bg-clay-muted text-overcast hover:bg-seafoam-soft hover:text-charcoal';
+    ? 'bg-seafoam text-charcoal'
+    : 'bg-sage text-overcast hover:bg-seafoam hover:text-charcoal';
   
-  // Editorial sizing
+  // Coastal sizing
   const sizeClasses = {
     'xs': 'py-1 px-2',
     'sm': 'py-1.5 px-3',
@@ -53,7 +53,7 @@ export const CategoryPill: React.FC<CategoryPillProps & {
       onClick={onClick}
     >
       {showIcon && Icon && <Icon className="mr-2 h-3 w-3" />}
-      <span>{category}</span>
+      <span className="lowercase">{category}</span>
       {children}
     </div>
   );
