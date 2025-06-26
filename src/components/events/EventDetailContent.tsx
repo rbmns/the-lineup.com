@@ -1,5 +1,5 @@
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import { Event } from '@/types';
 import { EventDetailHero } from './detail/EventDetailHero';
 import { EventDetailMainContent } from './detail/EventDetailMainContent';
@@ -27,24 +27,50 @@ const EventDetailContent = ({
   rsvpLoading = false,
   isOwner = false,
 }: EventDetailContentProps) => {
+  // Local state to track RSVP status for immediate UI updates
+  const [currentRsvpStatus, setCurrentRsvpStatus] = useState<'Going' | 'Interested' | null>(event.rsvp_status);
+
+  // Update local state when event prop changes
+  useEffect(() => {
+    setCurrentRsvpStatus(event.rsvp_status);
+  }, [event.rsvp_status]);
+
   const handleRsvp = useCallback(async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp) return false;
     
     try {
-      console.log(`EventDetailContent: Current RSVP status before handling: ${event.rsvp_status}, handling: ${status}`);
+      console.log(`EventDetailContent: Current RSVP status before handling: ${currentRsvpStatus}, handling: ${status}`);
+      
+      // Optimistically update the UI
+      const newStatus = currentRsvpStatus === status ? null : status;
+      setCurrentRsvpStatus(newStatus);
       
       const result = await onRsvp(status);
+      
+      // If the RSVP failed, revert the optimistic update
+      if (!result) {
+        setCurrentRsvpStatus(currentRsvpStatus);
+      }
+      
       return result;
     } catch (error) {
       console.error('RSVP error:', error);
+      // Revert optimistic update on error
+      setCurrentRsvpStatus(currentRsvpStatus);
       return false;
     }
-  }, [onRsvp, event.rsvp_status]);
+  }, [onRsvp, currentRsvpStatus]);
+
+  // Create an event object with updated RSVP status for passing to child components
+  const eventWithUpdatedRsvp = useMemo(() => ({
+    ...event,
+    rsvp_status: currentRsvpStatus
+  }), [event, currentRsvpStatus]);
 
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <EventDetailHero event={event} />
+      <EventDetailHero event={eventWithUpdatedRsvp} />
 
       {/* Main Content */}
       <div className="w-full px-6 lg:px-12 xl:px-16 py-12 lg:py-16 xl:py-20">
@@ -54,11 +80,11 @@ const EventDetailContent = ({
             {/* Left Column - Main Content */}
             <div className="lg:col-span-3 space-y-8">
               <EventDetailMainContent
-                event={event}
+                event={eventWithUpdatedRsvp}
                 attendees={attendees}
                 isAuthenticated={true}
                 isOwner={isOwner}
-                rsvpLoading={rsvpLoading}
+                rsvpLoading={rsvpLoading || isRsvpLoading}
                 rsvpFeedback={null}
                 onRsvp={handleRsvp}
               />
@@ -67,7 +93,7 @@ const EventDetailContent = ({
             {/* Right Column - Event Details Sidebar */}
             <div className="lg:col-span-1">
               <EventDetailSidebar
-                event={event}
+                event={eventWithUpdatedRsvp}
                 attendees={attendees}
                 isAuthenticated={true}
               />
