@@ -28,13 +28,13 @@ export default function BeachThemeHeroSection({
   className,
   size = "default",
   variant = "default",
-}: BeachThemeHeroSectionProps) => {
+}: BeachThemeHeroSectionProps) {
   // Background solid color based on variant
   const solidOverlay = {
     default: "bg-[#0891B2]",
     ocean: "bg-[#0891B2]",
     sunset: "bg-[#F43F5E]",
-    tropical: "bg-[#06B6D4]",
+    tropical: "bg-[#06B6D4]"
   };
 
   // Background pattern based on selection
