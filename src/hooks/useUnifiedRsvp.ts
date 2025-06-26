@@ -13,11 +13,19 @@ export const useUnifiedRsvp = () => {
   const updateEventCaches = useCallback((eventId: string, newStatus: 'Going' | 'Interested' | null) => {
     console.log(`Updating all caches for event ${eventId} with status: ${newStatus}`);
     
-    // Update individual event cache immediately
-    queryClient.setQueryData(['event', eventId], (oldData: any) => {
+    // Update individual event cache immediately with proper structure
+    queryClient.setQueryData(['event', eventId, user?.id], (oldData: any) => {
       if (!oldData) return oldData;
       const updated = { ...oldData, rsvp_status: newStatus };
       console.log(`Updated individual event cache for ${eventId}: ${newStatus}`);
+      return updated;
+    });
+
+    // Also update cache without user ID for backward compatibility
+    queryClient.setQueryData(['event', eventId], (oldData: any) => {
+      if (!oldData) return oldData;
+      const updated = { ...oldData, rsvp_status: newStatus };
+      console.log(`Updated individual event cache (no user) for ${eventId}: ${newStatus}`);
       return updated;
     });
 

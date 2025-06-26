@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { fetchEventById } from '@/lib/eventService';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -26,63 +26,27 @@ const EventDetail: React.FC<EventDetailProps> = ({
   const eventId = propEventId || paramId;
   const { user, isAuthenticated } = useAuth();
   const { handleRsvp, loadingEventId } = useUnifiedRsvp();
-  const queryClient = useQueryClient();
 
-  // Enhanced event fetching with RSVP status from cache
+  // Simplified event fetching - let the service handle RSVP status properly
   const {
     data: event,
     isLoading,
     error
   } = useQuery({
-    queryKey: ['event', eventId],
+    queryKey: ['event', eventId, user?.id],
     queryFn: async () => {
       if (!eventId) return null;
       
-      console.log(`Fetching event ${eventId} for detail page`);
+      console.log(`Fetching event ${eventId} for detail page with user ${user?.id}`);
       
-      // Always check cache first for RSVP status
-      let cachedRsvpStatus = null;
+      // Fetch event data with proper RSVP filtering
+      const eventData = await fetchEventById(eventId, user?.id);
       
-      if (user?.id) {
-        // Check events list cache first
-        const eventsListData = queryClient.getQueryData(['events', user.id]);
-        if (eventsListData && Array.isArray(eventsListData)) {
-          const cachedEvent = eventsListData.find((e: any) => e.id === eventId);
-          if (cachedEvent && cachedEvent.rsvp_status !== undefined) {
-            cachedRsvpStatus = cachedEvent.rsvp_status;
-            console.log(`Found RSVP status in events list cache: ${cachedRsvpStatus}`);
-          }
-        }
-        
-        // Also check individual event cache
-        const individualEventData = queryClient.getQueryData(['event', eventId]);
-        if (individualEventData && (individualEventData as any).rsvp_status !== undefined) {
-          cachedRsvpStatus = (individualEventData as any).rsvp_status;
-          console.log(`Found RSVP status in individual event cache: ${cachedRsvpStatus}`);
-        }
+      if (eventData) {
+        console.log(`Event ${eventId} detail page - RSVP status: ${eventData.rsvp_status}`);
       }
       
-      // Fetch fresh event data
-      const freshEventData = await fetchEventById(eventId);
-      
-      if (freshEventData && user?.id) {
-        // Use cached RSVP status if available, otherwise use fresh data
-        const finalRsvpStatus = cachedRsvpStatus !== null ? cachedRsvpStatus : freshEventData.rsvp_status;
-        
-        const eventWithRsvp = {
-          ...freshEventData,
-          rsvp_status: finalRsvpStatus
-        };
-        
-        console.log(`Event ${eventId} detail page - Final RSVP status: ${finalRsvpStatus}`);
-        
-        // Update cache with the correct RSVP status
-        queryClient.setQueryData(['event', eventId], eventWithRsvp);
-        
-        return eventWithRsvp;
-      }
-      
-      return freshEventData;
+      return eventData;
     },
     enabled: !!eventId,
     staleTime: 1000 * 10, // 10 seconds
@@ -97,16 +61,9 @@ const EventDetail: React.FC<EventDetailProps> = ({
 
   const handleRsvpClick = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!eventId) return false;
-    console.log(`RSVP button clicked: ${status} for event ${eventId}`);
+    console.log(`RSVP button clicked: ${status} for event ${eventId}, current status: ${event?.rsvp_status}`);
     const result = await handleRsvp(eventId, status);
-    
-    // Force refetch of event data to ensure consistency
-    if (result) {
-      setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ['event', eventId] });
-      }, 100);
-    }
-    
+    console.log(`RSVP operation result: ${result}`);
     return result;
   };
 
