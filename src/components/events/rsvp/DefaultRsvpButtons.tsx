@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Check, Heart, Loader2 } from 'lucide-react';
@@ -26,13 +26,6 @@ export const DefaultRsvpButtons: React.FC<DefaultRsvpButtonsProps> = ({
   size = 'default',
   variant = 'default'
 }) => {
-  const [localStatus, setLocalStatus] = useState<RsvpStatus>(currentStatus);
-
-  // Sync local state with prop changes
-  useEffect(() => {
-    setLocalStatus(currentStatus);
-  }, [currentStatus]);
-
   const goingLoading = isLoading && activeButton === 'Going';
   const interestedLoading = isLoading && activeButton === 'Interested';
 
@@ -40,10 +33,7 @@ export const DefaultRsvpButtons: React.FC<DefaultRsvpButtonsProps> = ({
     e.stopPropagation();
     e.preventDefault();
     
-    const result = await onRsvp(status);
-    
-    // The parent component will handle the state update through currentStatus prop
-    // so we don't need to update localStatus here
+    await onRsvp(status);
   };
 
   // Size-specific classes
@@ -55,7 +45,7 @@ export const DefaultRsvpButtons: React.FC<DefaultRsvpButtonsProps> = ({
 
   // Variant-specific classes
   const getVariantClasses = (buttonType: 'Going' | 'Interested') => {
-    const isActive = localStatus === buttonType;
+    const isActive = currentStatus === buttonType;
 
     if (variant === 'default') {
       if (buttonType === 'Going') {
@@ -114,7 +104,7 @@ export const DefaultRsvpButtons: React.FC<DefaultRsvpButtonsProps> = ({
             size={size === "sm" ? 14 : size === "lg" ? 18 : 16}
             className={cn(
               "transition-transform",
-              localStatus === "Going" ? "scale-110" : "scale-100"
+              currentStatus === "Going" ? "scale-110" : "scale-100"
             )}
           />
         )}
@@ -141,7 +131,7 @@ export const DefaultRsvpButtons: React.FC<DefaultRsvpButtonsProps> = ({
             size={size === "sm" ? 14 : size === "lg" ? 18 : 16}
             className={cn(
               "transition-transform",
-              localStatus === "Interested" ? "scale-110" : "scale-100"
+              currentStatus === "Interested" ? "scale-110" : "scale-100"
             )}
           />
         )}

@@ -1,15 +1,14 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { fetchEventById } from '@/lib/eventService';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Helmet } from 'react-helmet-async';
-import { useEventRsvpHandler } from '@/hooks/events/useEventRsvpHandler';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
 import { useEventAttendees } from '@/hooks/useEventAttendees';
+import { useUnifiedRsvp } from '@/hooks/useUnifiedRsvp';
 import { EventDetailHero } from '@/components/events/detail/EventDetailHero';
 import { EventDetailMainContent } from '@/components/events/detail/EventDetailMainContent';
 import { EventDetailSidebar } from '@/components/events/detail/EventDetailSidebar';
@@ -26,9 +25,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
   const { id: paramId } = useParams<{ id: string }>();
   const eventId = propEventId || paramId;
   const { user, isAuthenticated } = useAuth();
-  const queryClient = useQueryClient();
-  const [rsvpLoading, setRsvpLoading] = useState(false);
-  const [rsvpFeedback, setRsvpFeedback] = useState<'going' | 'interested' | null>(null);
+  const { handleRsvp, loadingEventId } = useUnifiedRsvp();
 
   const {
     data: event,
@@ -47,82 +44,9 @@ const EventDetail: React.FC<EventDetailProps> = ({
     enabled: isAuthenticated
   });
 
-  const { handleRsvp } = useEventRsvpHandler(eventId!);
-
-  const handleRsvpWithFeedback = async (status: 'Going' | 'Interested'): Promise<boolean> => {
-    if (!user) {
-      toast({
-        title: "Sign in required",
-        description: "Please sign in to RSVP to events",
-        variant: "destructive"
-      });
-      return false;
-    }
-
-    setRsvpLoading(true);
-    setRsvpFeedback(status.toLowerCase() as 'going' | 'interested');
-
-    try {
-      const result = await handleRsvp(status);
-      if (result) {
-        // Update the event detail cache immediately
-        queryClient.setQueryData(['event', eventId], (oldData: any) => {
-          if (!oldData) return oldData;
-          const newStatus = oldData.rsvp_status === status ? null : status;
-          const updatedEvent = {
-            ...oldData,
-            rsvp_status: newStatus
-          };
-
-          if (oldData.attendees) {
-            const attendees = { ...oldData.attendees };
-
-            if (oldData.rsvp_status === 'Going') {
-              attendees.going = Math.max(0, attendees.going - 1);
-            } else if (oldData.rsvp_status === 'Interested') {
-              attendees.interested = Math.max(0, attendees.interested - 1);
-            }
-
-            if (newStatus === 'Going') {
-              attendees.going += 1;
-            } else if (newStatus === 'Interested') {
-              attendees.interested += 1;
-            }
-            updatedEvent.attendees = attendees;
-          }
-          return updatedEvent;
-        });
-
-        queryClient.invalidateQueries({ queryKey: ['events'] });
-        queryClient.invalidateQueries({ queryKey: ['events', user?.id] });
-        queryClient.invalidateQueries({ queryKey: ['event-attendees', eventId] });
-
-        toast({
-          title: "RSVP updated",
-          description: `You are now ${event?.rsvp_status === status ? 'not ' : ''}${status.toLowerCase()} to this event`
-        });
-
-        setTimeout(() => setRsvpFeedback(null), 1000);
-        return true;
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to update RSVP. Please try again.",
-          variant: "destructive"
-        });
-        return false;
-      }
-    } catch (error) {
-      console.error('RSVP error:', error);
-      toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive"
-      });
-      return false;
-    } finally {
-      setRsvpLoading(false);
-    }
+  const handleRsvpClick = async (status: 'Going' | 'Interested'): Promise<boolean> => {
+    if (!eventId) return false;
+    return await handleRsvp(eventId, status);
   };
 
   if (isLoading) {
@@ -178,9 +102,9 @@ const EventDetail: React.FC<EventDetailProps> = ({
             attendees={attendees}
             isAuthenticated={isAuthenticated}
             isOwner={isOwner}
-            rsvpLoading={rsvpLoading}
-            rsvpFeedback={rsvpFeedback}
-            onRsvp={handleRsvpWithFeedback}
+            rsvpLoading={loadingEventId === eventId}
+            rsvpFeedback={null}
+            onRsvp={handleRsvpClick}
           />
 
           {/* Right Column - Event Details */}
