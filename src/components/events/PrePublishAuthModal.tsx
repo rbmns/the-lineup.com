@@ -43,8 +43,10 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
 
     try {
       if (isLogin) {
+        console.log("Attempting login with email:", email);
         const { error } = await signIn(email, password);
         if (error) {
+          console.error("Login error:", error);
           toast({
             title: "Login failed",
             description: error.message,
@@ -52,9 +54,12 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
           });
           return;
         }
+        console.log("Login successful");
       } else {
+        console.log("Attempting signup with email:", email);
         const { error } = await signUp(email, password, name);
         if (error) {
+          console.error("Signup error:", error);
           toast({
             title: "Sign up failed",
             description: error.message,
@@ -62,6 +67,7 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
           });
           return;
         }
+        console.log("Signup successful");
       }
 
       toast({
@@ -69,8 +75,13 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
         description: isLogin ? "You're now logged in." : "Account created successfully!",
       });
 
-      onSuccess();
+      // Wait a moment for auth state to update, then call success
+      setTimeout(() => {
+        onSuccess();
+      }, 1000);
+
     } catch (error: any) {
+      console.error("Auth error:", error);
       toast({
         title: "Something went wrong",
         description: error.message || "Please try again.",
@@ -157,7 +168,7 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
             disabled={isSubmitting}
           >
             {isSubmitting 
-              ? "Creating..." 
+              ? "Processing..." 
               : isLogin 
                 ? "Sign in & Publish" 
                 : "Create Account & Publish"
@@ -170,6 +181,7 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
             type="button"
             onClick={() => setIsLogin(!isLogin)}
             className="text-sm text-primary hover:underline"
+            disabled={isSubmitting}
           >
             {isLogin 
               ? "Don't have an account? Sign up" 
