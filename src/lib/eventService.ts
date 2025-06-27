@@ -118,3 +118,72 @@ export const fetchEventAttendees = async (eventId: string) => {
     return { going: [], interested: [] };
   }
 };
+
+export const createEvent = async (eventData: any) => {
+  try {
+    console.log('createEvent: Creating event with data:', eventData);
+    
+    const { data, error } = await supabase
+      .from('events')
+      .insert([eventData])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('createEvent: Error creating event:', error);
+      return { data: null, error };
+    }
+
+    console.log('createEvent: Event created successfully:', data);
+    return { data, error: null };
+  } catch (error) {
+    console.error('createEvent: Unexpected error:', error);
+    return { data: null, error };
+  }
+};
+
+export const updateEvent = async (eventId: string, eventData: any) => {
+  try {
+    console.log(`updateEvent: Updating event ${eventId} with data:`, eventData);
+    
+    const { data, error } = await supabase
+      .from('events')
+      .update(eventData)
+      .eq('id', eventId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('updateEvent: Error updating event:', error);
+      return { data: null, error };
+    }
+
+    console.log('updateEvent: Event updated successfully:', data);
+    return { data, error: null };
+  } catch (error) {
+    console.error('updateEvent: Unexpected error:', error);
+    return { data: null, error };
+  }
+};
+
+export const deleteEvent = async (eventId: string) => {
+  try {
+    console.log(`deleteEvent: Deleting event ${eventId}`);
+    
+    const { error } = await supabase
+      .from('events')
+      .delete()
+      .eq('id', eventId);
+
+    if (error) {
+      console.error('deleteEvent: Error deleting event:', error);
+      return { error };
+    }
+
+    console.log('deleteEvent: Event deleted successfully');
+    return { error: null };
+  } catch (error) {
+    console.error('deleteEvent: Unexpected error:', error);
+    return { error };
+  }
+};
