@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
-import { CreateVenueForm, CreateVenueFormValues } from '@/components/venues/CreateVenueForm';
+import { CreateVenueForm } from '@/components/venues/CreateVenueForm';
+import { CreateVenueFormValues } from '@/components/venues/CreateVenueSchema';
 import { AppPageHeader } from '@/components/ui/AppPageHeader';
 import { useToast } from '@/hooks/use-toast';
 
