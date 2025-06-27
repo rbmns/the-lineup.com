@@ -12,6 +12,7 @@ import { VibesDropdownFilter } from '@/components/events/filters/VibesDropdownFi
 import { CategoriesDropdownFilter } from '@/components/events/filters/CategoriesDropdownFilter';
 import { DateDropdownFilter } from '@/components/events/filters/DateDropdownFilter';
 import { LocationDropdownFilter } from '@/components/events/filters/LocationDropdownFilter';
+import { X } from 'lucide-react';
 
 const Events = () => {
   const isMobile = useIsMobile();
@@ -84,58 +85,120 @@ const Events = () => {
       {/* Content */}
       <div className="w-full px-3 sm:px-4 lg:px-8">
         <div className="space-y-4">
-          {/* Search Bar */}
-          <div className="w-full">
-            <EventSearch 
-              placeholder="Search events..." 
-              className="w-full"
-              square={true}
-            />
-          </div>
+          {/* Search and Filters Row */}
+          <div className="space-y-3 lg:space-y-0">
+            {/* Desktop Layout - Search and Filters on same row */}
+            <div className="hidden lg:flex items-center gap-4">
+              {/* Search - narrower on desktop */}
+              <div className="flex-1 max-w-md">
+                <EventSearch 
+                  placeholder="Search events..." 
+                  className="w-full"
+                  square={true}
+                />
+              </div>
+              
+              {/* Filters */}
+              <div className="flex items-center gap-3">
+                <VibesDropdownFilter
+                  selectedVibes={selectedVibes}
+                  onVibeChange={setSelectedVibes}
+                  events={allEvents || []}
+                  vibesLoading={isLoading}
+                />
+                
+                <CategoriesDropdownFilter
+                  selectedCategories={selectedEventTypes}
+                  onToggleCategory={handleCategoryToggle}
+                  onSelectAll={handleSelectAllCategories}
+                  onDeselectAll={handleDeselectAllCategories}
+                  allEventTypes={allEventTypes}
+                />
+                
+                <DateDropdownFilter
+                  selectedDateFilter={selectedDateFilter}
+                  onDateFilterChange={setSelectedDateFilter}
+                  dateFilters={dateFilters}
+                />
+                
+                <LocationDropdownFilter
+                  venueAreas={venueAreas}
+                  selectedLocationId={selectedLocation}
+                  onLocationChange={setSelectedLocation}
+                  isLoading={areasLoading}
+                  isLocationLoaded={isLocationLoaded}
+                />
 
-          {/* Filter Dropdowns Row */}
-          <div className="flex flex-wrap gap-3">
-            <VibesDropdownFilter
-              selectedVibes={selectedVibes}
-              onVibeChange={setSelectedVibes}
-              events={allEvents || []}
-              vibesLoading={isLoading}
-            />
-            
-            <CategoriesDropdownFilter
-              selectedCategories={selectedEventTypes}
-              onToggleCategory={handleCategoryToggle}
-              onSelectAll={handleSelectAllCategories}
-              onDeselectAll={handleDeselectAllCategories}
-              allEventTypes={allEventTypes}
-            />
-            
-            <DateDropdownFilter
-              selectedDateFilter={selectedDateFilter}
-              onDateFilterChange={setSelectedDateFilter}
-              dateFilters={dateFilters}
-            />
-            
-            <LocationDropdownFilter
-              venueAreas={venueAreas}
-              selectedLocationId={selectedLocation}
-              onLocationChange={setSelectedLocation}
-              isLoading={areasLoading}
-              isLocationLoaded={isLocationLoaded}
-            />
-          </div>
-
-          {/* Clear Filters */}
-          {hasActiveFilters && (
-            <div className="w-full">
-              <button
-                onClick={resetAllFilters}
-                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Clear all filters
-              </button>
+                {/* Clear Filters - Compact */}
+                {hasActiveFilters && (
+                  <button
+                    onClick={resetAllFilters}
+                    className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                    Clear
+                  </button>
+                )}
+              </div>
             </div>
-          )}
+
+            {/* Mobile Layout - Stacked */}
+            <div className="lg:hidden space-y-3">
+              {/* Search Bar */}
+              <div className="w-full">
+                <EventSearch 
+                  placeholder="Search events..." 
+                  className="w-full"
+                  square={true}
+                />
+              </div>
+
+              {/* Filter Dropdowns Row */}
+              <div className="flex flex-wrap gap-3">
+                <VibesDropdownFilter
+                  selectedVibes={selectedVibes}
+                  onVibeChange={setSelectedVibes}
+                  events={allEvents || []}
+                  vibesLoading={isLoading}
+                />
+                
+                <CategoriesDropdownFilter
+                  selectedCategories={selectedEventTypes}
+                  onToggleCategory={handleCategoryToggle}
+                  onSelectAll={handleSelectAllCategories}
+                  onDeselectAll={handleDeselectAllCategories}
+                  allEventTypes={allEventTypes}
+                />
+                
+                <DateDropdownFilter
+                  selectedDateFilter={selectedDateFilter}
+                  onDateFilterChange={setSelectedDateFilter}
+                  dateFilters={dateFilters}
+                />
+                
+                <LocationDropdownFilter
+                  venueAreas={venueAreas}
+                  selectedLocationId={selectedLocation}
+                  onLocationChange={setSelectedLocation}
+                  isLoading={areasLoading}
+                  isLocationLoaded={isLocationLoaded}
+                />
+              </div>
+
+              {/* Clear Filters - Mobile */}
+              {hasActiveFilters && (
+                <div className="w-full">
+                  <button
+                    onClick={resetAllFilters}
+                    className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                    Clear
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Results Section */}
           <div className="w-full">
