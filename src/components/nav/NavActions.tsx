@@ -2,7 +2,7 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { CreateEventButton } from './CreateEventButton';
-import { UserMenu } from './UserMenu';
+import UserMenu from './UserMenu';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
