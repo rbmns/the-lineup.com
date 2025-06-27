@@ -1,125 +1,103 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import { Check, ChevronsUpDown, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { MapPin, X } from 'lucide-react';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
-import { LocationCategory } from '@/utils/locationCategories';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { Event } from '@/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface LocationFilterProps {
-  availableLocations: LocationCategory[];
-  selectedLocation: string | null;
-  onLocationChange: (areaId: string | null) => void;
-  isLoading?: boolean;
-  events?: Event[];
-  showTitle?: boolean;
+  venueAreas: Array<{ id: string; name: string }>;
+  selectedLocationId: string | null;
+  onLocationChange: (locationId: string | null) => void;
+  isLoading: boolean;
+  isLocationLoaded: boolean;
+  className?: string;
 }
 
 export const LocationFilter: React.FC<LocationFilterProps> = ({
-  availableLocations,
-  selectedLocation,
+  venueAreas,
+  selectedLocationId,
   onLocationChange,
-  isLoading = false,
-  events = [],
-  showTitle = true
+  isLoading,
+  isLocationLoaded,
+  className
 }) => {
-  const isMobile = useIsMobile();
-
-  // Filter locations to only show those that have events
-  const locationsWithEvents = React.useMemo(() => {
-    if (!events || events.length === 0) return availableLocations;
-    
-    return availableLocations.filter(area => {
-      const citiesInArea = area.cities;
-      return events.some(event => {
-        if (!event.venues?.city && !event.location) return false;
-        
-        // Skip events with "TBD" or similar in location
-        if (event.location && (
-          event.location.toLowerCase().includes('tbd') || 
-          event.location.toLowerCase().includes('to be determined') ||
-          event.location.toLowerCase().includes('location tbd')
-        )) {
-          return false;
-        }
-        
-        const eventCity = event.venues?.city || event.location;
-        return eventCity && citiesInArea.some(city => 
-          city.toLowerCase() === eventCity.toLowerCase()
-        );
-      });
-    });
-  }, [availableLocations, events]);
+  const [open, setOpen] = useState(false);
 
   if (isLoading) {
     return (
-      <div className="space-y-3 sm:space-y-4">
-        {showTitle && (
-          <h2 className={`${isMobile ? 'text-xl' : 'text-2xl md:text-3xl'} font-semibold tracking-tight text-primary`}>Location</h2>
-        )}
-        <div className="flex flex-wrap gap-2">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className={`${isMobile ? 'h-9 w-24' : 'h-8 w-20'} bg-gray-200 rounded-full animate-pulse`}></div>
-          ))}
-        </div>
+      <div className={cn("space-y-2", className)}>
+        <Skeleton className="h-10 w-full" />
       </div>
     );
   }
 
-  // Always show the filter section, even if no areas have events yet
+  // Find the selected location name
+  const selectedLocation = venueAreas.find(area => area.id === selectedLocationId);
+  const displayValue = selectedLocationId === null ? "All Areas" : selectedLocation?.name || "Select location...";
+
+  // Create options with "All Areas" first
+  const locationOptions = [
+    { id: null, name: "All Areas" },
+    ...venueAreas
+  ];
+
   return (
-    <div className="space-y-3 sm:space-y-4 md:space-y-6">
-      {showTitle && (
-        <div className="flex items-center justify-between">
-          <h2 className={`${isMobile ? 'text-xl' : 'text-2xl md:text-3xl'} font-semibold tracking-tight text-primary`}>Location</h2>
-          {selectedLocation && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onLocationChange(null)}
-              className="h-6 w-6 p-0 hover:bg-primary/10"
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          )}
-        </div>
-      )}
-      
-      <div className="flex flex-wrap gap-2">
-        <Button
-          variant={selectedLocation === null ? "default" : "outline"}
-          size="sm"
-          onClick={() => onLocationChange(null)}
-          className={cn(
-            isMobile ? "text-xs px-3 py-2 h-9" : "text-xs px-3 py-1.5 h-auto",
-            "rounded-full transition-coastal",
-            selectedLocation === null 
-              ? "bg-primary text-white hover:bg-primary/90" 
-              : "border-gray-200 text-neutral hover:bg-primary/5"
-          )}
-        >
-          All Areas
-        </Button>
-        
-        {availableLocations.map(area => (
+    <div className={cn("space-y-2", className)}>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button
-            key={area.id}
-            variant={selectedLocation === area.id ? "default" : "outline"}
-            size="sm"
-            onClick={() => onLocationChange(area.id)}
-            className={cn(
-              isMobile ? "text-xs px-3 py-2 h-9" : "text-xs px-3 py-1.5 h-auto",
-              "rounded-full transition-coastal",
-              selectedLocation === area.id 
-                ? "bg-primary text-white hover:bg-primary/90" 
-                : "border-gray-200 text-neutral hover:bg-primary/5"
-            )}
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between"
           >
-            {area.displayName}
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-gray-400" />
+              <span className="truncate">{displayValue}</span>
+            </div>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
-        ))}
-      </div>
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0" align="start">
+          <Command>
+            <CommandInput placeholder="Search locations..." />
+            <CommandEmpty>No location found.</CommandEmpty>
+            <CommandGroup>
+              {locationOptions.map((location) => (
+                <CommandItem
+                  key={location.id || 'all-areas'}
+                  value={location.name}
+                  onSelect={() => {
+                    onLocationChange(location.id);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      selectedLocationId === location.id ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {location.name}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 };

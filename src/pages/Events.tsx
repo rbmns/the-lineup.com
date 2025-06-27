@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
 import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayout';
@@ -5,6 +6,7 @@ import { EventsResultsSection } from '@/components/events/page-sections/EventsRe
 import { EventsVibeSection } from '@/components/events/page-sections/EventsVibeSection';
 import { useVenueAreas } from '@/hooks/useVenueAreas';
 import { EventsAdvancedSection } from '@/components/events/page-sections/EventsAdvancedSection';
+import { EventSearch } from '@/components/events/search/EventSearch';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnifiedRsvp } from '@/hooks/useUnifiedRsvp';
@@ -70,14 +72,22 @@ const Events = () => {
   return (
     <div className="min-h-screen w-full">
       {/* Header Section - Full width with controlled padding */}
-      <div className="w-full px-2 sm:px-4 lg:px-8 py-12 sm:py-16">
-        <div className="text-center">
+      <div className="w-full px-2 sm:px-4 lg:px-8 py-8 sm:py-12">
+        <div className="text-center space-y-6">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#005F73] mb-4 leading-tight">
             Discover <span className="text-[#2A9D8F]">Events</span>
           </h1>
           <p className="text-lg sm:text-xl text-[#4A4A48] max-w-3xl mx-auto leading-relaxed">
             Discover what's happening nearby — from beach parties to chill yoga sessions.
           </p>
+          
+          {/* Search Bar */}
+          <div className="max-w-2xl mx-auto">
+            <EventSearch 
+              placeholder="Search events by name, location, or vibe..." 
+              className="w-full"
+            />
+          </div>
         </div>
       </div>
 
