@@ -25,27 +25,29 @@ const MainNav = () => {
         <div className="w-full flex flex-col">
           <div className={cn(
             "w-full flex items-center justify-between",
-            isMobile ? "px-3 py-2" : "px-4 py-2.5"
+            isMobile ? "px-4 py-3" : "px-6 py-4"
           )}>
             {/* Left side - Logo */}
             <div className="flex items-center h-full flex-shrink-0">
               {!isMobile && (
-                <Link to="/" className="flex items-center justify-center mr-3 flex-shrink-0">
+                <Link to="/" className="flex items-center justify-center mr-4 flex-shrink-0">
                   <img 
                     src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" 
                     alt="thelineup Symbol" 
-                    className="w-6 h-6 transition-opacity hover:opacity-80" 
+                    className="w-8 h-8 transition-opacity hover:opacity-80" 
                   />
                 </Link>
               )}
               <BrandLogo 
                 showText={true} 
-                className="font-display text-lg text-midnight hover:text-overcast transition-colors" 
+                className="font-display text-xl text-midnight hover:text-overcast transition-colors" 
               />
             </div>
 
             {/* Right side - Actions */}
-            <NavActions />
+            <NavActions 
+              onAuthRequired={handleAuthRequired}
+            />
           </div>
         </div>
       </header>

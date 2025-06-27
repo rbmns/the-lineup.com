@@ -9,7 +9,13 @@ import { cn } from '@/lib/utils';
 import UserMenu from './UserMenu';
 import { CreateEventButton } from './CreateEventButton';
 
-export const NavActions: React.FC = () => {
+interface NavActionsProps {
+  onAuthRequired: () => void;
+}
+
+export const NavActions: React.FC<NavActionsProps> = ({
+  onAuthRequired
+}) => {
   const {
     isAuthenticated,
     user,
@@ -27,10 +33,10 @@ export const NavActions: React.FC = () => {
   return (
     <div className={cn(
       "flex items-center flex-shrink-0",
-      isMobile ? "gap-1.5" : "gap-2 lg:gap-3"
+      isMobile ? "gap-2" : "gap-3 lg:gap-4"
     )}>
       {/* Create Event Button */}
-      <CreateEventButton />
+      <CreateEventButton onAuthRequired={onAuthRequired} />
 
       {isAuthenticated && user ? (
         <>
@@ -56,7 +62,7 @@ export const NavActions: React.FC = () => {
           onClick={handleSignInClick} 
           className={cn(
             "flex-shrink-0 text-midnight hover:text-overcast transition-colors duration-200 font-body",
-            isMobile ? "text-sm px-2 py-1.5" : "text-sm px-3"
+            isMobile ? "text-sm px-3 py-2" : "text-sm px-4"
           )}
         >
           Sign in
