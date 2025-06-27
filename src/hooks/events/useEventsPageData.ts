@@ -38,6 +38,8 @@ export const useEventsPageData = () => {
   const { data: eventsData, isLoading: eventsLoading } = useQuery({
     queryKey: ['events', user?.id],
     queryFn: async () => {
+      console.log('useEventsPageData: Fetching events...');
+      
       let query = supabase
         .from('events')
         .select(`
@@ -56,9 +58,19 @@ export const useEventsPageData = () => {
       const { data, error } = await query;
 
       if (error) {
-        console.error('Error fetching events:', error);
+        console.error('useEventsPageData: Error fetching events:', error);
         throw error;
       }
+
+      console.log(`useEventsPageData: Fetched ${data?.length || 0} events`);
+      console.log('useEventsPageData: Sample events:', data?.slice(0, 3)?.map(e => ({
+        id: e.id,
+        title: e.title,
+        status: e.status,
+        start_date: e.start_date,
+        event_category: e.event_category,
+        vibe: e.vibe
+      })));
 
       // If user is authenticated, fetch RSVP status for each event
       if (user?.id && data) {
@@ -79,7 +91,7 @@ export const useEventsPageData = () => {
               rsvp_status: rsvp?.status || null
             };
             
-            console.log(`Event ${event.id} (${event.title}) RSVP status set to: ${eventWithRsvp.rsvp_status}`);
+            console.log(`useEventsPageData: Event ${event.id} (${event.title}) RSVP status set to: ${eventWithRsvp.rsvp_status}`);
             return eventWithRsvp;
           });
           
@@ -178,14 +190,27 @@ export const useEventsPageData = () => {
     ...new Set(eventsData?.map(event => event.event_category).filter(Boolean))
   ] as string[];
 
+  console.log('useEventsPageData: All event types found:', allEventTypes);
+
   // Filter out past events first
   const upcomingEvents = eventsData?.filter(event => {
-    if (!event.start_date) return true;
+    if (!event.start_date) {
+      console.log(`useEventsPageData: Event ${event.id} has no start_date, including it`);
+      return true;
+    }
     const eventDate = new Date(event.start_date);
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Reset to start of day for comparison
-    return eventDate >= today;
+    const isUpcoming = eventDate >= today;
+    
+    if (!isUpcoming) {
+      console.log(`useEventsPageData: Event ${event.id} (${event.title}) is in the past: ${event.start_date}`);
+    }
+    
+    return isUpcoming;
   }) || [];
+
+  console.log(`useEventsPageData: After filtering past events: ${upcomingEvents.length} upcoming events`);
 
   // Helper function to get cities for a selected area
   const getCitiesForSelectedArea = (areaId: string): string[] => {
@@ -195,25 +220,43 @@ export const useEventsPageData = () => {
 
   // Filter events based on all criteria
   const filteredEvents = upcomingEvents?.filter(event => {
-    // Vibe filter
-    if (selectedVibes.length > 0 && !selectedVibes.includes(event.vibe || 'general')) {
-      return false;
+    console.log(`useEventsPageData: Filtering event ${event.id} (${event.title}):`);
+    
+    // Vibe filter - only apply if vibes are selected
+    if (selectedVibes.length > 0) {
+      const eventVibe = event.vibe || 'general';
+      if (!selectedVibes.includes(eventVibe)) {
+        console.log(`  - Filtered out by vibe: event has '${eventVibe}', selected: [${selectedVibes.join(', ')}]`);
+        return false;
+      }
+      console.log(`  - Passes vibe filter: '${eventVibe}'`);
     }
 
-    // Event type filter
-    if (selectedEventTypes.length > 0 && !selectedEventTypes.includes(event.event_category || '')) {
-      return false;
+    // Event type filter - only apply if types are selected
+    if (selectedEventTypes.length > 0) {
+      const eventCategory = event.event_category || '';
+      if (!selectedEventTypes.includes(eventCategory)) {
+        console.log(`  - Filtered out by event type: event has '${eventCategory}', selected: [${selectedEventTypes.join(', ')}]`);
+        return false;
+      }
+      console.log(`  - Passes event type filter: '${eventCategory}'`);
     }
 
-    // Venue filter
-    if (selectedVenues.length > 0 && !selectedVenues.includes(event.venue_id || '')) {
-      return false;
+    // Venue filter - only apply if venues are selected
+    if (selectedVenues.length > 0) {
+      const eventVenueId = event.venue_id || '';
+      if (!selectedVenues.includes(eventVenueId)) {
+        console.log(`  - Filtered out by venue: event has '${eventVenueId}', selected: [${selectedVenues.join(', ')}]`);
+        return false;
+      }
+      console.log(`  - Passes venue filter: '${eventVenueId}'`);
     }
 
-    // Area-based location filter
+    // Area-based location filter - only apply if location is selected
     if (selectedLocation) {
       // If no venue city or location, exclude this event
       if (!event.venues?.city && !event.location) {
+        console.log(`  - Filtered out by location: event has no venue city or location`);
         return false;
       }
       
@@ -223,6 +266,7 @@ export const useEventsPageData = () => {
         event.location.toLowerCase().includes('to be determined') ||
         event.location.toLowerCase().includes('location tbd')
       )) {
+        console.log(`  - Filtered out by location: event has TBD location: '${event.location}'`);
         return false;
       }
 
@@ -232,23 +276,38 @@ export const useEventsPageData = () => {
       if (eventCity && !citiesInArea.some(city => 
         city.toLowerCase() === eventCity.toLowerCase()
       )) {
+        console.log(`  - Filtered out by location: event city '${eventCity}' not in selected area cities: [${citiesInArea.join(', ')}]`);
         return false;
       }
+      console.log(`  - Passes location filter: '${eventCity}'`);
     }
 
-    // Date filter
+    // Date filter - only apply if date range is set
     if (dateRange?.from && event.start_date) {
       const eventDate = new Date(event.start_date);
       if (eventDate < dateRange.from) {
+        console.log(`  - Filtered out by date: event date ${event.start_date} is before ${dateRange.from}`);
         return false;
       }
       if (dateRange.to && eventDate > dateRange.to) {
+        console.log(`  - Filtered out by date: event date ${event.start_date} is after ${dateRange.to}`);
         return false;
       }
+      console.log(`  - Passes date filter: '${event.start_date}'`);
     }
 
+    console.log(`  - Event passes all filters!`);
     return true;
   }) || [];
+
+  console.log(`useEventsPageData: After all filtering: ${filteredEvents.length} events`);
+  console.log('useEventsPageData: Final filtered events:', filteredEvents.map(e => ({
+    id: e.id,
+    title: e.title,
+    event_category: e.event_category,
+    vibe: e.vibe,
+    start_date: e.start_date
+  })));
 
   // Use RSVP state manager with the user ID
   const rsvpManager = useRsvpStateManager(user?.id);
