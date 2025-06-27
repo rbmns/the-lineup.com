@@ -69,6 +69,12 @@ const Events = () => {
 
   const filteredEventsCount = events?.length || 0;
 
+  // Transform venue data to match expected format
+  const transformedAvailableVenues = availableVenues.map(venue => ({
+    value: venue.id,
+    label: venue.name
+  }));
+
   return (
     <div className="min-h-screen w-full">
       {/* Header Section - Full width with controlled padding */}
@@ -116,7 +122,7 @@ const Events = () => {
               selectedDateFilter={selectedDateFilter} 
               filteredEventsCount={filteredEventsCount} 
               allEventTypes={allEventTypes} 
-              availableVenues={availableVenues} 
+              availableVenues={transformedAvailableVenues}
               events={allEvents || []} 
               venueAreas={venueAreas} 
               isLocationLoaded={isLocationLoaded} 

@@ -20,7 +20,7 @@ interface NavActionsProps {
 }
 
 export const NavActions: React.FC<NavActionsProps> = ({ onAuthRequired }) => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, profile, isAuthenticated, logout } = useAuth();
   const isMobile = useIsMobile();
 
   const handleLogout = () => {
@@ -59,7 +59,7 @@ export const NavActions: React.FC<NavActionsProps> = ({ onAuthRequired }) => {
               )}
             >
               <User className="h-4 w-4" />
-              {!isMobile && <span>{user.username || 'Profile'}</span>}
+              {!isMobile && <span>{profile?.username || 'Profile'}</span>}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
@@ -75,7 +75,7 @@ export const NavActions: React.FC<NavActionsProps> = ({ onAuthRequired }) => {
                 My Events
               </Link>
             </DropdownMenuItem>
-            {user.role === 'admin' && (
+            {profile?.role === 'admin' && (
               <DropdownMenuItem asChild>
                 <Link to="/admin" className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
