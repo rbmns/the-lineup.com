@@ -25,7 +25,7 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
   const [name, setName] = useState('');
   const [gdprConsent, setGdprConsent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, isAuthenticated, user } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +55,17 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
           return;
         }
         console.log("Login successful");
+        
+        toast({
+          title: "Welcome back! 🎉",
+          description: "You're now logged in.",
+        });
+
+        // Wait for auth state to update, then call success
+        setTimeout(() => {
+          onSuccess();
+        }, 500);
+
       } else {
         console.log("Attempting signup with email:", email);
         const { error } = await signUp(email, password, name);
@@ -68,17 +79,29 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
           return;
         }
         console.log("Signup successful");
+
+        // Check if user is immediately authenticated (email confirmation disabled)
+        // Wait a bit for auth state to propagate
+        setTimeout(() => {
+          // Check auth state after signup
+          if (isAuthenticated && user) {
+            console.log("User is immediately authenticated, proceeding with event creation");
+            toast({
+              title: "Account created & you're logged in! 🎉",
+              description: "Publishing your event now...",
+            });
+            onSuccess();
+          } else {
+            console.log("Email confirmation required, showing confirmation message");
+            toast({
+              title: "Account created! 📧",
+              description: "Please check your email to confirm your account. Your event will be ready to publish once confirmed.",
+              duration: 6000,
+            });
+            onClose(); // Close modal but don't trigger success since event can't be published yet
+          }
+        }, 1000);
       }
-
-      toast({
-        title: "Welcome! 🎉",
-        description: isLogin ? "You're now logged in." : "Account created successfully!",
-      });
-
-      // Wait a moment for auth state to update, then call success
-      setTimeout(() => {
-        onSuccess();
-      }, 1000);
 
     } catch (error: any) {
       console.error("Auth error:", error);

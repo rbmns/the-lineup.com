@@ -23,7 +23,7 @@ interface EventFormProps {
 }
 
 export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = false, initialData }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user, session } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [createdEventId, setCreatedEventId] = useState<string | null>(null);
@@ -56,6 +56,8 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
   const handleFormSubmit = async (data: any) => {
     console.log("Form submit called with data:", data);
     console.log("Is authenticated:", isAuthenticated);
+    console.log("User object:", user);
+    console.log("Session object:", session);
     console.log("Is edit mode:", isEditMode);
     
     // If editing an existing event, proceed normally
@@ -63,8 +65,11 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
       return originalOnSubmit(data);
     }
 
+    // Check authentication using multiple indicators for reliability
+    const isUserAuthenticated = isAuthenticated && user && session;
+    
     // If not authenticated, store form data and show auth modal
-    if (!isAuthenticated) {
+    if (!isUserAuthenticated) {
       console.log("User not authenticated, showing auth modal");
       setPendingFormData(data);
       setShowAuthModal(true);
@@ -78,18 +83,29 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
 
   const handleAuthSuccess = async () => {
     console.log("Auth success callback called");
+    console.log("Current auth state - isAuthenticated:", isAuthenticated, "user:", user);
+    
     setShowAuthModal(false);
     
     if (pendingFormData) {
       console.log("Submitting pending form data after auth success");
-      // Submit the form data that was stored before authentication
-      try {
-        await originalOnSubmit(pendingFormData);
-        setPendingFormData(null);
-      } catch (error) {
-        console.error("Error submitting form after auth:", error);
-      }
+      
+      // Add a small delay to ensure auth state is fully propagated
+      setTimeout(async () => {
+        try {
+          await originalOnSubmit(pendingFormData);
+          setPendingFormData(null);
+        } catch (error) {
+          console.error("Error submitting form after auth:", error);
+        }
+      }, 500);
     }
+  };
+
+  const handleAuthModalClose = () => {
+    console.log("Auth modal closed without success");
+    setShowAuthModal(false);
+    setPendingFormData(null);
   };
 
   return (
@@ -146,10 +162,7 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
 
       <PrePublishAuthModal
         open={showAuthModal}
-        onClose={() => {
-          setShowAuthModal(false);
-          setPendingFormData(null);
-        }}
+        onClose={handleAuthModalClose}
         onSuccess={handleAuthSuccess}
       />
 

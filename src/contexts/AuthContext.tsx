@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
@@ -64,6 +65,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.log("User logged in:", newSession.user.id);
             setUser(newSession.user);
             
+            // Immediately update authentication state before profile fetch
             setTimeout(() => {
               refreshProfile(newSession.user);
             }, 0);
@@ -137,19 +139,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (authData?.user) {
         console.log("Sign up successful, creating profile for user:", authData.user.id);
         
-        const newProfile = {
-          id: authData.user.id,
-          username: username || email.split('@')[0],
-          email: email,
-          avatar_url: [] as any[],
-          location: null,
-          location_category: null,
-          status: null,
-          tagline: null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-        
         const profileSuccess = await ensureUserProfileExists(
           authData.user.id, 
           email, 
@@ -166,15 +155,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         
         setIsNewUser(true);
-        toast({
-          title: "Account created!",
-          description: "Check your email to confirm your account.",
-        });
         
+        // For signup, we need to handle both cases:
+        // 1. Email confirmation disabled - user is immediately logged in
+        // 2. Email confirmation enabled - user needs to confirm email
         if (authData.session) {
+          // User is immediately logged in (email confirmation disabled)
+          console.log("User immediately logged in after signup");
           setSession(authData.session);
           setUser(authData.user);
+          
+          // Ensure profile is created and fetched
           await refreshProfile(authData.user);
+          
+          toast({
+            title: "Account created! 🎉",
+            description: "You're now logged in and ready to publish events.",
+          });
+        } else {
+          // Email confirmation required
+          toast({
+            title: "Account created!",
+            description: "Check your email to confirm your account before publishing events.",
+          });
         }
         
         return { error: null };
