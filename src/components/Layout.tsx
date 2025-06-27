@@ -11,7 +11,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
 
 const TOP_NAV_HEIGHT = 64;
-const LEFT_SIDEBAR_WIDTH = 80;
 const MOBILE_BOTTOM_NAV_HEIGHT = 80;
 
 const Layout = () => {
@@ -26,22 +25,6 @@ const Layout = () => {
     <div className="min-h-screen w-full overflow-x-hidden bg-sand">
       <MainNav />
       <div className="flex w-full min-h-screen">
-        {/* Left sidebar - Desktop only */}
-        {!isMobile && (
-          <div
-            className="fixed left-0 bg-sand"
-            style={{
-              top: TOP_NAV_HEIGHT,
-              bottom: 0,
-              width: LEFT_SIDEBAR_WIDTH,
-              zIndex: 30,
-              height: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
-            }}
-          >
-            <LeftSidebar />
-          </div>
-        )}
-
         {/* Main Content Area */}
         <div
           className="flex-1 w-full min-h-screen bg-sand flex flex-col"
@@ -49,7 +32,6 @@ const Layout = () => {
             !isMobile
               ? {
                   paddingTop: TOP_NAV_HEIGHT,
-                  paddingLeft: LEFT_SIDEBAR_WIDTH,
                   minHeight: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
                 }
               : {

@@ -1,15 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { BrandLogo } from '@/components/ui/brand-logo';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { AuthOverlay } from '@/components/auth/AuthOverlay';
 import { NavActions } from './nav/NavActions';
+import { Calendar, Users, Star } from 'lucide-react';
 
 const MainNav = () => {
   const [showAuthOverlay, setShowAuthOverlay] = useState(false);
   const isMobile = useIsMobile();
+  const location = useLocation();
 
   const handleCloseAuthOverlay = () => {
     setShowAuthOverlay(false);
@@ -18,6 +20,24 @@ const MainNav = () => {
   const handleAuthRequired = () => {
     setShowAuthOverlay(true);
   };
+
+  const navItems = [
+    {
+      path: '/events',
+      icon: Calendar,
+      label: 'Events',
+    },
+    {
+      path: '/casual-plans',
+      icon: Star,
+      label: 'Plans',
+    },
+    {
+      path: '/friends',
+      icon: Users,
+      label: 'Friends',
+    },
+  ];
 
   return (
     <>
@@ -43,6 +63,32 @@ const MainNav = () => {
                 className="font-display text-lg text-midnight hover:text-overcast transition-colors" 
               />
             </div>
+
+            {/* Center - Navigation (Desktop only) */}
+            {!isMobile && (
+              <nav className="flex items-center space-x-1">
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location.pathname === item.path;
+
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={cn(
+                        "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                        isActive
+                          ? "text-clay bg-sage/30"
+                          : "text-midnight hover:text-clay hover:bg-sage/20"
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            )}
 
             {/* Right side - Actions */}
             <NavActions 
