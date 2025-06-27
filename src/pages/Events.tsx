@@ -88,8 +88,8 @@ const Events = () => {
       {/* Compact Content */}
       <div className="w-full px-3 sm:px-4 lg:px-8">
         <div className="space-y-2 sm:space-y-3">
-          {/* Compact Search and Location Row */}
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center">
+          {/* Compact Search, Location, and Advanced Filters Row */}
+          <div className="flex flex-col lg:flex-row gap-2 sm:gap-3 items-stretch lg:items-center">
             <div className="flex-1 min-w-0">
               <EventSearch 
                 placeholder="Search events..." 
@@ -97,16 +97,37 @@ const Events = () => {
                 square={true}
               />
             </div>
-            <div className="sm:w-48 flex-shrink-0">
-              <LocationFilter
-                venueAreas={venueAreas}
-                selectedLocationId={selectedLocation}
-                onLocationChange={setSelectedLocation}
-                isLoading={areasLoading}
-                isLocationLoaded={isLocationLoaded}
-                className="w-full"
-                compact={true}
-              />
+            <div className="flex gap-2 sm:gap-3 items-center">
+              <div className="w-full sm:w-48 lg:w-56 flex-shrink-0">
+                <LocationFilter
+                  venueAreas={venueAreas}
+                  selectedLocationId={selectedLocation}
+                  onLocationChange={setSelectedLocation}
+                  isLoading={areasLoading}
+                  isLocationLoaded={isLocationLoaded}
+                  className="w-full"
+                  compact={true}
+                />
+              </div>
+              <div className="flex-shrink-0">
+                <EventsAdvancedSection 
+                  onFilterChange={handleFilterChange} 
+                  selectedEventTypes={selectedEventTypes} 
+                  selectedVenues={selectedVenues} 
+                  selectedVibes={selectedVibes} 
+                  selectedLocation={selectedLocation} 
+                  dateRange={dateRange} 
+                  selectedDateFilter={selectedDateFilter} 
+                  filteredEventsCount={filteredEventsCount} 
+                  allEventTypes={allEventTypes} 
+                  availableVenues={transformedAvailableVenues}
+                  events={allEvents || []} 
+                  venueAreas={venueAreas} 
+                  isLocationLoaded={isLocationLoaded} 
+                  areasLoading={areasLoading}
+                  inline={true}
+                />
+              </div>
             </div>
           </div>
 
@@ -117,26 +138,6 @@ const Events = () => {
               onVibeChange={setSelectedVibes} 
               events={allEvents || []} 
               vibesLoading={isLoading} 
-            />
-          </div>
-
-          {/* Compact Advanced Filters Section */}
-          <div className="w-full">
-            <EventsAdvancedSection 
-              onFilterChange={handleFilterChange} 
-              selectedEventTypes={selectedEventTypes} 
-              selectedVenues={selectedVenues} 
-              selectedVibes={selectedVibes} 
-              selectedLocation={selectedLocation} 
-              dateRange={dateRange} 
-              selectedDateFilter={selectedDateFilter} 
-              filteredEventsCount={filteredEventsCount} 
-              allEventTypes={allEventTypes} 
-              availableVenues={transformedAvailableVenues}
-              events={allEvents || []} 
-              venueAreas={venueAreas} 
-              isLocationLoaded={isLocationLoaded} 
-              areasLoading={areasLoading} 
             />
           </div>
 

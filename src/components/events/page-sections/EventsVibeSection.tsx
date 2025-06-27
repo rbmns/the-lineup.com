@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { VibeFilter } from '@/components/events/VibeFilter';
 import { Event } from '@/types';
 
 interface EventsVibeSectionProps {
@@ -20,22 +19,22 @@ export const EventsVibeSection: React.FC<EventsVibeSectionProps> = ({
   const vibes = [...new Set(events.map(event => event.vibe).filter(Boolean))] as string[];
 
   return (
-    <div className="bg-[#F4E7D3] border border-[#E8DCC6] rounded-lg p-2 sm:p-3">
-      <div className="flex items-center gap-2 mb-2">
-        <h3 className="text-xs sm:text-sm font-medium text-[#005F73]">Vibes</h3>
+    <div className="bg-white border border-gray-200 rounded-lg p-3">
+      <div className="flex items-center gap-2 mb-3">
+        <h3 className="text-sm font-medium text-gray-700">Vibes</h3>
         {selectedVibes.length > 0 && (
-          <span className="px-1.5 py-0.5 bg-[#2A9D8F] text-white rounded-full text-xs font-medium">
+          <span className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
             {selectedVibes.length}
           </span>
         )}
       </div>
-      <div className="flex flex-wrap gap-1 sm:gap-1.5">
+      <div className="flex flex-wrap gap-1.5">
         <button
           onClick={() => onVibeChange([])}
-          className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full border transition-all ${
+          className={`px-3 py-1.5 text-sm rounded-full border transition-all font-medium ${
             selectedVibes.length === 0
-              ? 'bg-[#005F73] text-white border-[#005F73]'
-              : 'bg-white text-[#005F73] border-[#E8DCC6] hover:border-[#005F73]'
+              ? 'bg-gray-900 text-white border-gray-900'
+              : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
           }`}
         >
           All
@@ -49,10 +48,10 @@ export const EventsVibeSection: React.FC<EventsVibeSectionProps> = ({
                 : [...selectedVibes, vibe];
               onVibeChange(newVibes);
             }}
-            className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-full border transition-all capitalize ${
+            className={`px-3 py-1.5 text-sm rounded-full border transition-all capitalize font-medium ${
               selectedVibes.includes(vibe)
-                ? 'bg-[#005F73] text-white border-[#005F73]'
-                : 'bg-white text-[#005F73] border-[#E8DCC6] hover:border-[#005F73]'
+                ? 'bg-gray-900 text-white border-gray-900'
+                : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
             }`}
           >
             {vibe}

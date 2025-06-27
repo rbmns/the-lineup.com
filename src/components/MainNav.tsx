@@ -90,7 +90,7 @@ const MainNav = () => {
               </nav>
             )}
 
-            {/* Right side - Actions */}
+            {/* Right side - Actions (always includes Create on desktop) */}
             <NavActions 
               onAuthRequired={handleAuthRequired}
             />

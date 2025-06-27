@@ -6,6 +6,11 @@ import { CategoryPill } from '@/components/ui/category-pill';
 import { DateFilterPill } from '@/components/events/DateFilterPill';
 import { Event } from '@/types';
 import { cn } from '@/lib/utils';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 interface EventsAdvancedSectionProps {
   onFilterChange: (filters: any) => void;
@@ -22,6 +27,7 @@ interface EventsAdvancedSectionProps {
   venueAreas: any[];
   isLocationLoaded: boolean;
   areasLoading: boolean;
+  inline?: boolean;
 }
 
 export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
@@ -38,9 +44,11 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
   events,
   venueAreas,
   isLocationLoaded,
-  areasLoading
+  areasLoading,
+  inline = false
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const hasActiveFilters = selectedEventTypes.length > 0 || selectedVenues.length > 0 || selectedDateFilter !== '';
   const activeFiltersCount = selectedEventTypes.length + selectedVenues.length + (selectedDateFilter ? 1 : 0);
@@ -68,6 +76,95 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
     });
   };
 
+  // For inline layout on desktop, use a popover
+  if (inline) {
+    return (
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className="flex items-center gap-2 h-10 px-3 relative"
+          >
+            <Filter className="h-4 w-4" />
+            <span className="text-sm">Filters</span>
+            {activeFiltersCount > 0 && (
+              <span className="px-1.5 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                {activeFiltersCount}
+              </span>
+            )}
+            <ChevronDown className="h-4 w-4" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80 p-4" align="end">
+          <div className="space-y-4">
+            {/* Categories */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-medium text-gray-700">Categories</h4>
+                {selectedEventTypes.length > 0 && (
+                  <span className="px-2 py-0.5 bg-gray-100 rounded-full text-xs text-gray-600">
+                    {selectedEventTypes.length}
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {allEventTypes.slice(0, 6).map((category) => (
+                  <CategoryPill 
+                    key={category} 
+                    category={category} 
+                    active={selectedEventTypes.includes(category)}
+                    onClick={() => toggleEventType(category)}
+                    showIcon={false}
+                    size="sm"
+                    className="text-xs"
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Date Filters */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-medium text-gray-700">When</h4>
+                {selectedDateFilter && (
+                  <span className="px-2 py-0.5 bg-gray-100 rounded-full text-xs text-gray-600">
+                    1
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {dateFilters.map((filter) => (
+                  <DateFilterPill
+                    key={filter}
+                    label={filter}
+                    active={selectedDateFilter === filter}
+                    onClick={() => toggleDateFilter(filter)}
+                    className="text-xs"
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Reset button */}
+            {hasActiveFilters && (
+              <div className="pt-2 border-t">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={resetFilters}
+                  className="w-full text-xs"
+                >
+                  Clear all filters
+                </Button>
+              </div>
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
+    );
+  }
+
+  // Original mobile/tablet layout
   return (
     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
       {/* Compact Header */}
