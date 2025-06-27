@@ -8,16 +8,20 @@ import { Link } from 'react-router-dom';
 
 interface NavActionsProps {
   onAuthRequired: () => void;
+  showCreateButton?: boolean;
 }
 
-export const NavActions: React.FC<NavActionsProps> = ({ onAuthRequired }) => {
+export const NavActions: React.FC<NavActionsProps> = ({ 
+  onAuthRequired, 
+  showCreateButton = false 
+}) => {
   const { user, profile, signOut } = useAuth();
 
   return (
     <div className="flex items-center space-x-2">
       {user ? (
         <>
-          <CreateEventButton onAuthRequired={onAuthRequired} />
+          {showCreateButton && <CreateEventButton onAuthRequired={onAuthRequired} />}
           <UserMenu 
             user={user}
             profile={profile}

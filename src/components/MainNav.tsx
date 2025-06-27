@@ -6,6 +6,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { AuthOverlay } from '@/components/auth/AuthOverlay';
 import { NavActions } from './nav/NavActions';
+import { CreateEventButton } from './nav/CreateEventButton';
 import { Calendar, Users, Star } from 'lucide-react';
 
 const MainNav = () => {
@@ -64,35 +65,43 @@ const MainNav = () => {
               />
             </div>
 
-            {/* Center - Navigation (Desktop only) */}
+            {/* Center - Navigation with Create Button (Desktop only) */}
             {!isMobile && (
-              <nav className="flex items-center space-x-1">
-                {navItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = location.pathname === item.path;
+              <div className="flex items-center space-x-1">
+                <nav className="flex items-center space-x-1">
+                  {navItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = location.pathname === item.path;
 
-                  return (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      className={cn(
-                        "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
-                        isActive
-                          ? "text-clay bg-sage/30"
-                          : "text-midnight hover:text-clay hover:bg-sage/20"
-                      )}
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span>{item.label}</span>
-                    </Link>
-                  );
-                })}
-              </nav>
+                    return (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className={cn(
+                          "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                          isActive
+                            ? "text-clay bg-sage/30"
+                            : "text-midnight hover:text-clay hover:bg-sage/20"
+                        )}
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span>{item.label}</span>
+                      </Link>
+                    );
+                  })}
+                </nav>
+                
+                {/* Create Event Button - Part of main nav */}
+                <div className="ml-2">
+                  <CreateEventButton onAuthRequired={handleAuthRequired} />
+                </div>
+              </div>
             )}
 
-            {/* Right side - Actions (always includes Create on desktop) */}
+            {/* Right side - User Actions (no Create button here anymore for desktop) */}
             <NavActions 
               onAuthRequired={handleAuthRequired}
+              showCreateButton={isMobile}
             />
           </div>
         </div>
