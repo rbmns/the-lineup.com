@@ -11,14 +11,19 @@ interface NavActionsProps {
 }
 
 export const NavActions: React.FC<NavActionsProps> = ({ onAuthRequired }) => {
-  const { user } = useAuth();
+  const { user, profile, signOut } = useAuth();
 
   return (
     <div className="flex items-center space-x-2">
       {user ? (
         <>
           <CreateEventButton onAuthRequired={onAuthRequired} />
-          <UserMenu />
+          <UserMenu 
+            user={user}
+            profile={profile}
+            handleSignOut={signOut}
+            canCreateEvents={true}
+          />
         </>
       ) : (
         <>
