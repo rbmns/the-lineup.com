@@ -1,11 +1,13 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SimpleEventForm } from '@/components/events/SimpleEventForm';
 import { OrganizerActivationModal } from '@/components/events/OrganizerActivationModal';
 import { PublishEventModal } from '@/components/events/PublishEventModal';
+import { AuthOverlay } from '@/components/auth/AuthOverlay';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
 type EventFormData = {
   title: string;
@@ -16,6 +18,8 @@ type EventFormData = {
   capacity?: string;
   vibe: string;
   category: string;
+  venueName?: string;
+  venueAddress?: string;
 };
 
 type OrganizerData = {
@@ -29,44 +33,91 @@ export default function CreateEventSimple() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const [eventData, setEventData] = useState<EventFormData | null>(null);
+  const [showAuthOverlay, setShowAuthOverlay] = useState(false);
   const [showOrganizerModal, setShowOrganizerModal] = useState(false);
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleEventSubmit = (data: EventFormData) => {
-    console.log('Event form submitted:', data);
-    setEventData(data);
-    
-    if (isAuthenticated) {
-      // User is logged in, show organizer modal
-      setShowOrganizerModal(true);
-    } else {
-      // User is not logged in, show publish modal for auth
-      setShowPublishModal(true);
+  // Check authentication on mount
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setShowAuthOverlay(true);
     }
+  }, [isAuthenticated]);
+
+  const handleEventSubmit = async (data: EventFormData) => {
+    console.log('Event form submitted:', data);
+    
+    if (!isAuthenticated) {
+      setEventData(data);
+      setShowPublishModal(true);
+      return;
+    }
+
+    // If authenticated, proceed with event creation
+    await createEventWithVenue(data);
   };
 
-  const handleOrganizerSubmit = async (organizerData: OrganizerData) => {
-    if (!eventData || !user) return;
-
+  const createEventWithVenue = async (data: EventFormData, userId?: string) => {
     setIsSubmitting(true);
     
     try {
-      // Here you would normally create the event and organizer data
-      console.log('Creating event with organizer data:', {
-        event: eventData,
-        organizer: organizerData
-      });
+      let venueId = null;
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create venue if venue data is provided
+      if (data.venueName && data.venueAddress) {
+        const { data: venueIdResult, error: venueError } = await supabase.rpc(
+          'create_venue_from_simple_form',
+          {
+            venue_name: data.venueName,
+            venue_address: data.venueAddress,
+            venue_city: data.location,
+            creator_user_id: userId || user?.id
+          }
+        );
+
+        if (venueError) {
+          console.error('Error creating venue:', venueError);
+          throw venueError;
+        }
+
+        venueId = venueIdResult;
+      }
+
+      // Create the event
+      const eventPayload = {
+        title: data.title,
+        description: data.description,
+        location: data.location,
+        start_date: data.date,
+        start_time: data.time,
+        event_category: data.category,
+        vibe: data.vibe,
+        created_by: userId || user?.id,
+        venue_id: venueId,
+        status: 'published'
+      };
+
+      if (data.capacity) {
+        // You could add capacity to events table if needed
+      }
+
+      const { data: event, error: eventError } = await supabase
+        .from('events')
+        .insert(eventPayload)
+        .select()
+        .single();
+
+      if (eventError) {
+        console.error('Error creating event:', eventError);
+        throw eventError;
+      }
 
       toast({
         title: "Event Created! 🎉",
         description: "Your event is now live and ready for attendees.",
       });
 
-      // Show success and redirect
       setTimeout(() => {
         navigate('/events');
       }, 1000);
@@ -83,33 +134,36 @@ export default function CreateEventSimple() {
     }
   };
 
+  const handleOrganizerSubmit = async (organizerData: OrganizerData) => {
+    if (!eventData || !user) return;
+    await createEventWithVenue(eventData);
+  };
+
   const handlePublishWithAuth = async (userData: { email: string; password: string; gdprConsent: boolean }) => {
     if (!eventData) return;
 
     setIsSubmitting(true);
     
     try {
-      // Here you would:
-      // 1. Create user account
-      // 2. Create event with user as organizer
-      console.log('Creating user and event:', {
-        user: userData,
-        event: eventData
+      // Create user account
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: userData.email,
+        password: userData.password,
       });
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (signUpError) throw signUpError;
 
-      toast({
-        title: "Welcome to The Lineup! 🎉",
-        description: "Your event is now live! You're now an organizer on The Lineup.",
-      });
+      if (authData.user) {
+        // Create event with the new user
+        await createEventWithVenue(eventData, authData.user.id);
 
-      // Close modal and redirect
-      setShowPublishModal(false);
-      setTimeout(() => {
-        navigate('/events');
-      }, 1000);
+        toast({
+          title: "Welcome to The Lineup! 🎉",
+          description: "Your event is now live! You're now an organizer on The Lineup.",
+        });
+
+        setShowPublishModal(false);
+      }
 
     } catch (error) {
       console.error('Error creating user and event:', error);
@@ -133,13 +187,23 @@ export default function CreateEventSimple() {
     setEventData(null);
   };
 
+  const handleAuthSuccess = () => {
+    setShowAuthOverlay(false);
+  };
+
+  const handleBrowseEvents = () => {
+    navigate('/events');
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <SimpleEventForm 
-        onSubmit={handleEventSubmit}
-        onCancel={handleCancel}
-        isSubmitting={isSubmitting}
-      />
+      {!showAuthOverlay && (
+        <SimpleEventForm 
+          onSubmit={handleEventSubmit}
+          onCancel={handleCancel}
+          isSubmitting={isSubmitting}
+        />
+      )}
       
       <OrganizerActivationModal
         isOpen={showOrganizerModal}
@@ -154,6 +218,18 @@ export default function CreateEventSimple() {
         onSubmit={handlePublishWithAuth}
         isSubmitting={isSubmitting}
       />
+
+      {showAuthOverlay && (
+        <AuthOverlay
+          title="Join to Create Events"
+          description="Sign up or log in to create and organize your own events!"
+          browseEventsButton={true}
+          onClose={handleAuthSuccess}
+          onBrowseEvents={handleBrowseEvents}
+        >
+          <></>
+        </AuthOverlay>
+      )}
     </div>
   );
 }

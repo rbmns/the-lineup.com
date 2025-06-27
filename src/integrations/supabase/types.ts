@@ -892,7 +892,9 @@ export type Database = {
       }
       venues: {
         Row: {
+          address: string | null
           city: string | null
+          coordinates: unknown | null
           created_at: string | null
           creator_id: string | null
           google_maps: string | null
@@ -904,7 +906,9 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          address?: string | null
           city?: string | null
+          coordinates?: unknown | null
           created_at?: string | null
           creator_id?: string | null
           google_maps?: string | null
@@ -916,7 +920,9 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          address?: string | null
           city?: string | null
+          coordinates?: unknown | null
           created_at?: string | null
           creator_id?: string | null
           google_maps?: string | null
@@ -972,6 +978,15 @@ export type Database = {
       }
     }
     Functions: {
+      create_venue_from_simple_form: {
+        Args: {
+          venue_name: string
+          venue_address: string
+          venue_city: string
+          creator_user_id?: string
+        }
+        Returns: string
+      }
       has_role: {
         Args: { user_id: string; role_name: string }
         Returns: boolean

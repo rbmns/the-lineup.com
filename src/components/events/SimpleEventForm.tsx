@@ -7,8 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { MapPin, Calendar, Clock } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { MapPin, Calendar, Clock, Building } from 'lucide-react';
 
 // Vibe options with emojis
 const VIBES = [
@@ -42,7 +41,9 @@ const eventSchema = z.object({
   time: z.string().min(1, 'Time is required'),
   capacity: z.string().optional(),
   vibe: z.string().min(1, 'Please select a vibe'),
-  category: z.string().min(1, 'Please select a category')
+  category: z.string().min(1, 'Please select a category'),
+  venueName: z.string().optional(),
+  venueAddress: z.string().optional()
 });
 
 type EventFormData = z.infer<typeof eventSchema>;
@@ -71,7 +72,9 @@ export const SimpleEventForm: React.FC<SimpleEventFormProps> = ({
       time: '',
       capacity: '',
       vibe: '',
-      category: ''
+      category: '',
+      venueName: '',
+      venueAddress: ''
     }
   });
 
@@ -129,14 +132,42 @@ export const SimpleEventForm: React.FC<SimpleEventFormProps> = ({
           )}
         </div>
 
-        {/* Location */}
+        {/* Venue Name */}
         <div>
-          <Label htmlFor="location" className="text-sm font-medium text-midnight">Location</Label>
+          <Label htmlFor="venueName" className="text-sm font-medium text-midnight">Venue Name (optional)</Label>
+          <div className="relative mt-1">
+            <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-overcast" />
+            <Input
+              id="venueName"
+              placeholder="Beach Club Amsterdam"
+              className="pl-10"
+              {...form.register('venueName')}
+            />
+          </div>
+        </div>
+
+        {/* Venue Address */}
+        <div>
+          <Label htmlFor="venueAddress" className="text-sm font-medium text-midnight">Venue Address (optional)</Label>
+          <div className="relative mt-1">
+            <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-overcast" />
+            <Input
+              id="venueAddress"
+              placeholder="123 Beach Street"
+              className="pl-10"
+              {...form.register('venueAddress')}
+            />
+          </div>
+        </div>
+
+        {/* Location (City) */}
+        <div>
+          <Label htmlFor="location" className="text-sm font-medium text-midnight">City</Label>
           <div className="relative mt-1">
             <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-overcast" />
             <Input
               id="location"
-              placeholder="Enter location"
+              placeholder="Amsterdam"
               className="pl-10"
               {...form.register('location')}
             />
@@ -257,7 +288,7 @@ export const SimpleEventForm: React.FC<SimpleEventFormProps> = ({
             className="flex-1 bg-midnight text-ivory hover:bg-overcast"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Creating...' : 'Create Event'}
+            {isSubmitting ? 'Publishing...' : 'Publish Event'}
           </Button>
         </div>
       </form>
