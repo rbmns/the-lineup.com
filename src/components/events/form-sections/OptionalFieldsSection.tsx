@@ -5,7 +5,6 @@ import { FormValues } from '@/components/events/form/EventFormTypes';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { VibeField } from './VibeField';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -45,18 +44,18 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
       </CollapsibleTrigger>
       
       <CollapsibleContent className="space-y-6 mt-4 pt-4 border-t border-gray-200">
-        {/* Organizer Link */}
+        {/* Booking Link */}
         <div>
-          <Label htmlFor="organizer_link">Organizer Link</Label>
+          <Label htmlFor="booking_link">Booking Link</Label>
           <Input
-            id="organizer_link"
+            id="booking_link"
             type="url"
-            placeholder="https://your-website.com"
-            {...register("organizer_link")}
-            aria-invalid={errors.organizer_link ? "true" : "false"}
+            placeholder="https://booking-website.com"
+            {...register("booking_link")}
+            aria-invalid={errors.booking_link ? "true" : "false"}
           />
-          {errors.organizer_link && (
-            <p className="text-red-500 text-sm mt-1">{errors.organizer_link.message}</p>
+          {errors.booking_link && (
+            <p className="text-red-500 text-sm mt-1">{errors.booking_link.message}</p>
           )}
         </div>
 
@@ -76,24 +75,6 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
             <p className="text-red-500 text-sm mt-1">{errors.fee.message}</p>
           )}
         </div>
-
-        {/* Booking Link */}
-        <div>
-          <Label htmlFor="booking_link">Booking Link</Label>
-          <Input
-            id="booking_link"
-            type="url"
-            placeholder="https://booking-website.com"
-            {...register("booking_link")}
-            aria-invalid={errors.booking_link ? "true" : "false"}
-          />
-          {errors.booking_link && (
-            <p className="text-red-500 text-sm mt-1">{errors.booking_link.message}</p>
-          )}
-        </div>
-
-        {/* Vibe */}
-        <VibeField control={control} />
 
         {/* Extra Info */}
         <div>
@@ -119,6 +100,9 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
             {...register("tags")}
             aria-invalid={errors.tags ? "true" : "false"}
           />
+          <p className="text-sm text-gray-600 mt-1">
+            Add relevant tags to increase your chances of being found in event searches
+          </p>
           {errors.tags && (
             <p className="text-red-500 text-sm mt-1">{errors.tags.message}</p>
           )}

@@ -6,9 +6,10 @@ import { PrePublishAuthModal } from './PrePublishAuthModal';
 import { EventPublishedModal } from './EventPublishedModal';
 import { TitleField } from './form-sections/TitleField';
 import { DescriptionField } from './form-sections/DescriptionField';
-import { CategoryField } from './form-sections/CategoryField';
 import { DateTimeFields } from './form-sections/DateTimeFields';
 import { VenueField } from './form-sections/VenueField';
+import { CategoryToggleField } from './form-sections/CategoryToggleField';
+import { VibeToggleField } from './form-sections/VibeToggleField';
 import { OptionalFieldsSection } from './form-sections/OptionalFieldsSection';
 import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
@@ -83,7 +84,6 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
           <div className="space-y-6">
             <TitleField register={register} errors={errors} />
             <DescriptionField register={register} errors={errors} />
-            <CategoryField watch={watch} setValue={setValue} errors={errors} />
             <DateTimeFields register={register} watch={watch} setValue={setValue} errors={errors} />
             <VenueField 
               watch={watch} 
@@ -93,6 +93,8 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
               isLoadingVenues={isLoadingVenues} 
               onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)}
             />
+            <CategoryToggleField watch={watch} setValue={setValue} errors={errors} />
+            <VibeToggleField watch={watch} setValue={setValue} errors={errors} />
           </div>
 
           {/* Optional Fields */}
