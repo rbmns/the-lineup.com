@@ -1,14 +1,11 @@
 
 import React, { useState } from 'react';
+import { Filter, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
-import { EventCategoryPills } from '@/components/events/EventCategoryPills';
-import { DateRangeFilter } from '@/components/events/DateRangeFilter';
-import { VenueFilter } from '@/components/events/VenueFilter';
-import { LocationFilter } from '@/components/events/filters/LocationFilter';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
+import { CategoryPill } from '@/components/ui/category-pill';
+import { DateFilterPill } from '@/components/events/DateFilterPill';
 import { Event } from '@/types';
+import { cn } from '@/lib/utils';
 
 interface EventsAdvancedSectionProps {
   onFilterChange: (filters: any) => void;
@@ -20,9 +17,9 @@ interface EventsAdvancedSectionProps {
   selectedDateFilter: string;
   filteredEventsCount: number;
   allEventTypes: string[];
-  availableVenues: Array<{ value: string; label: string }>;
+  availableVenues: Array<{ value: string, label: string }>;
   events: Event[];
-  venueAreas: Array<{ id: string; name: string }>;
+  venueAreas: any[];
   isLocationLoaded: boolean;
   areasLoading: boolean;
 }
@@ -43,187 +40,126 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
   isLocationLoaded,
   areasLoading
 }) => {
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  const isMobile = useIsMobile();
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  const hasActiveFilters = selectedEventTypes.length > 0 || 
-                          selectedVenues.length > 0 || 
-                          selectedVibes.length > 0 ||
-                          selectedLocation !== null ||
-                          !!dateRange || 
-                          (selectedDateFilter && selectedDateFilter !== '');
+  const hasActiveFilters = selectedEventTypes.length > 0 || selectedVenues.length > 0 || selectedDateFilter !== '';
+  const activeFiltersCount = selectedEventTypes.length + selectedVenues.length + (selectedDateFilter ? 1 : 0);
 
-  const getActiveFiltersCount = () => {
-    let count = 0;
-    if (selectedEventTypes.length > 0) count += selectedEventTypes.length;
-    if (selectedVenues.length > 0) count += selectedVenues.length;
-    if (selectedLocation !== null) count += 1;
-    if (dateRange || (selectedDateFilter && selectedDateFilter !== '')) count += 1;
-    return count;
-  };
+  const dateFilters = ['today', 'tomorrow', 'this week', 'this weekend', 'next week', 'later'];
 
-  const activeFiltersCount = getActiveFiltersCount();
-
-  const handleToggleCategory = (category: string) => {
-    const newTypes = selectedEventTypes.includes(category)
-      ? selectedEventTypes.filter(t => t !== category)
-      : [...selectedEventTypes, category];
+  const toggleEventType = (eventType: string) => {
+    const newTypes = selectedEventTypes.includes(eventType)
+      ? selectedEventTypes.filter(t => t !== eventType)
+      : [...selectedEventTypes, eventType];
     onFilterChange({ eventTypes: newTypes });
   };
 
-  const handleSelectAllCategories = () => {
-    onFilterChange({ eventTypes: allEventTypes });
+  const toggleDateFilter = (filter: string) => {
+    const newFilter = selectedDateFilter === filter ? '' : filter;
+    onFilterChange({ dateFilter: newFilter });
   };
 
-  const handleDeselectAllCategories = () => {
-    onFilterChange({ eventTypes: [] });
-  };
-
-  const handleResetCategories = () => {
-    onFilterChange({ eventTypes: [] });
-  };
-
-  const handleVenueChange = (venues: string[]) => {
-    onFilterChange({ venues });
-  };
-
-  const handleLocationChange = (locationId: string | null) => {
-    onFilterChange({ location: locationId });
-  };
-
-  const handleDateRangeChange = (range: any) => {
-    onFilterChange({ date: range, dateFilter: '' });
-  };
-
-  const handleDateFilterChange = (filter: string) => {
-    onFilterChange({ dateFilter: filter, date: undefined });
-  };
-
-  const handleResetAll = () => {
+  const resetFilters = () => {
     onFilterChange({
       eventTypes: [],
       venues: [],
-      vibes: [],
-      location: null,
-      date: undefined,
-      dateFilter: ''
+      dateFilter: '',
+      date: undefined
     });
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Category Pills - Always visible */}
-      <div className="space-y-3 sm:space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className={`${isMobile ? 'text-lg' : 'text-xl md:text-2xl'} font-semibold tracking-tight text-primary`}>
-            Browse by category
-          </h2>
-          {!isMobile && selectedEventTypes.length > 0 && (
-            <div className="text-sm text-neutral-50">
-              {selectedEventTypes.length} of {allEventTypes.length} categories selected
-            </div>
-          )}
+    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      {/* Compact Header */}
+      <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-100">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="flex items-center gap-2 text-sm font-medium"
+          >
+            <Filter className="h-4 w-4" />
+            <span>Filters</span>
+            {activeFiltersCount > 0 && (
+              <span className="px-1.5 py-0.5 bg-[#2A9D8F] text-white rounded-full text-xs">
+                {activeFiltersCount}
+              </span>
+            )}
+            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
         </div>
         
-        <EventCategoryPills
-          categories={allEventTypes}
-          selectedCategories={selectedEventTypes}
-          onToggleCategory={handleToggleCategory}
-          onSelectAll={handleSelectAllCategories}
-          onDeselectAll={handleDeselectAllCategories}
-          onReset={handleResetCategories}
-          showActions={!isMobile}
-        />
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-500">
+            {filteredEventsCount} events
+          </span>
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={resetFilters}
+              className="text-xs text-gray-500 hover:text-gray-700"
+            >
+              Clear
+            </Button>
+          )}
+        </div>
       </div>
 
-      {/* Advanced Filters Toggle */}
-      <div className="flex items-center justify-between">
-        <Button
-          variant={showAdvancedFilters ? "default" : "outline"}
-          onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-          className={cn(
-            "flex items-center gap-2 transition-all",
-            showAdvancedFilters && "bg-primary text-white"
-          )}
-          size={isMobile ? "sm" : "default"}
-        >
-          <Filter className="h-4 w-4" />
-          <span>Advanced Filters</span>
-          {activeFiltersCount > 0 && (
-            <span className="ml-1 bg-white text-primary rounded-full px-2 py-0.5 text-xs font-medium">
-              {activeFiltersCount}
-            </span>
-          )}
-          {showAdvancedFilters ? (
-            <ChevronUp className="h-4 w-4" />
-          ) : (
-            <ChevronDown className="h-4 w-4" />
-          )}
-        </Button>
-        
-        {hasActiveFilters && (
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={handleResetAll}
-            className="text-gray-500 hover:text-gray-700 flex items-center gap-1"
-          >
-            <X className="h-4 w-4" />
-            Reset all
-          </Button>
-        )}
-      </div>
-
-      {/* Advanced Filters Panel */}
-      {showAdvancedFilters && (
-        <div className="bg-gray-50 rounded-lg p-4 sm:p-6 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Location Filter */}
-            <div className="space-y-2">
-              <h3 className="font-medium text-sm">Location</h3>
-              <LocationFilter
-                venueAreas={venueAreas}
-                selectedLocationId={selectedLocation}
-                onLocationChange={handleLocationChange}
-                isLoading={areasLoading}
-                isLocationLoaded={isLocationLoaded}
-              />
+      {/* Expandable Content */}
+      {isExpanded && (
+        <div className="p-3 sm:p-4 space-y-4">
+          {/* Categories */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <h4 className="text-sm font-medium text-gray-700">Categories</h4>
+              {selectedEventTypes.length > 0 && (
+                <span className="px-1.5 py-0.5 bg-gray-100 rounded-full text-xs text-gray-600">
+                  {selectedEventTypes.length}
+                </span>
+              )}
             </div>
-
-            {/* Venue Filter */}
-            <div className="space-y-2">
-              <h3 className="font-medium text-sm">Venue</h3>
-              <VenueFilter
-                venues={availableVenues}
-                selectedVenues={selectedVenues}
-                onVenueChange={handleVenueChange}
-                onReset={() => handleVenueChange([])}
-              />
+            <div className="flex flex-wrap gap-1.5">
+              {allEventTypes.slice(0, 8).map((category) => (
+                <CategoryPill 
+                  key={category} 
+                  category={category} 
+                  active={selectedEventTypes.includes(category)}
+                  onClick={() => toggleEventType(category)}
+                  showIcon={false}
+                  size="sm"
+                  className="text-xs"
+                />
+              ))}
             </div>
+          </div>
 
-            {/* Date Filter */}
-            <div className="space-y-2">
-              <h3 className="font-medium text-sm">Date</h3>
-              <DateRangeFilter
-                dateRange={dateRange}
-                onDateRangeChange={handleDateRangeChange}
-                onReset={() => handleDateRangeChange(undefined)}
-                selectedDateFilter={selectedDateFilter}
-                onDateFilterChange={handleDateFilterChange}
-              />
+          {/* Date Filters */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <h4 className="text-sm font-medium text-gray-700">When</h4>
+              {selectedDateFilter && (
+                <span className="px-1.5 py-0.5 bg-gray-100 rounded-full text-xs text-gray-600">
+                  1
+                </span>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {dateFilters.map((filter) => (
+                <DateFilterPill
+                  key={filter}
+                  label={filter}
+                  active={selectedDateFilter === filter}
+                  onClick={() => toggleDateFilter(filter)}
+                  size="sm"
+                  className="text-xs"
+                />
+              ))}
             </div>
           </div>
         </div>
       )}
-
-      {/* Results Summary */}
-      <div className="text-center text-sm text-gray-600">
-        {filteredEventsCount > 0 ? (
-          <span>Showing {filteredEventsCount} event{filteredEventsCount !== 1 ? 's' : ''}</span>
-        ) : (
-          <span>No events found with current filters</span>
-        )}
-      </div>
     </div>
   );
 };

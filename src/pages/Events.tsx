@@ -41,11 +41,6 @@ const Events = () => {
 
   const { data: venueAreas = [], isLoading: areasLoading } = useVenueAreas();
 
-  // Debug logging
-  console.log('Events page - venueAreas:', venueAreas);
-  console.log('Events page - selectedLocation:', selectedLocation);
-  console.log('Events page - isLocationLoaded:', isLocationLoaded);
-
   const handleFilterChange = (filters: any) => {
     if (filters.eventTypes !== undefined) {
       setSelectedEventTypes(filters.eventTypes);
@@ -77,30 +72,30 @@ const Events = () => {
 
   return (
     <div className="min-h-screen w-full">
-      {/* Header Section - Full width with controlled padding */}
-      <div className="w-full px-2 sm:px-4 lg:px-8 py-8 sm:py-12">
-        <div className="text-center space-y-6">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#005F73] mb-4 leading-tight">
+      {/* Compact Header Section */}
+      <div className="w-full px-3 sm:px-4 lg:px-8 py-4 sm:py-6">
+        <div className="text-center space-y-3 sm:space-y-4">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#005F73] leading-tight">
             Discover <span className="text-[#2A9D8F]">Events</span>
           </h1>
-          <p className="text-lg sm:text-xl text-[#4A4A48] max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-[#4A4A48] max-w-2xl mx-auto leading-relaxed">
             Discover what's happening nearby — from beach parties to chill yoga sessions.
           </p>
           
-          {/* Search Bar */}
-          <div className="max-w-2xl mx-auto">
+          {/* Compact Search Bar */}
+          <div className="max-w-xl mx-auto">
             <EventSearch 
-              placeholder="Search events by name, location, or vibe..." 
-              className="w-full"
+              placeholder="Search events..." 
+              className="w-full h-10"
             />
           </div>
         </div>
       </div>
 
-      {/* Content - Full width with reduced mobile padding */}
-      <div className="w-full px-2 sm:px-4 lg:px-8">
-        <div className="space-y-4 sm:space-y-6">
-          {/* Vibe Filter */}
+      {/* Compact Content */}
+      <div className="w-full px-3 sm:px-4 lg:px-8">
+        <div className="space-y-3 sm:space-y-4">
+          {/* Compact Vibe Filter */}
           <div className="w-full">
             <EventsVibeSection 
               selectedVibes={selectedVibes} 
@@ -110,7 +105,7 @@ const Events = () => {
             />
           </div>
 
-          {/* Advanced Filters Section */}
+          {/* Compact Advanced Filters Section */}
           <div className="w-full">
             <EventsAdvancedSection 
               onFilterChange={handleFilterChange} 
