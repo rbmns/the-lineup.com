@@ -36,7 +36,7 @@ export const NavActions: React.FC<NavActionsProps> = ({
       isMobile ? "gap-2" : "gap-3 lg:gap-4"
     )}>
       {/* Create Event Button */}
-      <CreateEventButton onAuthRequired={onAuthRequired} />
+      <CreateEventButton />
 
       {isAuthenticated && user ? (
         <>
