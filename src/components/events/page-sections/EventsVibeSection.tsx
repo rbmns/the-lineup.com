@@ -16,6 +16,9 @@ export const EventsVibeSection: React.FC<EventsVibeSectionProps> = ({
   events,
   vibesLoading
 }) => {
+  // Extract unique vibes from events
+  const vibes = [...new Set(events.map(event => event.vibe).filter(Boolean))] as string[];
+
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-3 sm:p-4">
       <div className="flex items-center gap-2 mb-2">
@@ -27,12 +30,11 @@ export const EventsVibeSection: React.FC<EventsVibeSectionProps> = ({
         )}
       </div>
       <VibeFilter
+        vibes={vibes}
         selectedVibes={selectedVibes}
         onVibeChange={onVibeChange}
-        events={events}
         isLoading={vibesLoading}
         className="gap-1.5"
-        compact={true}
       />
     </div>
   );

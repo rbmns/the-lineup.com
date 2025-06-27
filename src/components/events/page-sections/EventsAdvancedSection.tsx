@@ -152,7 +152,6 @@ export const EventsAdvancedSection: React.FC<EventsAdvancedSectionProps> = ({
                   label={filter}
                   active={selectedDateFilter === filter}
                   onClick={() => toggleDateFilter(filter)}
-                  size="sm"
                   className="text-xs"
                 />
               ))}
