@@ -8,6 +8,7 @@ import { ensureUserProfileExists, safeFetchProfile, createDefaultUserProfile } f
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   profile: UserProfile | null;
   isAuthenticated: boolean;
   loading: boolean;
@@ -27,6 +28,7 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
+  session: null,
   profile: null,
   isAuthenticated: false,
   loading: true,
