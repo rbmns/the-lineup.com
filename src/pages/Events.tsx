@@ -259,7 +259,7 @@ const Events = () => {
                 />
               </div>
               
-              {/* Filters and Clear Button Container */}
+              {/* Filters Container */}
               <div className="flex items-center gap-3">
                 <VibesDropdownFilter
                   selectedVibes={selectedVibes}
@@ -289,18 +289,18 @@ const Events = () => {
                   isLoading={areasLoading}
                   isLocationLoaded={isLocationLoaded}
                 />
-
-                {/* Clear Filters - More Prominent */}
-                {(hasActiveFilters || searchQuery.trim()) && (
-                  <button
-                    onClick={handleResetAllFilters}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 border border-red-500 rounded-lg transition-all duration-200 hover:shadow-lg"
-                  >
-                    <X className="h-4 w-4" />
-                    Clear All
-                  </button>
-                )}
               </div>
+
+              {/* Clear Filters - Less prominent, lower hierarchy */}
+              {(hasActiveFilters || searchQuery.trim()) && (
+                <button
+                  onClick={handleResetAllFilters}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-normal text-gray-500 hover:text-gray-700 hover:bg-gray-50 border border-gray-200 rounded-md transition-colors"
+                >
+                  <X className="h-3.5 w-3.5" />
+                  Clear
+                </button>
+              )}
             </div>
 
             {/* Mobile Layout - Stacked with improved spacing */}
@@ -348,14 +348,14 @@ const Events = () => {
                 />
               </div>
 
-              {/* Clear Filters - Mobile */}
+              {/* Clear Filters - Mobile, less prominent */}
               {(hasActiveFilters || searchQuery.trim()) && (
-                <div className="w-full">
+                <div className="flex justify-end">
                   <button
                     onClick={handleResetAllFilters}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 border border-red-500 rounded-lg transition-all duration-200 hover:shadow-lg"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-normal text-gray-500 hover:text-gray-700 hover:bg-gray-50 border border-gray-200 rounded-md transition-colors"
                   >
-                    <X className="h-4 w-4" />
+                    <X className="h-3.5 w-3.5" />
                     Clear All
                   </button>
                 </div>
