@@ -22,9 +22,9 @@ import CasualPlans from '@/pages/CasualPlans';
 import CreateCasualPlanPage from '@/components/casual-plans/CreateCasualPlanPage';
 import CreateEventSimple from '@/pages/CreateEventSimple';
 
-const TOP_NAV_HEIGHT = 64;
-const LEFT_SIDEBAR_WIDTH = 80;
-const MOBILE_BOTTOM_NAV_HEIGHT = 80;
+const TOP_NAV_HEIGHT = 48;
+const LEFT_SIDEBAR_WIDTH = 64;
+const MOBILE_BOTTOM_NAV_HEIGHT = 64;
 
 const Layout = () => {
   const { user, loading } = useAuth();
@@ -73,7 +73,7 @@ const Layout = () => {
         >
           {/* Main content with coastal spacing */}
           <main className="w-full flex-1 flex flex-col">
-            <div className={`flex-1 flex flex-col ${!isHomePage ? 'py-8 px-6' : ''}`}>
+            <div className={`flex-1 flex flex-col ${!isHomePage ? 'py-6 px-4' : ''}`}>
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/profile/:userId" element={<ProfilePage />} />
