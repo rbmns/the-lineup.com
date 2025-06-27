@@ -6,9 +6,21 @@ import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/toaster";
 import { CookieConsent } from "@/components/CookieConsent";
 import { useEffect } from "react";
-import { useLocation, Outlet } from 'react-router-dom';
+import { useLocation, Routes, Route } from 'react-router-dom';
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
+
+import Home from '@/pages/Home';
+import ProfilePage from '@/pages/ProfilePage';
+import ProfileEdit from '@/pages/ProfileEdit';
+import Events from '@/pages/Events';
+import EventDetailPage from '@/pages/events/EventDetailPage';
+import CreateEvent from '@/pages/events/create';
+import OrganisePage from '@/pages/OrganisePage';
+import CreateVenuePage from '@/pages/CreateVenuePage';
+import CasualPlans from '@/pages/CasualPlans';
+import CreateCasualPlanPage from '@/components/casual-plans/CreateCasualPlanPage';
+import CreateEventSimple from '@/pages/CreateEventSimple';
 
 const TOP_NAV_HEIGHT = 64;
 const LEFT_SIDEBAR_WIDTH = 80;
@@ -62,7 +74,19 @@ const Layout = () => {
           {/* Main content with coastal spacing */}
           <main className="w-full flex-1 flex flex-col">
             <div className={`flex-1 flex flex-col ${!isHomePage ? 'py-8 px-6' : ''}`}>
-              <Outlet />
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/profile/:userId" element={<ProfilePage />} />
+                <Route path="/profile/edit" element={<ProfileEdit />} />
+                <Route path="/events" element={<Events />} />
+                <Route path="/events/:eventId" element={<EventDetailPage />} />
+                <Route path="/events/create" element={<CreateEvent />} />
+                <Route path="/organise" element={<OrganisePage />} />
+                <Route path="/venues/create" element={<CreateVenuePage />} />
+                <Route path="/casual-plans" element={<CasualPlans />} />
+                <Route path="/casual-plans/create" element={<CreateCasualPlanPage />} />
+                <Route path="/events/create-simple" element={<CreateEventSimple />} />
+              </Routes>
             </div>
           </main>
           {!isMobile && <Footer />}

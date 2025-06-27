@@ -23,19 +23,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <AuthProvider>
-          <Routes>
-            <Route path="/" element={<Layout><Home /></Layout>} />
-            <Route path="/profile/:userId" element={<Layout><ProfilePage /></Layout>} />
-            <Route path="/profile/edit" element={<Layout><ProfileEdit /></Layout>} />
-            <Route path="/events" element={<Layout><Events /></Layout>} />
-            <Route path="/events/:eventId" element={<Layout><EventDetailPage /></Layout>} />
-            <Route path="/events/create" element={<Layout><CreateEvent /></Layout>} />
-            <Route path="/organise" element={<Layout><OrganisePage /></Layout>} />
-            <Route path="/venues/create" element={<Layout><CreateVenuePage /></Layout>} />
-            <Route path="/casual-plans" element={<Layout><CasualPlans /></Layout>} />
-            <Route path="/casual-plans/create" element={<Layout><CreateCasualPlanPage /></Layout>} />
-            <Route path="/events/create-simple" element={<CreateEventSimple />} />
-          </Routes>
+          <Layout />
         </AuthProvider>
       </Router>
     </QueryClientProvider>

@@ -17,7 +17,7 @@ export const useEventsFilters = (props: UseEventsFiltersProps) => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(props.initialDateRange || undefined);
   const [vibe, setVibe] = useState(props.initialVibe || 'all');
 
-  const { data: events, isLoading, isError, error, refetch } = useEvents();
+  const { data: events, isLoading, error, refetch } = useEvents();
 
   const handleCategoryChange = (newCategory: string) => {
     setCategory(newCategory);
@@ -53,7 +53,7 @@ export const useEventsFilters = (props: UseEventsFiltersProps) => {
   return {
     events: filteredEvents,
     isLoading,
-    isError,
+    isError: !!error,
     error,
     refetch,
     category,
