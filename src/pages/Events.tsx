@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
 import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayout';
 import { EventsResultsSection } from '@/components/events/page-sections/EventsResultsSection';
@@ -13,6 +12,7 @@ import { CategoriesDropdownFilter } from '@/components/events/filters/Categories
 import { DateDropdownFilter } from '@/components/events/filters/DateDropdownFilter';
 import { LocationDropdownFilter } from '@/components/events/filters/LocationDropdownFilter';
 import { X } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 const Events = () => {
   const isMobile = useIsMobile();
@@ -44,7 +44,66 @@ const Events = () => {
 
   const { data: venueAreas = [], isLoading: areasLoading } = useVenueAreas();
 
+  // Add search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Event[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
   const dateFilters = ['today', 'tomorrow', 'this week', 'this weekend', 'next week', 'later'];
+
+  // Handle real-time search
+  const handleSearch = useCallback(async (query: string) => {
+    setSearchQuery(query);
+    
+    if (!query.trim()) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const searchPattern = `%${query.toLowerCase()}%`;
+      
+      const { data, error } = await supabase
+        .from('events')
+        .select(`
+          *,
+          venues!events_venue_id_fkey(id, name, city, street, postal_code)
+        `)
+        .eq('status', 'published')
+        .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},destination.ilike.${searchPattern},event_category.ilike.${searchPattern},tags.ilike.${searchPattern},vibe.ilike.${searchPattern}`)
+        .order('start_date', { ascending: true });
+
+      if (error) {
+        console.error('Search error:', error);
+        return;
+      }
+
+      if (data) {
+        const processedEvents = data.map(event => ({
+          ...event,
+          venues: event.venues ? {
+            id: event.venues.id,
+            name: event.venues.name,
+            city: event.venues.city,
+            street: event.venues.street,
+            postal_code: event.venues.postal_code
+          } : undefined,
+          attendees: {
+            going: 0,
+            interested: 0
+          }
+        }));
+
+        setSearchResults(processedEvents);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
 
   const toggleDateFilter = (filter: string) => {
     const newFilter = selectedDateFilter === filter ? 'anytime' : filter;
@@ -66,7 +125,9 @@ const Events = () => {
     setSelectedEventTypes([]);
   };
 
-  const filteredEventsCount = events?.length || 0;
+  // Determine which events to display
+  const displayEvents = searchQuery.trim() ? searchResults : events;
+  const filteredEventsCount = displayEvents?.length || 0;
 
   return (
     <div className="min-h-screen w-full">
@@ -95,6 +156,8 @@ const Events = () => {
                   placeholder="Search events..." 
                   className="w-full"
                   square={true}
+                  onSearch={handleSearch}
+                  initialValue={searchQuery}
                 />
               </div>
               
@@ -150,6 +213,8 @@ const Events = () => {
                   placeholder="Search events..." 
                   className="w-full"
                   square={true}
+                  onSearch={handleSearch}
+                  initialValue={searchQuery}
                 />
               </div>
 
@@ -203,10 +268,14 @@ const Events = () => {
           {/* Results Section */}
           <div className="w-full">
             <EventsResultsSection 
-              filteredEvents={events} 
-              hasActiveFilters={hasActiveFilters} 
-              resetFilters={resetAllFilters} 
-              eventsLoading={isLoading} 
+              filteredEvents={displayEvents} 
+              hasActiveFilters={hasActiveFilters || !!searchQuery.trim()} 
+              resetFilters={() => {
+                resetAllFilters();
+                setSearchQuery('');
+                setSearchResults([]);
+              }} 
+              eventsLoading={isLoading || isSearching} 
               isFilterLoading={false} 
               user={user} 
               enhancedHandleRsvp={handleRsvp} 
