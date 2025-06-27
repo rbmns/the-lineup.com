@@ -139,7 +139,7 @@ export const EventsTable = () => {
               </TableCell>
               <TableCell className="text-right">
                 <Button asChild variant="outline" size="sm">
-                  <Link to={`/events/${event.id}`}>View</Link>
+                  <Link to={`/events/detail/${event.id}`}>View</Link>
                 </Button>
               </TableCell>
             </TableRow>

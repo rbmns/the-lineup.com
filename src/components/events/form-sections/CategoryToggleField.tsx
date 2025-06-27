@@ -33,7 +33,7 @@ export const CategoryToggleField: React.FC<CategoryToggleFieldProps> = ({
         type="single" 
         value={selectedCategory} 
         onValueChange={handleCategoryChange}
-        className="flex flex-wrap gap-2 mt-2"
+        className="flex flex-wrap gap-1.5 mt-2"
       >
         {EVENT_CATEGORIES.map((category) => {
           const Icon = getCategoryIcon(category);
@@ -42,9 +42,9 @@ export const CategoryToggleField: React.FC<CategoryToggleFieldProps> = ({
               key={category}
               value={category}
               variant="outline"
-              className="capitalize text-sm px-3 py-2 rounded-full data-[state=on]:bg-seafoam data-[state=on]:text-midnight"
+              className="capitalize text-xs px-2 py-1.5 rounded-sm border border-sage bg-coconut text-midnight hover:bg-seafoam hover:border-overcast data-[state=on]:bg-seafoam data-[state=on]:text-midnight data-[state=on]:border-overcast transition-colors font-mono"
             >
-              {Icon && <Icon className="mr-2 h-4 w-4" />}
+              {Icon && <Icon className="mr-1.5 h-3 w-3" />}
               {category}
             </ToggleGroupItem>
           );
