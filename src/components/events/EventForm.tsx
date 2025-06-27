@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useEventForm } from '@/hooks/events/useEventForm.tsx';
 import { CreateVenueModal } from '@/components/venues/CreateVenueModal';
@@ -111,9 +110,9 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
   return (
     <>
       <Form {...form}>
-        <form onSubmit={handleSubmit(handleFormSubmit, onInvalid)} className="space-y-6">
-          {/* Required Fields */}
-          <div className="space-y-6">
+        <form onSubmit={handleSubmit(handleFormSubmit, onInvalid)} className="space-y-4 sm:space-y-6">
+          {/* Required Fields - More compact spacing */}
+          <div className="space-y-4 sm:space-y-6">
             <TitleField register={register} errors={errors} />
             <DescriptionField register={register} errors={errors} />
             <DateTimeFields register={register} watch={watch} setValue={setValue} errors={errors} />
@@ -129,8 +128,8 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
             <VibeToggleField watch={watch} setValue={setValue} errors={errors} />
           </div>
 
-          {/* Optional Fields */}
-          <div className="pt-4">
+          {/* Optional Fields - More compact */}
+          <div className="pt-2 sm:pt-4">
             <OptionalFieldsSection 
               register={register} 
               errors={errors} 
@@ -140,13 +139,13 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
             />
           </div>
 
-          {/* Submit Button */}
-          <div className="pt-6">
+          {/* Submit Button - More compact */}
+          <div className="pt-4 sm:pt-6">
             <Button 
               type="submit" 
               variant="default"
               disabled={isSubmitting}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto h-9 sm:h-10 text-sm sm:text-base"
             >
               {isSubmitting ? "Publishing..." : isEditMode ? "Update Event" : "Publish Event"}
             </Button>

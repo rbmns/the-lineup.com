@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
 import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayout';
@@ -247,7 +246,7 @@ const Events = () => {
         <div className="space-y-3 sm:space-y-4">
           {/* Search and Filters Row */}
           <div className="space-y-3 lg:space-y-0">
-            {/* Desktop Layout - Search and Filters on same row */}
+            {/* Desktop Layout - Search, Filters, and Clear Button on same row */}
             <div className="hidden lg:flex items-center gap-4">
               {/* Search - narrower on desktop */}
               <div className="flex-1 max-w-md">
@@ -260,7 +259,7 @@ const Events = () => {
                 />
               </div>
               
-              {/* Filters */}
+              {/* Filters and Clear Button Container */}
               <div className="flex items-center gap-3">
                 <VibesDropdownFilter
                   selectedVibes={selectedVibes}
@@ -291,14 +290,14 @@ const Events = () => {
                   isLocationLoaded={isLocationLoaded}
                 />
 
-                {/* Clear Filters - Compact */}
+                {/* Clear Filters - More Prominent */}
                 {(hasActiveFilters || searchQuery.trim()) && (
                   <button
                     onClick={handleResetAllFilters}
-                    className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 border border-red-500 rounded-lg transition-all duration-200 hover:shadow-lg"
                   >
-                    <X className="h-3 w-3" />
-                    Clear
+                    <X className="h-4 w-4" />
+                    Clear All
                   </button>
                 )}
               </div>
@@ -354,10 +353,10 @@ const Events = () => {
                 <div className="w-full">
                   <button
                     onClick={handleResetAllFilters}
-                    className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-500 hover:bg-red-600 border border-red-500 rounded-lg transition-all duration-200 hover:shadow-lg"
                   >
-                    <X className="h-3 w-3" />
-                    Clear
+                    <X className="h-4 w-4" />
+                    Clear All
                   </button>
                 </div>
               )}

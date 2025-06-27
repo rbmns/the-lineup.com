@@ -4,12 +4,7 @@ import { FieldErrors, UseFormRegister, UseFormSetValue, UseFormWatch } from 'rea
 import { FormValues } from '@/components/events/form/EventFormTypes';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { DatePicker } from '@/components/ui/date-picker';
 
 interface DateTimeFieldsProps {
   register: UseFormRegister<FormValues>;
@@ -19,93 +14,61 @@ interface DateTimeFieldsProps {
 }
 
 export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ register, watch, setValue, errors }) => (
-  <>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <Label htmlFor="start_date">Start Date</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant={"outline"}
-              className={cn(
-                "w-full justify-start text-left font-normal",
-                !watch("start_date") && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {watch("start_date") ? format(watch("start_date"), "PPP") : "Pick a date"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={watch("start_date")}
-              onSelect={(date) => date && setValue("start_date", date)}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
+  <div className="space-y-3 sm:space-y-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+      <div className="space-y-1 sm:space-y-2">
+        <Label htmlFor="start_date" className="text-sm sm:text-base">Start Date</Label>
+        <DatePicker
+          selected={watch("start_date")}
+          onSelect={(date) => date && setValue("start_date", date)}
+          className="w-full h-8 sm:h-10 text-sm"
+        />
         {errors.start_date && (
-          <p className="text-red-500 text-sm mt-1">{errors.start_date.message}</p>
+          <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.start_date.message}</p>
         )}
       </div>
 
-      <div>
-        <Label htmlFor="start_time">Start Time</Label>
+      <div className="space-y-1 sm:space-y-2">
+        <Label htmlFor="start_time" className="text-sm sm:text-base">Start Time</Label>
         <Input
           id="start_time"
           type="time"
           {...register("start_time")}
           aria-invalid={errors.start_time ? "true" : "false"}
+          className="h-8 sm:h-10 text-sm"
         />
         {errors.start_time && (
-          <p className="text-red-500 text-sm mt-1">{errors.start_time.message}</p>
+          <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.start_time.message}</p>
         )}
       </div>
     </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <Label htmlFor="end_date">End Date</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant={"outline"}
-              className={cn(
-                "w-full justify-start text-left font-normal",
-                !watch("end_date") && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {watch("end_date") ? format(watch("end_date"), "PPP") : "Pick a date"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={watch("end_date")}
-              onSelect={(date) => date && setValue("end_date", date)}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+      <div className="space-y-1 sm:space-y-2">
+        <Label htmlFor="end_date" className="text-sm sm:text-base">End Date</Label>
+        <DatePicker
+          selected={watch("end_date")}
+          onSelect={(date) => date && setValue("end_date", date)}
+          className="w-full h-8 sm:h-10 text-sm"
+        />
         {errors.end_date && (
-          <p className="text-red-500 text-sm mt-1">{errors.end_date.message}</p>
+          <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.end_date.message}</p>
         )}
       </div>
 
-      <div>
-        <Label htmlFor="end_time">End Time</Label>
+      <div className="space-y-1 sm:space-y-2">
+        <Label htmlFor="end_time" className="text-sm sm:text-base">End Time</Label>
         <Input
           id="end_time"
           type="time"
           {...register("end_time")}
           aria-invalid={errors.end_time ? "true" : "false"}
+          className="h-8 sm:h-10 text-sm"
         />
         {errors.end_time && (
-          <p className="text-red-500 text-sm mt-1">{errors.end_time.message}</p>
+          <p className="text-red-500 text-xs sm:text-sm mt-1">{errors.end_time.message}</p>
         )}
       </div>
     </div>
-  </>
+  </div>
 );
