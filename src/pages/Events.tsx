@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
 import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayout';
@@ -51,7 +52,14 @@ const Events = () => {
 
   const dateFilters = ['today', 'tomorrow', 'this week', 'this weekend', 'next week', 'later'];
 
-  // Handle real-time search
+  // Helper function to get cities for a selected area
+  const getCitiesForSelectedArea = (areaId: string): string[] => {
+    // This would need to be implemented based on your venue area data structure
+    // For now, we'll use a basic approach
+    return [];
+  };
+
+  // Enhanced search that respects all filters
   const handleSearch = useCallback(async (query: string) => {
     setSearchQuery(query);
     
@@ -65,7 +73,7 @@ const Events = () => {
     try {
       const searchPattern = `%${query.toLowerCase()}%`;
       
-      const { data, error } = await supabase
+      let searchQuery = supabase
         .from('events')
         .select(`
           *,
@@ -75,13 +83,15 @@ const Events = () => {
         .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},destination.ilike.${searchPattern},event_category.ilike.${searchPattern},tags.ilike.${searchPattern},vibe.ilike.${searchPattern}`)
         .order('start_date', { ascending: true });
 
+      const { data, error } = await searchQuery;
+
       if (error) {
         console.error('Search error:', error);
         return;
       }
 
       if (data) {
-        const processedEvents = data.map(event => ({
+        let processedEvents = data.map(event => ({
           ...event,
           venues: event.venues ? {
             id: event.venues.id,
@@ -96,6 +106,88 @@ const Events = () => {
           }
         }));
 
+        // Apply filters to search results
+        processedEvents = processedEvents.filter(event => {
+          // Vibe filter
+          if (selectedVibes.length > 0 && !selectedVibes.includes(event.vibe || '')) {
+            return false;
+          }
+
+          // Category filter
+          if (selectedEventTypes.length > 0 && !selectedEventTypes.includes(event.event_category || '')) {
+            return false;
+          }
+
+          // Venue filter
+          if (selectedVenues.length > 0 && !selectedVenues.includes(event.venue_id || '')) {
+            return false;
+          }
+
+          // Location area filter
+          if (selectedLocation) {
+            // Get the selected area details
+            const selectedArea = venueAreas.find(area => area.id === selectedLocation);
+            if (selectedArea && selectedArea.cities) {
+              const eventCity = event.venues?.city || event.location;
+              if (eventCity && !selectedArea.cities.some(city => 
+                city.toLowerCase() === eventCity.toLowerCase()
+              )) {
+                return false;
+              }
+            }
+          }
+
+          // Date filter
+          if (selectedDateFilter && selectedDateFilter !== 'anytime') {
+            const today = new Date();
+            const eventDate = new Date(event.start_date || '');
+            
+            switch (selectedDateFilter) {
+              case 'today':
+                if (eventDate.toDateString() !== today.toDateString()) return false;
+                break;
+              case 'tomorrow':
+                const tomorrow = new Date(today);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                if (eventDate.toDateString() !== tomorrow.toDateString()) return false;
+                break;
+              case 'this week':
+                const weekStart = new Date(today);
+                weekStart.setDate(today.getDate() - today.getDay());
+                const weekEnd = new Date(weekStart);
+                weekEnd.setDate(weekStart.getDate() + 6);
+                if (eventDate < weekStart || eventDate > weekEnd) return false;
+                break;
+              case 'this weekend':
+                const dayOfWeek = today.getDay();
+                const daysUntilSaturday = (6 - dayOfWeek) % 7;
+                const saturday = new Date(today);
+                saturday.setDate(today.getDate() + daysUntilSaturday);
+                const sunday = new Date(saturday);
+                sunday.setDate(saturday.getDate() + 1);
+                if (eventDate.toDateString() !== saturday.toDateString() && 
+                    eventDate.toDateString() !== sunday.toDateString()) return false;
+                break;
+              case 'next week':
+                const nextWeekStart = new Date(today);
+                nextWeekStart.setDate(today.getDate() + (7 - today.getDay()));
+                const nextWeekEnd = new Date(nextWeekStart);
+                nextWeekEnd.setDate(nextWeekStart.getDate() + 6);
+                if (eventDate < nextWeekStart || eventDate > nextWeekEnd) return false;
+                break;
+            }
+          }
+
+          // Date range filter
+          if (dateRange?.from && event.start_date) {
+            const eventDate = new Date(event.start_date);
+            if (eventDate < dateRange.from) return false;
+            if (dateRange.to && eventDate > dateRange.to) return false;
+          }
+
+          return true;
+        });
+
         setSearchResults(processedEvents);
       }
     } catch (error) {
@@ -103,7 +195,7 @@ const Events = () => {
     } finally {
       setIsSearching(false);
     }
-  }, []);
+  }, [selectedVibes, selectedEventTypes, selectedVenues, selectedLocation, selectedDateFilter, dateRange, venueAreas]);
 
   const toggleDateFilter = (filter: string) => {
     const newFilter = selectedDateFilter === filter ? 'anytime' : filter;
@@ -128,6 +220,13 @@ const Events = () => {
   // Determine which events to display
   const displayEvents = searchQuery.trim() ? searchResults : events;
   const filteredEventsCount = displayEvents?.length || 0;
+
+  // Enhanced reset that clears search too
+  const handleResetAllFilters = () => {
+    resetAllFilters();
+    setSearchQuery('');
+    setSearchResults([]);
+  };
 
   return (
     <div className="min-h-screen w-full">
@@ -193,9 +292,9 @@ const Events = () => {
                 />
 
                 {/* Clear Filters - Compact */}
-                {hasActiveFilters && (
+                {(hasActiveFilters || searchQuery.trim()) && (
                   <button
-                    onClick={resetAllFilters}
+                    onClick={handleResetAllFilters}
                     className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     <X className="h-3 w-3" />
@@ -251,10 +350,10 @@ const Events = () => {
               </div>
 
               {/* Clear Filters - Mobile */}
-              {hasActiveFilters && (
+              {(hasActiveFilters || searchQuery.trim()) && (
                 <div className="w-full">
                   <button
-                    onClick={resetAllFilters}
+                    onClick={handleResetAllFilters}
                     className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     <X className="h-3 w-3" />
@@ -270,11 +369,7 @@ const Events = () => {
             <EventsResultsSection 
               filteredEvents={displayEvents} 
               hasActiveFilters={hasActiveFilters || !!searchQuery.trim()} 
-              resetFilters={() => {
-                resetAllFilters();
-                setSearchQuery('');
-                setSearchResults([]);
-              }} 
+              resetFilters={handleResetAllFilters} 
               eventsLoading={isLoading || isSearching} 
               isFilterLoading={false} 
               user={user} 
