@@ -1,7 +1,9 @@
 
 import React from 'react';
-import { CategoryFilteredEventsContent } from '@/components/events/category-filters/CategoryFilteredEventsContent';
 import { Event } from '@/types';
+import { EventCountDisplay } from '@/components/events/EventCountDisplay';
+import { NoResultsFound } from '@/components/events/list-components/NoResultsFound';
+import { LazyEventsList } from '@/components/events/LazyEventsList';
 
 interface EventsResultsSectionProps {
   filteredEvents: Event[];
@@ -10,8 +12,8 @@ interface EventsResultsSectionProps {
   eventsLoading: boolean;
   isFilterLoading: boolean;
   user: any;
-  enhancedHandleRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
-  loadingEventId?: string;
+  enhancedHandleRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
+  loadingEventId: string | null;
 }
 
 export const EventsResultsSection: React.FC<EventsResultsSectionProps> = ({
@@ -22,21 +24,37 @@ export const EventsResultsSection: React.FC<EventsResultsSectionProps> = ({
   isFilterLoading,
   user,
   enhancedHandleRsvp,
-  loadingEventId,
+  loadingEventId
 }) => {
+  const eventsCount = filteredEvents.length;
+  const showNoResults = !eventsLoading && !isFilterLoading && filteredEvents.length === 0;
+
   return (
-    <div className="space-y-4">
-      <CategoryFilteredEventsContent 
-        showNoExactMatchesMessage={filteredEvents.length === 0 && hasActiveFilters}
-        resetFilters={resetFilters}
-        exactMatches={filteredEvents}
-        similarEvents={[]}
-        isLoading={eventsLoading || isFilterLoading} 
-        isFilterLoading={isFilterLoading}
-        hasActiveFilters={hasActiveFilters}
-        onRsvp={user ? enhancedHandleRsvp : undefined}
-        loadingEventId={loadingEventId}
-      />
+    <div className="space-y-8 mt-8">
+      {/* Events count */}
+      <div className="text-center">
+        <p className="text-sm text-gray-600">
+          {eventsLoading ? 'Loading events...' : `${eventsCount} events found`}
+        </p>
+      </div>
+      
+      {showNoResults ? (
+        <NoResultsFound 
+          resetFilters={resetFilters}
+          message={hasActiveFilters ? "No events found matching your filters." : "No events available."}
+        />
+      ) : (
+        <LazyEventsList 
+          mainEvents={filteredEvents}
+          relatedEvents={[]} 
+          isLoading={eventsLoading || isFilterLoading}
+          onRsvp={user ? enhancedHandleRsvp : undefined}
+          showRsvpButtons={!!user}
+          hasActiveFilters={hasActiveFilters}
+          loadingEventId={loadingEventId}
+          hideCount={true}
+        />
+      )}
     </div>
   );
 };

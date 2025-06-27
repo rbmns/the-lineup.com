@@ -5,9 +5,10 @@ import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayo
 import { EventsResultsSection } from '@/components/events/page-sections/EventsResultsSection';
 import { EventsVibeSection } from '@/components/events/page-sections/EventsVibeSection';
 import { useVenueAreas } from '@/hooks/useVenueAreas';
-import { EventsAdvancedSection } from '@/components/events/page-sections/EventsAdvancedSection';
 import { LocationFilter } from '@/components/events/filters/LocationFilter';
 import { EventSearch } from '@/components/events/search/EventSearch';
+import { EventCategories } from '@/components/events/Event_Categories';
+import { DateFilterPill } from '@/components/events/DateFilterPill';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUnifiedRsvp } from '@/hooks/useUnifiedRsvp';
@@ -42,34 +43,29 @@ const Events = () => {
 
   const { data: venueAreas = [], isLoading: areasLoading } = useVenueAreas();
 
-  const handleFilterChange = (filters: any) => {
-    if (filters.eventTypes !== undefined) {
-      setSelectedEventTypes(filters.eventTypes);
-    }
-    if (filters.venues !== undefined) {
-      setSelectedVenues(filters.venues);
-    }
-    if (filters.vibes !== undefined) {
-      setSelectedVibes(filters.vibes);
-    }
-    if (filters.location !== undefined) {
-      setSelectedLocation(filters.location);
-    }
-    if (filters.date !== undefined) {
-      setDateRange(filters.date);
-    }
-    if (filters.dateFilter !== undefined) {
-      setSelectedDateFilter(filters.dateFilter);
-    }
+  const dateFilters = ['today', 'tomorrow', 'this week', 'this weekend', 'next week', 'later'];
+
+  const toggleDateFilter = (filter: string) => {
+    const newFilter = selectedDateFilter === filter ? 'anytime' : filter;
+    setSelectedDateFilter(newFilter);
+  };
+
+  const handleCategoryToggle = (category: string) => {
+    const newTypes = selectedEventTypes.includes(category)
+      ? selectedEventTypes.filter(t => t !== category)
+      : [...selectedEventTypes, category];
+    setSelectedEventTypes(newTypes);
+  };
+
+  const handleSelectAllCategories = () => {
+    setSelectedEventTypes(allEventTypes);
+  };
+
+  const handleDeselectAllCategories = () => {
+    setSelectedEventTypes([]);
   };
 
   const filteredEventsCount = events?.length || 0;
-
-  // Transform venue data to match expected format
-  const transformedAvailableVenues = availableVenues.map(venue => ({
-    value: venue.id,
-    label: venue.name
-  }));
 
   return (
     <div className="min-h-screen w-full">
@@ -85,53 +81,63 @@ const Events = () => {
         </div>
       </div>
 
-      {/* Compact Content */}
+      {/* Content */}
       <div className="w-full px-3 sm:px-4 lg:px-8">
-        <div className="space-y-2 sm:space-y-3">
-          {/* Compact Search, Location, and Advanced Filters Row */}
-          <div className="flex flex-col lg:flex-row gap-2 sm:gap-3 items-stretch lg:items-center">
-            <div className="flex-1 min-w-0">
-              <EventSearch 
-                placeholder="Search events..." 
-                className="w-full h-10"
-                square={true}
+        <div className="space-y-4">
+          {/* Search Bar */}
+          <div className="w-full">
+            <EventSearch 
+              placeholder="Search events..." 
+              className="w-full"
+              square={true}
+            />
+          </div>
+
+          {/* Location Filter */}
+          <div className="w-full">
+            <div className="bg-white border border-gray-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-3">
+                <h3 className="text-sm font-medium text-gray-700">Location</h3>
+                {selectedLocation && (
+                  <span className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                    1
+                  </span>
+                )}
+              </div>
+              <LocationFilter
+                venueAreas={venueAreas}
+                selectedLocationId={selectedLocation}
+                onLocationChange={setSelectedLocation}
+                isLoading={areasLoading}
+                isLocationLoaded={isLocationLoaded}
+                className="w-full"
+                compact={true}
               />
-            </div>
-            <div className="flex gap-2 sm:gap-3 items-center">
-              <div className="w-full sm:w-48 lg:w-56 flex-shrink-0">
-                <LocationFilter
-                  venueAreas={venueAreas}
-                  selectedLocationId={selectedLocation}
-                  onLocationChange={setSelectedLocation}
-                  isLoading={areasLoading}
-                  isLocationLoaded={isLocationLoaded}
-                  className="w-full"
-                  compact={true}
-                />
-              </div>
-              <div className="flex-shrink-0">
-                <EventsAdvancedSection 
-                  onFilterChange={handleFilterChange} 
-                  selectedEventTypes={selectedEventTypes} 
-                  selectedVenues={selectedVenues} 
-                  selectedVibes={selectedVibes} 
-                  selectedLocation={selectedLocation} 
-                  dateRange={dateRange} 
-                  selectedDateFilter={selectedDateFilter} 
-                  filteredEventsCount={filteredEventsCount} 
-                  allEventTypes={allEventTypes} 
-                  availableVenues={transformedAvailableVenues}
-                  events={allEvents || []} 
-                  venueAreas={venueAreas} 
-                  isLocationLoaded={isLocationLoaded} 
-                  areasLoading={areasLoading}
-                  inline={true}
-                />
-              </div>
             </div>
           </div>
 
-          {/* Compact Vibe Filter */}
+          {/* Categories Filter */}
+          <div className="w-full">
+            <div className="bg-white border border-gray-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-3">
+                <h3 className="text-sm font-medium text-gray-700">Categories</h3>
+                {selectedEventTypes.length > 0 && (
+                  <span className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                    {selectedEventTypes.length}
+                  </span>
+                )}
+              </div>
+              <EventCategories
+                selectedCategories={selectedEventTypes}
+                onToggleCategory={handleCategoryToggle}
+                onSelectAll={handleSelectAllCategories}
+                onDeselectAll={handleDeselectAllCategories}
+                variant="filter"
+              />
+            </div>
+          </div>
+
+          {/* Vibe Filter */}
           <div className="w-full">
             <EventsVibeSection 
               selectedVibes={selectedVibes} 
@@ -140,6 +146,53 @@ const Events = () => {
               vibesLoading={isLoading} 
             />
           </div>
+
+          {/* Date Filter */}
+          <div className="w-full">
+            <div className="bg-white border border-gray-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 mb-3">
+                <h3 className="text-sm font-medium text-gray-700">When</h3>
+                {selectedDateFilter && selectedDateFilter !== 'anytime' && (
+                  <span className="px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
+                    1
+                  </span>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  onClick={() => setSelectedDateFilter('anytime')}
+                  className={`px-3 py-1.5 text-sm rounded-full border transition-all font-medium ${
+                    selectedDateFilter === 'anytime' || !selectedDateFilter
+                      ? 'bg-gray-900 text-white border-gray-900'
+                      : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400'
+                  }`}
+                >
+                  Anytime
+                </button>
+                {dateFilters.map((filter) => (
+                  <DateFilterPill
+                    key={filter}
+                    label={filter}
+                    active={selectedDateFilter === filter}
+                    onClick={() => toggleDateFilter(filter)}
+                    className="text-sm"
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Clear Filters */}
+          {hasActiveFilters && (
+            <div className="w-full">
+              <button
+                onClick={resetAllFilters}
+                className="w-full px-4 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
 
           {/* Results Section */}
           <div className="w-full">
