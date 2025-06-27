@@ -173,7 +173,7 @@ export default function Events() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Event Size</label>
               <select className="w-full p-2 border border-gray-300 rounded-md">
                 <option value="">Any Size</option>
-                <option value="small">Small (< 20 people)</option>
+                <option value="small">Small (&lt; 20 people)</option>
                 <option value="medium">Medium (20-100 people)</option>
                 <option value="large">Large (100+ people)</option>
               </select>
