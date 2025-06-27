@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Check, ChevronsUpDown, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -24,6 +23,7 @@ interface LocationFilterProps {
   isLoading: boolean;
   isLocationLoaded: boolean;
   className?: string;
+  compact?: boolean;
 }
 
 export const LocationFilter: React.FC<LocationFilterProps> = ({
@@ -32,7 +32,8 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
   onLocationChange,
   isLoading,
   isLocationLoaded,
-  className
+  className,
+  compact = false
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -53,6 +54,53 @@ export const LocationFilter: React.FC<LocationFilterProps> = ({
     { id: null, name: "All Areas" },
     ...venueAreas
   ];
+
+  if (compact) {
+    return (
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between h-10 text-sm"
+          >
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-gray-400" />
+              <span className="truncate">{displayValue}</span>
+            </div>
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0 bg-white border border-gray-200 shadow-lg z-50" align="start">
+          <Command>
+            <CommandInput placeholder="Search locations..." />
+            <CommandEmpty>No location found.</CommandEmpty>
+            <CommandGroup>
+              {locationOptions.map((location) => (
+                <CommandItem
+                  key={location.id || 'all-areas'}
+                  value={location.name}
+                  onSelect={() => {
+                    onLocationChange(location.id);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      "mr-2 h-4 w-4",
+                      selectedLocationId === location.id ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                  {location.name}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    );
+  }
 
   return (
     <div className={cn("space-y-2", className)}>

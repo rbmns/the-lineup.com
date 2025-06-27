@@ -6,6 +6,7 @@ import { EventsResultsSection } from '@/components/events/page-sections/EventsRe
 import { EventsVibeSection } from '@/components/events/page-sections/EventsVibeSection';
 import { useVenueAreas } from '@/hooks/useVenueAreas';
 import { EventsAdvancedSection } from '@/components/events/page-sections/EventsAdvancedSection';
+import { LocationFilter } from '@/components/events/filters/LocationFilter';
 import { EventSearch } from '@/components/events/search/EventSearch';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
@@ -73,28 +74,42 @@ const Events = () => {
   return (
     <div className="min-h-screen w-full">
       {/* Compact Header Section */}
-      <div className="w-full px-3 sm:px-4 lg:px-8 py-4 sm:py-6">
-        <div className="text-center space-y-3 sm:space-y-4">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#005F73] leading-tight">
+      <div className="w-full px-3 sm:px-4 lg:px-8 py-3 sm:py-4">
+        <div className="text-center space-y-2 sm:space-y-3">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#005F73] leading-tight">
             Discover <span className="text-[#2A9D8F]">Events</span>
           </h1>
-          <p className="text-base sm:text-lg text-[#4A4A48] max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-[#4A4A48] max-w-xl mx-auto leading-relaxed">
             Discover what's happening nearby — from beach parties to chill yoga sessions.
           </p>
-          
-          {/* Compact Search Bar */}
-          <div className="max-w-xl mx-auto">
-            <EventSearch 
-              placeholder="Search events..." 
-              className="w-full h-10"
-            />
-          </div>
         </div>
       </div>
 
       {/* Compact Content */}
       <div className="w-full px-3 sm:px-4 lg:px-8">
-        <div className="space-y-3 sm:space-y-4">
+        <div className="space-y-2 sm:space-y-3">
+          {/* Compact Search and Location Row */}
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center">
+            <div className="flex-1 min-w-0">
+              <EventSearch 
+                placeholder="Search events..." 
+                className="w-full h-10"
+                square={true}
+              />
+            </div>
+            <div className="sm:w-48 flex-shrink-0">
+              <LocationFilter
+                venueAreas={venueAreas}
+                selectedLocationId={selectedLocation}
+                onLocationChange={setSelectedLocation}
+                isLoading={areasLoading}
+                isLocationLoaded={isLocationLoaded}
+                className="w-full"
+                compact={true}
+              />
+            </div>
+          </div>
+
           {/* Compact Vibe Filter */}
           <div className="w-full">
             <EventsVibeSection 
