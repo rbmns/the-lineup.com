@@ -1,10 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SimpleEventForm } from '@/components/events/SimpleEventForm';
-import { OrganizerActivationModal } from '@/components/events/OrganizerActivationModal';
 import { PublishEventModal } from '@/components/events/PublishEventModal';
-import { AuthOverlay } from '@/components/auth/AuthOverlay';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
@@ -22,39 +20,24 @@ type EventFormData = {
   venueAddress?: string;
 };
 
-type OrganizerData = {
-  name: string;
-  email: string;
-  bio?: string;
-  website?: string;
-};
-
 export default function CreateEventSimple() {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const [eventData, setEventData] = useState<EventFormData | null>(null);
-  const [showAuthOverlay, setShowAuthOverlay] = useState(false);
-  const [showOrganizerModal, setShowOrganizerModal] = useState(false);
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Check authentication on mount
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setShowAuthOverlay(true);
-    }
-  }, [isAuthenticated]);
-
   const handleEventSubmit = async (data: EventFormData) => {
     console.log('Event form submitted:', data);
+    setEventData(data);
     
     if (!isAuthenticated) {
-      setEventData(data);
+      // Show auth modal for non-authenticated users
       setShowPublishModal(true);
       return;
     }
 
-    // If authenticated, proceed with event creation
+    // If authenticated, proceed with event creation directly
     await createEventWithVenue(data);
   };
 
@@ -98,10 +81,6 @@ export default function CreateEventSimple() {
         status: 'published'
       };
 
-      if (data.capacity) {
-        // You could add capacity to events table if needed
-      }
-
       const { data: event, error: eventError } = await supabase
         .from('events')
         .insert(eventPayload)
@@ -134,11 +113,6 @@ export default function CreateEventSimple() {
     }
   };
 
-  const handleOrganizerSubmit = async (organizerData: OrganizerData) => {
-    if (!eventData || !user) return;
-    await createEventWithVenue(eventData);
-  };
-
   const handlePublishWithAuth = async (userData: { email: string; password: string; gdprConsent: boolean }) => {
     if (!eventData) return;
 
@@ -149,6 +123,9 @@ export default function CreateEventSimple() {
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: userData.email,
         password: userData.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`
+        }
       });
 
       if (signUpError) throw signUpError;
@@ -159,7 +136,7 @@ export default function CreateEventSimple() {
 
         toast({
           title: "Welcome to The Lineup! 🎉",
-          description: "Your event is now live! You're now an organizer on The Lineup.",
+          description: "Your account has been created and your event is now live!",
         });
 
         setShowPublishModal(false);
@@ -182,54 +159,24 @@ export default function CreateEventSimple() {
   };
 
   const handleCloseModal = () => {
-    setShowOrganizerModal(false);
     setShowPublishModal(false);
     setEventData(null);
   };
 
-  const handleAuthSuccess = () => {
-    setShowAuthOverlay(false);
-  };
-
-  const handleBrowseEvents = () => {
-    navigate('/events');
-  };
-
   return (
     <div className="container mx-auto px-4 py-8">
-      {!showAuthOverlay && (
-        <SimpleEventForm 
-          onSubmit={handleEventSubmit}
-          onCancel={handleCancel}
-          isSubmitting={isSubmitting}
-        />
-      )}
-      
-      <OrganizerActivationModal
-        isOpen={showOrganizerModal}
-        onClose={handleCloseModal}
-        onSubmit={handleOrganizerSubmit}
+      <SimpleEventForm 
+        onSubmit={handleEventSubmit}
+        onCancel={handleCancel}
         isSubmitting={isSubmitting}
       />
-
+      
       <PublishEventModal
         isOpen={showPublishModal}
         onClose={handleCloseModal}
         onSubmit={handlePublishWithAuth}
         isSubmitting={isSubmitting}
       />
-
-      {showAuthOverlay && (
-        <AuthOverlay
-          title="Join to Create Events"
-          description="Sign up or log in to create and organize your own events!"
-          browseEventsButton={true}
-          onClose={handleAuthSuccess}
-          onBrowseEvents={handleBrowseEvents}
-        >
-          <></>
-        </AuthOverlay>
-      )}
     </div>
   );
 }

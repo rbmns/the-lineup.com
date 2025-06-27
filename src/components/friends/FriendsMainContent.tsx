@@ -133,6 +133,17 @@ export const FriendsMainContent: React.FC = () => {
   const pendingRequestsCount = requests?.length || 0;
   const suggestedFriendsCount = suggestedFriends?.length || 0;
 
+  // Debug logging
+  console.log('Friends data:', { 
+    friends, 
+    requests, 
+    suggestedFriends, 
+    friendsLoading, 
+    requestsLoading, 
+    suggestedLoading,
+    user: user?.id 
+  });
+
   return (
     <div className="min-h-screen">
       <FriendsHeader />
@@ -144,61 +155,68 @@ export const FriendsMainContent: React.FC = () => {
         />
       </div>
 
-      {/* Friends Content - No wrapper containers */}
+      {/* Friends Content */}
       <div className="max-w-screen-lg mx-auto px-6 pb-6 md:pb-8">
-        <FriendsTabsNew
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          pendingRequestsCount={pendingRequestsCount}
-          suggestedFriendsCount={suggestedFriendsCount}
-          allFriendsContent={
-            <FriendsTabContent
-              friends={filteredFriends}
-              loading={friendsLoading}
-              requests={requests || []}
-              onAcceptRequest={onAcceptRequest}
-              onDeclineRequest={onDeclineRequest}
-              showFriendRequests={false}
-              searchQuery={undefined}
-              onSearchChange={undefined}
-            />
-          }
-          suggestionsContent={
-            <SuggestedFriendsTabContent
-              suggestedFriends={suggestedFriends}
-              loading={suggestedLoading}
-              onAddFriend={handleAddSuggestedFriend}
-              onDismiss={handleDismissSuggestion}
-              currentUserId={user?.id}
-              friendIds={friendIds}
-            />
-          }
-          requestsContent={
-            <FriendsTabContent
-              friends={[]}
-              loading={requestsLoading}
-              requests={requests || []}
-              onAcceptRequest={onAcceptRequest}
-              onDeclineRequest={onDeclineRequest}
-              showFriendRequests={true}
-              searchQuery={undefined}
-              onSearchChange={undefined}
-            />
-          }
-          eventsContent={
-            <FriendsEventsTabContent 
-              friendIds={friendIds}
-              currentUserId={user.id}
-              friends={friends || []}
-            />
-          }
-          casualPlansContent={
-            <FriendsCasualPlansTabContent 
-              friendIds={friendIds}
-              currentUserId={user.id}
-            />
-          }
-        />
+        {friendsLoading ? (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#005F73] mx-auto mb-4"></div>
+            <p className="text-[#005F73]">Loading friends...</p>
+          </div>
+        ) : (
+          <FriendsTabsNew
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            pendingRequestsCount={pendingRequestsCount}
+            suggestedFriendsCount={suggestedFriendsCount}
+            allFriendsContent={
+              <FriendsTabContent
+                friends={filteredFriends}
+                loading={friendsLoading}
+                requests={requests || []}
+                onAcceptRequest={onAcceptRequest}
+                onDeclineRequest={onDeclineRequest}
+                showFriendRequests={false}
+                searchQuery={undefined}
+                onSearchChange={undefined}
+              />
+            }
+            suggestionsContent={
+              <SuggestedFriendsTabContent
+                suggestedFriends={suggestedFriends}
+                loading={suggestedLoading}
+                onAddFriend={handleAddSuggestedFriend}
+                onDismiss={handleDismissSuggestion}
+                currentUserId={user?.id}
+                friendIds={friendIds}
+              />
+            }
+            requestsContent={
+              <FriendsTabContent
+                friends={[]}
+                loading={requestsLoading}
+                requests={requests || []}
+                onAcceptRequest={onAcceptRequest}
+                onDeclineRequest={onDeclineRequest}
+                showFriendRequests={true}
+                searchQuery={undefined}
+                onSearchChange={undefined}
+              />
+            }
+            eventsContent={
+              <FriendsEventsTabContent 
+                friendIds={friendIds}
+                currentUserId={user?.id}
+                friends={friends || []}
+              />
+            }
+            casualPlansContent={
+              <FriendsCasualPlansTabContent 
+                friendIds={friendIds}
+                currentUserId={user?.id}
+              />
+            }
+          />
+        )}
       </div>
     </div>
   );
