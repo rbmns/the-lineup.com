@@ -131,21 +131,21 @@ const Events = () => {
 
   return (
     <div className="min-h-screen w-full">
-      {/* Compact Header Section */}
-      <div className="w-full px-3 sm:px-4 lg:px-8 py-3 sm:py-4">
+      {/* Compact Header Section - Mobile optimized */}
+      <div className="w-full px-2 sm:px-4 lg:px-8 py-3 sm:py-4">
         <div className="text-center space-y-2 sm:space-y-3">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#005F73] leading-tight">
             Discover <span className="text-[#2A9D8F]">Events</span>
           </h1>
-          <p className="text-sm sm:text-base text-[#4A4A48] max-w-xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base text-[#4A4A48] max-w-xl mx-auto leading-relaxed px-2">
             Discover what's happening nearby — from beach parties to chill yoga sessions.
           </p>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="w-full px-3 sm:px-4 lg:px-8">
-        <div className="space-y-4">
+      {/* Content - Mobile optimized spacing */}
+      <div className="w-full px-2 sm:px-4 lg:px-8">
+        <div className="space-y-3 sm:space-y-4">
           {/* Search and Filters Row */}
           <div className="space-y-3 lg:space-y-0">
             {/* Desktop Layout - Search and Filters on same row */}
@@ -205,7 +205,7 @@ const Events = () => {
               </div>
             </div>
 
-            {/* Mobile Layout - Stacked */}
+            {/* Mobile Layout - Stacked with improved spacing */}
             <div className="lg:hidden space-y-3">
               {/* Search Bar */}
               <div className="w-full">
@@ -218,8 +218,8 @@ const Events = () => {
                 />
               </div>
 
-              {/* Filter Dropdowns Row */}
-              <div className="flex flex-wrap gap-3">
+              {/* Filter Dropdowns Row - Better mobile spacing */}
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
                 <VibesDropdownFilter
                   selectedVibes={selectedVibes}
                   onVibeChange={setSelectedVibes}
