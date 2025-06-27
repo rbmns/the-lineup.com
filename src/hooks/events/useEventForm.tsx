@@ -18,6 +18,7 @@ interface UseEventFormProps {
   eventId?: string;
   isEditMode?: boolean;
   initialData?: Event;
+  onEventCreated?: (eventId: string, eventTitle: string) => void;
 }
 
 // Helper function to ensure URL has protocol
@@ -35,7 +36,7 @@ const ensureHttpProtocol = (url: string): string => {
   return `http://${trimmedUrl}`;
 };
 
-export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEventFormProps) => {
+export const useEventForm = ({ eventId, isEditMode = false, initialData, onEventCreated }: UseEventFormProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -192,19 +193,25 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData }: UseEv
           return;
         }
         console.log("Event created successfully in DB:", createdEvent);
-        toast({
-          title: 'Event Created! 🎉',
-          description: 'Your new event is now live and ready for RSVPs.',
-        });
         
-        // Force refetch of events data and navigate to events page
+        // Force refetch of events data
         await queryClient.invalidateQueries({ queryKey: ['events'] });
         await queryClient.refetchQueries({ queryKey: ['events'] });
         
-        // Navigate to events page instead of organise dashboard
-        setTimeout(() => {
-          navigate('/events');
-        }, 500);
+        // Call the success callback if provided
+        if (onEventCreated && createdEvent) {
+          onEventCreated(createdEvent.id, data.title);
+        } else {
+          // Fallback to navigation if no callback
+          toast({
+            title: 'Event Created! 🎉',
+            description: 'Your new event is now live and ready for RSVPs.',
+          });
+          
+          setTimeout(() => {
+            navigate('/events');
+          }, 500);
+        }
       }
     } catch (error: any) {
       console.error("Form submission error", error);
