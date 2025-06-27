@@ -27,6 +27,8 @@ const EventDetail: React.FC<EventDetailProps> = ({
   const { user, isAuthenticated } = useAuth();
   const { handleRsvp, loadingEventId } = useUnifiedRsvp();
 
+  console.log('EventDetail - eventId:', eventId, 'user:', user?.id);
+
   // Simplified event fetching - let the service handle RSVP status properly
   const {
     data: event,
@@ -35,7 +37,10 @@ const EventDetail: React.FC<EventDetailProps> = ({
   } = useQuery({
     queryKey: ['event', eventId, user?.id],
     queryFn: async () => {
-      if (!eventId) return null;
+      if (!eventId) {
+        console.error('EventDetail: No eventId provided');
+        return null;
+      }
       
       console.log(`Fetching event ${eventId} for detail page with user ${user?.id}`);
       
@@ -44,19 +49,26 @@ const EventDetail: React.FC<EventDetailProps> = ({
       
       if (eventData) {
         console.log(`Event ${eventId} detail page - RSVP status: ${eventData.rsvp_status}`);
+        console.log('Event data loaded:', eventData);
+      } else {
+        console.error(`No event data returned for ID: ${eventId}`);
       }
       
       return eventData;
     },
     enabled: !!eventId,
     staleTime: 1000 * 10, // 10 seconds
+    retry: (failureCount, error) => {
+      console.error(`Event fetch attempt ${failureCount + 1} failed:`, error);
+      return failureCount < 2; // Retry up to 2 times
+    },
   });
 
   const {
     attendees,
     loading: attendeesLoading
   } = useEventAttendees(eventId!, {
-    enabled: isAuthenticated
+    enabled: isAuthenticated && !!eventId
   });
 
   const handleRsvpClick = async (status: 'Going' | 'Interested'): Promise<boolean> => {
@@ -68,6 +80,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
   };
 
   if (isLoading) {
+    console.log('EventDetail - Loading event data...');
     return (
       <div className="min-h-screen bg-white">
         <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
@@ -84,6 +97,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
   }
 
   if (error || !event) {
+    console.error('EventDetail - Error or no event:', error, 'eventId:', eventId);
     return (
       <div className="min-h-screen bg-white">
         <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
