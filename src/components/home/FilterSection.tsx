@@ -50,7 +50,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-sm text-ocean-deep/70 font-mono font-medium bg-coral/10 px-3 py-1.5 rounded-lg w-fit uppercase tracking-wide">
             <Tag className="h-4 w-4 text-coral" />
-            <span>category</span>
+            <span>CATEGORY</span>
             {selectedEventTypes.length > 0 && (
               <span className="px-1.5 py-0.5 bg-sungold/30 text-ocean-deep rounded-full text-xs font-medium">
                 {selectedEventTypes.length}
@@ -73,7 +73,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
 
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-sm text-ocean-deep/70 font-mono font-medium bg-coral/10 px-3 py-1.5 rounded-lg w-fit uppercase tracking-wide">
-            <span>date</span>
+            <span>DATE</span>
             {selectedDateFilter && (
               <span className="px-1.5 py-0.5 bg-sungold/30 text-ocean-deep rounded-full text-xs font-medium">
                 1

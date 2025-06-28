@@ -60,6 +60,8 @@
     font-size: 0.75rem;
     font-weight: 500;
     color: rgb(0 95 115); /* Ocean deep for mono text */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   /* Primary brand colors */
@@ -96,6 +98,19 @@
 
   button:hover {
     transform: translateY(-1px);
+  }
+
+  /* Consistent filter styling */
+  .filter-label {
+    @apply font-mono text-xs font-medium uppercase tracking-wide text-ocean-deep/70;
+  }
+
+  .filter-pill {
+    @apply font-mono text-xs font-medium uppercase tracking-wide px-3 py-1.5 rounded-full transition-all duration-200;
+  }
+
+  .filter-button {
+    @apply font-mono text-xs font-medium uppercase tracking-wide px-3 py-2 rounded-md transition-all duration-200;
   }
 }
 

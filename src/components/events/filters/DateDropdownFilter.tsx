@@ -27,7 +27,7 @@ export const DateDropdownFilter: React.FC<DateDropdownFilterProps> = ({
     setOpen(false);
   };
 
-  const displayText = selectedDateFilter === 'anytime' || !selectedDateFilter ? "date" : selectedDateFilter;
+  const displayText = selectedDateFilter === 'anytime' || !selectedDateFilter ? "DATE" : selectedDateFilter.toUpperCase();
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
