@@ -67,7 +67,7 @@ export const HomeHeroSection: React.FC = () => {
         </h1>
 
         {/* Subtitle - optimized for mobile readability */}
-        <p className="text-base sm:text-lg md:text-xl text-ocean-deep max-w-xl lg:max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-8 drop-shadow-md px-2">
+        <p className="text-base sm:text-lg md:text-xl text-midnight max-w-xl lg:max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-8 drop-shadow-md px-2">
           Discover what's happening nearby — join events, see who's going, and stay connected after.
         </p>
 
@@ -95,7 +95,7 @@ export const HomeHeroSection: React.FC = () => {
       <div className="relative z-20 hidden sm:flex justify-center pb-6 sm:pb-8">
         <button
           onClick={handleScrollDown}
-          className="flex flex-col items-center text-ocean-deep/80 hover:text-ocean-deep transition-colors duration-300 group"
+          className="flex flex-col items-center text-midnight hover:text-sunset-yellow transition-colors duration-300 group"
           aria-label="Scroll down"
         >
           <ChevronDown className="h-6 w-6 sm:h-8 sm:w-8 animate-bounce group-hover:animate-none transition-all duration-300" />

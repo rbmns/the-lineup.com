@@ -62,10 +62,10 @@ const MainNav = () => {
     return 'bg-coconut';
   };
 
-  // Determine text color based on background - darker for hero overlay
+  // Determine text color based on background - deep ocean blue for home page
   const getTextColor = () => {
     if (isHomePage && !isScrolled) {
-      return 'text-ocean-deep'; // Changed from white to ocean-deep for better contrast
+      return 'text-ocean-deep';
     }
     return 'text-midnight';
   };
@@ -94,7 +94,7 @@ const MainNav = () => {
                   />
                 </Link>}
               <Link to="/" className={cn(
-                "font-display font-semibold hover:text-vibrant-aqua transition-colors text-lg",
+                "font-display font-semibold hover:text-sunset-yellow transition-colors text-lg",
                 getTextColor()
               )}>
                 the lineup
@@ -114,7 +114,7 @@ const MainNav = () => {
                         getTextColor(),
                         isActive 
                           ? "bg-vibrant-aqua/20" 
-                          : "hover:text-vibrant-aqua hover:bg-vibrant-aqua/10"
+                          : "hover:text-sunset-yellow hover:bg-sunset-yellow/10"
                       )}
                     >
                       <Icon className="h-4 w-4" />
@@ -142,7 +142,7 @@ const MainNav = () => {
                     "flex flex-col items-center gap-1 px-3 py-2 rounded-md font-mono text-xs font-medium transition-all duration-200 uppercase min-w-0",
                     isActive 
                       ? "text-midnight bg-vibrant-aqua/20" 
-                      : "text-midnight hover:text-vibrant-aqua hover:bg-vibrant-aqua/10"
+                      : "text-midnight hover:text-sunset-yellow hover:bg-sunset-yellow/10"
                   )}
                 >
                   <Icon className="h-4 w-4 flex-shrink-0" />
