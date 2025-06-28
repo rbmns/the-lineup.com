@@ -38,6 +38,8 @@ const config = {
         'seafoam': 'rgb(162 180 178)',   // Supportive green (legacy)
         'ocean-deep': 'rgb(0 95 115)',   // Primary brand color
         'vibrant-aqua': 'rgb(144 224 239)', // Accent color for hovers/highlights
+        'coral': 'rgb(238 108 77)',      // For small elements like filter labels
+        'sungold': 'rgb(255 158 0)',     // For small elements like filter labels
         'driftwood': 'rgb(140 140 137)', // Neutral gray (legacy)
         'midnight': 'rgb(30 30 30)',     // Dark text (legacy)
         

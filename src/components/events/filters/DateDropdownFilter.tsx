@@ -27,7 +27,7 @@ export const DateDropdownFilter: React.FC<DateDropdownFilterProps> = ({
     setOpen(false);
   };
 
-  const displayText = selectedDateFilter === 'anytime' || !selectedDateFilter ? "When" : selectedDateFilter;
+  const displayText = selectedDateFilter === 'anytime' || !selectedDateFilter ? "date" : selectedDateFilter;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -36,10 +36,10 @@ export const DateDropdownFilter: React.FC<DateDropdownFilterProps> = ({
           variant="outline"
           className="flex items-center gap-2 h-10 px-3 border-ocean-deep/20 bg-coconut text-ocean-deep rounded-md font-mono text-xs font-medium uppercase tracking-wide hover:bg-vibrant-aqua/10 hover:border-vibrant-aqua/40 transition-all duration-200"
         >
-          <Calendar className="h-4 w-4 text-vibrant-aqua" />
+          <Calendar className="h-4 w-4 text-coral" />
           <span>{displayText}</span>
           {selectedDateFilter && selectedDateFilter !== 'anytime' && (
-            <span className="px-1.5 py-0.5 bg-vibrant-aqua/20 text-ocean-deep rounded-full text-xs font-medium">
+            <span className="px-1.5 py-0.5 bg-sungold/20 text-ocean-deep rounded-full text-xs font-medium">
               1
             </span>
           )}
@@ -52,7 +52,7 @@ export const DateDropdownFilter: React.FC<DateDropdownFilterProps> = ({
           <button
             onClick={() => handleDateFilterSelect('anytime')}
             className={`w-full px-4 py-2 text-left text-sm hover:bg-vibrant-aqua/10 transition-colors font-mono uppercase tracking-wide ${
-              selectedDateFilter === 'anytime' || !selectedDateFilter ? 'bg-vibrant-aqua/20 font-medium text-ocean-deep' : 'text-ocean-deep'
+              selectedDateFilter === 'anytime' || !selectedDateFilter ? 'bg-sungold/20 font-medium text-ocean-deep' : 'text-ocean-deep'
             }`}
           >
             anytime
@@ -67,7 +67,7 @@ export const DateDropdownFilter: React.FC<DateDropdownFilterProps> = ({
               key={filter}
               onClick={() => handleDateFilterSelect(filter)}
               className={`w-full px-4 py-2 text-left text-sm hover:bg-vibrant-aqua/10 transition-colors font-mono uppercase tracking-wide ${
-                selectedDateFilter === filter ? 'bg-vibrant-aqua/20 font-medium text-ocean-deep' : 'text-ocean-deep'
+                selectedDateFilter === filter ? 'bg-sungold/20 font-medium text-ocean-deep' : 'text-ocean-deep'
               }`}
             >
               {filter}

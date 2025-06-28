@@ -23,13 +23,13 @@ export const HomeHeroSection: React.FC = () => {
 
   const handleScrollDown = () => {
     window.scrollTo({ 
-      top: window.innerHeight * 0.9, 
+      top: window.innerHeight * 0.85, 
       behavior: 'smooth' 
     });
   };
 
   return (
-    <section className="relative min-h-[100svh] flex flex-col justify-between overflow-hidden w-full">
+    <section className="relative min-h-[100svh] flex flex-col justify-between overflow-hidden w-full -mt-[60px] pt-[60px]">
       {/* Background Image - Full width */}
       <div className="absolute inset-0 z-0 w-full">
         <img
@@ -40,26 +40,26 @@ export const HomeHeroSection: React.FC = () => {
       </div>
 
       {/* Coral Overlay */}
-      <div className="absolute inset-0 z-10 bg-vibrant-coral/20"></div>
+      <div className="absolute inset-0 z-10 bg-coral/20"></div>
 
       {/* Content - Optimized for mobile viewport */}
-      <div className="relative z-20 w-full px-4 sm:px-6 lg:px-12 text-center flex-1 flex flex-col justify-center pt-4 pb-8">
+      <div className="relative z-20 w-full px-4 sm:px-6 lg:px-12 text-center flex-1 flex flex-col justify-center pt-2 pb-6">
         {/* Main heading - Responsive text sizing */}
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight drop-shadow-lg">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-display font-bold text-white mb-3 sm:mb-4 md:mb-6 leading-tight drop-shadow-lg">
           Find events and plans that fit your vibe
         </h1>
 
         {/* Subtitle */}
-        <p className="text-lg sm:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed mb-6 sm:mb-8 drop-shadow-md">
+        <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed mb-4 sm:mb-6 md:mb-8 drop-shadow-md px-2">
           Discover what's happening nearby — join events, see who's going, and stay connected after.
         </p>
 
         {/* CTA Buttons - Consistent styling */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center max-w-md sm:max-w-none mx-auto">
           <Button
             onClick={handleExploreEvents}
             size="lg"
-            className="w-full sm:w-auto bg-primary text-white hover:bg-primary/90 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl border-0"
+            className="w-full sm:w-auto bg-ocean-deep text-coconut hover:bg-ocean-deep/90 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl border-0 rounded-md"
           >
             Explore Events
           </Button>
@@ -67,7 +67,7 @@ export const HomeHeroSection: React.FC = () => {
             onClick={handleCreateProfile}
             variant="outline"
             size="lg"
-            className="w-full sm:w-auto border-2 border-white/30 text-white bg-white/10 backdrop-blur-sm hover:bg-white/20 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium transition-all duration-300"
+            className="w-full sm:w-auto border-2 border-white/30 text-white bg-white/10 backdrop-blur-sm hover:bg-white/20 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium transition-all duration-300 rounded-md"
           >
             {isAuthenticated ? 'View Profile' : 'Create Profile'}
           </Button>
@@ -75,14 +75,14 @@ export const HomeHeroSection: React.FC = () => {
       </div>
 
       {/* Scroll Down Arrow - Only show on larger screens */}
-      <div className="relative z-20 hidden sm:flex justify-center pb-6 sm:pb-8">
+      <div className="relative z-20 hidden sm:flex justify-center pb-4 sm:pb-6">
         <button
           onClick={handleScrollDown}
           className="flex flex-col items-center text-white/80 hover:text-white transition-colors duration-300 group"
           aria-label="Scroll down"
         >
-          <ChevronDown className="h-6 w-6 sm:h-8 sm:w-8 animate-bounce group-hover:animate-none transition-all duration-300" />
-          <span className="text-xs sm:text-sm mt-1 opacity-80">Scroll down</span>
+          <ChevronDown className="h-5 w-5 sm:h-6 sm:w-6 animate-bounce group-hover:animate-none transition-all duration-300" />
+          <span className="text-xs mt-1 opacity-80">Scroll down</span>
         </button>
       </div>
     </section>

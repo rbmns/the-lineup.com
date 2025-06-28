@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { X, Tag, Filter } from 'lucide-react';
+import { Tag, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { DateFilterPill } from '@/components/events/DateFilterPill';
+import { ClearFiltersButton } from '@/components/events/filters/ClearFiltersButton';
 import { DateRange } from 'react-day-picker';
 
 interface EventFiltersProps {
@@ -50,7 +51,11 @@ export const EventFilters: React.FC<EventFiltersProps> = ({
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-medium">Quick Filters</h2>
         
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
+          <ClearFiltersButton 
+            onClick={resetFilters}
+            hasActiveFilters={hasActiveFilters}
+          />
           {onToggleAdvancedFilters && (
             <Button
               variant={showAdvancedFilters ? "default" : "outline"}
@@ -67,11 +72,11 @@ export const EventFilters: React.FC<EventFiltersProps> = ({
 
       <div className="space-y-6">
         <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm text-gray-600 font-medium bg-gray-50 px-3 py-1 rounded-lg w-fit">
-            <Tag className="h-4 w-4" />
-            <span>what</span>
+          <div className="flex items-center gap-2 text-sm text-ocean-deep/70 font-mono font-medium bg-coral/10 px-3 py-1.5 rounded-lg w-fit uppercase tracking-wide">
+            <Tag className="h-4 w-4 text-coral" />
+            <span>category</span>
             {eventTypeCount > 0 && (
-              <span className="px-1.5 py-0.5 bg-gray-200 rounded-full text-xs">
+              <span className="px-1.5 py-0.5 bg-sungold/30 text-ocean-deep rounded-full text-xs font-medium">
                 {eventTypeCount}
               </span>
             )}
@@ -90,10 +95,10 @@ export const EventFilters: React.FC<EventFiltersProps> = ({
         </div>
 
         <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm text-gray-600 font-medium bg-gray-50 px-3 py-1 rounded-lg w-fit">
-            <span>when</span>
-            {selectedDateFilter && (
-              <span className="px-1.5 py-0.5 bg-gray-200 rounded-full text-xs">
+          <div className="flex items-center gap-2 text-sm text-ocean-deep/70 font-mono font-medium bg-coral/10 px-3 py-1.5 rounded-lg w-fit uppercase tracking-wide">
+            <span>date</span>
+            {selectedDateFilter && selectedDateFilter !== 'anytime' && (
+              <span className="px-1.5 py-0.5 bg-sungold/30 text-ocean-deep rounded-full text-xs font-medium">
                 1
               </span>
             )}
@@ -116,18 +121,6 @@ export const EventFilters: React.FC<EventFiltersProps> = ({
             ))}
           </div>
         </div>
-
-        {hasActiveFilters && (
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={resetFilters}
-            className="text-gray-500 hover:text-gray-800 flex items-center gap-1"
-          >
-            <X className="h-4 w-4" />
-            Reset filters
-          </Button>
-        )}
       </div>
     </div>
   );

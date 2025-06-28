@@ -75,6 +75,14 @@
     color: rgb(201 181 162);
   }
 
+  .text-coral {
+    color: rgb(238 108 77);
+  }
+
+  .text-sungold {
+    color: rgb(255 158 0);
+  }
+
   /* Remove all harsh shadows - use coastal alternatives */
   * {
     box-shadow: none !important;
@@ -116,6 +124,14 @@
   .bg-vibrant-aqua {
     background-color: rgb(144 224 239);
   }
+
+  .bg-coral {
+    background-color: rgb(238 108 77);
+  }
+
+  .bg-sungold {
+    background-color: rgb(255 158 0);
+  }
   
   .border-ocean-deep {
     border-color: rgb(0 95 115);
@@ -123,6 +139,14 @@
 
   .border-vibrant-aqua {
     border-color: rgb(144 224 239);
+  }
+
+  .border-coral {
+    border-color: rgb(238 108 77);
+  }
+
+  .border-sungold {
+    border-color: rgb(255 158 0);
   }
   
   /* Coastal shadows */

@@ -1,9 +1,9 @@
 
 import React from 'react';
-import { X, Tag } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Tag } from 'lucide-react';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { DateFilterPill } from '@/components/events/DateFilterPill';
+import { ClearFiltersButton } from '@/components/events/filters/ClearFiltersButton';
 
 interface FilterSectionProps {
   availableCategories: string[];
@@ -38,59 +38,66 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
   };
 
   return (
-    <div className="space-y-8">
-      <div className="space-y-3">
-        <div className="flex items-center gap-2 text-sm text-gray-600 font-medium bg-gray-50 px-3 py-1 rounded-lg w-fit">
-          <Tag className="h-4 w-4" />
-          <span>what</span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {availableCategories.map((category) => (
-            <CategoryPill 
-              key={category} 
-              category={category} 
-              active={selectedEventTypes.includes(category)}
-              onClick={() => handleToggleEventType(category)}
-              showIcon={true}
-              size="default"
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="space-y-3">
-        <div className="flex items-center gap-2 text-sm text-gray-600 font-medium bg-gray-50 px-3 py-1 rounded-lg w-fit">
-          <span>when</span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {dateFilters.map((filter) => (
-            <DateFilterPill
-              key={filter}
-              label={filter}
-              active={selectedDateFilter === filter}
-              onClick={() => {
-                if (selectedDateFilter === filter) {
-                  setSelectedDateFilter('');
-                } else {
-                  setSelectedDateFilter(filter);
-                }
-              }}
-            />
-          ))}
-        </div>
-      </div>
-
-      {hasActiveFilters && (
-        <Button 
-          variant="ghost" 
-          size="sm"
+    <div className="space-y-6">
+      <div className="flex items-center justify-end">
+        <ClearFiltersButton 
           onClick={resetFilters}
-          className="text-gray-500 hover:text-gray-800 flex items-center gap-1 transition-all duration-300"
-        >
-          <X className="h-4 w-4" />
-          Reset filters
-        </Button>
-      )}
+          hasActiveFilters={hasActiveFilters}
+        />
+      </div>
+
+      <div className="space-y-6">
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-sm text-ocean-deep/70 font-mono font-medium bg-coral/10 px-3 py-1.5 rounded-lg w-fit uppercase tracking-wide">
+            <Tag className="h-4 w-4 text-coral" />
+            <span>category</span>
+            {selectedEventTypes.length > 0 && (
+              <span className="px-1.5 py-0.5 bg-sungold/30 text-ocean-deep rounded-full text-xs font-medium">
+                {selectedEventTypes.length}
+              </span>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {availableCategories.map((category) => (
+              <CategoryPill 
+                key={category} 
+                category={category} 
+                active={selectedEventTypes.includes(category)}
+                onClick={() => handleToggleEventType(category)}
+                showIcon={true}
+                size="default"
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-sm text-ocean-deep/70 font-mono font-medium bg-coral/10 px-3 py-1.5 rounded-lg w-fit uppercase tracking-wide">
+            <span>date</span>
+            {selectedDateFilter && (
+              <span className="px-1.5 py-0.5 bg-sungold/30 text-ocean-deep rounded-full text-xs font-medium">
+                1
+              </span>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {dateFilters.map((filter) => (
+              <DateFilterPill
+                key={filter}
+                label={filter}
+                active={selectedDateFilter === filter}
+                onClick={() => {
+                  if (selectedDateFilter === filter) {
+                    setSelectedDateFilter('');
+                  } else {
+                    setSelectedDateFilter(filter);
+                  }
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

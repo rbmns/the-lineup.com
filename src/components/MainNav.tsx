@@ -58,15 +58,14 @@ const MainNav = () => {
                 <Link to="/" className="flex items-center justify-center mr-3 flex-shrink-0">
                   <img 
                     src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" 
-                    alt="thelineup Symbol" 
+                    alt="the lineup Symbol" 
                     className="w-5 h-5 transition-opacity hover:opacity-80" 
                   />
                 </Link>
               )}
-              <BrandLogo 
-                showText={true} 
-                className="font-display text-base text-ocean-deep hover:text-ocean-deep/80 transition-colors" 
-              />
+              <Link to="/" className="font-display text-base text-ocean-deep hover:text-ocean-deep/80 transition-colors">
+                the lineup
+              </Link>
             </div>
 
             {/* Center - Navigation (Desktop only) */}
