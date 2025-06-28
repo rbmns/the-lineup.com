@@ -30,17 +30,34 @@ export const HomeHeroSection: React.FC = () => {
 
   return (
     <section className="relative min-h-screen flex flex-col justify-between overflow-hidden w-full">
-      {/* Background Image - Full width */}
+      {/* Background Image - Full width with visual treatments */}
       <div className="absolute inset-0 z-0 w-full">
         <img
           src="/lovable-uploads/51db736f-9219-471a-806c-7db86c226fd1.png"
           alt="Beach sunset background"
           className="w-full h-full object-cover"
+          style={{
+            filter: 'saturate(0.8) brightness(1.1) contrast(1.05)',
+          }}
         />
       </div>
 
-      {/* Coral Overlay */}
-      <div className="absolute inset-0 z-10 bg-coral/20"></div>
+      {/* Sand/Coconut Soft Overlay */}
+      <div 
+        className="absolute inset-0 z-10" 
+        style={{
+          backgroundColor: 'rgba(248, 245, 240, 0.35)' // Sand color at 35% opacity
+        }}
+      ></div>
+
+      {/* Warm Sunset Tint Overlay */}
+      <div 
+        className="absolute inset-0 z-15" 
+        style={{
+          backgroundColor: 'rgba(255, 158, 0, 0.12)', // Sunset yellow at 12% opacity
+          mixBlendMode: 'overlay'
+        }}
+      ></div>
 
       {/* Content - Optimized for mobile viewport and above-the-fold */}
       <div className="relative z-20 w-full px-4 sm:px-6 lg:px-12 text-center flex-1 flex flex-col justify-center py-16 sm:py-20 md:py-24">
