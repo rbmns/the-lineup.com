@@ -2,30 +2,31 @@
 import React from 'react';
 import { Button } from './button';
 import { Plus, Search, ArrowRight } from 'lucide-react';
-import { type BorderRadiusToken } from '@/constants/design-tokens';
 
 export const ButtonShowcase: React.FC = () => {
-  const radiusOptions: BorderRadiusToken[] = ['none', 'sm', 'DEFAULT'];
-  
   return (
     <div className="space-y-8 p-6">
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Border Radius Options</h2>
-        <p className="text-sm text-gray-600">Demonstrates all available border radius variants for buttons</p>
+        <h2 className="text-xl font-semibold">Button Variants</h2>
+        <p className="text-sm text-gray-600">Demonstrates all available button variants with coastal styling</p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {radiusOptions.map((radius) => (
-            <div key={radius} className="space-y-2">
-              <Button radius={radius} className="w-full">
-                {radius}
-              </Button>
-              <code className="text-xs text-gray-500 block text-center">radius="{radius}"</code>
-            </div>
-          ))}
+          <Button variant="default" className="w-full">
+            Default
+          </Button>
+          <Button variant="outline" className="w-full">
+            Outline
+          </Button>
+          <Button variant="secondary" className="w-full">
+            Secondary
+          </Button>
+          <Button variant="accent" className="w-full">
+            Accent
+          </Button>
         </div>
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Button Variants with Default Radius</h2>
+        <h2 className="text-xl font-semibold">Button Variants with Default Styling</h2>
         <div className="flex flex-wrap gap-4">
           <Button variant="default">Default</Button>
           <Button variant="outline">Outline</Button>
@@ -36,26 +37,26 @@ export const ButtonShowcase: React.FC = () => {
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold">Button Sizes with Custom Radius</h2>
+        <h2 className="text-xl font-semibold">Button Sizes</h2>
         <div className="flex flex-wrap items-center gap-4">
-          <Button size="sm" radius="sm">Small</Button>
-          <Button size="default" radius="sm">Medium</Button>
-          <Button size="lg" radius="sm">Large</Button>
+          <Button size="sm">Small</Button>
+          <Button size="default">Medium</Button>
+          <Button size="lg">Large</Button>
         </div>
       </div>
 
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Buttons with Icons</h2>
         <div className="flex flex-wrap gap-4">
-          <Button radius="sm">
+          <Button>
             <Plus />
             Create Event
           </Button>
-          <Button variant="outline" radius="sm">
+          <Button variant="outline">
             <Search />
             Search Events
           </Button>
-          <Button variant="secondary" radius="sm">
+          <Button variant="secondary">
             Explore Events
             <ArrowRight />
           </Button>
@@ -69,19 +70,19 @@ export const ButtonShowcase: React.FC = () => {
             <div>
               <h4 className="font-medium text-green-700 mb-2">✓ Do</h4>
               <ul className="space-y-1 text-gray-700">
-                <li>• Use default radius for most buttons</li>
-                <li>• Use "none" for completely square buttons</li>
-                <li>• Use "sm" for slightly rounded buttons</li>
-                <li>• Keep radius consistent within a component</li>
+                <li>• Use default variant for primary actions</li>
+                <li>• Use outline for secondary actions</li>
+                <li>• Use accent for special highlights</li>
+                <li>• Keep button sizing consistent within components</li>
               </ul>
             </div>
             <div>
               <h4 className="font-medium text-red-700 mb-2">✗ Don't</h4>
               <ul className="space-y-1 text-gray-700">
-                <li>• Mix different radius values randomly</li>
-                <li>• Override with className rounded-*</li>
-                <li>• Use inconsistent radius values</li>
-                <li>• Forget to specify radius for consistency</li>
+                <li>• Mix different button styles randomly</li>
+                <li>• Use destructive unless for delete actions</li>
+                <li>• Override with conflicting className styles</li>
+                <li>• Use ghost variant for primary actions</li>
               </ul>
             </div>
           </div>

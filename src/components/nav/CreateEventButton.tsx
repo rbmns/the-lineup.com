@@ -22,9 +22,8 @@ export const CreateEventButton: React.FC<CreateEventButtonProps> = ({
 
   return (
     <Button
-      variant="seafoam"
+      variant="accent"
       onClick={handleCreateEventClick}
-      radius="sm"
       className={cn(
         "flex items-center gap-2 flex-shrink-0",
         isMobile ? "text-sm px-3 py-2" : "text-sm px-4 py-2"
