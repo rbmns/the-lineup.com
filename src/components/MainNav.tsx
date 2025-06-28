@@ -62,10 +62,10 @@ const MainNav = () => {
     return 'bg-coconut';
   };
 
-  // Determine text color based on background
+  // Determine text color based on background - darker for hero overlay
   const getTextColor = () => {
     if (isHomePage && !isScrolled) {
-      return 'text-white';
+      return 'text-ocean-deep'; // Changed from white to ocean-deep for better contrast
     }
     return 'text-midnight';
   };
