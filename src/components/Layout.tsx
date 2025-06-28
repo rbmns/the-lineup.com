@@ -8,7 +8,7 @@ import { useLocation, Outlet } from 'react-router-dom';
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
 
-const TOP_NAV_HEIGHT = 60;
+const TOP_NAV_HEIGHT = 70;
 const MOBILE_BOTTOM_NAV_HEIGHT = 80;
 
 const Layout = () => {
@@ -24,21 +24,7 @@ const Layout = () => {
       <MainNav />
       <div className="flex w-full min-h-screen">
         {/* Main Content Area - flows naturally on sand background */}
-        <div
-          className="flex-1 w-full min-h-screen bg-sand flex flex-col"
-          style={
-            !isMobile
-              ? {
-                  paddingTop: TOP_NAV_HEIGHT,
-                  minHeight: `calc(100vh - ${TOP_NAV_HEIGHT}px)`,
-                }
-              : {
-                  paddingTop: TOP_NAV_HEIGHT,
-                  paddingBottom: MOBILE_BOTTOM_NAV_HEIGHT,
-                  minHeight: `calc(100vh - ${TOP_NAV_HEIGHT + MOBILE_BOTTOM_NAV_HEIGHT}px)`,
-                }
-          }
-        >
+        <div className="flex-1 w-full min-h-screen bg-sand flex flex-col">
           {/* Main content - flows naturally without page wrappers */}
           <main className="w-full flex-1 flex flex-col">
             <div className="flex-1 flex flex-col">

@@ -13,8 +13,8 @@ export const EventsPageLayout: React.FC<EventsPageLayoutProps> = ({
   
   return (
     <div className="min-h-screen w-full">
-      {/* Content - No background styling or containers */}
-      <div className={`${isMobile ? 'px-3 py-4' : 'px-4 sm:px-6 py-4 sm:py-6'}`}>
+      {/* Content - No padding top, flows directly from nav */}
+      <div className={`${isMobile ? 'px-3 py-4' : 'px-4 sm:px-6 py-6'}`}>
         {children}
       </div>
     </div>

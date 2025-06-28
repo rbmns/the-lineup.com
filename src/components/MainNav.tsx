@@ -50,7 +50,7 @@ const MainNav = () => {
         <div className="w-full flex flex-col">
           <div className={cn(
             "w-full flex items-center justify-between",
-            isMobile ? "px-4 py-3" : "px-6 py-2.5"
+            isMobile ? "px-4 py-3" : "px-6 py-3"
           )}>
             {/* Left side - Logo */}
             <div className="flex items-center h-full flex-shrink-0">
@@ -59,11 +59,11 @@ const MainNav = () => {
                   <img 
                     src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" 
                     alt="the lineup Symbol" 
-                    className="w-5 h-5 transition-opacity hover:opacity-80" 
+                    className="w-6 h-6 transition-opacity hover:opacity-80" 
                   />
                 </Link>
               )}
-              <Link to="/" className="font-display text-base text-ocean-deep hover:text-ocean-deep/80 transition-colors">
+              <Link to="/" className="font-display text-xl md:text-2xl font-bold text-ocean-deep hover:text-ocean-deep/80 transition-colors">
                 the lineup
               </Link>
             </div>
