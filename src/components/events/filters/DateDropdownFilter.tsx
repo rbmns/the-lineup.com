@@ -34,40 +34,40 @@ export const DateDropdownFilter: React.FC<DateDropdownFilterProps> = ({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="flex items-center gap-2 h-10 px-3 border-sage/40 bg-coconut text-midnight rounded-md font-mono text-xs font-medium hover:bg-sage/20 hover:border-sage/60 transition-all duration-200"
+          className="flex items-center gap-2 h-10 px-3 border-ocean-deep/20 bg-coconut text-ocean-deep rounded-md font-mono text-xs font-medium uppercase tracking-wide hover:bg-vibrant-aqua/10 hover:border-vibrant-aqua/40 transition-all duration-200"
         >
-          <Calendar className="h-4 w-4 text-ocean-deep" />
-          <span className="lowercase">{displayText}</span>
+          <Calendar className="h-4 w-4 text-vibrant-aqua" />
+          <span>{displayText}</span>
           {selectedDateFilter && selectedDateFilter !== 'anytime' && (
-            <span className="px-1.5 py-0.5 bg-vibrant-aqua/20 text-midnight/90 rounded-full text-xs font-medium">
+            <span className="px-1.5 py-0.5 bg-vibrant-aqua/20 text-ocean-deep rounded-full text-xs font-medium">
               1
             </span>
           )}
-          <ChevronDown className="h-3.5 w-3.5 text-driftwood" />
+          <ChevronDown className="h-3.5 w-3.5 text-ocean-deep/70" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-56 p-0 bg-coconut border-sage/40 shadow-elevated rounded-md" align="start">
+      <PopoverContent className="w-56 p-0 bg-coconut border-ocean-deep/20 shadow-coastal rounded-md" align="start">
         <div className="py-2">
           {/* Anytime option */}
           <button
             onClick={() => handleDateFilterSelect('anytime')}
-            className={`w-full px-4 py-2 text-left text-sm hover:bg-sage/20 transition-colors font-mono ${
-              selectedDateFilter === 'anytime' || !selectedDateFilter ? 'bg-vibrant-aqua/20 font-medium text-ocean-deep' : 'text-midnight'
+            className={`w-full px-4 py-2 text-left text-sm hover:bg-vibrant-aqua/10 transition-colors font-mono uppercase tracking-wide ${
+              selectedDateFilter === 'anytime' || !selectedDateFilter ? 'bg-vibrant-aqua/20 font-medium text-ocean-deep' : 'text-ocean-deep'
             }`}
           >
             anytime
           </button>
           
           {/* Divider */}
-          <div className="border-t border-sage/30 my-1" />
+          <div className="border-t border-ocean-deep/10 my-1" />
           
           {/* Date filters */}
           {dateFilters.map((filter) => (
             <button
               key={filter}
               onClick={() => handleDateFilterSelect(filter)}
-              className={`w-full px-4 py-2 text-left text-sm hover:bg-sage/20 transition-colors lowercase font-mono ${
-                selectedDateFilter === filter ? 'bg-vibrant-aqua/20 font-medium text-ocean-deep' : 'text-midnight'
+              className={`w-full px-4 py-2 text-left text-sm hover:bg-vibrant-aqua/10 transition-colors font-mono uppercase tracking-wide ${
+                selectedDateFilter === filter ? 'bg-vibrant-aqua/20 font-medium text-ocean-deep' : 'text-ocean-deep'
               }`}
             >
               {filter}

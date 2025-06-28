@@ -1,32 +1,32 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
-/* Coastal bohemian styling foundation */
+/* Coastal community styling foundation */
 @layer base {
   :root {
     --background: 248 245 240; /* Sand background */
-    --foreground: 30 30 30; /* Midnight text */
+    --foreground: 0 95 115; /* Ocean deep text */
 
     --card: 252 250 247; /* Coconut card background */
-    --card-foreground: 30 30 30;
+    --card-foreground: 0 95 115;
     
     --primary: 0 95 115; /* Ocean Deep */
     --primary-foreground: 252 250 247;
 
-    --secondary: 218 224 220; /* Sage */
-    --secondary-foreground: 30 30 30;
+    --secondary: 201 181 162; /* Clay */
+    --secondary-foreground: 0 95 115;
 
     --muted: 140 140 137; /* Driftwood */
-    --muted-foreground: 30 30 30;
+    --muted-foreground: 0 95 115;
 
     --accent: 144 224 239; /* Vibrant Aqua */
-    --accent-foreground: 30 30 30;
+    --accent-foreground: 0 95 115;
 
     --destructive: 205 92 92;
     --destructive-foreground: 252 250 247;
 
-    --border: 218 224 220; /* Sage for borders */
-    --input: 218 224 220;
+    --border: 0 95 115; /* Ocean Deep for borders */
+    --input: 0 95 115;
     --ring: 0 95 115; /* Ocean Deep for focus rings */
 
     --radius: 0.5rem; /* Consistent md radius */
@@ -34,45 +34,37 @@
 
   html, body {
     background: rgb(248 245 240); /* Sand - full site background */
-    color: rgb(30 30 30); /* Midnight for better accessibility */
+    color: rgb(0 95 115); /* Ocean deep for better accessibility */
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
     font-weight: 400;
   }
 
-  /* Typography system - coastal bohemian style */
+  /* Typography system - coastal community style */
   .font-display {
     font-family: 'Inter', sans-serif;
     font-weight: 600;
     letter-spacing: -0.01em;
-    color: rgb(30 30 30); /* Midnight for headings */
+    color: rgb(0 95 115); /* Ocean deep for headings */
   }
 
   .font-body {
     font-family: 'Inter', sans-serif;
     font-weight: 400;
     line-height: 1.6;
-    color: rgb(30 30 30); /* Midnight for body text */
+    color: rgb(0 95 115); /* Ocean deep for body text */
   }
 
   .font-mono {
     font-family: 'JetBrains Mono', 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
     font-size: 0.75rem;
     font-weight: 500;
-    color: rgb(30 30 30); /* Midnight for mono text */
+    color: rgb(0 95 115); /* Ocean deep for mono text */
   }
 
-  /* Color utilities */
-  .text-midnight {
-    color: rgb(30 30 30);
-  }
-
+  /* Primary brand colors */
   .text-ocean-deep {
     color: rgb(0 95 115);
-  }
-
-  .text-driftwood {
-    color: rgb(140 140 137);
   }
 
   .text-vibrant-aqua {
@@ -81,10 +73,6 @@
 
   .text-clay {
     color: rgb(201 181 162);
-  }
-
-  .text-seafoam {
-    color: rgb(162 180 178);
   }
 
   /* Remove all harsh shadows - use coastal alternatives */
@@ -117,16 +105,8 @@
     background-color: rgb(250 248 245);
   }
   
-  .bg-sage {
-    background-color: rgb(218 224 220);
-  }
-
   .bg-clay {
     background-color: rgb(201 181 162);
-  }
-
-  .bg-seafoam {
-    background-color: rgb(162 180 178);
   }
 
   .bg-ocean-deep {
@@ -137,12 +117,12 @@
     background-color: rgb(144 224 239);
   }
   
-  .border-sage {
-    border-color: rgb(218 224 220);
-  }
-
   .border-ocean-deep {
     border-color: rgb(0 95 115);
+  }
+
+  .border-vibrant-aqua {
+    border-color: rgb(144 224 239);
   }
   
   /* Coastal shadows */
@@ -170,5 +150,20 @@
 
   .hover-ocean:hover {
     background-color: rgba(0, 95, 115, 0.05);
+  }
+}
+
+/* Global button consistency with coastal styling */
+@layer components {
+  .btn-primary {
+    @apply bg-ocean-deep text-coconut hover:bg-ocean-deep/90 border-0 font-medium transition-all duration-200 hover:-translate-y-0.5 shadow-coastal;
+  }
+  
+  .btn-outline {
+    @apply border border-ocean-deep/20 text-ocean-deep hover:bg-vibrant-aqua/10 hover:border-vibrant-aqua/40 font-medium transition-all duration-200 hover:-translate-y-0.5;
+  }
+  
+  .btn-ghost {
+    @apply text-ocean-deep hover:bg-vibrant-aqua/10 font-medium transition-all duration-200 hover:-translate-y-0.5;
   }
 }

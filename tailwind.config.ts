@@ -27,35 +27,35 @@ const config = {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "rgb(248 245 240)", // Sand - main background
-        foreground: "rgb(30 30 30)", // Midnight text
+        foreground: "rgb(0 95 115)", // Ocean deep text
         
-        // Bohemian coastal color palette
-        'sand': 'rgb(248 245 240)',
-        'coconut': 'rgb(252 250 247)', 
-        'ivory': 'rgb(250 248 245)',
-        'sage': 'rgb(218 224 220)',
-        'clay': 'rgb(201 181 162)',
-        'seafoam': 'rgb(162 180 178)',
-        'ocean-deep': 'rgb(0 95 115)',
-        'vibrant-aqua': 'rgb(144 224 239)',
-        'driftwood': 'rgb(140 140 137)',
-        'midnight': 'rgb(30 30 30)',
+        // Coastal color palette - vibrant and natural
+        'sand': 'rgb(248 245 240)',      // Main site background
+        'coconut': 'rgb(252 250 247)',   // Event cards & nav background
+        'ivory': 'rgb(250 248 245)',     // Alternative sections
+        'sage': 'rgb(218 224 220)',      // Muted accents (legacy)
+        'clay': 'rgb(201 181 162)',      // Supportive color for tags/secondary
+        'seafoam': 'rgb(162 180 178)',   // Supportive green (legacy)
+        'ocean-deep': 'rgb(0 95 115)',   // Primary brand color
+        'vibrant-aqua': 'rgb(144 224 239)', // Accent color for hovers/highlights
+        'driftwood': 'rgb(140 140 137)', // Neutral gray (legacy)
+        'midnight': 'rgb(30 30 30)',     // Dark text (legacy)
         
         primary: {
           DEFAULT: "rgb(0 95 115)", // Ocean Deep
           foreground: "rgb(252 250 247)", // Coconut text on ocean
         },
         secondary: {
-          DEFAULT: "rgb(218 224 220)", // Sage
-          foreground: "rgb(30 30 30)", // Midnight
+          DEFAULT: "rgb(201 181 162)", // Clay
+          foreground: "rgb(0 95 115)", // Ocean Deep
         },
         muted: {
           DEFAULT: "rgb(140 140 137)", // Driftwood
-          foreground: "rgb(30 30 30)", // Midnight
+          foreground: "rgb(0 95 115)", // Ocean Deep
         },
         accent: {
           DEFAULT: "rgb(144 224 239)", // Vibrant Aqua
-          foreground: "rgb(30 30 30)", // Midnight
+          foreground: "rgb(0 95 115)", // Ocean Deep
         },
         destructive: {
           DEFAULT: "rgb(205 92 92)",
@@ -63,7 +63,7 @@ const config = {
         },
         card: {
           DEFAULT: "rgb(252 250 247)", // Coconut
-          foreground: "rgb(30 30 30)", // Midnight
+          foreground: "rgb(0 95 115)", // Ocean Deep
         },
       },
       fontFamily: {

@@ -8,7 +8,7 @@ import { useLocation, Outlet } from 'react-router-dom';
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
 
-const TOP_NAV_HEIGHT = 60; // Reduced from 72
+const TOP_NAV_HEIGHT = 60;
 const MOBILE_BOTTOM_NAV_HEIGHT = 80;
 
 const Layout = () => {
@@ -39,7 +39,7 @@ const Layout = () => {
                 }
           }
         >
-          {/* Main content - no page wrappers, flows naturally */}
+          {/* Main content - flows naturally without page wrappers */}
           <main className="w-full flex-1 flex flex-col">
             <div className="flex-1 flex flex-col">
               <Outlet />

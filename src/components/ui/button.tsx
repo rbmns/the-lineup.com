@@ -9,14 +9,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-ocean-deep text-coconut hover:bg-ocean-deep/90 shadow-coastal hover:shadow-elevated",
-        primary: "bg-ocean-deep text-coconut hover:bg-ocean-deep/90 shadow-coastal hover:shadow-elevated",
-        secondary: "bg-clay text-midnight hover:bg-clay/90 shadow-coastal hover:shadow-elevated",
-        accent: "bg-vibrant-aqua text-midnight hover:bg-vibrant-aqua/90 shadow-coastal hover:shadow-elevated",
-        outline: "border border-sage/40 bg-transparent text-midnight hover:bg-sage/20 hover:border-sage/60",
-        ghost: "text-midnight hover:bg-sage/20 hover:text-ocean-deep",
-        link: "text-ocean-deep hover:text-ocean-deep/80 hover:underline underline-offset-4",
-        destructive: "bg-destructive text-coconut hover:bg-destructive/90 shadow-coastal hover:shadow-elevated",
+        default: "bg-ocean-deep text-coconut hover:bg-ocean-deep/90 shadow-coastal",
+        primary: "bg-ocean-deep text-coconut hover:bg-ocean-deep/90 shadow-coastal",
+        secondary: "bg-clay text-ocean-deep hover:bg-clay/90 shadow-coastal",
+        accent: "bg-vibrant-aqua text-ocean-deep hover:bg-vibrant-aqua/90 shadow-coastal",
+        outline: "border border-ocean-deep/20 bg-transparent text-ocean-deep hover:bg-vibrant-aqua/10 hover:border-vibrant-aqua/40",
+        ghost: "text-ocean-deep hover:bg-vibrant-aqua/10 hover:text-ocean-deep",
+        link: "text-ocean-deep hover:text-vibrant-aqua hover:underline underline-offset-4",
+        destructive: "bg-destructive text-coconut hover:bg-destructive/90 shadow-coastal",
       },
       size: {
         default: "px-4 py-2.5 h-10",

@@ -6,7 +6,6 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { AuthOverlay } from '@/components/auth/AuthOverlay';
 import { NavActions } from './nav/NavActions';
-import { CreateEventButton } from './nav/CreateEventButton';
 import { Calendar, Users, Star, Plus } from 'lucide-react';
 
 const MainNav = () => {
@@ -47,7 +46,7 @@ const MainNav = () => {
 
   return (
     <>
-      <header className="sticky top-0 left-0 right-0 z-50 w-full bg-coconut border-b border-sage/40 shadow-navigation">
+      <header className="sticky top-0 left-0 right-0 z-50 w-full bg-coconut border-b border-ocean-deep/10 shadow-coastal">
         <div className="w-full flex flex-col">
           <div className={cn(
             "w-full flex items-center justify-between",
@@ -84,8 +83,8 @@ const MainNav = () => {
                       className={cn(
                         "flex items-center gap-2 px-3 py-2 rounded-md font-body text-sm font-medium transition-all duration-200",
                         isActive
-                          ? "text-ocean-deep bg-vibrant-aqua/20 shadow-coastal"
-                          : "text-midnight hover:text-ocean-deep hover:bg-sage/20 hover:-translate-y-0.5"
+                          ? "text-ocean-deep bg-vibrant-aqua/20"
+                          : "text-ocean-deep hover:text-vibrant-aqua hover:bg-vibrant-aqua/10 hover:-translate-y-0.5"
                       )}
                     >
                       <Icon className="h-4 w-4" />
@@ -99,7 +98,7 @@ const MainNav = () => {
             {/* Right side - User Actions */}
             <NavActions 
               onAuthRequired={handleAuthRequired}
-              showCreateButton={false} // We now have create in main nav
+              showCreateButton={false}
             />
           </div>
         </div>
@@ -107,7 +106,7 @@ const MainNav = () => {
 
       {/* Mobile Bottom Navigation */}
       {isMobile && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-coconut border-t border-sage/40 shadow-navigation pb-safe">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-coconut border-t border-ocean-deep/10 shadow-coastal pb-safe">
           <nav className="flex items-center justify-around px-4 py-3">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -118,10 +117,10 @@ const MainNav = () => {
                   key={item.path}
                   to={item.path}
                   className={cn(
-                    "flex flex-col items-center gap-1 px-3 py-2 rounded-md font-mono text-xs font-medium transition-all duration-200",
+                    "flex flex-col items-center gap-1 px-3 py-2 rounded-md font-mono text-xs font-medium transition-all duration-200 uppercase",
                     isActive
                       ? "text-ocean-deep bg-vibrant-aqua/20"
-                      : "text-driftwood hover:text-ocean-deep hover:bg-sage/20"
+                      : "text-ocean-deep hover:text-vibrant-aqua hover:bg-vibrant-aqua/10"
                   )}
                 >
                   <Icon className="h-5 w-5" />

@@ -21,13 +21,13 @@ export const CategoryPill: React.FC<CategoryPillProps & {
 }) => {
   const Icon = getCategoryIcon(category);
   
-  // Bohemian coastal pill styling
-  const baseClasses = 'rounded-full font-mono text-xs font-medium transition-all duration-200 flex items-center border';
+  // Coastal pill styling with vibrant aqua accents
+  const baseClasses = 'rounded-full font-mono text-xs font-medium transition-all duration-200 flex items-center border uppercase tracking-wide';
   
-  // Category pills use clay background
+  // Category pills use vibrant aqua background when active, ocean-deep text
   const colorClasses = active || showIcon
-    ? 'bg-clay/10 text-midnight/90 border-clay/20'
-    : 'bg-sage/20 text-midnight/80 hover:bg-clay/10 hover:text-midnight/90 border-sage/30';
+    ? 'bg-vibrant-aqua/20 text-ocean-deep border-vibrant-aqua/30'
+    : 'bg-ocean-deep/10 text-ocean-deep hover:bg-vibrant-aqua/10 hover:text-ocean-deep border-ocean-deep/20';
   
   // Consistent sizing
   const sizeClasses = {
@@ -52,8 +52,8 @@ export const CategoryPill: React.FC<CategoryPillProps & {
       )}
       onClick={onClick}
     >
-      {showIcon && Icon && <Icon className="mr-1.5 h-3 w-3" />}
-      <span className="lowercase">{category}</span>
+      {showIcon && Icon && <Icon className="mr-1.5 h-3 w-3 text-vibrant-aqua" />}
+      <span>{category}</span>
       {children}
     </div>
   );
