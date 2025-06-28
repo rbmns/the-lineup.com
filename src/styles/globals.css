@@ -117,6 +117,19 @@
     @apply font-mono text-xs font-medium uppercase tracking-wide px-3 py-2 rounded-md transition-all duration-200;
     @apply border border-sage/50 text-midnight hover:border-clay/50 hover:bg-clay/10;
   }
+
+  /* Image filters for natural warmth */
+  .filter-warm {
+    filter: sepia(8%) saturate(1.1) brightness(1.02) contrast(1.05) hue-rotate(-2deg);
+  }
+
+  .filter-cinematic {
+    filter: sepia(12%) saturate(1.15) brightness(0.98) contrast(1.08) hue-rotate(-5deg);
+  }
+
+  .img-cinematic {
+    filter: sepia(12%) saturate(1.15) brightness(0.98) contrast(1.08) hue-rotate(-5deg);
+  }
 }
 
 /* Coastal utility classes - updated palette */
@@ -229,21 +242,21 @@
 
   /* Event card styling */
   .event-card {
-    @apply bg-coconut border border-sage/30 rounded-lg p-6 cursor-pointer transition-all duration-200;
-    @apply hover:-translate-y-1 hover:shadow-coastal-hover hover:border-sage/50;
+    @apply bg-coconut border border-clay/20 rounded-md p-6 cursor-pointer transition-all duration-200;
+    @apply hover:-translate-y-1 hover:shadow-coastal-hover hover:border-clay/30;
   }
 
-  /* Category/vibe pills for event cards */
+  /* Category/vibe pills for event cards - natural styling */
   .event-pill {
-    @apply text-xs font-mono font-medium px-2.5 py-1 rounded-full uppercase tracking-wide;
-    @apply bg-sage/40 text-midnight border border-sage/60;
+    @apply text-xs font-mono font-medium px-2.5 py-1 rounded-md uppercase tracking-wide;
+    @apply bg-midnight/10 text-midnight border border-midnight/20;
   }
 
   .event-pill-vibe {
-    @apply bg-clay/20 text-clay border-clay/40;
+    @apply bg-midnight/10 text-midnight border border-midnight/20;
   }
 
   .event-pill-category {
-    @apply bg-vibrant-aqua/20 text-ocean-deep border-vibrant-aqua/40;
+    @apply bg-ocean-deep/15 text-ocean-deep border border-ocean-deep/25;
   }
 }

@@ -95,8 +95,8 @@ export const EventCard: React.FC<EventCardProps> = ({
   return (
     <div 
       className={cn(
-        "bg-coconut border border-sage/30 rounded-lg p-6 cursor-pointer transition-all duration-200",
-        "hover:-translate-y-1 hover:shadow-coastal-hover hover:border-sage/50 w-full group",
+        "bg-coconut border border-clay/20 rounded-md p-6 cursor-pointer transition-all duration-200",
+        "hover:-translate-y-1 hover:shadow-coastal-hover hover:border-clay/30 w-full group",
         className
       )}
       onClick={handleClick}
@@ -107,7 +107,7 @@ export const EventCard: React.FC<EventCardProps> = ({
         <img
           src={imageUrl}
           alt={event.title}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 filter-warm"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (!target.src.includes('/img/default.jpg')) {
@@ -132,29 +132,29 @@ export const EventCard: React.FC<EventCardProps> = ({
       {/* Metadata */}
       <div className="font-mono text-xs text-overcast space-y-2 mb-4 uppercase tracking-wide">
         <div className="flex items-center space-x-2">
-          <Calendar className="h-3.5 w-3.5 text-vibrant-aqua" />
+          <Calendar className="h-3.5 w-3.5 text-clay" />
           <span>
             {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
           </span>
         </div>
         
         <div className="flex items-center space-x-2">
-          <MapPin className="h-3.5 w-3.5 text-vibrant-aqua" />
+          <MapPin className="h-3.5 w-3.5 text-clay" />
           <span>
             {getVenueDisplay()}
           </span>
         </div>
       </div>
 
-      {/* Tags/Vibes and Category - distinct styling */}
+      {/* Tags/Vibes and Category - natural styling */}
       <div className="flex flex-wrap gap-2 mb-4">
         {event.vibe && (
-          <span className="event-pill-vibe">
+          <span className="px-2.5 py-1 text-xs font-mono font-medium rounded-md bg-midnight/10 text-midnight uppercase tracking-wide border border-midnight/20">
             {event.vibe}
           </span>
         )}
         {event.event_category && (
-          <span className="event-pill-category">
+          <span className="px-2.5 py-1 text-xs font-mono font-medium rounded-md bg-ocean-deep/15 text-ocean-deep uppercase tracking-wide border border-ocean-deep/25">
             {event.event_category}
           </span>
         )}
@@ -167,7 +167,7 @@ export const EventCard: React.FC<EventCardProps> = ({
           onClick={(e) => e.stopPropagation()}
         >
           <button
-            className="btn-primary w-full"
+            className="btn-primary w-full px-4 py-2.5 text-sm font-medium rounded-md"
             onClick={(e) => {
               e.stopPropagation();
               handleRsvp('Going');
