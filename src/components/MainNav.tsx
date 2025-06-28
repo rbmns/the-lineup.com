@@ -51,28 +51,28 @@ const MainNav = () => {
         <div className="w-full flex flex-col">
           <div className={cn(
             "w-full flex items-center justify-between",
-            isMobile ? "px-4 py-3" : "px-6 py-4"
+            isMobile ? "px-4 py-3" : "px-6 py-2.5"
           )}>
             {/* Left side - Logo */}
             <div className="flex items-center h-full flex-shrink-0">
               {!isMobile && (
-                <Link to="/" className="flex items-center justify-center mr-4 flex-shrink-0">
+                <Link to="/" className="flex items-center justify-center mr-3 flex-shrink-0">
                   <img 
                     src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" 
                     alt="thelineup Symbol" 
-                    className="w-6 h-6 transition-opacity hover:opacity-80" 
+                    className="w-5 h-5 transition-opacity hover:opacity-80" 
                   />
                 </Link>
               )}
               <BrandLogo 
                 showText={true} 
-                className="font-display text-lg text-ocean-deep hover:text-ocean-deep/80 transition-colors" 
+                className="font-display text-base text-ocean-deep hover:text-ocean-deep/80 transition-colors" 
               />
             </div>
 
             {/* Center - Navigation (Desktop only) */}
             {!isMobile && (
-              <nav className="flex items-center space-x-2">
+              <nav className="flex items-center space-x-1">
                 {navItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = location.pathname === item.path;
@@ -82,7 +82,7 @@ const MainNav = () => {
                       key={item.path}
                       to={item.path}
                       className={cn(
-                        "flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium transition-all duration-200",
+                        "flex items-center gap-2 px-3 py-2 rounded-md font-body text-sm font-medium transition-all duration-200",
                         isActive
                           ? "text-ocean-deep bg-vibrant-aqua/20 shadow-coastal"
                           : "text-midnight hover:text-ocean-deep hover:bg-sage/20 hover:-translate-y-0.5"
@@ -118,7 +118,7 @@ const MainNav = () => {
                   key={item.path}
                   to={item.path}
                   className={cn(
-                    "flex flex-col items-center gap-1 px-3 py-2 rounded-md text-xs font-medium transition-all duration-200",
+                    "flex flex-col items-center gap-1 px-3 py-2 rounded-md font-mono text-xs font-medium transition-all duration-200",
                     isActive
                       ? "text-ocean-deep bg-vibrant-aqua/20"
                       : "text-driftwood hover:text-ocean-deep hover:bg-sage/20"
