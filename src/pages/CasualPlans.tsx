@@ -6,11 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { CasualPlanCard } from '@/components/casual-plans/CasualPlanCard';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const CasualPlans = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const { plans, isLoading, rsvpToPlan, loadingPlanId } = useCasualPlans();
+  const isMobile = useIsMobile();
 
   console.log('CasualPlans component - plans:', plans);
   console.log('CasualPlans component - isLoading:', isLoading);
@@ -24,13 +26,13 @@ const CasualPlans = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Header Section - No background styling */}
-      <div className="max-w-screen-lg mx-auto px-6 py-12 sm:py-16">
+      {/* Header Section - Optimized for mobile above the fold */}
+      <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-8' : 'py-12 sm:py-16'}`}>
         <div className="text-center">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#005F73] mb-4 leading-tight">
+          <h1 className={`font-bold text-[#005F73] mb-4 leading-tight ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
             Casual <span className="text-[#2A9D8F]">Plans</span>
           </h1>
-          <p className="text-lg sm:text-xl text-[#4A4A48] max-w-3xl mx-auto leading-relaxed mb-6">
+          <p className={`text-[#4A4A48] max-w-3xl mx-auto leading-relaxed ${isMobile ? 'text-base mb-6' : 'text-lg sm:text-xl mb-6'}`}>
             Spontaneous meetups and activities with fellow travelers
           </p>
           
@@ -46,14 +48,14 @@ const CasualPlans = () => {
         </div>
       </div>
 
-      <div className="max-w-screen-lg mx-auto px-6 py-8">
-        {/* Login prompt for non-authenticated users */}
+      <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-4' : 'py-8'}`}>
+        {/* Login prompt for non-authenticated users - Optimized for mobile above the fold */}
         {!isAuthenticated && (
-          <div className="border border-[#2A9D8F]/20 rounded-xl p-6 mb-8">
-            <h3 className="text-lg font-semibold text-[#005F73] mb-2">
+          <div className={`border border-[#2A9D8F]/20 rounded-xl p-6 mb-8 ${isMobile ? 'mx-2' : ''}`}>
+            <h3 className={`font-semibold text-[#005F73] mb-2 ${isMobile ? 'text-lg' : 'text-lg'}`}>
               Join the community to see full details
             </h3>
-            <p className="text-[#4A4A48] mb-4">
+            <p className={`text-[#4A4A48] mb-4 ${isMobile ? 'text-sm' : 'text-sm'}`}>
               Sign up to view locations, times, and connect with other members creating casual plans.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">

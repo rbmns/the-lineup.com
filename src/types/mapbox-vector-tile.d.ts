@@ -1,10 +1,5 @@
 
-// Type declaration for @mapbox/vector-tile to resolve TypeScript errors
 declare module '@mapbox/vector-tile' {
-  export interface VectorTile {
-    layers: { [key: string]: VectorTileLayer };
-  }
-  
   export interface VectorTileLayer {
     length: number;
     name: string;
@@ -12,17 +7,24 @@ declare module '@mapbox/vector-tile' {
     extent: number;
     feature(i: number): VectorTileFeature;
   }
-  
+
   export interface VectorTileFeature {
-    id: number | string | undefined;
-    type: 1 | 2 | 3; // Point, LineString, Polygon
+    id?: number | string;
+    type: number;
     extent: number;
     properties: { [key: string]: any };
     loadGeometry(): Array<Array<{ x: number; y: number }>>;
+    bbox?(): [number, number, number, number];
+    toGeoJSON(x: number, y: number, z: number): GeoJSON.Feature;
   }
-  
+
   export default class VectorTile {
-    constructor(data: Uint8Array | ArrayBuffer);
+    constructor(data: Uint8Array | ArrayBuffer, end?: number);
     layers: { [key: string]: VectorTileLayer };
   }
+}
+
+declare module 'mapbox__vector-tile' {
+  export * from '@mapbox/vector-tile';
+  export { default } from '@mapbox/vector-tile';
 }
