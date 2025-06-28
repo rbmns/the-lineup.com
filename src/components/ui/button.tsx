@@ -5,18 +5,18 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center font-body text-sm font-medium rounded-md transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ocean-deep focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:-translate-y-0.5",
+  "inline-flex items-center justify-center font-body text-sm font-medium rounded-md transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vibrant-aqua focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:-translate-y-1",
   {
     variants: {
       variant: {
-        default: "bg-ocean-deep text-coconut hover:bg-ocean-deep/90 shadow-coastal",
-        primary: "bg-ocean-deep text-coconut hover:bg-ocean-deep/90 shadow-coastal",
-        secondary: "bg-clay text-ocean-deep hover:bg-clay/90 shadow-coastal",
-        accent: "bg-vibrant-aqua text-ocean-deep hover:bg-vibrant-aqua/90 shadow-coastal",
-        outline: "border border-ocean-deep/20 bg-transparent text-ocean-deep hover:bg-vibrant-aqua/10 hover:border-vibrant-aqua/40",
-        ghost: "text-ocean-deep hover:bg-vibrant-aqua/10 hover:text-ocean-deep",
-        link: "text-ocean-deep hover:text-vibrant-aqua hover:underline underline-offset-4",
-        destructive: "bg-destructive text-coconut hover:bg-destructive/90 shadow-coastal",
+        default: "bg-vibrant-aqua text-midnight hover:bg-vibrant-aqua/90 shadow-coastal",
+        primary: "bg-vibrant-aqua text-midnight hover:bg-vibrant-aqua/90 shadow-coastal",
+        secondary: "bg-clay text-coconut hover:bg-clay/90 shadow-coastal",
+        accent: "bg-sunset-yellow text-midnight hover:bg-sunset-yellow/90 shadow-coastal",
+        outline: "border border-sage/50 bg-transparent text-midnight hover:bg-sage/20 hover:border-clay/50",
+        ghost: "text-midnight hover:bg-sage/20 hover:text-midnight",
+        link: "text-ocean-deep hover:text-clay hover:underline underline-offset-4",
+        destructive: "bg-clay text-coconut hover:bg-clay/90 shadow-coastal",
       },
       size: {
         default: "px-4 py-2.5 h-10",

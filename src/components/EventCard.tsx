@@ -95,7 +95,8 @@ export const EventCard: React.FC<EventCardProps> = ({
   return (
     <div 
       className={cn(
-        "bg-coconut border border-ocean-deep/10 rounded-md p-6 cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-coastal hover:bg-vibrant-aqua/5 w-full group",
+        "bg-coconut border border-sage/30 rounded-lg p-6 cursor-pointer transition-all duration-200",
+        "hover:-translate-y-1 hover:shadow-coastal-hover hover:border-sage/50 w-full group",
         className
       )}
       onClick={handleClick}
@@ -117,19 +118,19 @@ export const EventCard: React.FC<EventCardProps> = ({
       </div>
       
       {/* Title */}
-      <h3 className="font-display text-lg text-ocean-deep mb-3 leading-tight font-semibold">
+      <h3 className="font-display text-lg text-midnight mb-3 leading-tight font-semibold">
         {event.title}
       </h3>
       
       {/* Organizer info */}
       {event.organiser_name && (
-        <p className="font-mono text-xs text-ocean-deep/70 mb-3 uppercase tracking-wide">
+        <p className="font-mono text-xs text-overcast mb-3 uppercase tracking-wide">
           By {event.organiser_name}
         </p>
       )}
       
       {/* Metadata */}
-      <div className="font-mono text-xs text-ocean-deep/70 space-y-2 mb-4 uppercase tracking-wide">
+      <div className="font-mono text-xs text-overcast space-y-2 mb-4 uppercase tracking-wide">
         <div className="flex items-center space-x-2">
           <Calendar className="h-3.5 w-3.5 text-vibrant-aqua" />
           <span>
@@ -145,28 +146,28 @@ export const EventCard: React.FC<EventCardProps> = ({
         </div>
       </div>
 
-      {/* Tags/Vibes and Category - coastal pill styling */}
+      {/* Tags/Vibes and Category - distinct styling */}
       <div className="flex flex-wrap gap-2 mb-4">
         {event.vibe && (
-          <span className="bg-vibrant-aqua/20 text-ocean-deep text-xs font-mono font-medium px-2.5 py-1 rounded-full uppercase tracking-wide">
+          <span className="event-pill-vibe">
             {event.vibe}
           </span>
         )}
         {event.event_category && (
-          <span className="bg-ocean-deep/10 text-ocean-deep text-xs font-mono font-medium px-2.5 py-1 rounded-full uppercase tracking-wide">
+          <span className="event-pill-category">
             {event.event_category}
           </span>
         )}
       </div>
 
-      {/* RSVP Button - coastal primary style */}
+      {/* RSVP Button - primary aqua style */}
       {shouldShowRsvp && onRsvp && (
         <div 
           data-rsvp-container="true" 
           onClick={(e) => e.stopPropagation()}
         >
           <button
-            className="bg-ocean-deep text-coconut text-sm font-body font-medium px-4 py-2.5 rounded-md hover:bg-ocean-deep/90 transition-all duration-200 hover:-translate-y-0.5 shadow-coastal w-full"
+            className="btn-primary w-full"
             onClick={(e) => {
               e.stopPropagation();
               handleRsvp('Going');
