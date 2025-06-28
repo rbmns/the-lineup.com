@@ -62,12 +62,20 @@ const MainNav = () => {
     return 'bg-coconut';
   };
 
+  // Determine text color based on background
+  const getTextColor = () => {
+    if (isHomePage && !isScrolled) {
+      return 'text-white';
+    }
+    return 'text-midnight';
+  };
+
   // Determine if we should show border/shadow
   const shouldShowBorder = !isHomePage || isScrolled;
 
   return <>
       <header className={cn(
-        "sticky top-0 left-0 right-0 z-50 w-full transition-all duration-300",
+        "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300",
         getNavBackground(),
         shouldShowBorder && "border-b border-clay/15 shadow-navigation"
       )}>
@@ -85,7 +93,10 @@ const MainNav = () => {
                     className="w-4 h-4 transition-opacity hover:opacity-80" 
                   />
                 </Link>}
-              <Link to="/" className="font-display font-semibold text-midnight hover:text-vibrant-aqua transition-colors text-lg">
+              <Link to="/" className={cn(
+                "font-display font-semibold hover:text-vibrant-aqua transition-colors text-lg",
+                getTextColor()
+              )}>
                 the lineup
               </Link>
             </div>
@@ -100,9 +111,10 @@ const MainNav = () => {
                       to={item.path} 
                       className={cn(
                         "flex items-center gap-2 px-3 py-2 rounded-md font-body text-sm font-medium transition-all duration-200",
+                        getTextColor(),
                         isActive 
-                          ? "text-midnight bg-vibrant-aqua/20" 
-                          : "text-midnight hover:text-vibrant-aqua hover:bg-vibrant-aqua/10"
+                          ? "bg-vibrant-aqua/20" 
+                          : "hover:text-vibrant-aqua hover:bg-vibrant-aqua/10"
                       )}
                     >
                       <Icon className="h-4 w-4" />
