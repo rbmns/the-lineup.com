@@ -40,7 +40,7 @@ const MainNav = () => {
   }];
 
   return <>
-      <header className="sticky top-0 left-0 right-0 z-50 w-full bg-coconut border-b border-sage/20 shadow-navigation">
+      <header className="sticky top-0 left-0 right-0 z-50 w-full bg-coconut border-b border-clay/20 shadow-navigation">
         <div className="w-full flex flex-col">
           <div className={cn("w-full flex items-center justify-between", isMobile ? "px-4 py-2" : "px-6 py-2")}>
             {/* Left side - Logo */}
@@ -71,8 +71,8 @@ const MainNav = () => {
         </div>
       </header>
 
-      {/* Mobile Bottom Navigation - softer styling */}
-      {isMobile && <div className="fixed bottom-0 left-0 right-0 z-50 bg-coconut border-t border-sage/20 shadow-navigation pb-safe">
+      {/* Mobile Bottom Navigation */}
+      {isMobile && <div className="fixed bottom-0 left-0 right-0 z-50 bg-coconut border-t border-clay/20 shadow-navigation pb-safe">
           <nav className="flex items-center justify-around px-4 py-1.5">
             {navItems.map(item => {
           const Icon = item.icon;

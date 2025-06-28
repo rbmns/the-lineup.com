@@ -9,14 +9,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-vibrant-aqua text-midnight hover:bg-vibrant-aqua/90 shadow-coastal",
-        primary: "bg-vibrant-aqua text-midnight hover:bg-vibrant-aqua/90 shadow-coastal",
-        secondary: "bg-clay text-coconut hover:bg-clay/90 shadow-coastal",
-        accent: "bg-sunset-yellow text-midnight hover:bg-sunset-yellow/90 shadow-coastal",
-        outline: "border border-sage/50 bg-transparent text-midnight hover:bg-sage/20 hover:border-clay/50",
-        ghost: "text-midnight hover:bg-sage/20 hover:text-midnight",
-        link: "text-ocean-deep hover:text-clay hover:underline underline-offset-4",
-        destructive: "bg-clay text-coconut hover:bg-clay/90 shadow-coastal",
+        default: "btn-primary",
+        primary: "btn-primary", 
+        secondary: "btn-secondary",
+        accent: "btn-accent",
+        outline: "btn-outline",
+        ghost: "btn-ghost",
+        link: "text-ocean-deep hover:text-clay hover:underline underline-offset-4 hover:translate-y-0",
+        destructive: "btn-secondary", // Use clay instead of harsh red
       },
       size: {
         default: "px-4 py-2.5 h-10",

@@ -9,8 +9,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "bg-coconut text-midnight rounded-lg border border-sage/30 shadow-coastal p-6",
-      "transition-all duration-200 hover:-translate-y-1 hover:shadow-coastal-hover hover:border-sage/50",
+      "event-card", // Use our unified event card styling
       className
     )}
     {...props}
