@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -97,9 +98,18 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData, onEvent
   }, [isEditMode, initialData, form]);
   
   const handleVenueCreated = (newVenue: Venue) => {
+    console.log("Venue created successfully:", newVenue);
+    
+    // Invalidate venues query to refresh the list
     queryClient.invalidateQueries({ queryKey: ['venues'] });
+    
+    // Set the newly created venue as selected in the form
     form.setValue("venue_id", newVenue.id, { shouldValidate: true, shouldDirty: true });
+    
+    // Close the modal
     setCreateVenueModalOpen(false);
+    
+    console.log("Venue selected in form and modal closed");
   };
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {

@@ -29,9 +29,14 @@ export const CreateVenueForm: React.FC<CreateVenueFormProps> = ({ onSubmit, isSu
 
   const isEditMode = !!venue;
 
+  const handleSubmit = async (data: CreateVenueFormValues) => {
+    console.log("Form data being submitted:", data);
+    await onSubmit(data);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"

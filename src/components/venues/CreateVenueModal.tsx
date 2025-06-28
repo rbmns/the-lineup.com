@@ -24,37 +24,73 @@ export const CreateVenueModal: React.FC<CreateVenueModalProps> = ({ open, onOpen
   const isEditMode = !!venueToEdit;
 
   const handleFormSubmit = async (formData: CreateVenueFormValues) => {
+    console.log("Venue form submitted with data:", formData);
+    
     if (!user) {
       toast.error("You must be logged in to manage venues.");
       return;
     }
+    
     setIsSubmitting(true);
+    
     try {
+      let savedVenue: Venue;
+      
       if (isEditMode && venueToEdit) {
+        console.log("Updating existing venue:", venueToEdit.id);
         const { data: updatedVenue, error } = await updateVenue(venueToEdit.id, formData);
-        if (error || !updatedVenue) {
-          throw error || new Error("Failed to update venue.");
+        
+        if (error) {
+          console.error("Error updating venue:", error);
+          throw error;
         }
-        toast.success(`Venue "${updatedVenue.name}" updated successfully!`);
-        onComplete(updatedVenue);
+        
+        if (!updatedVenue) {
+          throw new Error("No venue data returned from update");
+        }
+        
+        savedVenue = updatedVenue;
+        toast.success(`Venue "${savedVenue.name}" updated successfully!`);
       } else {
+        console.log("Creating new venue");
         const venueData = { ...formData, creator_id: user.id };
         const { data: newVenue, error } = await createVenue(venueData);
-        if (error || !newVenue) {
-          throw error || new Error("Failed to create venue.");
+        
+        if (error) {
+          console.error("Error creating venue:", error);
+          throw error;
         }
-        toast.success(`Venue "${newVenue.name}" created successfully!`);
-        onComplete(newVenue);
+        
+        if (!newVenue) {
+          throw new Error("No venue data returned from creation");
+        }
+        
+        savedVenue = newVenue;
+        toast.success(`Venue "${savedVenue.name}" created successfully!`);
       }
-      queryClient.invalidateQueries({ queryKey: ['venues'] });
+      
+      // Invalidate and refetch venues
+      await queryClient.invalidateQueries({ queryKey: ['venues'] });
+      
+      // Call the completion callback with the saved venue
+      console.log("Calling onComplete with venue:", savedVenue);
+      onComplete(savedVenue);
+      
+      // Close the modal
       onOpenChange(false);
+      
     } catch (error: any) {
-      console.error("Failed to save venue", error);
+      console.error("Failed to save venue:", error);
+      
+      let errorMessage = "Failed to save venue. Please try again.";
+      
       if (error?.code === '23505' && error?.message?.includes('venues_name_key')) {
-        toast.error("A venue with this name already exists. Please use a different name.");
-      } else {
-        toast.error("Failed to save venue. Please try again.");
+        errorMessage = "A venue with this name already exists. Please use a different name.";
+      } else if (error?.message) {
+        errorMessage = error.message;
       }
+      
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -69,7 +105,11 @@ export const CreateVenueModal: React.FC<CreateVenueModalProps> = ({ open, onOpen
             {isEditMode ? 'Update the details for this venue.' : 'Add a new venue to the list. This will be available for all event creators.'}
           </DialogDescription>
         </DialogHeader>
-        <CreateVenueForm onSubmit={handleFormSubmit} isSubmitting={isSubmitting} venue={venueToEdit} />
+        <CreateVenueForm 
+          onSubmit={handleFormSubmit} 
+          isSubmitting={isSubmitting} 
+          venue={venueToEdit} 
+        />
       </DialogContent>
     </Dialog>
   );
