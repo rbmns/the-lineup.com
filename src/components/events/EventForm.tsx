@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useEventForm } from '@/hooks/events/useEventForm.tsx';
 import { CreateVenueModal } from '@/components/venues/CreateVenueModal';
@@ -67,7 +68,7 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
     // Check authentication using multiple indicators for reliability
     const isUserAuthenticated = isAuthenticated && user && session;
     
-    // If not authenticated, store form data and show auth modal
+    // If not authenticated, store form data and show auth modal (without redundant toast)
     if (!isUserAuthenticated) {
       console.log("User not authenticated, showing auth modal");
       setPendingFormData(data);

@@ -26,12 +26,12 @@ const Friends: React.FC = () => {
     return (
       <div className="min-h-screen">
         {/* Header Section - Optimized for mobile above the fold */}
-        <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-8' : 'py-16 sm:py-20 lg:py-24'}`}>
+        <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-4' : 'py-8 sm:py-12'}`}>
           <div className="text-center">
-            <h1 className={`font-bold text-[#005F73] mb-6 leading-tight ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
+            <h1 className={`font-bold text-[#005F73] mb-4 leading-tight ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
               Connect with your <span className="text-[#2A9D8F]">crew</span>
             </h1>
-            <p className={`text-[#4A4A48] max-w-3xl mx-auto leading-relaxed mb-8 ${isMobile ? 'text-base' : 'text-lg sm:text-xl'}`}>
+            <p className={`text-[#4A4A48] max-w-3xl mx-auto leading-relaxed mb-6 ${isMobile ? 'text-base' : 'text-lg sm:text-xl'}`}>
               See what your friends are up to, discover events together, and make new connections.
             </p>
             <div className="flex justify-center items-center gap-6 text-2xl opacity-60">
@@ -53,12 +53,12 @@ const Friends: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Header Section - Optimized for mobile */}
-      <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-8' : 'py-16 sm:py-20 lg:py-24'}`}>
+      <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-4' : 'py-8 sm:py-12'}`}>
         <div className="text-center">
-          <h1 className={`font-bold text-[#005F73] mb-6 leading-tight ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
+          <h1 className={`font-bold text-[#005F73] mb-4 leading-tight ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
             Your <span className="text-[#2A9D8F]">crew</span>
           </h1>
-          <p className={`text-[#4A4A48] max-w-3xl mx-auto leading-relaxed mb-8 ${isMobile ? 'text-base' : 'text-lg sm:text-xl'}`}>
+          <p className={`text-[#4A4A48] max-w-3xl mx-auto leading-relaxed mb-6 ${isMobile ? 'text-base' : 'text-lg sm:text-xl'}`}>
             See what your friends are up to and discover events together.
           </p>
           <div className="flex justify-center items-center gap-6 text-2xl opacity-60">

@@ -73,7 +73,7 @@ const ProfilePage: React.FC = () => {
         showSettings={false}
         onToggleSettings={() => {}}
       />
-      <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 max-w-5xl">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-5xl">
         <Tabs defaultValue={defaultTab} className="w-full">
           <TabsList className={`grid w-full ${gridColsClass}`}>
             <TabsTrigger value="rsvps" className="text-xs sm:text-sm">
@@ -86,7 +86,7 @@ const ProfilePage: React.FC = () => {
             )}
           </TabsList>
           
-          <TabsContent value="rsvps" className="mt-6 sm:mt-8">
+          <TabsContent value="rsvps" className="mt-4 sm:mt-6">
             <Tabs defaultValue="upcoming" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="upcoming" className="text-xs sm:text-sm px-2 sm:px-4">
@@ -97,7 +97,7 @@ const ProfilePage: React.FC = () => {
                 </TabsTrigger>
               </TabsList>
               
-              <TabsContent value="upcoming" className="mt-4 sm:mt-6">
+              <TabsContent value="upcoming" className="mt-3 sm:mt-4">
                 <UserRsvpedEvents 
                   userId={user.id} 
                   events={upcomingEvents}
@@ -107,7 +107,7 @@ const ProfilePage: React.FC = () => {
                 />
               </TabsContent>
               
-              <TabsContent value="past" className="mt-4 sm:mt-6">
+              <TabsContent value="past" className="mt-3 sm:mt-4">
                 <UserRsvpedEvents 
                   userId={user.id} 
                   events={pastEvents}
@@ -120,7 +120,7 @@ const ProfilePage: React.FC = () => {
           </TabsContent>
           
           {showAdminTab && (
-            <TabsContent value="admin" className="mt-6 sm:mt-8">
+            <TabsContent value="admin" className="mt-4 sm:mt-6">
               {isAdminLoading ? (
                 <div className="space-y-4">
                   <Skeleton className="h-48 w-full rounded-lg" />

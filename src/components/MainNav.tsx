@@ -42,13 +42,13 @@ const MainNav = () => {
   return <>
       <header className="sticky top-0 left-0 right-0 z-50 w-full bg-coconut border-b border-ocean-deep/10 shadow-coastal">
         <div className="w-full flex flex-col">
-          <div className={cn("w-full flex items-center justify-between", isMobile ? "px-4 py-3" : "px-6 py-3")}>
+          <div className={cn("w-full flex items-center justify-between", isMobile ? "px-4 py-2" : "px-6 py-2")}>
             {/* Left side - Logo */}
             <div className="flex items-center h-full flex-shrink-0">
-              {!isMobile && <Link to="/" className="flex items-center justify-center mr-3 flex-shrink-0">
-                  <img src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" alt="the lineup Symbol" className="w-7 h-7 transition-opacity hover:opacity-80" />
+              {!isMobile && <Link to="/" className="flex items-center justify-center mr-2 flex-shrink-0">
+                  <img src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" alt="the lineup Symbol" className="w-5 h-5 transition-opacity hover:opacity-80" />
                 </Link>}
-              <Link to="/" className={cn("font-display font-bold text-ocean-deep hover:text-ocean-deep/80 transition-colors", isMobile ? "text-2xl" : "text-3xl")}>
+              <Link to="/" className={cn("font-display font-bold text-ocean-deep hover:text-ocean-deep/80 transition-colors", isMobile ? "text-xl" : "text-2xl")}>
                 the lineup
               </Link>
             </div>
@@ -73,12 +73,12 @@ const MainNav = () => {
 
       {/* Mobile Bottom Navigation - Reduced height */}
       {isMobile && <div className="fixed bottom-0 left-0 right-0 z-50 bg-coconut border-t border-ocean-deep/10 shadow-coastal pb-safe">
-          <nav className="flex items-center justify-around px-4 py-2">
+          <nav className="flex items-center justify-around px-4 py-1.5">
             {navItems.map(item => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
-          return <Link key={item.path} to={item.path} className={cn("flex flex-col items-center gap-1 px-3 py-1.5 rounded-md font-mono text-xs font-medium transition-all duration-200 uppercase", isActive ? "text-ocean-deep bg-vibrant-aqua/20" : "text-ocean-deep hover:text-vibrant-aqua hover:bg-vibrant-aqua/10")}>
-                  <Icon className="h-4 w-4" />
+          return <Link key={item.path} to={item.path} className={cn("flex flex-col items-center gap-0.5 px-3 py-1 rounded-md font-mono text-xs font-medium transition-all duration-200 uppercase", isActive ? "text-ocean-deep bg-vibrant-aqua/20" : "text-ocean-deep hover:text-vibrant-aqua hover:bg-vibrant-aqua/10")}>
+                  <Icon className="h-3.5 w-3.5" />
                   <span>{item.label}</span>
                 </Link>;
         })}

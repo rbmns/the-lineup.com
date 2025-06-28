@@ -51,7 +51,7 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({ hideTitle = false }) 
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
+      {/* Hero Section - Reduced padding */}
       {!hideTitle && (
         <PageHeader 
           title={isOwnProfile ? displayName : `${displayName}'s Profile`}
@@ -62,13 +62,13 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({ hideTitle = false }) 
         />
       )}
 
-      {/* Profile Content */}
-      <div className="container mx-auto px-4 py-6 md:py-8">
+      {/* Profile Content - Reduced padding */}
+      <div className="container mx-auto px-4 py-4 md:py-6">
         <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
             {/* Profile Header - Full width on mobile, sidebar on desktop */}
             <div className="lg:col-span-1">
-              <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg shadow-sm p-6 text-white sticky top-6">
+              <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg shadow-sm p-4 md:p-6 text-white sticky top-6">
                 <ProfileHeaderContainer
                   profile={profile}
                   isOwnProfile={isOwnProfile}
@@ -83,7 +83,7 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({ hideTitle = false }) 
 
             {/* Events Section */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="bg-white rounded-lg shadow-sm p-4 md:p-6">
                 <ProfileEventsContainer
                   profileId={profile?.id || null}
                   profile={profile as UserProfile}
