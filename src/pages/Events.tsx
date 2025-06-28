@@ -235,9 +235,6 @@ const Events = () => {
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-semibold text-ocean-deep leading-tight">
             Discover <span className="text-vibrant-aqua">Events</span>
           </h1>
-          <p className="text-base sm:text-lg text-driftwood max-w-2xl mx-auto leading-relaxed font-body">
-            Find your next adventure — from sunset beach parties to morning yoga flows.
-          </p>
         </div>
       </div>
 
@@ -292,7 +289,7 @@ const Events = () => {
               {(hasActiveFilters || searchQuery.trim()) && (
                 <button
                   onClick={handleResetAllFilters}
-                  className="flex items-center gap-2 px-3 py-2 text-xs font-mono font-medium text-driftwood hover:text-ocean-deep hover:bg-sage/20 border border-sage/40 rounded-md transition-all duration-200 hover:-translate-y-0.5"
+                  className="flex items-center gap-2 px-3 py-2 text-xs font-mono font-medium text-ocean-deep/70 hover:text-ocean-deep hover:bg-coral/10 border border-ocean-deep/20 rounded-md transition-all duration-200 hover:-translate-y-0.5 uppercase tracking-wide"
                 >
                   <X className="h-3.5 w-3.5" />
                   Clear
@@ -347,7 +344,7 @@ const Events = () => {
                 <div className="flex justify-center">
                   <button
                     onClick={handleResetAllFilters}
-                    className="flex items-center gap-2 px-4 py-2 text-xs font-mono font-medium text-driftwood hover:text-ocean-deep hover:bg-sage/20 border border-sage/40 rounded-md transition-all duration-200"
+                    className="flex items-center gap-2 px-4 py-2 text-xs font-mono font-medium text-ocean-deep/70 hover:text-ocean-deep hover:bg-coral/10 border border-ocean-deep/20 rounded-md transition-all duration-200 uppercase tracking-wide"
                   >
                     <X className="h-3.5 w-3.5" />
                     Clear All

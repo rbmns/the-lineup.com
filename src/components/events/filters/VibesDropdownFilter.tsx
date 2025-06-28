@@ -37,41 +37,41 @@ export const VibesDropdownFilter: React.FC<VibesDropdownFilterProps> = ({
     onVibeChange([]);
   };
 
-  const displayText = selectedVibes.length === 0 ? "Vibes" : 
-                    selectedVibes.length === 1 ? selectedVibes[0] : 
-                    `${selectedVibes.length} vibes`;
+  const displayText = selectedVibes.length === 0 ? "VIBE" : 
+                    selectedVibes.length === 1 ? selectedVibes[0].toUpperCase() : 
+                    `${selectedVibes.length} VIBES`;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="flex items-center gap-2 h-10 px-3 border-sage/40 bg-coconut text-midnight rounded-md font-mono text-xs font-medium hover:bg-sage/20 hover:border-sage/60 transition-all duration-200"
+          className="flex items-center gap-2 h-10 px-3 border-ocean-deep/20 bg-coconut text-ocean-deep rounded-md font-mono text-xs font-medium uppercase tracking-wide hover:bg-vibrant-aqua/10 hover:border-vibrant-aqua/40 transition-all duration-200"
         >
-          <Sparkles className="h-4 w-4 text-ocean-deep" />
-          <span className="lowercase">{displayText}</span>
+          <Sparkles className="h-4 w-4 text-coral" />
+          <span>{displayText}</span>
           {selectedVibes.length > 0 && (
-            <span className="px-1.5 py-0.5 bg-ocean-deep/5 text-midnight/90 rounded-full text-xs font-medium">
+            <span className="px-1.5 py-0.5 bg-sungold/20 text-ocean-deep rounded-full text-xs font-medium">
               {selectedVibes.length}
             </span>
           )}
-          <ChevronDown className="h-3.5 w-3.5 text-driftwood" />
+          <ChevronDown className="h-3.5 w-3.5 text-ocean-deep/70" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-64 p-0 bg-coconut border-sage/40 shadow-elevated rounded-md" align="start">
+      <PopoverContent className="w-64 p-0 bg-coconut border-ocean-deep/20 shadow-coastal rounded-md" align="start">
         <div className="py-2">
           {/* All Vibes option */}
           <button
             onClick={handleClearAll}
-            className={`w-full px-4 py-2 text-left text-sm hover:bg-sage/20 transition-colors font-mono ${
-              selectedVibes.length === 0 ? 'bg-vibrant-aqua/20 font-medium text-ocean-deep' : 'text-midnight'
+            className={`w-full px-4 py-2 text-left text-sm hover:bg-vibrant-aqua/10 transition-colors font-mono uppercase tracking-wide ${
+              selectedVibes.length === 0 ? 'bg-sungold/20 font-medium text-ocean-deep' : 'text-ocean-deep'
             }`}
           >
-            All Vibes
+            all vibes
           </button>
           
           {vibesLoading && (
-            <div className="px-4 py-2 text-sm text-driftwood font-mono">
+            <div className="px-4 py-2 text-sm text-ocean-deep/70 font-mono uppercase tracking-wide">
               Loading vibes...
             </div>
           )}
@@ -80,8 +80,8 @@ export const VibesDropdownFilter: React.FC<VibesDropdownFilterProps> = ({
             <button
               key={vibe}
               onClick={() => handleVibeToggle(vibe)}
-              className={`w-full px-4 py-2 text-left text-sm hover:bg-sage/20 transition-colors lowercase font-mono ${
-                selectedVibes.includes(vibe) ? 'bg-vibrant-aqua/20 font-medium text-ocean-deep' : 'text-midnight'
+              className={`w-full px-4 py-2 text-left text-sm hover:bg-vibrant-aqua/10 transition-colors font-mono uppercase tracking-wide ${
+                selectedVibes.includes(vibe) ? 'bg-sungold/20 font-medium text-ocean-deep' : 'text-ocean-deep'
               }`}
             >
               {vibe}
@@ -89,7 +89,7 @@ export const VibesDropdownFilter: React.FC<VibesDropdownFilterProps> = ({
           ))}
           
           {!vibesLoading && vibes.length === 0 && (
-            <div className="px-4 py-2 text-sm text-driftwood font-mono">
+            <div className="px-4 py-2 text-sm text-ocean-deep/70 font-mono uppercase tracking-wide">
               No vibes available
             </div>
           )}

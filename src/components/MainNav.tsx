@@ -63,7 +63,7 @@ const MainNav = () => {
                   />
                 </Link>
               )}
-              <Link to="/" className="font-display text-xl md:text-2xl font-bold text-ocean-deep hover:text-ocean-deep/80 transition-colors">
+              <Link to="/" className="font-display text-2xl md:text-3xl font-bold text-ocean-deep hover:text-ocean-deep/80 transition-colors">
                 the lineup
               </Link>
             </div>
