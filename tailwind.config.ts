@@ -26,34 +26,35 @@ const config = {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "rgb(248 245 240)", // Sand
-        foreground: "rgb(30 30 30)", // Midnight
+        background: "rgb(248 245 240)", // Sand - main background
+        foreground: "rgb(30 30 30)", // Midnight text
         
-        // Coastal color palette with improved accessibility
+        // Bohemian coastal color palette
         'sand': 'rgb(248 245 240)',
         'coconut': 'rgb(252 250 247)', 
         'ivory': 'rgb(250 248 245)',
         'sage': 'rgb(218 224 220)',
         'clay': 'rgb(201 181 162)',
         'seafoam': 'rgb(162 180 178)',
-        'overcast': 'rgb(106 122 131)', // Improved contrast
-        'charcoal': 'rgb(30 30 30)', // Now uses midnight
-        'midnight': 'rgb(30 30 30)', // New primary text color
+        'ocean-deep': 'rgb(0 95 115)',
+        'vibrant-aqua': 'rgb(144 224 239)',
+        'driftwood': 'rgb(140 140 137)',
+        'midnight': 'rgb(30 30 30)',
         
         primary: {
-          DEFAULT: "rgb(201 181 162)", // Clay
-          foreground: "rgb(30 30 30)", // Midnight
+          DEFAULT: "rgb(0 95 115)", // Ocean Deep
+          foreground: "rgb(252 250 247)", // Coconut text on ocean
         },
         secondary: {
           DEFAULT: "rgb(218 224 220)", // Sage
           foreground: "rgb(30 30 30)", // Midnight
         },
         muted: {
-          DEFAULT: "rgb(106 122 131)", // Overcast - improved
+          DEFAULT: "rgb(140 140 137)", // Driftwood
           foreground: "rgb(30 30 30)", // Midnight
         },
         accent: {
-          DEFAULT: "rgb(162 180 178)", // Seafoam
+          DEFAULT: "rgb(144 224 239)", // Vibrant Aqua
           foreground: "rgb(30 30 30)", // Midnight
         },
         destructive: {
@@ -68,12 +69,17 @@ const config = {
       fontFamily: {
         'display': ['Inter', 'sans-serif'],
         'body': ['Inter', 'sans-serif'],
-        'mono': ['SF Mono', 'Consolas', 'Liberation Mono', 'Menlo', 'monospace'],
+        'mono': ['JetBrains Mono', 'SF Mono', 'Consolas', 'Liberation Mono', 'Menlo', 'monospace'],
       },
       borderRadius: {
-        lg: "0.125rem", // Minimal radius
-        md: "0.125rem",
-        sm: "0.125rem",
+        lg: "0.5rem", // Consistent md radius
+        md: "0.5rem",
+        sm: "0.375rem",
+      },
+      boxShadow: {
+        'coastal': '0 2px 8px 0 rgba(0, 95, 115, 0.08)',
+        'elevated': '0 4px 12px 0 rgba(0, 95, 115, 0.12)',
+        'navigation': '0 1px 3px 0 rgba(0, 95, 115, 0.1), 0 1px 2px 0 rgba(0, 95, 115, 0.06)',
       },
       keyframes: {
         "fade-in": {

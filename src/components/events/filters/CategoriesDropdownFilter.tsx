@@ -43,32 +43,32 @@ export const CategoriesDropdownFilter: React.FC<CategoriesDropdownFilterProps> =
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          className="flex items-center gap-2 h-10 px-3 border-sage bg-coconut text-midnight rounded-sm font-mono text-sm hover:bg-seafoam hover:border-overcast transition-colors"
+          className="flex items-center gap-2 h-10 px-3 border-sage/40 bg-coconut text-midnight rounded-md font-mono text-xs font-medium hover:bg-sage/20 hover:border-sage/60 transition-all duration-200"
         >
-          <Grid3X3 className="h-4 w-4 text-gray-400" />
-          <span className="capitalize">{displayText}</span>
+          <Grid3X3 className="h-4 w-4 text-ocean-deep" />
+          <span className="lowercase">{displayText}</span>
           {selectedCategories.length > 0 && (
-            <span className="px-1.5 py-0.5 bg-seafoam text-midnight rounded-full text-xs font-medium">
+            <span className="px-1.5 py-0.5 bg-clay/10 text-midnight/90 rounded-full text-xs font-medium">
               {selectedCategories.length}
             </span>
           )}
-          <ChevronDown className="h-4 w-4 text-gray-500" />
+          <ChevronDown className="h-3.5 w-3.5 text-driftwood" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-64 p-0 bg-coconut border-sage" align="start">
+      <PopoverContent className="w-64 p-0 bg-coconut border-sage/40 shadow-elevated rounded-md" align="start">
         <div className="py-2">
           {/* All Categories option */}
           <button
             onClick={handleSelectAll}
-            className={`w-full px-4 py-2 text-left text-sm hover:bg-seafoam transition-colors font-mono ${
-              selectedCategories.length === 0 ? 'bg-seafoam font-medium text-midnight' : 'text-midnight'
+            className={`w-full px-4 py-2 text-left text-sm hover:bg-sage/20 transition-colors font-mono ${
+              selectedCategories.length === 0 ? 'bg-vibrant-aqua/20 font-medium text-ocean-deep' : 'text-midnight'
             }`}
           >
             All Categories
           </button>
           
           {/* Divider */}
-          <div className="border-t border-sage my-1" />
+          <div className="border-t border-sage/30 my-1" />
           
           {/* Categories list */}
           {allEventTypes.map((category) => {
@@ -77,8 +77,8 @@ export const CategoriesDropdownFilter: React.FC<CategoriesDropdownFilterProps> =
               <button
                 key={category}
                 onClick={() => onToggleCategory(category)}
-                className={`w-full px-4 py-2 text-left text-sm hover:bg-seafoam transition-colors capitalize font-mono flex items-center gap-2 ${
-                  selectedCategories.includes(category) ? 'bg-seafoam font-medium text-midnight' : 'text-midnight'
+                className={`w-full px-4 py-2 text-left text-sm hover:bg-sage/20 transition-colors lowercase font-mono flex items-center gap-2 ${
+                  selectedCategories.includes(category) ? 'bg-vibrant-aqua/20 font-medium text-ocean-deep' : 'text-midnight'
                 }`}
               >
                 {Icon && <Icon className="h-3.5 w-3.5" />}
@@ -87,9 +87,8 @@ export const CategoriesDropdownFilter: React.FC<CategoriesDropdownFilterProps> =
             );
           })}
           
-          {/* No categories found */}
           {allEventTypes.length === 0 && (
-            <div className="px-4 py-2 text-sm text-gray-500 font-mono">
+            <div className="px-4 py-2 text-sm text-driftwood font-mono">
               No categories available
             </div>
           )}

@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { AuthOverlay } from '@/components/auth/AuthOverlay';
 import { NavActions } from './nav/NavActions';
 import { CreateEventButton } from './nav/CreateEventButton';
-import { Calendar, Users, Star } from 'lucide-react';
+import { Calendar, Users, Star, Plus } from 'lucide-react';
 
 const MainNav = () => {
   const [showAuthOverlay, setShowAuthOverlay] = useState(false);
@@ -29,6 +29,11 @@ const MainNav = () => {
       label: 'Events',
     },
     {
+      path: '/events/create',
+      icon: Plus,
+      label: 'Create',
+    },
+    {
       path: '/casual-plans',
       icon: Star,
       label: 'Plans',
@@ -42,16 +47,16 @@ const MainNav = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-coconut border-b border-overcast">
+      <header className="sticky top-0 left-0 right-0 z-50 w-full bg-coconut border-b border-sage/40 shadow-navigation">
         <div className="w-full flex flex-col">
           <div className={cn(
             "w-full flex items-center justify-between",
-            isMobile ? "px-3 py-2" : "px-4 py-2.5"
+            isMobile ? "px-4 py-3" : "px-6 py-4"
           )}>
             {/* Left side - Logo */}
             <div className="flex items-center h-full flex-shrink-0">
               {!isMobile && (
-                <Link to="/" className="flex items-center justify-center mr-3 flex-shrink-0">
+                <Link to="/" className="flex items-center justify-center mr-4 flex-shrink-0">
                   <img 
                     src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" 
                     alt="thelineup Symbol" 
@@ -61,51 +66,72 @@ const MainNav = () => {
               )}
               <BrandLogo 
                 showText={true} 
-                className="font-display text-lg text-midnight hover:text-overcast transition-colors" 
+                className="font-display text-lg text-ocean-deep hover:text-ocean-deep/80 transition-colors" 
               />
             </div>
 
-            {/* Center - Navigation with Create Button (Desktop only) */}
+            {/* Center - Navigation (Desktop only) */}
             {!isMobile && (
-              <div className="flex items-center space-x-1">
-                <nav className="flex items-center space-x-1">
-                  {navItems.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = location.pathname === item.path;
+              <nav className="flex items-center space-x-2">
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location.pathname === item.path;
 
-                    return (
-                      <Link
-                        key={item.path}
-                        to={item.path}
-                        className={cn(
-                          "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors",
-                          isActive
-                            ? "text-clay bg-sage/30"
-                            : "text-midnight hover:text-clay hover:bg-sage/20"
-                        )}
-                      >
-                        <Icon className="h-4 w-4" />
-                        <span>{item.label}</span>
-                      </Link>
-                    );
-                  })}
-                </nav>
-                
-                {/* Create Event Button - Part of main nav */}
-                <div className="ml-2">
-                  <CreateEventButton onAuthRequired={handleAuthRequired} />
-                </div>
-              </div>
+                  return (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={cn(
+                        "flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-medium transition-all duration-200",
+                        isActive
+                          ? "text-ocean-deep bg-vibrant-aqua/20 shadow-coastal"
+                          : "text-midnight hover:text-ocean-deep hover:bg-sage/20 hover:-translate-y-0.5"
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
             )}
 
-            {/* Right side - User Actions (no Create button here anymore for desktop) */}
+            {/* Right side - User Actions */}
             <NavActions 
               onAuthRequired={handleAuthRequired}
-              showCreateButton={isMobile}
+              showCreateButton={false} // We now have create in main nav
             />
           </div>
         </div>
       </header>
+
+      {/* Mobile Bottom Navigation */}
+      {isMobile && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-coconut border-t border-sage/40 shadow-navigation pb-safe">
+          <nav className="flex items-center justify-around px-4 py-3">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={cn(
+                    "flex flex-col items-center gap-1 px-3 py-2 rounded-md text-xs font-medium transition-all duration-200",
+                    isActive
+                      ? "text-ocean-deep bg-vibrant-aqua/20"
+                      : "text-driftwood hover:text-ocean-deep hover:bg-sage/20"
+                  )}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      )}
 
       {/* Auth Overlay */}
       {showAuthOverlay && (

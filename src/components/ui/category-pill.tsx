@@ -21,24 +21,24 @@ export const CategoryPill: React.FC<CategoryPillProps & {
 }) => {
   const Icon = getCategoryIcon(category);
   
-  // Coastal pill styling with improved accessibility
-  const baseClasses = 'rounded-sm font-mono text-xs transition-colors flex items-center border border-overcast';
+  // Bohemian coastal pill styling
+  const baseClasses = 'rounded-full font-mono text-xs font-medium transition-all duration-200 flex items-center border';
   
-  // Accessible color scheme with midnight text
+  // Category pills use clay background
   const colorClasses = active || showIcon
-    ? 'bg-seafoam text-midnight border-overcast'
-    : 'bg-sage text-midnight hover:bg-seafoam hover:text-midnight border-overcast';
+    ? 'bg-clay/10 text-midnight/90 border-clay/20'
+    : 'bg-sage/20 text-midnight/80 hover:bg-clay/10 hover:text-midnight/90 border-sage/30';
   
-  // Coastal sizing
+  // Consistent sizing
   const sizeClasses = {
-    'xs': 'py-1 px-2',
-    'sm': 'py-1.5 px-3',
-    'default': 'py-2 px-4',
-    'lg': 'py-2.5 px-5'
+    'xs': 'px-2 py-0.5',
+    'sm': 'px-2.5 py-1',
+    'default': 'px-3 py-1.5',
+    'lg': 'px-4 py-2'
   };
   
   const interactiveClasses = onClick 
-    ? 'cursor-pointer' 
+    ? 'cursor-pointer hover:-translate-y-0.5' 
     : 'cursor-default';
   
   return (
@@ -52,7 +52,7 @@ export const CategoryPill: React.FC<CategoryPillProps & {
       )}
       onClick={onClick}
     >
-      {showIcon && Icon && <Icon className="mr-2 h-3 w-3" />}
+      {showIcon && Icon && <Icon className="mr-1.5 h-3 w-3" />}
       <span className="lowercase">{category}</span>
       {children}
     </div>

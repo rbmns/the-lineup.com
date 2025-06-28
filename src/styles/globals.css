@@ -1,25 +1,25 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
-/* Coastal styling foundation */
+/* Coastal bohemian styling foundation */
 @layer base {
   :root {
     --background: 248 245 240; /* Sand background */
-    --foreground: 30 30 30; /* Midnight text for better contrast */
+    --foreground: 30 30 30; /* Midnight text */
 
     --card: 252 250 247; /* Coconut card background */
     --card-foreground: 30 30 30;
     
-    --primary: 201 181 162; /* Clay for primary actions */
-    --primary-foreground: 30 30 30;
+    --primary: 0 95 115; /* Ocean Deep */
+    --primary-foreground: 252 250 247;
 
     --secondary: 218 224 220; /* Sage */
     --secondary-foreground: 30 30 30;
 
-    --muted: 106 122 131; /* Overcast gray - improved contrast */
+    --muted: 140 140 137; /* Driftwood */
     --muted-foreground: 30 30 30;
 
-    --accent: 162 180 178; /* Seafoam accent */
+    --accent: 144 224 239; /* Vibrant Aqua */
     --accent-foreground: 30 30 30;
 
     --destructive: 205 92 92;
@@ -27,77 +27,79 @@
 
     --border: 218 224 220; /* Sage for borders */
     --input: 218 224 220;
-    --ring: 201 181 162; /* Clay for focus rings */
+    --ring: 0 95 115; /* Ocean Deep for focus rings */
 
-    --radius: 0.125rem; /* Minimal radius */
+    --radius: 0.5rem; /* Consistent md radius */
   }
 
   html, body {
-    background: rgb(248 245 240); /* Sand */
+    background: rgb(248 245 240); /* Sand - full site background */
     color: rgb(30 30 30); /* Midnight for better accessibility */
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
     font-weight: 400;
   }
 
-  /* Typography system - coastal style with improved accessibility */
+  /* Typography system - coastal bohemian style */
   .font-display {
+    font-family: 'Inter', sans-serif;
     font-weight: 600;
     letter-spacing: -0.01em;
     color: rgb(30 30 30); /* Midnight for headings */
   }
 
   .font-body {
+    font-family: 'Inter', sans-serif;
     font-weight: 400;
-    line-height: 1.5;
+    line-height: 1.6;
     color: rgb(30 30 30); /* Midnight for body text */
   }
 
   .font-mono {
-    font-family: 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-family: 'JetBrains Mono', 'SF Mono', Consolas, 'Liberation Mono', Menlo, monospace;
     font-size: 0.75rem;
-    font-weight: 400;
-    text-transform: lowercase;
+    font-weight: 500;
     color: rgb(30 30 30); /* Midnight for mono text */
   }
 
-  /* Accessible color utilities */
+  /* Color utilities */
   .text-midnight {
     color: rgb(30 30 30);
   }
 
-  .text-overcast {
-    color: rgb(106 122 131); /* Improved contrast */
+  .text-ocean-deep {
+    color: rgb(0 95 115);
   }
 
-  .text-seafoam {
-    color: rgb(162 180 178);
+  .text-driftwood {
+    color: rgb(140 140 137);
+  }
+
+  .text-vibrant-aqua {
+    color: rgb(144 224 239);
   }
 
   .text-clay {
     color: rgb(201 181 162);
   }
 
-  /* Legacy charcoal class now uses midnight */
-  .text-charcoal {
-    color: rgb(30 30 30);
+  .text-seafoam {
+    color: rgb(162 180 178);
   }
 
-  /* Remove all shadows and effects for coastal simplicity */
+  /* Remove all harsh shadows - use coastal alternatives */
   * {
     box-shadow: none !important;
     text-shadow: none !important;
   }
 
-  /* Clean button resets */
+  /* Clean button and interactive element styling */
   button {
-    box-shadow: none !important;
-    transform: none !important;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: all 0.2s ease;
   }
 
   button:hover {
-    transform: none !important;
+    transform: translateY(-1px);
   }
 }
 
@@ -126,32 +128,47 @@
   .bg-seafoam {
     background-color: rgb(162 180 178);
   }
-  
-  .border-overcast {
-    border-color: rgb(106 122 131);
+
+  .bg-ocean-deep {
+    background-color: rgb(0 95 115);
+  }
+
+  .bg-vibrant-aqua {
+    background-color: rgb(144 224 239);
   }
   
   .border-sage {
     border-color: rgb(218 224 220);
   }
-  
-  /* Coastal spacing */
-  .spacing-section {
-    padding: 3rem 1.5rem;
+
+  .border-ocean-deep {
+    border-color: rgb(0 95 115);
   }
   
-  .spacing-card {
-    padding: 1.5rem;
+  /* Coastal shadows */
+  .shadow-coastal {
+    box-shadow: 0 2px 8px 0 rgba(0, 95, 115, 0.08) !important;
   }
   
-  /* Clean hover effects - subtle color shifts only */
-  .hover-clay:hover {
-    background-color: rgb(201 181 162);
-    transition: background-color 0.2s ease;
+  .shadow-elevated {
+    box-shadow: 0 4px 12px 0 rgba(0, 95, 115, 0.12) !important;
+  }
+
+  .shadow-navigation {
+    box-shadow: 0 1px 3px 0 rgba(0, 95, 115, 0.1), 0 1px 2px 0 rgba(0, 95, 115, 0.06) !important;
   }
   
-  .hover-seafoam:hover {
-    background-color: rgb(162 180 178);
-    transition: background-color 0.2s ease;
+  /* Interactive hover effects */
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px 0 rgba(0, 95, 115, 0.12) !important;
+  }
+  
+  .hover-aqua:hover {
+    background-color: rgba(144, 224, 239, 0.05);
+  }
+
+  .hover-ocean:hover {
+    background-color: rgba(0, 95, 115, 0.05);
   }
 }

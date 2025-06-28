@@ -228,27 +228,26 @@ const Events = () => {
   };
 
   return (
-    <div className="min-h-screen w-full">
-      {/* Compact Header Section - Mobile optimized */}
-      <div className="w-full px-2 sm:px-4 lg:px-8 py-3 sm:py-4">
-        <div className="text-center space-y-2 sm:space-y-3">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#005F73] leading-tight">
-            Discover <span className="text-[#2A9D8F]">Events</span>
+    <div className="min-h-screen w-full bg-sand">
+      {/* Bohemian Header Section */}
+      <div className="w-full px-6 py-8">
+        <div className="text-center space-y-4">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-semibold text-ocean-deep leading-tight">
+            Discover <span className="text-vibrant-aqua">Events</span>
           </h1>
-          <p className="text-sm sm:text-base text-[#4A4A48] max-w-xl mx-auto leading-relaxed px-2">
-            Discover what's happening nearby — from beach parties to chill yoga sessions.
+          <p className="text-base sm:text-lg text-driftwood max-w-2xl mx-auto leading-relaxed font-body">
+            Find your next adventure — from sunset beach parties to morning yoga flows.
           </p>
         </div>
       </div>
 
-      {/* Content - Mobile optimized spacing */}
-      <div className="w-full px-2 sm:px-4 lg:px-8">
-        <div className="space-y-3 sm:space-y-4">
-          {/* Search and Filters Row */}
-          <div className="space-y-3 lg:space-y-0">
-            {/* Desktop Layout - Search, Filters, and Clear Button on same row */}
-            <div className="hidden lg:flex items-center gap-4">
-              {/* Search - narrower on desktop */}
+      {/* Content - flows naturally */}
+      <div className="w-full px-6">
+        <div className="space-y-6">
+          {/* Search and Filters */}
+          <div className="space-y-4 lg:space-y-0">
+            {/* Desktop Layout */}
+            <div className="hidden lg:flex items-center gap-4 max-w-5xl mx-auto">
               <div className="flex-1 max-w-md">
                 <EventSearch 
                   placeholder="Search events..." 
@@ -259,7 +258,6 @@ const Events = () => {
                 />
               </div>
               
-              {/* Filters Container */}
               <div className="flex items-center gap-3">
                 <VibesDropdownFilter
                   selectedVibes={selectedVibes}
@@ -291,11 +289,10 @@ const Events = () => {
                 />
               </div>
 
-              {/* Clear Filters - Less prominent, lower hierarchy */}
               {(hasActiveFilters || searchQuery.trim()) && (
                 <button
                   onClick={handleResetAllFilters}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-normal text-gray-500 hover:text-gray-700 hover:bg-gray-50 border border-gray-200 rounded-md transition-colors"
+                  className="flex items-center gap-2 px-3 py-2 text-xs font-mono font-medium text-driftwood hover:text-ocean-deep hover:bg-sage/20 border border-sage/40 rounded-md transition-all duration-200 hover:-translate-y-0.5"
                 >
                   <X className="h-3.5 w-3.5" />
                   Clear
@@ -303,9 +300,8 @@ const Events = () => {
               )}
             </div>
 
-            {/* Mobile Layout - Stacked with improved spacing */}
-            <div className="lg:hidden space-y-3">
-              {/* Search Bar */}
+            {/* Mobile Layout */}
+            <div className="lg:hidden space-y-4">
               <div className="w-full">
                 <EventSearch 
                   placeholder="Search events..." 
@@ -316,8 +312,7 @@ const Events = () => {
                 />
               </div>
 
-              {/* Filter Dropdowns Row - Better mobile spacing */}
-              <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
+              <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
                 <VibesDropdownFilter
                   selectedVibes={selectedVibes}
                   onVibeChange={setSelectedVibes}
@@ -348,12 +343,11 @@ const Events = () => {
                 />
               </div>
 
-              {/* Clear Filters - Mobile, less prominent */}
               {(hasActiveFilters || searchQuery.trim()) && (
-                <div className="flex justify-end">
+                <div className="flex justify-center">
                   <button
                     onClick={handleResetAllFilters}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-normal text-gray-500 hover:text-gray-700 hover:bg-gray-50 border border-gray-200 rounded-md transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 text-xs font-mono font-medium text-driftwood hover:text-ocean-deep hover:bg-sage/20 border border-sage/40 rounded-md transition-all duration-200"
                   >
                     <X className="h-3.5 w-3.5" />
                     Clear All
