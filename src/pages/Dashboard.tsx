@@ -135,7 +135,7 @@ const Dashboard: React.FC = () => {
                             <div className="flex items-center gap-2">
                               <Badge variant="secondary" className="text-xs">
                                 <Users className="h-3 w-3 mr-1" />
-                                {event.attendee_count || 0}
+                                {(event.going_count || 0) + (event.interested_count || 0)}
                               </Badge>
                               <div className="flex gap-1">
                                 <Button size="sm" variant="outline" asChild>
@@ -173,7 +173,7 @@ const Dashboard: React.FC = () => {
                             <div className="flex items-center gap-2">
                               <Badge variant="outline" className="text-xs">
                                 <Users className="h-3 w-3 mr-1" />
-                                {event.attendee_count || 0}
+                                {(event.going_count || 0) + (event.interested_count || 0)}
                               </Badge>
                               <Button size="sm" variant="outline" asChild>
                                 <Link to={`/events/${event.slug || event.id}`}>
