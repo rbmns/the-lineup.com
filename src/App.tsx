@@ -1,4 +1,3 @@
-
 import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { HelmetProvider } from 'react-helmet-async';
@@ -29,6 +28,7 @@ import SearchPage from '@/pages/SearchPage';
 import OrganisePage from '@/pages/OrganisePage';
 import { SearchProvider } from '@/contexts/SearchContext';
 import AdminPage from '@/pages/AdminPage';
+import Dashboard from '@/pages/Dashboard';
 
 function App() {
   return (
@@ -52,7 +52,7 @@ function App() {
                   <Route path="friends" element={<Friends />} />
                   <Route path="profile" element={<ProfilePage />} />
                   <Route path="profile/edit" element={<ProfileEdit />} />
-                  <Route path="organise" element={<OrganisePage />} />
+                  <Route path="organise" element={<Dashboard />} />
                   <Route path="search" element={<SearchPage />} />
                   <Route path="admin" element={<AdminPage />} />
                   <Route path="login" element={<Login />} />
