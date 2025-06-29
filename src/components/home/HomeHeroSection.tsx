@@ -44,14 +44,14 @@ export const HomeHeroSection: React.FC = () => {
 
       {/* Content - Optimized for mobile viewport and above-the-fold */}
       <div className="relative z-20 w-full px-4 sm:px-6 lg:px-12 text-center flex-1 flex flex-col justify-center py-16 sm:py-20 md:py-24">
-        {/* Main heading with semi-transparent background */}
-        <div className="bg-coconut/90 backdrop-blur-sm rounded-lg p-6 sm:p-8 md:p-10 max-w-4xl mx-auto mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-display font-bold text-midnight mb-3 sm:mb-4 leading-tight">
+        {/* Main heading with consistent semi-transparent background */}
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl border-2 border-secondary-50 shadow-lg p-6 sm:p-8 md:p-10 max-w-4xl mx-auto mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold text-primary mb-3 sm:mb-4 leading-tight">
             Find events and plans that fit your vibe
           </h1>
 
           {/* Subtitle */}
-          <p className="text-base sm:text-lg md:text-xl text-overcast max-w-xl lg:max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-8">
+          <p className="text-base sm:text-lg md:text-xl text-neutral max-w-xl lg:max-w-2xl mx-auto leading-relaxed mb-6 sm:mb-8">
             Discover what's happening nearby — join events, see who's going, and stay connected after.
           </p>
 
@@ -60,7 +60,7 @@ export const HomeHeroSection: React.FC = () => {
             <Button 
               onClick={handleExploreEvents} 
               size="lg" 
-              className="w-full sm:w-auto bg-ocean-deep text-white hover:bg-ocean-deep/90 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl border-0 rounded-md"
+              className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl border-0 rounded-md"
             >
               Explore Events
             </Button>
@@ -68,7 +68,7 @@ export const HomeHeroSection: React.FC = () => {
               onClick={handleCreateProfile} 
               variant="outline" 
               size="lg" 
-              className="w-full sm:w-auto border-2 border-ocean-deep/50 text-ocean-deep bg-white/80 backdrop-blur-sm hover:bg-white/90 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium transition-all duration-300 rounded-md"
+              className="w-full sm:w-auto border-2 border-primary/20 text-primary hover:bg-primary/5 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium transition-all duration-300 rounded-md"
             >
               {isAuthenticated ? 'View Profile' : 'Create Profile'}
             </Button>

@@ -138,6 +138,11 @@
     color: rgb(106 122 131) !important;
   }
 
+  /* Add neutral color for consistent text */
+  .text-neutral {
+    color: rgb(106 122 131) !important;
+  }
+
   /* IMAGE FILTERS - WARM AND NATURAL */
   .filter-warm {
     filter: sepia(8%) saturate(1.1) brightness(1.02) contrast(1.05) hue-rotate(-2deg) !important;
@@ -207,6 +212,11 @@
   .border-vibrant-aqua {
     border-color: rgb(144 224 239) !important;
   }
+
+  /* Add secondary border utilities */
+  .border-secondary-50 {
+    border-color: rgba(238, 108, 77, 0.2) !important;
+  }
   
   /* UNIFIED SHADOW SYSTEM */
   .shadow-coastal {
@@ -242,6 +252,32 @@
 
 /* UNIFIED COMPONENT STYLES */
 @layer components {
+  /* UNIFIED AUTH COMPONENT STYLING */
+  .auth-container {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(8px) !important;
+    border-radius: 1rem !important;
+    border: 2px solid rgba(238, 108, 77, 0.2) !important;
+    box-shadow: 0 4px 16px 0 rgba(0, 95, 115, 0.12) !important;
+    padding: 1.5rem !important;
+  }
+
+  .auth-heading {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+    color: rgb(0 95 115) !important;
+    font-size: 1.25rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .auth-subtext {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 400 !important;
+    color: rgb(106 122 131) !important;
+    font-size: 0.875rem !important;
+    line-height: 1.6 !important;
+  }
+
   /* BUTTON SYSTEM - PRIMARY AQUA, SECONDARY CLAY */
   .btn-primary {
     background-color: rgb(144 224 239) !important;
