@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useCasualPlans } from '@/hooks/useCasualPlans';
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,10 +31,10 @@ const CasualPlans = () => {
         {/* Header Section - Compact for viewport fit */}
         <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-2' : 'py-4'}`}>
           <div className="text-center">
-            <h1 className={`font-bold text-[#005F73] mb-2 leading-tight ${isMobile ? 'text-xl' : 'text-2xl sm:text-3xl'}`}>
-              Casual <span className="text-[#2A9D8F]">Plans</span>
+            <h1 className={`font-bold text-primary mb-2 leading-tight ${isMobile ? 'text-xl' : 'text-2xl sm:text-3xl'}`}>
+              Casual <span className="text-secondary">Plans</span>
             </h1>
-            <p className={`text-[#4A4A48] max-w-2xl mx-auto leading-relaxed ${isMobile ? 'text-sm mb-3' : 'text-base mb-4'}`}>
+            <p className={`auth-subtext max-w-2xl mx-auto leading-relaxed ${isMobile ? 'text-sm mb-3' : 'text-base mb-4'}`}>
               Spontaneous meetups and activities with fellow travelers
             </p>
           </div>
@@ -41,17 +42,17 @@ const CasualPlans = () => {
 
         <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-2' : 'py-4'}`}>
           {/* Login prompt for non-authenticated users - Compact for viewport fit */}
-          <div className={`border border-[#2A9D8F]/20 rounded-xl ${isMobile ? 'p-4 mx-2' : 'p-6'}`}>
-            <h3 className={`font-semibold text-[#005F73] mb-2 ${isMobile ? 'text-base' : 'text-lg'}`}>
+          <div className={`auth-container ${isMobile ? 'mx-2' : ''}`}>
+            <h3 className={`auth-heading ${isMobile ? 'text-base' : 'text-lg'}`}>
               Join the community to see full details
             </h3>
-            <p className={`text-[#4A4A48] mb-3 ${isMobile ? 'text-xs' : 'text-sm'}`}>
+            <p className={`auth-subtext mb-3 ${isMobile ? 'text-xs' : 'text-sm'}`}>
               Sign up to view locations, times, and connect with other members creating casual plans.
             </p>
             <div className="flex flex-col sm:flex-row gap-2">
               <Button 
                 onClick={() => navigate('/login')}
-                className="bg-[#2A9D8F] hover:bg-[#2A9D8F]/90 text-white"
+                className="btn-primary"
                 size={isMobile ? "default" : "lg"}
               >
                 Sign In
@@ -59,7 +60,7 @@ const CasualPlans = () => {
               <Button 
                 variant="outline" 
                 onClick={() => navigate('/signup')}
-                className="border-[#2A9D8F] text-[#005F73] hover:bg-[#2A9D8F]/10"
+                className="btn-outline"
                 size={isMobile ? "default" : "lg"}
               >
                 Sign Up
@@ -77,16 +78,16 @@ const CasualPlans = () => {
       {/* Header Section - Optimized for mobile above the fold */}
       <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-8' : 'py-12 sm:py-16'}`}>
         <div className="text-center">
-          <h1 className={`font-bold text-[#005F73] mb-4 leading-tight ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
-            Casual <span className="text-[#2A9D8F]">Plans</span>
+          <h1 className={`font-bold text-primary mb-4 leading-tight ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
+            Casual <span className="text-secondary">Plans</span>
           </h1>
-          <p className={`text-[#4A4A48] max-w-3xl mx-auto leading-relaxed ${isMobile ? 'text-base mb-6' : 'text-lg sm:text-xl mb-6'}`}>
+          <p className={`auth-subtext max-w-3xl mx-auto leading-relaxed ${isMobile ? 'text-base mb-6' : 'text-lg sm:text-xl mb-6'}`}>
             Spontaneous meetups and activities with fellow travelers
           </p>
           
           <Button 
             onClick={() => navigate('/casual-plans/create')}
-            className="bg-[#2A9D8F] hover:bg-[#2A9D8F]/90 text-white"
+            className="btn-primary"
           >
             <Plus className="h-4 w-4 mr-2" />
             Create Plan
@@ -121,15 +122,15 @@ const CasualPlans = () => {
             ) : (
               <div className="text-center py-12">
                 <div className="text-4xl sm:text-6xl mb-4">🏖️</div>
-                <h3 className="text-lg sm:text-xl font-medium text-[#005F73] mb-2">
+                <h3 className="text-lg sm:text-xl font-medium text-primary mb-2">
                   No casual plans yet
                 </h3>
-                <p className="text-[#4A4A48] mb-4 text-sm sm:text-base">
+                <p className="auth-subtext mb-4 text-sm sm:text-base">
                   Be the first to create a spontaneous meetup!
                 </p>
                 <Button 
                   onClick={() => navigate('/casual-plans/create')}
-                  className="bg-[#2A9D8F] hover:bg-[#2A9D8F]/90 text-white"
+                  className="btn-primary"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Create Your First Plan

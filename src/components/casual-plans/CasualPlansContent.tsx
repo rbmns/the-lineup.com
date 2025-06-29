@@ -45,21 +45,21 @@ export const CasualPlansContent: React.FC = () => {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         {/* Login Prompt Section */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 mb-8 text-center shadow-sm">
-          <LogIn className="h-12 w-12 text-[#66B2B2] mx-auto mb-4" />
-          <h3 className="text-xl sm:text-2xl font-semibold text-[#003840] mb-2">
+        <div className="auth-container mb-8 text-center shadow-sm max-w-2xl mx-auto">
+          <LogIn className="h-12 w-12 text-primary mx-auto mb-4" />
+          <h3 className="auth-heading text-xl sm:text-2xl mb-2">
             Sign in to see full details
           </h3>
-          <p className="text-[#4A4A48] mb-6 text-sm sm:text-base">
+          <p className="auth-subtext mb-6 text-sm sm:text-base">
             Join our community to view locations, times, and connect with other members
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-            <Button asChild className="bg-[#66B2B2] hover:bg-[#66B2B2]/90 text-white">
+            <Button asChild className="btn-primary">
               <Link to="/login">
                 Sign In
               </Link>
             </Button>
-            <Button variant="outline" asChild className="border-[#66B2B2] text-[#003840] hover:bg-[#66B2B2]/10">
+            <Button variant="outline" asChild className="btn-outline">
               <Link to="/signup">
                 Create Account
               </Link>
@@ -69,11 +69,11 @@ export const CasualPlansContent: React.FC = () => {
 
         {/* Preview Cards - Titles Only */}
         <div className="mb-8">
-          <h2 className="text-xl sm:text-2xl font-semibold text-[#003840] mb-6">Recent Casual Plans</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold text-primary mb-6">Recent Casual Plans</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {mockPlansForNonAuth.map((plan) => (
               <div key={plan.id} className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 hover:border-gray-300 transition-colors shadow-sm">
-                <h3 className="font-medium text-[#003840] mb-4 text-sm sm:text-base">{plan.title}</h3>
+                <h3 className="font-medium text-primary mb-4 text-sm sm:text-base">{plan.title}</h3>
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center text-xs sm:text-sm text-gray-300">
                     <span>📅 ••••••••••</span>
@@ -86,8 +86,8 @@ export const CasualPlansContent: React.FC = () => {
                   </div>
                 </div>
                 <div className="pt-3 border-t border-gray-100 text-center">
-                  <p className="text-xs text-[#4A4A48] mb-2">
-                    <Link to="/login" className="text-[#66B2B2] hover:text-[#66B2B2]/80 underline">
+                  <p className="text-xs auth-subtext mb-2">
+                    <Link to="/login" className="text-primary hover:text-primary/80 underline">
                       Sign in
                     </Link>{' '}
                     to see full details
@@ -99,15 +99,15 @@ export const CasualPlansContent: React.FC = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-[#F4E7D3] rounded-2xl p-6 sm:p-8 text-center">
-          <Plus className="h-12 w-12 text-[#003840] mx-auto mb-4" />
-          <h3 className="text-xl sm:text-2xl font-semibold text-[#003840] mb-2">
+        <div className="bg-secondary/10 rounded-2xl p-6 sm:p-8 text-center">
+          <Plus className="h-12 w-12 text-primary mx-auto mb-4" />
+          <h3 className="text-xl sm:text-2xl font-semibold text-primary mb-2">
             Have a casual plan in mind?
           </h3>
-          <p className="text-[#4A4A48] mb-6 text-sm sm:text-base">
+          <p className="auth-subtext mb-6 text-sm sm:text-base">
             Create an account to post your own casual meetups and connect with locals
           </p>
-          <Button asChild size="lg" className="bg-[#003840] hover:bg-[#003840]/90 text-white">
+          <Button asChild size="lg" className="btn-primary">
             <Link to="/signup">
               Get Started
             </Link>
@@ -122,7 +122,7 @@ export const CasualPlansContent: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
       {/* Create Plan CTA */}
       <div className="mb-8 text-center">
-        <Button asChild size="lg" className="bg-[#66B2B2] hover:bg-[#66B2B2]/90 text-white">
+        <Button asChild size="lg" className="btn-primary">
           <Link to="/casual-plans/create">
             <Plus className="h-5 w-5 mr-2" />
             Create Casual Plan
@@ -146,13 +146,13 @@ export const CasualPlansContent: React.FC = () => {
       ) : (
         <div className="text-center py-12">
           <div className="text-4xl sm:text-6xl mb-4">🏖️</div>
-          <h3 className="text-xl sm:text-2xl font-semibold text-[#003840] mb-2">
+          <h3 className="text-xl sm:text-2xl font-semibold text-primary mb-2">
             No casual plans yet
           </h3>
-          <p className="text-[#4A4A48] mb-6 text-sm sm:text-base">
+          <p className="auth-subtext mb-6 text-sm sm:text-base">
             Be the first to create a casual meetup in your area
           </p>
-          <Button asChild className="bg-[#66B2B2] hover:bg-[#66B2B2]/90 text-white">
+          <Button asChild className="btn-primary">
             <Link to="/casual-plans/create">
               Create the First Plan
             </Link>

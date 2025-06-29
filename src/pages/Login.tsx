@@ -35,7 +35,7 @@ const Login = () => {
           <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4">
             Sign in to your account
           </h1>
-          <p className="text-lg text-neutral">
+          <p className="text-lg auth-subtext">
             Ready to find your next adventure?
           </p>
           <div className="flex justify-center items-center gap-4 text-xl opacity-60 mt-4">
@@ -45,10 +45,10 @@ const Login = () => {
           </div>
         </div>
 
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+        <Card className="auth-container border-0 shadow-lg">
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-semibold text-primary">Sign In</CardTitle>
-            <CardDescription className="text-neutral">
+            <CardTitle className="auth-heading text-2xl">Sign In</CardTitle>
+            <CardDescription className="auth-subtext">
               Sign in to your account to continue
             </CardDescription>
           </CardHeader>

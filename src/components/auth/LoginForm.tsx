@@ -90,12 +90,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         onSubmit={handleSubmit}
       />
       
-      <div className="text-sm text-center text-gray-500 space-y-2 mt-4">
+      <div className="text-sm text-center auth-subtext space-y-2 mt-4">
         <p>
           Don't have an account?{' '}
           <button 
             onClick={onToggleMode}
-            className="text-vibrant-seafoam hover:text-vibrant-seafoam/80 font-medium transition-colors"
+            className="text-primary hover:text-primary/80 font-medium transition-colors"
             type="button"
           >
             Sign up
@@ -105,7 +105,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
           <p>
             <button 
               onClick={onForgotPassword}
-              className="text-vibrant-seafoam hover:text-vibrant-seafoam/80 transition-colors"
+              className="text-primary hover:text-primary/80 transition-colors"
               type="button"
             >
               Forgot password?
