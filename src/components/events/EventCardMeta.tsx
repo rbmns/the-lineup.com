@@ -13,6 +13,7 @@ interface EventCardMetaProps {
       name: string;
       city?: string;
       street?: string;
+      country?: string;
     } | null;
     location?: string;
   };
@@ -56,7 +57,14 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
   const getVenueDisplay = (): string => {
     // First priority: venue name from venues table
     if (event.venues?.name) {
-      return event.venues.name;
+      let display = event.venues.name;
+      
+      // Add city if available and different from venue name
+      if (event.venues.city && !event.venues.name.toLowerCase().includes(event.venues.city.toLowerCase())) {
+        display += `, ${event.venues.city}`;
+      }
+      
+      return display;
     }
     
     // Second priority: location field (legacy)

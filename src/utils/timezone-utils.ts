@@ -1,5 +1,6 @@
 
-import { formatInTimeZone } from 'date-fns-tz';
+import { formatInTimeZone, toZonedTime } from 'date-fns-tz';
+import { parseISO } from 'date-fns';
 
 /**
  * Get the user's browser timezone
@@ -9,42 +10,8 @@ export const getUserTimezone = (): string => {
 };
 
 /**
- * Convert a time string and date to a proper Date object in the event's timezone
- */
-export const createEventDateTime = (
-  dateStr: string, 
-  timeStr: string, 
-  eventTimezone: string = 'Europe/Amsterdam'
-): Date => {
-  if (!dateStr || !timeStr) {
-    throw new Error('Date and time are required');
-  }
-  
-  // Create the datetime string in the event's timezone
-  const datetimeStr = `${dateStr}T${timeStr}:00`;
-  
-  // Parse as if it's in the event's timezone
-  // Note: This creates a Date object that represents the correct UTC time
-  const date = new Date(datetimeStr);
-  
-  // Adjust for timezone offset difference
-  const eventOffset = getTimezoneOffset(eventTimezone, date);
-  const localOffset = date.getTimezoneOffset() * 60000; // Convert to milliseconds
-  
-  return new Date(date.getTime() - eventOffset + localOffset);
-};
-
-/**
- * Get timezone offset in milliseconds for a given timezone at a specific date
- */
-const getTimezoneOffset = (timezone: string, date: Date): number => {
-  const utc1 = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
-  const utc2 = new Date(date.toLocaleString('en-US', { timeZone: timezone }));
-  return utc2.getTime() - utc1.getTime();
-};
-
-/**
- * Format event time in viewer's timezone (or specified display timezone)
+ * Format event time in viewer's timezone
+ * Takes a date string, time string, and event timezone, converts to viewer's timezone
  */
 export const formatEventTime = (
   dateStr: string,
@@ -55,38 +22,19 @@ export const formatEventTime = (
   try {
     const viewerTimezone = displayTimezone || getUserTimezone();
     
-    // Create a proper datetime string for the event timezone
+    // Create ISO datetime string in event's timezone
     const eventDateTime = `${dateStr}T${timeStr}:00`;
     
-    // Parse the datetime as if it's in the event's timezone
-    const utcTime = new Date(eventDateTime + (eventTimezone === 'UTC' ? 'Z' : ''));
+    // Parse as a date and treat it as being in the event timezone
+    const eventDate = parseISO(eventDateTime);
     
-    // If the event timezone is not UTC, we need to adjust
-    if (eventTimezone !== 'UTC') {
-      // Create a temporary date to get the offset
-      const tempDate = new Date(eventDateTime);
-      const eventOffset = getTimezoneOffsetMinutes(eventTimezone, tempDate);
-      const adjustedTime = new Date(tempDate.getTime() - (eventOffset * 60000));
-      
-      // Format in viewer's timezone
-      return formatInTimeZone(adjustedTime, viewerTimezone, 'HH:mm');
-    }
-    
-    // Format in viewer's timezone
-    return formatInTimeZone(utcTime, viewerTimezone, 'HH:mm');
+    // Convert from event timezone to viewer timezone and format
+    const zonedEventTime = toZonedTime(eventDate, eventTimezone);
+    return formatInTimeZone(zonedEventTime, viewerTimezone, 'HH:mm', { timeZone: eventTimezone });
   } catch (error) {
     console.error('Error formatting event time:', error);
     return timeStr.substring(0, 5); // Fallback to original time
   }
-};
-
-/**
- * Get timezone offset in minutes for a given timezone at a specific date
- */
-const getTimezoneOffsetMinutes = (timezone: string, date: Date): number => {
-  const utcTime = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
-  const timezoneTime = new Date(date.toLocaleString('en-US', { timeZone: timezone }));
-  return (timezoneTime.getTime() - utcTime.getTime()) / (1000 * 60);
 };
 
 /**
@@ -99,7 +47,7 @@ export const formatEventDate = (
 ): string => {
   try {
     const viewerTimezone = displayTimezone || getUserTimezone();
-    const date = new Date(dateStr);
+    const date = parseISO(dateStr);
     
     return formatInTimeZone(date, viewerTimezone, 'EEE, d MMM yyyy');
   } catch (error) {
@@ -160,3 +108,22 @@ export const getCommonTimezones = () => [
   { value: 'Asia/Tokyo', label: 'Tokyo (Japan)' },
   { value: 'Australia/Sydney', label: 'Sydney (Australia)' },
 ];
+
+/**
+ * Create a proper Date object from date and time strings in a specific timezone
+ */
+export const createEventDateTime = (
+  dateStr: string, 
+  timeStr: string, 
+  eventTimezone: string = 'Europe/Amsterdam'
+): Date => {
+  if (!dateStr || !timeStr) {
+    throw new Error('Date and time are required');
+  }
+  
+  const eventDateTime = `${dateStr}T${timeStr}:00`;
+  const eventDate = parseISO(eventDateTime);
+  
+  // Convert to the event's timezone
+  return toZonedTime(eventDate, eventTimezone);
+};

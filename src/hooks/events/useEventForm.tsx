@@ -1,18 +1,17 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useForm, SubmitHandler, FieldErrors } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useQueryClient } from '@tanstack/react-query';
-import { toast } from '@/hooks/use-toast';
 
-import { Event, Venue } from '@/types';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState, useEffect } from 'react';
 import { FormValues } from '@/components/events/form/EventFormTypes';
-import { EventSchema } from '@/components/events/form/EventFormSchema';
-import { processFormData } from '@/components/events/form/EventFormUtils';
-import { fetchEventById, createEvent, updateEvent } from '@/lib/eventService';
-import { useAuth } from '@/contexts/AuthContext';
+import { EventFormSchema } from '@/components/events/form/EventFormSchema';
+import { Event, Venue } from '@/types';
 import { useVenues } from '@/hooks/useVenues';
+import { supabase } from '@/lib/supabase';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import { createSlug } from '@/utils/supabaseHelpers';
+import TimezoneService from '@/services/timezoneService';
 
 interface UseEventFormProps {
   eventId?: string;
@@ -21,288 +20,150 @@ interface UseEventFormProps {
   onEventCreated?: (eventId: string, eventTitle: string) => void;
 }
 
-// Helper function to ensure URL has protocol
-const ensureHttpProtocol = (url: string): string => {
-  if (!url) return url;
-  const trimmedUrl = url.trim();
-  if (!trimmedUrl) return trimmedUrl;
-  
-  // If URL already has a protocol, return as is
-  if (trimmedUrl.match(/^https?:\/\//i)) {
-    return trimmedUrl;
-  }
-  
-  // Add http:// if missing
-  return `http://${trimmedUrl}`;
-};
-
-export const useEventForm = ({ eventId, isEditMode = false, initialData, onEventCreated }: UseEventFormProps) => {
-  const navigate = useNavigate();
+export const useEventForm = ({
+  eventId,
+  isEditMode = false,
+  initialData,
+  onEventCreated
+}: UseEventFormProps) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { venues, isLoading: isLoadingVenues } = useVenues();
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { venues, isLoading: isLoadingVenues, refetch: refetchVenues } = useVenues();
   const [isCreateVenueModalOpen, setCreateVenueModalOpen] = useState(false);
-  const queryClient = useQueryClient();
+  const [autoDetectedTimezone, setAutoDetectedTimezone] = useState<string | null>(null);
+  const [selectedVenueName, setSelectedVenueName] = useState<string>('');
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(EventSchema),
+    resolver: zodResolver(EventFormSchema),
     defaultValues: {
-      title: '',
-      description: '',
-      event_category: '', // Remove default 'other' value
-      start_date: new Date(),
-      start_time: '',
-      end_date: new Date(),
-      end_time: '',
-      venue_id: '',
-      organizer_link: '',
-      fee: '0',
-      booking_link: '',
-      extra_info: '',
-      tags: '',
-      vibe: null,
-    },
-    mode: 'onChange',
+      title: initialData?.title || '',
+      description: initialData?.description || '',
+      start_date: initialData?.start_date || '',
+      start_time: initialData?.start_time || '',
+      end_time: initialData?.end_time || '',
+      venue_id: initialData?.venue_id || '',
+      event_category: initialData?.event_category || '',
+      vibe: initialData?.vibe || '',
+      timezone: initialData?.timezone || 'Europe/Amsterdam',
+      organizer_link: initialData?.organizer_link || '',
+      fee: initialData?.fee || '',
+      booking_link: initialData?.booking_link || '',
+      tags: initialData?.tags || '',
+      extra_info: initialData?.extra_info || ''
+    }
   });
 
-  useEffect(() => {
-    if (isEditMode && initialData) {
-      console.log('Populating form with initial data:', initialData);
-      const fetchedEventData = initialData;
-      const defaultVals = {
-          title: fetchedEventData.title || '',
-          description: fetchedEventData.description || '',
-          event_category: (fetchedEventData as any).event_category || (fetchedEventData as any).event_type || 'other',
-          start_date: fetchedEventData.start_date ? new Date(fetchedEventData.start_date) : new Date(),
-          start_time: fetchedEventData.start_time?.substring(0, 5) || '',
-          end_date: fetchedEventData.end_date ? new Date(fetchedEventData.end_date) : new Date(),
-          end_time: fetchedEventData.end_time?.substring(0, 5) || '',
-          venue_id: fetchedEventData.venue_id || '',
-          organizer_link: fetchedEventData.organizer_link || '',
-          fee: fetchedEventData.fee?.toString() || '0',
-          booking_link: fetchedEventData.booking_link || '',
-          extra_info: fetchedEventData.extra_info || '',
-          tags: Array.isArray(fetchedEventData.tags) ? fetchedEventData.tags.join(', ') : (fetchedEventData.tags || ''),
-          vibe: (fetchedEventData as any).vibe || null,
-      };
-      
-      console.log('Setting form values:', defaultVals);
-      Object.entries(defaultVals).forEach(([key, value]) => {
-          form.setValue(key as keyof FormValues, value as any);
-      });
-      
-      // Force form to recognize it has been modified with initial data
-      form.trigger();
-    }
-  }, [isEditMode, initialData, form]);
-  
-  const handleVenueCreated = async (newVenue: Venue) => {
-    console.log("Venue created successfully:", newVenue);
-    
-    try {
-      // Immediately invalidate and refetch venues query to get the latest data
-      await queryClient.invalidateQueries({ queryKey: ['venues'] });
-      
-      // Refetch venues to ensure we have the latest data
-      await refetchVenues();
-      
-      // Set the newly created venue as selected in the form
-      form.setValue("venue_id", newVenue.id, { 
-        shouldValidate: true, 
-        shouldDirty: true,
-        shouldTouch: true 
-      });
-      
-      // Close the modal
-      setCreateVenueModalOpen(false);
-      
-      // Show success message
-      toast({
-        title: "Venue created!",
-        description: `${newVenue.name} has been created and selected for your event.`,
-      });
-      
-      console.log("Venue selected in form and modal closed");
-    } catch (error) {
-      console.error("Error updating venues after creation:", error);
-      
-      // Still set the venue in the form even if refetch fails
-      form.setValue("venue_id", newVenue.id, { 
-        shouldValidate: true, 
-        shouldDirty: true,
-        shouldTouch: true 
-      });
-      setCreateVenueModalOpen(false);
-      
-      toast({
-        title: "Venue created!",
-        description: `${newVenue.name} has been created and selected. If you don't see it in the list, please refresh the page.`,
-      });
-    }
-  };
+  // Watch venue selection to auto-detect timezone
+  const selectedVenueId = form.watch('venue_id');
 
-  const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    console.log('Form submission started with data:', data);
-    
+  useEffect(() => {
+    const autoDetectTimezone = async () => {
+      if (!selectedVenueId || !venues) return;
+
+      const selectedVenue = venues.find(v => v.id === selectedVenueId);
+      if (!selectedVenue?.city) return;
+
+      setSelectedVenueName(selectedVenue.name || '');
+
+      try {
+        const detectedTimezone = await TimezoneService.getTimezoneForCity(selectedVenue.city);
+        setAutoDetectedTimezone(detectedTimezone);
+        
+        // Only set if user hasn't manually selected a different timezone
+        const currentTimezone = form.getValues('timezone');
+        if (currentTimezone === 'Europe/Amsterdam' || !currentTimezone) {
+          form.setValue('timezone', detectedTimezone);
+        }
+      } catch (error) {
+        console.error('Error auto-detecting timezone:', error);
+      }
+    };
+
+    autoDetectTimezone();
+  }, [selectedVenueId, venues, form]);
+
+  const onSubmit = async (data: FormValues) => {
     if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "You must be logged in to create an event.",
-        variant: "destructive",
-      });
+      toast.error('You must be logged in to create events');
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
-      // Process URLs to ensure they have proper protocol
-      const processedData = {
+      const slug = createSlug(data.title, data.start_date);
+      
+      const eventData = {
         ...data,
-        organizer_link: data.organizer_link ? ensureHttpProtocol(data.organizer_link) : '',
-        booking_link: data.booking_link ? ensureHttpProtocol(data.booking_link) : '',
-        extra_info: data.extra_info || '', // Ensure extra_info is always a string
+        creator: user.id,
+        created_by: user.id,
+        slug,
+        status: 'published' as const
       };
 
-      const processedEventData = processFormData(processedData, user.id);
-      console.log('Processed event data for submission:', JSON.stringify(processedEventData, null, 2));
-      
+      let result;
       if (isEditMode && eventId) {
-        console.log('Updating event with ID:', eventId);
-        const { error } = await updateEvent(eventId, processedEventData as any);
-        if (error) {
-          console.error("Failed to update event", error);
-          console.error("Supabase error details:", JSON.stringify(error, null, 2));
-          
-          let errorMessage = "Failed to update event";
-          if (error.message?.includes('duplicate key')) {
-            errorMessage = "An event with this title already exists. Please choose a different title.";
-          } else if (error.message?.includes('invalid input')) {
-            errorMessage = "Please check your input data and try again.";
-          } else if (error.message?.includes('extra_info')) {
-            errorMessage = "There was an issue with the additional information field. Please try again.";
-          } else if (error.message) {
-            errorMessage = error.message;
-          }
-          
-          toast({
-            title: "Update Failed",
-            description: errorMessage,
-            variant: "destructive",
-          });
-          return;
-        }
-        console.log("Event updated successfully");
-        toast({
-          title: 'Event Updated! 🎉',
-          description: 'Your event changes have been saved successfully.',
-        });
-        
-        // Force refetch of events data
-        await queryClient.invalidateQueries({ queryKey: ['events'] });
-        await queryClient.invalidateQueries({ queryKey: ['event-details', eventId] });
-        await queryClient.refetchQueries({ queryKey: ['events'] });
-        
-        navigate('/events');
+        result = await supabase
+          .from('events')
+          .update(eventData)
+          .eq('id', eventId)
+          .select()
+          .single();
       } else {
-        console.log('Creating new event');
-        const { data: createdEvent, error } = await createEvent(processedEventData as any);
-        if (error) {
-          console.error("Failed to create event", error);
-          console.error("Supabase error details:", JSON.stringify(error, null, 2));
-          
-          let errorMessage = "Failed to create event";
-          if (error.message?.includes('duplicate key')) {
-            errorMessage = "An event with this title already exists. Please choose a different title.";
-          } else if (error.message?.includes('invalid input')) {
-            errorMessage = "Please check your input data and try again.";
-          } else if (error.message?.includes('venue_id')) {
-            errorMessage = "Please select a valid venue for your event.";
-          } else if (error.message?.includes('extra_info')) {
-            errorMessage = "There was an issue with the additional information field. Please try again.";
-          } else if (error.message) {
-            errorMessage = error.message;
-          }
-          
-          toast({
-            title: "Creation Failed",
-            description: errorMessage,
-            variant: "destructive",
-          });
-          return;
-        }
-        console.log("Event created successfully in DB:", createdEvent);
-        
-        // Force refetch of events data
-        await queryClient.invalidateQueries({ queryKey: ['events'] });
-        await queryClient.refetchQueries({ queryKey: ['events'] });
-        
-        // Call the success callback if provided
-        if (onEventCreated && createdEvent) {
-          onEventCreated(createdEvent.id, data.title);
-        } else {
-          // Fallback to navigation if no callback
-          toast({
-            title: 'Event Created! 🎉',
-            description: 'Your new event is now live and ready for RSVPs.',
-          });
-          
-          setTimeout(() => {
-            navigate('/events');
-          }, 500);
-        }
+        result = await supabase
+          .from('events')
+          .insert([eventData])
+          .select()
+          .single();
       }
+
+      if (result.error) {
+        throw result.error;
+      }
+
+      const action = isEditMode ? 'updated' : 'created';
+      toast.success(`Event ${action} successfully!`);
+
+      if (!isEditMode && result.data && onEventCreated) {
+        onEventCreated(result.data.id, result.data.title);
+      } else if (isEditMode) {
+        navigate(`/events/${result.data.slug || result.data.id}`);
+      }
+
     } catch (error: any) {
-      console.error("Form submission error", error);
-      
-      let errorMessage = "Failed to save event. Please try again.";
-      if (error?.message?.includes('Network')) {
-        errorMessage = "Network error. Please check your connection and try again.";
-      } else if (error?.message?.includes('extra_info')) {
-        errorMessage = "There was an issue with the additional information field. Please try again.";
-      } else if (error?.message) {
-        errorMessage = error.message;
-      }
-      
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      console.error('Error saving event:', error);
+      toast.error(error.message || 'Failed to save event');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const onInvalid = (errors: FieldErrors<FormValues>) => {
+  const onInvalid = (errors: any) => {
     console.log('Form validation errors:', errors);
-    const errorFields = Object.keys(errors);
-    const firstError = errors[errorFields[0] as keyof FormValues];
-    
-    toast({
-      title: "Form Validation Error",
-      description: firstError?.message || "Please correct the errors in the form",
-      variant: "destructive",
-    });
-
-    // Scroll to first error field
-    const firstErrorField = document.querySelector(`[name="${errorFields[0]}"]`) as HTMLElement;
-    if (firstErrorField) {
-      firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      firstErrorField.focus();
+    const firstError = Object.values(errors)[0] as any;
+    if (firstError?.message) {
+      toast.error(firstError.message);
     }
+  };
+
+  const handleVenueCreated = (venue: Venue) => {
+    form.setValue('venue_id', venue.id);
+    toast.success(`Venue "${venue.name}" selected!`);
   };
 
   return {
     form,
     isSubmitting,
-    isEditMode,
-    venues,
+    venues: venues || [],
     isLoadingVenues,
     isCreateVenueModalOpen,
     setCreateVenueModalOpen,
     handleVenueCreated,
     onSubmit,
     onInvalid,
+    autoDetectedTimezone,
+    selectedVenueName
   };
 };

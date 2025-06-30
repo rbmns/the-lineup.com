@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useEventForm } from '@/hooks/events/useEventForm.tsx';
 import { CreateVenueModal } from '@/components/venues/CreateVenueModal';
@@ -8,6 +7,7 @@ import { TitleField } from './form-sections/TitleField';
 import { DescriptionField } from './form-sections/DescriptionField';
 import { DateTimeFields } from './form-sections/DateTimeFields';
 import { VenueField } from './form-sections/VenueField';
+import { TimezoneField } from './form-sections/TimezoneField';
 import { CategoryToggleField } from './form-sections/CategoryToggleField';
 import { VibeToggleField } from './form-sections/VibeToggleField';
 import { OptionalFieldsSection } from './form-sections/OptionalFieldsSection';
@@ -51,7 +51,9 @@ export const EventForm: React.FC<EventFormProps> = ({
     setCreateVenueModalOpen,
     handleVenueCreated,
     onSubmit: originalOnSubmit,
-    onInvalid
+    onInvalid,
+    autoDetectedTimezone,
+    selectedVenueName
   } = useEventForm({
     eventId,
     isEditMode,
@@ -185,6 +187,10 @@ export const EventForm: React.FC<EventFormProps> = ({
               venues={venues} 
               isLoadingVenues={isLoadingVenues} 
               onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)} 
+            />
+            <TimezoneField 
+              autoDetectedTimezone={autoDetectedTimezone || undefined}
+              venueName={selectedVenueName}
             />
             <CategoryToggleField watch={watch} setValue={setValue} errors={errors} />
             <VibeToggleField watch={watch} setValue={setValue} errors={errors} />

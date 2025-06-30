@@ -4,21 +4,29 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useFormContext } from 'react-hook-form';
 import { FormValues } from '@/components/events/form/EventFormTypes';
-import { getCommonTimezones, getUserTimezone } from '@/utils/timezone-utils';
+import { getCommonTimezones } from '@/utils/timezone-utils';
 
-export const TimezoneField: React.FC = () => {
+interface TimezoneFieldProps {
+  autoDetectedTimezone?: string;
+  venueName?: string;
+}
+
+export const TimezoneField: React.FC<TimezoneFieldProps> = ({ 
+  autoDetectedTimezone, 
+  venueName 
+}) => {
   const form = useFormContext<FormValues>();
   const timezones = getCommonTimezones();
 
-  // Set default timezone to user's browser timezone on mount
+  // Set auto-detected timezone when available
   React.useEffect(() => {
-    const currentValue = form.getValues('timezone');
-    if (!currentValue) {
-      const userTz = getUserTimezone();
-      const matchingTimezone = timezones.find(tz => tz.value === userTz);
-      form.setValue('timezone', matchingTimezone?.value || 'Europe/Amsterdam');
+    if (autoDetectedTimezone && !form.getValues('timezone')) {
+      form.setValue('timezone', autoDetectedTimezone);
     }
-  }, [form, timezones]);
+  }, [autoDetectedTimezone, form]);
+
+  const selectedTimezone = form.watch('timezone');
+  const isAutoDetected = selectedTimezone === autoDetectedTimezone;
 
   return (
     <div className="space-y-2">
@@ -29,12 +37,17 @@ export const TimezoneField: React.FC = () => {
           <FormItem>
             <FormLabel className="text-sm font-medium text-graphite-grey flex items-center gap-2">
               <span>🌍</span>
-              Timezone *
+              Event Timezone
+              {isAutoDetected && venueName && (
+                <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+                  Auto-detected from {venueName}
+                </span>
+              )}
             </FormLabel>
             <Select onValueChange={field.onChange} value={field.value}>
               <FormControl>
                 <SelectTrigger className="h-10 bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal">
-                  <SelectValue placeholder="Select your timezone" />
+                  <SelectValue placeholder="Select event timezone" />
                 </SelectTrigger>
               </FormControl>
               <SelectContent className="bg-white border-mist-grey shadow-lg max-h-60 overflow-y-auto">
@@ -49,6 +62,11 @@ export const TimezoneField: React.FC = () => {
                 ))}
               </SelectContent>
             </Select>
+            {autoDetectedTimezone && (
+              <p className="text-xs text-graphite-grey/75">
+                Events will show in each viewer's local timezone automatically
+              </p>
+            )}
             <FormMessage />
           </FormItem>
         )}

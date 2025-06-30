@@ -1,7 +1,7 @@
 
 import { useMemo } from 'react';
 import { Calendar } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, parseISO } from 'date-fns';
 import { formatEventTime, formatEventDate, createEventDateTime, getUserTimezone } from '@/utils/timezone-utils';
 
 interface EventDateTimeSectionProps {
@@ -98,6 +98,11 @@ export const EventDateTimeSection = ({
         <p className="text-sm text-gray-600">{timeUntilEvent}</p>
         {eventDuration && (
           <p className="text-sm text-gray-600">Duration: {eventDuration}</p>
+        )}
+        {timezone !== viewerTimezone && (
+          <p className="text-xs text-gray-500 mt-1">
+            Event timezone: {timezone}
+          </p>
         )}
       </div>
     </div>

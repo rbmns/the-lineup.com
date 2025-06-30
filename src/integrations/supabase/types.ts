@@ -169,6 +169,33 @@ export type Database = {
         }
         Relationships: []
       }
+      city_timezones: {
+        Row: {
+          city_name: string
+          country_code: string
+          country_name: string
+          created_at: string | null
+          id: string
+          timezone: string
+        }
+        Insert: {
+          city_name: string
+          country_code: string
+          country_name: string
+          created_at?: string | null
+          id?: string
+          timezone: string
+        }
+        Update: {
+          city_name?: string
+          country_code?: string
+          country_name?: string
+          created_at?: string | null
+          id?: string
+          timezone?: string
+        }
+        Relationships: []
+      }
       creator_requests: {
         Row: {
           contact_email: string | null
@@ -898,6 +925,7 @@ export type Database = {
           address: string | null
           city: string | null
           coordinates: unknown | null
+          country: string | null
           created_at: string | null
           creator_id: string | null
           google_maps: string | null
@@ -912,6 +940,7 @@ export type Database = {
           address?: string | null
           city?: string | null
           coordinates?: unknown | null
+          country?: string | null
           created_at?: string | null
           creator_id?: string | null
           google_maps?: string | null
@@ -926,6 +955,7 @@ export type Database = {
           address?: string | null
           city?: string | null
           coordinates?: unknown | null
+          country?: string | null
           created_at?: string | null
           creator_id?: string | null
           google_maps?: string | null
@@ -988,6 +1018,14 @@ export type Database = {
           venue_city: string
           creator_user_id?: string
         }
+        Returns: string
+      }
+      get_city_country: {
+        Args: { city_name: string }
+        Returns: string
+      }
+      get_city_timezone: {
+        Args: { city_name: string }
         Returns: string
       }
       has_role: {
