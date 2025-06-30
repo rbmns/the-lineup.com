@@ -100,22 +100,22 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
     <div className="space-y-6">
       {/* Location Card */}
       <Card className="bg-pure-white border border-mist-grey shadow-sm">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-lg font-semibold text-graphite-grey flex items-center">
-            <MapPin className="h-5 w-5 text-ocean-teal mr-3" />
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base font-semibold text-graphite-grey flex items-center">
+            <MapPin className="h-4 w-4 text-ocean-teal mr-2" />
             Location
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="pt-0 space-y-3">
           {event.venues ? (
             <>
               {event.venues.name && (
                 <div>
-                  <h4 className="font-semibold text-graphite-grey text-base">{event.venues.name}</h4>
+                  <h4 className="font-medium text-graphite-grey text-sm">{event.venues.name}</h4>
                 </div>
               )}
               
-              <div className="text-sm text-graphite-grey/70">
+              <div className="text-xs text-graphite-grey/70">
                 {[
                   event.venues.street,
                   event.venues.postal_code,
@@ -128,14 +128,14 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
                   href={googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-ocean-teal hover:text-ocean-teal/80 transition-colors text-sm font-medium mt-3"
+                  className="inline-flex items-center gap-1 text-ocean-teal hover:text-ocean-teal/80 transition-colors text-xs font-medium"
                 >
                   View on map
                 </a>
               )}
             </>
           ) : (
-            <div className="text-sm text-graphite-grey/60 italic">
+            <div className="text-xs text-graphite-grey/60 italic">
               Location details not available
             </div>
           )}
@@ -145,17 +145,17 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
       {/* Booking Information Card */}
       {hasBookingInfo && (
         <Card className="bg-pure-white border border-mist-grey shadow-sm">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-semibold text-graphite-grey">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-semibold text-graphite-grey">
               Booking Info
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="pt-0 space-y-3">
             {/* Entry Fee */}
             {event.fee !== null && event.fee !== undefined && (
               <div>
-                <p className="text-sm font-medium text-graphite-grey mb-1">Entry fee</p>
-                <p className="text-base font-semibold text-graphite-grey">
+                <p className="text-xs font-medium text-graphite-grey mb-1">Entry fee</p>
+                <p className="text-sm font-semibold text-graphite-grey">
                   {event.fee === 0 ? 'Free Event' : `€${event.fee}`}
                 </p>
               </div>
@@ -164,15 +164,15 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
             {/* Booking Link */}
             {hasBookingLink && (
               <>
-                {hasFee && <Separator className="my-3" />}
+                {hasFee && <Separator className="my-2" />}
                 <div>
                   <a 
                     href={event.booking_link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-ocean-teal text-pure-white px-4 py-2 rounded-md hover:bg-ocean-teal/90 transition-colors font-medium text-sm"
+                    className="inline-flex items-center gap-2 bg-ocean-teal text-pure-white px-3 py-1.5 rounded-md hover:bg-ocean-teal/90 transition-colors font-medium text-xs"
                   >
-                    <ExternalLink className="h-4 w-4" />
+                    <ExternalLink className="h-3 w-3" />
                     Book Tickets
                   </a>
                 </div>
@@ -185,17 +185,17 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
       {/* Friends Attending - only show if authenticated and there are friend attendees */}
       {isAuthenticated && (friendAttendees.going.length > 0 || friendAttendees.interested.length > 0) && (
         <Card className="bg-pure-white border border-mist-grey shadow-sm">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-semibold text-graphite-grey">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-semibold text-graphite-grey">
               Friends Attending
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="pt-0 space-y-4">
             {friendAttendees.going.length > 0 && (
               <div>
-                <h4 className="text-base font-medium text-graphite-grey mb-3 flex items-center">
+                <h4 className="text-sm font-medium text-graphite-grey mb-2 flex items-center">
                   Going
-                  <span className="ml-2 text-sm text-graphite-grey/70">
+                  <span className="ml-2 text-xs text-graphite-grey/70">
                     {friendAttendees.going.length}
                   </span>
                 </h4>
@@ -204,14 +204,14 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
                     <button 
                       key={attendee.id} 
                       onClick={() => handleUserClick(attendee.id)} 
-                      className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+                      className="flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-pointer"
                     >
-                      <div className="w-8 h-8 bg-gradient-to-r from-ocean-teal to-sage rounded-full flex items-center justify-center shadow-sm">
+                      <div className="w-6 h-6 bg-gradient-to-r from-ocean-teal to-sage rounded-full flex items-center justify-center shadow-sm">
                         <span className="text-xs font-bold text-pure-white">
                           {attendee.username?.charAt(0).toUpperCase() || 'U'}
                         </span>
                       </div>
-                      <span className="text-sm font-medium text-graphite-grey">{attendee.username}</span>
+                      <span className="text-xs font-medium text-graphite-grey">{attendee.username}</span>
                     </button>
                   ))}
                 </div>
@@ -220,9 +220,9 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
             
             {friendAttendees.interested.length > 0 && (
               <div>
-                <h4 className="text-base font-medium text-graphite-grey mb-3 flex items-center">
+                <h4 className="text-sm font-medium text-graphite-grey mb-2 flex items-center">
                   Interested
-                  <span className="ml-2 text-sm text-graphite-grey/70">
+                  <span className="ml-2 text-xs text-graphite-grey/70">
                     {friendAttendees.interested.length}
                   </span>
                 </h4>
@@ -231,14 +231,14 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
                     <button 
                       key={attendee.id} 
                       onClick={() => handleUserClick(attendee.id)} 
-                      className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
+                      className="flex items-center gap-1.5 hover:opacity-80 transition-opacity cursor-pointer"
                     >
-                      <div className="w-8 h-8 bg-gradient-to-r from-clay to-seafoam rounded-full flex items-center justify-center shadow-sm">
+                      <div className="w-6 h-6 bg-gradient-to-r from-clay to-seafoam rounded-full flex items-center justify-center shadow-sm">
                         <span className="text-xs font-bold text-pure-white">
                           {attendee.username?.charAt(0).toUpperCase() || 'U'}
                         </span>
                       </div>
-                      <span className="text-sm font-medium text-graphite-grey">{attendee.username}</span>
+                      <span className="text-xs font-medium text-graphite-grey">{attendee.username}</span>
                     </button>
                   ))}
                 </div>
@@ -246,9 +246,9 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
             )}
 
             {/* All Attendees Summary */}
-            <div className="pt-4 border-t border-mist-grey">
-              <h4 className="text-base font-medium text-graphite-grey mb-2">All Attendees</h4>
-              <div className="flex items-center gap-4 text-sm">
+            <div className="pt-3 border-t border-mist-grey">
+              <h4 className="text-sm font-medium text-graphite-grey mb-1">All Attendees</h4>
+              <div className="flex items-center gap-3 text-xs">
                 <span className="text-graphite-grey/80">
                   Going: <span className="font-medium text-graphite-grey">{attendees.going.length}</span>
                 </span>
@@ -264,22 +264,22 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
       {/* Attendees Card - only show if authenticated and no friends attending */}
       {isAuthenticated && friendAttendees.going.length === 0 && friendAttendees.interested.length === 0 && (
         <Card className="bg-pure-white border border-mist-grey shadow-sm">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-lg font-semibold text-graphite-grey flex items-center">
-              <Users className="h-5 w-5 text-ocean-teal mr-3" />
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-semibold text-graphite-grey flex items-center">
+              <Users className="h-4 w-4 text-ocean-teal mr-2" />
               Attendees
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-4 text-sm">
+          <CardContent className="pt-0">
+            <div className="flex items-center gap-3 text-xs">
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-sage rounded-full"></div>
+                <div className="w-2 h-2 bg-sage rounded-full"></div>
                 <span className="font-medium text-graphite-grey">
                   {attendees.going.length} going
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-clay rounded-full"></div>
+                <div className="w-2 h-2 bg-clay rounded-full"></div>
                 <span className="font-medium text-graphite-grey">
                   {attendees.interested.length} interested
                 </span>
