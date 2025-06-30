@@ -12,7 +12,7 @@ export const fetchEventById = async (eventId: string, userId?: string): Promise<
       return null;
     }
 
-    // Build the query to fetch event with related data
+    // Build the query to fetch event with related data - include new timestamptz columns
     let query = supabase
       .from('events')
       .select(`

@@ -2,8 +2,7 @@
 import React from 'react';
 import { Calendar, Clock, RepeatIcon, CalendarDays } from 'lucide-react';
 import { Event } from '@/types';
-import { formatEventDate, formatEventTime, formatEventCardDateTime, getUserTimezone } from '@/utils/timezone-utils';
-import { isMultiDayEvent, getMultiDayDateRange } from '@/utils/event-date-utils';
+import { formatEventDateTime, formatEventEndDateTime, getUserTimezone } from '@/utils/timezone-utils';
 import { Badge } from '../ui/badge';
 
 interface EventDateTimeInfoProps {
@@ -21,12 +20,27 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
   showRecurring = false,
   recurringEvents = []
 }) => {
-  // Get viewer's timezone and event timezone
+  // Get viewer's timezone
   const viewerTimezone = getUserTimezone();
-  const eventTimezone = event.timezone || 'Europe/Amsterdam';
+  
+  // Use unified datetime formatting
+  const { date, time } = formatEventDateTime({
+    start_datetime: event.start_datetime,
+    start_date: event.start_date || undefined,
+    start_time: event.start_time || undefined,
+    timezone: event.timezone
+  }, viewerTimezone);
+  
+  const endTime = formatEventEndDateTime({
+    end_datetime: event.end_datetime,
+    start_datetime: event.start_datetime,
+    start_date: event.start_date || undefined,
+    end_time: event.end_time || undefined,
+    timezone: event.timezone
+  }, viewerTimezone);
   
   // Check if we have valid date information
-  if (!event.start_date) {
+  if (!event.start_datetime && !event.start_date) {
     return (
       <div className={`flex items-center gap-2 text-gray-500 italic ${className}`}>
         <Calendar className={`h-4 w-4 flex-shrink-0 ${iconClassName}`} />
@@ -35,13 +49,9 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
     );
   }
   
-  const isMultiDay = isMultiDayEvent(event);
+  // Check for multi-day events
+  const isMultiDay = event.end_date && event.start_date && event.end_date !== event.start_date;
   const isRecurring = recurringEvents && recurringEvents.length > 0;
-
-  // Format date and times in viewer's timezone
-  const startDate = formatEventDate(event.start_date, eventTimezone, viewerTimezone);
-  const startTime = event.start_time ? formatEventTime(event.start_date, event.start_time, eventTimezone, viewerTimezone) : null;
-  const endTime = event.end_time ? formatEventTime(event.start_date, event.end_time, eventTimezone, viewerTimezone) : null;
 
   return (
     <div className={`flex flex-col gap-2 text-gray-700 ${className}`}>
@@ -59,32 +69,12 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
       <div className="flex items-start gap-2">
         <Calendar className={`flex-shrink-0 text-gray-500 mt-1 ${iconClassName}`} />
         <div className="space-y-1">
-          {isMultiDay ? (
-            <>
-              <div className="font-medium">{getMultiDayDateRange(event)}</div>
-              <div className="flex items-center gap-1 text-sm">
-                <Clock className="h-3.5 w-3.5 text-gray-500" />
-                <span>Starts {startTime}</span>
-                {endTime && <span>• Ends {endTime}</span>}
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="font-medium">{startDate}</div>
-              <div className="flex items-center gap-1 text-sm">
-                <Clock className="h-3.5 w-3.5 text-gray-500" />
-                <span>{startTime}</span>
-                {endTime && <span>- {endTime}</span>}
-              </div>
-            </>
-          )}
-          
-          {/* Show timezone info if different from viewer's timezone */}
-          {eventTimezone !== viewerTimezone && (
-            <div className="text-xs text-gray-500">
-              Event timezone: {eventTimezone}
-            </div>
-          )}
+          <div className="font-medium">{date}</div>
+          <div className="flex items-center gap-1 text-sm">
+            <Clock className="h-3.5 w-3.5 text-gray-500" />
+            <span>{time}</span>
+            {endTime && <span>- {endTime}</span>}
+          </div>
         </div>
       </div>
       
@@ -100,17 +90,17 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
             <div className="text-xs uppercase font-medium text-gray-500">Other dates:</div>
             <div className="space-y-1.5">
               {recurringEvents.map((recEvent) => {
-                const recEventDateTime = formatEventCardDateTime(
-                  recEvent.start_date!, 
-                  recEvent.start_time, 
-                  recEvent.end_date,
-                  recEvent.timezone || eventTimezone,
-                  viewerTimezone
-                );
+                const recEventDateTime = formatEventDateTime({
+                  start_datetime: recEvent.start_datetime,
+                  start_date: recEvent.start_date || undefined,
+                  start_time: recEvent.start_time || undefined,
+                  timezone: recEvent.timezone
+                }, viewerTimezone);
+                
                 return (
                   <div key={recEvent.id} className="text-sm">
                     <Badge variant="outline" className="mr-2">
-                      {recEventDateTime}
+                      {recEventDateTime.dateTime}
                     </Badge>
                   </div>
                 );

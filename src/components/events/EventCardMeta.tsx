@@ -1,11 +1,12 @@
 
 import React from 'react';
 import { CalendarIcon, MapPin } from 'lucide-react';
-import { formatEventTime, formatEventDate, getUserTimezone } from '@/utils/timezone-utils';
+import { formatEventDateTime, getUserTimezone } from '@/utils/timezone-utils';
 import { cn } from '@/lib/utils';
 
 interface EventCardMetaProps {
   event: { 
+    start_datetime?: string;
     start_date?: string | null;
     start_time?: string | null;
     timezone?: string;
@@ -27,31 +28,14 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
   className 
 }) => {
   const viewerTimezone = getUserTimezone();
-  const eventTimezone = event.timezone || 'Europe/Amsterdam';
   
-  // Format date for display in viewer's timezone
-  const formatEventDateDisplay = (event: any): string => {
-    try {
-      if (!event.start_date) return 'Date not specified';
-      
-      return formatEventDate(event.start_date, eventTimezone, viewerTimezone);
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return 'Date not specified';
-    }
-  };
-  
-  // Format time in viewer's timezone
-  const getEventTimeDisplay = (event: any): string => {
-    if (!event.start_time || !event.start_date) return 'Time not specified';
-    
-    try {
-      return formatEventTime(event.start_date, event.start_time, eventTimezone, viewerTimezone);
-    } catch (error) {
-      console.error('Error formatting time:', error);
-      return event.start_time.substring(0, 5);
-    }
-  };
+  // Use unified datetime formatting
+  const { date, time } = formatEventDateTime({
+    start_datetime: event.start_datetime,
+    start_date: event.start_date || undefined,
+    start_time: event.start_time || undefined,
+    timezone: event.timezone
+  }, viewerTimezone);
 
   // Get venue display name with proper fallback logic
   const getVenueDisplay = (): string => {
@@ -83,7 +67,7 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
       <div className="flex items-center text-gray-600">
         <CalendarIcon className="h-4 w-4 mr-2" />
         <span className={cn("font-inter leading-7", textSize)}>
-          {formatEventDateDisplay(event)} at {getEventTimeDisplay(event)}
+          {date} at {time}
         </span>
       </div>
 

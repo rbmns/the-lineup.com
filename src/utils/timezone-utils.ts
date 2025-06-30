@@ -28,8 +28,100 @@ export const getTimezoneAbbreviation = (timezone: string): string => {
 };
 
 /**
- * Format event time in viewer's timezone
- * Takes a date string, time string, and event timezone, converts to viewer's timezone
+ * UNIFIED DATETIME FORMATTING - Use this for all event datetime display
+ * Handles both legacy (date/time fields) and new (timestamptz) formats
+ */
+export const formatEventDateTime = (
+  event: {
+    start_datetime?: string;
+    start_date?: string;
+    start_time?: string;
+    timezone?: string;
+  },
+  displayTimezone?: string
+): {
+  date: string;
+  time: string;
+  dateTime: string;
+} => {
+  const viewerTimezone = displayTimezone || getUserTimezone();
+  
+  try {
+    let eventDateTime: Date;
+    
+    // Use new timestamptz field if available
+    if (event.start_datetime) {
+      eventDateTime = new Date(event.start_datetime);
+    } 
+    // Fallback to legacy date/time fields
+    else if (event.start_date && event.start_time) {
+      const eventTimezone = event.timezone || 'Europe/Amsterdam';
+      const dateTimeStr = `${event.start_date}T${event.start_time}`;
+      const parsedDateTime = parseISO(dateTimeStr);
+      eventDateTime = toZonedTime(parsedDateTime, eventTimezone);
+    }
+    else {
+      throw new Error('No valid datetime information');
+    }
+    
+    // Format all components in viewer timezone
+    const date = formatInTimeZone(eventDateTime, viewerTimezone, 'EEE, d MMM yyyy');
+    const time = formatInTimeZone(eventDateTime, viewerTimezone, 'HH:mm');
+    const dateTime = `${date}, ${time}`;
+    
+    return { date, time, dateTime };
+  } catch (error) {
+    console.error('Error formatting event datetime:', error);
+    return {
+      date: 'Date not available',
+      time: 'Time not available', 
+      dateTime: 'Date and time not available'
+    };
+  }
+};
+
+/**
+ * Format event end datetime
+ */
+export const formatEventEndDateTime = (
+  event: {
+    end_datetime?: string;
+    start_datetime?: string;
+    start_date?: string;
+    end_time?: string;
+    timezone?: string;
+  },
+  displayTimezone?: string
+): string => {
+  const viewerTimezone = displayTimezone || getUserTimezone();
+  
+  try {
+    let endDateTime: Date;
+    
+    // Use new timestamptz field if available
+    if (event.end_datetime) {
+      endDateTime = new Date(event.end_datetime);
+    }
+    // Fallback to legacy fields with end_time
+    else if (event.start_date && event.end_time) {
+      const eventTimezone = event.timezone || 'Europe/Amsterdam';
+      const dateTimeStr = `${event.start_date}T${event.end_time}`;
+      const parsedDateTime = parseISO(dateTimeStr);
+      endDateTime = toZonedTime(parsedDateTime, eventTimezone);
+    }
+    else {
+      return '';
+    }
+    
+    return formatInTimeZone(endDateTime, viewerTimezone, 'HH:mm');
+  } catch (error) {
+    console.error('Error formatting event end datetime:', error);
+    return '';
+  }
+};
+
+/**
+ * Legacy function - kept for backward compatibility but now uses unified approach
  */
 export const formatEventTime = (
   dateStr: string,
@@ -37,101 +129,58 @@ export const formatEventTime = (
   eventTimezone: string = 'Europe/Amsterdam',
   displayTimezone?: string
 ): string => {
-  try {
-    const viewerTimezone = displayTimezone || getUserTimezone();
-    
-    // If timezones are the same, no conversion needed
-    if (eventTimezone === viewerTimezone) {
-      return timeStr.substring(0, 5);
-    }
-    
-    // Create a datetime string representing the event time in the event's timezone
-    const eventDateTimeStr = `${dateStr}T${timeStr}`;
-    
-    // Use formatInTimeZone to directly convert from event timezone to viewer timezone
-    // This is much simpler and more reliable than manual conversion
-    const eventTime = parseISO(eventDateTimeStr);
-    
-    // Format the time in the viewer's timezone, treating the input as being in the event timezone
-    return formatInTimeZone(eventTime, viewerTimezone, 'HH:mm', {
-      timeZone: eventTimezone
-    });
-  } catch (error) {
-    console.error('Error formatting event time:', error, { dateStr, timeStr, eventTimezone, displayTimezone });
-    return timeStr.substring(0, 5); // Fallback to original time
-  }
-};
-
-/**
- * Format event time with timezone abbreviation
- */
-export const formatEventTimeWithTimezone = (
-  dateStr: string,
-  timeStr: string,
-  eventTimezone: string = 'Europe/Amsterdam',
-  displayTimezone?: string
-): string => {
-  const viewerTimezone = displayTimezone || getUserTimezone();
-  const formattedTime = formatEventTime(dateStr, timeStr, eventTimezone, displayTimezone);
-  const tzAbbr = getTimezoneAbbreviation(viewerTimezone);
+  const result = formatEventDateTime({
+    start_date: dateStr,
+    start_time: timeStr,
+    timezone: eventTimezone
+  }, displayTimezone);
   
-  return `${formattedTime} ${tzAbbr}`;
+  return result.time;
 };
 
 /**
- * Format event date consistently across the app in viewer's timezone
+ * Legacy function - kept for backward compatibility
  */
 export const formatEventDate = (
   dateStr: string,
   eventTimezone: string = 'Europe/Amsterdam',
   displayTimezone?: string
 ): string => {
-  try {
-    const viewerTimezone = displayTimezone || getUserTimezone();
-    const date = parseISO(dateStr);
-    
-    return formatInTimeZone(date, viewerTimezone, 'EEE, d MMM yyyy');
-  } catch (error) {
-    console.error('Error formatting event date:', error);
-    return dateStr;
-  }
+  const result = formatEventDateTime({
+    start_date: dateStr,
+    start_time: '12:00:00', // Dummy time for date formatting
+    timezone: eventTimezone
+  }, displayTimezone);
+  
+  return result.date;
 };
 
 /**
- * Format event date and time for display in cards, showing in viewer's timezone
+ * Format for event cards - uses unified approach
  */
 export const formatEventCardDateTime = (
-  startDate: string,
-  startTime?: string | null,
-  endDate?: string | null,
-  eventTimezone: string = 'Europe/Amsterdam',
+  event: {
+    start_datetime?: string;
+    start_date?: string;
+    start_time?: string;
+    end_date?: string;
+    timezone?: string;
+  },
   displayTimezone?: string
 ): string => {
-  if (!startDate) return '';
-  
-  const viewerTimezone = displayTimezone || getUserTimezone();
-  
   // Check if it's a multi-day event
-  if (endDate && endDate !== startDate) {
-    const startFormatted = formatEventDate(startDate, eventTimezone, viewerTimezone);
-    const endFormatted = formatEventDate(endDate, eventTimezone, viewerTimezone);
-    return `${startFormatted} - ${endFormatted}`;
+  if (event.end_date && event.start_date && event.end_date !== event.start_date) {
+    const startResult = formatEventDateTime(event, displayTimezone);
+    const endResult = formatEventDateTime({
+      start_date: event.end_date,
+      start_time: event.start_time,
+      timezone: event.timezone
+    }, displayTimezone);
+    return `${startResult.date} - ${endResult.date}`;
   }
   
-  try {
-    const datePart = formatEventDate(startDate, eventTimezone, viewerTimezone);
-    
-    if (!startTime) {
-      return datePart;
-    }
-    
-    // Don't show timezone abbreviation - just the converted time
-    const timePart = formatEventTime(startDate, startTime, eventTimezone, viewerTimezone);
-    return `${datePart}, ${timePart}`;
-  } catch (error) {
-    console.error('Error formatting event card date-time:', error);
-    return startDate;
-  }
+  const result = formatEventDateTime(event, displayTimezone);
+  return result.dateTime;
 };
 
 /**
@@ -153,6 +202,7 @@ export const getCommonTimezones = () => [
 
 /**
  * Create a proper Date object from date and time strings in a specific timezone
+ * Legacy function - kept for backward compatibility
  */
 export const createEventDateTime = (
   dateStr: string, 
