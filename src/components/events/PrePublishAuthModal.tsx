@@ -92,7 +92,7 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
           toast({
             title: "Login failed",
             description: error.message,
-            variant: "destructive",
+            variant: "descriptive",
           });
           return;
         }
@@ -122,15 +122,17 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
         }
         console.log("Signup successful");
 
-        // Show success message and close modal immediately
-        // The event creation will happen after auth state is confirmed
+        // For new accounts, show success and proceed to publish immediately
+        // The event will be published since the email is stored with the account
         toast({
-          title: "Account created! 📧",
-          description: "Please check your email to confirm your account, then try publishing your event again.",
+          title: "Account created! 🎉",
+          description: "Your account has been created and your event will be published.",
         });
         
-        // Close the modal - user needs to confirm email first
-        onClose();
+        // Wait for auth state to update, then call success to publish the event
+        setTimeout(() => {
+          onSuccess();
+        }, 1500);
       }
 
     } catch (error: any) {
@@ -158,7 +160,7 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
           <p className="text-neutral leading-relaxed">
             {isLogin 
               ? "Welcome back! Sign in to publish your event."
-              : "Join the community and make your event live for everyone to discover."
+              : "Join the community and publish your event instantly. Your event will go live right after creating your account."
             }
           </p>
         </div>
@@ -243,7 +245,7 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
                 ? "Processing..." 
                 : isLogin 
                   ? "Sign in & Publish" 
-                  : "Create Account"
+                  : "Create Account & Publish"
               }
             </Button>
           </form>

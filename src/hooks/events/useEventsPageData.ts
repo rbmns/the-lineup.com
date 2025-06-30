@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
@@ -21,15 +20,17 @@ export const useEventsPageData = () => {
   // Use the persistent location preference as the selected location
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
 
-  // Sync with location preference when loaded
+  // Sync with location preference when loaded - but don't auto-set if user explicitly cleared it
   useEffect(() => {
     if (isLoaded) {
       setSelectedLocation(selectedAreaId);
+      console.log('Location preference loaded:', selectedAreaId);
     }
   }, [selectedAreaId, isLoaded]);
 
   // Custom location change handler that persists the preference
   const handleLocationChange = (areaId: string | null) => {
+    console.log('Location changed to:', areaId);
     setSelectedLocation(areaId);
     updateLocationPreference(areaId);
   };
@@ -63,14 +64,6 @@ export const useEventsPageData = () => {
       }
 
       console.log(`useEventsPageData: Fetched ${data?.length || 0} events`);
-      console.log('useEventsPageData: Sample events:', data?.slice(0, 3)?.map(e => ({
-        id: e.id,
-        title: e.title,
-        status: e.status,
-        start_date: e.start_date,
-        event_category: e.event_category,
-        vibe: e.vibe
-      })));
 
       // If user is authenticated, fetch RSVP status for each event
       if (user?.id && data) {
@@ -168,22 +161,6 @@ export const useEventsPageData = () => {
       return convertAreasToCategories(areas || [], cityMappings || []);
     },
   });
-
-  // Auto-set location based on user's profile location
-  useEffect(() => {
-    if (user && profile && profile.location && isLoaded && !selectedAreaId && venueAreas.length > 0 && cityAreas.length > 0) {
-      // Find if user's location matches any city in the venue areas
-      const userCity = profile.location;
-      const matchingCityArea = cityAreas.find(cityArea => 
-        cityArea.city_name.toLowerCase() === userCity.toLowerCase()
-      );
-      
-      if (matchingCityArea) {
-        console.log('Auto-setting location filter based on user profile:', userCity, 'to area:', matchingCityArea.area_id);
-        handleLocationChange(matchingCityArea.area_id);
-      }
-    }
-  }, [user, profile, isLoaded, selectedAreaId, venueAreas, cityAreas]);
 
   // Get all event types/categories for advanced filtering
   const allEventTypes = [
@@ -301,13 +278,6 @@ export const useEventsPageData = () => {
   }) || [];
 
   console.log(`useEventsPageData: After all filtering: ${filteredEvents.length} events`);
-  console.log('useEventsPageData: Final filtered events:', filteredEvents.map(e => ({
-    id: e.id,
-    title: e.title,
-    event_category: e.event_category,
-    vibe: e.vibe,
-    start_date: e.start_date
-  })));
 
   // Use RSVP state manager with the user ID
   const rsvpManager = useRsvpStateManager(user?.id);

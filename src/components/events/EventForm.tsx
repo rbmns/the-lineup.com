@@ -106,15 +106,15 @@ export const EventForm: React.FC<EventFormProps> = ({
     if (pendingFormData) {
       console.log("Submitting pending form data after auth success");
       
-      // Show a toast to let user know we're checking their authentication
+      // Show a toast to let user know we're processing their event
       toast({
-        title: "Checking authentication...",
-        description: "Please wait while we confirm your login status.",
+        title: "Publishing your event...",
+        description: "Please wait while we publish your event.",
       });
 
-      // Add a longer delay to ensure auth state is fully propagated
+      // Add a delay to ensure auth state is fully propagated for new accounts
       setTimeout(async () => {
-        // Double-check auth state before proceeding
+        // Check auth state before proceeding - for new accounts, they should be logged in now
         if (isAuthenticated && user && session) {
           try {
             console.log("Auth confirmed, now submitting event");
@@ -123,21 +123,40 @@ export const EventForm: React.FC<EventFormProps> = ({
           } catch (error) {
             console.error("Error submitting form after auth:", error);
             toast({
-              title: "Event creation failed",
-              description: "Please try again or check your authentication status.",
+              title: "Event publishing failed",
+              description: "Please try again or check your connection.",
               variant: "destructive"
             });
           }
         } else {
-          console.log("Auth state not confirmed, asking user to try again");
-          toast({
-            title: "Authentication needed",
-            description: "Please sign in again and try publishing your event.",
-            variant: "destructive"
-          });
-          setPendingFormData(null);
+          console.log("Auth state not yet confirmed, retrying in a moment");
+          // For new accounts, auth state might take longer to propagate
+          setTimeout(async () => {
+            if (isAuthenticated && user && session) {
+              try {
+                console.log("Auth confirmed on retry, now submitting event");
+                await originalOnSubmit(pendingFormData);
+                setPendingFormData(null);
+              } catch (error) {
+                console.error("Error submitting form after auth retry:", error);
+                toast({
+                  title: "Event publishing failed",
+                  description: "Please try refreshing the page and try again.",
+                  variant: "destructive"
+                });
+              }
+            } else {
+              console.log("Auth state still not confirmed, asking user to try again");
+              toast({
+                title: "Please try again",
+                description: "Your account was created but there was an issue publishing your event. Please try again.",
+                variant: "destructive"
+              });
+              setPendingFormData(null);
+            }
+          }, 2000);
         }
-      }, 2000);
+      }, 1000);
     }
   };
 
