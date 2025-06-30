@@ -8,17 +8,17 @@ const Signup = () => {
   const navigate = useNavigate();
   
   return (
-    <div className="min-h-screen bg-sand flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-sand flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
-        {/* Welcome Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-h2 font-display text-ocean-deep mb-6">
+        {/* Welcome Header - Reduced spacing */}
+        <div className="text-center mb-6">
+          <h1 className="text-2xl sm:text-3xl font-display text-ocean-deep mb-4">
             Create an Account
           </h1>
-          <p className="text-body-base text-graphite-grey mb-4">
+          <p className="text-sm sm:text-base text-graphite-grey mb-3">
             Join us to discover events and connect with your community
           </p>
-          <div className="flex justify-center items-center gap-4 text-xl opacity-60">
+          <div className="flex justify-center items-center gap-3 text-lg opacity-60">
             <span>🎨</span>
             <span>🏖️</span>
             <span>🎶</span>
@@ -26,11 +26,11 @@ const Signup = () => {
         </div>
 
         <Card className="card-base">
-          <CardHeader className="text-center pb-6">
-            <CardTitle className="text-h4 text-ocean-deep mb-2">
+          <CardHeader className="text-center pb-4">
+            <CardTitle className="text-xl text-ocean-deep mb-2">
               Get Started
             </CardTitle>
-            <CardDescription className="text-body-small text-graphite-grey/80">
+            <CardDescription className="text-sm text-graphite-grey/80">
               Create your account to start discovering amazing events
             </CardDescription>
           </CardHeader>

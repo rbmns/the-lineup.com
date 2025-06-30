@@ -32,7 +32,7 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
   }
 
   return (
-    <div className="space-y-6 w-full">
+    <div className="space-y-4 w-full">
       {errorMessage && (
         <Alert variant="destructive" className="bg-coral/10 border-coral/20">
           <AlertCircle className="h-4 w-4" />
@@ -43,18 +43,18 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
       )}
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {step === 1 && <SignupStep1 loading={loading} />}
           {step === 2 && <SignupStep2 loading={loading} blurredFields={blurredFields} handleFieldBlur={handleFieldBlur} />}
 
-          <div className="flex justify-between pt-6">
+          <div className="flex justify-between pt-4">
             {step > 1 && (
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={prevStep} 
                 disabled={loading}
-                className="btn-secondary h-12 px-6"
+                className="btn-secondary h-10 px-4"
               >
                 Back
               </Button>
@@ -65,7 +65,7 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
                 type="button" 
                 onClick={nextStep} 
                 disabled={loading} 
-                className="btn-primary ml-auto h-12 px-6"
+                className="btn-primary ml-auto h-10 px-4"
               >
                 Next
               </Button>
@@ -73,7 +73,7 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
               <Button 
                 type="submit" 
                 disabled={loading || authLoading} 
-                className="btn-primary ml-auto h-12 px-6"
+                className="btn-primary ml-auto h-10 px-4"
               >
                 {loading ? "Creating account..." : "Create account"}
               </Button>
@@ -82,7 +82,7 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
         </form>
       </Form>
 
-      <div className="relative my-8">
+      <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t border-mist-grey" />
         </div>
@@ -96,12 +96,12 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
       <GoogleAuthButton 
         onClick={handleGoogleLogin}
         loading={loading || authLoading}
-        className="w-full h-12"
+        className="w-full h-10"
       >
         Sign up with Google
       </GoogleAuthButton>
 
-      <div className="text-center text-body-small text-graphite-grey pt-6">
+      <div className="text-center text-sm text-graphite-grey pt-4">
         Already have an account?{" "}
         <button 
           onClick={onToggleMode}

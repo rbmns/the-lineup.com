@@ -44,16 +44,16 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <GoogleAuthButton 
         onClick={handleGoogleLogin} 
         loading={loading || authLoading}
-        className="w-full"
+        className="w-full h-10"
       >
         Sign in with Google
       </GoogleAuthButton>
 
-      <div className="relative my-6">
+      <div className="relative my-4">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t border-mist-grey" />
         </div>
@@ -90,7 +90,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         onSubmit={handleSubmit}
       />
       
-      <div className="text-body-small text-graphite-grey space-y-3 pt-4">
+      <div className="text-sm text-graphite-grey space-y-2 pt-3">
         <div className="text-center">
           Don't have an account?{' '}
           <button 
