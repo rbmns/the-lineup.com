@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useEventForm } from '@/hooks/events/useEventForm.tsx';
 import { CreateVenueModal } from '@/components/venues/CreateVenueModal';
@@ -17,22 +16,27 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Event } from '@/types';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-
 interface EventFormProps {
   eventId?: string;
   isEditMode?: boolean;
   initialData?: Event;
 }
-
-export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = false, initialData }) => {
-  const { isAuthenticated, user, session } = useAuth();
+export const EventForm: React.FC<EventFormProps> = ({
+  eventId,
+  isEditMode = false,
+  initialData
+}) => {
+  const {
+    isAuthenticated,
+    user,
+    session
+  } = useAuth();
   const isMobile = useIsMobile();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [createdEventId, setCreatedEventId] = useState<string | null>(null);
   const [createdEventTitle, setCreatedEventTitle] = useState<string>('');
   const [pendingFormData, setPendingFormData] = useState<any>(null);
-  
   const {
     form,
     isSubmitting,
@@ -42,10 +46,10 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
     setCreateVenueModalOpen,
     handleVenueCreated,
     onSubmit: originalOnSubmit,
-    onInvalid,
-  } = useEventForm({ 
-    eventId, 
-    isEditMode, 
+    onInvalid
+  } = useEventForm({
+    eventId,
+    isEditMode,
     initialData,
     onEventCreated: (eventId: string, eventTitle: string) => {
       setCreatedEventId(eventId);
@@ -53,16 +57,23 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
       setShowSuccessModal(true);
     }
   });
-
-  const { register, handleSubmit, setValue, watch, formState: { errors }, control } = form;
-
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: {
+      errors
+    },
+    control
+  } = form;
   const handleFormSubmit = async (data: any) => {
     console.log("Form submit called with data:", data);
     console.log("Is authenticated:", isAuthenticated);
     console.log("User object:", user);
     console.log("Session object:", session);
     console.log("Is edit mode:", isEditMode);
-    
+
     // If editing an existing event, proceed normally
     if (isEditMode) {
       return originalOnSubmit(data);
@@ -70,7 +81,7 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
 
     // Check authentication using multiple indicators for reliability
     const isUserAuthenticated = isAuthenticated && user && session;
-    
+
     // If not authenticated, store form data and show auth modal (without redundant toast)
     if (!isUserAuthenticated) {
       console.log("User not authenticated, showing auth modal");
@@ -83,16 +94,13 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
     console.log("User authenticated, proceeding with submission");
     return originalOnSubmit(data);
   };
-
   const handleAuthSuccess = async () => {
     console.log("Auth success callback called");
     console.log("Current auth state - isAuthenticated:", isAuthenticated, "user:", user);
-    
     setShowAuthModal(false);
-    
     if (pendingFormData) {
       console.log("Submitting pending form data after auth success");
-      
+
       // Add a small delay to ensure auth state is fully propagated
       setTimeout(async () => {
         try {
@@ -104,37 +112,25 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
       }, 500);
     }
   };
-
   const handleAuthModalClose = () => {
     console.log("Auth modal closed without success");
     setShowAuthModal(false);
     setPendingFormData(null);
   };
-
-  return (
-    <>
+  return <>
       <Form {...form}>
         <form onSubmit={handleSubmit(handleFormSubmit, onInvalid)} className="space-y-8">
           {/* Required Fields Section */}
           <div className="form-section">
             <div className="form-section-header">
-              <h3 className="form-section-title">Event Details</h3>
-              <p className="form-section-description">
-                Tell people about your event
-              </p>
+              
+              
             </div>
             
             <TitleField register={register} errors={errors} />
             <DescriptionField register={register} errors={errors} />
             <DateTimeFields register={register} watch={watch} setValue={setValue} errors={errors} />
-            <VenueField 
-              watch={watch} 
-              setValue={setValue} 
-              errors={errors} 
-              venues={venues} 
-              isLoadingVenues={isLoadingVenues} 
-              onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)}
-            />
+            <VenueField watch={watch} setValue={setValue} errors={errors} venues={venues} isLoadingVenues={isLoadingVenues} onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)} />
             <CategoryToggleField watch={watch} setValue={setValue} errors={errors} />
             <VibeToggleField watch={watch} setValue={setValue} errors={errors} />
           </div>
@@ -148,54 +144,23 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
               </p>
             </div>
             
-            <OptionalFieldsSection 
-              register={register} 
-              errors={errors} 
-              control={control}
-              watch={watch}
-              setValue={setValue}
-            />
+            <OptionalFieldsSection register={register} errors={errors} control={control} watch={watch} setValue={setValue} />
           </div>
 
           {/* Submit Button */}
-          <div className={cn(
-            "pt-8 border-t border-mist-grey",
-            isMobile ? "pb-4" : "pb-0"
-          )}>
-            <Button 
-              type="submit" 
-              variant="primary"
-              disabled={isSubmitting}
-              className={cn(
-                isMobile ? "w-full" : "w-auto"
-              )}
-            >
+          <div className={cn("pt-8 border-t border-mist-grey", isMobile ? "pb-4" : "pb-0")}>
+            <Button type="submit" variant="primary" disabled={isSubmitting} className={cn(isMobile ? "w-full" : "w-auto")}>
               {isSubmitting ? "Publishing..." : isEditMode ? "Update Event" : "Publish Event"}
             </Button>
           </div>
         </form>
       </Form>
 
-      <CreateVenueModal 
-        open={isCreateVenueModalOpen}
-        onOpenChange={setCreateVenueModalOpen}
-        onComplete={handleVenueCreated}
-      />
+      <CreateVenueModal open={isCreateVenueModalOpen} onOpenChange={setCreateVenueModalOpen} onComplete={handleVenueCreated} />
 
-      <PrePublishAuthModal
-        open={showAuthModal}
-        onClose={handleAuthModalClose}
-        onSuccess={handleAuthSuccess}
-      />
+      <PrePublishAuthModal open={showAuthModal} onClose={handleAuthModalClose} onSuccess={handleAuthSuccess} />
 
-      <EventPublishedModal
-        open={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
-        eventId={createdEventId || undefined}
-        eventTitle={createdEventTitle}
-      />
-    </>
-  );
+      <EventPublishedModal open={showSuccessModal} onClose={() => setShowSuccessModal(false)} eventId={createdEventId || undefined} eventTitle={createdEventTitle} />
+    </>;
 };
-
 export default EventForm;
