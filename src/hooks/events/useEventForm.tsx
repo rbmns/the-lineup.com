@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, useEffect } from 'react';
 import { FormValues } from '@/components/events/form/EventFormTypes';
-import { EventFormSchema } from '@/components/events/form/EventFormSchema';
+import { EventSchema } from '@/components/events/form/EventFormSchema';
 import { Event, Venue } from '@/types';
 import { useVenues } from '@/hooks/useVenues';
 import { supabase } from '@/lib/supabase';
@@ -36,21 +36,22 @@ export const useEventForm = ({
   const [selectedVenueName, setSelectedVenueName] = useState<string>('');
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(EventFormSchema),
+    resolver: zodResolver(EventSchema),
     defaultValues: {
       title: initialData?.title || '',
       description: initialData?.description || '',
-      start_date: initialData?.start_date || '',
+      start_date: initialData?.start_date ? new Date(initialData.start_date) : new Date(),
       start_time: initialData?.start_time || '',
+      end_date: initialData?.end_date ? new Date(initialData.end_date) : new Date(),
       end_time: initialData?.end_time || '',
       venue_id: initialData?.venue_id || '',
       event_category: initialData?.event_category || '',
       vibe: initialData?.vibe || '',
       timezone: initialData?.timezone || 'Europe/Amsterdam',
       organizer_link: initialData?.organizer_link || '',
-      fee: initialData?.fee || '',
+      fee: typeof initialData?.fee === 'number' ? initialData.fee.toString() : (initialData?.fee || ''),
       booking_link: initialData?.booking_link || '',
-      tags: initialData?.tags || '',
+      tags: Array.isArray(initialData?.tags) ? initialData.tags.join(', ') : (initialData?.tags || ''),
       extra_info: initialData?.extra_info || ''
     }
   });
@@ -93,10 +94,12 @@ export const useEventForm = ({
     setIsSubmitting(true);
 
     try {
-      const slug = createSlug(data.title, data.start_date);
+      const slug = createSlug(data.title, data.start_date.toISOString().split('T')[0]);
       
       const eventData = {
         ...data,
+        start_date: data.start_date.toISOString().split('T')[0],
+        end_date: data.end_date.toISOString().split('T')[0],
         creator: user.id,
         created_by: user.id,
         slug,

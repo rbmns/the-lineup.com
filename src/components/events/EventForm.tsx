@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useEventForm } from '@/hooks/events/useEventForm.tsx';
 import { CreateVenueModal } from '@/components/venues/CreateVenueModal';
@@ -69,8 +70,7 @@ export const EventForm: React.FC<EventFormProps> = ({
     handleSubmit,
     setValue,
     watch,
-    formState: { errors },
-    control
+    formState: { errors }
   } = form;
 
   const handleFormSubmit = async (data: any) => {
@@ -200,7 +200,7 @@ export const EventForm: React.FC<EventFormProps> = ({
           <div className="space-y-6">
             <OptionalFieldsSection 
               errors={errors} 
-              control={control} 
+              control={form.control} 
               watch={watch} 
               setValue={setValue} 
             />
