@@ -1,4 +1,3 @@
-
 import { Event } from '@/types';
 import { EVENT_CATEGORIES, EVENT_VIBES } from '@/utils/categorySystem';
 
@@ -17,6 +16,7 @@ export type FormValues = {
   extra_info: string;
   tags: string;
   vibe?: string;
+  timezone: string;
 };
 
 export type SafeEventData = {
@@ -38,6 +38,7 @@ export type SafeEventData = {
   slug?: string;
   vibe?: string | null;
   created_by?: string;
+  timezone?: string | null;
 };
 
 export interface EventFormProps {

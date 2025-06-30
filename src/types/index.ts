@@ -79,6 +79,7 @@ export interface Event {
   created_by?: string;
   formattedDate?: string;
   formattedTime?: string;
+  timezone?: string | null;
 }
 
 export interface EventRsvp {
