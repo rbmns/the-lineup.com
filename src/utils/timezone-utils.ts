@@ -1,4 +1,3 @@
-
 import { formatInTimeZone, toZonedTime, fromZonedTime } from 'date-fns-tz';
 import { parseISO, format } from 'date-fns';
 
@@ -7,6 +6,24 @@ import { parseISO, format } from 'date-fns';
  */
 export const getUserTimezone = (): string => {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
+};
+
+/**
+ * Get timezone abbreviation for display
+ */
+export const getTimezoneAbbreviation = (timezone: string): string => {
+  try {
+    const date = new Date();
+    const formatter = new Intl.DateTimeFormat('en', {
+      timeZone: timezone,
+      timeZoneName: 'short'
+    });
+    const parts = formatter.formatToParts(date);
+    const timeZonePart = parts.find(part => part.type === 'timeZoneName');
+    return timeZonePart?.value || timezone.split('/').pop() || timezone;
+  } catch (error) {
+    return timezone.split('/').pop() || timezone;
+  }
 };
 
 /**
@@ -27,14 +44,14 @@ export const formatEventTime = (
       return timeStr.substring(0, 5);
     }
     
-    // Create a proper datetime string in the event's timezone
+    // Create a date object representing the event time in the event's timezone
     const eventDateTimeStr = `${dateStr}T${timeStr}:00`;
-    
-    // Parse the datetime and treat it as being in the event timezone
     const eventDateTime = parseISO(eventDateTimeStr);
+    
+    // Treat this datetime as being in the event timezone
     const eventInEventTz = toZonedTime(eventDateTime, eventTimezone);
     
-    // Convert from event timezone to UTC, then to viewer timezone
+    // Convert to UTC first, then to viewer timezone
     const utcTime = fromZonedTime(eventInEventTz, eventTimezone);
     
     // Format in viewer's timezone
@@ -43,6 +60,22 @@ export const formatEventTime = (
     console.error('Error formatting event time:', error, { dateStr, timeStr, eventTimezone, displayTimezone });
     return timeStr.substring(0, 5); // Fallback to original time
   }
+};
+
+/**
+ * Format event time with timezone abbreviation
+ */
+export const formatEventTimeWithTimezone = (
+  dateStr: string,
+  timeStr: string,
+  eventTimezone: string = 'Europe/Amsterdam',
+  displayTimezone?: string
+): string => {
+  const viewerTimezone = displayTimezone || getUserTimezone();
+  const formattedTime = formatEventTime(dateStr, timeStr, eventTimezone, displayTimezone);
+  const tzAbbr = getTimezoneAbbreviation(viewerTimezone);
+  
+  return `${formattedTime} ${tzAbbr}`;
 };
 
 /**
@@ -92,7 +125,7 @@ export const formatEventCardDateTime = (
       return datePart;
     }
     
-    const timePart = formatEventTime(startDate, startTime, eventTimezone, viewerTimezone);
+    const timePart = formatEventTimeWithTimezone(startDate, startTime, eventTimezone, viewerTimezone);
     return `${datePart}, ${timePart}`;
   } catch (error) {
     console.error('Error formatting event card date-time:', error);

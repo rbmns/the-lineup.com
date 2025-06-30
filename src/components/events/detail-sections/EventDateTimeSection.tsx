@@ -1,8 +1,9 @@
 
+
 import { useMemo } from 'react';
 import { Calendar } from 'lucide-react';
 import { formatDistanceToNow, parseISO } from 'date-fns';
-import { formatEventTime, formatEventDate, createEventDateTime, getUserTimezone } from '@/utils/timezone-utils';
+import { formatEventTimeWithTimezone, formatEventDate, createEventDateTime, getUserTimezone, getTimezoneAbbreviation } from '@/utils/timezone-utils';
 
 interface EventDateTimeSectionProps {
   startTime?: string;
@@ -19,15 +20,17 @@ export const EventDateTimeSection = ({
 }: EventDateTimeSectionProps) => {
   
   const viewerTimezone = getUserTimezone();
+  const viewerTzAbbr = getTimezoneAbbreviation(viewerTimezone);
+  const eventTzAbbr = getTimezoneAbbreviation(timezone);
   
   // Format time range for detail view in viewer's timezone
   const formattedTimeRange = useMemo(() => {
     if (!startTime || !startDate) return '';
-    if (!endTime) return formatEventTime(startDate, startTime, timezone, viewerTimezone);
+    if (!endTime) return formatEventTimeWithTimezone(startDate, startTime, timezone, viewerTimezone);
     
     try {
-      const startFormatted = formatEventTime(startDate, startTime, timezone, viewerTimezone);
-      const endFormatted = formatEventTime(startDate, endTime, timezone, viewerTimezone);
+      const startFormatted = formatEventTimeWithTimezone(startDate, startTime, timezone, viewerTimezone);
+      const endFormatted = formatEventTimeWithTimezone(startDate, endTime, timezone, viewerTimezone);
       return `${startFormatted} - ${endFormatted}`;
     } catch (error) {
       console.error('Error formatting time range:', error);
@@ -101,10 +104,11 @@ export const EventDateTimeSection = ({
         )}
         {timezone !== viewerTimezone && (
           <p className="text-xs text-gray-500 mt-1">
-            Event timezone: {timezone}
+            Event timezone: {eventTzAbbr} • Your timezone: {viewerTzAbbr}
           </p>
         )}
       </div>
     </div>
   );
 };
+
