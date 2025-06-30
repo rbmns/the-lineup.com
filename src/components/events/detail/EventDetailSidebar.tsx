@@ -2,9 +2,8 @@
 import React from 'react';
 import { Event } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Calendar, Clock, Users, ExternalLink, Info } from 'lucide-react';
-import { formatInTimeZone } from 'date-fns-tz';
-import { AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
+import { MapPin, Users, ExternalLink, Info, Ticket, Globe, CalendarClock } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 interface EventDetailSidebarProps {
   event: Event;
@@ -17,46 +16,16 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
   attendees,
   isAuthenticated
 }) => {
-  const formatDateTime = (dateStr?: string | null, timeStr?: string | null) => {
-    if (!dateStr || !timeStr) return null;
-    try {
-      const dateTime = new Date(`${dateStr}T${timeStr}`);
-      return formatInTimeZone(dateTime, AMSTERDAM_TIMEZONE, 'PPP p');
-    } catch (error) {
-      return null;
-    }
-  };
-
-  const startDateTime = formatDateTime(event.start_date, event.start_time);
-  const endDateTime = formatDateTime(event.start_date, event.end_time);
+  const hasFee = typeof event.fee === 'number' && event.fee > 0;
+  const hasBookingLink = !!event.booking_link;
+  const hasOrganizerLink = !!event.organizer_link;
+  const hasExtraInfo = !!event.extra_info;
+  
+  // Check if we have any booking info to display
+  const showBookingInfo = hasFee || hasBookingLink || hasOrganizerLink || hasExtraInfo;
 
   return (
     <div className="space-y-6">
-      {/* Date & Time */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm font-semibold flex items-center gap-2 text-graphite-grey">
-            <Calendar className="h-4 w-4 text-ocean-teal" />
-            Date & Time
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="text-sm space-y-1">
-            {startDateTime && (
-              <div className="flex items-start gap-2">
-                <Clock className="h-3 w-3 text-gray-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p>{startDateTime}</p>
-                  {endDateTime && endDateTime !== startDateTime && (
-                    <p className="text-gray-500">Until {endDateTime}</p>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Location */}
       {(event.venues || event.location) && (
         <Card>
@@ -76,9 +45,90 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
                     {event.venues.city}
                     {event.venues.postal_code && ` ${event.venues.postal_code}`}
                   </p>
+                  {event.venues.google_maps && (
+                    <a
+                      href={event.venues.google_maps}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-ocean-teal hover:text-ocean-teal/80 transition-colors mt-2"
+                    >
+                      View on map
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  )}
                 </div>
               ) : (
                 <p>{event.location}</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Booking Information */}
+      {showBookingInfo && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2 text-graphite-grey">
+              <Info className="h-4 w-4 text-ocean-teal" />
+              Booking Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="text-sm space-y-3">
+              {hasFee && (
+                <div className="flex items-start gap-2">
+                  <Ticket className="h-3 w-3 text-gray-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium">Entry fee</p>
+                    <p className="text-gray-600">€{event.fee}</p>
+                  </div>
+                </div>
+              )}
+
+              {hasBookingLink && (
+                <div className="flex items-start gap-2">
+                  <CalendarClock className="h-3 w-3 text-gray-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium">Booking required</p>
+                    <a
+                      href={event.booking_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-ocean-teal hover:text-ocean-teal/80 transition-colors"
+                    >
+                      Book tickets
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              {hasOrganizerLink && (
+                <div className="flex items-start gap-2">
+                  <Globe className="h-3 w-3 text-gray-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium">Organizer website</p>
+                    <a
+                      href={event.organizer_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-ocean-teal hover:text-ocean-teal/80 transition-colors"
+                    >
+                      {new URL(event.organizer_link).hostname.replace('www.', '')}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              {hasExtraInfo && (
+                <>
+                  {(hasFee || hasBookingLink || hasOrganizerLink) && <Separator className="my-2" />}
+                  <div>
+                    <p className="text-gray-600">{event.extra_info}</p>
+                  </div>
+                </>
               )}
             </div>
           </CardContent>
@@ -104,36 +154,6 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
                 <span>Interested</span>
                 <span className="font-medium">{attendees.interested.length}</span>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Booking Information */}
-      {(event.booking_link || event.extra_info) && (
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-semibold flex items-center gap-2 text-graphite-grey">
-              <Info className="h-4 w-4 text-ocean-teal" />
-              Booking Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="text-sm space-y-3">
-              {event.extra_info && (
-                <p>{event.extra_info}</p>
-              )}
-              {event.booking_link && (
-                <a
-                  href={event.booking_link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-ocean-teal hover:text-ocean-teal/80 transition-colors"
-                >
-                  Book tickets
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              )}
             </div>
           </CardContent>
         </Card>
