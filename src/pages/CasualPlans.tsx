@@ -28,14 +28,14 @@ const CasualPlans = () => {
   // For non-authenticated users, show improved login prompt
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-sand flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-pure-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md">
           {/* Welcome Header */}
           <div className="text-center mb-8">
-            <h1 className="text-h2 font-display text-ocean-deep mb-6">
+            <h1 className="text-h2 font-montserrat text-graphite-grey mb-6">
               Casual Plans
             </h1>
-            <p className="text-body-base text-graphite-grey mb-4">
+            <p className="text-body-base text-graphite-grey/80 font-lato mb-4">
               Spontaneous meetups and activities with fellow travelers
             </p>
             <div className="flex justify-center items-center gap-4 text-xl opacity-60">
@@ -45,15 +45,15 @@ const CasualPlans = () => {
             </div>
           </div>
 
-          <Card className="card-base">
+          <Card className="bg-pure-white border border-mist-grey shadow-lg">
             <CardHeader className="text-center pb-6">
               <div className={`bg-ocean-teal/10 rounded-full flex items-center justify-center mx-auto mb-4 ${isMobile ? 'w-12 h-12' : 'w-16 h-16'}`}>
-                <span className={isMobile ? 'text-xl' : 'text-2xl'}>🏖️</span>
+                <span className={`${isMobile ? 'text-xl' : 'text-2xl'} text-ocean-teal`}>🏖️</span>
               </div>
-              <CardTitle className={`text-ocean-deep mb-2 ${isMobile ? 'text-lg' : 'text-h4'}`}>
+              <CardTitle className={`text-graphite-grey mb-2 font-montserrat ${isMobile ? 'text-lg' : 'text-xl'}`}>
                 Join the community
               </CardTitle>
-              <CardDescription className={`text-graphite-grey/80 ${isMobile ? 'text-xs' : 'text-body-small'}`}>
+              <CardDescription className={`text-graphite-grey/80 font-lato ${isMobile ? 'text-xs' : 'text-sm'}`}>
                 Sign up to view locations, times, and connect with other members creating casual plans.
               </CardDescription>
             </CardHeader>
@@ -61,7 +61,7 @@ const CasualPlans = () => {
               <div className="space-y-3">
                 <Button 
                   onClick={() => navigate('/signup')}
-                  className="w-full btn-primary"
+                  className="w-full bg-ocean-teal hover:bg-ocean-teal/90 text-pure-white font-montserrat"
                   size={isMobile ? "default" : "lg"}
                 >
                   Sign Up
@@ -69,7 +69,7 @@ const CasualPlans = () => {
                 <Button 
                   onClick={() => navigate('/login')} 
                   variant="outline"
-                  className="w-full btn-outline"
+                  className="w-full border-ocean-teal text-ocean-teal hover:bg-ocean-teal hover:text-pure-white font-montserrat"
                   size={isMobile ? "default" : "lg"}
                 >
                   Log In
@@ -88,16 +88,16 @@ const CasualPlans = () => {
       {/* Header Section - Optimized for mobile above the fold */}
       <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-8' : 'py-12 sm:py-16'}`}>
         <div className="text-center">
-          <h1 className={`font-bold text-ocean-deep mb-4 leading-tight ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
+          <h1 className={`font-bold text-graphite-grey mb-4 leading-tight font-montserrat ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
             Casual <span className="text-ocean-teal">Plans</span>
           </h1>
-          <p className={`text-graphite-grey max-w-3xl mx-auto leading-relaxed ${isMobile ? 'text-base mb-6' : 'text-lg sm:text-xl mb-6'}`}>
+          <p className={`text-graphite-grey/80 max-w-3xl mx-auto leading-relaxed font-lato ${isMobile ? 'text-base mb-6' : 'text-lg sm:text-xl mb-6'}`}>
             Spontaneous meetups and activities with fellow travelers
           </p>
           
           <Button 
             onClick={() => navigate('/casual-plans/create')}
-            className="btn-primary"
+            className="bg-ocean-teal hover:bg-ocean-teal/90 text-pure-white font-montserrat"
           >
             <Plus className="h-4 w-4 mr-2" />
             Create Plan
@@ -132,15 +132,15 @@ const CasualPlans = () => {
             ) : (
               <div className="text-center py-12">
                 <div className="text-4xl sm:text-6xl mb-4">🏖️</div>
-                <h3 className="text-lg sm:text-xl font-medium text-ocean-deep mb-2">
+                <h3 className="text-lg sm:text-xl font-medium text-graphite-grey mb-2 font-montserrat">
                   No casual plans yet
                 </h3>
-                <p className="text-graphite-grey/80 mb-4 text-sm sm:text-base">
+                <p className="text-graphite-grey/80 mb-4 text-sm sm:text-base font-lato">
                   Be the first to create a spontaneous meetup!
                 </p>
                 <Button 
                   onClick={() => navigate('/casual-plans/create')}
-                  className="btn-primary"
+                  className="bg-ocean-teal hover:bg-ocean-teal/90 text-pure-white font-montserrat"
                 >
                   <Plus className="h-4 w-4 mr-2" />
                   Create Your First Plan

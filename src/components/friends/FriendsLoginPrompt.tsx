@@ -12,15 +12,15 @@ export const FriendsLoginPrompt: React.FC = () => {
   return (
     <div className={`container mx-auto px-4 ${isMobile ? 'py-2' : 'py-4'}`}>
       <div className="max-w-md mx-auto">
-        <Card className="card-base">
+        <Card className="bg-pure-white border border-mist-grey shadow-lg">
           <CardHeader className="text-center pb-6">
             <div className={`bg-ocean-teal/10 rounded-full flex items-center justify-center mx-auto mb-4 ${isMobile ? 'w-12 h-12' : 'w-16 h-16'}`}>
-              <span className={isMobile ? 'text-xl' : 'text-2xl'}>👥</span>
+              <span className={`${isMobile ? 'text-xl' : 'text-2xl'} text-ocean-teal`}>👥</span>
             </div>
-            <CardTitle className={`text-ocean-deep mb-2 ${isMobile ? 'text-lg' : 'text-h4'}`}>
+            <CardTitle className={`text-graphite-grey mb-2 font-montserrat ${isMobile ? 'text-lg' : 'text-xl'}`}>
               Connect with your crew
             </CardTitle>
-            <CardDescription className={`text-graphite-grey/80 ${isMobile ? 'text-xs' : 'text-body-small'}`}>
+            <CardDescription className={`text-graphite-grey/80 font-lato ${isMobile ? 'text-xs' : 'text-sm'}`}>
               Sign up to see what your friends are up to and discover events together.
             </CardDescription>
           </CardHeader>
@@ -28,7 +28,7 @@ export const FriendsLoginPrompt: React.FC = () => {
             <div className="space-y-3">
               <Button 
                 onClick={() => navigate('/signup')} 
-                className="w-full btn-primary"
+                className="w-full bg-ocean-teal hover:bg-ocean-teal/90 text-pure-white font-montserrat"
                 size={isMobile ? "default" : "lg"}
               >
                 Sign Up
@@ -36,7 +36,7 @@ export const FriendsLoginPrompt: React.FC = () => {
               <Button 
                 onClick={() => navigate('/login')} 
                 variant="outline"
-                className="w-full btn-outline"
+                className="w-full border-ocean-teal text-ocean-teal hover:bg-ocean-teal hover:text-pure-white font-montserrat"
                 size={isMobile ? "default" : "lg"}
               >
                 Log In

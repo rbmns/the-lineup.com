@@ -24,14 +24,14 @@ const Friends: React.FC = () => {
   // If user is not authenticated, show the login prompt with improved styling
   if (!user) {
     return (
-      <div className="min-h-screen bg-sand flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-pure-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md">
           {/* Welcome Header */}
           <div className="text-center mb-8">
-            <h1 className="text-h2 font-display text-ocean-deep mb-6">
+            <h1 className="text-h2 font-montserrat text-graphite-grey mb-6">
               Connect with Friends
             </h1>
-            <p className="text-body-base text-graphite-grey mb-4">
+            <p className="text-body-base text-graphite-grey/80 font-lato mb-4">
               See what your friends are up to and discover events together
             </p>
             <div className="flex justify-center items-center gap-4 text-xl opacity-60">
@@ -53,10 +53,10 @@ const Friends: React.FC = () => {
       {/* Header Section */}
       <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-4' : 'py-8 sm:py-12'}`}>
         <div className="text-center">
-          <h1 className={`font-bold text-ocean-deep mb-4 leading-tight ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
+          <h1 className={`font-bold text-graphite-grey mb-4 leading-tight font-montserrat ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
             Your <span className="text-ocean-teal">crew</span>
           </h1>
-          <p className={`text-graphite-grey max-w-3xl mx-auto leading-relaxed mb-6 ${isMobile ? 'text-base' : 'text-lg sm:text-xl'}`}>
+          <p className={`text-graphite-grey/80 max-w-3xl mx-auto leading-relaxed mb-6 font-lato ${isMobile ? 'text-base' : 'text-lg sm:text-xl'}`}>
             See what your friends are up to and discover events together.
           </p>
         </div>
