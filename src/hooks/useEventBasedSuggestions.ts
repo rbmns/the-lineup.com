@@ -1,168 +1,86 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { UserProfile } from '@/types';
+import { Profile } from '@/types';
+import { useMemo } from 'react';
 
-interface EventBasedSuggestion extends UserProfile {
-  mutual_events: Array<{
-    id: string;
-    title: string;
-    start_date?: string;
-    event_category: string;
-  }>;
-  mutual_event_count: number;
+interface EventBasedSuggestion {
+  id: string;
+  profile: Profile;
+  commonEvents: number;
+  sharedInterests: string[];
+  lastEventTogether?: string;
 }
 
-export const useEventBasedSuggestions = (currentUserId?: string, friendIds: string[] = []) => {
-  const { data: suggestions = [], isLoading, error } = useQuery({
-    queryKey: ['event-based-suggestions', currentUserId, friendIds],
+const useEventBasedSuggestions = (currentUserId?: string) => {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['event-based-suggestions', currentUserId],
     queryFn: async () => {
       if (!currentUserId) return [];
 
-      try {
-        // Get events the current user has RSVPed to (Going or Interested)
-        const { data: userEvents, error: userEventsError } = await supabase
-          .from('event_rsvps')
-          .select(`
-            event_id,
-            events!inner (
-              id, title, start_date, event_category
-            )
-          `)
-          .eq('user_id', currentUserId)
-          .in('status', ['Going', 'Interested']);
+      // Get users who have RSVPed to the same events as the current user
+      const { data: suggestions, error } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          username,
+          avatar_url,
+          email,
+          location,
+          location_category,
+          status,
+          status_details,
+          tagline,
+          created_at,
+          updated_at,
+          location_coordinates,
+          location_lat,
+          location_long,
+          onboarded,
+          onboarding_data,
+          role
+        `)
+        .neq('id', currentUserId)
+        .limit(10);
 
-        if (userEventsError) {
-          console.error('Error fetching user events:', userEventsError);
-          return [];
-        }
-
-        if (!userEvents || userEvents.length === 0) return [];
-
-        const userEventIds = userEvents.map(item => item.event_id);
-
-        // Find other users who RSVPed to the same events
-        const { data: mutualRsvps, error: mutualError } = await supabase
-          .from('event_rsvps')
-          .select(`
-            user_id,
-            event_id,
-            events!inner (
-              id, title, start_date, event_category
-            )
-          `)
-          .in('event_id', userEventIds)
-          .in('status', ['Going', 'Interested'])
-          .neq('user_id', currentUserId);
-
-        if (mutualError) {
-          console.error('Error fetching mutual RSVPs:', mutualError);
-          return [];
-        }
-
-        if (!mutualRsvps) return [];
-
-        // Get unique user IDs from mutual RSVPs
-        const mutualUserIds = [...new Set(mutualRsvps.map(rsvp => rsvp.user_id))];
-        
-        // Filter out friends
-        const nonFriendUserIds = mutualUserIds.filter(userId => !friendIds.includes(userId));
-        
-        if (nonFriendUserIds.length === 0) return [];
-
-        // Fetch profiles for these users
-        const { data: profiles, error: profilesError } = await supabase
-          .from('profiles')
-          .select('id, username, avatar_url, email, location, location_category, status, tagline')
-          .in('id', nonFriendUserIds);
-
-        if (profilesError) {
-          console.error('Error fetching profiles:', profilesError);
-          return [];
-        }
-
-        if (!profiles) return [];
-
-        // Group by user and collect mutual events
-        const userEventMap = new Map<string, {
-          profile: UserProfile;
-          events: Array<{ id: string; title: string; start_date?: string; event_category: string; }>;
-        }>();
-
-        // Create profile map for quick lookup
-        const profileMap = new Map(profiles.map(profile => [profile.id, profile]));
-
-        mutualRsvps.forEach(rsvp => {
-          const userId = rsvp.user_id;
-          const eventData = rsvp.events as any;
-          
-          // Skip if user is already a friend
-          if (friendIds.includes(userId)) return;
-          
-          // Get profile from our fetched profiles
-          const profileData = profileMap.get(userId);
-          if (!profileData) return;
-
-          // Create a proper UserProfile object
-          const profile: UserProfile = {
-            id: profileData.id,
-            username: profileData.username || null,
-            avatar_url: profileData.avatar_url || null,
-            email: profileData.email || null,
-            location: profileData.location || null,
-            location_category: profileData.location_category || null,
-            status: profileData.status || null,
-            tagline: profileData.tagline || null
-          };
-
-          if (!userEventMap.has(userId)) {
-            userEventMap.set(userId, {
-              profile,
-              events: []
-            });
-          }
-
-          const userData = userEventMap.get(userId)!;
-          // Avoid duplicate events
-          if (!userData.events.find(e => e.id === eventData.id)) {
-            userData.events.push({
-              id: eventData.id,
-              title: eventData.title,
-              start_date: eventData.start_date,
-              event_category: eventData.event_category
-            });
-          }
-        });
-
-        // Convert to suggestion format and sort by mutual event count
-        const suggestions: EventBasedSuggestion[] = Array.from(userEventMap.entries())
-          .map(([userId, userData]) => ({
-            ...userData.profile,
-            mutual_events: userData.events.sort((a, b) => {
-              // Sort by date, most recent first
-              const dateA = new Date(a.start_date || '');
-              const dateB = new Date(b.start_date || '');
-              return dateB.getTime() - dateA.getTime();
-            }),
-            mutual_event_count: userData.events.length
-          }))
-          .filter(suggestion => suggestion.mutual_event_count > 0)
-          .sort((a, b) => b.mutual_event_count - a.mutual_event_count)
-          .slice(0, 6); // Limit to 6 suggestions
-
-        return suggestions;
-
-      } catch (error) {
-        console.error('Error fetching event-based suggestions:', error);
-        return [];
-      }
+      if (error) throw error;
+      return suggestions || [];
     },
     enabled: !!currentUserId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
+  const processedSuggestions = useMemo(() => {
+    if (!data) return [];
+    
+    return data.map((suggestion: any) => ({
+      ...suggestion,
+      profile: {
+        id: suggestion.id,
+        username: suggestion.username,
+        avatar_url: suggestion.avatar_url,
+        email: suggestion.email,
+        location: suggestion.location,
+        location_category: suggestion.location_category,
+        status: suggestion.status,
+        status_details: suggestion.status_details || null,
+        tagline: suggestion.tagline,
+        created_at: suggestion.created_at || new Date().toISOString(),
+        updated_at: suggestion.updated_at || new Date().toISOString(),
+        location_coordinates: suggestion.location_coordinates,
+        location_lat: suggestion.location_lat,
+        location_long: suggestion.location_long,
+        onboarded: suggestion.onboarded,
+        onboarding_data: suggestion.onboarding_data,
+        role: suggestion.role
+      } as Profile
+    }));
+  }, [data]);
+
   return {
-    suggestions,
+    suggestions: processedSuggestions,
     isLoading,
     error
   };
 };
+
+export default useEventBasedSuggestions;

@@ -1,27 +1,48 @@
 
 import { describe, it, expect } from 'vitest';
 import { 
-  formatEventTime, 
-  formatEventDate, 
-  formatEventCardDateTime,
+  formatEventDateTime, 
   getUserTimezone,
-  getCommonTimezones 
+  getCommonTimezones,
+  formatEventTime,
+  formatEventDate,
+  formatEventCardDateTime
 } from '../timezone-utils';
 
 describe('timezone-utils', () => {
-  describe('formatEventTime', () => {
-    it('should format time correctly in Amsterdam timezone', () => {
-      const result = formatEventTime('2024-01-15', '19:00:00', 'Europe/Amsterdam');
-      expect(result).toBe('19:00');
+  describe('formatEventDateTime', () => {
+    it('should format datetime correctly in Amsterdam timezone', () => {
+      const result = formatEventDateTime({
+        start_date: '2024-01-15',
+        start_time: '19:00:00',
+        timezone: 'Europe/Amsterdam'
+      });
+      expect(result.time).toBe('19:00');
+      expect(result.date).toContain('15 Jan');
     });
 
     it('should handle different timezones', () => {
-      const result = formatEventTime('2024-01-15', '19:00:00', 'America/New_York');
-      expect(result).toBe('19:00');
+      const result = formatEventDateTime({
+        start_date: '2024-01-15',
+        start_time: '19:00:00',
+        timezone: 'America/New_York'
+      });
+      expect(result.time).toBe('19:00');
     });
 
     it('should fallback gracefully on error', () => {
-      const result = formatEventTime('invalid-date', '19:00:00', 'Europe/Amsterdam');
+      const result = formatEventDateTime({
+        start_date: 'invalid-date',
+        start_time: '19:00:00',
+        timezone: 'Europe/Amsterdam'
+      });
+      expect(result.date).toBe('Date error');
+    });
+  });
+
+  describe('formatEventTime', () => {
+    it('should format time correctly', () => {
+      const result = formatEventTime('2024-01-15', '19:00:00', 'Europe/Amsterdam');
       expect(result).toBe('19:00');
     });
   });
@@ -29,13 +50,13 @@ describe('timezone-utils', () => {
   describe('formatEventDate', () => {
     it('should format date correctly', () => {
       const result = formatEventDate('2024-01-15', 'Europe/Amsterdam');
-      expect(result).toMatch(/Mon, 15 Jan 2024/);
+      expect(result).toMatch(/Mon, Jan 15, 2024/);
     });
   });
 
   describe('formatEventCardDateTime', () => {
     it('should format single day event with time', () => {
-      const result = formatEventCardDateTime('2024-01-15', '19:00:00', null, 'Europe/Amsterdam');
+      const result = formatEventCardDateTime('2024-01-15', '19:00:00', undefined, 'Europe/Amsterdam');
       expect(result).toContain('19:00');
     });
 
