@@ -28,31 +28,31 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-sand flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-secondary-25 to-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md">
         {/* Welcome Header */}
         <div className="text-center mb-8">
-          <h1 className="text-h2 font-display text-ocean-deep mb-6">
-            Welcome Back
+          <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4">
+            Sign in to your account
           </h1>
-          <p className="text-body-base text-graphite-grey mb-4">
-            Sign in to your account to continue
+          <p className="text-lg auth-subtext">
+            Ready to find your next adventure?
           </p>
-          <div className="flex justify-center items-center gap-4 text-xl opacity-60">
+          <div className="flex justify-center items-center gap-4 text-xl opacity-60 mt-4">
             <span>🌊</span>
             <span>🎯</span>
             <span>✨</span>
           </div>
         </div>
 
-        <Card className="card-base">
-          <CardHeader className="text-center pb-6">
-            <CardTitle className="text-h4 text-ocean-deep mb-2">Sign In</CardTitle>
-            <CardDescription className="text-body-small text-graphite-grey/80">
-              Enter your credentials to access your account
+        <Card className="auth-container border-0 shadow-lg">
+          <CardHeader className="space-y-1 text-center">
+            <CardTitle className="auth-heading text-2xl">Sign In</CardTitle>
+            <CardDescription className="auth-subtext">
+              Sign in to your account to continue
             </CardDescription>
           </CardHeader>
-          <CardContent className="px-6 pb-6">
+          <CardContent className="space-y-4">
             <LoginForm 
               onToggleMode={handleToggleMode}
               onForgotPassword={handleForgotPassword}
