@@ -1,51 +1,44 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
 
 interface AuthOverlayProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title?: string;
-  description?: string;
-  children?: React.ReactNode;
+  title: string;
+  description: string;
+  children: React.ReactNode;
   browseEventsButton?: boolean;
-  onBrowseEvents?: () => void;
+  onClose?: () => void; // to dismiss overlay
+  onBrowseEvents?: () => void; // callback for browse events
 }
 
 export const AuthOverlay: React.FC<AuthOverlayProps> = ({
-  isOpen,
-  onClose,
-  title = "Join The Lineup",
-  description = "Sign up or log in to access all features and connect with your community.",
+  title,
+  description,
   children,
   browseEventsButton = false,
+  onClose,
   onBrowseEvents
 }) => {
   const navigate = useNavigate();
 
-  if (!isOpen) return null;
-
   const handleLogin = () => {
-    onClose();
+    if (onClose) onClose();
     // Use setTimeout to let overlay unmount before navigating
     setTimeout(() => navigate('/login'), 0);
   };
 
   const handleSignup = () => {
-    onClose();
+    if (onClose) onClose();
     setTimeout(() => navigate('/signup'), 0);
   };
 
   return (
     <div className="relative min-h-screen">
       {/* Background content - greyed out and non-interactive */}
-      {children && (
-        <div className="opacity-30 pointer-events-none">
-          {children}
-        </div>
-      )}
+      <div className="opacity-30 pointer-events-none">
+        {children}
+      </div>
       {/* Overlay */}
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
         <Card className="w-full max-w-md mx-auto bg-white">

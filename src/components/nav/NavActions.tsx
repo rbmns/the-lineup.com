@@ -5,23 +5,20 @@ import { CreateEventButton } from './CreateEventButton';
 import UserMenu from './UserMenu';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { cn } from '@/lib/utils';
 
 interface NavActionsProps {
   onAuthRequired: () => void;
   showCreateButton?: boolean;
-  className?: string;
 }
 
 export const NavActions: React.FC<NavActionsProps> = ({ 
   onAuthRequired, 
-  showCreateButton = false,
-  className
+  showCreateButton = false 
 }) => {
   const { user, profile, signOut } = useAuth();
 
   return (
-    <div className={cn("flex items-center space-x-2", className)}>
+    <div className="flex items-center space-x-2">
       {user ? (
         <>
           {showCreateButton && <CreateEventButton onAuthRequired={onAuthRequired} />}

@@ -6,7 +6,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card } from '@/components/ui/card';
 import { StatusBadgeRenderer } from './StatusBadgeRenderer';
 import { navigateToUserProfile } from '@/utils/navigationUtils';
-import { MapPin } from 'lucide-react';
 
 interface FriendCardProps {
   friend: UserProfile;
@@ -32,30 +31,27 @@ export const FriendCard: React.FC<FriendCardProps> = ({ friend }) => {
   };
 
   return (
-    <Card className="card-base cursor-pointer hover-lift transition-smooth" onClick={handleCardClick}>
+    <Card className="p-4 cursor-pointer hover:shadow-md transition-shadow" onClick={handleCardClick}>
       <div className="flex items-center space-x-4">
         <Avatar className="h-12 w-12">
           <AvatarImage src={getAvatarUrl() || undefined} />
-          <AvatarFallback className="bg-mist-grey text-graphite-grey font-montserrat">{getInitials(friend.username)}</AvatarFallback>
+          <AvatarFallback>{getInitials(friend.username)}</AvatarFallback>
         </Avatar>
         
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-h4 font-montserrat text-graphite-grey truncate hover:text-ocean-teal transition-colors">
+            <h3 className="font-medium text-gray-900 truncate hover:text-purple-700">
               {friend.username || 'Unknown User'}
             </h3>
             <StatusBadgeRenderer status={friend.status} />
           </div>
           
           {friend.location && (
-            <div className="flex items-center text-small text-graphite-grey font-lato opacity-75 truncate mb-1">
-              <MapPin className="h-3 w-3 mr-1 text-ocean-teal flex-shrink-0" />
-              <span className="truncate">{friend.location}</span>
-            </div>
+            <p className="text-sm text-gray-500 truncate">{friend.location}</p>
           )}
           
           {friend.tagline && (
-            <p className="text-small text-graphite-grey font-lato opacity-75 truncate">{friend.tagline}</p>
+            <p className="text-sm text-gray-600 truncate mt-1">{friend.tagline}</p>
           )}
         </div>
       </div>
