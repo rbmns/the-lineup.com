@@ -101,7 +101,8 @@ export const createVenue = async (venueData: CreateVenueFormValues): Promise<{ d
       street: venueData.street || null,
       city: venueData.city || null,
       postal_code: venueData.postal_code || null,
-      description: venueData.description || null,
+      website: venueData.website || null,
+      google_maps: venueData.google_maps || null,
       creator_id: null // Allow null for non-authenticated users
     };
 
@@ -145,7 +146,14 @@ export const updateVenue = async (id: string, venueData: CreateVenueFormValues):
   try {
     const { data, error } = await supabase
       .from('venues')
-      .update(venueData)
+      .update({
+        name: venueData.name,
+        street: venueData.street || null,
+        city: venueData.city || null,
+        postal_code: venueData.postal_code || null,
+        website: venueData.website || null,
+        google_maps: venueData.google_maps || null,
+      })
       .eq('id', id)
       .select()
       .single();
