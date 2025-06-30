@@ -26,16 +26,18 @@ export const EventGrid: React.FC<EventGridProps> = ({
   return (
     <div
       className={cn(
-        // Using design system grid layout
-        "grid gap-4 sm:gap-6 w-full",
-        // Responsive grid using design system breakpoints
+        // Grid layout with consistent heights
+        "grid gap-6 w-full",
+        // Responsive grid columns
         "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4",
+        // Ensure equal row heights
+        "auto-rows-fr",
         className
       )}
       style={style}
     >
       {events.map((event) => (
-        <div key={event.id} data-event-id={event.id} className="w-full min-w-0 h-full">
+        <div key={event.id} data-event-id={event.id} className="w-full h-full">
           <EventCard 
             event={event} 
             onRsvp={onRsvp}

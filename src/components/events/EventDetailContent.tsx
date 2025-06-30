@@ -29,36 +29,45 @@ const EventDetailContent = ({
 }: EventDetailContentProps) => {
 
   return (
-    <div className="min-h-screen bg-coconut">
+    <div className="min-h-screen bg-pure-white">
       {/* Hero Section */}
       <EventDetailHero event={event} />
 
-      {/* Main Content */}
-      <div className="w-full px-6 lg:px-12 xl:px-16 py-12 lg:py-16 xl:py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12">
-            
-            {/* Left Column - Main Content */}
-            <div className="lg:col-span-3 space-y-8">
-              <EventDetailMainContent
-                event={event}
-                attendees={attendees}
-                isAuthenticated={true}
-                isOwner={isOwner}
-                rsvpLoading={rsvpLoading || isRsvpLoading}
-                rsvpFeedback={null}
-                onRsvp={onRsvp}
-              />
-            </div>
-            
-            {/* Right Column - Event Details Sidebar */}
-            <div className="lg:col-span-1">
-              <EventDetailSidebar
-                event={event}
-                attendees={attendees}
-                isAuthenticated={true}
-              />
-            </div>
+      {/* Main Content Area - Apply section-content styling */}
+      <div className="section-content">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+          
+          {/* Left Column - Main Content (2/3 width) */}
+          <div className="lg:col-span-2 space-y-8">
+            <EventDetailMainContent
+              event={event}
+              attendees={attendees}
+              isAuthenticated={true}
+              isOwner={isOwner}
+              rsvpLoading={rsvpLoading || isRsvpLoading}
+              rsvpFeedback={null}
+              onRsvp={onRsvp}
+            />
+          </div>
+          
+          {/* Right Column - Event Details Sidebar (1/3 width) */}
+          <div className="lg:col-span-1">
+            <EventDetailSidebar
+              event={event}
+              attendees={attendees}
+              isAuthenticated={true}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Related Events Section */}
+      <div className="bg-mist-grey/30">
+        <div className="section-content">
+          <h2 className="text-h2 text-graphite-grey font-montserrat mb-8">Related Events</h2>
+          {/* Related events grid would go here */}
+          <div className="text-body-base text-graphite-grey">
+            Related events will be displayed here.
           </div>
         </div>
       </div>

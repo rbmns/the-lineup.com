@@ -47,22 +47,23 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
   const googleMapsUrl = getGoogleMapsUrl();
 
   return (
-    <div className="space-y-4">
-      {/* Location */}
-      <Card>
-        <CardContent className="p-4">
+    <div className="space-y-6">
+      {/* Location Card */}
+      <Card className="bg-pure-white border border-mist-grey shadow-md">
+        <CardContent className="p-6">
           <div className="flex items-start gap-3">
-            <MapPin className="h-5 w-5 text-gray-600 mt-0.5" />
-            <div className="text-left">
-              <h3 className="font-medium text-gray-900 mb-1 text-left">Location</h3>
-              <p className="text-sm text-gray-600 text-left">{eventLocation}</p>
+            <MapPin className="h-5 w-5 text-ocean-teal mt-1 flex-shrink-0" />
+            <div className="text-left flex-1">
+              <h3 className="text-h4 text-graphite-grey font-montserrat mb-2">Location</h3>
+              <p className="text-body-base text-graphite-grey font-lato mb-3">{eventLocation}</p>
               {googleMapsUrl && (
                 <a
                   href={googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block mt-2 text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                  className="inline-flex items-center text-small text-ocean-teal hover:text-graphite-grey hover:underline font-lato"
                 >
+                  <ExternalLink className="h-4 w-4 mr-1" />
                   View on map
                 </a>
               )}
@@ -71,19 +72,19 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
         </CardContent>
       </Card>
 
-      {/* Booking Info */}
+      {/* Booking Info Card */}
       {(event.fee || event.booking_link) && (
-        <Card>
-          <CardContent className="p-4">
+        <Card className="bg-pure-white border border-mist-grey shadow-md">
+          <CardContent className="p-6">
             <div className="flex items-start gap-3">
-              <Ticket className="h-5 w-5 text-gray-600 mt-0.5" />
-              <div className="text-left">
-                <h3 className="font-medium text-gray-900 mb-3 text-left">Booking Info</h3>
+              <Ticket className="h-5 w-5 text-ocean-teal mt-1 flex-shrink-0" />
+              <div className="text-left flex-1">
+                <h3 className="text-h4 text-graphite-grey font-montserrat mb-3">Booking Info</h3>
                 
                 {event.fee && (
                   <div className="mb-3">
-                    <span className="text-sm text-gray-600">Entry fee: </span>
-                    <span className="font-medium">€{event.fee}</span>
+                    <span className="text-body-base text-graphite-grey font-lato">Entry fee: </span>
+                    <span className="text-body-base font-montserrat font-semibold text-graphite-grey">€{event.fee}</span>
                   </div>
                 )}
                 
@@ -93,9 +94,10 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
                       href={event.booking_link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                      className="inline-flex items-center text-small text-ocean-teal hover:text-graphite-grey hover:underline font-lato"
                     >
-                      Booking
+                      <ExternalLink className="h-4 w-4 mr-1" />
+                      Book tickets
                     </a>
                   </div>
                 )}
@@ -105,24 +107,28 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
         </Card>
       )}
 
-      {/* Attendee Summary */}
+      {/* Attendee Summary Card */}
       {isAuthenticated && (
-        <Card>
-          <CardContent className="p-4">
+        <Card className="bg-pure-white border border-mist-grey shadow-md">
+          <CardContent className="p-6">
             <div className="flex items-start gap-3">
-              <Users className="h-5 w-5 text-gray-600 mt-0.5" />
+              <Users className="h-5 w-5 text-ocean-teal mt-1 flex-shrink-0" />
               <div className="w-full text-left">
-                <h3 className="font-medium text-gray-900 mb-3 text-left">Attendees</h3>
+                <h3 className="text-h4 text-graphite-grey font-montserrat mb-4">Attendees</h3>
                 
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Going</span>
-                    <span className="text-sm font-medium">{attendees?.going?.length || 0}</span>
+                    <span className="text-body-base text-graphite-grey font-lato">Going</span>
+                    <span className="text-body-base font-montserrat font-semibold text-graphite-grey">
+                      {attendees?.going?.length || 0}
+                    </span>
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Interested</span>
-                    <span className="text-sm font-medium">{attendees?.interested?.length || 0}</span>
+                    <span className="text-body-base text-graphite-grey font-lato">Interested</span>
+                    <span className="text-body-base font-montserrat font-semibold text-graphite-grey">
+                      {attendees?.interested?.length || 0}
+                    </span>
                   </div>
                 </div>
               </div>
