@@ -11,13 +11,15 @@ const Friends: React.FC = () => {
 
   // Show loading state while checking authentication
   if (loading) {
-    <div className="min-h-screen flex items-center justify-center bg-pure-white">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ocean-teal mx-auto mb-4"></div>
-        <p className="text-body-base text-graphite-grey font-lato">Loading...</p>
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-pure-white">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ocean-teal mx-auto mb-4"></div>
+          <p className="text-body-base text-graphite-grey font-lato">Loading...</p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
   // If user is not authenticated, show the login prompt with design system styling
   if (!user) {
