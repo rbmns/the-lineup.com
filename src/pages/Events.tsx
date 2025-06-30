@@ -251,11 +251,11 @@ const Events = () => {
 
       {/* Content - flows naturally */}
       <div className="w-full px-6">
-        <div className="space-y-6">
-          {/* Search and Filters */}
+        <div className="space-y-6 max-w-6xl mx-auto">
+          {/* Search and Filters - Centered */}
           <div className="space-y-4 lg:space-y-0">
-            {/* Desktop Layout */}
-            <div className="hidden lg:flex items-center gap-4 max-w-5xl mx-auto">
+            {/* Desktop Layout - Centered */}
+            <div className="hidden lg:flex items-center justify-center gap-4">
               <div className="flex-1 max-w-md">
                 <EventSearch 
                   placeholder="Search events..." 
@@ -308,9 +308,9 @@ const Events = () => {
               )}
             </div>
 
-            {/* Mobile Layout */}
+            {/* Mobile Layout - Centered */}
             <div className="lg:hidden space-y-4">
-              <div className="w-full">
+              <div className="w-full max-w-md mx-auto">
                 <EventSearch 
                   placeholder="Search events..." 
                   className="w-full"
@@ -320,7 +320,7 @@ const Events = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
+              <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:justify-center">
                 <VibesDropdownFilter
                   selectedVibes={selectedVibes}
                   onVibeChange={setSelectedVibes}
