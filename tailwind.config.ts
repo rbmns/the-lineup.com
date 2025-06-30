@@ -29,8 +29,9 @@ const config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         
-        // The Lineup Coastal Minerals Palette
+        // The Lineup Coastal Minerals Palette - Updated with coastal-haze
         'pure-white': '#FFFFFF',
+        'coastal-haze': '#F2F8F8', // New subtle coastal tint
         'graphite-grey': '#2C3E50', 
         'mist-grey': '#ECEFF1',
         'ocean-teal': '#00A389',
