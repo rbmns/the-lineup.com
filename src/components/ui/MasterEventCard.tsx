@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin } from 'lucide-react';
@@ -111,7 +110,7 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
         {/* Category badge overlay */}
         {event.event_category && (
           <div className="absolute top-3 left-3">
-            <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-mist-grey text-graphite-grey">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-mist-grey text-graphite-grey font-mono text-xs">
               {event.event_category}
             </span>
           </div>
@@ -120,42 +119,35 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
       
       {/* Content Section - Flexible grow area */}
       <div className="flex flex-col flex-grow">
-        {/* Title */}
+        {/* Title - Keep original font (Montserrat) */}
         <h4 className="text-h4 text-graphite-grey font-montserrat mb-2 line-clamp-2">
           {event.title}
         </h4>
         
-        {/* Organizer info */}
+        {/* Organizer info - Use JetBrains Mono */}
         {event.organiser_name && (
-          <p className="text-small text-graphite-grey opacity-75 font-lato mb-3">
+          <p className="text-sm text-graphite-grey opacity-75 font-mono mb-3">
             By {event.organiser_name}
           </p>
         )}
         
-        {/* Date & Time */}
-        <div className="text-small text-graphite-grey opacity-75 font-lato mb-3 flex items-center gap-2">
+        {/* Date & Time - Use JetBrains Mono */}
+        <div className="text-sm text-graphite-grey opacity-75 font-mono mb-3 flex items-center gap-2">
           <Calendar className="h-4 w-4 text-ocean-teal flex-shrink-0" />
           <span>{formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}</span>
         </div>
         
-        {/* Location */}
-        <div className="text-sm text-graphite-grey font-lato flex items-center mb-4 hover:underline hover:text-ocean-teal">
+        {/* Location - Use JetBrains Mono */}
+        <div className="text-sm text-graphite-grey font-mono flex items-center mb-4 hover:underline hover:text-ocean-teal">
           <MapPin className="h-4 w-4 text-graphite-grey mr-2 flex-shrink-0" />
           <span className="truncate">{getVenueDisplay()}</span>
         </div>
         
-        {/* Description (if available and not compact) - Flex grow pushes button down */}
-        {event.description && !compact && (
-          <p className="text-body-base text-graphite-grey font-lato mb-5 flex-grow line-clamp-3">
-            {event.description}
-          </p>
-        )}
-        
-        {/* RSVP Status Display */}
+        {/* RSVP Status Display - Use JetBrains Mono */}
         {showRsvpStatus && event.rsvp_status && (
           <div className="flex items-center gap-2 mb-4">
             <span className={cn(
-              "inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium",
+              "inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-mono font-medium",
               event.rsvp_status === 'Going' 
                 ? "bg-ocean-teal/20 text-ocean-teal" 
                 : "bg-sunrise-ochre/20 text-graphite-grey"

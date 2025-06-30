@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Search, Plus } from 'lucide-react';
+import { Search, UserPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -62,16 +62,16 @@ export const HomeHeroSection = () => {
             </Link>
           </Button>
           
-          {isAuthenticated && (
+          {!isAuthenticated && (
             <Button
               asChild
               variant="outline"
               size={isMobile ? "lg" : "lg"}
               className="btn-outline border-2 border-pure-white text-pure-white hover:bg-pure-white hover:text-ocean-deep font-semibold transition-all duration-200 backdrop-blur-sm"
             >
-              <Link to="/events/create">
-                <Plus className="mr-2 h-5 w-5" />
-                Create Event
+              <Link to="/signup">
+                <UserPlus className="mr-2 h-5 w-5" />
+                Sign Up / Login
               </Link>
             </Button>
           )}
