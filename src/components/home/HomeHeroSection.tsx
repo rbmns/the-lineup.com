@@ -35,10 +35,7 @@ export const HomeHeroSection = () => {
             "font-display font-semibold text-pure-white leading-tight drop-shadow-lg",
             isMobile ? "text-3xl" : "text-5xl lg:text-6xl"
           )}>
-            Find Your Perfect{' '}
-            <span className="text-vibrant-aqua">
-              Event
-            </span>
+            discover local events and casual plans that fit your vibe
           </h1>
           
           <p className={cn(
