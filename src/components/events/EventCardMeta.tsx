@@ -1,14 +1,14 @@
 
 import React from 'react';
 import { CalendarIcon, MapPin } from 'lucide-react';
-import { formatInTimeZone } from 'date-fns-tz';
-import { AMSTERDAM_TIMEZONE, formatTime } from '@/utils/date-formatting';
+import { formatEventTime, formatEventDate, getUserTimezone } from '@/utils/timezone-utils';
 import { cn } from '@/lib/utils';
 
 interface EventCardMetaProps {
   event: { 
     start_date?: string | null;
     start_time?: string | null;
+    timezone?: string;
     venues?: { 
       name: string;
       city?: string;
@@ -25,23 +25,31 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
   compact = false,
   className 
 }) => {
-  // Format date for display in Amsterdam timezone
-  const formatEventDate = (event: any): string => {
+  const viewerTimezone = getUserTimezone();
+  const eventTimezone = event.timezone || 'Europe/Amsterdam';
+  
+  // Format date for display in viewer's timezone
+  const formatEventDateDisplay = (event: any): string => {
     try {
       if (!event.start_date) return 'Date not specified';
       
-      const date = new Date(event.start_date);
-      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "d MMM yyyy");
+      return formatEventDate(event.start_date, eventTimezone, viewerTimezone);
     } catch (error) {
       console.error('Error formatting date:', error);
       return 'Date not specified';
     }
   };
   
-  // Format time using the 24-hour time format (remove seconds)
+  // Format time in viewer's timezone
   const getEventTimeDisplay = (event: any): string => {
-    if (!event.start_time) return 'Time not specified';
-    return formatTime(event.start_time);
+    if (!event.start_time || !event.start_date) return 'Time not specified';
+    
+    try {
+      return formatEventTime(event.start_date, event.start_time, eventTimezone, viewerTimezone);
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return event.start_time.substring(0, 5);
+    }
   };
 
   // Get venue display name with proper fallback logic
@@ -67,7 +75,7 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
       <div className="flex items-center text-gray-600">
         <CalendarIcon className="h-4 w-4 mr-2" />
         <span className={cn("font-inter leading-7", textSize)}>
-          {formatEventDate(event)} at {getEventTimeDisplay(event)}
+          {formatEventDateDisplay(event)} at {getEventTimeDisplay(event)}
         </span>
       </div>
 

@@ -2,7 +2,7 @@
 import { useMemo } from 'react';
 import { Calendar } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { formatEventTime, formatEventDate, createEventDateTime } from '@/utils/timezone-utils';
+import { formatEventTime, formatEventDate, createEventDateTime, getUserTimezone } from '@/utils/timezone-utils';
 
 interface EventDateTimeSectionProps {
   startTime?: string;
@@ -18,20 +18,22 @@ export const EventDateTimeSection = ({
   timezone = 'Europe/Amsterdam'
 }: EventDateTimeSectionProps) => {
   
-  // Format time range for detail view
+  const viewerTimezone = getUserTimezone();
+  
+  // Format time range for detail view in viewer's timezone
   const formattedTimeRange = useMemo(() => {
     if (!startTime || !startDate) return '';
-    if (!endTime) return formatEventTime(startDate, startTime, timezone);
+    if (!endTime) return formatEventTime(startDate, startTime, timezone, viewerTimezone);
     
     try {
-      const startFormatted = formatEventTime(startDate, startTime, timezone);
-      const endFormatted = formatEventTime(startDate, endTime, timezone);
+      const startFormatted = formatEventTime(startDate, startTime, timezone, viewerTimezone);
+      const endFormatted = formatEventTime(startDate, endTime, timezone, viewerTimezone);
       return `${startFormatted} - ${endFormatted}`;
     } catch (error) {
       console.error('Error formatting time range:', error);
       return '';
     }
-  }, [startTime, endTime, startDate, timezone]);
+  }, [startTime, endTime, startDate, timezone, viewerTimezone]);
   
   // Format time until event
   const timeUntilEvent = useMemo(() => {
@@ -70,12 +72,12 @@ export const EventDateTimeSection = ({
     }
   }, [startTime, endTime, startDate, timezone]);
 
-  // For the display format "Sunday, 18 May 2025, 15:00 - 20:00"
+  // For the display format "Sunday, 18 May 2025, 15:00 - 20:00" in viewer's timezone
   const displayDateTime = useMemo(() => {
     if (!startDate) return '';
     
     try {
-      let formatted = formatEventDate(startDate, timezone);
+      let formatted = formatEventDate(startDate, timezone, viewerTimezone);
       
       if (formattedTimeRange) {
         formatted += `, ${formattedTimeRange}`;
@@ -86,7 +88,7 @@ export const EventDateTimeSection = ({
       console.error('Error formatting display date time:', error);
       return '';
     }
-  }, [startDate, formattedTimeRange, timezone]);
+  }, [startDate, formattedTimeRange, timezone, viewerTimezone]);
 
   return (
     <div className="flex items-start space-x-2">
