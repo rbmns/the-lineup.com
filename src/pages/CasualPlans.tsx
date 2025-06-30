@@ -3,6 +3,7 @@ import React from 'react';
 import { useCasualPlans } from '@/hooks/useCasualPlans';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { CasualPlanCard } from '@/components/casual-plans/CasualPlanCard';
@@ -24,49 +25,58 @@ const CasualPlans = () => {
     return success;
   };
 
-  // For non-authenticated users, make the page fit in viewport
+  // For non-authenticated users, show improved login prompt
   if (!isAuthenticated) {
     return (
-      <div className="h-screen flex flex-col justify-center">
-        {/* Header Section - Compact for viewport fit */}
-        <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-2' : 'py-4'}`}>
-          <div className="text-center">
-            <h1 className={`font-bold text-primary mb-2 leading-tight ${isMobile ? 'text-xl' : 'text-2xl sm:text-3xl'}`}>
-              Casual <span className="text-secondary">Plans</span>
+      <div className="min-h-screen bg-sand flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div className="w-full max-w-md">
+          {/* Welcome Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-h2 font-display text-ocean-deep mb-6">
+              Casual Plans
             </h1>
-            <p className={`auth-subtext max-w-2xl mx-auto leading-relaxed ${isMobile ? 'text-sm mb-3' : 'text-base mb-4'}`}>
+            <p className="text-body-base text-graphite-grey mb-4">
               Spontaneous meetups and activities with fellow travelers
             </p>
-          </div>
-        </div>
-
-        <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-2' : 'py-4'}`}>
-          {/* Login prompt for non-authenticated users - Compact for viewport fit */}
-          <div className={`auth-container ${isMobile ? 'mx-2' : ''}`}>
-            <h3 className={`auth-heading ${isMobile ? 'text-base' : 'text-lg'}`}>
-              Join the community to see full details
-            </h3>
-            <p className={`auth-subtext mb-3 ${isMobile ? 'text-xs' : 'text-sm'}`}>
-              Sign up to view locations, times, and connect with other members creating casual plans.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <Button 
-                onClick={() => navigate('/login')}
-                className="btn-primary"
-                size={isMobile ? "default" : "lg"}
-              >
-                Sign In
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/signup')}
-                className="btn-outline"
-                size={isMobile ? "default" : "lg"}
-              >
-                Sign Up
-              </Button>
+            <div className="flex justify-center items-center gap-4 text-xl opacity-60">
+              <span>🏖️</span>
+              <span>⚡</span>
+              <span>🌊</span>
             </div>
           </div>
+
+          <Card className="card-base">
+            <CardHeader className="text-center pb-6">
+              <div className={`bg-ocean-teal/10 rounded-full flex items-center justify-center mx-auto mb-4 ${isMobile ? 'w-12 h-12' : 'w-16 h-16'}`}>
+                <span className={isMobile ? 'text-xl' : 'text-2xl'}>🏖️</span>
+              </div>
+              <CardTitle className={`text-ocean-deep mb-2 ${isMobile ? 'text-lg' : 'text-h4'}`}>
+                Join the community
+              </CardTitle>
+              <CardDescription className={`text-graphite-grey/80 ${isMobile ? 'text-xs' : 'text-body-small'}`}>
+                Sign up to view locations, times, and connect with other members creating casual plans.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="px-6 pb-6">
+              <div className="space-y-3">
+                <Button 
+                  onClick={() => navigate('/signup')}
+                  className="w-full btn-primary"
+                  size={isMobile ? "default" : "lg"}
+                >
+                  Sign Up
+                </Button>
+                <Button 
+                  onClick={() => navigate('/login')} 
+                  variant="outline"
+                  className="w-full btn-outline"
+                  size={isMobile ? "default" : "lg"}
+                >
+                  Log In
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
@@ -74,14 +84,14 @@ const CasualPlans = () => {
 
   // For authenticated users, keep the existing layout
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-pure-white">
       {/* Header Section - Optimized for mobile above the fold */}
       <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-8' : 'py-12 sm:py-16'}`}>
         <div className="text-center">
-          <h1 className={`font-bold text-primary mb-4 leading-tight ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
-            Casual <span className="text-secondary">Plans</span>
+          <h1 className={`font-bold text-ocean-deep mb-4 leading-tight ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
+            Casual <span className="text-ocean-teal">Plans</span>
           </h1>
-          <p className={`auth-subtext max-w-3xl mx-auto leading-relaxed ${isMobile ? 'text-base mb-6' : 'text-lg sm:text-xl mb-6'}`}>
+          <p className={`text-graphite-grey max-w-3xl mx-auto leading-relaxed ${isMobile ? 'text-base mb-6' : 'text-lg sm:text-xl mb-6'}`}>
             Spontaneous meetups and activities with fellow travelers
           </p>
           
@@ -122,10 +132,10 @@ const CasualPlans = () => {
             ) : (
               <div className="text-center py-12">
                 <div className="text-4xl sm:text-6xl mb-4">🏖️</div>
-                <h3 className="text-lg sm:text-xl font-medium text-primary mb-2">
+                <h3 className="text-lg sm:text-xl font-medium text-ocean-deep mb-2">
                   No casual plans yet
                 </h3>
-                <p className="auth-subtext mb-4 text-sm sm:text-base">
+                <p className="text-graphite-grey/80 mb-4 text-sm sm:text-base">
                   Be the first to create a spontaneous meetup!
                 </p>
                 <Button 

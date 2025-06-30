@@ -53,7 +53,7 @@ export const HomeHeroSection = () => {
         )}>
           <Button 
             asChild 
-            size={isMobile ? "lg" : "lg"}
+            size={isMobile ? "default" : "lg"}
             className="btn-primary bg-ocean-teal hover:bg-ocean-teal/90 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
           >
             <Link to="/events">
@@ -66,7 +66,7 @@ export const HomeHeroSection = () => {
             <Button
               asChild
               variant="outline"
-              size={isMobile ? "lg" : "lg"}
+              size={isMobile ? "default" : "lg"}
               className="btn-outline border-2 border-pure-white text-pure-white hover:bg-pure-white hover:text-ocean-deep font-semibold transition-all duration-200 backdrop-blur-sm"
             >
               <Link to="/signup">
