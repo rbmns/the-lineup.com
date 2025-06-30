@@ -92,7 +92,7 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
           toast({
             title: "Login failed",
             description: error.message,
-            variant: "descriptive",
+            variant: "destructive",
           });
           return;
         }
