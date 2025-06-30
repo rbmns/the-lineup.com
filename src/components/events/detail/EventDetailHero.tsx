@@ -38,15 +38,6 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
         {/* Subtle graphite-grey overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-graphite-grey/60 via-graphite-grey/20 to-transparent" />
         
-        {/* Category badge - top left */}
-        {event.event_category && (
-          <div className="absolute top-4 left-4 z-20">
-            <span className="inline-flex items-center px-3 py-1 rounded-sm bg-pure-white/90 text-graphite-grey text-sm font-medium backdrop-blur-sm">
-              {event.event_category}
-            </span>
-          </div>
-        )}
-        
         {/* Share button - top right */}
         <div className="absolute top-4 right-4 z-20">
           <EventShareButton 
