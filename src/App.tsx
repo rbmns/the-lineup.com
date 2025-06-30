@@ -1,3 +1,4 @@
+
 import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { HelmetProvider } from 'react-helmet-async';
@@ -52,7 +53,9 @@ function App() {
                   <Route path="friends" element={<Friends />} />
                   <Route path="profile" element={<ProfilePage />} />
                   <Route path="profile/edit" element={<ProfileEdit />} />
-                  <Route path="organise" element={<Dashboard />} />
+                  {/* Update organise route to redirect to dashboard */}
+                  <Route path="organise" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="dashboard" element={<Dashboard />} />
                   <Route path="search" element={<SearchPage />} />
                   <Route path="admin" element={<AdminPage />} />
                   <Route path="login" element={<Login />} />

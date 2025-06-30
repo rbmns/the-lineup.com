@@ -107,10 +107,10 @@ export const createVenue = async (venueData: CreateVenueFormValues): Promise<{ d
   try {
     console.log('Creating venue with data:', venueData);
     
-    // Get current user
+    // Get current user (might be null for unauthenticated users)
     const { data: { user } } = await supabase.auth.getUser();
     
-    // Create venue data - use the current user's ID as creator_id
+    // Create venue data - use the current user's ID as creator_id if authenticated, null if not
     const dataToInsert = {
       name: venueData.name,
       street: venueData.street || null,
@@ -118,7 +118,7 @@ export const createVenue = async (venueData: CreateVenueFormValues): Promise<{ d
       postal_code: venueData.postal_code || null,
       website: venueData.website || null,
       google_maps: venueData.google_maps || null,
-      creator_id: user?.id || null
+      creator_id: user?.id || null // This will be null for unauthenticated users
     };
 
     console.log('Data to insert:', dataToInsert);
