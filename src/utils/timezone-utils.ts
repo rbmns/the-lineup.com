@@ -1,6 +1,6 @@
 
-import { formatInTimeZone, toZonedTime } from 'date-fns-tz';
-import { parseISO } from 'date-fns';
+import { formatInTimeZone, toZonedTime, fromZonedTime } from 'date-fns-tz';
+import { parseISO, format } from 'date-fns';
 
 /**
  * Get the user's browser timezone
@@ -22,17 +22,25 @@ export const formatEventTime = (
   try {
     const viewerTimezone = displayTimezone || getUserTimezone();
     
-    // Create ISO datetime string in event's timezone
-    const eventDateTime = `${dateStr}T${timeStr}:00`;
+    // If timezones are the same, no conversion needed
+    if (eventTimezone === viewerTimezone) {
+      return timeStr.substring(0, 5);
+    }
     
-    // Parse as a date and treat it as being in the event timezone
-    const eventDate = parseISO(eventDateTime);
+    // Create a proper datetime string in the event's timezone
+    const eventDateTimeStr = `${dateStr}T${timeStr}:00`;
     
-    // Convert from event timezone to viewer timezone and format
-    const zonedEventTime = toZonedTime(eventDate, eventTimezone);
-    return formatInTimeZone(zonedEventTime, viewerTimezone, 'HH:mm', { timeZone: eventTimezone });
+    // Parse the datetime and treat it as being in the event timezone
+    const eventDateTime = parseISO(eventDateTimeStr);
+    const eventInEventTz = toZonedTime(eventDateTime, eventTimezone);
+    
+    // Convert from event timezone to UTC, then to viewer timezone
+    const utcTime = fromZonedTime(eventInEventTz, eventTimezone);
+    
+    // Format in viewer's timezone
+    return formatInTimeZone(utcTime, viewerTimezone, 'HH:mm');
   } catch (error) {
-    console.error('Error formatting event time:', error);
+    console.error('Error formatting event time:', error, { dateStr, timeStr, eventTimezone, displayTimezone });
     return timeStr.substring(0, 5); // Fallback to original time
   }
 };
