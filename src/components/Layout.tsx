@@ -18,11 +18,11 @@ const Layout = () => {
   useScrollToTop();
 
   return (
-    <div className="min-h-screen w-full bg-sand">
+    <div className="min-h-screen w-full bg-pure-white">
       <MainNav />
       <div className="flex w-full min-h-screen">
-        {/* Main Content Area - flows naturally on sand background */}
-        <div className="flex-1 w-full min-h-screen bg-sand flex flex-col">
+        {/* Main Content Area - using design system background */}
+        <div className="flex-1 w-full min-h-screen bg-pure-white flex flex-col">
           {/* Main content - add top padding only for non-home pages */}
           <main className={cn(
             "w-full flex-1 flex flex-col",

@@ -18,17 +18,17 @@ export const EventsPageHeader: React.FC<EventsPageHeaderProps> = ({
   const isMobile = useIsMobile();
 
   return (
-    <div className="relative w-full bg-coconut border-b border-ocean-deep/10">
+    <div className="relative w-full bg-pure-white border-b border-mist-grey">
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         <div className="max-w-4xl mx-auto">
-          <h1 className={`${isMobile ? 'text-2xl' : 'text-3xl md:text-4xl'} font-display font-bold tracking-tight text-ocean-deep mb-2 leading-tight`}>
+          <h1 className={`${isMobile ? 'text-h2' : 'text-h1'} font-display font-bold tracking-tight text-graphite-grey mb-2 leading-tight`}>
             {title}
           </h1>
           
           {/* Tagline */}
           <div className="mt-2">
-            <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-ocean-deep/70 font-mono font-medium uppercase tracking-wider`}>
+            <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-graphite-grey/70 font-montserrat font-semibold uppercase tracking-wider`}>
               Discover • Connect • Experience
             </span>
           </div>

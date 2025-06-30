@@ -54,30 +54,27 @@ const MainNav = () => {
     label: 'Friends'
   }];
 
-  // Determine nav background based on page and scroll state
+  // Determine nav background - always opaque
   const getNavBackground = () => {
     if (isHomePage && !isScrolled) {
-      return 'bg-transparent';
+      return 'bg-pure-white/95 backdrop-blur-md';
     }
-    return 'bg-coconut';
+    return 'bg-pure-white';
   };
 
-  // Determine text color based on background - deep ocean blue for home page
+  // Text color is always consistent
   const getTextColor = () => {
-    if (isHomePage && !isScrolled) {
-      return 'text-ocean-deep';
-    }
-    return 'text-midnight';
+    return 'text-graphite-grey';
   };
 
-  // Determine if we should show border/shadow
-  const shouldShowBorder = !isHomePage || isScrolled;
+  // Always show border/shadow for clarity
+  const shouldShowBorder = true;
 
   return <>
       <header className={cn(
         "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300",
         getNavBackground(),
-        shouldShowBorder && "border-b border-clay/15 shadow-navigation"
+        shouldShowBorder && "border-b border-mist-grey shadow-md"
       )}>
         <div className="w-full flex flex-col">
           <div className={cn(
@@ -94,7 +91,7 @@ const MainNav = () => {
                   />
                 </Link>}
               <Link to="/" className={cn(
-                "font-display font-semibold hover:text-sunset-yellow transition-colors text-lg",
+                "font-display font-bold hover:text-ocean-teal transition-colors text-xl",
                 getTextColor()
               )}>
                 the lineup
@@ -102,7 +99,7 @@ const MainNav = () => {
             </div>
 
             {/* Center - Navigation (Desktop only) */}
-            {!isMobile && <nav className="flex items-center space-x-2">
+            {!isMobile && <nav className="flex items-center space-x-1">
                 {navItems.map(item => {
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
@@ -110,11 +107,10 @@ const MainNav = () => {
                       key={item.path} 
                       to={item.path} 
                       className={cn(
-                        "flex items-center gap-2 px-3 py-2 rounded-md font-body text-sm font-medium transition-all duration-200",
-                        getTextColor(),
+                        "nav-link flex items-center gap-2 px-4 py-2 rounded-md font-montserrat text-sm font-medium transition-all duration-200",
                         isActive 
-                          ? "bg-vibrant-aqua/20" 
-                          : "hover:text-sunset-yellow hover:bg-sunset-yellow/10"
+                          ? "bg-ocean-teal/15 text-ocean-teal" 
+                          : "text-graphite-grey hover:text-ocean-teal hover:bg-ocean-teal/10"
                       )}
                     >
                       <Icon className="h-4 w-4" />
@@ -129,8 +125,8 @@ const MainNav = () => {
         </div>
       </header>
 
-      {/* Mobile Bottom Navigation */}
-      {isMobile && <div className="fixed bottom-0 left-0 right-0 z-50 bg-coconut border-t border-clay/15 shadow-navigation pb-safe">
+      {/* Mobile Bottom Navigation - Fully opaque */}
+      {isMobile && <div className="fixed bottom-0 left-0 right-0 z-50 bg-pure-white border-t border-mist-grey shadow-lg pb-safe">
           <nav className="flex items-center justify-around px-2 py-2">
             {navItems.map(item => {
           const Icon = item.icon;
@@ -139,10 +135,10 @@ const MainNav = () => {
                   key={item.path} 
                   to={item.path} 
                   className={cn(
-                    "flex flex-col items-center gap-1 px-3 py-2 rounded-md font-mono text-xs font-medium transition-all duration-200 uppercase min-w-0",
+                    "flex flex-col items-center gap-1 px-3 py-2 rounded-md font-montserrat text-xs font-medium transition-all duration-200 uppercase min-w-0",
                     isActive 
-                      ? "text-midnight bg-vibrant-aqua/20" 
-                      : "text-midnight hover:text-sunset-yellow hover:bg-sunset-yellow/10"
+                      ? "text-ocean-teal bg-ocean-teal/15" 
+                      : "text-graphite-grey hover:text-ocean-teal hover:bg-ocean-teal/10"
                   )}
                 >
                   <Icon className="h-4 w-4 flex-shrink-0" />

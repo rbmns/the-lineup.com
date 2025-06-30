@@ -39,7 +39,7 @@ export const LocationDropdownFilter: React.FC<LocationDropdownFilterProps> = ({
     return (
       <Button 
         variant="outline" 
-        className="w-full sm:w-auto justify-between bg-coconut border-sage text-ocean-deep hover:bg-sage/30 hover:text-ocean-deep"
+        className="btn-secondary w-full sm:w-auto justify-between"
         disabled
       >
         <div className="flex items-center gap-2">
@@ -58,13 +58,13 @@ export const LocationDropdownFilter: React.FC<LocationDropdownFilterProps> = ({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full sm:w-auto justify-between bg-coconut border-sage text-ocean-deep hover:bg-sage/30 hover:text-ocean-deep"
+          className="btn-secondary w-full sm:w-auto justify-between"
         >
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
             <span className="truncate">{displayValue}</span>
             {selectedLocationId && (
-              <span className="ml-1 px-1.5 py-0.5 bg-sungold/30 text-ocean-deep rounded-full text-xs font-medium">
+              <span className="ml-1 px-1.5 py-0.5 bg-sunrise-ochre/30 text-graphite-grey rounded-full text-xs font-medium">
                 1
               </span>
             )}
@@ -72,15 +72,15 @@ export const LocationDropdownFilter: React.FC<LocationDropdownFilterProps> = ({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-0 bg-coconut border-sage">
+      <PopoverContent className="w-[300px] p-0 bg-pure-white border-mist-grey shadow-lg z-50">
         <Command>
-          <CommandInput placeholder="Search locations..." className="text-ocean-deep" />
-          <CommandEmpty>No location found.</CommandEmpty>
+          <CommandInput placeholder="Search locations..." className="input-field border-0" />
+          <CommandEmpty className="p-4 text-center text-graphite-grey/60">No location found.</CommandEmpty>
           <CommandGroup>
             <CommandItem
               value="all-locations"
               onSelect={() => handleSelect('all-locations')}
-              className="hover:bg-sage/30 text-ocean-deep"
+              className="hover:bg-mist-grey text-graphite-grey cursor-pointer"
             >
               <Check
                 className={cn(
@@ -95,7 +95,7 @@ export const LocationDropdownFilter: React.FC<LocationDropdownFilterProps> = ({
                 key={area.id}
                 value={area.id}
                 onSelect={() => handleSelect(area.id)}
-                className="hover:bg-sage/30 text-ocean-deep"
+                className="hover:bg-mist-grey text-graphite-grey cursor-pointer"
               >
                 <Check
                   className={cn(
@@ -104,9 +104,9 @@ export const LocationDropdownFilter: React.FC<LocationDropdownFilterProps> = ({
                   )}
                 />
                 <div className="flex flex-col">
-                  <span>{area.name}</span>
+                  <span className="font-montserrat font-medium">{area.name}</span>
                   {area.cities && area.cities.length > 0 && (
-                    <span className="text-xs text-ocean-deep/60">
+                    <span className="text-xs text-graphite-grey/60 font-lato">
                       {area.cities.slice(0, 3).join(', ')}
                       {area.cities.length > 3 && ` +${area.cities.length - 3} more`}
                     </span>

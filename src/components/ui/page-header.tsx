@@ -18,14 +18,14 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   const isMobile = useIsMobile();
   
   return (
-    <div className="relative w-full bg-white border-b border-gray-200">
+    <div className="relative w-full bg-pure-white border-b border-mist-grey">
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         <div className="max-w-4xl mx-auto">
-          <h1 className={`${isMobile ? 'text-3xl' : 'text-4xl md:text-5xl'} font-bold tracking-tight text-gray-900 mb-4 leading-tight ${className}`}>
+          <h1 className={`${isMobile ? 'text-h2' : 'text-h1'} font-display font-bold tracking-tight text-graphite-grey mb-4 leading-tight ${className}`}>
             {title}
           </h1>
-          <p className={`${isMobile ? 'text-base' : 'text-lg md:text-xl'} text-gray-600 max-w-2xl mx-auto leading-relaxed font-medium`}>
+          <p className={`${isMobile ? 'text-body-base' : 'text-body-base'} text-graphite-grey/80 max-w-2xl mx-auto leading-relaxed font-lato font-medium`}>
             {subtitle}
           </p>
         </div>
