@@ -1,24 +1,13 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useCreatorStatus } from '@/hooks/useCreatorStatus';
 import { CreatorDashboard } from '@/components/organise/CreatorDashboard';
-import { OrganiseContent } from '@/components/organise/OrganiseContent';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
 const Dashboard = () => {
-  const { user, isAuthenticated } = useAuth();
-  const { canCreateEvents, isLoading } = useCreatorStatus();
+  const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-pure-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-ocean-teal"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen w-full bg-pure-white">
@@ -37,10 +26,7 @@ const Dashboard = () => {
           "text-graphite-grey mx-auto",
           isMobile ? "text-sm max-w-xs" : "text-body-base max-w-2xl"
         )}>
-          {isAuthenticated && canCreateEvents 
-            ? "Manage your events and track their performance"
-            : "Get started with organizing events"
-          }
+          Create and manage your events
         </p>
       </div>
 
@@ -49,11 +35,7 @@ const Dashboard = () => {
         "mx-auto",
         isMobile ? "px-4" : "px-8"
       )}>
-        {isAuthenticated && canCreateEvents ? (
-          <CreatorDashboard />
-        ) : (
-          <OrganiseContent />
-        )}
+        <CreatorDashboard />
       </div>
     </div>
   );

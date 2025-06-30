@@ -9,10 +9,8 @@ import { AdminSection } from './AdminSection';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { AuthOverlay } from '@/components/auth/AuthOverlay';
-import { RequestCreatorModal } from './RequestCreatorModal';
 import { CreatorRequestsManager } from './CreatorRequestsManager';
 import { CreatorRequestService } from '@/services/CreatorRequestService';
-import { toast } from "sonner";
 import { useQuery } from '@tanstack/react-query';
 import { useCreatorStatus } from '@/hooks/useCreatorStatus';
 import { SidebarToggleButton } from './SidebarToggleButton';
@@ -22,12 +20,6 @@ interface SocialSidebarProps {
   onToggleVisibility?: () => void;
 }
 
-interface CreatorRequestFormValues {
-  reason: string;
-  contact_email?: string;
-  contact_phone?: string;
-}
-
 export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   visible = true,
   onToggleVisibility,
@@ -35,15 +27,9 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showAuth, setShowAuth] = useState(false);
-  const [showRequestCreator, setShowRequestCreator] = useState(false);
   const [showRequestsManager, setShowRequestsManager] = useState(false);
 
-  const {
-    isLoading: isCreatorStatusLoading,
-    canCreateEvents,
-    isAdmin,
-    creatorRequestStatus,
-  } = useCreatorStatus();
+  const { isAdmin } = useCreatorStatus();
 
   const fetchAdminRequests = async () => {
     const { data, error } = await CreatorRequestService.getCreatorRequestsForAdmin();
@@ -84,33 +70,8 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
   };
 
   const handleCreateEventClick = () => {
-    if (!user) {
-      setShowAuth(true);
-      return;
-    }
-    
-    if (isCreatorStatusLoading) return;
-    
-    const hasPermission = canCreateEvents || creatorRequestStatus === 'approved';
-    
-    if (hasPermission) {
-      navigate('/events/create');
-    } else {
-      setShowRequestCreator(true);
-    }
+    navigate('/events/create');
   };
-
-  const handleRequestCreator = async (formData: CreatorRequestFormValues) => {
-    if (!user) return;
-    const { error } = await CreatorRequestService.requestCreatorAccess(user.id, formData);
-    if (error) {
-      toast.error("There was an issue submitting your request. Please try again.");
-    } else {
-      toast.success("Your request has been submitted!");
-    }
-  };
-
-  const shouldShowCreateButton = !user || (user && canCreateEvents);
 
   return (
     <>
@@ -128,20 +89,17 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
               />
             )}
 
-            {shouldShowCreateButton && (
-              <div className="py-2">
-                <Button
-                  size="sm"
-                  variant="primary"
-                  className="w-full"
-                  onClick={handleCreateEventClick}
-                  disabled={isCreatorStatusLoading}
-                >
-                  <Plus className="w-4 h-4" />
-                  Create Event
-                </Button>
-              </div>
-            )}
+            <div className="py-2">
+              <Button
+                size="sm"
+                variant="primary"
+                className="w-full"
+                onClick={handleCreateEventClick}
+              >
+                <Plus className="w-4 h-4" />
+                Create Event
+              </Button>
+            </div>
             
             {!user && <SignUpPrompt />}
             <CommunitySection />
@@ -156,13 +114,6 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
             onClose={() => setShowRequestsManager(false)}
         />
       }
-      
-      <RequestCreatorModal
-        open={showRequestCreator}
-        onClose={() => setShowRequestCreator(false)}
-        onRequest={handleRequestCreator}
-        requestStatus={creatorRequestStatus}
-      />
       
       {showAuth && !user && (
         <AuthOverlay

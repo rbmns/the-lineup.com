@@ -4,13 +4,23 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Plus, Calendar, Users, BarChart3 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const CreatorDashboard: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Event Dashboard</h1>
-        <p className="text-gray-600">Manage your events and track their performance</p>
+        <p className="text-gray-600">Create and manage your events</p>
+        {!isAuthenticated && (
+          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-blue-800 text-sm">
+              You can create events without signing up, but you'll need to sign in to publish them.
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
@@ -20,9 +30,11 @@ export const CreatorDashboard: React.FC = () => {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">
+              {isAuthenticated ? '0' : '-'}
+            </div>
             <p className="text-xs text-muted-foreground">
-              Currently active events
+              {isAuthenticated ? 'Currently active events' : 'Sign in to view your events'}
             </p>
           </CardContent>
         </Card>
@@ -33,9 +45,11 @@ export const CreatorDashboard: React.FC = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">
+              {isAuthenticated ? '0' : '-'}
+            </div>
             <p className="text-xs text-muted-foreground">
-              Across all your events
+              {isAuthenticated ? 'Across all your events' : 'Sign in to view stats'}
             </p>
           </CardContent>
         </Card>
@@ -46,9 +60,11 @@ export const CreatorDashboard: React.FC = () => {
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-2xl font-bold">
+              {isAuthenticated ? '0' : '-'}
+            </div>
             <p className="text-xs text-muted-foreground">
-              Total events created
+              {isAuthenticated ? 'Total events created' : 'Sign in to view history'}
             </p>
           </CardContent>
         </Card>
@@ -66,12 +82,14 @@ export const CreatorDashboard: React.FC = () => {
                 Create New Event
               </Link>
             </Button>
-            <Button asChild variant="outline" className="w-full justify-start">
-              <Link to="/profile?tab=created">
-                <Calendar className="mr-2 h-4 w-4" />
-                View My Events
-              </Link>
-            </Button>
+            {isAuthenticated && (
+              <Button asChild variant="outline" className="w-full justify-start">
+                <Link to="/profile?tab=created">
+                  <Calendar className="mr-2 h-4 w-4" />
+                  View My Events
+                </Link>
+              </Button>
+            )}
           </CardContent>
         </Card>
 
@@ -83,7 +101,12 @@ export const CreatorDashboard: React.FC = () => {
             <div className="text-center text-gray-500 py-8">
               <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>No recent activity</p>
-              <p className="text-sm">Create your first event to get started!</p>
+              <p className="text-sm">
+                {isAuthenticated 
+                  ? "Create your first event to get started!" 
+                  : "Sign in to view your activity"
+                }
+              </p>
             </div>
           </CardContent>
         </Card>
