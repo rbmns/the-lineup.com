@@ -6,7 +6,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Plus } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
 import { cn } from '@/lib/utils';
 
@@ -27,23 +27,28 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
   const [isOpen, setIsOpen] = React.useState(false);
   
   return (
-    <div className="space-y-6">
-      <div className="border-t border-mist-grey pt-6">
-        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-          <CollapsibleTrigger asChild>
-            <button
-              type="button"
-              className="flex items-center gap-2 text-lg font-medium text-graphite-grey hover:text-ocean-teal transition-colors w-full text-left"
-            >
-              <ChevronDown className={cn(
-                "h-4 w-4 transition-transform duration-200",
-                isOpen && "rotate-180"
-              )} />
-              Optional Information
-            </button>
-          </CollapsibleTrigger>
-          
-          <CollapsibleContent className="space-y-4 mt-4">
+    <div className="bg-gradient-to-r from-dusk-coral/5 to-dusk-coral/10 p-6 rounded-lg border border-dusk-coral/20">
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger asChild>
+          <button
+            type="button"
+            className="flex items-center gap-3 text-xl font-semibold text-dusk-coral hover:text-dusk-coral/80 transition-colors w-full text-left group"
+          >
+            <div className="w-3 h-3 bg-dusk-coral rounded-full"></div>
+            <Plus className={cn(
+              "h-5 w-5 transition-transform duration-200",
+              isOpen && "rotate-45"
+            )} />
+            Optional Information
+            <ChevronDown className={cn(
+              "h-4 w-4 transition-transform duration-200 ml-auto",
+              isOpen && "rotate-180"
+            )} />
+          </button>
+        </CollapsibleTrigger>
+        
+        <CollapsibleContent className="space-y-6 mt-6">
+          <div className="grid gap-6 md:grid-cols-2">
             {/* Organizer Link */}
             <FormField
               control={form.control}
@@ -56,7 +61,7 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
                   <FormControl>
                     <Input
                       placeholder="https://example.com"
-                      className="h-10"
+                      className="h-11 border-2 border-mist-grey focus:border-dusk-coral"
                       {...field}
                     />
                   </FormControl>
@@ -78,7 +83,7 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
                     <Input
                       type="number"
                       placeholder="0"
-                      className="h-10"
+                      className="h-11 border-2 border-mist-grey focus:border-dusk-coral"
                       {...field}
                     />
                   </FormControl>
@@ -99,7 +104,7 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
                   <FormControl>
                     <Input
                       placeholder="https://example.com/book"
-                      className="h-10"
+                      className="h-11 border-2 border-mist-grey focus:border-dusk-coral"
                       {...field}
                     />
                   </FormControl>
@@ -120,7 +125,7 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
                   <FormControl>
                     <Input
                       placeholder="outdoor, sports, fun"
-                      className="h-10"
+                      className="h-11 border-2 border-mist-grey focus:border-dusk-coral"
                       {...field}
                     />
                   </FormControl>
@@ -128,30 +133,30 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
                 </FormItem>
               )}
             />
+          </div>
 
-            {/* Extra Info */}
-            <FormField
-              control={form.control}
-              name="extra_info"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-graphite-grey">
-                    Additional Information
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Any additional details about your event..."
-                      className="min-h-[100px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CollapsibleContent>
-        </Collapsible>
-      </div>
+          {/* Extra Info - Full width */}
+          <FormField
+            control={form.control}
+            name="extra_info"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-graphite-grey">
+                  Additional Information
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Any additional details about your event..."
+                    className="min-h-[120px] border-2 border-mist-grey focus:border-dusk-coral"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 };

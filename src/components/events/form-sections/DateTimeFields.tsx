@@ -33,13 +33,13 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ watch, setValue,
 
   // Auto-set end time to be 2 hours after start time when start time changes
   useEffect(() => {
-    if (startTime && !showEndDate) {
+    if (startTime) {
       const [hours, minutes] = startTime.split(':').map(Number);
       const endHours = (hours + 2) % 24;
       const endTime = `${endHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
       setValue('end_time', endTime);
     }
-  }, [startTime, setValue, showEndDate]);
+  }, [startTime, setValue]);
 
   const handleEndDateToggle = (checked: boolean | "indeterminate") => {
     const isChecked = checked === true;
@@ -47,12 +47,15 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ watch, setValue,
   };
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Start Date & Time */}
-      <div className="space-y-4">
-        <h3 className="text-sm font-medium text-graphite-grey">Event Start</h3>
+      <div className="bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 p-6 rounded-lg border border-ocean-teal/20">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-3 h-3 bg-ocean-teal rounded-full"></div>
+          <h3 className="text-lg font-semibold text-ocean-teal">Event Start</h3>
+        </div>
         <div className={cn(
-          "grid gap-3",
+          "grid gap-4",
           isMobile ? "grid-cols-1" : "grid-cols-2"
         )}>
           <FormField
@@ -67,7 +70,7 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ watch, setValue,
                   <DatePicker
                     selected={field.value}
                     onSelect={(date) => date && field.onChange(date)}
-                    className="w-full h-10"
+                    className="w-full h-11 border-2 border-mist-grey focus:border-ocean-teal"
                   />
                 </FormControl>
                 <FormMessage />
@@ -86,7 +89,7 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ watch, setValue,
                 <FormControl>
                   <Input
                     type="time"
-                    className="h-10"
+                    className="h-11 border-2 border-mist-grey focus:border-ocean-teal"
                     {...field}
                   />
                 </FormControl>
@@ -97,29 +100,34 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ watch, setValue,
         </div>
       </div>
 
-      {/* End Date Toggle */}
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id="show-end-date"
-          checked={showEndDate}
-          onCheckedChange={handleEndDateToggle}
-        />
-        <label
-          htmlFor="show-end-date"
-          className="text-sm font-medium text-graphite-grey cursor-pointer"
-        >
-          Set different end date/time
-        </label>
-      </div>
+      {/* End Time (Always shown) */}
+      <div className="bg-gradient-to-r from-sunrise-ochre/5 to-sunrise-ochre/10 p-6 rounded-lg border border-sunrise-ochre/20">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="w-3 h-3 bg-sunrise-ochre rounded-full"></div>
+          <h3 className="text-lg font-semibold text-sunrise-ochre">Event End</h3>
+        </div>
+        
+        {/* End Date Toggle */}
+        <div className="flex items-center space-x-3 mb-4 p-3 bg-white/50 rounded-md">
+          <Checkbox
+            id="show-end-date"
+            checked={showEndDate}
+            onCheckedChange={handleEndDateToggle}
+          />
+          <label
+            htmlFor="show-end-date"
+            className="text-sm font-medium text-graphite-grey cursor-pointer"
+          >
+            Event ends on a different date
+          </label>
+        </div>
 
-      {/* End Date & Time - Only show if checkbox is checked */}
-      {showEndDate && (
-        <div className="space-y-4">
-          <h3 className="text-sm font-medium text-graphite-grey">Event End</h3>
-          <div className={cn(
-            "grid gap-3",
-            isMobile ? "grid-cols-1" : "grid-cols-2"
-          )}>
+        <div className={cn(
+          "grid gap-4",
+          isMobile ? "grid-cols-1" : showEndDate ? "grid-cols-2" : "grid-cols-1"
+        )}>
+          {/* End Date - Only show if checkbox is checked */}
+          {showEndDate && (
             <FormField
               control={form.control}
               name="end_date"
@@ -132,36 +140,37 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ watch, setValue,
                     <DatePicker
                       selected={field.value}
                       onSelect={(date) => date && field.onChange(date)}
-                      className="w-full h-10"
+                      className="w-full h-11 border-2 border-mist-grey focus:border-sunrise-ochre"
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+          )}
 
-            <FormField
-              control={form.control}
-              name="end_time"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-graphite-grey">
-                    End Time
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="time"
-                      className="h-10"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          {/* End Time - Always shown */}
+          <FormField
+            control={form.control}
+            name="end_time"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-graphite-grey">
+                  End Time *
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="time"
+                    className="h-11 border-2 border-mist-grey focus:border-sunrise-ochre"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
-      )}
+      </div>
     </div>
   );
 };
