@@ -4,6 +4,8 @@ import { Tag } from 'lucide-react';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { DateFilterPill } from '@/components/events/DateFilterPill';
 import { ClearFiltersButton } from '@/components/events/filters/ClearFiltersButton';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
 interface FilterSectionProps {
   availableCategories: string[];
@@ -24,6 +26,8 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
   selectedDateFilter,
   setSelectedDateFilter
 }) => {
+  const isMobile = useIsMobile();
+  
   const dateFilters = [
     'today',
     'tomorrow',
@@ -38,7 +42,10 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className={cn(
+      "w-full max-w-full overflow-x-hidden",
+      isMobile ? "space-y-4" : "space-y-6"
+    )}>
       <div className="flex items-center justify-end">
         <ClearFiltersButton 
           onClick={resetFilters}
@@ -46,7 +53,9 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
         />
       </div>
 
-      <div className="space-y-6">
+      <div className={cn(
+        isMobile ? "space-y-4" : "space-y-6"
+      )}>
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-sm text-ocean-deep/70 font-mono font-medium bg-coral/10 px-3 py-1.5 rounded-lg w-fit uppercase tracking-wide">
             <Tag className="h-4 w-4 text-coral" />
@@ -57,7 +66,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
               </span>
             )}
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 w-full overflow-x-hidden">
             {availableCategories.map((category) => (
               <CategoryPill 
                 key={category} 
@@ -80,7 +89,7 @@ export const FilterSection: React.FC<FilterSectionProps> = ({
               </span>
             )}
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 w-full overflow-x-hidden">
             {dateFilters.map((filter) => (
               <DateFilterPill
                 key={filter}

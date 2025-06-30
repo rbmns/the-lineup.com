@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
 import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayout';
@@ -14,6 +13,7 @@ import { DateDropdownFilter } from '@/components/events/filters/DateDropdownFilt
 import { LocationDropdownFilter } from '@/components/events/filters/LocationDropdownFilter';
 import { X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { cn } from '@/lib/utils';
 
 const Events = () => {
   const isMobile = useIsMobile();
@@ -239,21 +239,30 @@ const Events = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-sand">
+    <div className="min-h-screen w-full bg-sand overflow-x-hidden">
       {/* Bohemian Header Section */}
-      <div className="w-full px-6 py-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-display font-semibold text-ocean-deep leading-tight">
+      <div className={cn(
+        "w-full",
+        isMobile ? "px-4 py-6" : "px-6 py-8"
+      )}>
+        <div className="text-center space-y-3">
+          <h1 className={cn(
+            "font-display font-semibold text-ocean-deep leading-tight",
+            isMobile ? "text-2xl" : "text-3xl sm:text-4xl lg:text-5xl"
+          )}>
             Discover <span className="text-vibrant-aqua">Events</span>
           </h1>
         </div>
       </div>
 
-      {/* Content - flows naturally */}
-      <div className="w-full px-6">
-        <div className="space-y-6 max-w-6xl mx-auto">
-          {/* Search and Filters - Centered */}
-          <div className="space-y-4 lg:space-y-0">
+      {/* Content - flows naturally with improved mobile spacing */}
+      <div className={cn(
+        "w-full max-w-full overflow-x-hidden",
+        isMobile ? "px-4" : "px-6"
+      )}>
+        <div className="space-y-4 max-w-6xl mx-auto w-full overflow-x-hidden">
+          {/* Search and Filters - Improved mobile centering */}
+          <div className="space-y-3">
             {/* Desktop Layout - Centered */}
             <div className="hidden lg:flex items-center justify-center gap-4">
               <div className="flex-1 max-w-md">
@@ -308,9 +317,9 @@ const Events = () => {
               )}
             </div>
 
-            {/* Mobile Layout - Centered */}
-            <div className="lg:hidden space-y-4">
-              <div className="w-full max-w-md mx-auto">
+            {/* Mobile Layout - Centered with tighter spacing */}
+            <div className="lg:hidden space-y-3">
+              <div className="w-full max-w-sm mx-auto">
                 <EventSearch 
                   placeholder="Search events..." 
                   className="w-full"
@@ -320,7 +329,8 @@ const Events = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:justify-center">
+              {/* Centered filter buttons with minimal gaps */}
+              <div className="flex flex-wrap gap-2 justify-center items-center">
                 <VibesDropdownFilter
                   selectedVibes={selectedVibes}
                   onVibeChange={setSelectedVibes}
@@ -355,7 +365,7 @@ const Events = () => {
                 <div className="flex justify-center">
                   <button
                     onClick={handleResetAllFilters}
-                    className="flex items-center gap-2 px-4 py-2 text-xs font-mono font-medium text-ocean-deep/70 hover:text-ocean-deep hover:bg-coral/10 border border-ocean-deep/20 rounded-md transition-all duration-200 uppercase tracking-wide"
+                    className="flex items-center gap-2 px-3 py-2 text-xs font-mono font-medium text-ocean-deep/70 hover:text-ocean-deep hover:bg-coral/10 border border-ocean-deep/20 rounded-md transition-all duration-200 uppercase tracking-wide"
                   >
                     <X className="h-3.5 w-3.5" />
                     Clear All
@@ -365,8 +375,8 @@ const Events = () => {
             </div>
           </div>
 
-          {/* Results Section */}
-          <div className="w-full">
+          {/* Results Section with improved mobile spacing */}
+          <div className="w-full overflow-x-hidden">
             <EventsResultsSection 
               filteredEvents={displayEvents} 
               hasActiveFilters={hasActiveFilters || !!searchQuery.trim()} 

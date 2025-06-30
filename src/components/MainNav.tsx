@@ -70,28 +70,31 @@ const MainNav = () => {
   // Always show border/shadow for clarity
   const shouldShowBorder = true;
 
-  return <>
+  return (
+    <>
       <header className={cn(
-        "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300",
+        "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 overflow-x-hidden",
         getNavBackground(),
         shouldShowBorder && "border-b border-mist-grey shadow-md"
       )}>
-        <div className="w-full flex flex-col">
+        <div className="w-full flex flex-col overflow-x-hidden">
           <div className={cn(
-            "w-full flex items-center justify-between transition-all duration-300",
+            "w-full flex items-center justify-between transition-all duration-300 max-w-full overflow-x-hidden",
             isMobile ? "px-4 py-3" : "px-6 py-3"
           )}>
             {/* Left side - Logo */}
-            <div className="flex items-center h-full flex-shrink-0">
-              {!isMobile && <Link to="/" className="flex items-center justify-center mr-3 flex-shrink-0">
+            <div className="flex items-center h-full flex-shrink-0 min-w-0">
+              {!isMobile && (
+                <Link to="/" className="flex items-center justify-center mr-3 flex-shrink-0">
                   <img 
                     src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" 
                     alt="the lineup Symbol" 
                     className="w-4 h-4 transition-opacity hover:opacity-80" 
                   />
-                </Link>}
+                </Link>
+              )}
               <Link to="/" className={cn(
-                "font-display font-bold hover:text-ocean-teal transition-colors text-xl",
+                "font-display font-bold hover:text-ocean-teal transition-colors text-xl truncate",
                 getTextColor()
               )}>
                 the lineup
@@ -99,25 +102,29 @@ const MainNav = () => {
             </div>
 
             {/* Center - Navigation (Desktop only) */}
-            {!isMobile && <nav className="flex items-center space-x-1">
+            {!isMobile && (
+              <nav className="flex items-center space-x-1 overflow-x-hidden">
                 {navItems.map(item => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.path;
-              return <Link 
+                  const Icon = item.icon;
+                  const isActive = location.pathname === item.path;
+                  return (
+                    <Link 
                       key={item.path} 
                       to={item.path} 
                       className={cn(
-                        "nav-link flex items-center gap-2 px-4 py-2 rounded-md font-montserrat text-sm font-medium transition-all duration-200",
+                        "nav-link flex items-center gap-2 px-4 py-2 rounded-md font-montserrat text-sm font-medium transition-all duration-200 whitespace-nowrap",
                         isActive 
                           ? "bg-ocean-teal/15 text-ocean-teal" 
                           : "text-graphite-grey hover:text-ocean-teal hover:bg-ocean-teal/10"
                       )}
                     >
-                      <Icon className="h-4 w-4" />
+                      <Icon className="h-4 w-4 flex-shrink-0" />
                       <span>{item.label}</span>
-                    </Link>;
-            })}
-              </nav>}
+                    </Link>
+                  );
+                })}
+              </nav>
+            )}
 
             {/* Right side - User Actions */}
             <NavActions onAuthRequired={handleAuthRequired} showCreateButton={false} />
@@ -126,30 +133,35 @@ const MainNav = () => {
       </header>
 
       {/* Mobile Bottom Navigation - Fully opaque */}
-      {isMobile && <div className="fixed bottom-0 left-0 right-0 z-50 bg-pure-white border-t border-mist-grey shadow-lg pb-safe">
-          <nav className="flex items-center justify-around px-2 py-2">
+      {isMobile && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-pure-white border-t border-mist-grey shadow-lg pb-safe overflow-x-hidden">
+          <nav className="flex items-center justify-around px-2 py-2 max-w-full overflow-x-hidden">
             {navItems.map(item => {
-          const Icon = item.icon;
-          const isActive = location.pathname === item.path;
-          return <Link 
+              const Icon = item.icon;
+              const isActive = location.pathname === item.path;
+              return (
+                <Link 
                   key={item.path} 
                   to={item.path} 
                   className={cn(
-                    "flex flex-col items-center gap-1 px-3 py-2 rounded-md font-montserrat text-xs font-medium transition-all duration-200 uppercase min-w-0",
+                    "flex flex-col items-center gap-1 px-2 py-2 rounded-md font-montserrat text-xs font-medium transition-all duration-200 uppercase min-w-0 flex-1 text-center",
                     isActive 
                       ? "text-ocean-teal bg-ocean-teal/15" 
                       : "text-graphite-grey hover:text-ocean-teal hover:bg-ocean-teal/10"
                   )}
                 >
                   <Icon className="h-4 w-4 flex-shrink-0" />
-                  <span className="truncate">{item.label}</span>
-                </Link>;
-        })}
+                  <span className="truncate text-xs">{item.label}</span>
+                </Link>
+              );
+            })}
           </nav>
-        </div>}
+        </div>
+      )}
 
       {/* Auth Overlay */}
-      {showAuthOverlay && <AuthOverlay 
+      {showAuthOverlay && (
+        <AuthOverlay 
           title="Join to Create Events" 
           description="Sign up or log in to create and organize your own events!" 
           browseEventsButton={true} 
@@ -157,8 +169,10 @@ const MainNav = () => {
           onBrowseEvents={handleCloseAuthOverlay}
         >
           <></>
-        </AuthOverlay>}
-    </>;
+        </AuthOverlay>
+      )}
+    </>
+  );
 };
 
 export default MainNav;

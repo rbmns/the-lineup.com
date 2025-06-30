@@ -3,6 +3,7 @@ import React from 'react';
 import { Event } from '@/types';
 import { EventCard } from '@/components/EventCard';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface EventGridProps {
   events: Event[];
@@ -23,13 +24,17 @@ export const EventGrid: React.FC<EventGridProps> = ({
   loadingEventId,
   compact
 }) => {
+  const isMobile = useIsMobile();
+  
   return (
     <div
       className={cn(
-        // Grid layout with consistent heights
-        "grid gap-6 w-full",
-        // Responsive grid columns
-        "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4",
+        // Grid layout with consistent heights and better mobile spacing
+        "grid w-full max-w-full overflow-x-hidden",
+        // Responsive grid columns with tighter mobile gaps
+        isMobile 
+          ? "grid-cols-1 gap-4" 
+          : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6",
         // Ensure equal row heights
         "auto-rows-fr",
         className
