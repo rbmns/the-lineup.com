@@ -13,90 +13,81 @@ const config = {
   theme: {
     container: {
       center: true,
-      padding: "1.5rem",
+      padding: "2rem",
       screens: {
         "2xl": "1400px",
       },
     },
     extend: {
-      screens: {
-        'xs': '480px',
+      fontFamily: {
+        'display': ['Inter', 'system-ui', 'sans-serif'],
+        'body': ['Inter', 'system-ui', 'sans-serif'],
+        'mono': ['JetBrains Mono', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "rgb(248 245 240)", // Sand - main background
-        foreground: "rgb(0 95 115)", // Ocean deep text
-        
-        // Coastal color palette - vibrant and natural
-        'sand': 'rgb(248 245 240)',      // Main site background
-        'coconut': 'rgb(252 250 247)',   // Event cards & nav background
-        'ivory': 'rgb(250 248 245)',     // Alternative sections
-        'sage': 'rgb(218 224 220)',      // Muted accents (legacy)
-        'clay': 'rgb(201 181 162)',      // Supportive color for tags/secondary
-        'seafoam': 'rgb(162 180 178)',   // Supportive green (legacy)
-        'ocean-deep': 'rgb(0 95 115)',   // Primary brand color
-        'vibrant-aqua': 'rgb(144 224 239)', // Accent color for hovers/highlights
-        'coral': 'rgb(238 108 77)',      // For small elements like filter labels
-        'sungold': 'rgb(255 158 0)',     // For small elements like filter labels
-        'driftwood': 'rgb(140 140 137)', // Neutral gray (legacy)
-        'midnight': 'rgb(30 30 30)',     // Dark text (legacy)
-        
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "rgb(0 95 115)", // Ocean Deep
-          foreground: "rgb(252 250 247)", // Coconut text on ocean
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "rgb(201 181 162)", // Clay
-          foreground: "rgb(0 95 115)", // Ocean Deep
-        },
-        muted: {
-          DEFAULT: "rgb(140 140 137)", // Driftwood
-          foreground: "rgb(0 95 115)", // Ocean Deep
-        },
-        accent: {
-          DEFAULT: "rgb(144 224 239)", // Vibrant Aqua
-          foreground: "rgb(0 95 115)", // Ocean Deep
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
-          DEFAULT: "rgb(205 92 92)",
-          foreground: "rgb(252 250 247)",
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: "rgb(252 250 247)", // Coconut
-          foreground: "rgb(0 95 115)", // Ocean Deep
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
         },
-      },
-      fontFamily: {
-        'display': ['Inter', 'sans-serif'],
-        'body': ['Inter', 'sans-serif'],
-        'mono': ['JetBrains Mono', 'SF Mono', 'Consolas', 'Liberation Mono', 'Menlo', 'monospace'],
+        // Coastal Theme Colors - Updated ocean-deep to be almost black
+        'ocean-deep': '#1a1a1a', // Changed from #005F73 to almost black
+        'vibrant-aqua': '#2A9D8F',
+        'coconut': '#F7F3E9',
+        'sunset-orange': '#E76F51',
+        'warm-sand': '#E9C46A',
+        'midnight': '#264653',
       },
       borderRadius: {
-        lg: "0.5rem", // Consistent md radius
-        md: "0.5rem",
-        sm: "0.375rem",
-      },
-      boxShadow: {
-        'coastal': '0 2px 8px 0 rgba(0, 95, 115, 0.08)',
-        'elevated': '0 4px 12px 0 rgba(0, 95, 115, 0.12)',
-        'navigation': '0 1px 3px 0 rgba(0, 95, 115, 0.1), 0 1px 2px 0 rgba(0, 95, 115, 0.06)',
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
-        "fade-in": {
-          "0%": {
-            opacity: "0",
-            transform: "translateY(4px)"
-          },
-          "100%": {
-            opacity: "1",
-            transform: "translateY(0)"
-          }
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
-        "fade-in": "fade-in 0.3s ease-out",
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+      },
+      boxShadow: {
+        'coastal': '0 4px 20px rgba(0, 95, 115, 0.08), 0 1px 3px rgba(0, 95, 115, 0.1)',
+        'coastal-lg': '0 10px 40px rgba(0, 95, 115, 0.12), 0 4px 16px rgba(0, 95, 115, 0.08)',
       },
     },
   },
