@@ -2,7 +2,7 @@
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar } from 'lucide-react';
-import { formatDate, formatEventTime } from '@/utils/date-formatting';
+import { formatDate, formatTime } from '@/utils/date-formatting';
 import { getEventImage } from '@/utils/eventImages';
 import EventShareButton from '@/components/events/EventShareButton';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -60,8 +60,9 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
               <div className="flex items-center text-large font-lato text-pure-white drop-shadow-md">
                 <Calendar className="h-5 w-5 mr-3 flex-shrink-0" />
                 <span>
-                  {event.start_date && formatDate(event.start_date)}
-                  {event.start_time && `, ${formatEventTime(event.start_time, event.end_time)}`}
+                  {event.start_date && formatDate(event.start_date, event.timezone)}
+                  {event.start_time && event.end_time && `, ${formatTime(event.start_time, event.start_date, event.timezone)}-${formatTime(event.end_time, event.start_date, event.timezone)}`}
+                  {event.start_time && !event.end_time && `, ${formatTime(event.start_time, event.start_date, event.timezone)}`}
                 </span>
               </div>
               
@@ -88,8 +89,9 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
             <div className="flex items-center text-base text-graphite-grey">
               <Calendar className="h-4 w-4 mr-2 flex-shrink-0 text-ocean-teal" />
               <span>
-                {event.start_date && formatDate(event.start_date)}
-                {event.start_time && `, ${formatEventTime(event.start_time, event.end_time)}`}
+                {event.start_date && formatDate(event.start_date, event.timezone)}
+                {event.start_time && event.end_time && `, ${formatTime(event.start_time, event.start_date, event.timezone)}-${formatTime(event.end_time, event.start_date, event.timezone)}`}
+                {event.start_time && !event.end_time && `, ${formatTime(event.start_time, event.start_date, event.timezone)}`}
               </span>
             </div>
             
