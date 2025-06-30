@@ -1,13 +1,20 @@
 
 export const designTokens = {
-  // THE LINEUP COASTAL MINERALS PALETTE
+  // THE LINEUP COASTAL MINERALS PALETTE - COMPLETE SYSTEM
   colors: {
     'pure-white': '#FFFFFF',
+    'coastal-haze': '#F2F8F8', // Subtle light blue-grey for backgrounds, tags, muted elements
     'graphite-grey': '#2C3E50', 
+    'ocean-deep': '#1a2332', // Almost black for main navigation and text
     'mist-grey': '#ECEFF1',
     'ocean-teal': '#00A389',
     'sunrise-ochre': '#E6AA68',
     'carbon-black': '#000000',
+    
+    // New Coastal Accent Colors for filters and highlights
+    'seafoam-drift': '#A9D1C1', // Muted green-blue
+    'dusk-coral': '#C47D68', // Desaturated earthy coral
+    'horizon-blue': '#6FA1B3', // Calm grey-blue
   },
   
   // MODERN PRECISION TYPOGRAPHY
@@ -59,12 +66,20 @@ export const designTokens = {
     gentle: 'transition-all duration-300 ease-in-out',
     quick: 'transition-all duration-150 ease-in-out',
   },
+  
+  // COASTAL FILTER STATES
+  filterStates: {
+    'seafoam-active': 'filter-active-seafoam',
+    'dusk-active': 'filter-active-dusk', 
+    'horizon-active': 'filter-active-horizon',
+  },
 } as const;
 
 export type BorderRadiusToken = keyof typeof designTokens.borderRadius;
 export type ShadowToken = keyof typeof designTokens.shadows;
 export type SpacingToken = keyof typeof designTokens.spacing;
 export type TransitionToken = keyof typeof designTokens.transitions;
+export type FilterStateToken = keyof typeof designTokens.filterStates;
 
 export const getBorderRadiusClass = (radius: BorderRadiusToken): string => {
   return designTokens.borderRadius[radius];
@@ -80,6 +95,10 @@ export const getSpacingClass = (spacing: SpacingToken): string => {
 
 export const getTransitionClass = (transition: TransitionToken): string => {
   return designTokens.transitions[transition];
+};
+
+export const getFilterStateClass = (state: FilterStateToken): string => {
+  return designTokens.filterStates[state];
 };
 
 // Design system defaults optimized for sophisticated coastal aesthetic

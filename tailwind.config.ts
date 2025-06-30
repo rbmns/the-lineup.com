@@ -29,14 +29,20 @@ const config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         
-        // The Lineup Coastal Minerals Palette - Updated with coastal-haze
+        // The Lineup Coastal Minerals Palette - Complete with New Coastal Accents
         'pure-white': '#FFFFFF',
-        'coastal-haze': '#F2F8F8', // New subtle coastal tint
+        'coastal-haze': '#F2F8F8', // Subtle light blue-grey for backgrounds, tags, muted elements
         'graphite-grey': '#2C3E50', 
+        'ocean-deep': '#1a2332', // Almost black for main navigation and text
         'mist-grey': '#ECEFF1',
         'ocean-teal': '#00A389',
         'sunrise-ochre': '#E6AA68',
         'carbon-black': '#000000',
+        
+        // New Coastal Accent Colors
+        'seafoam-drift': '#A9D1C1', // Muted green-blue for filter active states
+        'dusk-coral': '#C47D68', // Desaturated earthy coral for filter active states
+        'horizon-blue': '#6FA1B3', // Calm grey-blue for filter active states
         
         primary: {
           DEFAULT: "#00A389", // ocean-teal
