@@ -18,10 +18,10 @@ const fetchVenues = async (): Promise<Venue[]> => {
 };
 
 export const useVenues = () => {
-  const { data: venues, isLoading, error, isSuccess } = useQuery<Venue[], Error>({
+  const { data: venues, isLoading, error, isSuccess, refetch } = useQuery<Venue[], Error>({
     queryKey: ['venues'],
     queryFn: fetchVenues,
   });
 
-  return { venues: venues || [], isLoading, error, isSuccess };
+  return { venues: venues || [], isLoading, error, isSuccess, refetch };
 };
