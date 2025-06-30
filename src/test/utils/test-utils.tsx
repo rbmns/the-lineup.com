@@ -1,6 +1,6 @@
 
 import React, { ReactElement } from 'react';
-import { render, RenderOptions } from '@testing-library/react';
+import { render, RenderOptions, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { vi } from 'vitest';
@@ -28,7 +28,6 @@ const mockUser: User = {
   action_link: null,
   phone: null,
   phone_confirmed_at: null,
-  phone_change_token_sent_at: null,
   new_phone: null,
   factors: null,
   identities: null,
@@ -103,4 +102,4 @@ const customRender = (
 ) => render(ui, { wrapper: AllTheProviders, ...options });
 
 export * from '@testing-library/react';
-export { customRender as render };
+export { customRender as render, screen, fireEvent, waitFor };
