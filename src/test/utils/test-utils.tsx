@@ -28,7 +28,7 @@ const mockUser: User = {
   action_link: null,
   phone: null,
   phone_confirmed_at: null,
-  phone_change_sent_at: null,
+  phone_change_token_sent_at: null,
   new_phone: null,
   factors: null,
   identities: null,
