@@ -75,6 +75,7 @@ const config = {
         'h3': ['1.875rem', { lineHeight: '1.3', fontWeight: '600' }], // 30px
         'h4': ['1.5rem', { lineHeight: '1.4', fontWeight: '600' }], // 24px
         'body-base': ['1.125rem', { lineHeight: '1.7' }], // 18px with relaxed leading
+        'large': ['1.25rem', { lineHeight: '1.6' }], // 20px
         'small': ['0.875rem', { lineHeight: '1.5' }], // 14px
       },
       borderRadius: {
@@ -86,6 +87,7 @@ const config = {
         'sm': '0 1px 2px 0 rgba(44, 62, 80, 0.05)',
         'md': '0 4px 6px -1px rgba(44, 62, 80, 0.1), 0 2px 4px -1px rgba(44, 62, 80, 0.06)',
         'lg': '0 10px 15px -3px rgba(44, 62, 80, 0.1), 0 4px 6px -2px rgba(44, 62, 80, 0.05)',
+        'xl': '0 20px 25px -5px rgba(44, 62, 80, 0.1), 0 10px 10px -5px rgba(44, 62, 80, 0.04)',
       },
       keyframes: {
         "fade-in": {
@@ -108,14 +110,52 @@ const config = {
             opacity: "1"
           }
         },
+        "slide-up": {
+          "0%": {
+            transform: "translateY(10px)",
+            opacity: "0"
+          },
+          "100%": {
+            transform: "translateY(0)",
+            opacity: "1"
+          }
+        },
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
       },
       animation: {
         "fade-in": "fade-in 0.2s ease-out",
         "scale-in": "scale-in 0.2s ease-out",
+        "slide-up": "slide-up 0.3s ease-out",
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
       },
       scale: {
         '101': '1.01',
+        '102': '1.02',
       },
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
+        '128': '32rem',
+      },
+      maxWidth: {
+        '8xl': '88rem',
+        '9xl': '96rem',
+      },
+      zIndex: {
+        '60': '60',
+        '70': '70',
+        '80': '80',
+        '90': '90',
+        '100': '100',
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],
