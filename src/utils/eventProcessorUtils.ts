@@ -21,9 +21,10 @@ export const processEventsData = (eventsData: any[], userId?: string): Event[] =
         venueData = {
           id: venue.id || '',
           name: venue.name || '',
-          street: venue.street || '',
-          postal_code: venue.postal_code || '',
-          city: venue.city || '',
+          street: venue.street || null,
+          postal_code: venue.postal_code || null,
+          city: venue.city || null,
+          country: venue.country || null, // Include country property
           website: venue.website || null,
           google_maps: venue.google_maps || null,
           region: venue.region || null,
@@ -35,9 +36,10 @@ export const processEventsData = (eventsData: any[], userId?: string): Event[] =
         venueData = {
           id: eventData.venues.id || '',
           name: eventData.venues.name || '',
-          street: eventData.venues.street || '',
-          postal_code: eventData.venues.postal_code || '',
-          city: eventData.venues.city || '',
+          street: eventData.venues.street || null,
+          postal_code: eventData.venues.postal_code || null,
+          city: eventData.venues.city || null,
+          country: eventData.venues.country || null, // Include country property
           website: eventData.venues.website || null,
           google_maps: eventData.venues.google_maps || null,
           region: eventData.venues.region || null,
@@ -67,6 +69,9 @@ export const processEventsData = (eventsData: any[], userId?: string): Event[] =
       start_time: eventData.start_time,
       end_date: eventData.end_date,
       end_time: eventData.end_time,
+      start_datetime: eventData.start_datetime,
+      end_datetime: eventData.end_datetime,
+      timezone: eventData.timezone,
       venue_id: eventData.venue_id,
       venues: venueData,
       creator: creatorProfile,

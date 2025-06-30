@@ -1,6 +1,4 @@
 
-import { Database } from './supabase';
-
 export type Json =
   | string
   | number
@@ -17,7 +15,7 @@ export interface Profile {
   location: string | null;
   status: string | null;
   tagline: string | null;
-  status_details: string | null;
+  status_details?: string | null;
   created_at: string;
   updated_at: string;
   location_category: string | null;
@@ -36,9 +34,9 @@ export interface Venue {
   id: string;
   created_at?: string;
   name: string | null;
-  street: string | null;
+  street?: string | null;
   city: string | null;
-  country: string | null;
+  country?: string | null;
   postal_code?: string | null;
   website?: string | null;
   google_maps?: string | null;
@@ -149,7 +147,3 @@ export interface EventsResponse {
   data: Event[] | null;
   error: any;
 }
-
-export type EventType = Database['public']['Tables']['events']['Row']
-export type VenueType = Database['public']['Tables']['venues']['Row']
-export type ProfileType = Database['public']['Tables']['profiles']['Row']

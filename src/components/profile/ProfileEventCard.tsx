@@ -2,7 +2,7 @@
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin, Users } from 'lucide-react';
-import { formatEventCardDateTime } from '@/utils/date-formatting';
+import { formatEventDateTime } from '@/utils/timezone-utils';
 
 interface ProfileEventCardProps {
   event: Event;
@@ -16,6 +16,14 @@ export const ProfileEventCard: React.FC<ProfileEventCardProps> = ({ event }) => 
     });
     window.dispatchEvent(customEvent);
   };
+
+  // Use the unified datetime formatting function
+  const eventDateTime = formatEventDateTime({
+    start_datetime: event.start_datetime,
+    start_date: event.start_date || undefined,
+    start_time: event.start_time || undefined,
+    timezone: event.timezone
+  });
 
   return (
     <div 
@@ -41,7 +49,7 @@ export const ProfileEventCard: React.FC<ProfileEventCardProps> = ({ event }) => 
           <div className="space-y-2">
             <div className="flex items-center text-small text-graphite-grey/80">
               <Calendar className="h-4 w-4 mr-2 flex-shrink-0 text-ocean-teal" />
-              <span>{formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}</span>
+              <span>{eventDateTime.dateTime}</span>
             </div>
             
             {(event.venues?.name || event.location) && (

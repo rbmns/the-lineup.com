@@ -5,7 +5,7 @@ import { Calendar, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { CategoryPill } from '@/components/ui/category-pill';
-import { formatEventCardDateTime } from '@/utils/date-formatting';
+import { formatEventDateTime } from '@/utils/timezone-utils';
 import { Card } from '@/components/ui/card';
 
 interface MobileEventListItemProps {
@@ -61,6 +61,14 @@ const MobileEventListItem: React.FC<MobileEventListItemProps> = ({
     );
   };
 
+  // Use the unified datetime formatting function
+  const eventDateTime = formatEventDateTime({
+    start_datetime: event.start_datetime,
+    start_date: event.start_date || undefined,
+    start_time: event.start_time || undefined,
+    timezone: event.timezone
+  });
+
   return (
     <Card 
       className={cn(
@@ -89,7 +97,7 @@ const MobileEventListItem: React.FC<MobileEventListItemProps> = ({
         <div className="flex items-center gap-2 text-xs text-[#005F73]/80">
           <Calendar className="h-3 w-3 text-[#2A9D8F] flex-shrink-0" />
           <span className="font-medium">
-            {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
+            {eventDateTime.dateTime}
           </span>
         </div>
         

@@ -19,6 +19,8 @@ const mockEvents: Event[] = [
       id: 'venue-1',
       name: 'Test Venue',
       city: 'Amsterdam',
+      street: 'Test Street',
+      country: 'Netherlands',
     },
   },
 ];
