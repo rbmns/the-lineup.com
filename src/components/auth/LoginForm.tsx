@@ -8,7 +8,6 @@ import { LoginFormFields } from '@/components/auth/LoginFormFields';
 import { useAuth } from '@/contexts/AuthContext';
 import GoogleAuthButton from './GoogleAuthButton';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
 
 interface LoginFormProps {
   onToggleMode?: () => void;
@@ -45,20 +44,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({
   };
 
   return (
-    <>
+    <div className="space-y-6">
       <GoogleAuthButton 
         onClick={handleGoogleLogin} 
         loading={loading || authLoading}
+        className="w-full"
       >
         Sign in with Google
       </GoogleAuthButton>
 
-      <div className="relative my-4">
+      <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t" />
+          <span className="w-full border-t border-mist-grey" />
         </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">
+        <div className="relative flex justify-center text-xs uppercase font-mono tracking-wide">
+          <span className="bg-pure-white px-3 text-graphite-grey/60">
             Or continue with
           </span>
         </div>
@@ -90,29 +90,29 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         onSubmit={handleSubmit}
       />
       
-      <div className="text-sm text-center text-gray-500 space-y-2 mt-4">
-        <p>
+      <div className="text-body-small text-graphite-grey space-y-3 pt-4">
+        <div className="text-center">
           Don't have an account?{' '}
           <button 
             onClick={onToggleMode}
-            className="text-vibrant-seafoam hover:text-vibrant-seafoam/80 font-medium transition-colors"
+            className="text-ocean-teal hover:text-ocean-teal/80 font-medium transition-colors"
             type="button"
           >
             Sign up
           </button>
-        </p>
+        </div>
         {onForgotPassword && (
-          <p>
+          <div className="text-center">
             <button 
               onClick={onForgotPassword}
-              className="text-vibrant-seafoam hover:text-vibrant-seafoam/80 transition-colors"
+              className="text-ocean-teal hover:text-ocean-teal/80 transition-colors"
               type="button"
             >
               Forgot password?
             </button>
-          </p>
+          </div>
         )}
       </div>
-    </>
+    </div>
   );
 };

@@ -5,29 +5,36 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center font-body text-sm font-medium rounded-md transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ocean-deep focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:-translate-y-0.5",
+  "inline-flex items-center justify-center font-montserrat font-semibold transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ocean-teal focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-ocean-deep text-coconut hover:bg-ocean-deep/90 shadow-coastal",
-        primary: "bg-ocean-deep text-coconut hover:bg-ocean-deep/90 shadow-coastal",
-        secondary: "bg-clay text-ocean-deep hover:bg-clay/90 shadow-coastal",
-        accent: "bg-vibrant-aqua text-ocean-deep hover:bg-vibrant-aqua/90 shadow-coastal",
-        outline: "border border-ocean-deep/20 bg-transparent text-ocean-deep hover:bg-vibrant-aqua/10 hover:border-vibrant-aqua/40",
-        ghost: "text-ocean-deep hover:bg-vibrant-aqua/10 hover:text-ocean-deep",
-        link: "text-ocean-deep hover:text-vibrant-aqua hover:underline underline-offset-4",
-        destructive: "bg-destructive text-coconut hover:bg-destructive/90 shadow-coastal",
+        default: "btn-primary",
+        primary: "btn-primary", 
+        secondary: "btn-secondary",
+        outline: "btn-secondary", // Use secondary styling for outline
+        ghost: "bg-transparent text-graphite-grey hover:bg-mist-grey hover:text-graphite-grey",
+        link: "text-ocean-teal hover:text-graphite-grey hover:underline underline-offset-4 hover:scale-100", // Override scale for links
+        destructive: "bg-red-500 text-pure-white hover:bg-red-600",
+        accent: "bg-sunrise-ochre text-graphite-grey hover:opacity-90 hover:scale-101",
       },
       size: {
-        default: "px-4 py-2.5 h-10",
-        sm: "px-3 py-2 h-9 text-sm",
-        lg: "px-6 py-3 h-12 text-base",
+        default: "px-6 py-3 text-base", // Generous padding as specified
+        sm: "px-4 py-2 text-sm",
+        lg: "px-8 py-4 text-lg",
         icon: "h-10 w-10",
       },
+      radius: {
+        sm: "rounded-sm",
+        md: "rounded-md", // Default
+        lg: "rounded-lg", 
+        full: "rounded-full",
+      }
     },
     defaultVariants: {
       variant: "default",
       size: "default",
+      radius: "md",
     },
   }
 );
@@ -39,12 +46,12 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, radius, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
     
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size }), className)}
+        className={cn(buttonVariants({ variant, size, radius }), className)}
         ref={ref}
         {...props}
       />

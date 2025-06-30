@@ -1,12 +1,14 @@
 
 import React from 'react';
 import { Event } from '@/types';
-import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, Users, ExternalLink, Ticket } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { MapPin, Calendar, Clock, Users, ExternalLink, Info } from 'lucide-react';
+import { formatInTimeZone } from 'date-fns-tz';
+import { AMSTERDAM_TIMEZONE } from '@/utils/dateUtils';
 
 interface EventDetailSidebarProps {
   event: Event;
-  attendees?: { going: any[]; interested: any[] };
+  attendees: { going: any[]; interested: any[] };
   isAuthenticated: boolean;
 }
 
@@ -15,117 +17,123 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
   attendees,
   isAuthenticated
 }) => {
-  const eventLocation = event.venues?.name 
-    ? `${event.venues.name}${event.venues.city ? `, ${event.venues.city}` : ''}` 
-    : event.location || 'Location TBD';
-
-  const getGoogleMapsUrl = () => {
-    if (event.venues?.google_maps) {
-      return event.venues.google_maps;
+  const formatDateTime = (dateStr?: string | null, timeStr?: string | null) => {
+    if (!dateStr || !timeStr) return null;
+    try {
+      const dateTime = new Date(`${dateStr}T${timeStr}`);
+      return formatInTimeZone(dateTime, AMSTERDAM_TIMEZONE, 'PPP p');
+    } catch (error) {
+      return null;
     }
-
-    if (event.venues) {
-      const searchQuery = [
-        event.venues.name,
-        event.venues.street,
-        event.venues.city,
-        event.venues.postal_code
-      ].filter(Boolean).join(', ');
-      
-      if (searchQuery) {
-        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`;
-      }
-    }
-
-    if (event.location) {
-      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
-    }
-    
-    return null;
   };
 
-  const googleMapsUrl = getGoogleMapsUrl();
+  const startDateTime = formatDateTime(event.start_date, event.start_time);
+  const endDateTime = formatDateTime(event.start_date, event.end_time);
 
   return (
-    <div className="space-y-4">
-      {/* Location */}
+    <div className="space-y-6">
+      {/* Date & Time */}
       <Card>
-        <CardContent className="p-4">
-          <div className="flex items-start gap-3">
-            <MapPin className="h-5 w-5 text-gray-600 mt-0.5" />
-            <div className="text-left">
-              <h3 className="font-medium text-gray-900 mb-1 text-left">Location</h3>
-              <p className="text-sm text-gray-600 text-left">{eventLocation}</p>
-              {googleMapsUrl && (
-                <a
-                  href={googleMapsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mt-2 text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                >
-                  View on map
-                </a>
-              )}
-            </div>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-semibold flex items-center gap-2 text-graphite-grey">
+            <Calendar className="h-4 w-4 text-ocean-teal" />
+            Date & Time
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="text-sm space-y-1">
+            {startDateTime && (
+              <div className="flex items-start gap-2">
+                <Clock className="h-3 w-3 text-gray-500 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p>{startDateTime}</p>
+                  {endDateTime && endDateTime !== startDateTime && (
+                    <p className="text-gray-500">Until {endDateTime}</p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Booking Info */}
-      {(event.fee || event.booking_link) && (
+      {/* Location */}
+      {(event.venues || event.location) && (
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <Ticket className="h-5 w-5 text-gray-600 mt-0.5" />
-              <div className="text-left">
-                <h3 className="font-medium text-gray-900 mb-3 text-left">Booking Info</h3>
-                
-                {event.fee && (
-                  <div className="mb-3">
-                    <span className="text-sm text-gray-600">Entry fee: </span>
-                    <span className="font-medium">€{event.fee}</span>
-                  </div>
-                )}
-                
-                {event.booking_link && (
-                  <div>
-                    <a
-                      href={event.booking_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                    >
-                      Booking
-                    </a>
-                  </div>
-                )}
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2 text-graphite-grey">
+              <MapPin className="h-4 w-4 text-ocean-teal" />
+              Location
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="text-sm">
+              {event.venues ? (
+                <div>
+                  <p className="font-medium">{event.venues.name}</p>
+                  <p className="text-gray-600">
+                    {event.venues.street && `${event.venues.street}, `}
+                    {event.venues.city}
+                    {event.venues.postal_code && ` ${event.venues.postal_code}`}
+                  </p>
+                </div>
+              ) : (
+                <p>{event.location}</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Attendees */}
+      {isAuthenticated && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2 text-graphite-grey">
+              <Users className="h-4 w-4 text-ocean-teal" />
+              Who's Coming
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="text-sm space-y-2">
+              <div className="flex justify-between">
+                <span>Going</span>
+                <span className="font-medium">{attendees.going.length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Interested</span>
+                <span className="font-medium">{attendees.interested.length}</span>
               </div>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Attendee Summary */}
-      {isAuthenticated && (
+      {/* Booking Information */}
+      {(event.booking_link || event.extra_info) && (
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-start gap-3">
-              <Users className="h-5 w-5 text-gray-600 mt-0.5" />
-              <div className="w-full text-left">
-                <h3 className="font-medium text-gray-900 mb-3 text-left">Attendees</h3>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Going</span>
-                    <span className="text-sm font-medium">{attendees?.going?.length || 0}</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">Interested</span>
-                    <span className="text-sm font-medium">{attendees?.interested?.length || 0}</span>
-                  </div>
-                </div>
-              </div>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2 text-graphite-grey">
+              <Info className="h-4 w-4 text-ocean-teal" />
+              Booking Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="text-sm space-y-3">
+              {event.extra_info && (
+                <p>{event.extra_info}</p>
+              )}
+              {event.booking_link && (
+                <a
+                  href={event.booking_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-ocean-teal hover:text-ocean-teal/80 transition-colors"
+                >
+                  Book tickets
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              )}
             </div>
           </CardContent>
         </Card>

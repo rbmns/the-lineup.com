@@ -14,8 +14,8 @@ const Friends: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#005F73] mx-auto mb-4"></div>
-          <p className="text-[#005F73]">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-primary">Loading...</p>
         </div>
       </div>
     );
@@ -24,17 +24,17 @@ const Friends: React.FC = () => {
   // If user is not authenticated, show the login prompt with optimized mobile layout
   if (!user) {
     return (
-      <div className="min-h-screen">
-        {/* Header Section - Optimized for mobile above the fold */}
-        <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-4' : 'py-8 sm:py-12'}`}>
+      <div className="h-screen flex flex-col justify-center">
+        {/* Header Section - Compact for viewport fit */}
+        <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-2' : 'py-4'}`}>
           <div className="text-center">
-            <h1 className={`font-bold text-[#005F73] mb-4 leading-tight ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
-              Connect with your <span className="text-[#2A9D8F]">crew</span>
+            <h1 className={`font-bold text-primary mb-2 leading-tight ${isMobile ? 'text-xl' : 'text-2xl sm:text-3xl'}`}>
+              Connect with your <span className="text-secondary">crew</span>
             </h1>
-            <p className={`text-[#4A4A48] max-w-3xl mx-auto leading-relaxed mb-6 ${isMobile ? 'text-base' : 'text-lg sm:text-xl'}`}>
+            <p className={`auth-subtext max-w-2xl mx-auto leading-relaxed mb-3 ${isMobile ? 'text-sm' : 'text-base'}`}>
               See what your friends are up to, discover events together, and make new connections.
             </p>
-            <div className="flex justify-center items-center gap-6 text-2xl opacity-60">
+            <div className="flex justify-center items-center gap-4 text-xl opacity-60">
               <span>👥</span>
               <span>🤝</span>
               <span>🎉</span>
@@ -55,10 +55,10 @@ const Friends: React.FC = () => {
       {/* Header Section - Optimized for mobile */}
       <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-4' : 'py-8 sm:py-12'}`}>
         <div className="text-center">
-          <h1 className={`font-bold text-[#005F73] mb-4 leading-tight ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
-            Your <span className="text-[#2A9D8F]">crew</span>
+          <h1 className={`font-bold text-primary mb-4 leading-tight ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
+            Your <span className="text-secondary">crew</span>
           </h1>
-          <p className={`text-[#4A4A48] max-w-3xl mx-auto leading-relaxed mb-6 ${isMobile ? 'text-base' : 'text-lg sm:text-xl'}`}>
+          <p className={`auth-subtext max-w-3xl mx-auto leading-relaxed mb-6 ${isMobile ? 'text-base' : 'text-lg sm:text-xl'}`}>
             See what your friends are up to and discover events together.
           </p>
           <div className="flex justify-center items-center gap-6 text-2xl opacity-60">

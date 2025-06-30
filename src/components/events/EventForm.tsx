@@ -15,6 +15,8 @@ import { Button } from '@/components/ui/button';
 import { Form } from '@/components/ui/form';
 import { useAuth } from '@/contexts/AuthContext';
 import { Event } from '@/types';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
 interface EventFormProps {
   eventId?: string;
@@ -24,6 +26,7 @@ interface EventFormProps {
 
 export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = false, initialData }) => {
   const { isAuthenticated, user, session } = useAuth();
+  const isMobile = useIsMobile();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [createdEventId, setCreatedEventId] = useState<string | null>(null);
@@ -111,9 +114,16 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
   return (
     <>
       <Form {...form}>
-        <form onSubmit={handleSubmit(handleFormSubmit, onInvalid)} className="space-y-4 sm:space-y-6">
-          {/* Required Fields - More compact spacing */}
-          <div className="space-y-4 sm:space-y-6">
+        <form onSubmit={handleSubmit(handleFormSubmit, onInvalid)} className="space-y-8">
+          {/* Required Fields Section */}
+          <div className="space-y-6">
+            <div className="pb-4 border-b border-mist-grey">
+              <h3 className="text-h4 text-graphite-grey mb-2">Event Details</h3>
+              <p className="text-small text-graphite-grey opacity-75">
+                Tell people about your event
+              </p>
+            </div>
+            
             <TitleField register={register} errors={errors} />
             <DescriptionField register={register} errors={errors} />
             <DateTimeFields register={register} watch={watch} setValue={setValue} errors={errors} />
@@ -129,8 +139,15 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
             <VibeToggleField watch={watch} setValue={setValue} errors={errors} />
           </div>
 
-          {/* Optional Fields - More compact */}
-          <div className="pt-2 sm:pt-4">
+          {/* Optional Fields Section */}
+          <div className="pt-6 border-t border-mist-grey">
+            <div className="pb-4">
+              <h3 className="text-h4 text-graphite-grey mb-2">Additional Information</h3>
+              <p className="text-small text-graphite-grey opacity-75">
+                Optional details to help attendees
+              </p>
+            </div>
+            
             <OptionalFieldsSection 
               register={register} 
               errors={errors} 
@@ -140,13 +157,19 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
             />
           </div>
 
-          {/* Submit Button - More compact */}
-          <div className="pt-4 sm:pt-6">
+          {/* Submit Button */}
+          <div className={cn(
+            "pt-8 border-t border-mist-grey",
+            isMobile ? "pb-4" : "pb-0"
+          )}>
             <Button 
               type="submit" 
               variant="default"
               disabled={isSubmitting}
-              className="w-full sm:w-auto h-9 sm:h-10 text-sm sm:text-base"
+              className={cn(
+                "btn-primary text-base font-semibold py-4 px-8 min-h-[50px]",
+                isMobile ? "w-full" : "w-auto"
+              )}
             >
               {isSubmitting ? "Publishing..." : isEditMode ? "Update Event" : "Publish Event"}
             </Button>

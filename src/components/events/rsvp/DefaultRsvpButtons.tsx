@@ -1,15 +1,12 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import { Check, Heart, Loader2 } from 'lucide-react';
-
-export type RsvpStatus = 'Going' | 'Interested' | null;
-export type RsvpHandler = (status: 'Going' | 'Interested') => Promise<boolean>;
+import { cn } from '@/lib/utils';
 
 interface DefaultRsvpButtonsProps {
-  currentStatus: RsvpStatus;
-  onRsvp: RsvpHandler;
+  currentStatus: 'Going' | 'Interested' | null;
+  onRsvp: (status: 'Going' | 'Interested', e?: React.MouseEvent) => Promise<boolean>;
   isLoading?: boolean;
   className?: string;
   activeButton?: 'Going' | 'Interested' | null;
@@ -21,122 +18,76 @@ export const DefaultRsvpButtons: React.FC<DefaultRsvpButtonsProps> = ({
   currentStatus,
   onRsvp,
   isLoading = false,
-  className,
-  activeButton,
+  className = '',
+  activeButton = null,
   size = 'default',
   variant = 'default'
 }) => {
-  const goingLoading = isLoading && activeButton === 'Going';
-  const interestedLoading = isLoading && activeButton === 'Interested';
+  const isGoing = currentStatus === 'Going';
+  const isInterested = currentStatus === 'Interested';
 
-  const handleRsvp = async (status: 'Going' | 'Interested', e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    
-    await onRsvp(status);
+  const buttonSizeClasses = {
+    sm: 'px-3 py-1.5 text-sm',
+    default: 'px-4 py-2 text-base',
+    lg: 'px-6 py-3 text-lg'
   };
 
-  // Size-specific classes
-  const sizeClasses = {
-    sm: "text-xs py-1 px-2 gap-1",
-    default: "text-sm py-1.5 px-3 gap-1.5",
-    lg: "text-base py-2 px-4 gap-2",
-  };
-
-  // Variant-specific classes
-  const getVariantClasses = (buttonType: 'Going' | 'Interested') => {
-    const isActive = currentStatus === buttonType;
-
-    if (variant === 'default') {
-      if (buttonType === 'Going') {
-        return isActive
-          ? "bg-[#005F73] text-white hover:bg-[#005F73]/90"
-          : "bg-[#F9F3E9] hover:bg-[#F9F3E9]/80 text-[#005F73]";
-      } else {
-        return isActive
-          ? "bg-[#EDC46A] text-white hover:bg-[#EDC46A]/90"
-          : "bg-[#F9F3E9] hover:bg-[#F9F3E9]/80 text-[#005F73]";
-      }
-    } else if (variant === 'subtle') {
-      if (buttonType === 'Going') {
-        return isActive
-          ? "bg-[#005F73]/15 text-[#005F73] hover:bg-[#005F73]/20"
-          : "bg-[#F4E7D3] hover:bg-[#F9F3E9] text-[#005F73]";
-      } else {
-        return isActive
-          ? "bg-[#EDC46A]/15 text-[#EDC46A] hover:bg-[#EDC46A]/20"
-          : "bg-[#F4E7D3] hover:bg-[#F9F3E9] text-[#005F73]";
-      }
-    } else {
-      // outline variant
-      if (buttonType === 'Going') {
-        return isActive
-          ? "border-[#005F73] bg-[#005F73]/10 text-[#005F73] hover:bg-[#005F73]/15"
-          : "border-gray-300 hover:border-[#005F73] text-[#005F73]";
-      } else {
-        return isActive
-          ? "border-[#EDC46A] bg-[#EDC46A]/10 text-[#EDC46A] hover:bg-[#EDC46A]/15"
-          : "border-gray-300 hover:border-[#EDC46A] text-[#005F73]";
-      }
-    }
-  };
+  const sizeClass = buttonSizeClasses[size];
 
   return (
-    <div className={cn("flex w-full gap-2", className)} data-no-navigation="true">
-      {/* Going Button */}
-      <button
-        type="button"
-        onClick={(e) => handleRsvp('Going', e)}
-        disabled={isLoading}
+    <div 
+      className={cn('flex gap-2 w-full', className)}
+      data-rsvp-buttons-container="true"
+    >
+      <Button
+        variant={isGoing ? "default" : "outline"}
         className={cn(
-          "flex flex-1 items-center justify-center rounded-md font-medium transition-all",
-          sizeClasses[size],
-          variant === "outline" ? "border" : "",
-          getVariantClasses('Going'),
-          "disabled:opacity-60 disabled:cursor-not-allowed"
+          'btn-primary flex-1 gap-2 transition-all duration-200',
+          sizeClass,
+          isGoing ? 'bg-ocean-teal hover:bg-ocean-teal/90 text-white' : 'border-ocean-teal text-ocean-teal hover:bg-ocean-teal hover:text-white',
+          activeButton === 'Going' && 'scale-95'
         )}
-        data-no-navigation="true"
-      >
-        {goingLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        ) : (
-          <Check 
-            size={size === "sm" ? 14 : size === "lg" ? 18 : 16}
-            className={cn(
-              "transition-transform",
-              currentStatus === "Going" ? "scale-110" : "scale-100"
-            )}
-          />
-        )}
-        Going
-      </button>
-
-      {/* Interested Button */}
-      <button
-        type="button"
-        onClick={(e) => handleRsvp('Interested', e)}
+        onClick={(e) => onRsvp('Going', e)}
         disabled={isLoading}
-        className={cn(
-          "flex flex-1 items-center justify-center rounded-md font-medium transition-all",
-          sizeClasses[size],
-          variant === "outline" ? "border" : "",
-          getVariantClasses('Interested')
-        )}
-        data-no-navigation="true"
+        data-rsvp-status="Going"
       >
-        {interestedLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
+        {isLoading && activeButton === 'Going' ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Going...
+          </>
         ) : (
-          <Heart 
-            size={size === "sm" ? 14 : size === "lg" ? 18 : 16}
-            className={cn(
-              "transition-transform",
-              currentStatus === "Interested" ? "scale-110" : "scale-100"
-            )}
-          />
+          <>
+            <Check className="h-4 w-4" />
+            Going
+          </>
         )}
-        Interested
-      </button>
+      </Button>
+      
+      <Button
+        variant={isInterested ? "default" : "outline"}
+        className={cn(
+          'btn-secondary flex-1 gap-2 transition-all duration-200',
+          sizeClass,
+          isInterested ? 'bg-sunrise-ochre hover:bg-sunrise-ochre/90 text-graphite-grey' : 'border-sunrise-ochre text-sunrise-ochre hover:bg-sunrise-ochre hover:text-graphite-grey',
+          activeButton === 'Interested' && 'scale-95'
+        )}
+        onClick={(e) => onRsvp('Interested', e)}
+        disabled={isLoading}
+        data-rsvp-status="Interested"
+      >
+        {isLoading && activeButton === 'Interested' ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Interested...
+          </>
+        ) : (
+          <>
+            <Heart className="h-4 w-4" />
+            Interested
+          </>
+        )}
+      </Button>
     </div>
   );
 };

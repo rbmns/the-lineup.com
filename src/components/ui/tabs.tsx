@@ -13,8 +13,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      // Beach vibe: swap for soft turquoise/seafoam gradient, less harsh border/shadow
-      "inline-flex h-10 items-center justify-center rounded-xl bg-gradient-to-r from-[#E0F7F7] via-[#FFF] to-[#FFFBEB] shadow-turquoise p-1 text-muted-foreground w-full border border-[#CFF0F0]",
+      "inline-flex h-10 items-center justify-center rounded-xl bg-coconut border border-sage p-1 text-midnight shadow-coastal w-full",
       className
     )}
     {...props}
@@ -29,8 +28,7 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      // Beach vibe active = turquoise, inactive = sand hover
-      "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-1.5 text-base font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-brand-turquoise data-[state=active]:text-white data-[state=active]:shadow-turquoise hover:bg-yellow-50 hover:text-brand-turquoise",
+      "inline-flex items-center justify-center whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium text-midnight transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-midnight data-[state=active]:shadow-coastal hover:bg-sage/30 hover:text-midnight",
       className
     )}
     {...props}

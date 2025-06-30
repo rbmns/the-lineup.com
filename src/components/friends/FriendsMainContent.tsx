@@ -9,9 +9,7 @@ import { FriendsTabContent } from '@/components/friends/FriendsTabContent';
 import { SuggestedFriendsTabContent } from '@/components/friends/SuggestedFriendsTabContent';
 import { FriendsHeader } from '@/components/friends/FriendsHeader';
 import { FriendsTabsNew } from '@/components/friends/FriendsTabsNew';
-import { FriendsEventsTabContent } from '@/components/friends/FriendsEventsTabContent';
 import { FriendsSearchSection } from '@/components/friends/FriendsSearchSection';
-import { FriendsCasualPlansTabContent } from '@/components/friends/FriendsCasualPlansTabContent';
 import { supabase } from '@/lib/supabase';
 
 export const FriendsMainContent: React.FC = () => {
@@ -75,10 +73,20 @@ export const FriendsMainContent: React.FC = () => {
     return filtered;
   }, [searchQuery, friends, user]);
 
-  // Get friend IDs for events and casual plans queries
+  // Get friend IDs and pending request IDs for filtering suggestions
   const friendIds = React.useMemo(() => {
     return friends?.map(friend => friend.id) || [];
   }, [friends]);
+
+  // Filter suggested friends to exclude those we already sent requests to
+  const filteredSuggestedFriends = React.useMemo(() => {
+    if (!suggestedFriends || !pendingRequestIds) return suggestedFriends;
+    
+    return suggestedFriends.filter(friend => 
+      !pendingRequestIds.includes(friend.id) && 
+      !friendIds.includes(friend.id)
+    );
+  }, [suggestedFriends, pendingRequestIds, friendIds]);
 
   // Handle sending a friend request
   const handleAddFriend = async (friendId: string) => {
@@ -131,7 +139,7 @@ export const FriendsMainContent: React.FC = () => {
   };
 
   const pendingRequestsCount = requests?.length || 0;
-  const suggestedFriendsCount = suggestedFriends?.length || 0;
+  const suggestedFriendsCount = filteredSuggestedFriends?.length || 0;
 
   return (
     <div className="min-h-screen">
@@ -144,7 +152,7 @@ export const FriendsMainContent: React.FC = () => {
         />
       </div>
 
-      {/* Friends Content - No wrapper containers */}
+      {/* Friends Content */}
       <div className="max-w-screen-lg mx-auto px-6 pb-6 md:pb-8">
         <FriendsTabsNew
           activeTab={activeTab}
@@ -165,7 +173,7 @@ export const FriendsMainContent: React.FC = () => {
           }
           suggestionsContent={
             <SuggestedFriendsTabContent
-              suggestedFriends={suggestedFriends}
+              suggestedFriends={filteredSuggestedFriends}
               loading={suggestedLoading}
               onAddFriend={handleAddSuggestedFriend}
               onDismiss={handleDismissSuggestion}
@@ -183,19 +191,6 @@ export const FriendsMainContent: React.FC = () => {
               showFriendRequests={true}
               searchQuery={undefined}
               onSearchChange={undefined}
-            />
-          }
-          eventsContent={
-            <FriendsEventsTabContent 
-              friendIds={friendIds}
-              currentUserId={user.id}
-              friends={friends || []}
-            />
-          }
-          casualPlansContent={
-            <FriendsCasualPlansTabContent 
-              friendIds={friendIds}
-              currentUserId={user.id}
             />
           }
         />

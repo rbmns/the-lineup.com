@@ -28,31 +28,31 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-secondary-25 to-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-sand flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md">
         {/* Welcome Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-primary mb-4">
-            Sign in to your account
+          <h1 className="text-h2 font-display text-ocean-deep mb-6">
+            Welcome Back
           </h1>
-          <p className="text-lg text-neutral">
-            Ready to find your next adventure?
+          <p className="text-body-base text-graphite-grey mb-4">
+            Sign in to your account to continue
           </p>
-          <div className="flex justify-center items-center gap-4 text-xl opacity-60 mt-4">
+          <div className="flex justify-center items-center gap-4 text-xl opacity-60">
             <span>🌊</span>
             <span>🎯</span>
             <span>✨</span>
           </div>
         </div>
 
-        <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-semibold text-primary">Sign In</CardTitle>
-            <CardDescription className="text-neutral">
-              Sign in to your account to continue
+        <Card className="card-base">
+          <CardHeader className="text-center pb-6">
+            <CardTitle className="text-h4 text-ocean-deep mb-2">Sign In</CardTitle>
+            <CardDescription className="text-body-small text-graphite-grey/80">
+              Enter your credentials to access your account
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="px-6 pb-6">
             <LoginForm 
               onToggleMode={handleToggleMode}
               onForgotPassword={handleForgotPassword}

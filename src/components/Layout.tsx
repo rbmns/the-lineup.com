@@ -7,9 +7,7 @@ import { CookieConsent } from "@/components/CookieConsent";
 import { useLocation, Outlet } from 'react-router-dom';
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useScrollToTop } from "@/hooks/useScrollToTop";
-
-const TOP_NAV_HEIGHT = 70;
-const MOBILE_BOTTOM_NAV_HEIGHT = 80;
+import { cn } from "@/lib/utils";
 
 const Layout = () => {
   const { user, loading } = useAuth();
@@ -20,13 +18,17 @@ const Layout = () => {
   useScrollToTop();
 
   return (
-    <div className="min-h-screen w-full bg-sand">
+    <div className="min-h-screen w-full bg-pure-white">
       <MainNav />
       <div className="flex w-full min-h-screen">
-        {/* Main Content Area - flows naturally on sand background */}
-        <div className="flex-1 w-full min-h-screen bg-sand flex flex-col">
-          {/* Main content - flows naturally without page wrappers */}
-          <main className="w-full flex-1 flex flex-col">
+        {/* Main Content Area */}
+        <div className="flex-1 w-full min-h-screen bg-pure-white flex flex-col">
+          {/* Main content with consistent padding system */}
+          <main className={cn(
+            "w-full flex-1 flex flex-col",
+            !isHomePage && "pt-16", // Add top padding for non-home pages
+            isMobile && "pb-20" // Add bottom padding on mobile for bottom nav
+          )}>
             <div className="flex-1 flex flex-col">
               <Outlet />
             </div>
