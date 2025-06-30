@@ -1,55 +1,122 @@
 
 export const designTokens = {
+  // THE LINEUP COASTAL MINERALS PALETTE
+  colors: {
+    'pure-white': '#FFFFFF',
+    'graphite-grey': '#2C3E50', 
+    'mist-grey': '#ECEFF1',
+    'ocean-teal': '#00A389',
+    'sunrise-ochre': '#E6AA68',
+    'carbon-black': '#000000',
+  },
+  
+  // MODERN PRECISION TYPOGRAPHY
+  typography: {
+    fonts: {
+      primary: 'Montserrat', // Headlines, navigation, emphasis
+      secondary: 'Lato', // Body text, details
+    },
+    sizes: {
+      display: '4rem', // 64px
+      h1: '3rem', // 48px
+      h2: '2.25rem', // 36px
+      h3: '1.875rem', // 30px
+      h4: '1.5rem', // 24px
+      bodyBase: '1.125rem', // 18px
+      small: '0.875rem', // 14px
+    },
+  },
+  
+  // SOPHISTICATED BORDER RADIUS
   borderRadius: {
     none: 'rounded-none',
-    sm: 'rounded-sm',
-    md: 'rounded-md',
-    DEFAULT: 'rounded-md', // Consistent minimal radius
+    sm: 'rounded-sm', // Very subtle rounding
+    md: 'rounded-md', // Most buttons, cards, inputs
+    lg: 'rounded-lg', // Prominent cards, modals
+    full: 'rounded-full', // Circular elements
+    DEFAULT: 'rounded-md', // Default for consistency
   },
+  
+  // CLEAN SHADOWS
+  shadows: {
+    sm: 'shadow-sm', // Very slight elevation
+    md: 'shadow-md', // General cards, clean and contained
+    lg: 'shadow-lg', // Prominent elevation
+  },
+  
+  // GENEROUS SPACING
   spacing: {
-    section: 'px-6 py-12',
-    card: 'p-6',
-    tight: 'p-4',
-    generous: 'px-6 py-16',
+    section: 'py-8 md:py-16', // Section vertical padding
+    container: 'px-6 md:px-8', // Container horizontal padding
+    card: 'p-6', // Card internal padding
+    generous: 'p-8 md:p-12', // Abundant whitespace
+    tight: 'p-4', // Compact spacing
   },
-  typography: {
-    display: 'font-display',
-    body: 'font-body',
-    mono: 'font-mono',
+  
+  // SMOOTH TRANSITIONS
+  transitions: {
+    default: 'transition-all duration-200 ease-in-out',
+    gentle: 'transition-all duration-300 ease-in-out',
+    quick: 'transition-all duration-150 ease-in-out',
   },
-  colors: {
-    // Bohemian coastal palette
-    sand: 'rgb(248 245 240)',        // Main background - warm sand
-    coconut: 'rgb(252 250 247)',     // Card backgrounds - soft coconut
-    ivory: 'rgb(250 248 245)',       // Alternate sections - gentle ivory
-    sage: 'rgb(218 224 220)',        // Muted accents - coastal sage
-    clay: 'rgb(201 181 162)',        // Warm earth tone
-    seafoam: 'rgb(162 180 178)',     // Soft sea green
-    oceanDeep: 'rgb(0 95 115)',      // Primary brand - deep ocean
-    vibrantAqua: 'rgb(144 224 239)', // Accent/hover pop - bright aqua
-    driftwood: 'rgb(140 140 137)',   // Neutral gray - weathered wood
-    midnight: 'rgb(30 30 30)',       // Primary text
-  }
 } as const;
 
 export type BorderRadiusToken = keyof typeof designTokens.borderRadius;
+export type ShadowToken = keyof typeof designTokens.shadows;
+export type SpacingToken = keyof typeof designTokens.spacing;
+export type TransitionToken = keyof typeof designTokens.transitions;
 
 export const getBorderRadiusClass = (radius: BorderRadiusToken): string => {
   return designTokens.borderRadius[radius];
 };
 
-// Coastal-focused defaults with consistent md radius
-export const defaultRadius = {
-  button: 'md' as BorderRadiusToken,
-  card: 'md' as BorderRadiusToken,
-  input: 'md' as BorderRadiusToken,
-  categoryPill: 'md' as BorderRadiusToken,  // Rounded but not full
-  badge: 'md' as BorderRadiusToken,
+export const getShadowClass = (shadow: ShadowToken): string => {
+  return designTokens.shadows[shadow];
+};
+
+export const getSpacingClass = (spacing: SpacingToken): string => {
+  return designTokens.spacing[spacing];
+};
+
+export const getTransitionClass = (transition: TransitionToken): string => {
+  return designTokens.transitions[transition];
+};
+
+// Design system defaults optimized for sophisticated coastal aesthetic
+export const defaults = {
+  button: {
+    radius: 'md' as BorderRadiusToken,
+    transition: 'default' as TransitionToken,
+  },
+  card: {
+    radius: 'md' as BorderRadiusToken,
+    shadow: 'md' as ShadowToken,
+    spacing: 'card' as SpacingToken,
+  },
+  input: {
+    radius: 'md' as BorderRadiusToken,
+    transition: 'default' as TransitionToken,
+  },
+  layout: {
+    section: 'section' as SpacingToken,
+    container: 'container' as SpacingToken,
+  },
 } as const;
 
-// New coastal shadows
-export const coastalShadows = {
-  coastal: '0 2px 8px 0 rgba(0, 95, 115, 0.08)',
-  elevated: '0 4px 12px 0 rgba(0, 95, 115, 0.12)',
-  navigation: '0 1px 3px 0 rgba(0, 95, 115, 0.1), 0 1px 2px 0 rgba(0, 95, 115, 0.06)',
-} as const;
+// Color utility functions for programmatic access
+export const getColorValue = (colorName: keyof typeof designTokens.colors): string => {
+  return designTokens.colors[colorName];
+};
+
+// Typography utility functions
+export const getFontSize = (size: keyof typeof designTokens.typography.sizes): string => {
+  return designTokens.typography.sizes[size];
+};
+
+export const getPrimaryFont = (): string => {
+  return designTokens.typography.fonts.primary;
+};
+
+export const getSecondaryFont = (): string => {
+  return designTokens.typography.fonts.secondary;
+};

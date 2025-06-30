@@ -9,7 +9,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "event-card", // Use our unified event card styling
+      "card-base", // Use our design system class
       className
     )}
     {...props}
@@ -35,7 +35,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn("font-display text-lg text-midnight leading-tight font-semibold", className)}
+    className={cn("text-h4 font-montserrat text-graphite-grey leading-tight", className)}
     {...props}
   />
 ))
@@ -47,7 +47,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("font-body text-sm text-overcast leading-relaxed", className)}
+    className={cn("text-body-base font-lato text-graphite-grey/80 leading-relaxed", className)}
     {...props}
   />
 ))
