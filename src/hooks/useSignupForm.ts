@@ -43,7 +43,40 @@ export const useSignupForm = () => {
 
   const handleGoogleLogin = async () => {
     if (loading || authLoading) return;
-    await loginWithGoogle();
+    
+    setLoading(true);
+    setErrorMessage("");
+    
+    try {
+      console.log("Attempting Google signup/login");
+      const { error } = await loginWithGoogle();
+      
+      if (error) {
+        console.error("Google signup/login error:", error);
+        setErrorMessage(error.message || "Google authentication failed. Please try again.");
+        toast({
+          title: "Google sign up failed",
+          description: error.message || "Please try again.",
+          variant: "destructive"
+        });
+      } else {
+        console.log("Google authentication successful");
+        toast({
+          title: "Welcome! 🎉",
+          description: "You're now signed in with Google.",
+        });
+      }
+    } catch (error: any) {
+      console.error("Unexpected Google auth error:", error);
+      setErrorMessage("An unexpected error occurred with Google authentication.");
+      toast({
+        title: "Something went wrong",
+        description: "Please try again or use email signup.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleFieldBlur = (fieldName: string) => {
@@ -55,45 +88,83 @@ export const useSignupForm = () => {
     setErrorMessage("");
     
     try {
-      await supabase.auth.signOut({ scope: 'global' }).catch(() => {});
+      console.log("Starting signup process for email:", values.email);
+      
+      // Clean up any existing sessions first
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (e) {
+        console.log("No existing session to clear");
+      }
       
       const baseUrl = window.location.origin;
+      const redirectUrl = `${baseUrl}/`;
+      
+      console.log("Using redirect URL:", redirectUrl);
+      
       const { data, error } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
         options: {
-          emailRedirectTo: `${baseUrl}/profile/edit?welcome=true`,
+          emailRedirectTo: redirectUrl,
+          data: {
+            username: values.email.split('@')[0]
+          }
         }
       });
 
       if (error) {
+        console.error("Signup error:", error);
+        
+        let errorMsg = error.message;
         if (error.message.includes("User already registered")) {
-          setErrorMessage("This email is already registered. Please use a different email or try logging in.");
-          toast({
-            title: "Account already exists",
-            description: "This email address is already registered. Please try logging in instead.",
-            variant: "destructive"
-          });
-          return;
+          errorMsg = "This email is already registered. Please try logging in instead.";
+        } else if (error.message.includes("Password")) {
+          errorMsg = "Password must be at least 6 characters long.";
+        } else if (error.message.includes("Email")) {
+          errorMsg = "Please enter a valid email address.";
         }
-        throw error;
+        
+        setErrorMessage(errorMsg);
+        toast({
+          title: "Sign up failed",
+          description: errorMsg,
+          variant: "destructive"
+        });
+        return;
       }
       
-      setRegistrationComplete(true);
-      setRegisteredEmail(values.email);
+      if (data?.user) {
+        console.log("Signup successful for user:", data.user.id);
+        
+        if (data.session) {
+          // User is immediately logged in (email confirmation disabled)
+          console.log("User immediately logged in after signup");
+          toast({
+            title: "Account created! 🎉",
+            description: "Your account has been created and you're now logged in.",
+          });
+        } else {
+          // Email confirmation required
+          console.log("Email confirmation required");
+          setRegistrationComplete(true);
+          setRegisteredEmail(values.email);
+          
+          toast({
+            title: "Check your email! 📧",
+            description: "We've sent you a confirmation link. Please check your inbox and click the link to activate your account.",
+          });
+        }
+      }
       
-      toast({
-        title: "Sign up successful!",
-        description: "We've sent you a confirmation email. Please check your inbox and verify your account.",
-        variant: "success"
-      });
     } catch (error: any) {
-      console.error("Signup failed:", error.message);
-      setErrorMessage(error.message || "Something went wrong");
+      console.error("Unexpected signup error:", error);
+      const errorMsg = "An unexpected error occurred. Please try again.";
+      setErrorMessage(errorMsg);
       
       toast({
         title: "Sign up failed",
-        description: error.message || "Something went wrong with your registration. Please try again.",
+        description: errorMsg,
         variant: "destructive"
       });
     } finally {
@@ -105,6 +176,7 @@ export const useSignupForm = () => {
     const emailValid = await form.trigger('email');
     if (emailValid) {
       setStep(2);
+      setErrorMessage(""); // Clear any previous errors when moving to next step
     }
   };
 

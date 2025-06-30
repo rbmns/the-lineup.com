@@ -40,7 +40,7 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData, onEvent
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { venues, isLoading: isLoadingVenues } = useVenues();
+  const { venues, isLoading: isLoadingVenues, refetch: refetchVenues } = useVenues();
   const [isCreateVenueModalOpen, setCreateVenueModalOpen] = useState(false);
   const queryClient = useQueryClient();
 
@@ -96,19 +96,49 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData, onEvent
     }
   }, [isEditMode, initialData, form]);
   
-  const handleVenueCreated = (newVenue: Venue) => {
+  const handleVenueCreated = async (newVenue: Venue) => {
     console.log("Venue created successfully:", newVenue);
     
-    // Invalidate venues query to refresh the list
-    queryClient.invalidateQueries({ queryKey: ['venues'] });
-    
-    // Set the newly created venue as selected in the form
-    form.setValue("venue_id", newVenue.id, { shouldValidate: true, shouldDirty: true });
-    
-    // Close the modal
-    setCreateVenueModalOpen(false);
-    
-    console.log("Venue selected in form and modal closed");
+    try {
+      // Immediately invalidate and refetch venues query to get the latest data
+      await queryClient.invalidateQueries({ queryKey: ['venues'] });
+      
+      // Refetch venues to ensure we have the latest data
+      await refetchVenues();
+      
+      // Set the newly created venue as selected in the form
+      form.setValue("venue_id", newVenue.id, { 
+        shouldValidate: true, 
+        shouldDirty: true,
+        shouldTouch: true 
+      });
+      
+      // Close the modal
+      setCreateVenueModalOpen(false);
+      
+      // Show success message
+      toast({
+        title: "Venue created!",
+        description: `${newVenue.name} has been created and selected for your event.`,
+      });
+      
+      console.log("Venue selected in form and modal closed");
+    } catch (error) {
+      console.error("Error updating venues after creation:", error);
+      
+      // Still set the venue in the form even if refetch fails
+      form.setValue("venue_id", newVenue.id, { 
+        shouldValidate: true, 
+        shouldDirty: true,
+        shouldTouch: true 
+      });
+      setCreateVenueModalOpen(false);
+      
+      toast({
+        title: "Venue created!",
+        description: `${newVenue.name} has been created and selected. If you don't see it in the list, please refresh the page.`,
+      });
+    }
   };
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {

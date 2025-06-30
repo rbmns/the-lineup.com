@@ -112,10 +112,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       console.log("Attempting to sign up user with email:", email);
       
-      await supabase.auth.signOut();
+      // Clean up any existing auth state
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (e) {
+        // Ignore cleanup errors
+      }
+      
       setUser(null);
       setProfile(null);
       setSession(null);
+      
+      // Get current domain for redirect URL
+      const currentDomain = window.location.origin;
+      const redirectUrl = `${currentDomain}/`;
+      
+      console.log("Using redirect URL:", redirectUrl);
       
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email,
@@ -124,12 +136,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           data: {
             username: username || email.split('@')[0]
           },
-          emailRedirectTo: `${window.location.origin}/profile/edit`
+          emailRedirectTo: redirectUrl
         }
       });
 
       if (signUpError) {
         console.error("Sign up error:", signUpError);
+        
+        // Handle specific error cases
+        if (signUpError.message.includes('User already registered')) {
+          return { 
+            error: { 
+              message: "This email is already registered. Please try logging in instead or use a different email address." 
+            }
+          };
+        }
+        
         return { error: signUpError };
       }
 
@@ -137,16 +159,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.log("Sign up successful for user:", authData.user.id);
         setIsNewUser(true);
         
-        // For signup, profiles will be created by the database trigger
-        // when the user confirms their email and is properly authenticated
-        
+        // For immediate login (if email confirmation is disabled)
         if (authData.session) {
-          // User is immediately logged in (email confirmation disabled)
           console.log("User immediately logged in after signup");
           setSession(authData.session);
           setUser(authData.user);
           
-          // Try to ensure profile exists, but don't fail if it doesn't work
+          // Try to ensure profile exists
           try {
             await ensureUserProfileExists(
               authData.user.id, 
@@ -157,6 +176,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           } catch (profileError) {
             console.warn("Profile creation failed, but signup succeeded:", profileError);
           }
+        } else {
+          // Email confirmation required
+          console.log("Email confirmation required for user:", authData.user.id);
+          toast({
+            title: "Check your email",
+            description: "We've sent you a confirmation link. Please check your email and click the link to activate your account.",
+          });
         }
         
         return { error: null };
@@ -173,7 +199,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       console.log("Attempting to sign in user with email:", email);
       
-      await supabase.auth.signOut();
+      // Clean up existing state
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (e) {
+        // Ignore cleanup errors
+      }
+      
       setUser(null);
       setProfile(null);
       setSession(null);
@@ -185,7 +217,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error("Sign in error:", error);
-        return { error, data: null };
+        
+        // Handle specific error cases
+        let errorMessage = error.message;
+        if (error.message.includes('Invalid login credentials')) {
+          errorMessage = "Invalid email or password. Please check your credentials and try again.";
+        } else if (error.message.includes('Email not confirmed')) {
+          errorMessage = "Please check your email and click the confirmation link before signing in.";
+        }
+        
+        return { error: { ...error, message: errorMessage }, data: null };
       }
 
       console.log("Sign in successful:", data.user?.id);
@@ -242,7 +283,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginWithEmail = async (email: string) => {
     try {
       console.log("Attempting magic link login with email:", email);
-      const { error } = await supabase.auth.signInWithOtp({ email });
+      
+      const currentDomain = window.location.origin;
+      const redirectUrl = `${currentDomain}/`;
+      
+      const { error } = await supabase.auth.signInWithOtp({ 
+        email,
+        options: {
+          emailRedirectTo: redirectUrl
+        }
+      });
 
       if (error) {
         console.error("Magic link login error:", error);
@@ -259,8 +309,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const loginWithGoogle = async () => {
     try {
       console.log("Attempting Google login");
+      
+      const currentDomain = window.location.origin;
+      const redirectUrl = `${currentDomain}/`;
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
+        options: {
+          redirectTo: redirectUrl
+        }
       });
 
       if (error) {
@@ -279,12 +336,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
         console.log("Attempting to send forgot password email to:", email);
         
-        // Sign out any existing user first
-        await supabase.auth.signOut({ scope: 'global' });
+        // Clean up any existing sessions
+        try {
+          await supabase.auth.signOut({ scope: 'global' });
+        } catch (e) {
+          // Ignore cleanup errors
+        }
         
-        // Add timestamp to prevent caching issues
-        const timestamp = new Date().getTime();
-        const redirectUrl = `${window.location.origin}/reset-password?t=${timestamp}`;
+        const currentDomain = window.location.origin;
+        const redirectUrl = `${currentDomain}/reset-password`;
+        
         console.log("Reset password redirect URL:", redirectUrl);
         
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -296,6 +357,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return { error };
         }
 
+        console.log("Password reset email sent successfully");
         return { error: null };
     } catch (error) {
         console.error("Unexpected error during forgot password request:", error);
@@ -312,6 +374,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (error) {
         console.error("Reset password error:", error);
+      } else {
+        console.log("Password reset successful");
       }
       
       return { error };

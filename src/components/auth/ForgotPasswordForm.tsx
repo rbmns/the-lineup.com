@@ -1,144 +1,83 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from '@/hooks/use-toast';
-import { AlertCircle, Info } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { supabase } from '@/lib/supabase';
+import { AlertCircle, CheckCircle } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from '@/hooks/use-toast';
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email({ message: "Please enter a valid email address." }),
+});
+
+type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
 interface ForgotPasswordFormProps {
   onBackToLogin: () => void;
 }
 
 export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackToLogin }) => {
-  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [infoMessage, setInfoMessage] = useState<string | null>(null);
-  const [rateLimited, setRateLimited] = useState(false);
-  const [waitTime, setWaitTime] = useState(30); // Default wait time in seconds
+  const [emailSent, setEmailSent] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const { forgotPassword } = useAuth();
 
-  // Sign out any existing user before processing password reset
-  useEffect(() => {
-    const signOutExistingUser = async () => {
-      try {
-        console.log("Signing out any existing users on forgot password page");
-        await supabase.auth.signOut({ scope: 'global' });
-        console.log("User signed out successfully");
-      } catch (err) {
-        console.error("Error signing out:", err);
-      }
-    };
-    
-    signOutExistingUser();
-  }, []);
+  const form = useForm<ForgotPasswordFormValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
 
-  useEffect(() => {
-    let timer: number | undefined;
-    
-    // If rate limited, start a countdown timer
-    if (rateLimited && waitTime > 0) {
-      timer = window.setTimeout(() => {
-        setWaitTime(prevTime => prevTime - 1);
-      }, 1000);
-    } else if (waitTime === 0) {
-      setRateLimited(false);
-      setError(null);
-    }
-    
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [rateLimited, waitTime]);
-
-  const handleRateLimitError = () => {
-    setRateLimited(true);
-    setWaitTime(30); // Reset to 30 seconds wait time
-    setError("Too many password reset attempts. Please wait a moment before trying again.");
-    
-    toast({
-      title: "Too many attempts",
-      description: "Please wait a moment before requesting another password reset.",
-      variant: "destructive"
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (rateLimited) {
-      toast({
-        title: "Action limited",
-        description: `Please wait ${waitTime} seconds before trying again.`,
-        variant: "destructive"
-      });
-      return;
-    }
-    
+  const onSubmit = async (values: ForgotPasswordFormValues) => {
     setLoading(true);
-    setError(null);
-    setInfoMessage(null);
+    setErrorMessage("");
     
     try {
-      // Always ensure user is signed out before sending password reset
-      console.log("Ensuring user is signed out before sending password reset email");
-      await supabase.auth.signOut({ scope: 'global' });
+      console.log("Sending password reset email to:", values.email);
       
-      console.log("Sending password reset email to:", email);
-      
-      // Generate absolute URL with timestamp to avoid caching issues
-      const origin = window.location.origin;
-      const timestamp = new Date().getTime();
-      const redirectUrl = `${origin}/reset-password?t=${timestamp}`;
-      
-      console.log("Full redirect URL:", redirectUrl);
-      
-      // Use direct Supabase call with proper redirectTo URL
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl,
-      });
-      
-      console.log("Password reset response:", { error });
+      const { error } = await forgotPassword(values.email);
       
       if (error) {
-        console.error("Password reset error details:", error);
+        console.error("Forgot password error:", error);
+        let errorMsg = error.message;
         
-        // Handle specific error cases
-        if (error.message?.toLowerCase().includes('rate limit') || 
-            error.message?.toLowerCase().includes('too many requests')) {
-          handleRateLimitError();
-        } else if (error.message?.toLowerCase().includes('email not found')) {
-          setError("We couldn't find an account with that email address.");
-          toast({
-            title: "Email not found",
-            description: "We couldn't find an account with that email address.",
-            variant: "destructive"
-          });
-        } else {
-          setError(error.message || "Failed to send password reset email. Please try again.");
-          toast({
-            title: "Password reset failed",
-            description: error.message || "Failed to send password reset email. Please try again.",
-            variant: "destructive"
-          });
+        if (error.message.includes('User not found')) {
+          errorMsg = "No account found with this email address.";
+        } else if (error.message.includes('rate limit')) {
+          errorMsg = "Too many requests. Please wait a few minutes before trying again.";
         }
+        
+        setErrorMessage(errorMsg);
+        toast({
+          title: "Error sending reset email",
+          description: errorMsg,
+          variant: "destructive"
+        });
         return;
       }
       
-      setInfoMessage("Password reset instructions sent to your email.");
+      console.log("Password reset email sent successfully");
+      setEmailSent(true);
+      
       toast({
-        title: "Password reset email sent",
-        description: "Check your inbox for instructions to reset your password.",
-        variant: "success"
+        title: "Reset email sent! 📧",
+        description: "Check your email for a link to reset your password.",
       });
+      
     } catch (error: any) {
-      console.error("Password reset failed:", error.message);
-      setError(error.message || "Failed to send password reset email. Please try again.");
+      console.error("Unexpected forgot password error:", error);
+      const errorMsg = "An unexpected error occurred. Please try again.";
+      setErrorMessage(errorMsg);
+      
       toast({
-        title: "Password reset failed",
-        description: error.message || "An unexpected error occurred. Please try again.",
+        title: "Error",
+        description: errorMsg,
         variant: "destructive"
       });
     } finally {
@@ -146,60 +85,91 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
     }
   };
 
-  return (
-    <>
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded flex items-start">
-          <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
-          <p>{error}</p>
+  if (emailSent) {
+    return (
+      <div className="space-y-4">
+        <Alert className="bg-green-50 border-green-200">
+          <CheckCircle className="h-4 w-4 text-green-600" />
+          <AlertDescription className="text-green-800">
+            We've sent a password reset link to <strong>{form.getValues('email')}</strong>. 
+            Please check your email and click the link to reset your password.
+          </AlertDescription>
+        </Alert>
+        
+        <div className="text-center space-y-2">
+          <p className="text-sm text-gray-600">
+            Didn't receive the email? Check your spam folder or try again.
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              setEmailSent(false);
+              form.reset();
+              setErrorMessage("");
+            }}
+            className="w-full"
+          >
+            Send another email
+          </Button>
         </div>
-      )}
-      
-      {infoMessage && (
-        <Alert className="bg-blue-50 border-blue-200">
-          <Info className="h-5 w-5 text-blue-600" />
-          <AlertDescription className="text-blue-700">{infoMessage}</AlertDescription>
+        
+        <div className="text-center">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onBackToLogin}
+            className="text-sm"
+          >
+            Back to login
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      {errorMessage && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{errorMessage}</AlertDescription>
         </Alert>
       )}
       
-      {rateLimited && (
-        <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded flex items-start">
-          <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
-          <p>Please wait {waitTime} seconds before trying again.</p>
-        </div>
-      )}
+      <div className="space-y-2">
+        <Label htmlFor="email">Email address</Label>
+        <Input
+          id="email"
+          type="email"
+          placeholder="your@email.com"
+          {...form.register('email')}
+          disabled={loading}
+        />
+        {form.formState.errors.email && (
+          <p className="text-sm text-red-600">{form.formState.errors.email.message}</p>
+        )}
+      </div>
       
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid gap-2">
-          <Label htmlFor="reset-email">Email</Label>
-          <Input
-            id="reset-email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
-            disabled={loading || rateLimited || !!infoMessage}
-            required
-          />
-        </div>
-        
-        <Button 
-          type="submit"
-          disabled={loading || rateLimited || !!infoMessage} 
-          className="w-full bg-purple hover:bg-purple/90 text-white"
-        >
-          {loading ? 'Sending...' : 'Send Reset Link'}
-        </Button>
-      </form>
+      <Button 
+        type="submit" 
+        disabled={loading} 
+        className="w-full"
+      >
+        {loading ? "Sending..." : "Send reset email"}
+      </Button>
       
-      <div className="text-sm text-center text-gray-500 mt-4">
-        <button 
+      <div className="text-center">
+        <Button
+          type="button"
+          variant="ghost"
           onClick={onBackToLogin}
-          className="text-purple hover:underline"
+          disabled={loading}
+          className="text-sm"
         >
           Back to login
-        </button>
+        </Button>
       </div>
-    </>
+    </form>
   );
 };
