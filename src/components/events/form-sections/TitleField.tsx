@@ -1,30 +1,37 @@
 
 import React from 'react';
-import { UseFormRegister, FieldErrors } from 'react-hook-form';
+import { FieldErrors } from 'react-hook-form';
 import { FormValues } from '@/components/events/form/EventFormTypes';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useFormContext } from 'react-hook-form';
 
 interface TitleFieldProps {
-  register: UseFormRegister<FormValues>;
   errors: FieldErrors<FormValues>;
 }
 
-export const TitleField: React.FC<TitleFieldProps> = ({ register, errors }) => (
-  <div className="space-y-2">
-    <Label htmlFor="title" className="text-sm font-medium text-graphite-grey">
-      Event Title *
-    </Label>
-    <Input
-      id="title"
-      type="text"
-      placeholder="e.g., Beach Volleyball Tournament"
-      className="h-10"
-      {...register("title")}
-      aria-invalid={errors.title ? "true" : "false"}
+export const TitleField: React.FC<TitleFieldProps> = ({ errors }) => {
+  const form = useFormContext<FormValues>();
+  
+  return (
+    <FormField
+      control={form.control}
+      name="title"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel className="text-sm font-medium text-graphite-grey">
+            Event Title *
+          </FormLabel>
+          <FormControl>
+            <Input
+              placeholder="e.g., Beach Volleyball Tournament"
+              className="h-10"
+              {...field}
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
     />
-    {errors.title && (
-      <p className="text-sm text-red-500">{errors.title.message}</p>
-    )}
-  </div>
-);
+  );
+};

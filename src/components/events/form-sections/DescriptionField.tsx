@@ -1,29 +1,37 @@
 
 import React from 'react';
-import { UseFormRegister, FieldErrors } from 'react-hook-form';
+import { FieldErrors } from 'react-hook-form';
 import { FormValues } from '@/components/events/form/EventFormTypes';
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { useFormContext } from 'react-hook-form';
 
 interface DescriptionFieldProps {
-  register: UseFormRegister<FormValues>;
   errors: FieldErrors<FormValues>;
 }
 
-export const DescriptionField: React.FC<DescriptionFieldProps> = ({ register, errors }) => (
-  <div className="space-y-3">
-    <Label htmlFor="description" className="form-label">
-      Description *
-    </Label>
-    <Textarea
-      id="description"
-      placeholder="Tell people what your event is about, what to expect, what to bring..."
-      className="textarea-field min-h-[120px]"
-      {...register("description")}
-      aria-invalid={errors.description ? "true" : "false"}
+export const DescriptionField: React.FC<DescriptionFieldProps> = ({ errors }) => {
+  const form = useFormContext<FormValues>();
+  
+  return (
+    <FormField
+      control={form.control}
+      name="description"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel className="form-label">
+            Description *
+          </FormLabel>
+          <FormControl>
+            <Textarea
+              placeholder="Tell people what your event is about, what to expect, what to bring..."
+              className="textarea-field min-h-[120px]"
+              {...field}
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
     />
-    {errors.description && (
-      <p className="text-red-500 text-small mt-2">{errors.description.message}</p>
-    )}
-  </div>
-);
+  );
+};
