@@ -16,11 +16,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Event } from '@/types';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+
 interface EventFormProps {
   eventId?: string;
   isEditMode?: boolean;
   initialData?: Event;
 }
+
 export const EventForm: React.FC<EventFormProps> = ({
   eventId,
   isEditMode = false,
@@ -37,6 +39,7 @@ export const EventForm: React.FC<EventFormProps> = ({
   const [createdEventId, setCreatedEventId] = useState<string | null>(null);
   const [createdEventTitle, setCreatedEventTitle] = useState<string>('');
   const [pendingFormData, setPendingFormData] = useState<any>(null);
+  
   const {
     form,
     isSubmitting,
@@ -119,37 +122,49 @@ export const EventForm: React.FC<EventFormProps> = ({
   };
   return <>
       <Form {...form}>
-        <form onSubmit={handleSubmit(handleFormSubmit, onInvalid)} className="space-y-8">
+        <form onSubmit={handleSubmit(handleFormSubmit, onInvalid)} className={cn(
+          "space-y-6",
+          isMobile ? "px-2" : "space-y-8"
+        )}>
           {/* Required Fields Section */}
-          <div className="form-section">
-            <div className="form-section-header">
-              
-              
-            </div>
-            
+          <div className="space-y-4">
             <TitleField register={register} errors={errors} />
             <DescriptionField register={register} errors={errors} />
             <DateTimeFields register={register} watch={watch} setValue={setValue} errors={errors} />
-            <VenueField watch={watch} setValue={setValue} errors={errors} venues={venues} isLoadingVenues={isLoadingVenues} onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)} />
+            <VenueField 
+              watch={watch} 
+              setValue={setValue} 
+              errors={errors} 
+              venues={venues} 
+              isLoadingVenues={isLoadingVenues} 
+              onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)} 
+            />
             <CategoryToggleField watch={watch} setValue={setValue} errors={errors} />
             <VibeToggleField watch={watch} setValue={setValue} errors={errors} />
           </div>
 
           {/* Optional Fields Section */}
-          <div className="form-section">
-            <div className="form-section-header">
-              <h3 className="form-section-title">Additional Information</h3>
-              <p className="form-section-description">
-                Optional details to help attendees
-              </p>
-            </div>
-            
-            <OptionalFieldsSection register={register} errors={errors} control={control} watch={watch} setValue={setValue} />
+          <div className="space-y-4">
+            <OptionalFieldsSection 
+              register={register} 
+              errors={errors} 
+              control={control} 
+              watch={watch} 
+              setValue={setValue} 
+            />
           </div>
 
           {/* Submit Button */}
-          <div className={cn("pt-8 border-t border-mist-grey", isMobile ? "pb-4" : "pb-0")}>
-            <Button type="submit" variant="primary" disabled={isSubmitting} className={cn(isMobile ? "w-full" : "w-auto")}>
+          <div className={cn(
+            "pt-6 border-t border-mist-grey sticky bottom-0 bg-white",
+            isMobile ? "pb-6 -mx-2 px-4" : "pb-4"
+          )}>
+            <Button 
+              type="submit" 
+              variant="primary" 
+              disabled={isSubmitting} 
+              className="w-full h-12 text-base font-semibold"
+            >
               {isSubmitting ? "Publishing..." : isEditMode ? "Update Event" : "Publish Event"}
             </Button>
           </div>
@@ -163,4 +178,5 @@ export const EventForm: React.FC<EventFormProps> = ({
       <EventPublishedModal open={showSuccessModal} onClose={() => setShowSuccessModal(false)} eventId={createdEventId || undefined} eventTitle={createdEventTitle} />
     </>;
 };
+
 export default EventForm;

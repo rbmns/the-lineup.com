@@ -12,22 +12,31 @@ const CreateEvent = () => {
       {/* Header Section */}
       <div className={cn(
         "section-content text-center",
-        isMobile ? "py-6" : "py-12"
+        isMobile ? "py-4 px-4" : "py-12"
       )}>
-        <h1 className="text-h1 text-graphite-grey mb-4">
+        <h1 className={cn(
+          "text-graphite-grey mb-2",
+          isMobile ? "text-2xl font-bold" : "text-h1"
+        )}>
           Create Event
         </h1>
-        <p className="text-body-base text-graphite-grey max-w-2xl mx-auto">
-          Share your event with the community and bring people together.
+        <p className={cn(
+          "text-graphite-grey mx-auto",
+          isMobile ? "text-sm max-w-xs" : "text-body-base max-w-2xl"
+        )}>
+          Share your event with the community
         </p>
       </div>
       
-      {/* Form Container - Boxed with proper padding */}
+      {/* Form Container */}
       <div className={cn(
-        "max-w-4xl mx-auto px-4 pb-8",
-        isMobile ? "px-4" : "px-8"
+        "mx-auto pb-8",
+        isMobile ? "px-4 max-w-full" : "px-8 max-w-4xl"
       )}>
-        <div className="card-base">
+        <div className={cn(
+          "bg-white rounded-lg border border-mist-grey",
+          isMobile ? "p-4" : "p-8"
+        )}>
           <EventForm />
         </div>
       </div>
