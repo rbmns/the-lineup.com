@@ -2,7 +2,6 @@
 import { useEffect } from 'react';
 import { Event } from '@/types';
 
-// Define the MetaTags interface if it doesn't exist
 interface MetaTags {
   title: string;
   description: string;
@@ -11,21 +10,17 @@ interface MetaTags {
 }
 
 export const useEventMetaTags = (event: Event | null | undefined) => {
-  if (!event) {
-    return null;
-  }
-  
   const setMetaTags = ({ title, description, imageUrl, path }: MetaTags) => {
-    // Set page title
-    document.title = title;
+    // Set page title using event title
+    document.title = `${title} | the lineup`;
     
     // Set meta tags
     const metaTags = {
-      'og:title': title,
+      'og:title': title, // Use event title as OG title
       'og:description': description,
       'og:image': imageUrl,
       'og:url': `${window.location.origin}${path}`,
-      'twitter:title': title,
+      'twitter:title': title, // Use event title for Twitter too
       'twitter:description': description,
       'twitter:image': imageUrl,
       'description': description
@@ -60,6 +55,23 @@ export const useEventMetaTags = (event: Event | null | undefined) => {
     }
     canonical.setAttribute('href', `${window.location.origin}${path}`);
   };
+
+  useEffect(() => {
+    if (event) {
+      const description = event.description ? 
+        event.description.replace(/<[^>]*>/g, '').substring(0, 160) + '...' :
+        `Join us for ${event.title}`;
+      
+      const imageUrl = event.image_urls?.[0] || 'https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg';
+      
+      setMetaTags({
+        title: event.title, // Use event title directly
+        description,
+        imageUrl,
+        path: `/events/${event.id}`
+      });
+    }
+  }, [event]);
   
   return { setMetaTags };
 };

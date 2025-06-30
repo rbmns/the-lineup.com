@@ -36,7 +36,7 @@ export const CreateVenueForm: React.FC<CreateVenueFormProps> = ({ onSubmit, isSu
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="name"
@@ -51,13 +51,17 @@ export const CreateVenueForm: React.FC<CreateVenueFormProps> = ({ onSubmit, isSu
           )}
         />
         
-        <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-4">
+          <div className="text-sm font-medium text-graphite-grey mb-2">
+            Address Information * (Required)
+          </div>
+          
           <FormField
             control={form.control}
             name="street"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Street Address</FormLabel>
+                <FormLabel>Street Address *</FormLabel>
                 <FormControl>
                   <Input placeholder="e.g., Beach Road 1" {...field} />
                 </FormControl>
@@ -65,46 +69,49 @@ export const CreateVenueForm: React.FC<CreateVenueFormProps> = ({ onSubmit, isSu
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>City</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., Zandvoort" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          
+          <div className="grid grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="postal_code"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Postal Code *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., 2042" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="city"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>City *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g., Zandvoort" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
 
-        <FormField
-          control={form.control}
-          name="postal_code"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Postal Code</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., 2042" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="border-t pt-4">
-          <p className="text-sm text-gray-600 mb-3">
-            * Either provide address information above OR a Google Maps link below
-          </p>
+        <div className="border-t pt-4 space-y-4">
+          <div className="text-sm font-medium text-graphite-grey mb-2">
+            Optional Information
+          </div>
           
           <FormField
             control={form.control}
             name="google_maps"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Google Maps Link (Alternative to address)</FormLabel>
+                <FormLabel>Google Maps Link</FormLabel>
                 <FormControl>
                   <Input type="url" placeholder="https://maps.google.com/..." {...field} />
                 </FormControl>
@@ -112,21 +119,21 @@ export const CreateVenueForm: React.FC<CreateVenueFormProps> = ({ onSubmit, isSu
               </FormItem>
             )}
           />
-        </div>
 
-        <FormField
-          control={form.control}
-          name="website"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Website (Optional)</FormLabel>
-              <FormControl>
-                <Input type="url" placeholder="https://example.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="website"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Website</FormLabel>
+                <FormControl>
+                  <Input type="url" placeholder="https://example.com" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <Button type="submit" disabled={isSubmitting} className="w-full">
           {isSubmitting ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Venue' : 'Create Venue')}

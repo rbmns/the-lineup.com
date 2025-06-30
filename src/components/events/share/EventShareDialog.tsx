@@ -17,13 +17,12 @@ export function EventShareDialog({ event, isOpen, onOpenChange }: EventShareDial
   const { getEventImageUrl } = useEventImages();
   
   const getEventUrl = () => {
-    // Always use the event ID for sharing to ensure it works
     return `${window.location.origin}/events/${event.id}`;
   };
 
   const getShareTitle = () => {
-    const location = event.venues?.city || event.destination || 'Zandvoort';
-    return `Check out ${event.title} in ${location}`;
+    // Use the event title as the main share title
+    return event.title;
   };
 
   const getShareDescription = () => {

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchEventById } from '@/lib/eventService';
@@ -9,6 +9,7 @@ import { Helmet } from 'react-helmet-async';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEventAttendees } from '@/hooks/useEventAttendees';
 import { useUnifiedRsvp } from '@/hooks/useUnifiedRsvp';
+import { useEventMetaTags } from '@/hooks/useEventMetaTags';
 import { EventDetailHero } from '@/components/events/detail/EventDetailHero';
 import { EventDetailMainContent } from '@/components/events/detail/EventDetailMainContent';
 import { EventDetailSidebar } from '@/components/events/detail/EventDetailSidebar';
@@ -63,6 +64,9 @@ const EventDetail: React.FC<EventDetailProps> = ({
       return failureCount < 2; // Retry up to 2 times
     },
   });
+
+  // Set up meta tags for sharing
+  useEventMetaTags(event);
 
   const {
     attendees,
@@ -122,6 +126,14 @@ const EventDetail: React.FC<EventDetailProps> = ({
       <Helmet>
         <title>{event.title} | the lineup</title>
         <meta name="description" content={event.description || `Join us for ${event.title}`} />
+        <meta property="og:title" content={event.title} />
+        <meta property="og:description" content={event.description || `Join us for ${event.title}`} />
+        <meta property="og:image" content={event.image_urls?.[0] || 'https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg'} />
+        <meta property="og:url" content={`${window.location.origin}/events/${event.id}`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={event.title} />
+        <meta name="twitter:description" content={event.description || `Join us for ${event.title}`} />
+        <meta name="twitter:image" content={event.image_urls?.[0] || 'https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg'} />
       </Helmet>
 
       {/* Hero Image Section - Full width */}

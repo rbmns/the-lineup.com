@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useEventForm } from '@/hooks/events/useEventForm.tsx';
 import { CreateVenueModal } from '@/components/venues/CreateVenueModal';
@@ -60,16 +61,15 @@ export const EventForm: React.FC<EventFormProps> = ({
       setShowSuccessModal(true);
     }
   });
+  
   const {
-    register,
     handleSubmit,
     setValue,
     watch,
-    formState: {
-      errors
-    },
+    formState: { errors },
     control
   } = form;
+
   const handleFormSubmit = async (data: any) => {
     console.log("Form submit called with data:", data);
     console.log("Is authenticated:", isAuthenticated);
@@ -85,7 +85,7 @@ export const EventForm: React.FC<EventFormProps> = ({
     // Check authentication using multiple indicators for reliability
     const isUserAuthenticated = isAuthenticated && user && session;
 
-    // If not authenticated, store form data and show auth modal (without redundant toast)
+    // If not authenticated, store form data and show auth modal
     if (!isUserAuthenticated) {
       console.log("User not authenticated, showing auth modal");
       setPendingFormData(data);
@@ -97,6 +97,7 @@ export const EventForm: React.FC<EventFormProps> = ({
     console.log("User authenticated, proceeding with submission");
     return originalOnSubmit(data);
   };
+
   const handleAuthSuccess = async () => {
     console.log("Auth success callback called");
     console.log("Current auth state - isAuthenticated:", isAuthenticated, "user:", user);
@@ -115,22 +116,25 @@ export const EventForm: React.FC<EventFormProps> = ({
       }, 500);
     }
   };
+
   const handleAuthModalClose = () => {
     console.log("Auth modal closed without success");
     setShowAuthModal(false);
     setPendingFormData(null);
   };
-  return <>
+
+  return (
+    <>
       <Form {...form}>
         <form onSubmit={handleSubmit(handleFormSubmit, onInvalid)} className={cn(
           "space-y-6",
           isMobile ? "px-2" : "space-y-8"
         )}>
           {/* Required Fields Section */}
-          <div className="space-y-4">
-            <TitleField register={register} errors={errors} />
-            <DescriptionField register={register} errors={errors} />
-            <DateTimeFields register={register} watch={watch} setValue={setValue} errors={errors} />
+          <div className="space-y-6">
+            <TitleField errors={errors} />
+            <DescriptionField errors={errors} />
+            <DateTimeFields watch={watch} setValue={setValue} errors={errors} />
             <VenueField 
               watch={watch} 
               setValue={setValue} 
@@ -144,9 +148,8 @@ export const EventForm: React.FC<EventFormProps> = ({
           </div>
 
           {/* Optional Fields Section */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             <OptionalFieldsSection 
-              register={register} 
               errors={errors} 
               control={control} 
               watch={watch} 
@@ -161,9 +164,9 @@ export const EventForm: React.FC<EventFormProps> = ({
           )}>
             <Button 
               type="submit" 
-              variant="primary" 
+              variant="default"
               disabled={isSubmitting} 
-              className="w-full h-12 text-base font-semibold"
+              className="w-full h-12 text-base font-semibold bg-ocean-teal hover:bg-ocean-teal/90"
             >
               {isSubmitting ? "Publishing..." : isEditMode ? "Update Event" : "Publish Event"}
             </Button>
@@ -171,12 +174,26 @@ export const EventForm: React.FC<EventFormProps> = ({
         </form>
       </Form>
 
-      <CreateVenueModal open={isCreateVenueModalOpen} onOpenChange={setCreateVenueModalOpen} onComplete={handleVenueCreated} />
+      <CreateVenueModal 
+        open={isCreateVenueModalOpen} 
+        onOpenChange={setCreateVenueModalOpen} 
+        onComplete={handleVenueCreated} 
+      />
 
-      <PrePublishAuthModal open={showAuthModal} onClose={handleAuthModalClose} onSuccess={handleAuthSuccess} />
+      <PrePublishAuthModal 
+        open={showAuthModal} 
+        onClose={handleAuthModalClose} 
+        onSuccess={handleAuthSuccess} 
+      />
 
-      <EventPublishedModal open={showSuccessModal} onClose={() => setShowSuccessModal(false)} eventId={createdEventId || undefined} eventTitle={createdEventTitle} />
-    </>;
+      <EventPublishedModal 
+        open={showSuccessModal} 
+        onClose={() => setShowSuccessModal(false)} 
+        eventId={createdEventId || undefined} 
+        eventTitle={createdEventTitle} 
+      />
+    </>
+  );
 };
 
 export default EventForm;

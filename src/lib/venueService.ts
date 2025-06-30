@@ -1,8 +1,8 @@
+
 import { supabase } from '@/lib/supabase';
 import { Venue } from '@/types';
 import { CreateVenueFormValues } from '@/components/venues/CreateVenueSchema';
 
-// The type for venueData now includes creator_id as optional
 type CreateVenueData = Partial<Omit<Venue, 'id' | 'slug' | 'created_at'>> & { creator_id?: string | null };
 
 // Function to categorize city to area based on country/region
@@ -11,45 +11,58 @@ const categorizeCityToArea = async (city: string): Promise<string | null> => {
   
   const cityLower = city.toLowerCase();
   
-  // Define area mappings - this can be expanded in the future
+  // Define area mappings based on country
   const areaMapping: Record<string, string> = {
-    // Portugal cities -> Ericeira Area
-    'ericeira': 'ericeira-area',
-    'lisboa': 'ericeira-area',
-    'lisbon': 'ericeira-area',
-    'porto': 'ericeira-area',
-    'cascais': 'ericeira-area',
-    'sintra': 'ericeira-area',
-    'peniche': 'ericeira-area',
-    'nazaré': 'ericeira-area',
-    'óbidos': 'ericeira-area',
-    'obidos': 'ericeira-area',
-    
     // Netherlands cities -> Zandvoort Area
-    'zandvoort': 'zandvoort-area',
-    'amsterdam': 'zandvoort-area',
-    'haarlem': 'zandvoort-area',
-    'leiden': 'zandvoort-area',
-    'the hague': 'zandvoort-area',
-    'den haag': 'zandvoort-area',
-    'rotterdam': 'zandvoort-area',
-    'utrecht': 'zandvoort-area',
-    'eindhoven': 'zandvoort-area',
-    'groningen': 'zandvoort-area',
+    'zandvoort': 'zandvoort',
+    'amsterdam': 'zandvoort',
+    'haarlem': 'zandvoort',
+    'leiden': 'zandvoort',
+    'the hague': 'zandvoort',
+    'den haag': 'zandvoort',
+    'rotterdam': 'zandvoort',
+    'utrecht': 'zandvoort',
+    'eindhoven': 'zandvoort',
+    'groningen': 'zandvoort',
+    
+    // Portugal cities -> Ericeira Area
+    'ericeira': 'ericeira',
+    'lisboa': 'ericeira',
+    'lisbon': 'ericeira',
+    'porto': 'ericeira',
+    'cascais': 'ericeira',
+    'sintra': 'ericeira',
+    'peniche': 'ericeira',
+    'nazaré': 'ericeira',
+    'óbidos': 'ericeira',
+    'obidos': 'ericeira',
   };
   
   // First try direct city match
   let targetAreaName = areaMapping[cityLower];
   
-  // If no direct match, try to categorize by common Portuguese/Dutch patterns
+  // If no direct match, try to categorize by common patterns
   if (!targetAreaName) {
-    // Portuguese patterns (you can add more sophisticated logic here)
-    if (cityLower.includes('portugal') || cityLower.includes('pt')) {
-      targetAreaName = 'ericeira-area';
+    // Check if it's in Portugal
+    if (cityLower.includes('portugal') || cityLower.includes('pt') || 
+        cityLower.includes('português') || cityLower.includes('portuguesa')) {
+      targetAreaName = 'ericeira';
     }
-    // Dutch patterns
-    else if (cityLower.includes('netherlands') || cityLower.includes('holland') || cityLower.includes('nl')) {
-      targetAreaName = 'zandvoort-area';
+    // Check if it's in Netherlands
+    else if (cityLower.includes('netherlands') || cityLower.includes('holland') || 
+             cityLower.includes('nederland') || cityLower.includes('nl')) {
+      targetAreaName = 'zandvoort';
+    }
+    // Default categorization: assume European cities
+    else {
+      // Simple heuristic: if it sounds Portuguese, put in Ericeira
+      if (cityLower.includes('ão') || cityLower.includes('ões') || 
+          cityLower.includes('ça') || cityLower.includes('ção')) {
+        targetAreaName = 'ericeira';
+      } else {
+        // Default to Zandvoort for other European cities
+        targetAreaName = 'zandvoort';
+      }
     }
   }
   
@@ -59,7 +72,7 @@ const categorizeCityToArea = async (city: string): Promise<string | null> => {
   const { data: area } = await supabase
     .from('venue_areas')
     .select('id')
-    .ilike('name', `%${targetAreaName.replace('-area', '')}%`)
+    .ilike('name', `%${targetAreaName}%`)
     .single();
     
   return area?.id || null;
