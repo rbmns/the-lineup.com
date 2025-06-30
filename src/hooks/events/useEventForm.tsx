@@ -17,14 +17,12 @@ interface UseEventFormProps {
   eventId?: string;
   isEditMode?: boolean;
   initialData?: Event;
-  onEventCreated?: (eventId: string, eventTitle: string) => void;
 }
 
 export const useEventForm = ({
   eventId,
   isEditMode = false,
-  initialData,
-  onEventCreated
+  initialData
 }: UseEventFormProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -129,9 +127,7 @@ export const useEventForm = ({
       const action = isEditMode ? 'updated' : 'created';
       toast.success(`Event ${action} successfully!`);
 
-      if (!isEditMode && result.data && onEventCreated) {
-        onEventCreated(result.data.id, result.data.title);
-      } else if (isEditMode) {
+      if (isEditMode) {
         navigate(`/events/${result.data.slug || result.data.id}`);
       }
 
