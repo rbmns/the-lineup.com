@@ -48,11 +48,16 @@ export const EventForm: React.FC<EventFormProps> = ({
     initialData
   });
 
+  // Define handleEventCreated first
+  const handleEventCreated = (eventId: string, eventTitle: string) => {
+    // This will be handled by useEventFormSubmission
+  };
+
   const {
     handleFormSubmit,
     handleAuthSuccess,
     handleAuthModalClose,
-    handleEventCreated,
+    handleEventCreated: handleEventCreatedFromSubmission,
     showAuthModal,
     showSuccessModal,
     setShowSuccessModal,
