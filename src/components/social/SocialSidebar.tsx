@@ -167,10 +167,10 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
       {showAuth && !user && (
         <AuthOverlay
           isOpen={showAuth}
+          onClose={handleCloseAuthOverlay}
           title="Create your account"
           description="Sign up or log in to create and share your own events!"
           browseEventsButton={true}
-          onClose={handleCloseAuthOverlay}
           onBrowseEvents={handleBrowseEvents}
         >
           <></>
