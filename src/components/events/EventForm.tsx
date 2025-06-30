@@ -116,10 +116,10 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
       <Form {...form}>
         <form onSubmit={handleSubmit(handleFormSubmit, onInvalid)} className="space-y-8">
           {/* Required Fields Section */}
-          <div className="space-y-6">
-            <div className="pb-4 border-b border-mist-grey">
-              <h3 className="text-h4 text-graphite-grey mb-2">Event Details</h3>
-              <p className="text-small text-graphite-grey opacity-75">
+          <div className="form-section">
+            <div className="form-section-header">
+              <h3 className="form-section-title">Event Details</h3>
+              <p className="form-section-description">
                 Tell people about your event
               </p>
             </div>
@@ -140,10 +140,10 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
           </div>
 
           {/* Optional Fields Section */}
-          <div className="pt-6 border-t border-mist-grey">
-            <div className="pb-4">
-              <h3 className="text-h4 text-graphite-grey mb-2">Additional Information</h3>
-              <p className="text-small text-graphite-grey opacity-75">
+          <div className="form-section">
+            <div className="form-section-header">
+              <h3 className="form-section-title">Additional Information</h3>
+              <p className="form-section-description">
                 Optional details to help attendees
               </p>
             </div>
@@ -164,10 +164,9 @@ export const EventForm: React.FC<EventFormProps> = ({ eventId, isEditMode = fals
           )}>
             <Button 
               type="submit" 
-              variant="default"
+              variant="primary"
               disabled={isSubmitting}
               className={cn(
-                "btn-primary text-base font-semibold py-4 px-8 min-h-[50px]",
                 isMobile ? "w-full" : "w-auto"
               )}
             >

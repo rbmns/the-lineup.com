@@ -108,16 +108,18 @@ export const CreateVenueModal: React.FC<CreateVenueModalProps> = ({ open, onOpen
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>{isEditMode ? 'Edit Venue' : 'Create a New Venue'}</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-8">
+        <DialogHeader className="space-y-4 mb-6">
+          <DialogTitle className="form-section-title">
+            {isEditMode ? 'Edit Venue' : 'Create a New Venue'}
+          </DialogTitle>
+          <DialogDescription className="form-section-description text-base">
             {isEditMode 
               ? 'Update the details for this venue.' 
               : 'Add a new venue to the list. This will be available for all event creators.'
             }
             {!user && !isEditMode && (
-              <span className="block mt-2 text-sm text-gray-600">
+              <span className="block mt-3 text-sm text-graphite-grey/75">
                 No account needed - your venue will be added to the public list immediately.
               </span>
             )}

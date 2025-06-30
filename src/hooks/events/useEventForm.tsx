@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -50,7 +49,7 @@ export const useEventForm = ({ eventId, isEditMode = false, initialData, onEvent
     defaultValues: {
       title: '',
       description: '',
-      event_category: 'other',
+      event_category: '', // Remove default 'other' value
       start_date: new Date(),
       start_time: '',
       end_date: new Date(),

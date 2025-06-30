@@ -28,8 +28,8 @@ export const CategoryToggleField: React.FC<CategoryToggleFieldProps> = ({
   };
 
   return (
-    <div className="space-y-3">
-      <Label htmlFor="event_category" className="form-label">Event Category</Label>
+    <div className="form-group">
+      <Label htmlFor="event_category" className="form-label">Event Category *</Label>
       <ToggleGroup 
         type="single" 
         value={selectedCategory || ""} 
