@@ -1,3 +1,4 @@
+
 import { supabase } from '@/lib/supabase';
 import { Venue } from '@/types';
 import { CreateVenueFormValues } from '@/components/venues/CreateVenueSchema';
@@ -90,13 +91,21 @@ const addCityToAreaMapping = async (city: string, areaId: string): Promise<void>
   console.log(`Added city "${city}" to area mapping`);
 };
 
-export const createVenue = async (venueData: CreateVenueData): Promise<{ data: Venue | null; error: any }> => {
+export const createVenue = async (venueData: CreateVenueFormValues): Promise<{ data: Venue | null; error: any }> => {
   try {
-    // Create venue data with optional creator_id (can be null for non-authenticated users)
+    console.log('Creating venue with data:', venueData);
+    
+    // Create venue data - use the form values directly
     const dataToInsert = {
-      ...venueData,
-      creator_id: venueData.creator_id || null
+      name: venueData.name,
+      street: venueData.street || null,
+      city: venueData.city || null,
+      postal_code: venueData.postal_code || null,
+      description: venueData.description || null,
+      creator_id: null // Allow null for non-authenticated users
     };
+
+    console.log('Data to insert:', dataToInsert);
 
     // First create the venue
     const { data, error } = await supabase
@@ -110,11 +119,18 @@ export const createVenue = async (venueData: CreateVenueData): Promise<{ data: V
       return { data: null, error };
     }
 
+    console.log('Venue created successfully:', data);
+
     // If venue was created successfully and has a city, categorize it
     if (data && venueData.city) {
-      const areaId = await categorizeCityToArea(venueData.city);
-      if (areaId) {
-        await addCityToAreaMapping(venueData.city, areaId);
+      try {
+        const areaId = await categorizeCityToArea(venueData.city);
+        if (areaId) {
+          await addCityToAreaMapping(venueData.city, areaId);
+        }
+      } catch (areaError) {
+        console.warn('Could not categorize city to area:', areaError);
+        // Don't fail venue creation if area mapping fails
       }
     }
 

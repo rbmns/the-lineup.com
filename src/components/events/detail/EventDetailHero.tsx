@@ -5,6 +5,8 @@ import { Calendar } from 'lucide-react';
 import { formatDate, formatEventTime } from '@/utils/date-formatting';
 import { getEventImage } from '@/utils/eventImages';
 import EventShareButton from '@/components/events/EventShareButton';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
 interface EventDetailHeroProps {
   event: Event;
@@ -12,11 +14,15 @@ interface EventDetailHeroProps {
 
 export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
   const eventImage = getEventImage(event);
+  const isMobile = useIsMobile();
 
   return (
     <div className="relative w-full">
       {/* Large Event Image */}
-      <div className="relative w-full h-96 md:h-[500px] overflow-hidden">
+      <div className={cn(
+        "relative w-full overflow-hidden",
+        isMobile ? "h-64" : "h-96 md:h-[500px]"
+      )}>
         <img 
           src={eventImage} 
           alt={event.title} 
@@ -49,18 +55,47 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
           />
         </div>
         
-        {/* Event Title and Key Metadata Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-          {/* Event Title */}
-          <h1 className="text-h1 font-montserrat text-pure-white mb-4 leading-tight drop-shadow-lg">
+        {/* Desktop: Event Title and Key Metadata Overlay */}
+        {!isMobile && (
+          <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+            {/* Event Title */}
+            <h1 className="text-h1 font-montserrat text-pure-white mb-4 leading-tight drop-shadow-lg">
+              {event.title}
+            </h1>
+            
+            {/* Key Metadata */}
+            <div className="space-y-2">
+              {/* Date and Time */}
+              <div className="flex items-center text-large font-lato text-pure-white drop-shadow-md">
+                <Calendar className="h-5 w-5 mr-3 flex-shrink-0" />
+                <span>
+                  {event.start_date && formatDate(event.start_date)}
+                  {event.start_time && `, ${formatEventTime(event.start_time, event.end_time)}`}
+                </span>
+              </div>
+              
+              {/* Organizer */}
+              {event.organiser_name && (
+                <p className="text-large font-lato text-pure-white/90 drop-shadow-md">
+                  By {event.organiser_name}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Mobile: Title and date below image */}
+      {isMobile && (
+        <div className="p-4 bg-pure-white">
+          <h1 className="text-2xl font-bold text-graphite-grey mb-3 leading-tight">
             {event.title}
           </h1>
           
-          {/* Key Metadata */}
           <div className="space-y-2">
             {/* Date and Time */}
-            <div className="flex items-center text-large font-lato text-pure-white drop-shadow-md">
-              <Calendar className="h-5 w-5 mr-3 flex-shrink-0" />
+            <div className="flex items-center text-base text-graphite-grey">
+              <Calendar className="h-4 w-4 mr-2 flex-shrink-0 text-ocean-teal" />
               <span>
                 {event.start_date && formatDate(event.start_date)}
                 {event.start_time && `, ${formatEventTime(event.start_time, event.end_time)}`}
@@ -69,13 +104,13 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
             
             {/* Organizer */}
             {event.organiser_name && (
-              <p className="text-large font-lato text-pure-white/90 drop-shadow-md">
+              <p className="text-sm text-graphite-grey/80">
                 By {event.organiser_name}
               </p>
             )}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
