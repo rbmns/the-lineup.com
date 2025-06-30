@@ -7,9 +7,10 @@ import { LoginForm } from '../LoginForm';
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     signIn: vi.fn(),
-    isLoading: false,
+    loading: false,
     user: null,
     isAuthenticated: false,
+    loginWithGoogle: vi.fn(),
   }),
 }));
 

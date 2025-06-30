@@ -25,14 +25,13 @@ const mockEvents: Event[] = [
 
 describe('EventsList', () => {
   const defaultProps = {
+    events: mockEvents,
+    onRsvp: vi.fn(),
+    showRsvpButtons: true,
+    compact: false,
     isLoading: false,
-    isSearching: false,
-    displayEvents: mockEvents,
-    noResultsFound: false,
+    hasActiveFilters: false,
     similarEvents: [],
-    resetFilters: vi.fn(),
-    handleRsvpAction: vi.fn(),
-    isAuthenticated: true,
   };
 
   it('renders events list', () => {
@@ -42,16 +41,15 @@ describe('EventsList', () => {
   });
 
   it('shows loading state', () => {
-    render(<EventsList {...defaultProps} isLoading={true} />);
+    render(<EventsList {...defaultProps} isLoading={true} events={[]} />);
     
-    // The FilteredEventsList component should handle loading state
+    // The component should handle loading state
     expect(screen.queryByText('Test Event')).not.toBeInTheDocument();
   });
 
-  it('shows no results message when no events found', () => {
-    render(<EventsList {...defaultProps} displayEvents={[]} noResultsFound={true} />);
+  it('shows empty state when no events', () => {
+    render(<EventsList {...defaultProps} events={[]} />);
     
-    // This will be handled by the FilteredEventsList component
     expect(screen.queryByText('Test Event')).not.toBeInTheDocument();
   });
 });
