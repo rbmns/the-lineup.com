@@ -1,9 +1,8 @@
 
 import React from 'react';
 import { CasualPlan } from '@/types/casual-plans';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, MapPin, Clock, Users } from 'lucide-react';
+import { CalendarDays, MapPin, Users } from 'lucide-react';
 import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { cn } from '@/lib/utils';
 
@@ -50,76 +49,74 @@ export const CasualPlanCard: React.FC<CasualPlanCardProps> = ({
   const currentRsvpStatus = plan.rsvp_status || null;
 
   return (
-    <Card 
+    <div 
       className={cn(
-        "h-full transition-all duration-200 shadow-sm hover:shadow-md border-overcast bg-coconut rounded-xl",
+        "card-base h-full flex flex-col transition-smooth hover-lift",
         isLoading && "opacity-50",
         className
       )}
       data-plan-id={plan.id}
     >
-      <CardContent className="p-4 sm:p-6 h-full flex flex-col">
-        <div className="flex-1 space-y-4">
-          {/* Title and Vibe */}
-          <div className="space-y-2">
-            <h3 className="font-display text-midnight text-lg line-clamp-2">{plan.title}</h3>
-            {showBlurred ? (
-              <div className="bg-gray-200 text-gray-400 px-2 py-1 rounded text-xs w-fit">
-                ••••••
-              </div>
-            ) : (
-              <Badge variant="secondary" className="bg-seafoam text-midnight text-xs rounded-full capitalize">
-                {plan.vibe}
-              </Badge>
-            )}
-          </div>
-
-          {/* Date and Time */}
-          <div className="flex items-center gap-2 font-mono text-overcast text-xs">
-            <CalendarDays className="h-4 w-4 text-clay flex-shrink-0" />
-            <span>
-              {formatDate(plan.date)}
-              {plan.time && ` • ${formatTime(plan.time)}`}
-            </span>
-          </div>
-
-          {/* Location */}
-          {plan.location && (
-            <div className="flex items-center gap-2 font-mono text-overcast text-xs">
-              <MapPin className="h-4 w-4 text-clay flex-shrink-0" />
-              <span className="truncate">{plan.location}</span>
+      <div className="flex-1 space-y-4 p-6">
+        {/* Title and Vibe */}
+        <div className="space-y-2">
+          <h3 className="text-h4 text-graphite-grey line-clamp-2">{plan.title}</h3>
+          {showBlurred ? (
+            <div className="event-card-tag w-fit">
+              ••••••
             </div>
-          )}
-
-          {/* Description */}
-          {plan.description && !showBlurred && (
-            <p className="text-midnight text-sm line-clamp-3">
-              {plan.description}
-            </p>
-          )}
-
-          {/* RSVP Buttons */}
-          {showRsvpButtons && !showBlurred && (
-            <div className="bg-sage text-midnight p-4 rounded-md">
-              <EventRsvpButtons
-                currentStatus={currentRsvpStatus}
-                onRsvp={handleRsvp}
-                isLoading={isLoading}
-                size="sm"
-                className="w-full"
-              />
-            </div>
-          )}
-
-          {/* Attendee count */}
-          {plan.attendee_count && plan.attendee_count > 0 && (
-            <div className="flex items-center gap-2 font-mono text-overcast text-xs">
-              <Users className="h-4 w-4 text-clay flex-shrink-0" />
-              <span>{plan.attendee_count} attending</span>
-            </div>
+          ) : (
+            <Badge variant="secondary" className="event-card-tag bg-sunrise-ochre/20 text-graphite-grey capitalize">
+              {plan.vibe}
+            </Badge>
           )}
         </div>
-      </CardContent>
-    </Card>
+
+        {/* Date and Time */}
+        <div className="flex items-center gap-2 text-small text-graphite-grey/80">
+          <CalendarDays className="h-4 w-4 text-ocean-teal flex-shrink-0" />
+          <span>
+            {formatDate(plan.date)}
+            {plan.time && ` • ${formatTime(plan.time)}`}
+          </span>
+        </div>
+
+        {/* Location */}
+        {plan.location && (
+          <div className="flex items-center gap-2 text-small text-graphite-grey/80">
+            <MapPin className="h-4 w-4 text-ocean-teal flex-shrink-0" />
+            <span className="truncate">{plan.location}</span>
+          </div>
+        )}
+
+        {/* Description */}
+        {plan.description && !showBlurred && (
+          <p className="text-body-base text-graphite-grey line-clamp-3">
+            {plan.description}
+          </p>
+        )}
+
+        {/* RSVP Buttons */}
+        {showRsvpButtons && !showBlurred && (
+          <div className="bg-mist-grey p-4 rounded-md">
+            <EventRsvpButtons
+              currentStatus={currentRsvpStatus}
+              onRsvp={handleRsvp}
+              isLoading={isLoading}
+              size="sm"
+              className="w-full"
+            />
+          </div>
+        )}
+
+        {/* Attendee count */}
+        {plan.attendee_count && plan.attendee_count > 0 && (
+          <div className="flex items-center gap-2 text-small text-graphite-grey/80">
+            <Users className="h-4 w-4 text-ocean-teal flex-shrink-0" />
+            <span>{plan.attendee_count} attending</span>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };

@@ -19,16 +19,16 @@ export const EventsPageHeader: React.FC<EventsPageHeaderProps> = ({
 
   return (
     <div className="relative w-full bg-pure-white border-b border-mist-grey">
-      {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+      {/* Content using design system classes */}
+      <div className="section-content-narrow text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className={`${isMobile ? 'text-h2' : 'text-h1'} font-display font-bold tracking-tight text-graphite-grey mb-2 leading-tight`}>
+          <h1 className={`${isMobile ? 'text-h2' : 'text-h1'} text-graphite-grey mb-2`}>
             {title}
           </h1>
           
-          {/* Tagline */}
+          {/* Tagline using design system typography */}
           <div className="mt-2">
-            <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-graphite-grey/70 font-montserrat font-semibold uppercase tracking-wider`}>
+            <span className={`${isMobile ? 'text-xs' : 'text-small'} text-graphite-grey/70 font-montserrat font-semibold uppercase tracking-wider`}>
               Discover • Connect • Experience
             </span>
           </div>

@@ -3,7 +3,6 @@ import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin, Users } from 'lucide-react';
 import { formatEventCardDateTime } from '@/utils/date-formatting';
-import { Card } from '@/components/ui/card';
 
 interface ProfileEventCardProps {
   event: Event;
@@ -19,40 +18,42 @@ export const ProfileEventCard: React.FC<ProfileEventCardProps> = ({ event }) => 
   };
 
   return (
-    <Card 
-      className="p-4 hover:bg-gray-50 hover:shadow-lg transition-all cursor-pointer rounded-xl shadow-md"
+    <div 
+      className="card-base cursor-pointer group hover-lift"
       onClick={handleClick}
     >
       <div className="flex items-start space-x-4">
         {event.image_urls && event.image_urls.length > 0 && (
-          <img
-            src={event.image_urls[0]}
-            alt={event.title}
-            className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
-          />
+          <div className="w-16 h-16 overflow-hidden rounded-md flex-shrink-0">
+            <img
+              src={event.image_urls[0]}
+              alt={event.title}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          </div>
         )}
         
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900 truncate">
+          <h3 className="text-h4 text-graphite-grey truncate mb-2">
             {event.title}
           </h3>
           
-          <div className="space-y-2 mt-2">
-            <div className="flex items-center text-sm text-gray-600">
-              <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
+          <div className="space-y-2">
+            <div className="flex items-center text-small text-graphite-grey/80">
+              <Calendar className="h-4 w-4 mr-2 flex-shrink-0 text-ocean-teal" />
               <span>{formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}</span>
             </div>
             
             {(event.venues?.name || event.location) && (
-              <div className="flex items-center text-sm text-gray-600">
-                <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
+              <div className="flex items-center text-small text-graphite-grey/80">
+                <MapPin className="h-4 w-4 mr-2 flex-shrink-0 text-ocean-teal" />
                 <span className="truncate">{event.venues?.name || event.location}</span>
               </div>
             )}
             
             {event.attendees && (
-              <div className="flex items-center text-sm text-gray-600">
-                <Users className="h-4 w-4 mr-2 flex-shrink-0" />
+              <div className="flex items-center text-small text-graphite-grey/80">
+                <Users className="h-4 w-4 mr-2 flex-shrink-0 text-ocean-teal" />
                 <span>{event.attendees.going} attending</span>
               </div>
             )}
@@ -61,16 +62,16 @@ export const ProfileEventCard: React.FC<ProfileEventCardProps> = ({ event }) => 
         
         {event.rsvp_status && (
           <div className="flex-shrink-0">
-            <span className={`px-2 py-1 text-xs rounded-full ${
+            <span className={`event-card-tag ${
               event.rsvp_status === 'Going' 
-                ? 'bg-green-100 text-green-800' 
-                : 'bg-blue-100 text-blue-800'
+                ? 'bg-ocean-teal/20 text-ocean-teal' 
+                : 'bg-sunrise-ochre/20 text-graphite-grey'
             }`}>
               {event.rsvp_status}
             </span>
           </div>
         )}
       </div>
-    </Card>
+    </div>
   );
 };

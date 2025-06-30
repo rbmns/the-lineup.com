@@ -18,7 +18,7 @@ interface MasterEventCardProps {
   className?: string;
   onClick?: (event: Event) => void;
   loadingEventId?: string | null;
-  children?: React.ReactNode; // For custom RSVP buttons or other content
+  children?: React.ReactNode;
 }
 
 export const MasterEventCard: React.FC<MasterEventCardProps> = ({
@@ -70,18 +70,6 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
     }
   };
 
-  const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
-    if (!onRsvp || !shouldShowRsvp) return false;
-    
-    try {
-      const result = await onRsvp(event.id, status);
-      return result === undefined ? true : !!result;
-    } catch (error) {
-      console.error('Error in MasterEventCard RSVP handler:', error);
-      return false;
-    }
-  };
-
   const getVenueDisplay = (): string => {
     if (event.venues?.name) {
       return event.venues.name;
@@ -97,19 +85,19 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
   return (
     <div 
       className={cn(
-        "bg-coconut border border-clay/20 rounded-md p-4 sm:p-6 cursor-pointer transition-all duration-200",
-        "hover:-translate-y-1 hover:shadow-coastal-hover hover:border-clay/30 w-full group",
+        "event-card group w-full h-full flex flex-col",
+        "cursor-pointer transition-smooth hover-lift",
         className
       )}
       onClick={handleClick}
       data-event-id={event.id}
     >
-      {/* Image */}
-      <div className="w-full h-48 mb-4 overflow-hidden rounded-md">
+      {/* Event Image - using design system image class */}
+      <div className="event-card-image relative overflow-hidden">
         <img
           src={imageUrl}
           alt={event.title}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 filter-warm"
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (!target.src.includes('/img/default.jpg')) {
@@ -117,76 +105,71 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
             }
           }}
         />
+        
+        {/* Category badge overlay */}
+        {event.event_category && (
+          <div className="absolute top-3 left-3">
+            <span className="event-card-tag">
+              {event.event_category}
+            </span>
+          </div>
+        )}
       </div>
       
-      {/* Title */}
-      <h3 className="font-display text-lg text-midnight mb-3 leading-tight font-semibold">
-        {event.title}
-      </h3>
-      
-      {/* Organizer info */}
-      {event.organiser_name && (
-        <p className="font-mono text-xs text-overcast mb-3 uppercase tracking-wide">
-          By {event.organiser_name}
-        </p>
-      )}
-      
-      {/* Metadata */}
-      <div className="font-mono text-xs text-overcast space-y-2 mb-4 uppercase tracking-wide">
-        <div className="flex items-center space-x-2">
-          <Calendar className="h-3.5 w-3.5 text-clay" />
-          <span>
-            {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
-          </span>
+      {/* Content Section */}
+      <div className="flex-1 flex flex-col p-4 space-y-3">
+        {/* Title - using design system typography */}
+        <h3 className="event-card-title">
+          {event.title}
+        </h3>
+        
+        {/* Organizer info */}
+        {event.organiser_name && (
+          <p className="event-card-meta">
+            By {event.organiser_name}
+          </p>
+        )}
+        
+        {/* Date & Time */}
+        <div className="event-card-meta flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-ocean-teal flex-shrink-0" />
+          <span>{formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}</span>
         </div>
         
-        <div className="flex items-center space-x-2">
-          <MapPin className="h-3.5 w-3.5 text-clay" />
-          <span>
-            {getVenueDisplay()}
-          </span>
+        {/* Location */}
+        <div className="event-card-location flex items-center gap-2">
+          <MapPin className="h-4 w-4 text-ocean-teal flex-shrink-0" />
+          <span className="truncate">{getVenueDisplay()}</span>
         </div>
-      </div>
-
-      {/* Tags/Vibes and Category - unified styling */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {event.vibe && (
-          <span className="px-2.5 py-1 text-xs font-mono font-medium rounded-md bg-midnight/10 text-midnight uppercase tracking-wide border border-midnight/20">
-            {event.vibe}
-          </span>
+        
+        {/* Description (if available and not compact) */}
+        {event.description && !compact && (
+          <p className="event-card-description line-clamp-2">
+            {event.description}
+          </p>
         )}
-        {event.event_category && (
-          <span className="px-2.5 py-1 text-xs font-mono font-medium rounded-md bg-ocean-deep/15 text-ocean-deep uppercase tracking-wide border border-ocean-deep/25">
-            {event.event_category}
-          </span>
+        
+        {/* RSVP Status Display */}
+        {showRsvpStatus && event.rsvp_status && (
+          <div className="flex items-center gap-2">
+            <span className={cn(
+              "px-2 py-1 rounded-full text-xs font-medium",
+              event.rsvp_status === 'Going' 
+                ? "bg-ocean-teal/20 text-ocean-teal" 
+                : "bg-sunrise-ochre/20 text-graphite-grey"
+            )}>
+              {event.rsvp_status}
+            </span>
+          </div>
+        )}
+        
+        {/* Children (typically RSVP buttons) */}
+        {children && (
+          <div className="mt-auto pt-2" data-rsvp-container="true">
+            {children}
+          </div>
         )}
       </div>
-
-      {/* Custom content or RSVP buttons */}
-      {children ? (
-        <div 
-          data-rsvp-container="true" 
-          onClick={(e) => e.stopPropagation()}
-        >
-          {children}
-        </div>
-      ) : shouldShowRsvp && onRsvp && (
-        <div 
-          data-rsvp-container="true" 
-          onClick={(e) => e.stopPropagation()}
-        >
-          <button
-            className="btn-primary w-full px-4 py-2.5 text-sm font-medium rounded-md"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleRsvp('Going');
-            }}
-            disabled={loadingEventId === event.id}
-          >
-            {event.rsvp_status === 'Going' ? 'Going' : 'Join Event'}
-          </button>
-        </div>
-      )}
     </div>
   );
 };

@@ -19,13 +19,13 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   
   return (
     <div className="relative w-full bg-pure-white border-b border-mist-grey">
-      {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+      {/* Content using design system classes */}
+      <div className="section-content-narrow text-center">
         <div className="max-w-4xl mx-auto">
-          <h1 className={`${isMobile ? 'text-h2' : 'text-h1'} font-display font-bold tracking-tight text-graphite-grey mb-4 leading-tight ${className}`}>
+          <h1 className={`${isMobile ? 'text-h2' : 'text-h1'} text-graphite-grey mb-4 ${className}`}>
             {title}
           </h1>
-          <p className={`${isMobile ? 'text-body-base' : 'text-body-base'} text-graphite-grey/80 max-w-2xl mx-auto leading-relaxed font-lato font-medium`}>
+          <p className={`text-body-base text-graphite-grey/80 max-w-2xl mx-auto`}>
             {subtitle}
           </p>
         </div>
