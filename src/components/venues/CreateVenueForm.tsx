@@ -42,7 +42,7 @@ export const CreateVenueForm: React.FC<CreateVenueFormProps> = ({ onSubmit, isSu
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Venue Name *</FormLabel>
+              <FormLabel>Venue Name</FormLabel>
               <FormControl>
                 <Input placeholder="e.g., The Surf Shack" {...field} />
               </FormControl>
@@ -50,36 +50,32 @@ export const CreateVenueForm: React.FC<CreateVenueFormProps> = ({ onSubmit, isSu
             </FormItem>
           )}
         />
-        
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="street"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Street Address</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., Beach Road 1" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>City</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., Zandvoort" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
+        <FormField
+          control={form.control}
+          name="city"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>City</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g., Zandvoort" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="street"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Street</FormLabel>
+              <FormControl>
+                <Input placeholder="e.g., Beach Road 1" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="postal_code"
@@ -93,27 +89,6 @@ export const CreateVenueForm: React.FC<CreateVenueFormProps> = ({ onSubmit, isSu
             </FormItem>
           )}
         />
-
-        <div className="border-t pt-4">
-          <p className="text-sm text-gray-600 mb-3">
-            * Either provide address information above OR a Google Maps link below
-          </p>
-          
-          <FormField
-            control={form.control}
-            name="google_maps"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Google Maps Link (Alternative to address)</FormLabel>
-                <FormControl>
-                  <Input type="url" placeholder="https://maps.google.com/..." {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
         <FormField
           control={form.control}
           name="website"
@@ -127,7 +102,19 @@ export const CreateVenueForm: React.FC<CreateVenueFormProps> = ({ onSubmit, isSu
             </FormItem>
           )}
         />
-
+        <FormField
+          control={form.control}
+          name="google_maps"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Google Maps Link (Optional)</FormLabel>
+              <FormControl>
+                <Input type="url" placeholder="https://maps.google.com/..." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <Button type="submit" disabled={isSubmitting} className="w-full">
           {isSubmitting ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Venue' : 'Create Venue')}
         </Button>
