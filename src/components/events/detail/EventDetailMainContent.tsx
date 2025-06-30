@@ -154,7 +154,7 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
           )}
 
           {/* Price */}
-          {(event.price !== null && event.price !== undefined) && (
+          {(event.fee !== null && event.fee !== undefined) && (
             <div className="flex items-start gap-4">
               <div className="p-3 bg-coral/20 rounded-full">
                 <span className="text-lg font-bold text-coral">€</span>
@@ -162,7 +162,7 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
               <div>
                 <h3 className="text-lg font-semibold text-midnight mb-1">Price</h3>
                 <p className="font-mono text-sm text-overcast">
-                  {event.price === 0 ? 'Free' : `€${event.price}`}
+                  {event.fee === 0 ? 'Free' : `€${event.fee}`}
                 </p>
               </div>
             </div>
@@ -208,12 +208,7 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
               <h3 className="text-2xl font-semibold text-midnight mb-2">
                 {event.organiser_name || event.creator?.username || 'Event Host'}
               </h3>
-              {event.organiser_email && (
-                <p className="font-mono text-sm text-overcast mb-2">
-                  Contact: {event.organiser_email}
-                </p>
-              )}
-              {event.creator?.email && !event.organiser_email && (
+              {event.creator?.email && (
                 <p className="font-mono text-sm text-overcast mb-2">
                   Contact: {event.creator.email}
                 </p>
@@ -253,23 +248,6 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
                   className="text-base text-clay hover:text-midnight hover:underline transition-colors font-mono break-all"
                 >
                   Book Now
-                </a>
-              </div>
-            )}
-
-            {event.external_link && (
-              <div className="bg-coconut/50 rounded-xl p-4">
-                <h4 className="font-semibold text-midnight mb-2 flex items-center">
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  More Information
-                </h4>
-                <a
-                  href={event.external_link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-base text-clay hover:text-midnight hover:underline transition-colors font-mono break-all"
-                >
-                  Learn More
                 </a>
               </div>
             )}
