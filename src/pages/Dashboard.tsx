@@ -17,40 +17,6 @@ const Dashboard: React.FC = () => {
   const { data: events = [], isLoading: eventsLoading } = useUserCreatedEvents();
   const { venues, isLoading: venuesLoading } = useVenues();
 
-  // If user is not logged in, redirect to login
-  if (!user) {
-    navigate('/login');
-    return null;
-  }
-
-  // Check if user has created any events - if not, show access denied
-  if (!eventsLoading && events.length === 0) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="max-w-md mx-auto text-center">
-          <Calendar className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Dashboard Access</h1>
-          <p className="text-gray-600 mb-6">
-            The organizer dashboard is only available for users who have created events.
-          </p>
-          <div className="space-y-3">
-            <Button asChild className="w-full">
-              <Link to="/events/create">
-                <Plus className="mr-2 h-4 w-4" />
-                Create Your First Event
-              </Link>
-            </Button>
-            <Button variant="outline" asChild className="w-full">
-              <Link to="/events">
-                Browse Events
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // Filter venues created by current user
   const userVenues = venues.filter(venue => venue.creator_id === user?.id);
 
@@ -66,6 +32,11 @@ const Dashboard: React.FC = () => {
   const sortedPastEvents = pastEvents.sort((a, b) => 
     new Date(b.start_date).getTime() - new Date(a.start_date).getTime()
   );
+
+  if (!user) {
+    navigate('/login');
+    return null;
+  }
 
   if (eventsLoading || venuesLoading) {
     return (

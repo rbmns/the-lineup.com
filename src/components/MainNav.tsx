@@ -46,9 +46,9 @@ const MainNav = () => {
             {/* Left side - Logo */}
             <div className="flex items-center h-full flex-shrink-0">
               {!isMobile && <Link to="/" className="flex items-center justify-center mr-2 flex-shrink-0">
-                  <img src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" alt="the lineup Symbol" className="w-4 h-4 transition-opacity hover:opacity-80" />
+                  <img src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" alt="the lineup Symbol" className="w-5 h-5 transition-opacity hover:opacity-80" />
                 </Link>}
-              <Link to="/" className={cn("font-display font-bold text-ocean-deep hover:text-ocean-deep/80 transition-colors", isMobile ? "text-lg" : "text-xl")}>
+              <Link to="/" className={cn("font-display font-bold text-ocean-deep hover:text-ocean-deep/80 transition-colors", isMobile ? "text-xl" : "text-2xl")}>
                 the lineup
               </Link>
             </div>
