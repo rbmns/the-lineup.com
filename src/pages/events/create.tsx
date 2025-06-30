@@ -3,6 +3,7 @@ import React from 'react';
 import { EventForm } from '@/components/events/EventForm';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { Mail } from 'lucide-react';
 
 const CreateEvent = () => {
   const isMobile = useIsMobile();
@@ -26,6 +27,27 @@ const CreateEvent = () => {
         )}>
           Share your event with the community
         </p>
+        
+        {/* Beta Message */}
+        <div className={cn(
+          "mt-4 p-3 bg-ocean-teal/10 border border-ocean-teal/20 rounded-lg mx-auto",
+          isMobile ? "max-w-xs text-xs" : "max-w-md text-sm"
+        )}>
+          <div className="flex items-center justify-center gap-2 text-ocean-teal font-medium mb-1">
+            <span className="text-xs bg-ocean-teal text-white px-2 py-0.5 rounded-full">BETA</span>
+            We're in Beta!
+          </div>
+          <div className="flex items-center justify-center gap-1 text-graphite-grey">
+            <Mail className="h-3 w-3" />
+            <span>Questions? Contact us at </span>
+            <a 
+              href="mailto:events@the-lineup.com" 
+              className="text-ocean-teal hover:underline font-medium"
+            >
+              events@the-lineup.com
+            </a>
+          </div>
+        </div>
       </div>
       
       {/* Form Container */}
