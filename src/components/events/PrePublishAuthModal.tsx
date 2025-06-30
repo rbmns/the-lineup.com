@@ -26,7 +26,7 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
   const [name, setName] = useState('');
   const [gdprConsent, setGdprConsent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { signIn, signUp, loginWithGoogle, isAuthenticated, user, session, loading: authLoading } = useAuth();
+  const { signIn, signUp, loginWithGoogle, loading: authLoading } = useAuth();
 
   const handleGoogleLogin = async () => {
     if (isSubmitting || authLoading) return;
@@ -122,25 +122,15 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
         }
         console.log("Signup successful");
 
-        // Wait longer for auth state to propagate after signup
-        setTimeout(() => {
-          // Check auth state after signup
-          if (isAuthenticated && user && session) {
-            console.log("User is immediately authenticated, proceeding with event creation");
-            toast({
-              title: "Account created & you're logged in! 🎉",
-              description: "Publishing your event now...",
-            });
-            onSuccess();
-          } else {
-            console.log("Email confirmation required, showing confirmation message");
-            toast({
-              title: "Account created! 📧",
-              description: "Please check your email to confirm your account. Your event will be ready to publish once confirmed.",
-            });
-            onClose(); // Close modal but don't trigger success since event can't be published yet
-          }
-        }, 1500);
+        // Show success message and close modal immediately
+        // The event creation will happen after auth state is confirmed
+        toast({
+          title: "Account created! 📧",
+          description: "Please check your email to confirm your account, then try publishing your event again.",
+        });
+        
+        // Close the modal - user needs to confirm email first
+        onClose();
       }
 
     } catch (error: any) {
@@ -253,7 +243,7 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
                 ? "Processing..." 
                 : isLogin 
                   ? "Sign in & Publish" 
-                  : "Create Account & Publish"
+                  : "Create Account"
               }
             </Button>
           </form>

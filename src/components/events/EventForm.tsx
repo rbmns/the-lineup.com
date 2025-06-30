@@ -17,6 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Event } from '@/types';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { toast } from '@/hooks/use-toast';
 
 interface EventFormProps {
   eventId?: string;
@@ -100,20 +101,43 @@ export const EventForm: React.FC<EventFormProps> = ({
 
   const handleAuthSuccess = async () => {
     console.log("Auth success callback called");
-    console.log("Current auth state - isAuthenticated:", isAuthenticated, "user:", user);
     setShowAuthModal(false);
+    
     if (pendingFormData) {
       console.log("Submitting pending form data after auth success");
+      
+      // Show a toast to let user know we're checking their authentication
+      toast({
+        title: "Checking authentication...",
+        description: "Please wait while we confirm your login status.",
+      });
 
-      // Add a small delay to ensure auth state is fully propagated
+      // Add a longer delay to ensure auth state is fully propagated
       setTimeout(async () => {
-        try {
-          await originalOnSubmit(pendingFormData);
+        // Double-check auth state before proceeding
+        if (isAuthenticated && user && session) {
+          try {
+            console.log("Auth confirmed, now submitting event");
+            await originalOnSubmit(pendingFormData);
+            setPendingFormData(null);
+          } catch (error) {
+            console.error("Error submitting form after auth:", error);
+            toast({
+              title: "Event creation failed",
+              description: "Please try again or check your authentication status.",
+              variant: "destructive"
+            });
+          }
+        } else {
+          console.log("Auth state not confirmed, asking user to try again");
+          toast({
+            title: "Authentication needed",
+            description: "Please sign in again and try publishing your event.",
+            variant: "destructive"
+          });
           setPendingFormData(null);
-        } catch (error) {
-          console.error("Error submitting form after auth:", error);
         }
-      }, 500);
+      }, 2000);
     }
   };
 

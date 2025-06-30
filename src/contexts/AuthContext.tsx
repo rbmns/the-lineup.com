@@ -67,10 +67,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.log("User logged in:", newSession.user.id);
             setUser(newSession.user);
             
-            // Immediately update authentication state before profile fetch
+            // Defer profile operations to prevent auth state conflicts
             setTimeout(() => {
               refreshProfile(newSession.user);
-            }, 0);
+            }, 100);
           } else {
             console.log("User logged out");
             setUser(null);
@@ -130,56 +130,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (signUpError) {
         console.error("Sign up error:", signUpError);
-        toast({
-          title: "Sign up failed",
-          description: signUpError.message,
-          variant: "destructive"
-        });
         return { error: signUpError };
       }
 
       if (authData?.user) {
-        console.log("Sign up successful, creating profile for user:", authData.user.id);
-        
-        const profileSuccess = await ensureUserProfileExists(
-          authData.user.id, 
-          email, 
-          username || email.split('@')[0]
-        );
-        
-        if (!profileSuccess) {
-          console.error("Error creating profile through utility function");
-          toast({
-            title: "Profile creation failed",
-            description: "Account created but we couldn't set up your profile.",
-            variant: "destructive"
-          });
-        }
-        
+        console.log("Sign up successful for user:", authData.user.id);
         setIsNewUser(true);
         
-        // For signup, we need to handle both cases:
-        // 1. Email confirmation disabled - user is immediately logged in
-        // 2. Email confirmation enabled - user needs to confirm email
+        // For signup, profiles will be created by the database trigger
+        // when the user confirms their email and is properly authenticated
+        
         if (authData.session) {
           // User is immediately logged in (email confirmation disabled)
           console.log("User immediately logged in after signup");
           setSession(authData.session);
           setUser(authData.user);
           
-          // Ensure profile is created and fetched
-          await refreshProfile(authData.user);
-          
-          toast({
-            title: "Account created! 🎉",
-            description: "You're now logged in and ready to publish events.",
-          });
-        } else {
-          // Email confirmation required
-          toast({
-            title: "Account created!",
-            description: "Check your email to confirm your account before publishing events.",
-          });
+          // Try to ensure profile exists, but don't fail if it doesn't work
+          try {
+            await ensureUserProfileExists(
+              authData.user.id, 
+              email, 
+              username || email.split('@')[0]
+            );
+            await refreshProfile(authData.user);
+          } catch (profileError) {
+            console.warn("Profile creation failed, but signup succeeded:", profileError);
+          }
         }
         
         return { error: null };
@@ -188,11 +165,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { error: null };
     } catch (error) {
       console.error("Unexpected error during sign up:", error);
-      toast({
-        title: "Sign up failed",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive"
-      });
       return { error };
     }
   };
@@ -213,11 +185,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error("Sign in error:", error);
-        toast({
-          title: "Sign in failed",
-          description: error.message || "Invalid login credentials. Please check your email and password.",
-          variant: "destructive"
-        });
         return { error, data: null };
       }
 
@@ -232,11 +199,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { error: null, data };
     } catch (error) {
       console.error("Unexpected error during sign in:", error);
-      toast({
-        title: "Sign in failed",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive"
-      });
       return { error, data: null };
     }
   };
@@ -438,8 +400,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       console.log("Refreshing profile for user:", currentUser.id);
       
-      setProfile(null);
-      
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
@@ -449,27 +409,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (profileError) {
         console.error("Error fetching profile:", profileError);
         
+        // Try to create profile if fetch fails
         if (currentUser.email) {
-          await ensureUserProfileExists(
-            currentUser.id, 
-            currentUser.email, 
-            currentUser.user_metadata?.username || currentUser.email.split('@')[0]
-          );
-          
-          const { data: retryData } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', currentUser.id as any)
-            .maybeSingle();
+          try {
+            console.log("Attempting to create profile for user:", currentUser.id);
+            await ensureUserProfileExists(
+              currentUser.id, 
+              currentUser.email, 
+              currentUser.user_metadata?.username || currentUser.email.split('@')[0]
+            );
             
-          if (retryData) {
-            const userProfile = safeFetchProfile(retryData);
-            if (userProfile) {
-              setProfile(userProfile);
+            // Retry fetching the profile
+            const { data: retryData } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', currentUser.id as any)
+              .maybeSingle();
+              
+            if (retryData) {
+              console.log("Profile created and fetched successfully");
+              const userProfile = safeFetchProfile(retryData);
+              if (userProfile) {
+                setProfile(userProfile);
+              }
+              return;
             }
-            return;
+          } catch (createError) {
+            console.error("Failed to create profile:", createError);
           }
         }
+        
+        // Fallback to default profile
+        setProfile(createDefaultUserProfile(
+          currentUser.id,
+          currentUser.email || '',
+          currentUser.email?.split('@')[0] || 'User'
+        ));
         return;
       }
 
@@ -487,17 +462,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           ));
         }
       } else {
-        console.log("No profile data found for user, trying to create one");
-        
-        if (currentUser.email) {
-          await ensureUserProfileExists(
-            currentUser.id, 
-            currentUser.email, 
-            currentUser.user_metadata?.username || currentUser.email.split('@')[0]
-          );
-          
-          await refreshProfile(currentUser);
-        }
+        console.log("No profile data found for user, creating default");
+        setProfile(createDefaultUserProfile(
+          currentUser.id,
+          currentUser.email || '',
+          currentUser.email?.split('@')[0] || 'User'
+        ));
       }
     } catch (error) {
       console.error("Unexpected error during profile refresh:", error);
