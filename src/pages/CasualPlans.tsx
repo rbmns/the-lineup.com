@@ -62,7 +62,7 @@ const CasualPlans = () => {
                 <Button 
                   onClick={() => navigate('/signup')}
                   className="w-full bg-ocean-teal hover:bg-ocean-teal/90 text-pure-white font-montserrat"
-                  size={isMobile ? "default" : "lg"}
+                  size="default"
                 >
                   Sign Up
                 </Button>
@@ -70,7 +70,7 @@ const CasualPlans = () => {
                   onClick={() => navigate('/login')} 
                   variant="outline"
                   className="w-full border-ocean-teal text-ocean-teal hover:bg-ocean-teal hover:text-pure-white font-montserrat"
-                  size={isMobile ? "default" : "lg"}
+                  size="default"
                 >
                   Log In
                 </Button>
