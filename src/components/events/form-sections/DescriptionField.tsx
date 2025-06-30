@@ -19,13 +19,13 @@ export const DescriptionField: React.FC<DescriptionFieldProps> = ({ errors }) =>
       name="description"
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="form-label">
+          <FormLabel className="text-sm font-medium text-graphite-grey">
             Description *
           </FormLabel>
           <FormControl>
             <Textarea
               placeholder="Tell people what your event is about, what to expect, what to bring..."
-              className="textarea-field min-h-[120px]"
+              className="min-h-[120px]"
               {...field}
             />
           </FormControl>
