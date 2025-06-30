@@ -26,17 +26,18 @@ export const CreateVenueModal: React.FC<CreateVenueModalProps> = ({ open, onOpen
   const handleFormSubmit = async (formData: CreateVenueFormValues) => {
     console.log("Venue form submitted with data:", formData);
     
-    if (!user) {
-      toast.error("You must be logged in to manage venues.");
-      return;
-    }
-    
     setIsSubmitting(true);
     
     try {
       let savedVenue: Venue;
       
       if (isEditMode && venueToEdit) {
+        // Editing requires authentication
+        if (!user) {
+          toast.error("You must be logged in to edit venues.");
+          return;
+        }
+        
         console.log("Updating existing venue:", venueToEdit.id);
         const { data: updatedVenue, error } = await updateVenue(venueToEdit.id, formData);
         
@@ -52,8 +53,12 @@ export const CreateVenueModal: React.FC<CreateVenueModalProps> = ({ open, onOpen
         savedVenue = updatedVenue;
         toast.success(`Venue "${savedVenue.name}" updated successfully!`);
       } else {
+        // Creating can be done without authentication
         console.log("Creating new venue");
-        const venueData = { ...formData, creator_id: user.id };
+        const venueData = { 
+          ...formData, 
+          creator_id: user?.id || null // Can be null for non-authenticated users
+        };
         const { data: newVenue, error } = await createVenue(venueData);
         
         if (error) {
@@ -67,6 +72,11 @@ export const CreateVenueModal: React.FC<CreateVenueModalProps> = ({ open, onOpen
         
         savedVenue = newVenue;
         toast.success(`Venue "${savedVenue.name}" created successfully!`);
+        
+        // Show additional message for non-authenticated users
+        if (!user) {
+          toast.info("Your venue has been added to the public list. Sign up to manage your venues later!");
+        }
       }
       
       // Invalidate and refetch venues
@@ -102,7 +112,15 @@ export const CreateVenueModal: React.FC<CreateVenueModalProps> = ({ open, onOpen
         <DialogHeader>
           <DialogTitle>{isEditMode ? 'Edit Venue' : 'Create a New Venue'}</DialogTitle>
           <DialogDescription>
-            {isEditMode ? 'Update the details for this venue.' : 'Add a new venue to the list. This will be available for all event creators.'}
+            {isEditMode 
+              ? 'Update the details for this venue.' 
+              : 'Add a new venue to the list. This will be available for all event creators.'
+            }
+            {!user && !isEditMode && (
+              <span className="block mt-2 text-sm text-gray-600">
+                No account needed - your venue will be added to the public list immediately.
+              </span>
+            )}
           </DialogDescription>
         </DialogHeader>
         <CreateVenueForm 

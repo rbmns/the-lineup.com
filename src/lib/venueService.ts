@@ -1,10 +1,9 @@
-
 import { supabase } from '@/lib/supabase';
 import { Venue } from '@/types';
 import { CreateVenueFormValues } from '@/components/venues/CreateVenueSchema';
 
-// The type for venueData now includes creator_id and omits auto-generated fields
-type CreateVenueData = Partial<Omit<Venue, 'id' | 'slug' | 'created_at'>> & { creator_id?: string };
+// The type for venueData now includes creator_id as optional
+type CreateVenueData = Partial<Omit<Venue, 'id' | 'slug' | 'created_at'>> & { creator_id?: string | null };
 
 // Function to categorize city to area based on country/region
 const categorizeCityToArea = async (city: string): Promise<string | null> => {
@@ -93,10 +92,16 @@ const addCityToAreaMapping = async (city: string, areaId: string): Promise<void>
 
 export const createVenue = async (venueData: CreateVenueData): Promise<{ data: Venue | null; error: any }> => {
   try {
+    // Create venue data with optional creator_id (can be null for non-authenticated users)
+    const dataToInsert = {
+      ...venueData,
+      creator_id: venueData.creator_id || null
+    };
+
     // First create the venue
     const { data, error } = await supabase
       .from('venues')
-      .insert(venueData)
+      .insert(dataToInsert)
       .select()
       .single();
 
