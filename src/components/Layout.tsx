@@ -21,9 +21,9 @@ const Layout = () => {
     <div className="min-h-screen w-full bg-pure-white">
       <MainNav />
       <div className="flex w-full min-h-screen">
-        {/* Main Content Area - using design system background */}
+        {/* Main Content Area */}
         <div className="flex-1 w-full min-h-screen bg-pure-white flex flex-col">
-          {/* Main content - add top padding only for non-home pages */}
+          {/* Main content with consistent padding system */}
           <main className={cn(
             "w-full flex-1 flex flex-col",
             !isHomePage && "pt-16", // Add top padding for non-home pages
