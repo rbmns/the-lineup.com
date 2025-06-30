@@ -17,18 +17,21 @@ export const SignupStep1: React.FC<SignupStep1Props> = ({ loading }) => {
       control={form.control}
       name="email"
       render={({ field }) => (
-        <FormItem>
-          <FormLabel>Email</FormLabel>
+        <FormItem className="space-y-3">
+          <FormLabel className="text-base font-semibold text-ocean-deep">
+            Email Address
+          </FormLabel>
           <FormControl>
             <Input 
               placeholder="name@example.com" 
               type="email" 
               autoComplete="email" 
-              disabled={loading} 
+              disabled={loading}
+              className="h-12 text-base border-2 border-mist-grey focus:border-ocean-teal transition-colors"
               {...field} 
             />
           </FormControl>
-          <FormMessage />
+          <FormMessage className="text-coral" />
         </FormItem>
       )}
     />
