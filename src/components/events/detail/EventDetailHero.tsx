@@ -14,9 +14,9 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
   const eventImage = getEventImage(event);
 
   return (
-    <div className="relative w-full">
-      {/* Large Event Image */}
-      <div className="relative w-full h-96 md:h-[500px] overflow-hidden">
+    <div className="w-full">
+      {/* Image Section */}
+      <div className="relative w-full h-56 sm:h-72 lg:h-80">
         <img 
           src={eventImage} 
           alt={event.title} 
@@ -29,52 +29,64 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
           }} 
         />
         
-        {/* Subtle graphite-grey overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-graphite-grey/60 via-graphite-grey/20 to-transparent" />
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         
-        {/* Category badge - top left */}
+        {/* Category as white text - top left */}
         {event.event_category && (
-          <div className="absolute top-4 left-4 z-20">
-            <span className="inline-flex items-center px-3 py-1 rounded-sm bg-pure-white/90 text-graphite-grey text-sm font-medium backdrop-blur-sm">
+          <div className="absolute top-3 sm:top-4 left-3 sm:left-4">
+            <span className="text-white text-sm font-medium px-3 py-1 bg-black/20 backdrop-blur-sm rounded-full">
               {event.event_category}
             </span>
           </div>
         )}
         
-        {/* Share button - top right */}
-        <div className="absolute top-4 right-4 z-20">
-          <EventShareButton 
-            event={event} 
-            variant="outline"
-          />
-        </div>
-        
-        {/* Event Title and Key Metadata Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-          {/* Event Title */}
-          <h1 className="text-h1 font-montserrat text-pure-white mb-4 leading-tight drop-shadow-lg">
-            {event.title}
-          </h1>
-          
-          {/* Key Metadata */}
-          <div className="space-y-2">
-            {/* Date and Time */}
-            <div className="flex items-center text-large font-lato text-pure-white drop-shadow-md">
-              <Calendar className="h-5 w-5 mr-3 flex-shrink-0" />
-              <span>
-                {event.start_date && formatDate(event.start_date)}
-                {event.start_time && `, ${formatEventTime(event.start_time, event.end_time)}`}
-              </span>
-            </div>
-            
-            {/* Organizer */}
-            {event.organiser_name && (
-              <p className="text-large font-lato text-pure-white/90 drop-shadow-md">
-                By {event.organiser_name}
-              </p>
-            )}
+        {/* Share button - Top right with custom styling */}
+        <div className="absolute top-3 sm:top-4 right-3 sm:right-4">
+          <div className="[&>button]:bg-transparent [&>button]:text-white [&>button]:border [&>button]:border-white/50 [&>button]:backdrop-blur-sm [&>button]:hover:bg-white [&>button]:hover:text-[#003840] [&>button]:transition-all [&>button]:duration-200">
+            <EventShareButton event={event} variant="outline" />
           </div>
         </div>
+        
+        {/* Desktop: Event title overlay - hidden on mobile */}
+        <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 lg:p-6 hidden sm:block">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-white mb-1 sm:mb-2 text-left leading-tight">
+            {event.title}
+          </h1>
+          <div className="flex items-center text-white/90 text-sm sm:text-base">
+            <Calendar className="h-4 w-4 mr-2 flex-shrink-0" />
+            <span className="font-medium">
+              {event.start_date && formatDate(event.start_date)}
+              {event.start_time && `, ${formatEventTime(event.start_time, event.end_time)}`}
+            </span>
+          </div>
+          {/* Organizer info without gradient background */}
+          {event.organiser_name && (
+            <p className="text-white/80 text-sm sm:text-base mt-1 font-medium">
+              By {event.organiser_name}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile: Content below image */}
+      <div className="block sm:hidden px-4 py-4 bg-white">
+        <h1 className="text-xl font-bold text-[#003840] mb-2 leading-tight">
+          {event.title}
+        </h1>
+        <div className="flex items-center text-[#003840]/80 text-sm mb-2">
+          <Calendar className="h-4 w-4 mr-2 flex-shrink-0 text-[#66B2B2]" />
+          <span className="font-medium">
+            {event.start_date && formatDate(event.start_date)}
+            {event.start_time && `, ${formatEventTime(event.start_time, event.end_time)}`}
+          </span>
+        </div>
+        {/* Organizer info without gradient background */}
+        {event.organiser_name && (
+          <p className="text-[#003840]/70 text-sm font-medium">
+            By <span className="text-[#66B2B2]">{event.organiser_name}</span>
+          </p>
+        )}
       </div>
     </div>
   );

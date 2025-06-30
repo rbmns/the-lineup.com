@@ -1,7 +1,13 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ChevronDown, Grid3X3 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { getCategoryIcon } from '@/components/ui/category/category-icon-mapping';
 
 interface CategoriesDropdownFilterProps {
   selectedCategories: string[];
@@ -18,78 +24,76 @@ export const CategoriesDropdownFilter: React.FC<CategoriesDropdownFilterProps> =
   onDeselectAll,
   allEventTypes
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
+  const handleSelectAll = () => {
+    if (selectedCategories.length === allEventTypes.length) {
+      onDeselectAll();
+    } else {
+      onSelectAll();
+    }
+  };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const displayText = selectedCategories.length > 0 
-    ? `Categories (${selectedCategories.length})`
-    : 'Categories';
+  const displayText = selectedCategories.length === 0 ? "CATEGORY" : 
+                     selectedCategories.length === 1 ? selectedCategories[0].toUpperCase() : 
+                     `${selectedCategories.length} CATEGORIES`;
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={cn(
-          "flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-md",
-          "font-mono text-xs uppercase tracking-wide text-gray-700",
-          "hover:bg-gray-50 hover:border-gray-300 transition-colors",
-          "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-          selectedCategories.length > 0 && "border-blue-300 bg-blue-50 text-blue-700"
-        )}
-      >
-        <Grid3X3 className="h-3.5 w-3.5" />
-        <span>{displayText}</span>
-        <ChevronDown className={cn(
-          "h-3.5 w-3.5 transition-transform",
-          isOpen && "rotate-180"
-        )} />
-      </button>
-
-      {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-64 overflow-y-auto">
-          <div className="py-1">
-            {/* Select/Deselect All Options */}
-            <div className="px-4 py-2 border-b border-gray-100">
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className="flex items-center gap-2 h-10 px-3 border-ocean-deep/20 bg-coconut text-ocean-deep rounded-md font-mono text-xs font-medium uppercase tracking-wide hover:bg-vibrant-aqua/10 hover:border-vibrant-aqua/40 transition-all duration-200"
+        >
+          <Grid3X3 className="h-4 w-4 text-coral" />
+          <span>{displayText}</span>
+          {selectedCategories.length > 0 && (
+            <span className="px-1.5 py-0.5 bg-sungold/20 text-ocean-deep rounded-full text-xs font-medium">
+              {selectedCategories.length}
+            </span>
+          )}
+          <ChevronDown className="h-3.5 w-3.5 text-ocean-deep/70" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64 p-0 bg-coconut border-ocean-deep/20 shadow-coastal rounded-md" align="start">
+        <div className="py-2">
+          {/* All Categories option */}
+          <button
+            onClick={handleSelectAll}
+            className={`w-full px-4 py-2 text-left text-sm hover:bg-vibrant-aqua/10 transition-colors font-mono uppercase tracking-wide ${
+              selectedCategories.length === 0 ? 'bg-sungold/20 font-medium text-ocean-deep' : 'text-ocean-deep'
+            }`}
+          >
+            all categories
+          </button>
+          
+          {/* Divider */}
+          <div className="border-t border-ocean-deep/10 my-1" />
+          
+          {/* Categories list */}
+          {allEventTypes.map((category) => {
+            const Icon = getCategoryIcon(category);
+            return (
               <button
-                onClick={() => {
-                  selectedCategories.length === allEventTypes.length ? onDeselectAll() : onSelectAll();
-                }}
-                className="text-xs font-mono uppercase tracking-wide text-blue-600 hover:text-blue-800"
-              >
-                {selectedCategories.length === allEventTypes.length ? 'Deselect All' : 'Select All'}
-              </button>
-            </div>
-            
-            {allEventTypes.map((category) => (
-              <label
                 key={category}
-                className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                onClick={() => onToggleCategory(category)}
+                className={`w-full px-4 py-2 text-left text-sm hover:bg-vibrant-aqua/10 transition-colors font-mono uppercase tracking-wide flex items-center gap-2 ${
+                  selectedCategories.includes(category) ? 'bg-sungold/20 font-medium text-ocean-deep' : 'text-ocean-deep'
+                }`}
               >
-                <input
-                  type="checkbox"
-                  checked={selectedCategories.includes(category)}
-                  onChange={() => onToggleCategory(category)}
-                  className="mr-3 rounded"
-                />
-                <span className="text-sm font-mono uppercase tracking-wide text-gray-700">
-                  {category}
-                </span>
-              </label>
-            ))}
-          </div>
+                {Icon && <Icon className="h-3.5 w-3.5" />}
+                {category}
+              </button>
+            );
+          })}
+          
+          {allEventTypes.length === 0 && (
+            <div className="px-4 py-2 text-sm text-ocean-deep/70 font-mono uppercase tracking-wide">
+              No categories available
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </PopoverContent>
+    </Popover>
   );
 };

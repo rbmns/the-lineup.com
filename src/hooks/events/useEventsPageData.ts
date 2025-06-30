@@ -252,7 +252,7 @@ export const useEventsPageData = () => {
       console.log(`  - Passes venue filter: '${eventVenueId}'`);
     }
 
-    // Area-based location filter - only apply if location is selected (not null)
+    // Area-based location filter - only apply if location is selected
     if (selectedLocation) {
       // If no venue city or location, exclude this event
       if (!event.venues?.city && !event.location) {
@@ -323,7 +323,7 @@ export const useEventsPageData = () => {
     setSelectedVibes([]);
     setSelectedEventTypes([]);
     setSelectedVenues([]);
-    handleLocationChange(null); // This will properly reset location to null
+    handleLocationChange(null);
     setDateRange(undefined);
     setSelectedDateFilter('anytime');
   };

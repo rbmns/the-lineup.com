@@ -1,40 +1,30 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ChevronDown, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { Event } from '@/types';
-import { cn } from '@/lib/utils';
 
 interface VibesDropdownFilterProps {
   selectedVibes: string[];
   onVibeChange: (vibes: string[]) => void;
   events: Event[];
-  vibesLoading?: boolean;
+  vibesLoading: boolean;
 }
 
 export const VibesDropdownFilter: React.FC<VibesDropdownFilterProps> = ({
   selectedVibes,
   onVibeChange,
   events,
-  vibesLoading = false
+  vibesLoading
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
 
-  // Extract unique vibes from events
-  const availableVibes = Array.from(
-    new Set(events.map(event => event.vibe).filter(Boolean))
-  ).sort();
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const vibes = [...new Set(events.map(event => event.vibe).filter(Boolean))] as string[];
 
   const handleVibeToggle = (vibe: string) => {
     const newVibes = selectedVibes.includes(vibe)
@@ -43,72 +33,68 @@ export const VibesDropdownFilter: React.FC<VibesDropdownFilterProps> = ({
     onVibeChange(newVibes);
   };
 
-  const displayText = selectedVibes.length > 0 
-    ? `Vibes (${selectedVibes.length})`
-    : 'Vibes';
+  const handleClearAll = () => {
+    onVibeChange([]);
+  };
 
-  if (vibesLoading) {
-    return (
-      <div className="relative">
-        <button 
-          className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-md font-mono text-xs uppercase tracking-wide"
-          disabled
-        >
-          <Sparkles className="h-3.5 w-3.5" />
-          Loading...
-        </button>
-      </div>
-    );
-  }
+  const displayText = selectedVibes.length === 0 ? "VIBE" : 
+                    selectedVibes.length === 1 ? selectedVibes[0].toUpperCase() : 
+                    `${selectedVibes.length} VIBES`;
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={cn(
-          "flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-md",
-          "font-mono text-xs uppercase tracking-wide text-gray-700",
-          "hover:bg-gray-50 hover:border-gray-300 transition-colors",
-          "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-          selectedVibes.length > 0 && "border-blue-300 bg-blue-50 text-blue-700"
-        )}
-      >
-        <Sparkles className="h-3.5 w-3.5" />
-        <span>{displayText}</span>
-        <ChevronDown className={cn(
-          "h-3.5 w-3.5 transition-transform",
-          isOpen && "rotate-180"
-        )} />
-      </button>
-
-      {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-64 overflow-y-auto">
-          <div className="py-1">
-            {availableVibes.length === 0 ? (
-              <div className="px-4 py-2 text-sm text-gray-500 font-mono">
-                No vibes available
-              </div>
-            ) : (
-              availableVibes.map((vibe) => (
-                <label
-                  key={vibe}
-                  className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedVibes.includes(vibe)}
-                    onChange={() => handleVibeToggle(vibe)}
-                    className="mr-3 rounded"
-                  />
-                  <span className="text-sm font-mono uppercase tracking-wide text-gray-700">
-                    {vibe}
-                  </span>
-                </label>
-              ))
-            )}
-          </div>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className="flex items-center gap-2 h-10 px-3 border-ocean-deep/20 bg-coconut text-ocean-deep rounded-md font-mono text-xs font-medium uppercase tracking-wide hover:bg-vibrant-aqua/10 hover:border-vibrant-aqua/40 transition-all duration-200"
+        >
+          <Sparkles className="h-4 w-4 text-coral" />
+          <span>{displayText}</span>
+          {selectedVibes.length > 0 && (
+            <span className="px-1.5 py-0.5 bg-sungold/20 text-ocean-deep rounded-full text-xs font-medium">
+              {selectedVibes.length}
+            </span>
+          )}
+          <ChevronDown className="h-3.5 w-3.5 text-ocean-deep/70" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64 p-0 bg-coconut border-ocean-deep/20 shadow-coastal rounded-md" align="start">
+        <div className="py-2">
+          {/* All Vibes option */}
+          <button
+            onClick={handleClearAll}
+            className={`w-full px-4 py-2 text-left text-sm hover:bg-vibrant-aqua/10 transition-colors font-mono uppercase tracking-wide ${
+              selectedVibes.length === 0 ? 'bg-sungold/20 font-medium text-ocean-deep' : 'text-ocean-deep'
+            }`}
+          >
+            all vibes
+          </button>
+          
+          {vibesLoading && (
+            <div className="px-4 py-2 text-sm text-ocean-deep/70 font-mono uppercase tracking-wide">
+              Loading vibes...
+            </div>
+          )}
+          
+          {!vibesLoading && vibes.map((vibe) => (
+            <button
+              key={vibe}
+              onClick={() => handleVibeToggle(vibe)}
+              className={`w-full px-4 py-2 text-left text-sm hover:bg-vibrant-aqua/10 transition-colors font-mono uppercase tracking-wide ${
+                selectedVibes.includes(vibe) ? 'bg-sungold/20 font-medium text-ocean-deep' : 'text-ocean-deep'
+              }`}
+            >
+              {vibe}
+            </button>
+          ))}
+          
+          {!vibesLoading && vibes.length === 0 && (
+            <div className="px-4 py-2 text-sm text-ocean-deep/70 font-mono uppercase tracking-wide">
+              No vibes available
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </PopoverContent>
+    </Popover>
   );
 };

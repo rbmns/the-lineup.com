@@ -13,14 +13,16 @@ const config = {
   theme: {
     container: {
       center: true,
-      padding: "1.5rem",
+      padding: "2rem",
       screens: {
         "2xl": "1400px",
       },
     },
     extend: {
-      screens: {
-        'xs': '480px',
+      fontFamily: {
+        'display': ['Inter', 'system-ui', 'sans-serif'],
+        'body': ['Inter', 'system-ui', 'sans-serif'],
+        'mono': ['JetBrains Mono', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -28,105 +30,48 @@ const config = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        
-        // The Lineup Coastal Minerals Palette - Complete with New Coastal Accents
-        'pure-white': '#FFFFFF',
-        'coastal-haze': '#F2F8F8', // Subtle light blue-grey for backgrounds, tags, muted elements
-        'graphite-grey': '#2C3E50', 
-        'ocean-deep': '#1a2332', // Almost black for main navigation and text
-        'mist-grey': '#ECEFF1',
-        'ocean-teal': '#00A389',
-        'sunrise-ochre': '#E6AA68',
-        'carbon-black': '#000000',
-        
-        // New Coastal Accent Colors
-        'seafoam-drift': '#A9D1C1', // Muted green-blue for filter active states
-        'dusk-coral': '#C47D68', // Desaturated earthy coral for filter active states
-        'horizon-blue': '#6FA1B3', // Calm grey-blue for filter active states
-        
         primary: {
-          DEFAULT: "#00A389", // ocean-teal
-          foreground: "#FFFFFF", // pure-white
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "#2C3E50", // graphite-grey
-          foreground: "#FFFFFF", // pure-white
-        },
-        muted: {
-          DEFAULT: "#ECEFF1", // mist-grey
-          foreground: "#2C3E50", // graphite-grey
-        },
-        accent: {
-          DEFAULT: "#E6AA68", // sunrise-ochre
-          foreground: "#2C3E50", // graphite-grey
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
-          DEFAULT: "#EF4444",
-          foreground: "#FFFFFF",
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
         },
         card: {
-          DEFAULT: "#FFFFFF", // pure-white
-          foreground: "#2C3E50", // graphite-grey
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
         },
-      },
-      fontFamily: {
-        'montserrat': ['Montserrat', 'sans-serif'],
-        'lato': ['Lato', 'sans-serif'],
-        'display': ['Montserrat', 'sans-serif'], // alias for montserrat
-        'body': ['Lato', 'sans-serif'], // alias for lato
-      },
-      fontSize: {
-        'display': ['4rem', { lineHeight: '1', letterSpacing: '-0.025em', fontWeight: '800' }], // 64px
-        'h1': ['3rem', { lineHeight: '1.1', letterSpacing: '-0.025em', fontWeight: '700' }], // 48px
-        'h2': ['2.25rem', { lineHeight: '1.2', letterSpacing: '-0.025em', fontWeight: '700' }], // 36px  
-        'h3': ['1.875rem', { lineHeight: '1.3', fontWeight: '600' }], // 30px
-        'h4': ['1.5rem', { lineHeight: '1.4', fontWeight: '600' }], // 24px
-        'body-base': ['1.125rem', { lineHeight: '1.7' }], // 18px with relaxed leading
-        'large': ['1.25rem', { lineHeight: '1.6' }], // 20px
-        'small': ['0.875rem', { lineHeight: '1.5' }], // 14px
+        // Coastal Theme Colors - Updated ocean-deep to be almost black
+        'ocean-deep': '#1a1a1a', // Changed from #005F73 to almost black
+        'vibrant-aqua': '#2A9D8F',
+        'coconut': '#F7F3E9',
+        'sunset-orange': '#E76F51',
+        'warm-sand': '#E9C46A',
+        'midnight': '#264653',
       },
       borderRadius: {
-        lg: "0.5rem", // 8px - for prominent cards, modals
-        md: "0.375rem", // 6px - for most buttons, general cards, inputs
-        sm: "0.25rem", // 4px - for very subtle rounding
-      },
-      boxShadow: {
-        'sm': '0 1px 2px 0 rgba(44, 62, 80, 0.05)',
-        'md': '0 4px 6px -1px rgba(44, 62, 80, 0.1), 0 2px 4px -1px rgba(44, 62, 80, 0.06)',
-        'lg': '0 10px 15px -3px rgba(44, 62, 80, 0.1), 0 4px 6px -2px rgba(44, 62, 80, 0.05)',
-        'xl': '0 20px 25px -5px rgba(44, 62, 80, 0.1), 0 10px 10px -5px rgba(44, 62, 80, 0.04)',
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
-        "fade-in": {
-          "0%": {
-            opacity: "0",
-            transform: "translateY(4px)"
-          },
-          "100%": {
-            opacity: "1",
-            transform: "translateY(0)"
-          }
-        },
-        "scale-in": {
-          "0%": {
-            transform: "scale(0.95)",
-            opacity: "0"
-          },
-          "100%": {
-            transform: "scale(1)",
-            opacity: "1"
-          }
-        },
-        "slide-up": {
-          "0%": {
-            transform: "translateY(10px)",
-            opacity: "0"
-          },
-          "100%": {
-            transform: "translateY(0)",
-            opacity: "1"
-          }
-        },
         "accordion-down": {
           from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
@@ -137,32 +82,13 @@ const config = {
         },
       },
       animation: {
-        "fade-in": "fade-in 0.2s ease-out",
-        "scale-in": "scale-in 0.2s ease-out",
-        "slide-up": "slide-up 0.3s ease-out",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
-      scale: {
-        '101': '1.01',
-        '102': '1.02',
+      boxShadow: {
+        'coastal': '0 4px 20px rgba(0, 95, 115, 0.08), 0 1px 3px rgba(0, 95, 115, 0.1)',
+        'coastal-lg': '0 10px 40px rgba(0, 95, 115, 0.12), 0 4px 16px rgba(0, 95, 115, 0.08)',
       },
-      spacing: {
-        '18': '4.5rem',
-        '88': '22rem',
-        '128': '32rem',
-      },
-      maxWidth: {
-        '8xl': '88rem',
-        '9xl': '96rem',
-      },
-      zIndex: {
-        '60': '60',
-        '70': '70',
-        '80': '80',
-        '90': '90',
-        '100': '100',
-      }
     },
   },
   plugins: [require("tailwindcss-animate")],

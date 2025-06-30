@@ -24,78 +24,58 @@ const CasualPlans = () => {
     return success;
   };
 
-  // For non-authenticated users, make the page fit in viewport
-  if (!isAuthenticated) {
-    return (
-      <div className="h-screen flex flex-col justify-center">
-        {/* Header Section - Compact for viewport fit */}
-        <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-2' : 'py-4'}`}>
-          <div className="text-center">
-            <h1 className={`font-bold text-primary mb-2 leading-tight ${isMobile ? 'text-xl' : 'text-2xl sm:text-3xl'}`}>
-              Casual <span className="text-secondary">Plans</span>
-            </h1>
-            <p className={`auth-subtext max-w-2xl mx-auto leading-relaxed ${isMobile ? 'text-sm mb-3' : 'text-base mb-4'}`}>
-              Spontaneous meetups and activities with fellow travelers
-            </p>
-          </div>
+  return (
+    <div className="min-h-screen">
+      {/* Header Section - Optimized for mobile above the fold */}
+      <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-8' : 'py-12 sm:py-16'}`}>
+        <div className="text-center">
+          <h1 className={`font-bold text-[#005F73] mb-4 leading-tight ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
+            Casual <span className="text-[#2A9D8F]">Plans</span>
+          </h1>
+          <p className={`text-[#4A4A48] max-w-3xl mx-auto leading-relaxed ${isMobile ? 'text-base mb-6' : 'text-lg sm:text-xl mb-6'}`}>
+            Spontaneous meetups and activities with fellow travelers
+          </p>
+          
+          {isAuthenticated && (
+            <Button 
+              onClick={() => navigate('/casual-plans/create')}
+              className="bg-[#2A9D8F] hover:bg-[#2A9D8F]/90 text-white"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create Plan
+            </Button>
+          )}
         </div>
+      </div>
 
-        <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-2' : 'py-4'}`}>
-          {/* Login prompt for non-authenticated users - Compact for viewport fit */}
-          <div className={`auth-container ${isMobile ? 'mx-2' : ''}`}>
-            <h3 className={`auth-heading ${isMobile ? 'text-base' : 'text-lg'}`}>
+      <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-4' : 'py-8'}`}>
+        {/* Login prompt for non-authenticated users - Optimized for mobile above the fold */}
+        {!isAuthenticated && (
+          <div className={`border border-[#2A9D8F]/20 rounded-xl p-6 mb-8 ${isMobile ? 'mx-2' : ''}`}>
+            <h3 className={`font-semibold text-[#005F73] mb-2 ${isMobile ? 'text-lg' : 'text-lg'}`}>
               Join the community to see full details
             </h3>
-            <p className={`auth-subtext mb-3 ${isMobile ? 'text-xs' : 'text-sm'}`}>
+            <p className={`text-[#4A4A48] mb-4 ${isMobile ? 'text-sm' : 'text-sm'}`}>
               Sign up to view locations, times, and connect with other members creating casual plans.
             </p>
-            <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex flex-col sm:flex-row gap-3">
               <Button 
                 onClick={() => navigate('/login')}
-                className="btn-primary"
-                size={isMobile ? "default" : "lg"}
+                className="bg-[#2A9D8F] hover:bg-[#2A9D8F]/90 text-white"
               >
                 Sign In
               </Button>
               <Button 
                 variant="outline" 
                 onClick={() => navigate('/signup')}
-                className="btn-outline"
-                size={isMobile ? "default" : "lg"}
+                className="border-[#2A9D8F] text-[#005F73] hover:bg-[#2A9D8F]/10"
               >
                 Sign Up
               </Button>
             </div>
           </div>
-        </div>
-      </div>
-    );
-  }
+        )}
 
-  // For authenticated users, keep the existing layout
-  return (
-    <div className="min-h-screen">
-      {/* Header Section - Optimized for mobile above the fold */}
-      <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-8' : 'py-12 sm:py-16'}`}>
-        <div className="text-center">
-          <h1 className={`font-bold text-primary mb-4 leading-tight ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
-            Casual <span className="text-secondary">Plans</span>
-          </h1>
-          <p className={`auth-subtext max-w-3xl mx-auto leading-relaxed ${isMobile ? 'text-base mb-6' : 'text-lg sm:text-xl mb-6'}`}>
-            Spontaneous meetups and activities with fellow travelers
-          </p>
-          
-          <Button 
-            onClick={() => navigate('/casual-plans/create')}
-            className="btn-primary"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create Plan
-          </Button>
-        </div>
-      </div>
-
-      <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-4' : 'py-8'}`}>
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {[...Array(6)].map((_, i) => (
@@ -112,29 +92,34 @@ const CasualPlans = () => {
                   <CasualPlanCard
                     key={plan.id}
                     plan={plan}
-                    onRsvp={handleRsvp}
-                    showRsvpButtons={true}
+                    onRsvp={isAuthenticated ? handleRsvp : undefined}
+                    showRsvpButtons={isAuthenticated}
                     isLoading={loadingPlanId === plan.id}
-                    showBlurred={false}
+                    showBlurred={!isAuthenticated}
                   />
                 ))}
               </div>
             ) : (
               <div className="text-center py-12">
                 <div className="text-4xl sm:text-6xl mb-4">🏖️</div>
-                <h3 className="text-lg sm:text-xl font-medium text-primary mb-2">
+                <h3 className="text-lg sm:text-xl font-medium text-[#005F73] mb-2">
                   No casual plans yet
                 </h3>
-                <p className="auth-subtext mb-4 text-sm sm:text-base">
-                  Be the first to create a spontaneous meetup!
+                <p className="text-[#4A4A48] mb-4 text-sm sm:text-base">
+                  {isAuthenticated 
+                    ? "Be the first to create a spontaneous meetup!"
+                    : "Sign in to see if there are any casual plans in your area."
+                  }
                 </p>
-                <Button 
-                  onClick={() => navigate('/casual-plans/create')}
-                  className="btn-primary"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Your First Plan
-                </Button>
+                {isAuthenticated && (
+                  <Button 
+                    onClick={() => navigate('/casual-plans/create')}
+                    className="bg-[#2A9D8F] hover:bg-[#2A9D8F]/90 text-white"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Your First Plan
+                  </Button>
+                )}
               </div>
             )}
           </>

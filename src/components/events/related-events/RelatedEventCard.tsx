@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Event } from '@/types';
 import { EventCard } from '@/components/EventCard';
@@ -20,18 +19,25 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({
   const { handleRsvp, loadingEventId } = useOptimisticRsvp(user?.id);
   const [localRsvpStatus, setLocalRsvpStatus] = useState<'Going' | 'Interested' | undefined>(event.rsvp_status);
   
+  // Format event date and time according to requirements
   const formatEventDateTime = (event: Event) => {
     if (!event.start_date) return { date: '', time: '' };
     
     try {
+      // Convert start_date to a Date object
       const startDate = new Date(event.start_date);
+      
+      // Format the date part as "day, date, month" - e.g., "Mon, 15 May"
       const formattedDate = formatInTimeZone(startDate, AMSTERDAM_TIMEZONE, "EEE, d MMM");
       
+      // Format the time part (without seconds)
       let timeStr = '';
       if (event.start_time) {
+        // Remove seconds if present
         const startTime = event.start_time.split(':').slice(0, 2).join(':');
         
         if (event.end_time) {
+          // If we have end time, format as a range (also without seconds)
           const endTime = event.end_time.split(':').slice(0, 2).join(':');
           timeStr = `${startTime} - ${endTime}`;
         } else {
@@ -49,29 +55,40 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({
     }
   };
   
+  // Get formatted date and time
   const eventDateTime = formatEventDateTime(event);
   
+  // RSVP handler with optimistic UI updates
   const handleRsvpAction = async (eventId: string, status: 'Going' | 'Interested') => {
     if (!user?.id || loadingEventId) return false;
     
+    console.log('RelatedEventCard - Handling RSVP:', { 
+      eventId, 
+      status, 
+      currentStatus: localRsvpStatus 
+    });
+    
     try {
+      // Optimistically update the UI
       const newStatus = localRsvpStatus === status ? undefined : status;
       setLocalRsvpStatus(newStatus);
       
-      // Apply visual feedback animation using design system classes
+      // Apply visual feedback animation
       const eventCard = document.querySelector(`[data-event-id="${eventId}"]`);
       if (eventCard) {
         if (status === 'Going') {
-          eventCard.classList.add('animate-scale-in');
-          setTimeout(() => eventCard.classList.remove('animate-scale-in'), 300);
+          eventCard.classList.add('rsvp-going-animation');
+          setTimeout(() => eventCard.classList.remove('rsvp-going-animation'), 300);
         } else {
-          eventCard.classList.add('animate-fade-in');
-          setTimeout(() => eventCard.classList.remove('animate-fade-in'), 300);
+          eventCard.classList.add('rsvp-interested-animation');
+          setTimeout(() => eventCard.classList.remove('rsvp-interested-animation'), 300);
         }
       }
       
+      // Apply the RSVP using our optimistic handler
       const success = await handleRsvp(eventId, status);
       
+      // If the RSVP failed, revert the optimistic update
       if (!success) {
         setLocalRsvpStatus(event.rsvp_status);
       }
@@ -79,21 +96,23 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({
       return success;
     } catch (error) {
       console.error('RelatedEventCard - RSVP error:', error);
+      // Revert optimistic update on error
       setLocalRsvpStatus(event.rsvp_status);
       return false;
     }
   };
 
+  // Create a modified event with the formatted date/time
   const eventWithFormattedDateTime = {
     ...event,
     formattedDate: eventDateTime.date || '',
     formattedTime: eventDateTime.time || '',
-    rsvp_status: localRsvpStatus
+    rsvp_status: localRsvpStatus // Use the local state for RSVP status
   };
 
   return (
     <div 
-      className="h-full transition-smooth hover-scale relative" 
+      className="h-full transition-all duration-300 hover:scale-[1.01] relative" 
       data-testid={`related-event-${event.id}`}
       data-event-id={event.id}
     >
@@ -101,7 +120,7 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({
         event={eventWithFormattedDateTime}
         showRsvpButtons={isAuthenticated}
         compact={true}
-        className="h-full card-base"
+        className="h-full border hover:shadow-md transition-all duration-300"
         onClick={onClick || undefined}
         onRsvp={isAuthenticated ? handleRsvpAction : undefined}
         loadingEventId={loadingEventId}

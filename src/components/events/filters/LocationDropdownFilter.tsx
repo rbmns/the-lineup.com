@@ -1,114 +1,106 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ChevronDown, MapPin } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 interface VenueArea {
   id: string;
   name: string;
+  cities?: string[];
 }
 
 interface LocationDropdownFilterProps {
   venueAreas: VenueArea[];
   selectedLocationId: string | null;
-  onLocationChange: (locationId: string | null) => void;
-  isLoading?: boolean;
-  isLocationLoaded?: boolean;
+  onLocationChange: (id: string | null) => void;
+  isLoading: boolean;
+  isLocationLoaded: boolean;
 }
 
 export const LocationDropdownFilter: React.FC<LocationDropdownFilterProps> = ({
   venueAreas,
   selectedLocationId,
   onLocationChange,
-  isLoading = false,
-  isLocationLoaded = true
+  isLoading,
+  isLocationLoaded
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const selectedArea = venueAreas.find(area => area.id === selectedLocationId);
-  const displayText = selectedArea ? selectedArea.name : 'All Locations';
+  const [open, setOpen] = useState(false);
 
   const handleLocationSelect = (locationId: string | null) => {
     onLocationChange(locationId);
-    setIsOpen(false);
+    setOpen(false);
   };
 
-  if (isLoading || !isLocationLoaded) {
-    return (
-      <div className="relative">
-        <button 
-          className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-md font-mono text-xs uppercase tracking-wide"
-          disabled
-        >
-          <MapPin className="h-3.5 w-3.5" />
-          Loading...
-        </button>
-      </div>
-    );
-  }
+  const selectedArea = venueAreas.find(area => area.id === selectedLocationId);
+  const displayText = selectedArea ? selectedArea.name : "Location";
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={cn(
-          "flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-md",
-          "font-mono text-xs uppercase tracking-wide text-gray-700",
-          "hover:bg-gray-50 hover:border-gray-300 transition-colors",
-          "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-          selectedLocationId && "border-blue-300 bg-blue-50 text-blue-700"
-        )}
-      >
-        <MapPin className="h-3.5 w-3.5" />
-        <span className="truncate max-w-[120px]">{displayText}</span>
-        <ChevronDown className={cn(
-          "h-3.5 w-3.5 transition-transform flex-shrink-0",
-          isOpen && "rotate-180"
-        )} />
-      </button>
-
-      {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-64 overflow-y-auto">
-          <div className="py-1">
-            <button
-              onClick={() => handleLocationSelect(null)}
-              className={cn(
-                "w-full px-4 py-2 text-left text-sm hover:bg-gray-100 transition-colors",
-                "font-mono uppercase tracking-wide",
-                !selectedLocationId ? "bg-blue-50 text-blue-700" : "text-gray-700"
-              )}
-            >
-              All Locations
-            </button>
-            
-            {venueAreas.map((area) => (
-              <button
-                key={area.id}
-                onClick={() => handleLocationSelect(area.id)}
-                className={cn(
-                  "w-full px-4 py-2 text-left text-sm hover:bg-gray-100 transition-colors",
-                  "font-mono uppercase tracking-wide",
-                  selectedLocationId === area.id ? "bg-blue-50 text-blue-700" : "text-gray-700"
-                )}
-              >
-                {area.name}
-              </button>
-            ))}
-          </div>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className="flex items-center gap-2 h-10 px-3 border-ocean-deep/20 bg-coconut text-ocean-deep rounded-md font-mono text-xs font-medium uppercase tracking-wide hover:bg-vibrant-aqua/10 hover:border-vibrant-aqua/40 transition-all duration-200"
+        >
+          <MapPin className="h-4 w-4 text-vibrant-aqua" />
+          <span>{displayText}</span>
+          {selectedLocationId && (
+            <span className="px-1.5 py-0.5 bg-vibrant-aqua/20 text-ocean-deep rounded-full text-xs font-medium">
+              1
+            </span>
+          )}
+          <ChevronDown className="h-3.5 w-3.5 text-ocean-deep/70" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-64 p-0 bg-coconut border-ocean-deep/20 shadow-coastal rounded-md" align="start">
+        <div className="py-2">
+          {/* All Locations option */}
+          <button
+            onClick={() => handleLocationSelect(null)}
+            className={`w-full px-4 py-2 text-left text-sm hover:bg-vibrant-aqua/10 transition-colors font-mono uppercase tracking-wide ${
+              !selectedLocationId ? 'bg-vibrant-aqua/20 font-medium text-ocean-deep' : 'text-ocean-deep'
+            }`}
+          >
+            all locations
+          </button>
+          
+          {isLoading && (
+            <div className="px-4 py-2 text-sm text-ocean-deep/70 font-mono uppercase tracking-wide">
+              Loading locations...
+            </div>
+          )}
+          
+          {!isLoading && venueAreas.length > 0 && (
+            <>
+              {/* Divider */}
+              <div className="border-t border-ocean-deep/10 my-1" />
+              
+              {/* Location areas */}
+              {venueAreas.map((area) => (
+                <button
+                  key={area.id}
+                  onClick={() => handleLocationSelect(area.id)}
+                  className={`w-full px-4 py-2 text-left text-sm hover:bg-vibrant-aqua/10 transition-colors font-mono uppercase tracking-wide ${
+                    selectedLocationId === area.id ? 'bg-vibrant-aqua/20 font-medium text-ocean-deep' : 'text-ocean-deep'
+                  }`}
+                >
+                  {area.name}
+                </button>
+              ))}
+            </>
+          )}
+          
+          {!isLoading && venueAreas.length === 0 && (
+            <div className="px-4 py-2 text-sm text-ocean-deep/70 font-mono uppercase tracking-wide">
+              No locations available
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </PopoverContent>
+    </Popover>
   );
 };

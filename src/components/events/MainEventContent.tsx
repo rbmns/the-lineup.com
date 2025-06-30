@@ -24,6 +24,7 @@ interface MainEventContentProps {
 }
 
 function formatDateTime(start_date?: string | null, start_time?: string | null, end_time?: string | null) {
+  // Combine start date and times
   if (!start_date || !start_time) return null;
   try {
     const startIso = `${start_date}T${start_time}`;
@@ -70,7 +71,7 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
   const dateTimeInfo = formatDateTime(event.start_date, event.start_time, event.end_time);
 
   return (
-    <Card className="bg-pure-white border border-mist-grey shadow-md overflow-hidden">
+    <Card className="overflow-hidden border border-overcast shadow-md hover:shadow-xl transition-all duration-500 animate-fade-in bg-coconut">
       {/* Image header */}
       <EventDetailHeader
         event={event}
@@ -89,23 +90,22 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
         <div className="p-6 space-y-6">
           {/* Mobile: show title/date under image only on mobile */}
           {isMobile && (
-            <div className="mb-6">
-              <h1 className="text-h1 font-montserrat text-graphite-grey leading-tight mb-3">
+            <div className="mb-2">
+              <h1 className="font-display text-midnight text-xl leading-tight mb-1">
                 {event?.title || 'Event'}
               </h1>
               {dateTimeInfo && (
-                <div className="flex items-center gap-2 text-body-base text-graphite-grey font-lato">
-                  <Calendar className="h-5 w-5 text-ocean-teal flex-shrink-0" />
+                <div className="flex items-center gap-2 font-mono text-overcast text-xs mt-1 mb-2">
+                  <Calendar className="h-4 w-4 text-clay" />
                   <span>{dateTimeInfo}</span>
                 </div>
               )}
             </div>
           )}
 
-          {/* RSVP buttons section */}
-          {isAuthenticated && (
-            <div className="bg-mist-grey/30 p-6 rounded-lg">
-              <h3 className="text-h4 text-graphite-grey font-montserrat mb-4">Join this event</h3>
+          {/* RSVP buttons for desktop - under the image */}
+          {isAuthenticated && !isMobile && (
+            <div className="bg-sage text-midnight p-6 rounded-md animate-fade-in" style={{ animationDelay: '150ms' }}>
               <EventRsvpButtons 
                 currentStatus={event?.rsvp_status}
                 onRsvp={handleRsvpWrapped}
@@ -117,20 +117,7 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
           )}
 
           {/* Event description section */}
-          <div className="space-y-4">
-            <h2 className="text-h2 text-graphite-grey font-montserrat">About this event</h2>
-            <EventDescription description={event.description} isMobile={isMobile} />
-          </div>
-
-          {/* Organizer section */}
-          {event.organiser_name && (
-            <div className="space-y-4">
-              <h3 className="text-h3 text-graphite-grey font-montserrat">Organizer</h3>
-              <p className="text-body-base text-graphite-grey font-lato">
-                This event is organized by <span className="font-semibold text-ocean-teal">{event.organiser_name}</span>
-              </p>
-            </div>
-          )}
+          <EventDescription description={event.description} isMobile={isMobile} />
         </div>
       </CardContent>
     </Card>

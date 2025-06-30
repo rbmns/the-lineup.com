@@ -32,49 +32,34 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
   }
 
   return (
-    <div className="space-y-6 w-full">
+    <div className="space-y-4 max-w-md w-full">
       {errorMessage && (
-        <Alert variant="destructive" className="bg-coral/10 border-coral/20">
+        <Alert variant="destructive" className="bg-red-50 border-red-200">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription className="text-graphite-grey">
+          <AlertDescription className="font-normal text-red-800">
             {errorMessage}
           </AlertDescription>
         </Alert>
       )}
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           {step === 1 && <SignupStep1 loading={loading} />}
           {step === 2 && <SignupStep2 loading={loading} blurredFields={blurredFields} handleFieldBlur={handleFieldBlur} />}
 
-          <div className="flex justify-between pt-4">
+          <div className="flex justify-between mt-6">
             {step > 1 && (
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={prevStep} 
-                disabled={loading}
-                className="btn-outline"
-              >
+              <Button type="button" variant="outline" onClick={prevStep} disabled={loading}>
                 Back
               </Button>
             )}
             
             {step < 2 ? (
-              <Button 
-                type="button" 
-                onClick={nextStep} 
-                disabled={loading} 
-                className="btn-primary ml-auto"
-              >
+              <Button type="button" variant="primary" onClick={nextStep} disabled={loading} className="ml-auto">
                 Next
               </Button>
             ) : (
-              <Button 
-                type="submit" 
-                disabled={loading || authLoading} 
-                className="btn-primary ml-auto"
-              >
+              <Button type="submit" variant="primary" disabled={loading || authLoading} className="ml-auto">
                 {loading ? "Creating account..." : "Create account"}
               </Button>
             )}
@@ -82,12 +67,12 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
         </form>
       </Form>
 
-      <div className="relative my-6">
+      <div className="relative my-4">
         <div className="absolute inset-0 flex items-center">
-          <span className="w-full border-t border-mist-grey" />
+          <span className="w-full border-t" />
         </div>
-        <div className="relative flex justify-center text-xs uppercase font-mono tracking-wide">
-          <span className="bg-pure-white px-3 text-graphite-grey/60">
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">
             Or continue with
           </span>
         </div>
@@ -96,19 +81,15 @@ export default function SignupForm({ onToggleMode }: { onToggleMode: () => void 
       <GoogleAuthButton 
         onClick={handleGoogleLogin}
         loading={loading || authLoading}
-        className="w-full"
       >
         Sign up with Google
       </GoogleAuthButton>
 
-      <div className="text-center text-body-small text-graphite-grey pt-4">
+      <div className="text-center text-sm">
         Already have an account?{" "}
-        <button 
-          onClick={onToggleMode}
-          className="text-ocean-teal hover:text-ocean-teal/80 font-medium transition-colors"
-        >
+        <Button variant="link" className="p-0" onClick={onToggleMode}>
           Sign in
-        </button>
+        </Button>
       </div>
     </div>
   );
