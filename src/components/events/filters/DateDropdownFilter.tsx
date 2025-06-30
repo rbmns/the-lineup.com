@@ -30,7 +30,7 @@ export const DateDropdownFilter: React.FC<DateDropdownFilterProps> = ({
 
   const displayText = selectedDateFilter && selectedDateFilter !== 'anytime' 
     ? selectedDateFilter 
-    : 'Date';
+    : 'DATE';
 
   const handleDateSelect = (filter: string) => {
     onDateFilterChange(filter);
