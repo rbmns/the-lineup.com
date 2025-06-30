@@ -166,6 +166,7 @@ export const SocialSidebar: React.FC<SocialSidebarProps> = ({
       
       {showAuth && !user && (
         <AuthOverlay
+          isOpen={showAuth}
           title="Create your account"
           description="Sign up or log in to create and share your own events!"
           browseEventsButton={true}
