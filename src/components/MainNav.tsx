@@ -54,111 +54,109 @@ const MainNav = () => {
     label: 'Friends'
   }];
 
-  // Determine nav background - always opaque
-  const getNavBackground = () => {
+  // Use global nav classes
+  const getNavClasses = () => {
     if (isHomePage && !isScrolled) {
-      return 'bg-pure-white/95 backdrop-blur-md';
+      return 'nav-desktop nav-desktop-transparent';
     }
-    return 'bg-pure-white';
+    return 'nav-desktop nav-desktop-solid';
   };
 
-  // Text color is always consistent
   const getTextColor = () => {
-    return 'text-graphite-grey';
+    if (isHomePage && !isScrolled) {
+      return 'nav-link-light';
+    }
+    return '';
   };
-
-  // Always show border/shadow for clarity
-  const shouldShowBorder = true;
 
   return <>
-      <header className={cn(
-        "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300",
-        getNavBackground(),
-        shouldShowBorder && "border-b border-mist-grey shadow-md"
-      )}>
-        <div className="w-full flex flex-col">
-          <div className={cn(
-            "w-full flex items-center justify-between transition-all duration-300",
-            isMobile ? "px-4 py-3" : "px-6 py-3"
+    <header className={getNavClasses()}>
+      <div className="w-full flex items-center justify-between">
+        {/* Left side - Logo */}
+        <div className="flex items-center h-full flex-shrink-0">
+          {!isMobile && (
+            <Link to="/" className="flex items-center justify-center mr-3 flex-shrink-0">
+              <img 
+                src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" 
+                alt="the lineup Symbol" 
+                className="w-4 h-4 transition-opacity hover:opacity-80" 
+              />
+            </Link>
+          )}
+          <Link to="/" className={cn(
+            "text-h3 font-montserrat font-bold transition-colors duration-200",
+            getTextColor() || "text-graphite-grey hover:text-ocean-teal"
           )}>
-            {/* Left side - Logo */}
-            <div className="flex items-center h-full flex-shrink-0">
-              {!isMobile && <Link to="/" className="flex items-center justify-center mr-3 flex-shrink-0">
-                  <img 
-                    src="/lovable-uploads/dc8b26e5-f005-4563-937d-21b702cc0295.png" 
-                    alt="the lineup Symbol" 
-                    className="w-4 h-4 transition-opacity hover:opacity-80" 
-                  />
-                </Link>}
-              <Link to="/" className={cn(
-                "font-display font-bold hover:text-ocean-teal transition-colors text-xl",
-                getTextColor()
-              )}>
-                the lineup
-              </Link>
-            </div>
-
-            {/* Center - Navigation (Desktop only) */}
-            {!isMobile && <nav className="flex items-center space-x-1">
-                {navItems.map(item => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.path;
-              return <Link 
-                      key={item.path} 
-                      to={item.path} 
-                      className={cn(
-                        "nav-link flex items-center gap-2 px-4 py-2 rounded-md font-montserrat text-sm font-medium transition-all duration-200",
-                        isActive 
-                          ? "bg-ocean-teal/15 text-ocean-teal" 
-                          : "text-graphite-grey hover:text-ocean-teal hover:bg-ocean-teal/10"
-                      )}
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span>{item.label}</span>
-                    </Link>;
-            })}
-              </nav>}
-
-            {/* Right side - User Actions */}
-            <NavActions onAuthRequired={handleAuthRequired} showCreateButton={false} />
-          </div>
+            the lineup
+          </Link>
         </div>
-      </header>
 
-      {/* Mobile Bottom Navigation - Fully opaque */}
-      {isMobile && <div className="fixed bottom-0 left-0 right-0 z-50 bg-pure-white border-t border-mist-grey shadow-lg pb-safe">
-          <nav className="flex items-center justify-around px-2 py-2">
-            {navItems.map(item => {
-          const Icon = item.icon;
-          const isActive = location.pathname === item.path;
-          return <Link 
-                  key={item.path} 
-                  to={item.path} 
+        {/* Center - Navigation Links (Desktop) */}
+        {!isMobile && (
+          <nav className="hidden md:flex items-center space-x-8">
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
                   className={cn(
-                    "flex flex-col items-center gap-1 px-3 py-2 rounded-md font-montserrat text-xs font-medium transition-all duration-200 uppercase min-w-0",
-                    isActive 
-                      ? "text-ocean-teal bg-ocean-teal/15" 
-                      : "text-graphite-grey hover:text-ocean-teal hover:bg-ocean-teal/10"
+                    "nav-link",
+                    getTextColor(),
+                    isActive && "nav-link-active"
                   )}
                 >
-                  <Icon className="h-4 w-4 flex-shrink-0" />
-                  <span className="truncate">{item.label}</span>
-                </Link>;
-        })}
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
-        </div>}
+        )}
 
-      {/* Auth Overlay */}
-      {showAuthOverlay && <AuthOverlay 
-          title="Join to Create Events" 
-          description="Sign up or log in to create and organize your own events!" 
-          browseEventsButton={true} 
-          onClose={handleCloseAuthOverlay} 
-          onBrowseEvents={handleCloseAuthOverlay}
-        >
-          <></>
-        </AuthOverlay>}
-    </>;
+        {/* Right side - Auth Actions */}
+        <div className="flex items-center space-x-4">
+          <NavActions 
+            onAuthRequired={handleAuthRequired}
+            className={getTextColor()}
+          />
+        </div>
+      </div>
+
+      {/* Mobile Bottom Navigation */}
+      {isMobile && (
+        <div className="nav-mobile-bottom">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            const Icon = item.icon;
+            
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className="nav-mobile-item"
+              >
+                <Icon className={cn(
+                  "nav-mobile-icon",
+                  isActive && "nav-mobile-icon-active"
+                )} />
+                <span className={cn(
+                  "nav-mobile-label",
+                  isActive && "nav-mobile-label-active"
+                )}>
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </header>
+
+    <AuthOverlay 
+      isOpen={showAuthOverlay} 
+      onClose={handleCloseAuthOverlay} 
+    />
+  </>;
 };
 
 export default MainNav;

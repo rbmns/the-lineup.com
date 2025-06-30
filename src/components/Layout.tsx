@@ -18,23 +18,21 @@ const Layout = () => {
   useScrollToTop();
 
   return (
-    <div className="min-h-screen w-full bg-pure-white">
+    <div className="min-h-screen w-full bg-pure-white flex flex-col">
       <MainNav />
-      <div className="flex w-full min-h-screen">
-        {/* Main Content Area - using design system background */}
-        <div className="flex-1 w-full min-h-screen bg-pure-white flex flex-col">
-          {/* Main content - add top padding only for non-home pages */}
-          <main className={cn(
-            "w-full flex-1 flex flex-col",
-            !isHomePage && "pt-16", // Add top padding for non-home pages
-            isMobile && "pb-20" // Add bottom padding on mobile for bottom nav
-          )}>
-            <div className="flex-1 flex flex-col">
-              <Outlet />
-            </div>
-          </main>
-          {!isMobile && <Footer />}
-        </div>
+      
+      {/* Main Content Area */}
+      <div className="flex-1 w-full">
+        <main className={cn(
+          "w-full flex-1 flex flex-col min-h-screen",
+          !isHomePage && "page-content-offset", // Use global class for top padding
+          isMobile && "pb-20" // Add bottom padding on mobile for bottom nav
+        )}>
+          <div className="flex-1 flex flex-col">
+            <Outlet />
+          </div>
+        </main>
+        {!isMobile && <Footer />}
       </div>
 
       <Toaster />

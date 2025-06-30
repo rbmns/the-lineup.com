@@ -26,14 +26,13 @@ export const FriendsTabContent = ({
   searchQuery = '',
   onSearchChange
 }: FriendsTabContentProps) => {
-  // Only show friend requests section if there are pending requests
   const hasPendingRequests = requests && requests.length > 0;
   
   return (
-    <>
+    <div className="section-content">
       {/* Search bar for filtering friends */}
       {onSearchChange && (
-        <div className="mb-4">
+        <div className="mb-6">
           <FriendSearchBar 
             searchQuery={searchQuery} 
             onSearchChange={onSearchChange} 
@@ -56,7 +55,7 @@ export const FriendsTabContent = ({
       )}
       
       <div>
-        <h2 className="text-xl font-semibold mb-4">
+        <h2 className="text-h2 font-montserrat text-graphite-grey mb-6">
           My Friends ({friends?.length || 0})
         </h2>
         <FriendsList 
@@ -64,6 +63,6 @@ export const FriendsTabContent = ({
           loading={loading}
         />
       </div>
-    </>
+    </div>
   );
 };

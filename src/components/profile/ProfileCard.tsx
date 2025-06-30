@@ -34,11 +34,9 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
   
   if (!profile) return null;
 
-  // Check if the profile is clickable based on friendship status
   const isClickable = linkToProfile && isProfileClickable(friendStatus, false);
 
   const handleProfileClick = () => {
-    // Only navigate if linkToProfile is true and profile is clickable based on friendship status
     if (isClickable) {
       console.log(`ProfileCard: Attempting to navigate to profile ${profile.id}`);
       console.log(`ProfileCard: Current friendship status: ${friendStatus}`);
@@ -50,7 +48,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
   };
 
   const handleAddFriendClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click
+    e.stopPropagation();
     if (onAddFriend) onAddFriend();
   };
 
@@ -60,26 +58,25 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
     Offline: 'bg-gray-400'
   };
 
-  // Determine the display elements based on friendship status
   const renderFriendshipButton = () => {
     if (!showActions) return null;
     
     switch (friendStatus) {
       case 'accepted':
         return (
-          <div className="flex items-center text-sm text-gray-600">
-            <Users className="h-4 w-4 mr-1 text-purple-600" />
+          <div className="flex items-center text-small text-graphite-grey font-lato">
+            <Users className="h-4 w-4 mr-1 text-ocean-teal" />
             <span>Friends</span>
           </div>
         );
       case 'pending':
         return (
-          <div className="flex items-center text-sm text-gray-500">
-            <Check className="h-4 w-4 mr-1 text-gray-400" />
+          <div className="flex items-center text-small text-graphite-grey font-lato opacity-75">
+            <Check className="h-4 w-4 mr-1" />
             <span>Request sent</span>
           </div>
         );
-      default: // 'none'
+      default:
         return (
           <Button 
             size="sm" 
@@ -94,39 +91,33 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
     }
   };
 
-  const cardClasses = `
-    ${isCompact ? 'p-3' : 'p-4'}
-    ${isClickable ? 'cursor-pointer hover:bg-gray-50' : ''}
-    transition-colors duration-200
-  `;
-
   return (
     <Card 
-      className={`overflow-hidden ${isClickable ? 'cursor-pointer hover:shadow-md' : ''}`}
+      className={`card-base transition-smooth ${isClickable ? 'cursor-pointer hover-lift' : ''}`}
       onClick={isClickable ? handleProfileClick : undefined}
     >
-      <CardContent className={cardClasses}>
+      <CardContent className={`${isCompact ? 'p-3' : 'p-4'}`}>
         <div className="flex gap-3 items-center">
           <div className="relative">
             <ProfileAvatar profile={profile} />
             {profile.status && (
               <div 
-                className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white ${statusColors[profile.status] || 'bg-gray-400'}`}
+                className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-pure-white ${statusColors[profile.status] || 'bg-mist-grey'}`}
               />
             )}
           </div>
           
           <div className="flex-1 min-w-0">
-            <h3 className={`font-medium ${isClickable ? 'text-purple-700 hover:underline' : 'text-gray-900'}`}>
+            <h3 className={`text-h4 font-montserrat ${isClickable ? 'text-ocean-teal hover:underline' : 'text-graphite-grey'}`}>
               {profile.username || 'Anonymous User'}
             </h3>
             
             {profile.tagline && !isCompact && (
-              <p className="text-sm text-gray-500 line-clamp-1 mt-0.5">{profile.tagline}</p>
+              <p className="text-small text-graphite-grey font-lato line-clamp-1 mt-1 opacity-75">{profile.tagline}</p>
             )}
             
             {profile.location && (
-              <div className="flex items-center text-xs text-gray-500 mt-1">
+              <div className="flex items-center text-small text-graphite-grey font-lato mt-1 opacity-75">
                 <MapPin className="h-3 w-3 mr-1" />
                 <span className="truncate">{profile.location}</span>
               </div>
