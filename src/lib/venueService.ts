@@ -5,102 +5,131 @@ import { CreateVenueFormValues } from '@/components/venues/CreateVenueSchema';
 
 type CreateVenueData = Partial<Omit<Venue, 'id' | 'slug' | 'created_at'>> & { creator_id?: string | null };
 
-// Function to categorize city to area based on country/region
+// Improved function to categorize city to area with better coverage
 const categorizeCityToArea = async (city: string): Promise<string | null> => {
   if (!city) return null;
   
-  const cityLower = city.toLowerCase();
+  const cityLower = city.toLowerCase().trim();
+  console.log('Categorizing city:', cityLower);
   
-  // Define area mappings based on country
-  const areaMapping: Record<string, string> = {
-    // Netherlands cities -> Zandvoort Area
-    'zandvoort': 'zandvoort',
-    'amsterdam': 'zandvoort',
-    'haarlem': 'zandvoort',
-    'leiden': 'zandvoort',
-    'the hague': 'zandvoort',
-    'den haag': 'zandvoort',
-    'rotterdam': 'zandvoort',
-    'utrecht': 'zandvoort',
-    'eindhoven': 'zandvoort',
-    'groningen': 'zandvoort',
+  // First, check if we already have a mapping for this city
+  const { data: existingMapping } = await supabase
+    .from('venue_city_areas')
+    .select('area_id')
+    .ilike('city_name', cityLower)
+    .single();
     
-    // Portugal cities -> Ericeira Area
-    'ericeira': 'ericeira',
-    'lisboa': 'ericeira',
-    'lisbon': 'ericeira',
-    'porto': 'ericeira',
-    'cascais': 'ericeira',
-    'sintra': 'ericeira',
-    'peniche': 'ericeira',
-    'nazaré': 'ericeira',
-    'óbidos': 'ericeira',
-    'obidos': 'ericeira',
+  if (existingMapping) {
+    console.log('Found existing mapping for city:', cityLower, 'to area:', existingMapping.area_id);
+    return existingMapping.area_id;
+  }
+  
+  // Extended area mapping with more comprehensive coverage
+  const areaMapping: Record<string, string[]> = {
+    'zandvoort': [
+      'zandvoort', 'amsterdam', 'haarlem', 'leiden', 'the hague', 'den haag', 
+      'rotterdam', 'utrecht', 'eindhoven', 'groningen', 'delft', 'tilburg',
+      'breda', 'nijmegen', 'apeldoorn', 'enschede', 'amersfoort', 'zaanstad',
+      'haarlemmermeer', 'zoetermeer', 'dordrecht', 'leiden', 'maastricht',
+      'brabant', 'limburg', 'gelderland', 'overijssel', 'flevoland',
+      'noord-holland', 'zuid-holland', 'zeeland', 'friesland', 'drenthe',
+      'netherlands', 'holland', 'nederland', 'nl'
+    ],
+    'ericeira': [
+      'ericeira', 'lisboa', 'lisbon', 'porto', 'cascais', 'sintra', 'peniche',
+      'nazaré', 'nazare', 'óbidos', 'obidos', 'torres vedras', 'mafra',
+      'lourinhã', 'lourinha', 'caldas da rainha', 'alcobaça', 'alcobaca',
+      'leiria', 'coimbra', 'aveiro', 'braga', 'faro', 'setubal', 'evora',
+      'beja', 'santarem', 'portalegre', 'castelo branco', 'guarda',
+      'viseu', 'vila real', 'braganca', 'viana do castelo',
+      'portugal', 'pt', 'português', 'portuguesa'
+    ]
   };
   
-  // First try direct city match
-  let targetAreaName = areaMapping[cityLower];
+  // Find which area this city should belong to
+  let targetAreaName: string | null = null;
   
-  // If no direct match, try to categorize by common patterns
-  if (!targetAreaName) {
-    // Check if it's in Portugal
-    if (cityLower.includes('portugal') || cityLower.includes('pt') || 
-        cityLower.includes('português') || cityLower.includes('portuguesa')) {
-      targetAreaName = 'ericeira';
-    }
-    // Check if it's in Netherlands
-    else if (cityLower.includes('netherlands') || cityLower.includes('holland') || 
-             cityLower.includes('nederland') || cityLower.includes('nl')) {
-      targetAreaName = 'zandvoort';
-    }
-    // Default categorization: assume European cities
-    else {
-      // Simple heuristic: if it sounds Portuguese, put in Ericeira
-      if (cityLower.includes('ão') || cityLower.includes('ões') || 
-          cityLower.includes('ça') || cityLower.includes('ção')) {
-        targetAreaName = 'ericeira';
-      } else {
-        // Default to Zandvoort for other European cities
-        targetAreaName = 'zandvoort';
-      }
+  for (const [areaName, cities] of Object.entries(areaMapping)) {
+    if (cities.some(mappedCity => 
+      cityLower.includes(mappedCity) || 
+      mappedCity.includes(cityLower) ||
+      cityLower === mappedCity
+    )) {
+      targetAreaName = areaName;
+      break;
     }
   }
   
-  if (!targetAreaName) return null;
+  // If no direct match, try pattern matching
+  if (!targetAreaName) {
+    if (cityLower.includes('portugal') || cityLower.includes('pt') || 
+        cityLower.includes('português') || cityLower.includes('portuguesa') ||
+        cityLower.match(/[ãáàâçéêíóôõú]/)) {
+      targetAreaName = 'ericeira';
+    } else if (cityLower.includes('netherlands') || cityLower.includes('holland') || 
+               cityLower.includes('nederland') || cityLower.includes('nl')) {
+      targetAreaName = 'zandvoort';
+    } else {
+      // Default to zandvoort for European cities
+      targetAreaName = 'zandvoort';
+    }
+  }
+  
+  if (!targetAreaName) {
+    console.warn('Could not determine area for city:', cityLower);
+    return null;
+  }
+  
+  console.log('Determined area for city:', cityLower, '->', targetAreaName);
   
   // Find the actual area ID from the database
-  const { data: area } = await supabase
+  const { data: area, error } = await supabase
     .from('venue_areas')
     .select('id')
     .ilike('name', `%${targetAreaName}%`)
     .single();
     
-  return area?.id || null;
+  if (error || !area) {
+    console.error('Could not find area in database:', targetAreaName, error);
+    return null;
+  }
+  
+  console.log('Found area ID:', area.id, 'for area name:', targetAreaName);
+  return area.id;
 };
 
 // Function to add city to area mapping
 const addCityToAreaMapping = async (city: string, areaId: string): Promise<void> => {
   if (!city || !areaId) return;
   
+  const cityLower = city.toLowerCase().trim();
+  
   // Check if mapping already exists
   const { data: existing } = await supabase
     .from('venue_city_areas')
     .select('id')
-    .eq('city_name', city)
+    .ilike('city_name', cityLower)
     .eq('area_id', areaId)
     .single();
     
-  if (existing) return; // Already exists
+  if (existing) {
+    console.log('City mapping already exists:', cityLower, '->', areaId);
+    return;
+  }
   
   // Add the mapping
-  await supabase
+  const { error } = await supabase
     .from('venue_city_areas')
     .insert({
-      city_name: city,
+      city_name: cityLower,
       area_id: areaId
     });
     
-  console.log(`Added city "${city}" to area mapping`);
+  if (error) {
+    console.error('Error adding city to area mapping:', error);
+  } else {
+    console.log(`Successfully added city "${cityLower}" to area mapping`);
+  }
 };
 
 export const createVenue = async (venueData: CreateVenueFormValues): Promise<{ data: Venue | null; error: any }> => {
@@ -140,12 +169,17 @@ export const createVenue = async (venueData: CreateVenueFormValues): Promise<{ d
     // If venue was created successfully and has a city, categorize it
     if (data && venueData.city) {
       try {
+        console.log('Attempting to categorize venue city:', venueData.city);
         const areaId = await categorizeCityToArea(venueData.city);
         if (areaId) {
+          console.log('Adding city to area mapping:', venueData.city, '->', areaId);
           await addCityToAreaMapping(venueData.city, areaId);
+          console.log('Successfully categorized venue into area');
+        } else {
+          console.warn('Could not determine area for city:', venueData.city);
         }
       } catch (areaError) {
-        console.warn('Could not categorize city to area:', areaError);
+        console.error('Error categorizing city to area:', areaError);
         // Don't fail venue creation if area mapping fails
       }
     }
@@ -180,9 +214,14 @@ export const updateVenue = async (id: string, venueData: CreateVenueFormValues):
 
     // If venue was updated successfully and has a city, categorize it
     if (data && venueData.city) {
-      const areaId = await categorizeCityToArea(venueData.city);
-      if (areaId) {
-        await addCityToAreaMapping(venueData.city, areaId);
+      try {
+        const areaId = await categorizeCityToArea(venueData.city);
+        if (areaId) {
+          await addCityToAreaMapping(venueData.city, areaId);
+        }
+      } catch (areaError) {
+        console.warn('Could not categorize city to area during update:', areaError);
+        // Don't fail venue update if area mapping fails
       }
     }
 
