@@ -1,8 +1,12 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, MapPin } from 'lucide-react';
-import { VenueArea } from '@/types';
 import { cn } from '@/lib/utils';
+
+interface VenueArea {
+  id: string;
+  name: string;
+}
 
 interface LocationDropdownFilterProps {
   venueAreas: VenueArea[];

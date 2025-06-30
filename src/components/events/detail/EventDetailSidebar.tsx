@@ -35,13 +35,13 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
       {/* Date & Time */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="event-detail-info-title flex items-center gap-2">
+          <CardTitle className="text-sm font-semibold flex items-center gap-2 text-graphite-grey">
             <Calendar className="h-4 w-4 text-ocean-teal" />
             Date & Time
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="event-detail-info-content space-y-1">
+          <div className="text-sm space-y-1">
             {startDateTime && (
               <div className="flex items-start gap-2">
                 <Clock className="h-3 w-3 text-gray-500 mt-0.5 flex-shrink-0" />
@@ -61,13 +61,13 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
       {(event.venues || event.location) && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="event-detail-info-title flex items-center gap-2">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2 text-graphite-grey">
               <MapPin className="h-4 w-4 text-ocean-teal" />
               Location
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="event-detail-info-content">
+            <div className="text-sm">
               {event.venues ? (
                 <div>
                   <p className="font-medium">{event.venues.name}</p>
@@ -89,13 +89,13 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
       {isAuthenticated && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="event-detail-info-title flex items-center gap-2">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2 text-graphite-grey">
               <Users className="h-4 w-4 text-ocean-teal" />
               Who's Coming
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="event-detail-info-content space-y-2">
+            <div className="text-sm space-y-2">
               <div className="flex justify-between">
                 <span>Going</span>
                 <span className="font-medium">{attendees.going.length}</span>
@@ -110,22 +110,22 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
       )}
 
       {/* Booking Information */}
-      {(event.booking_url || event.booking_info) && (
+      {(event.booking_link || event.extra_info) && (
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="event-detail-info-title flex items-center gap-2">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2 text-graphite-grey">
               <Info className="h-4 w-4 text-ocean-teal" />
               Booking Information
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="event-detail-info-content space-y-3">
-              {event.booking_info && (
-                <p>{event.booking_info}</p>
+            <div className="text-sm space-y-3">
+              {event.extra_info && (
+                <p>{event.extra_info}</p>
               )}
-              {event.booking_url && (
+              {event.booking_link && (
                 <a
-                  href={event.booking_url}
+                  href={event.booking_link}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-ocean-teal hover:text-ocean-teal/80 transition-colors"
