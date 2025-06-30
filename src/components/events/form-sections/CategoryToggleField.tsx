@@ -21,37 +21,47 @@ export const CategoryToggleField: React.FC<CategoryToggleFieldProps> = ({
   const selectedCategory = watch("event_category");
 
   const handleCategoryChange = (value: string) => {
-    if (value) {
+    console.log("Category selection changed to:", value);
+    if (value && value !== selectedCategory) {
       setValue("event_category", value, { shouldValidate: true, shouldDirty: true });
     }
   };
 
   return (
-    <div>
-      <Label htmlFor="event_category">Event Category</Label>
+    <div className="space-y-3">
+      <Label htmlFor="event_category" className="form-label">Event Category</Label>
       <ToggleGroup 
         type="single" 
-        value={selectedCategory} 
+        value={selectedCategory || ""} 
         onValueChange={handleCategoryChange}
-        className="flex flex-wrap gap-1.5 mt-2"
+        className="flex flex-wrap gap-2 justify-start"
       >
         {EVENT_CATEGORIES.map((category) => {
           const Icon = getCategoryIcon(category);
+          const isSelected = selectedCategory === category;
+          
           return (
             <ToggleGroupItem
               key={category}
               value={category}
               variant="outline"
-              className="capitalize text-xs px-2 py-1.5 rounded-sm border border-sage bg-coconut text-midnight hover:bg-seafoam hover:border-overcast data-[state=on]:bg-seafoam data-[state=on]:text-midnight data-[state=on]:border-overcast transition-colors font-mono"
+              className={`
+                capitalize text-sm px-3 py-2 rounded-md border transition-all duration-200
+                ${isSelected 
+                  ? 'bg-ocean-teal text-pure-white border-ocean-teal shadow-sm' 
+                  : 'bg-pure-white text-graphite-grey border-mist-grey hover:bg-coastal-haze hover:border-ocean-teal'
+                }
+              `}
+              data-state={isSelected ? 'on' : 'off'}
             >
-              {Icon && <Icon className="mr-1.5 h-3 w-3" />}
+              {Icon && <Icon className="mr-2 h-4 w-4" />}
               {category}
             </ToggleGroupItem>
           );
         })}
       </ToggleGroup>
       {errors.event_category && (
-        <p className="text-red-500 text-sm mt-1">{errors.event_category.message}</p>
+        <p className="form-error-message">{errors.event_category.message}</p>
       )}
     </div>
   );
