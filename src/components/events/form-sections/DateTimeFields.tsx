@@ -40,6 +40,11 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ watch, setValue,
       setValue('end_time', endTime);
     }
   }, [startTime, setValue, showEndDate]);
+
+  const handleEndDateToggle = (checked: boolean | "indeterminate") => {
+    const isChecked = checked === true;
+    setShowEndDate(isChecked);
+  };
   
   return (
     <div className="space-y-6">
@@ -97,7 +102,7 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ watch, setValue,
         <Checkbox
           id="show-end-date"
           checked={showEndDate}
-          onCheckedChange={setShowEndDate}
+          onCheckedChange={handleEndDateToggle}
         />
         <label
           htmlFor="show-end-date"
