@@ -24,9 +24,9 @@ export const LoginFormFields: React.FC<LoginFormFieldsProps> = ({
   onSubmit
 }) => {
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
-      <div className="space-y-3">
-        <Label htmlFor="login-email" className="text-base font-semibold text-ocean-deep">
+    <form onSubmit={onSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="login-email" className="text-sm font-medium text-graphite-grey">
           Email Address
         </Label>
         <Input
@@ -36,13 +36,13 @@ export const LoginFormFields: React.FC<LoginFormFieldsProps> = ({
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email"
           disabled={loading || rateLimited}
-          className="h-12 text-base border-2 border-mist-grey focus:border-ocean-teal transition-colors"
+          className="h-10"
           required
         />
       </div>
       
-      <div className="space-y-3">
-        <Label htmlFor="login-password" className="text-base font-semibold text-ocean-deep">
+      <div className="space-y-2">
+        <Label htmlFor="login-password" className="text-sm font-medium text-graphite-grey">
           Password
         </Label>
         <Input
@@ -52,7 +52,7 @@ export const LoginFormFields: React.FC<LoginFormFieldsProps> = ({
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Enter your password"
           disabled={loading || rateLimited}
-          className="h-12 text-base border-2 border-mist-grey focus:border-ocean-teal transition-colors"
+          className="h-10"
           required
         />
       </div>
@@ -60,8 +60,7 @@ export const LoginFormFields: React.FC<LoginFormFieldsProps> = ({
       <Button 
         type="submit"
         disabled={loading || rateLimited} 
-        variant="primary"
-        className="w-full h-12 text-base"
+        className="w-full h-10 bg-ocean-teal hover:bg-ocean-teal/90 text-white"
       >
         {loading ? 'Logging in...' : 'Login'}
       </Button>

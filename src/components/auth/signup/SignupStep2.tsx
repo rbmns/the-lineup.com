@@ -15,13 +15,13 @@ export const SignupStep2: React.FC<SignupStep2Props> = ({ loading, blurredFields
   const form = useFormContext<SignupFormValues>();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <FormField
         control={form.control}
         name="password"
         render={({ field }) => (
-          <FormItem className="space-y-3">
-            <FormLabel className="text-base font-semibold text-ocean-deep">
+          <FormItem className="space-y-2">
+            <FormLabel className="text-sm font-medium text-graphite-grey">
               Password
             </FormLabel>
             <FormControl>
@@ -30,7 +30,7 @@ export const SignupStep2: React.FC<SignupStep2Props> = ({ loading, blurredFields
                 type="password" 
                 autoComplete="new-password"
                 disabled={loading}
-                className="h-12 text-base border-2 border-mist-grey focus:border-ocean-teal transition-colors"
+                className="h-10"
                 onBlur={() => {
                   field.onBlur();
                   handleFieldBlur('password');
@@ -38,7 +38,7 @@ export const SignupStep2: React.FC<SignupStep2Props> = ({ loading, blurredFields
                 {...field} 
               />
             </FormControl>
-            {blurredFields.password && <FormMessage className="text-coral" />}
+            {blurredFields.password && <FormMessage className="text-sm text-red-500" />}
           </FormItem>
         )}
       />
@@ -47,8 +47,8 @@ export const SignupStep2: React.FC<SignupStep2Props> = ({ loading, blurredFields
         control={form.control}
         name="confirmPassword"
         render={({ field }) => (
-          <FormItem className="space-y-3">
-            <FormLabel className="text-base font-semibold text-ocean-deep">
+          <FormItem className="space-y-2">
+            <FormLabel className="text-sm font-medium text-graphite-grey">
               Confirm Password
             </FormLabel>
             <FormControl>
@@ -57,7 +57,7 @@ export const SignupStep2: React.FC<SignupStep2Props> = ({ loading, blurredFields
                 type="password" 
                 autoComplete="new-password" 
                 disabled={loading}
-                className="h-12 text-base border-2 border-mist-grey focus:border-ocean-teal transition-colors"
+                className="h-10"
                 onBlur={() => {
                   field.onBlur();
                   handleFieldBlur('confirmPassword');
@@ -65,7 +65,7 @@ export const SignupStep2: React.FC<SignupStep2Props> = ({ loading, blurredFields
                 {...field} 
               />
             </FormControl>
-            {blurredFields.confirmPassword && <FormMessage className="text-coral" />}
+            {blurredFields.confirmPassword && <FormMessage className="text-sm text-red-500" />}
           </FormItem>
         )}
       />

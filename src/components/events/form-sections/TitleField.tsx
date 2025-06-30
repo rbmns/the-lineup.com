@@ -11,20 +11,20 @@ interface TitleFieldProps {
 }
 
 export const TitleField: React.FC<TitleFieldProps> = ({ register, errors }) => (
-  <div className="form-group">
-    <Label htmlFor="title" className="form-label">
+  <div className="space-y-2">
+    <Label htmlFor="title" className="text-sm font-medium text-graphite-grey">
       Event Title *
     </Label>
     <Input
       id="title"
       type="text"
       placeholder="e.g., Beach Volleyball Tournament"
-      className="form-field input-field-large"
+      className="h-10"
       {...register("title")}
       aria-invalid={errors.title ? "true" : "false"}
     />
     {errors.title && (
-      <p className="form-error-message">{errors.title.message}</p>
+      <p className="text-sm text-red-500">{errors.title.message}</p>
     )}
   </div>
 );
