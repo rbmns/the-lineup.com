@@ -101,26 +101,7 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
       </div>
 
       {/* Date & Time Section */}
-      <div className="text-left bg-gradient-to-r from-sage/5 to-clay/5 rounded-xl p-6 border border-sage/10">
-        <h3 className="text-lg font-semibold mb-4 text-left tracking-tight text-midnight font-montserrat flex items-center">
-          <Calendar className="h-5 w-5 mr-2 text-sage" />
-          When
-        </h3>
-        <div className="space-y-2">
-          {event.start_date && <p className="font-lato text-base text-midnight">
-              {new Date(event.start_date).toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })}
-            </p>}
-          {event.start_time && <p className="font-mono text-sm text-overcast flex items-center">
-              <Clock className="h-4 w-4 mr-1" />
-              {event.start_time} {event.end_time && `- ${event.end_time}`}
-            </p>}
-        </div>
-      </div>
+      
 
       {/* Booking Information Section */}
       {(event.booking_link || event.fee !== null && event.fee !== undefined) && <div className="text-left bg-gradient-to-r from-clay/5 to-coral/5 rounded-xl p-6 border border-clay/10">
