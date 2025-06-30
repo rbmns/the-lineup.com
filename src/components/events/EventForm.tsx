@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useEventForm } from '@/hooks/events/useEventForm.tsx';
 import { useEventFormSubmission } from '@/hooks/events/useEventFormSubmission.tsx';
@@ -81,10 +80,10 @@ export const EventForm: React.FC<EventFormProps> = ({
           isMobile ? "px-2" : ""
         )}>
           {/* Basic Information Section */}
-          <div className="bg-gradient-to-r from-graphite-grey/5 to-graphite-grey/10 p-6 rounded-lg border border-graphite-grey/20">
+          <div className="bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 p-6 rounded-lg border border-ocean-teal/20">
             <div className="flex items-center gap-2 mb-6">
-              <div className="w-3 h-3 bg-graphite-grey rounded-full"></div>
-              <h2 className="text-xl font-semibold text-graphite-grey">Basic Information</h2>
+              <div className="w-3 h-3 bg-ocean-teal rounded-full"></div>
+              <h2 className="text-xl font-semibold text-ocean-teal">Basic Information</h2>
             </div>
             <div className="space-y-6">
               <TitleField errors={errors} />
@@ -96,10 +95,10 @@ export const EventForm: React.FC<EventFormProps> = ({
           <DateTimeFields watch={watch} setValue={setValue} errors={errors} />
 
           {/* Location & Details Section */}
-          <div className="bg-gradient-to-r from-seafoam-drift/10 to-seafoam-drift/20 p-6 rounded-lg border border-seafoam-drift/30">
+          <div className="bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 p-6 rounded-lg border border-ocean-teal/20">
             <div className="flex items-center gap-2 mb-6">
-              <div className="w-3 h-3 bg-seafoam-drift rounded-full"></div>
-              <h2 className="text-xl font-semibold text-seafoam-drift">Location & Details</h2>
+              <div className="w-3 h-3 bg-ocean-teal rounded-full"></div>
+              <h2 className="text-xl font-semibold text-ocean-teal">Location & Details</h2>
             </div>
             <div className="space-y-6">
               <VenueField 

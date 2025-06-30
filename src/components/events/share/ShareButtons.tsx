@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "./ShareIcons";
 import { shareToFacebook, shareToWhatsApp, shareToSnapchat, shareToLinkedIn, shareToSignal } from "@/utils/sharing/socialShare";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 export interface ShareButtonsProps {
   title: string;
@@ -46,21 +46,14 @@ export function ShareButtons({ title, description, url, imageUrl, onCopyLink }: 
       }
     } catch (error) {
       console.error(`Error sharing to ${platform}:`, error);
-      toast({
-        title: "Sharing Error",
-        description: `Could not share to ${platform}. Please try copying the link instead.`,
-        variant: "destructive",
-      });
+      toast.error(`Could not share to ${platform}. Please try copying the link instead.`);
     }
   };
 
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(url);
-      toast({
-        title: "Link Copied",
-        description: "Event link has been copied to your clipboard",
-      });
+      toast.success("Event link copied to clipboard!");
       if (onCopyLink) {
         onCopyLink();
       }
@@ -73,19 +66,12 @@ export function ShareButtons({ title, description, url, imageUrl, onCopyLink }: 
       textArea.select();
       try {
         document.execCommand('copy');
-        toast({
-          title: "Link Copied",
-          description: "Event link has been copied to your clipboard",
-        });
+        toast.success("Event link copied to clipboard!");
         if (onCopyLink) {
           onCopyLink();
         }
       } catch (fallbackError) {
-        toast({
-          title: "Copy Failed",
-          description: "Could not copy link. Please manually copy the URL.",
-          variant: "destructive",
-        });
+        toast.error("Could not copy link. Please manually copy the URL.");
       }
       document.body.removeChild(textArea);
     }

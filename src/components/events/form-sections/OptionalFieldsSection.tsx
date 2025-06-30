@@ -27,14 +27,14 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
   const [isOpen, setIsOpen] = React.useState(false);
   
   return (
-    <div className="bg-gradient-to-r from-dusk-coral/5 to-dusk-coral/10 p-6 rounded-lg border border-dusk-coral/20">
+    <div className="bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 p-6 rounded-lg border border-ocean-teal/20">
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger asChild>
           <button
             type="button"
-            className="flex items-center gap-3 text-xl font-semibold text-dusk-coral hover:text-dusk-coral/80 transition-colors w-full text-left group"
+            className="flex items-center gap-3 text-xl font-semibold text-ocean-teal hover:text-ocean-teal/80 transition-colors w-full text-left group"
           >
-            <div className="w-3 h-3 bg-dusk-coral rounded-full"></div>
+            <div className="w-3 h-3 bg-ocean-teal rounded-full"></div>
             <Plus className={cn(
               "h-5 w-5 transition-transform duration-200",
               isOpen && "rotate-45"
@@ -61,7 +61,7 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
                   <FormControl>
                     <Input
                       placeholder="https://example.com"
-                      className="h-11 border-2 border-mist-grey focus:border-dusk-coral"
+                      className="h-11 border-2 border-mist-grey focus:border-ocean-teal"
                       {...field}
                     />
                   </FormControl>
@@ -83,7 +83,7 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
                     <Input
                       type="number"
                       placeholder="0"
-                      className="h-11 border-2 border-mist-grey focus:border-dusk-coral"
+                      className="h-11 border-2 border-mist-grey focus:border-ocean-teal"
                       {...field}
                     />
                   </FormControl>
@@ -104,7 +104,7 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
                   <FormControl>
                     <Input
                       placeholder="https://example.com/book"
-                      className="h-11 border-2 border-mist-grey focus:border-dusk-coral"
+                      className="h-11 border-2 border-mist-grey focus:border-ocean-teal"
                       {...field}
                     />
                   </FormControl>
@@ -125,7 +125,7 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
                   <FormControl>
                     <Input
                       placeholder="outdoor, sports, fun"
-                      className="h-11 border-2 border-mist-grey focus:border-dusk-coral"
+                      className="h-11 border-2 border-mist-grey focus:border-ocean-teal"
                       {...field}
                     />
                   </FormControl>
@@ -147,7 +147,7 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
                 <FormControl>
                   <Textarea
                     placeholder="Any additional details about your event..."
-                    className="min-h-[120px] border-2 border-mist-grey focus:border-dusk-coral"
+                    className="min-h-[120px] border-2 border-mist-grey focus:border-ocean-teal"
                     {...field}
                   />
                 </FormControl>
