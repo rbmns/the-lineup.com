@@ -8,6 +8,7 @@ import { useEventImages } from '@/hooks/useEventImages';
 import { toast } from '@/hooks/use-toast';
 import { formatEventCardDateTime } from '@/utils/date-formatting';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLocation } from 'react-router-dom';
 
 interface MasterEventCardProps {
   event: Event;
@@ -35,9 +36,15 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
   const { isAuthenticated } = useAuth();
   const { navigateToEvent } = useEventNavigation();
   const { getEventImageUrl } = useEventImages();
+  const location = useLocation();
   const imageUrl = getEventImageUrl(event);
 
   const shouldShowRsvp = isAuthenticated && showRsvpButtons;
+
+  // Determine which page we're on for description display
+  const isHomePage = location.pathname === '/';
+  const isEventsPage = location.pathname === '/events';
+  const isDetailPage = location.pathname.includes('/events/');
 
   const handleClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
@@ -82,24 +89,24 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
     return 'Location TBD';
   };
 
+  const getDescriptionClass = (): string => {
+    if (isHomePage) return 'event-card-description-home';
+    if (isEventsPage) return 'event-card-description-events';
+    if (isDetailPage) return 'event-card-description-detail';
+    return 'event-card-description-home'; // Default fallback
+  };
+
   return (
     <div 
-      className={cn(
-        // Container styling with uniform dimensions
-        "bg-pure-white rounded-lg shadow-md border border-mist-grey p-5",
-        "h-full flex flex-col cursor-pointer transition-all duration-200 ease-in-out",
-        "hover:shadow-lg hover:-translate-y-1",
-        className
-      )}
+      className={cn("event-card", className)}
       onClick={handleClick}
       data-event-id={event.id}
     >
-      {/* Image Container - Fixed height for uniformity */}
-      <div className="w-full overflow-hidden mb-4 rounded-t-md h-40 md:h-48">
+      {/* Image Container with Fixed Height */}
+      <div className="event-card-image">
         <img
           src={imageUrl}
           alt={event.title}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (!target.src.includes('/img/default.jpg')) {
@@ -110,52 +117,52 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
         
         {/* Category badge overlay */}
         {event.event_category && (
-          <div className="absolute top-3 left-3">
-            <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-mist-grey text-graphite-grey">
+          <div className="absolute top-3 left-3 z-10">
+            <span className="event-card-category-tag">
               {event.event_category}
             </span>
           </div>
         )}
       </div>
       
-      {/* Content Section - Flexible grow area */}
-      <div className="flex flex-col flex-grow">
+      {/* Flexible Content Section */}
+      <div className="event-card-content">
         {/* Title */}
-        <h4 className="text-h4 text-graphite-grey font-montserrat mb-2 line-clamp-2">
+        <h4 className="event-card-title">
           {event.title}
         </h4>
         
         {/* Organizer info */}
         {event.organiser_name && (
-          <p className="text-small text-graphite-grey opacity-75 font-lato mb-3">
+          <p className="event-card-metadata">
             By {event.organiser_name}
           </p>
         )}
         
         {/* Date & Time */}
-        <div className="text-small text-graphite-grey opacity-75 font-lato mb-3 flex items-center gap-2">
+        <div className="event-card-metadata flex items-center gap-2">
           <Calendar className="h-4 w-4 text-ocean-teal flex-shrink-0" />
           <span>{formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}</span>
         </div>
         
         {/* Location */}
-        <div className="text-sm text-graphite-grey font-lato flex items-center mb-4 hover:underline hover:text-ocean-teal">
-          <MapPin className="h-4 w-4 text-graphite-grey mr-2 flex-shrink-0" />
+        <div className="event-card-location">
+          <MapPin className="h-4 w-4 flex-shrink-0" />
           <span className="truncate">{getVenueDisplay()}</span>
         </div>
         
-        {/* Description (if available and not compact) - Flex grow pushes button down */}
-        {event.description && !compact && (
-          <p className="text-body-base text-graphite-grey font-lato mb-5 flex-grow line-clamp-3">
+        {/* Description - Conditional Display Based on Page */}
+        {event.description && (
+          <div className={cn("event-card-description", getDescriptionClass())}>
             {event.description}
-          </p>
+          </div>
         )}
         
         {/* RSVP Status Display */}
         {showRsvpStatus && event.rsvp_status && (
           <div className="flex items-center gap-2 mb-4">
             <span className={cn(
-              "inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-medium",
+              "event-card-category-tag",
               event.rsvp_status === 'Going' 
                 ? "bg-ocean-teal/20 text-ocean-teal" 
                 : "bg-sunrise-ochre/20 text-graphite-grey"
@@ -167,7 +174,7 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
         
         {/* Children (typically RSVP buttons) - Always at bottom */}
         {children && (
-          <div className="mt-auto" data-rsvp-container="true">
+          <div className="event-card-cta" data-rsvp-container="true">
             {children}
           </div>
         )}
