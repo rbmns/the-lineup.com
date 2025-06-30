@@ -46,7 +46,6 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
           <EventShareButton 
             event={event} 
             variant="outline"
-            className="bg-pure-white/10 border-pure-white/50 text-pure-white hover:bg-pure-white hover:text-graphite-grey backdrop-blur-sm"
           />
         </div>
         
