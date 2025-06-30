@@ -21,100 +21,111 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ watch, setValue,
   const isMobile = useIsMobile();
   
   return (
-    <div className="space-y-4">
-      {/* Timezone Field */}
-      <TimezoneField />
+    <div className="space-y-6">
+      {/* Timezone Field - Prominently displayed at the top */}
+      <div className="bg-mist-grey/20 p-4 rounded-lg border-l-4 border-l-ocean-teal">
+        <TimezoneField />
+        <p className="text-xs text-graphite-grey/70 mt-1">
+          All times will be displayed in this timezone for your event
+        </p>
+      </div>
 
       {/* Start Date & Time */}
-      <div className={cn(
-        "grid gap-3",
-        isMobile ? "grid-cols-1" : "grid-cols-2"
-      )}>
-        <FormField
-          control={form.control}
-          name="start_date"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm font-medium text-graphite-grey">
-                Start Date *
-              </FormLabel>
-              <FormControl>
-                <DatePicker
-                  selected={field.value}
-                  onSelect={(date) => date && field.onChange(date)}
-                  className="w-full h-10"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <div className="space-y-4">
+        <h3 className="text-sm font-medium text-graphite-grey">Event Start</h3>
+        <div className={cn(
+          "grid gap-3",
+          isMobile ? "grid-cols-1" : "grid-cols-2"
+        )}>
+          <FormField
+            control={form.control}
+            name="start_date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-graphite-grey">
+                  Start Date *
+                </FormLabel>
+                <FormControl>
+                  <DatePicker
+                    selected={field.value}
+                    onSelect={(date) => date && field.onChange(date)}
+                    className="w-full h-10"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="start_time"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm font-medium text-graphite-grey">
-                Start Time *
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="time"
-                  className="h-10"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="start_time"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-graphite-grey">
+                  Start Time *
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="time"
+                    className="h-10"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </div>
 
       {/* End Date & Time */}
-      <div className={cn(
-        "grid gap-3",
-        isMobile ? "grid-cols-1" : "grid-cols-2"
-      )}>
-        <FormField
-          control={form.control}
-          name="end_date"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm font-medium text-graphite-grey">
-                End Date
-              </FormLabel>
-              <FormControl>
-                <DatePicker
-                  selected={field.value}
-                  onSelect={(date) => date && field.onChange(date)}
-                  className="w-full h-10"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <div className="space-y-4">
+        <h3 className="text-sm font-medium text-graphite-grey">Event End (Optional)</h3>
+        <div className={cn(
+          "grid gap-3",
+          isMobile ? "grid-cols-1" : "grid-cols-2"
+        )}>
+          <FormField
+            control={form.control}
+            name="end_date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-graphite-grey">
+                  End Date
+                </FormLabel>
+                <FormControl>
+                  <DatePicker
+                    selected={field.value}
+                    onSelect={(date) => date && field.onChange(date)}
+                    className="w-full h-10"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="end_time"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm font-medium text-graphite-grey">
-                End Time
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type="time"
-                  className="h-10"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="end_time"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium text-graphite-grey">
+                  End Time
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type="time"
+                    className="h-10"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </div>
     </div>
   );

@@ -21,31 +21,38 @@ export const TimezoneField: React.FC = () => {
   }, [form, timezones]);
 
   return (
-    <FormField
-      control={form.control}
-      name="timezone"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel className="text-sm font-medium text-graphite-grey">
-            Timezone
-          </FormLabel>
-          <Select onValueChange={field.onChange} value={field.value}>
-            <FormControl>
-              <SelectTrigger className="h-10">
-                <SelectValue placeholder="Select timezone" />
-              </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              {timezones.map((timezone) => (
-                <SelectItem key={timezone.value} value={timezone.value}>
-                  {timezone.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <FormMessage />
-        </FormItem>
-      )}
-    />
+    <div className="space-y-2">
+      <FormField
+        control={form.control}
+        name="timezone"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-sm font-medium text-graphite-grey flex items-center gap-2">
+              <span>🌍</span>
+              Timezone *
+            </FormLabel>
+            <Select onValueChange={field.onChange} value={field.value}>
+              <FormControl>
+                <SelectTrigger className="h-10 bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal">
+                  <SelectValue placeholder="Select your timezone" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent className="bg-white border-mist-grey shadow-lg max-h-60 overflow-y-auto">
+                {timezones.map((timezone) => (
+                  <SelectItem 
+                    key={timezone.value} 
+                    value={timezone.value}
+                    className="hover:bg-mist-grey/50 focus:bg-mist-grey cursor-pointer"
+                  >
+                    {timezone.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </div>
   );
 };
