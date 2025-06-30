@@ -1,3 +1,4 @@
+
 import { formatInTimeZone, toZonedTime, fromZonedTime } from 'date-fns-tz';
 import { parseISO, format } from 'date-fns';
 
@@ -44,18 +45,17 @@ export const formatEventTime = (
       return timeStr.substring(0, 5);
     }
     
-    // Create a date object representing the event time in the event's timezone
-    const eventDateTimeStr = `${dateStr}T${timeStr}:00`;
-    const eventDateTime = parseISO(eventDateTimeStr);
+    // Create a datetime string representing the event time in the event's timezone
+    const eventDateTimeStr = `${dateStr}T${timeStr}`;
     
-    // Treat this datetime as being in the event timezone
-    const eventInEventTz = toZonedTime(eventDateTime, eventTimezone);
+    // Use formatInTimeZone to directly convert from event timezone to viewer timezone
+    // This is much simpler and more reliable than manual conversion
+    const eventTime = parseISO(eventDateTimeStr);
     
-    // Convert to UTC first, then to viewer timezone
-    const utcTime = fromZonedTime(eventInEventTz, eventTimezone);
-    
-    // Format in viewer's timezone
-    return formatInTimeZone(utcTime, viewerTimezone, 'HH:mm');
+    // Format the time in the viewer's timezone, treating the input as being in the event timezone
+    return formatInTimeZone(eventTime, viewerTimezone, 'HH:mm', {
+      timeZone: eventTimezone
+    });
   } catch (error) {
     console.error('Error formatting event time:', error, { dateStr, timeStr, eventTimezone, displayTimezone });
     return timeStr.substring(0, 5); // Fallback to original time
@@ -125,7 +125,8 @@ export const formatEventCardDateTime = (
       return datePart;
     }
     
-    const timePart = formatEventTimeWithTimezone(startDate, startTime, eventTimezone, viewerTimezone);
+    // Don't show timezone abbreviation - just the converted time
+    const timePart = formatEventTime(startDate, startTime, eventTimezone, viewerTimezone);
     return `${datePart}, ${timePart}`;
   } catch (error) {
     console.error('Error formatting event card date-time:', error);
