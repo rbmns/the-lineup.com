@@ -8,6 +8,7 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { useFormContext } from 'react-hook-form';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { TimezoneField } from './TimezoneField';
 
 interface DateTimeFieldsProps {
   watch: UseFormWatch<FormValues>;
@@ -21,6 +22,9 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ watch, setValue,
   
   return (
     <div className="space-y-4">
+      {/* Timezone Field */}
+      <TimezoneField />
+
       {/* Start Date & Time */}
       <div className={cn(
         "grid gap-3",

@@ -1,29 +1,23 @@
-
 import { formatInTimeZone } from 'date-fns-tz';
+import { formatEventTime, formatEventDate, formatEventCardDateTime } from './timezone-utils';
 
-// Set timezone constant for Amsterdam/Netherlands
+// Set timezone constant for Amsterdam/Netherlands (kept for backward compatibility)
 export const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
 
 /**
- * Helper to format event date in a consistent way
+ * Helper to format event date in a consistent way - now timezone-aware
  */
-export const formatDate = (dateString: string): string => {
-  try {
-    const date = new Date(dateString);
-    return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, d MMM yyyy");
-  } catch (error) {
-    console.error('Error formatting date:', error);
-    return dateString;
-  }
+export const formatDate = (dateString: string, timezone: string = AMSTERDAM_TIMEZONE): string => {
+  return formatEventDate(dateString, timezone);
 };
 
 /**
- * Helper to format event date in featured format (Sun, 25 May)
+ * Helper to format event date in featured format (Sun, 25 May) - now timezone-aware
  */
-export const formatFeaturedDate = (dateString: string): string => {
+export const formatFeaturedDate = (dateString: string, timezone: string = AMSTERDAM_TIMEZONE): string => {
   try {
     const date = new Date(dateString);
-    return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, d MMM");
+    return formatInTimeZone(date, timezone, "EEE, d MMM");
   } catch (error) {
     console.error('Error formatting featured date:', error);
     return dateString;
@@ -31,17 +25,22 @@ export const formatFeaturedDate = (dateString: string): string => {
 };
 
 /**
- * Helper to format event time in a consistent way - 24h format
+ * Helper to format event time in a consistent way - now timezone-aware
  */
-export const formatTime = (timeString: string): string => {
+export const formatTime = (timeString: string, dateString?: string, timezone: string = AMSTERDAM_TIMEZONE): string => {
   try {
     // If it's a full ISO string
     if (timeString.includes('T')) {
       const time = new Date(timeString);
-      return formatInTimeZone(time, AMSTERDAM_TIMEZONE, "HH:mm");
+      return formatInTimeZone(time, timezone, "HH:mm");
     }
     
-    // If it's just a time string (HH:MM:SS)
+    // If it's just a time string (HH:MM:SS) and we have a date
+    if (timeString.includes(':') && dateString) {
+      return formatEventTime(dateString, timeString, timezone);
+    }
+    
+    // Fallback for just time string
     if (timeString.includes(':')) {
       const timeparts = timeString.split(':');
       return `${timeparts[0]}:${timeparts[1]}`; // Only keep hours and minutes
@@ -55,16 +54,21 @@ export const formatTime = (timeString: string): string => {
 };
 
 /**
- * Format event time (handles start and end time)
+ * Format event time (handles start and end time) - now timezone-aware
  */
-export const formatEventTime = (startTime: string, endTime?: string | null): string => {
+export const formatEventTimeRange = (
+  startTime: string, 
+  endTime?: string | null, 
+  dateString?: string,
+  timezone: string = AMSTERDAM_TIMEZONE
+): string => {
   if (!startTime) return '';
   
-  const formattedStartTime = formatTime(startTime);
+  const formattedStartTime = formatTime(startTime, dateString, timezone);
   
   if (!endTime) return formattedStartTime;
   
-  const formattedEndTime = formatTime(endTime);
+  const formattedEndTime = formatTime(endTime, dateString, timezone);
   return `${formattedStartTime}-${formattedEndTime}`;
 };
 
@@ -109,36 +113,6 @@ export const formatMultiDayRange = (startDate: string, endDate: string): string 
 };
 
 /**
- * Formats event date and time for cards, e.g. "Sun, 25 May, 20:30" or "May 31 - June 15" for multi-day events
+ * Formats event date and time for cards - updated to use timezone-aware function
  */
-export const formatEventCardDateTime = (startDate: string, startTime?: string | null, endDate?: string | null): string => {
-  if (!startDate) return '';
-  
-  // Check if it's a multi-day event - show date range without time for ongoing events
-  if (isMultiDayEvent(startDate, endDate)) {
-    return formatMultiDayRange(startDate, endDate!);
-  }
-  
-  try {
-    const date = new Date(startDate);
-    const datePart = formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEE, d MMM");
-
-    if (!startTime) {
-      return datePart;
-    }
-
-    // Create a new date object with the time for correct timezone formatting
-    // Handles both ISO date strings and simple time strings.
-    const timeDate = new Date(startTime.includes('T') ? startTime : `${startDate.split('T')[0]}T${startTime}`);
-    const timePart = formatInTimeZone(timeDate, AMSTERDAM_TIMEZONE, "HH:mm");
-    
-    return `${datePart}, ${timePart}`;
-  } catch (error) {
-    console.error('Error formatting event card date-time:', error);
-    // Fallback to a simpler format
-    const datePart = formatFeaturedDate(startDate);
-    if (!startTime) return datePart;
-    const timePart = formatTime(startTime).substring(0, 5); // Just get HH:mm
-    return `${datePart}, ${timePart}`;
-  }
-};
+export { formatEventCardDateTime } from './timezone-utils';

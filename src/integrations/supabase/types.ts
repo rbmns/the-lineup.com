@@ -368,6 +368,7 @@ export type Database = {
           start_time: string | null
           status: Database["public"]["Enums"]["event_status"]
           tags: string | null
+          timezone: string
           title: string | null
           updated_at: string | null
           venue_id: string | null
@@ -400,6 +401,7 @@ export type Database = {
           start_time?: string | null
           status?: Database["public"]["Enums"]["event_status"]
           tags?: string | null
+          timezone?: string
           title?: string | null
           updated_at?: string | null
           venue_id?: string | null
@@ -432,6 +434,7 @@ export type Database = {
           start_time?: string | null
           status?: Database["public"]["Enums"]["event_status"]
           tags?: string | null
+          timezone?: string
           title?: string | null
           updated_at?: string | null
           venue_id?: string | null

@@ -1,104 +1,62 @@
 
 import { useMemo } from 'react';
 import { Calendar } from 'lucide-react';
-import { formatInTimeZone } from 'date-fns-tz';
 import { formatDistanceToNow } from 'date-fns';
-import { AMSTERDAM_TIMEZONE } from '@/utils/date-formatting';
+import { formatEventTime, formatEventDate, createEventDateTime } from '@/utils/timezone-utils';
 
 interface EventDateTimeSectionProps {
   startTime?: string;
   endTime?: string;
+  startDate?: string;
+  timezone?: string;
 }
 
-export const EventDateTimeSection = ({ startTime, endTime }: EventDateTimeSectionProps) => {
-  // Format date for detail view
-  const formattedDate = useMemo(() => {
-    if (!startTime) return '';
-    
-    try {
-      const date = new Date(startTime);
-      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEEE, d MMMM yyyy, HH:mm");
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return String(startTime);
-    }
-  }, [startTime]);
+export const EventDateTimeSection = ({ 
+  startTime, 
+  endTime, 
+  startDate,
+  timezone = 'Europe/Amsterdam'
+}: EventDateTimeSectionProps) => {
   
   // Format time range for detail view
   const formattedTimeRange = useMemo(() => {
-    if (!startTime) return '';
-    if (!endTime) return '';
+    if (!startTime || !startDate) return '';
+    if (!endTime) return formatEventTime(startDate, startTime, timezone);
     
     try {
-      // Check if these are full datetime strings or just time strings
-      let startDate, endDate;
-      
-      if (startTime.includes('T') || startTime.includes(' ')) {
-        // Full datetime string
-        startDate = new Date(startTime);
-        endDate = new Date(endTime);
-      } else {
-        // Just time strings - use today's date
-        const today = new Date().toISOString().split('T')[0];
-        startDate = new Date(`${today}T${startTime}`);
-        endDate = new Date(`${today}T${endTime}`);
-      }
-      
-      const startFormatted = formatInTimeZone(startDate, AMSTERDAM_TIMEZONE, "HH:mm");
-      const endFormatted = formatInTimeZone(endDate, AMSTERDAM_TIMEZONE, "HH:mm");
+      const startFormatted = formatEventTime(startDate, startTime, timezone);
+      const endFormatted = formatEventTime(startDate, endTime, timezone);
       return `${startFormatted} - ${endFormatted}`;
     } catch (error) {
       console.error('Error formatting time range:', error);
       return '';
     }
-  }, [startTime, endTime]);
+  }, [startTime, endTime, startDate, timezone]);
   
   // Format time until event
   const timeUntilEvent = useMemo(() => {
-    if (!startTime) return '';
+    if (!startTime || !startDate) return '';
     
     try {
-      let date;
-      if (startTime.includes('T') || startTime.includes(' ')) {
-        date = new Date(startTime);
-      } else {
-        // Just time string - use today's date
-        const today = new Date().toISOString().split('T')[0];
-        date = new Date(`${today}T${startTime}`);
-      }
+      const eventDateTime = createEventDateTime(startDate, startTime, timezone);
       
-      if (date <= new Date()) return 'Event has started';
-      return `Starts ${formatDistanceToNow(date, { addSuffix: true })}`;
+      if (eventDateTime <= new Date()) return 'Event has started';
+      return `Starts ${formatDistanceToNow(eventDateTime, { addSuffix: true })}`;
     } catch (error) {
       console.error('Error calculating time until event:', error);
       return '';
     }
-  }, [startTime]);
+  }, [startTime, startDate, timezone]);
   
-  // Format event duration - only if both times are valid
+  // Format event duration
   const eventDuration = useMemo(() => {
-    if (!startTime || !endTime) return '';
+    if (!startTime || !endTime || !startDate) return '';
     
     try {
-      let startDate, endDate;
+      const startDateTime = createEventDateTime(startDate, startTime, timezone);
+      const endDateTime = createEventDateTime(startDate, endTime, timezone);
       
-      if (startTime.includes('T') || startTime.includes(' ')) {
-        // Full datetime strings
-        startDate = new Date(startTime);
-        endDate = new Date(endTime);
-      } else {
-        // Just time strings - use today's date
-        const today = new Date().toISOString().split('T')[0];
-        startDate = new Date(`${today}T${startTime}`);
-        endDate = new Date(`${today}T${endTime}`);
-      }
-      
-      // Check if dates are valid
-      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-        return '';
-      }
-      
-      const durationHours = Math.abs(endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
+      const durationHours = Math.abs(endDateTime.getTime() - startDateTime.getTime()) / (1000 * 60 * 60);
       
       if (durationHours < 1) {
         const durationMinutes = Math.round(durationHours * 60);
@@ -110,22 +68,14 @@ export const EventDateTimeSection = ({ startTime, endTime }: EventDateTimeSectio
       console.error('Error calculating event duration:', error);
       return '';
     }
-  }, [startTime, endTime]);
+  }, [startTime, endTime, startDate, timezone]);
 
   // For the display format "Sunday, 18 May 2025, 15:00 - 20:00"
   const displayDateTime = useMemo(() => {
-    if (!startTime) return '';
+    if (!startDate) return '';
     
     try {
-      let date;
-      if (startTime.includes('T') || startTime.includes(' ')) {
-        date = new Date(startTime);
-      } else {
-        const today = new Date().toISOString().split('T')[0];
-        date = new Date(`${today}T${startTime}`);
-      }
-      
-      let formatted = formatInTimeZone(date, AMSTERDAM_TIMEZONE, "EEEE, d MMMM yyyy");
+      let formatted = formatEventDate(startDate, timezone);
       
       if (formattedTimeRange) {
         formatted += `, ${formattedTimeRange}`;
@@ -136,7 +86,7 @@ export const EventDateTimeSection = ({ startTime, endTime }: EventDateTimeSectio
       console.error('Error formatting display date time:', error);
       return '';
     }
-  }, [startTime, formattedTimeRange]);
+  }, [startDate, formattedTimeRange, timezone]);
 
   return (
     <div className="flex items-start space-x-2">

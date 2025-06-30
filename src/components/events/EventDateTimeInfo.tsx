@@ -2,8 +2,7 @@
 import React from 'react';
 import { Calendar, Clock, RepeatIcon, CalendarDays } from 'lucide-react';
 import { Event } from '@/types';
-import { formatInTimeZone } from 'date-fns-tz';
-import { AMSTERDAM_TIMEZONE, formatDate, formatTime, getEventDateTime } from '@/utils/dateUtils';
+import { formatEventDate, formatEventTime, formatEventCardDateTime } from '@/utils/timezone-utils';
 import { isMultiDayEvent, getMultiDayDateRange } from '@/utils/event-date-utils';
 import { Badge } from '../ui/badge';
 
@@ -22,12 +21,11 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
   showRecurring = false,
   recurringEvents = []
 }) => {
-  // Check if we have valid date information
-  const eventStartTime = getEventDateTime(event);
-  const eventEndTime = event.end_time;
-  const isMultiDay = isMultiDayEvent(event);
+  // Get event timezone or default
+  const eventTimezone = event.timezone || 'Europe/Amsterdam';
   
-  if (!eventStartTime) {
+  // Check if we have valid date information
+  if (!event.start_date) {
     return (
       <div className={`flex items-center gap-2 text-gray-500 italic ${className}`}>
         <Calendar className={`h-4 w-4 flex-shrink-0 ${iconClassName}`} />
@@ -36,33 +34,12 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
     );
   }
   
-  // Format date and time for display in Amsterdam timezone with 24-hour format
-  const formatDateStr = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, 'EEEE, d MMMM yyyy');
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return dateString;
-    }
-  };
-
-  const formatTimeStr = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      return formatInTimeZone(date, AMSTERDAM_TIMEZONE, 'HH:mm');
-    } catch (error) {
-      console.error('Error formatting time:', error);
-      return dateString;
-    }
-  };
-
-  const startDate = formatDateStr(eventStartTime);
-  const startTime = formatTimeStr(eventStartTime);
-  const endTime = eventEndTime ? formatTimeStr(eventEndTime) : null;
-  const endDate = eventEndTime ? formatDateStr(eventEndTime) : null;
-  
+  const isMultiDay = isMultiDayEvent(event);
   const isRecurring = recurringEvents && recurringEvents.length > 0;
+
+  const startDate = formatEventDate(event.start_date, eventTimezone);
+  const startTime = event.start_time ? formatEventTime(event.start_date, event.start_time, eventTimezone) : null;
+  const endTime = event.end_time ? formatEventTime(event.start_date, event.end_time, eventTimezone) : null;
 
   return (
     <div className={`flex flex-col gap-2 text-gray-700 ${className}`}>
@@ -114,13 +91,17 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
             <div className="text-xs uppercase font-medium text-gray-500">Other dates:</div>
             <div className="space-y-1.5">
               {recurringEvents.map((recEvent) => {
-                const recEventDateTime = getEventDateTime(recEvent);
+                const recEventDateTime = formatEventCardDateTime(
+                  recEvent.start_date!, 
+                  recEvent.start_time, 
+                  recEvent.end_date,
+                  recEvent.timezone || eventTimezone
+                );
                 return (
                   <div key={recEvent.id} className="text-sm">
                     <Badge variant="outline" className="mr-2">
-                      {recEventDateTime ? formatDate(recEventDateTime) : 'Date not set'}
+                      {recEventDateTime}
                     </Badge>
-                    {recEventDateTime ? formatTime(recEventDateTime) : ''}{recEvent.end_time && ` - ${formatTime(recEvent.end_time)}`}
                   </div>
                 );
               })}

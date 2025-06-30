@@ -1,6 +1,6 @@
-
 import { Event } from '@/types';
 import { addDays, startOfWeek } from 'date-fns';
+import { createEventDateTime } from './timezone-utils';
 
 /**
  * Get the full week range array for calendar views
@@ -11,7 +11,7 @@ export const getWeekRange = (date: Date): Date[] => {
 };
 
 /**
- * Gets the event datetime from an event object
+ * Gets the event datetime from an event object - now timezone-aware
  */
 export const getEventDateTime = (event: Event): string => {
   if (!event) return '';
@@ -21,14 +21,21 @@ export const getEventDateTime = (event: Event): string => {
   }
   
   if (event.start_date && event.start_time) {
-    return combineDateAndTime(event.start_date, event.start_time);
+    try {
+      const eventTimezone = event.timezone || 'Europe/Amsterdam';
+      const dateTime = createEventDateTime(event.start_date, event.start_time, eventTimezone);
+      return dateTime.toISOString();
+    } catch (error) {
+      console.error('Error creating event datetime:', error);
+      return combineDateAndTime(event.start_date, event.start_time);
+    }
   }
   
   return event.start_date || '';
 };
 
 /**
- * Gets the event end datetime from an event object
+ * Gets the event end datetime from an event object - now timezone-aware
  */
 export const getEventEndDateTime = (event: Event): string => {
   if (!event) return '';
@@ -38,7 +45,14 @@ export const getEventEndDateTime = (event: Event): string => {
   }
   
   if (event.start_date && event.end_time) {
-    return combineDateAndTime(event.start_date, event.end_time);
+    try {
+      const eventTimezone = event.timezone || 'Europe/Amsterdam';
+      const dateTime = createEventDateTime(event.start_date, event.end_time, eventTimezone);
+      return dateTime.toISOString();
+    } catch (error) {
+      console.error('Error creating event end datetime:', error);
+      return combineDateAndTime(event.start_date, event.end_time);
+    }
   }
   
   return '';
