@@ -11,7 +11,7 @@ interface DescriptionFieldProps {
 }
 
 export const DescriptionField: React.FC<DescriptionFieldProps> = ({ register, errors }) => (
-  <div className="space-y-2">
+  <div className="space-y-3">
     <Label htmlFor="description" className="form-label">
       Description *
     </Label>
@@ -23,7 +23,7 @@ export const DescriptionField: React.FC<DescriptionFieldProps> = ({ register, er
       aria-invalid={errors.description ? "true" : "false"}
     />
     {errors.description && (
-      <p className="text-red-500 text-small mt-1">{errors.description.message}</p>
+      <p className="text-red-500 text-small mt-2">{errors.description.message}</p>
     )}
   </div>
 );

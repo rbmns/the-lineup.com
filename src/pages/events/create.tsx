@@ -9,12 +9,12 @@ const CreateEvent = () => {
 
   return (
     <div className="min-h-screen w-full bg-pure-white">
-      {/* Header Section using global section-content */}
+      {/* Header Section */}
       <div className={cn(
         "section-content text-center",
-        isMobile ? "py-8" : "py-12"
+        isMobile ? "py-6" : "py-12"
       )}>
-        <h1 className="text-h1 text-primary mb-4">
+        <h1 className="text-h1 text-graphite-grey mb-4">
           Create Event
         </h1>
         <p className="text-body-base text-graphite-grey max-w-2xl mx-auto">
@@ -22,8 +22,11 @@ const CreateEvent = () => {
         </p>
       </div>
       
-      {/* Form Container using global design system */}
-      <div className="section-content-narrow">
+      {/* Form Container - Boxed with proper padding */}
+      <div className={cn(
+        "max-w-4xl mx-auto px-4 pb-8",
+        isMobile ? "px-4" : "px-8"
+      )}>
         <div className="card-base">
           <EventForm />
         </div>

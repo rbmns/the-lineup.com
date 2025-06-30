@@ -1,13 +1,11 @@
 
-import React from 'react';
-import { Check, ChevronsUpDown, MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import React, { useState, useRef, useEffect } from 'react';
+import { ChevronDown, MapPin } from 'lucide-react';
+import { VenueArea } from '@/types';
 import { cn } from '@/lib/utils';
 
 interface LocationDropdownFilterProps {
-  venueAreas: Array<{ id: string; name: string; cities?: string[] }>;
+  venueAreas: VenueArea[];
   selectedLocationId: string | null;
   onLocationChange: (locationId: string | null) => void;
   isLoading?: boolean;
@@ -21,102 +19,92 @@ export const LocationDropdownFilter: React.FC<LocationDropdownFilterProps> = ({
   isLoading = false,
   isLocationLoaded = true
 }) => {
-  const [open, setOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const selectedArea = selectedLocationId ? venueAreas.find(area => area.id === selectedLocationId) : null;
-  const displayValue = selectedArea ? selectedArea.name : 'All Locations';
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
 
-  const handleSelect = (value: string) => {
-    if (value === 'all-locations') {
-      onLocationChange(null);
-    } else {
-      onLocationChange(value === selectedLocationId ? null : value);
-    }
-    setOpen(false);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedArea = venueAreas.find(area => area.id === selectedLocationId);
+  const displayText = selectedArea ? selectedArea.name : 'All Locations';
+
+  const handleLocationSelect = (locationId: string | null) => {
+    onLocationChange(locationId);
+    setIsOpen(false);
   };
 
   if (isLoading || !isLocationLoaded) {
     return (
-      <Button 
-        variant="outline" 
-        className="btn-secondary w-full sm:w-auto justify-between"
-        disabled
-      >
-        <div className="flex items-center gap-2">
-          <MapPin className="h-4 w-4" />
-          <span>Loading...</span>
-        </div>
-        <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
-      </Button>
+      <div className="relative">
+        <button 
+          className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-md font-mono text-xs uppercase tracking-wide"
+          disabled
+        >
+          <MapPin className="h-3.5 w-3.5" />
+          Loading...
+        </button>
+      </div>
     );
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="btn-secondary w-full sm:w-auto justify-between"
-        >
-          <div className="flex items-center gap-2">
-            <MapPin className="h-4 w-4" />
-            <span className="truncate">{displayValue}</span>
-            {selectedLocationId && (
-              <span className="ml-1 px-1.5 py-0.5 bg-sunrise-ochre/30 text-graphite-grey rounded-full text-xs font-medium">
-                1
-              </span>
-            )}
-          </div>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[300px] p-0 bg-pure-white border-mist-grey shadow-lg z-50">
-        <Command>
-          <CommandInput placeholder="Search locations..." className="input-field border-0" />
-          <CommandEmpty className="p-4 text-center text-graphite-grey/60">No location found.</CommandEmpty>
-          <CommandGroup>
-            <CommandItem
-              value="all-locations"
-              onSelect={() => handleSelect('all-locations')}
-              className="hover:bg-mist-grey text-graphite-grey cursor-pointer"
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          "flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-md",
+          "font-mono text-xs uppercase tracking-wide text-gray-700",
+          "hover:bg-gray-50 hover:border-gray-300 transition-colors",
+          "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+          selectedLocationId && "border-blue-300 bg-blue-50 text-blue-700"
+        )}
+      >
+        <MapPin className="h-3.5 w-3.5" />
+        <span className="truncate max-w-[120px]">{displayText}</span>
+        <ChevronDown className={cn(
+          "h-3.5 w-3.5 transition-transform flex-shrink-0",
+          isOpen && "rotate-180"
+        )} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-200 rounded-md shadow-lg z-50 max-h-64 overflow-y-auto">
+          <div className="py-1">
+            <button
+              onClick={() => handleLocationSelect(null)}
+              className={cn(
+                "w-full px-4 py-2 text-left text-sm hover:bg-gray-100 transition-colors",
+                "font-mono uppercase tracking-wide",
+                !selectedLocationId ? "bg-blue-50 text-blue-700" : "text-gray-700"
+              )}
             >
-              <Check
-                className={cn(
-                  "mr-2 h-4 w-4",
-                  !selectedLocationId ? "opacity-100" : "opacity-0"
-                )}
-              />
               All Locations
-            </CommandItem>
+            </button>
+            
             {venueAreas.map((area) => (
-              <CommandItem
+              <button
                 key={area.id}
-                value={area.id}
-                onSelect={() => handleSelect(area.id)}
-                className="hover:bg-mist-grey text-graphite-grey cursor-pointer"
+                onClick={() => handleLocationSelect(area.id)}
+                className={cn(
+                  "w-full px-4 py-2 text-left text-sm hover:bg-gray-100 transition-colors",
+                  "font-mono uppercase tracking-wide",
+                  selectedLocationId === area.id ? "bg-blue-50 text-blue-700" : "text-gray-700"
+                )}
               >
-                <Check
-                  className={cn(
-                    "mr-2 h-4 w-4",
-                    selectedLocationId === area.id ? "opacity-100" : "opacity-0"
-                  )}
-                />
-                <div className="flex flex-col">
-                  <span className="font-montserrat font-medium">{area.name}</span>
-                  {area.cities && area.cities.length > 0 && (
-                    <span className="text-xs text-graphite-grey/60 font-lato">
-                      {area.cities.slice(0, 3).join(', ')}
-                      {area.cities.length > 3 && ` +${area.cities.length - 3} more`}
-                    </span>
-                  )}
-                </div>
-              </CommandItem>
+                {area.name}
+              </button>
             ))}
-          </CommandGroup>
-        </Command>
-      </PopoverContent>
-    </Popover>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };

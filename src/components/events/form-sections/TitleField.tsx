@@ -11,7 +11,7 @@ interface TitleFieldProps {
 }
 
 export const TitleField: React.FC<TitleFieldProps> = ({ register, errors }) => (
-  <div className="space-y-2">
+  <div className="space-y-3">
     <Label htmlFor="title" className="form-label">
       Event Title *
     </Label>
@@ -24,7 +24,7 @@ export const TitleField: React.FC<TitleFieldProps> = ({ register, errors }) => (
       aria-invalid={errors.title ? "true" : "false"}
     />
     {errors.title && (
-      <p className="text-red-500 text-small mt-1">{errors.title.message}</p>
+      <p className="text-red-500 text-small mt-2">{errors.title.message}</p>
     )}
   </div>
 );
