@@ -102,5 +102,7 @@ const customRender = (
   options?: Omit<RenderOptions, 'wrapper'>
 ) => render(ui, { wrapper: AllTheProviders, ...options });
 
+// Export everything from React Testing Library
 export * from '@testing-library/react';
+// Override render method and export additional utilities
 export { customRender as render, screen, fireEvent, waitFor };
