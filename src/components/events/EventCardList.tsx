@@ -8,10 +8,10 @@ import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { useEventImages } from '@/hooks/useEventImages';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { toast } from '@/hooks/use-toast';
-import { formatEventCardDateTime } from '@/utils/date-formatting';
 import { LineupImage } from '@/components/ui/lineup-image';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
+import { formatEventDateTime } from '@/utils/timezone-utils';
 
 interface EventCardListProps {
   event: Event;
@@ -103,6 +103,14 @@ const EventCardList: React.FC<EventCardListProps> = ({
     return 'Location TBD';
   };
 
+  // Format event date and time using unified approach
+  const eventDateTime = formatEventDateTime({
+    start_datetime: event.start_datetime,
+    start_date: event.start_date || undefined,
+    start_time: event.start_time || undefined,
+    timezone: event.timezone
+  });
+
   return (
     <div className={cn("w-full px-3 sm:px-4 lg:px-6", className)}>
       <Card 
@@ -118,7 +126,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
         <div className="relative h-[100px] sm:h-auto sm:w-[120px] overflow-hidden bg-gray-100 flex-shrink-0">
           <LineupImage
             src={imageUrl}
-            alt={event.title}
+            alt={event.title || 'Event'}
             aspectRatio="square"
             overlayVariant="ocean"
             className="h-full w-full"
@@ -164,7 +172,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
           <div className="flex items-center gap-2 text-xs sm:text-sm text-[#005F73]/80">
             <Calendar className="h-4 w-4 text-[#2A9D8F] flex-shrink-0" />
             <span className="font-medium">
-              {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
+              {eventDateTime.dateTime}
             </span>
           </div>
           
@@ -186,7 +194,7 @@ const EventCardList: React.FC<EventCardListProps> = ({
                 onClick={(e) => e.stopPropagation()}
               >
                 <EventRsvpButtons
-                  currentStatus={event.rsvp_status || null}
+                  currentStatus={event.rsvp_status}
                   onRsvp={handleRsvp}
                   size="sm"
                   showStatusOnly={!shouldShowRsvp && showRsvpStatus}

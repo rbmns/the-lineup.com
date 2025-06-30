@@ -18,7 +18,7 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({
 }) => {
   const { user, isAuthenticated } = useAuth();
   const { handleRsvp, loadingEventId } = useOptimisticRsvp(user?.id);
-  const [localRsvpStatus, setLocalRsvpStatus] = useState<'Going' | 'Interested' | undefined>(event.rsvp_status);
+  const [localRsvpStatus, setLocalRsvpStatus] = useState<'Going' | 'Interested' | null>(event.rsvp_status || null);
   
   const formatEventDateTime = (event: Event) => {
     if (!event.start_date) return { date: '', time: '' };
@@ -55,7 +55,7 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({
     if (!user?.id || loadingEventId) return false;
     
     try {
-      const newStatus = localRsvpStatus === status ? undefined : status;
+      const newStatus = localRsvpStatus === status ? null : status;
       setLocalRsvpStatus(newStatus);
       
       // Apply visual feedback animation using design system classes
@@ -73,13 +73,13 @@ export const RelatedEventCard: React.FC<RelatedEventCardProps> = ({
       const success = await handleRsvp(eventId, status);
       
       if (!success) {
-        setLocalRsvpStatus(event.rsvp_status);
+        setLocalRsvpStatus(event.rsvp_status || null);
       }
       
       return success;
     } catch (error) {
       console.error('RelatedEventCard - RSVP error:', error);
-      setLocalRsvpStatus(event.rsvp_status);
+      setLocalRsvpStatus(event.rsvp_status || null);
       return false;
     }
   };
