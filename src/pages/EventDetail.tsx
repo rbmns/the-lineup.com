@@ -10,7 +10,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useEventAttendees } from '@/hooks/useEventAttendees';
 import { useUnifiedRsvp } from '@/hooks/useUnifiedRsvp';
 import { useEventMetaTags } from '@/hooks/useEventMetaTags';
-import { EventDetailContent } from '@/components/events/EventDetailContent';
+import { EventDetailHero } from '@/components/events/detail/EventDetailHero';
+import { EventDetailMainContent } from '@/components/events/detail/EventDetailMainContent';
+import { EventDetailSidebar } from '@/components/events/detail/EventDetailSidebar';
 
 interface EventDetailProps {
   eventId?: string;
@@ -28,7 +30,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
 
   console.log('EventDetail - eventId:', eventId, 'user:', user?.id);
 
-  // Fetch event data
+  // Simplified event fetching - let the service handle RSVP status properly
   const {
     data: event,
     isLoading,
@@ -43,6 +45,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
       
       console.log(`Fetching event ${eventId} for detail page with user ${user?.id}`);
       
+      // Fetch event data with proper RSVP filtering
       const eventData = await fetchEventById(eventId, user?.id);
       
       if (eventData) {
@@ -58,7 +61,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
     staleTime: 1000 * 10, // 10 seconds
     retry: (failureCount, error) => {
       console.error(`Event fetch attempt ${failureCount + 1} failed:`, error);
-      return failureCount < 2;
+      return failureCount < 2; // Retry up to 2 times
     },
   });
 
@@ -119,7 +122,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
   console.log(`EventDetail rendering - Event RSVP status: ${event.rsvp_status}`);
 
   return (
-    <>
+    <div className="min-h-screen bg-white">
       <Helmet>
         <title>{event.title} | the lineup</title>
         <meta name="description" content={event.description || `Join us for ${event.title}`} />
@@ -133,29 +136,44 @@ const EventDetail: React.FC<EventDetailProps> = ({
         <meta name="twitter:image" content={event.image_urls?.[0] || 'https://raw.githubusercontent.com/rbmns/images/main/lineup/default.jpg'} />
       </Helmet>
 
-      <EventDetailContent
-        event={event}
-        attendees={attendees}
-        isAuthenticated={isAuthenticated}
-        rsvpLoading={loadingEventId === eventId}
-        onRsvp={handleRsvpClick}
-        isOwner={isOwner}
-      />
+      {/* Hero Image Section - Full width */}
+      <EventDetailHero event={event} />
 
-      {/* Back to Events button at bottom */}
-      {showBackButton && (
-        <div className="bg-pure-white">
-          <div className="section-content">
-            <div className="pt-8 border-t border-mist-grey">
-              <Link to="/events" className="inline-flex items-center text-ocean-teal hover:text-ocean-teal/80 transition-colors">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Events
-              </Link>
-            </div>
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Main Content */}
+          <EventDetailMainContent
+            event={event}
+            attendees={attendees}
+            isAuthenticated={isAuthenticated}
+            isOwner={isOwner}
+            rsvpLoading={loadingEventId === eventId}
+            rsvpFeedback={null}
+            onRsvp={handleRsvpClick}
+          />
+
+          {/* Right Column - Event Details */}
+          <div className="lg:col-span-1">
+            <EventDetailSidebar
+              event={event}
+              attendees={attendees}
+              isAuthenticated={isAuthenticated}
+            />
           </div>
         </div>
-      )}
-    </>
+
+        {/* Back to Events button at bottom */}
+        {showBackButton && (
+          <div className="mt-12 pt-8 border-t border-gray-200">
+            <Link to="/events" className="inline-flex items-center text-blue-600 hover:text-blue-800">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Events
+            </Link>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
