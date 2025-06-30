@@ -1,4 +1,3 @@
-
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, useEffect } from 'react';
@@ -30,8 +29,6 @@ export const useEventForm = ({
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCreateVenueModalOpen, setCreateVenueModalOpen] = useState(false);
-  const [autoDetectedTimezone, setAutoDetectedTimezone] = useState<string | null>(null);
-  const [selectedVenueName, setSelectedVenueName] = useState<string>('');
 
   const form = useForm<FormValues>({
     resolver: zodResolver(EventSchema),
@@ -54,7 +51,7 @@ export const useEventForm = ({
     }
   });
 
-  // Watch venue selection to auto-detect timezone
+  // Watch venue selection to auto-detect timezone (silently)
   const selectedVenueId = form.watch('venue_id');
 
   useEffect(() => {
@@ -64,19 +61,15 @@ export const useEventForm = ({
       const selectedVenue = venues.find(v => v.id === selectedVenueId);
       if (!selectedVenue?.city) return;
 
-      setSelectedVenueName(selectedVenue.name || '');
-
       try {
         const detectedTimezone = await TimezoneService.getTimezoneForCity(selectedVenue.city);
-        setAutoDetectedTimezone(detectedTimezone);
         
-        // Only set if user hasn't manually selected a different timezone
-        const currentTimezone = form.getValues('timezone');
-        if (currentTimezone === 'Europe/Amsterdam' || !currentTimezone) {
-          form.setValue('timezone', detectedTimezone);
-        }
+        // Automatically set the timezone without showing it to the user
+        form.setValue('timezone', detectedTimezone);
       } catch (error) {
         console.error('Error auto-detecting timezone:', error);
+        // Keep default timezone if detection fails
+        form.setValue('timezone', 'Europe/Amsterdam');
       }
     };
 
@@ -161,8 +154,6 @@ export const useEventForm = ({
     setCreateVenueModalOpen,
     handleVenueCreated,
     onSubmit,
-    onInvalid,
-    autoDetectedTimezone,
-    selectedVenueName
+    onInvalid
   };
 };

@@ -8,7 +8,6 @@ import { DatePicker } from '@/components/ui/date-picker';
 import { useFormContext } from 'react-hook-form';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { TimezoneField } from './TimezoneField';
 
 interface DateTimeFieldsProps {
   watch: UseFormWatch<FormValues>;
@@ -22,14 +21,6 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ watch, setValue,
   
   return (
     <div className="space-y-6">
-      {/* Timezone Field - Prominently displayed at the top */}
-      <div className="bg-mist-grey/20 p-4 rounded-lg border-l-4 border-l-ocean-teal">
-        <TimezoneField />
-        <p className="text-xs text-graphite-grey/70 mt-1">
-          All times will be displayed in this timezone for your event
-        </p>
-      </div>
-
       {/* Start Date & Time */}
       <div className="space-y-4">
         <h3 className="text-sm font-medium text-graphite-grey">Event Start</h3>
