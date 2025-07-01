@@ -33,8 +33,7 @@ export const useEvents = (
             venues!events_venue_id_fkey(*),
             event_rsvps!left(id, user_id, status)
           `)
-          .order('start_date', { ascending: true })
-          .order('start_time', { ascending: true });
+          .order('start_datetime', { ascending: true }); // Use start_datetime instead of start_date and start_time
 
         // Apply status filter - only show published events unless explicitly requesting all statuses
         if (!options.includeAllStatuses) {

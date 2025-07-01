@@ -1,307 +1,262 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
+import { processEventsData } from '@/utils/eventProcessorUtils';
+import { filterUpcomingEvents } from '@/utils/date-filtering';
 import { DateRange } from 'react-day-picker';
-import { useRsvpStateManager } from './useRsvpStateManager';
-import { useAuth } from '@/contexts/AuthContext';
-import { useLocationPreference } from '@/hooks/useLocationPreference';
-import { convertAreasToCategories } from '@/utils/locationCategories';
 
 export const useEventsPageData = () => {
-  const { user, profile } = useAuth();
-  const { selectedAreaId, updateLocationPreference, isLoaded } = useLocationPreference();
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
   const [selectedVenues, setSelectedVenues] = useState<string[]>([]);
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [selectedDateFilter, setSelectedDateFilter] = useState<string>('anytime');
-
-  // Use the persistent location preference as the selected location
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [selectedDateFilter, setSelectedDateFilter] = useState<string>('anytime');
+  const [isLocationLoaded, setIsLocationLoaded] = useState(false);
 
-  // Sync with location preference when loaded - but don't auto-set if user explicitly cleared it
+  // Load location preference from localStorage
   useEffect(() => {
-    if (isLoaded) {
-      setSelectedLocation(selectedAreaId);
-      console.log('Location preference loaded:', selectedAreaId);
+    const savedLocation = localStorage.getItem('selectedLocation');
+    if (savedLocation && savedLocation !== 'null') {
+      setSelectedLocation(savedLocation);
     }
-  }, [selectedAreaId, isLoaded]);
+    setIsLocationLoaded(true);
+    console.log('Location preference loaded:', savedLocation);
+  }, []);
 
-  // Custom location change handler that persists the preference
-  const handleLocationChange = (areaId: string | null) => {
-    console.log('Location changed to:', areaId);
-    setSelectedLocation(areaId);
-    updateLocationPreference(areaId);
-  };
-
-  // Fetch events with RSVP status for authenticated users
-  const { data: eventsData, isLoading: eventsLoading } = useQuery({
-    queryKey: ['events', user?.id],
-    queryFn: async () => {
-      console.log('useEventsPageData: Fetching events...');
-      
-      let query = supabase
-        .from('events')
-        .select(`
-          *,
-          venues!events_venue_id_fkey (
-            id,
-            name,
-            city,
-            street,
-            postal_code
-          )
-        `)
-        .eq('status', 'published')
-        .order('start_date', { ascending: true });
-
-      const { data, error } = await query;
-
-      if (error) {
-        console.error('useEventsPageData: Error fetching events:', error);
-        throw error;
+  // Save location preference to localStorage
+  useEffect(() => {
+    if (isLocationLoaded) {
+      if (selectedLocation) {
+        localStorage.setItem('selectedLocation', selectedLocation);
+      } else {
+        localStorage.removeItem('selectedLocation');
       }
+    }
+  }, [selectedLocation, isLocationLoaded]);
 
-      console.log(`useEventsPageData: Fetched ${data?.length || 0} events`);
-
-      // If user is authenticated, fetch RSVP status for each event
-      if (user?.id && data) {
-        const eventIds = data.map(event => event.id);
+  // Fetch all events with proper column names
+  const { data: allEvents, isLoading, error } = useQuery({
+    queryKey: ['events-page-data'],
+    queryFn: async () => {
+      try {
+        console.log('useEventsPageData: Fetching events...');
         
-        if (eventIds.length > 0) {
-          const { data: rsvpData } = await supabase
-            .from('event_rsvps')
-            .select('event_id, status')
-            .eq('user_id', user.id)
-            .in('event_id', eventIds);
+        const { data, error } = await supabase
+          .from('events')
+          .select(`
+            *,
+            venues!events_venue_id_fkey(*)
+          `)
+          .eq('status', 'published')
+          .order('start_datetime', { ascending: true }); // Use start_datetime instead of start_date
 
-          // Map RSVP status to events and log for debugging
-          const eventsWithRsvp = data.map(event => {
-            const rsvp = rsvpData?.find(r => r.event_id === event.id);
-            const eventWithRsvp = {
-              ...event,
-              rsvp_status: rsvp?.status || null
-            };
-            
-            console.log(`useEventsPageData: Event ${event.id} (${event.title}) RSVP status set to: ${eventWithRsvp.rsvp_status}`);
-            return eventWithRsvp;
-          });
-          
-          return eventsWithRsvp;
+        if (error) {
+          console.error('useEventsPageData: Error fetching events:', error);
+          throw error;
         }
-      }
 
-      return data || [];
-    },
-    staleTime: 1000 * 30, // 30 seconds for fresh data
-  });
+        if (!data) {
+          console.log('useEventsPageData: No events found');
+          return [];
+        }
 
-  // Get available venues for filtering
-  const { data: availableVenues = [] } = useQuery({
-    queryKey: ['venues'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('venues')
-        .select('id, name, city')
-        .order('name', { ascending: true });
+        console.log('useEventsPageData: Raw events from database:', data.length);
 
-      if (error) {
-        console.error('Error fetching venues:', error);
+        // Fetch creator profiles separately
+        const creatorIds = data.map(event => event.creator).filter(Boolean);
+        let creatorsData = [];
+        
+        if (creatorIds.length > 0) {
+          const { data: creators, error: creatorsError } = await supabase
+            .from('profiles')
+            .select('id, username, avatar_url, email, location, status, tagline')
+            .in('id', creatorIds);
+            
+          if (!creatorsError && creators) {
+            creatorsData = creators;
+          }
+        }
+
+        // Combine events with creators
+        const eventsWithCreators = data.map(event => ({
+          ...event,
+          creator: creatorsData.find(creator => creator.id === event.creator) || null
+        }));
+
+        // Process events data
+        const processedEvents = processEventsData(eventsWithCreators);
+        console.log('useEventsPageData: Processed events:', processedEvents.length);
+
+        return processedEvents;
+      } catch (error) {
+        console.error('useEventsPageData: Error in query:', error);
         throw error;
       }
-
-      return data || [];
     },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false,
   });
 
-  // Fetch venue city areas for area filtering
-  const { data: cityAreas = [] } = useQuery({
-    queryKey: ['venue-city-areas'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('venue_city_areas')
-        .select('area_id, city_name');
-
-      if (error) {
-        console.error('Error fetching venue city areas:', error);
-        throw error;
-      }
-
-      return data || [];
-    },
-  });
-
-  // Fetch venue areas and convert to proper format with cities
-  const { data: venueAreas = [] } = useQuery({
-    queryKey: ['venue-areas-with-cities'],
-    queryFn: async () => {
-      // Fetch areas
-      const { data: areas, error: areasError } = await supabase
-        .from('venue_areas')
-        .select('id, name')
-        .order('display_order', { ascending: true });
-
-      if (areasError) {
-        console.error('Error fetching venue areas:', areasError);
-        throw areasError;
-      }
-
-      // Fetch city mappings
-      const { data: cityMappings, error: cityError } = await supabase
-        .from('venue_city_areas')
-        .select('area_id, city_name');
-
-      if (cityError) {
-        console.error('Error fetching venue city areas:', cityError);
-        throw cityError;
-      }
-
-      // Convert to LocationCategory format with cities
-      return convertAreasToCategories(areas || [], cityMappings || []);
-    },
-  });
-
-  // Get all event types/categories for advanced filtering
-  const allEventTypes = [
-    ...new Set(eventsData?.map(event => event.event_category).filter(Boolean))
-  ] as string[];
-
-  console.log('useEventsPageData: All event types found:', allEventTypes);
-
-  // Filter out past events first
-  const upcomingEvents = eventsData?.filter(event => {
-    if (!event.start_date) {
-      console.log(`useEventsPageData: Event ${event.id} has no start_date, including it`);
-      return true;
+  // Filter events to only show upcoming ones
+  const upcomingEvents = useMemo(() => {
+    if (!allEvents || allEvents.length === 0) {
+      console.log('useEventsPageData: No events to filter');
+      return [];
     }
-    const eventDate = new Date(event.start_date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset to start of day for comparison
-    const isUpcoming = eventDate >= today;
-    
-    if (!isUpcoming) {
-      console.log(`useEventsPageData: Event ${event.id} (${event.title}) is in the past: ${event.start_date}`);
+
+    const filtered = filterUpcomingEvents(allEvents);
+    console.log('useEventsPageData: After filtering past events:', filtered.length, 'upcoming events');
+    return filtered;
+  }, [allEvents]);
+
+  // Apply all filters
+  const filteredEvents = useMemo(() => {
+    if (!upcomingEvents || upcomingEvents.length === 0) {
+      console.log('useEventsPageData: No upcoming events to filter');
+      return [];
     }
-    
-    return isUpcoming;
-  }) || [];
 
-  console.log(`useEventsPageData: After filtering past events: ${upcomingEvents.length} upcoming events`);
+    let result = [...upcomingEvents];
 
-  // Helper function to get cities for a selected area
-  const getCitiesForSelectedArea = (areaId: string): string[] => {
-    const area = venueAreas.find(area => area.id === areaId);
-    return area ? area.cities : [];
-  };
-
-  // Filter events based on all criteria
-  const filteredEvents = upcomingEvents?.filter(event => {
-    console.log(`useEventsPageData: Filtering event ${event.id} (${event.title}):`);
-    
-    // Vibe filter - only apply if vibes are selected
+    // Apply vibe filter
     if (selectedVibes.length > 0) {
-      const eventVibe = event.vibe || 'general';
-      if (!selectedVibes.includes(eventVibe)) {
-        console.log(`  - Filtered out by vibe: event has '${eventVibe}', selected: [${selectedVibes.join(', ')}]`);
-        return false;
-      }
-      console.log(`  - Passes vibe filter: '${eventVibe}'`);
+      result = result.filter(event => 
+        event.vibe && selectedVibes.includes(event.vibe)
+      );
     }
 
-    // Event type filter - only apply if types are selected
+    // Apply event type filter
     if (selectedEventTypes.length > 0) {
-      const eventCategory = event.event_category || '';
-      if (!selectedEventTypes.includes(eventCategory)) {
-        console.log(`  - Filtered out by event type: event has '${eventCategory}', selected: [${selectedEventTypes.join(', ')}]`);
-        return false;
-      }
-      console.log(`  - Passes event type filter: '${eventCategory}'`);
+      result = result.filter(event => 
+        event.event_category && selectedEventTypes.includes(event.event_category)
+      );
     }
 
-    // Venue filter - only apply if venues are selected
+    // Apply venue filter
     if (selectedVenues.length > 0) {
-      const eventVenueId = event.venue_id || '';
-      if (!selectedVenues.includes(eventVenueId)) {
-        console.log(`  - Filtered out by venue: event has '${eventVenueId}', selected: [${selectedVenues.join(', ')}]`);
-        return false;
-      }
-      console.log(`  - Passes venue filter: '${eventVenueId}'`);
+      result = result.filter(event => 
+        event.venue_id && selectedVenues.includes(event.venue_id)
+      );
     }
 
-    // Area-based location filter - only apply if location is selected (not null)
+    // Apply location filter
     if (selectedLocation) {
-      // If no venue city or location, exclude this event
-      if (!event.venues?.city && !event.location) {
-        console.log(`  - Filtered out by location: event has no venue city or location`);
-        return false;
-      }
-      
-      // If event has "Location TBD" or similar, exclude it
-      if (event.location && (
-        event.location.toLowerCase().includes('tbd') || 
-        event.location.toLowerCase().includes('to be determined') ||
-        event.location.toLowerCase().includes('location tbd')
-      )) {
-        console.log(`  - Filtered out by location: event has TBD location: '${event.location}'`);
-        return false;
-      }
-
-      const citiesInArea = getCitiesForSelectedArea(selectedLocation);
-      const eventCity = event.venues?.city || event.location;
-      
-      if (eventCity && !citiesInArea.some(city => 
-        city.toLowerCase() === eventCity.toLowerCase()
-      )) {
-        console.log(`  - Filtered out by location: event city '${eventCity}' not in selected area cities: [${citiesInArea.join(', ')}]`);
-        return false;
-      }
-      console.log(`  - Passes location filter: '${eventCity}'`);
+      // This would need venue area data to work properly
+      // For now, we'll skip this filter
     }
 
-    // Date filter - only apply if date range is set
-    if (dateRange?.from && event.start_date) {
-      const eventDate = new Date(event.start_date);
-      if (eventDate < dateRange.from) {
-        console.log(`  - Filtered out by date: event date ${event.start_date} is before ${dateRange.from}`);
-        return false;
-      }
-      if (dateRange.to && eventDate > dateRange.to) {
-        console.log(`  - Filtered out by date: event date ${event.start_date} is after ${dateRange.to}`);
-        return false;
-      }
-      console.log(`  - Passes date filter: '${event.start_date}'`);
+    // Apply date filters
+    if (dateRange || (selectedDateFilter && selectedDateFilter !== 'anytime')) {
+      result = result.filter(event => {
+        if (!event.start_datetime) return false;
+        
+        const eventDate = new Date(event.start_datetime);
+        
+        // Custom date range
+        if (dateRange?.from) {
+          if (eventDate < dateRange.from) return false;
+          if (dateRange.to && eventDate > dateRange.to) return false;
+          return true;
+        }
+        
+        // Predefined filters
+        if (selectedDateFilter && selectedDateFilter !== 'anytime') {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          switch (selectedDateFilter) {
+            case 'today':
+              const todayEnd = new Date(today);
+              todayEnd.setHours(23, 59, 59, 999);
+              return eventDate >= today && eventDate <= todayEnd;
+              
+            case 'tomorrow':
+              const tomorrow = new Date(today);
+              tomorrow.setDate(tomorrow.getDate() + 1);
+              const tomorrowEnd = new Date(tomorrow);
+              tomorrowEnd.setHours(23, 59, 59, 999);
+              return eventDate >= tomorrow && eventDate <= tomorrowEnd;
+              
+            case 'this week':
+              const weekStart = new Date(today);
+              weekStart.setDate(today.getDate() - today.getDay());
+              const weekEnd = new Date(weekStart);
+              weekEnd.setDate(weekStart.getDate() + 6);
+              weekEnd.setHours(23, 59, 59, 999);
+              return eventDate >= weekStart && eventDate <= weekEnd;
+              
+            case 'this weekend':
+              const dayOfWeek = today.getDay();
+              const daysUntilSaturday = (6 - dayOfWeek) % 7;
+              const saturday = new Date(today);
+              saturday.setDate(today.getDate() + daysUntilSaturday);
+              const sunday = new Date(saturday);
+              sunday.setDate(saturday.getDate() + 1);
+              sunday.setHours(23, 59, 59, 999);
+              return eventDate >= saturday && eventDate <= sunday;
+              
+            case 'next week':
+              const nextWeekStart = new Date(today);
+              nextWeekStart.setDate(today.getDate() + (7 - today.getDay()));
+              const nextWeekEnd = new Date(nextWeekStart);
+              nextWeekEnd.setDate(nextWeekStart.getDate() + 6);
+              nextWeekEnd.setHours(23, 59, 59, 999);
+              return eventDate >= nextWeekStart && eventDate <= nextWeekEnd;
+              
+            default:
+              return true;
+          }
+        }
+        
+        return true;
+      });
     }
 
-    console.log(`  - Event passes all filters!`);
-    return true;
-  }) || [];
+    console.log('useEventsPageData: After all filtering:', result.length, 'events');
+    return result;
+  }, [upcomingEvents, selectedVibes, selectedEventTypes, selectedVenues, selectedLocation, dateRange, selectedDateFilter]);
 
-  console.log(`useEventsPageData: After all filtering: ${filteredEvents.length} events`);
+  // Extract available options from all events
+  const { allEventTypes, availableVenues } = useMemo(() => {
+    if (!allEvents || allEvents.length === 0) {
+      console.log('useEventsPageData: All event types found:', []);
+      return { allEventTypes: [], availableVenues: [] };
+    }
 
-  // Use RSVP state manager with the user ID
-  const rsvpManager = useRsvpStateManager(user?.id);
+    const eventTypes = [...new Set(allEvents.map(event => event.event_category).filter(Boolean))];
+    const venues = [...new Set(allEvents
+      .filter(event => event.venues?.name && event.venue_id)
+      .map(event => ({ id: event.venue_id, name: event.venues?.name }))
+      .filter(Boolean))];
+
+    console.log('useEventsPageData: All event types found:', eventTypes);
+    return { allEventTypes: eventTypes, availableVenues: venues };
+  }, [allEvents]);
 
   const hasActiveFilters = selectedVibes.length > 0 || 
                           selectedEventTypes.length > 0 || 
                           selectedVenues.length > 0 || 
-                          selectedLocation !== null ||
-                          !!dateRange || 
-                          selectedDateFilter !== 'anytime';
+                          selectedLocation !== null || 
+                          dateRange !== undefined || 
+                          (selectedDateFilter && selectedDateFilter !== 'anytime');
 
   const resetAllFilters = () => {
     setSelectedVibes([]);
     setSelectedEventTypes([]);
     setSelectedVenues([]);
-    handleLocationChange(null); // This will properly reset location to null
+    setSelectedLocation(null);
     setDateRange(undefined);
     setSelectedDateFilter('anytime');
   };
 
   return {
     events: filteredEvents,
-    allEvents: upcomingEvents, // Return upcoming events only for vibe detection
-    isLoading: eventsLoading,
+    allEvents: upcomingEvents,
+    isLoading,
+    error,
     selectedVibes,
     selectedEventTypes,
     selectedVenues,
@@ -311,14 +266,13 @@ export const useEventsPageData = () => {
     setSelectedVibes,
     setSelectedEventTypes,
     setSelectedVenues,
-    setSelectedLocation: handleLocationChange,
+    setSelectedLocation,
     setDateRange,
     setSelectedDateFilter,
     allEventTypes,
     availableVenues,
     hasActiveFilters,
     resetAllFilters,
-    updateEventRsvp: rsvpManager.handleRsvp,
-    isLocationLoaded: isLoaded
+    isLocationLoaded
   };
 };
