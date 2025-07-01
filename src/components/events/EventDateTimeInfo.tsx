@@ -94,8 +94,7 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
                   recEvent.start_date!, 
                   recEvent.start_time, 
                   recEvent.end_date,
-                  recEvent.timezone || eventTimezone,
-                  recEvent.venues?.city
+                  recEvent.timezone || eventTimezone
                 );
                 return (
                   <div key={recEvent.id} className="text-sm">
