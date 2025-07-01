@@ -1,13 +1,14 @@
 
 import React from 'react';
 import { CalendarIcon, MapPin } from 'lucide-react';
-import { formatEventTime, formatEventDate, getUserTimezone } from '@/utils/timezone-utils';
+import { formatEventDate, formatEventTimeRange } from '@/utils/timezone-utils';
 import { cn } from '@/lib/utils';
 
 interface EventCardMetaProps {
   event: { 
     start_date?: string | null;
     start_time?: string | null;
+    end_time?: string | null;
     timezone?: string;
     venues?: { 
       name: string;
@@ -26,30 +27,36 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
   compact = false,
   className 
 }) => {
-  const viewerTimezone = getUserTimezone();
   const eventTimezone = event.timezone || 'Europe/Amsterdam';
   
-  // Format date for display in viewer's timezone
+  // Format date in event's local timezone
   const formatEventDateDisplay = (event: any): string => {
     try {
       if (!event.start_date) return 'Date not specified';
       
-      return formatEventDate(event.start_date, eventTimezone, viewerTimezone);
+      return formatEventDate(event.start_date, eventTimezone);
     } catch (error) {
       console.error('Error formatting date:', error);
       return 'Date not specified';
     }
   };
   
-  // Format time in viewer's timezone
+  // Format time range in event's local timezone with location label
   const getEventTimeDisplay = (event: any): string => {
-    if (!event.start_time || !event.start_date) return 'Time not specified';
+    if (!event.start_date) return 'Time not specified';
     
     try {
-      return formatEventTime(event.start_date, event.start_time, eventTimezone, viewerTimezone);
+      const city = event.venues?.city;
+      return formatEventTimeRange(
+        event.start_date, 
+        event.start_time, 
+        event.end_time, 
+        eventTimezone, 
+        city
+      );
     } catch (error) {
       console.error('Error formatting time:', error);
-      return event.start_time.substring(0, 5);
+      return event.start_time ? event.start_time.substring(0, 5) : 'Time not specified';
     }
   };
 
@@ -83,7 +90,14 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
       <div className="flex items-center text-gray-600">
         <CalendarIcon className="h-4 w-4 mr-2" />
         <span className={cn("font-inter leading-7", textSize)}>
-          {formatEventDateDisplay(event)} at {getEventTimeDisplay(event)}
+          {formatEventDateDisplay(event)}
+        </span>
+      </div>
+
+      <div className="flex items-center text-gray-600">
+        <CalendarIcon className="h-4 w-4 mr-2" />
+        <span className={cn("font-inter leading-7", textSize)}>
+          {getEventTimeDisplay(event)}
         </span>
       </div>
 

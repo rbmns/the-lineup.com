@@ -2,7 +2,7 @@
 import React from 'react';
 import { Calendar, Clock, RepeatIcon, CalendarDays } from 'lucide-react';
 import { Event } from '@/types';
-import { formatEventDate, formatEventTime, formatEventCardDateTime, getUserTimezone } from '@/utils/timezone-utils';
+import { formatEventDate, formatEventTimeRange, formatEventCardDateTime } from '@/utils/timezone-utils';
 import { isMultiDayEvent, getMultiDayDateRange } from '@/utils/event-date-utils';
 import { Badge } from '../ui/badge';
 
@@ -21,9 +21,9 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
   showRecurring = false,
   recurringEvents = []
 }) => {
-  // Get viewer's timezone and event timezone
-  const viewerTimezone = getUserTimezone();
+  // Get event timezone and venue city for location labels
   const eventTimezone = event.timezone || 'Europe/Amsterdam';
+  const venueCity = event.venues?.city;
   
   // Check if we have valid date information
   if (!event.start_date) {
@@ -38,10 +38,9 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
   const isMultiDay = isMultiDayEvent(event);
   const isRecurring = recurringEvents && recurringEvents.length > 0;
 
-  // Format date and times in viewer's timezone
-  const startDate = formatEventDate(event.start_date, eventTimezone, viewerTimezone);
-  const startTime = event.start_time ? formatEventTime(event.start_date, event.start_time, eventTimezone, viewerTimezone) : null;
-  const endTime = event.end_time ? formatEventTime(event.start_date, event.end_time, eventTimezone, viewerTimezone) : null;
+  // Format date and times in event's local timezone
+  const startDate = formatEventDate(event.start_date, eventTimezone);
+  const timeRange = formatEventTimeRange(event.start_date, event.start_time, event.end_time, eventTimezone, venueCity);
 
   return (
     <div className={`flex flex-col gap-2 text-gray-700 ${className}`}>
@@ -64,8 +63,7 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
               <div className="font-medium">{getMultiDayDateRange(event)}</div>
               <div className="flex items-center gap-1 text-sm">
                 <Clock className="h-3.5 w-3.5 text-gray-500" />
-                <span>Starts {startTime}</span>
-                {endTime && <span>• Ends {endTime}</span>}
+                <span>{timeRange || 'Time not specified'}</span>
               </div>
             </>
           ) : (
@@ -73,17 +71,9 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
               <div className="font-medium">{startDate}</div>
               <div className="flex items-center gap-1 text-sm">
                 <Clock className="h-3.5 w-3.5 text-gray-500" />
-                <span>{startTime}</span>
-                {endTime && <span>- {endTime}</span>}
+                <span>{timeRange || 'Time not specified'}</span>
               </div>
             </>
-          )}
-          
-          {/* Show timezone info if different from viewer's timezone */}
-          {eventTimezone !== viewerTimezone && (
-            <div className="text-xs text-gray-500">
-              Event timezone: {eventTimezone}
-            </div>
           )}
         </div>
       </div>
@@ -105,7 +95,7 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
                   recEvent.start_time, 
                   recEvent.end_date,
                   recEvent.timezone || eventTimezone,
-                  viewerTimezone
+                  recEvent.venues?.city
                 );
                 return (
                   <div key={recEvent.id} className="text-sm">

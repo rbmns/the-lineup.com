@@ -1,42 +1,36 @@
 
-
 import { useMemo } from 'react';
 import { Calendar } from 'lucide-react';
 import { formatDistanceToNow, parseISO } from 'date-fns';
-import { formatEventTimeWithTimezone, formatEventDate, createEventDateTime, getUserTimezone, getTimezoneAbbreviation } from '@/utils/timezone-utils';
+import { formatEventTimeRange, formatEventDate, createEventDateTime, getTimezoneLocationLabel } from '@/utils/timezone-utils';
 
 interface EventDateTimeSectionProps {
   startTime?: string;
   endTime?: string;
   startDate?: string;
   timezone?: string;
+  city?: string;
 }
 
 export const EventDateTimeSection = ({ 
   startTime, 
   endTime, 
   startDate,
-  timezone = 'Europe/Amsterdam'
+  timezone = 'Europe/Amsterdam',
+  city
 }: EventDateTimeSectionProps) => {
   
-  const viewerTimezone = getUserTimezone();
-  const viewerTzAbbr = getTimezoneAbbreviation(viewerTimezone);
-  const eventTzAbbr = getTimezoneAbbreviation(timezone);
-  
-  // Format time range for detail view in viewer's timezone
+  // Format time range for detail view in event's local timezone
   const formattedTimeRange = useMemo(() => {
-    if (!startTime || !startDate) return '';
-    if (!endTime) return formatEventTimeWithTimezone(startDate, startTime, timezone, viewerTimezone);
+    if (!startDate) return '';
     
     try {
-      const startFormatted = formatEventTimeWithTimezone(startDate, startTime, timezone, viewerTimezone);
-      const endFormatted = formatEventTimeWithTimezone(startDate, endTime, timezone, viewerTimezone);
-      return `${startFormatted} - ${endFormatted}`;
+      return formatEventTimeRange(startDate, startTime, endTime, timezone, city);
     } catch (error) {
       console.error('Error formatting time range:', error);
       return '';
     }
-  }, [startTime, endTime, startDate, timezone, viewerTimezone]);
+  }, [startTime, endTime, startDate, timezone, city]);
   
   // Format time until event
   const timeUntilEvent = useMemo(() => {
@@ -75,12 +69,12 @@ export const EventDateTimeSection = ({
     }
   }, [startTime, endTime, startDate, timezone]);
 
-  // For the display format "Sunday, 18 May 2025, 15:00 - 20:00" in viewer's timezone
+  // For the display format "Sunday, 18 May 2025, 15:00 – 20:00 · Lisbon time"
   const displayDateTime = useMemo(() => {
     if (!startDate) return '';
     
     try {
-      let formatted = formatEventDate(startDate, timezone, viewerTimezone);
+      let formatted = formatEventDate(startDate, timezone);
       
       if (formattedTimeRange) {
         formatted += `, ${formattedTimeRange}`;
@@ -91,7 +85,7 @@ export const EventDateTimeSection = ({
       console.error('Error formatting display date time:', error);
       return '';
     }
-  }, [startDate, formattedTimeRange, timezone, viewerTimezone]);
+  }, [startDate, formattedTimeRange, timezone]);
 
   return (
     <div className="flex items-start space-x-2">
@@ -102,13 +96,7 @@ export const EventDateTimeSection = ({
         {eventDuration && (
           <p className="text-sm text-gray-600">Duration: {eventDuration}</p>
         )}
-        {timezone !== viewerTimezone && (
-          <p className="text-xs text-gray-500 mt-1">
-            Event timezone: {eventTzAbbr} • Your timezone: {viewerTzAbbr}
-          </p>
-        )}
       </div>
     </div>
   );
 };
-

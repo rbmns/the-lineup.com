@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin } from 'lucide-react';
@@ -5,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { useEventImages } from '@/hooks/useEventImages';
 import { toast } from '@/hooks/use-toast';
-import { formatEventCardDateTime } from '@/utils/date-formatting';
+import { formatEventCardDateTime } from '@/utils/timezone-utils';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface MasterEventCardProps {
@@ -131,10 +132,18 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
           </p>
         )}
         
-        {/* Date & Time - Use JetBrains Mono */}
+        {/* Date & Time with location label - Use JetBrains Mono */}
         <div className="text-sm text-graphite-grey opacity-75 font-mono mb-3 flex items-center gap-2">
           <Calendar className="h-4 w-4 text-ocean-teal flex-shrink-0" />
-          <span>{formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}</span>
+          <span>
+            {formatEventCardDateTime(
+              event.start_date, 
+              event.start_time, 
+              event.end_date, 
+              event.timezone,
+              event.venues?.city
+            )}
+          </span>
         </div>
         
         {/* Location - Use JetBrains Mono */}
