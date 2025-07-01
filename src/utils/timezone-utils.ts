@@ -33,7 +33,7 @@ export const getTimezoneAbbreviation = (timezone: string): string => {
 export const getTimezoneLocationLabel = (timezone: string, city?: string): string => {
   // If we have a city from the venue, use it
   if (city) {
-    return `Local time (${city})`;
+    return `${city} time`;
   }
   
   // Map common timezones to friendly location names
@@ -56,7 +56,7 @@ export const getTimezoneLocationLabel = (timezone: string, city?: string): strin
 
 /**
  * Format event time in the event's local timezone (not viewer's timezone)
- * Always shows the time as it appears locally at the event location
+ * The time stored is already in the local time of the event location
  */
 export const formatEventTime = (
   dateStr: string,
@@ -64,12 +64,13 @@ export const formatEventTime = (
   eventTimezone: string = 'Europe/Amsterdam'
 ): string => {
   try {
-    // Simply format the time as it would appear in the event's timezone
-    const eventDateTimeStr = `${dateStr}T${timeStr}`;
-    const eventDateTime = parseISO(eventDateTimeStr);
+    // The time string represents the local time at the event location
+    // We don't need timezone conversion for display - just format it as-is
+    const timeParts = timeStr.split(':');
+    const hours = timeParts[0].padStart(2, '0');
+    const minutes = timeParts[1].padStart(2, '0');
     
-    // Format in the event's timezone (this is what locals would see)
-    return formatInTimeZone(eventDateTime, eventTimezone, 'HH:mm');
+    return `${hours}:${minutes}`;
   } catch (error) {
     console.error('Error formatting event time:', error, { dateStr, timeStr, eventTimezone });
     return timeStr.substring(0, 5); // Fallback to original time
@@ -185,6 +186,7 @@ export const getCommonTimezones = () => [
 
 /**
  * Create a proper Date object from date and time strings in a specific timezone
+ * This correctly handles the local time at the event location
  */
 export const createEventDateTime = (
   dateStr: string, 
@@ -195,9 +197,10 @@ export const createEventDateTime = (
     throw new Error('Date and time are required');
   }
   
+  // Parse the date and time as if they're in the event's timezone
   const eventDateTime = `${dateStr}T${timeStr}`;
-  const eventDate = parseISO(eventDateTime);
+  const localDate = parseISO(eventDateTime);
   
-  // Convert to the event's timezone
-  return toZonedTime(eventDate, eventTimezone);
+  // Convert from the event timezone to UTC, then to a proper Date object
+  return fromZonedTime(localDate, eventTimezone);
 };
