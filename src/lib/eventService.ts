@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { asEqParam } from '@/utils/supabaseTypeUtils';
