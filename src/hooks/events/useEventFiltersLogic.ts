@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Event } from '@/types';
 import { filterEventsByType, filterEventsByVenue } from '@/utils/eventUtils';
-import { filterEventsByDate } from '@/utils/date-filtering';
+import { filterEventsByDateRange } from '@/utils/date-filtering';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { DateRange } from 'react-day-picker';
@@ -55,7 +55,7 @@ export const useEventFiltersLogic = (
 
     // Apply date filter based on selected option or date range
     if (dateRange || selectedDateFilter) {
-      result = filterEventsByDate(result, selectedDateFilter, dateRange);
+      result = result.filter(event => filterEventsByDateRange(event, selectedDateFilter, dateRange));
     }
 
     // Update state with filtered events
@@ -89,12 +89,12 @@ export const useEventFiltersLogic = (
 
       // Apply date filter based on date range or predefined filters
       if (dateRange && dateRange.from) {
-        const fromDate = dateRange.from.toISOString().split('T')[0]; // Get YYYY-MM-DD
-        query = query.gte('start_date', fromDate);
+        const fromDate = dateRange.from.toISOString(); // Use full datetime
+        query = query.gte('start_datetime', fromDate);
 
         if (dateRange.to) {
-          const toDate = dateRange.to.toISOString().split('T')[0]; // Get YYYY-MM-DD
-          query = query.lte('start_date', toDate);
+          const toDate = dateRange.to.toISOString(); // Use full datetime
+          query = query.lte('start_datetime', toDate);
         }
       } else if (selectedDateFilter) {
         // Handle predefined filters
@@ -103,14 +103,14 @@ export const useEventFiltersLogic = (
         switch (selectedDateFilter) {
           case 'today':
             filterDate = new Date().toISOString().split('T')[0]; // Today in YYYY-MM-DD
-            query = query.eq('start_date', filterDate);
+            query = query.eq('start_datetime', filterDate);
             break;
             
           case 'tomorrow':
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             filterDate = tomorrow.toISOString().split('T')[0]; // Tomorrow in YYYY-MM-DD
-            query = query.eq('start_date', filterDate);
+            query = query.eq('start_datetime', filterDate);
             break;
             
           case 'this-weekend':
@@ -125,8 +125,8 @@ export const useEventFiltersLogic = (
             sunday.setDate(friday.getDate() + 2);
             
             query = query
-              .gte('start_date', friday.toISOString().split('T')[0])
-              .lte('start_date', sunday.toISOString().split('T')[0]);
+              .gte('start_datetime', friday.toISOString())
+              .lte('start_datetime', sunday.toISOString());
             break;
             
           case 'next-week':
@@ -140,19 +140,19 @@ export const useEventFiltersLogic = (
             nextSunday.setDate(nextMonday.getDate() + 6);
             
             query = query
-              .gte('start_date', nextMonday.toISOString().split('T')[0])
-              .lte('start_date', nextSunday.toISOString().split('T')[0]);
+              .gte('start_datetime', nextMonday.toISOString())
+              .lte('start_datetime', nextSunday.toISOString());
             break;
             
           default:
             // If none of the above, just filter by today or later
-            filterDate = new Date().toISOString().split('T')[0]; // Today in YYYY-MM-DD
-            query = query.gte('start_date', filterDate);
+            const now = new Date();
+            query = query.gte('start_datetime', now.toISOString());
         }
       }
 
-      // Always sort by date and time
-      query = query.order('start_date', { ascending: true }).order('start_time', { ascending: true });
+      // Always sort by datetime
+      query = query.order('start_datetime', { ascending: true });
 
       // Execute query
       const { data, error } = await query;

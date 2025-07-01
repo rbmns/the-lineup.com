@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Event } from '@/types'; 
-import { filterEventsByDate } from '@/utils/date-filtering'; 
+import { filterEventsByDateRange } from '@/utils/date-filtering'; 
 
 interface UseEventFilteringEngineProps {
   events: Event[] | undefined;
@@ -64,8 +64,7 @@ export const useEventFilteringEngine = ({
       
       // Date filter - only apply if a specific date filter is selected
       if (selectedDateFilter || (dateRange && dateRange.from)) {
-        const dateFilteredEvents = filterEventsByDate([event], selectedDateFilter, dateRange);
-        return dateFilteredEvents.length > 0;
+        return filterEventsByDateRange(event, selectedDateFilter, dateRange);
       }
       
       return true;

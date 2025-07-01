@@ -1,7 +1,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { filterPastEvents, sortEventsByDate, filterUpcomingEvents } from '@/utils/date-filtering';
+import { filterUpcomingEvents } from '@/utils/date-filtering';
 import { processEventsData } from '@/utils/eventProcessorUtils';
 import { Event } from '@/types';
 
@@ -57,8 +57,7 @@ export const useUserEvents = (userId: string | undefined): UseUserEventsResult =
           `)
           .eq('status', 'published')
           .in('id', eventIds)
-          .order('start_date', { ascending: true })
-          .order('start_time', { ascending: true });
+          .order('start_datetime', { ascending: true });
 
         if (eventsError) {
           console.error('useUserEvents: Error fetching events:', eventsError);
@@ -113,27 +112,27 @@ export const useUserEvents = (userId: string | undefined): UseUserEventsResult =
         console.log('useUserEvents: Current date for filtering:', now);
         
         const pastEvents = eventsWithRsvp.filter(event => {
-          if (!event.start_date) return false;
-          const eventDate = new Date(event.start_date);
+          if (!event.start_datetime) return false;
+          const eventDate = new Date(event.start_datetime);
           const isPast = eventDate < now;
-          console.log(`Event ${event.title}: ${event.start_date} is past: ${isPast}`);
+          console.log(`Event ${event.title}: ${event.start_datetime} is past: ${isPast}`);
           return isPast;
         });
         
         const upcomingEvents = eventsWithRsvp.filter(event => {
-          if (!event.start_date) return false;
-          const eventDate = new Date(event.start_date);
+          if (!event.start_datetime) return false;
+          const eventDate = new Date(event.start_datetime);
           const isUpcoming = eventDate >= now;
-          console.log(`Event ${event.title}: ${event.start_date} is upcoming: ${isUpcoming}`);
+          console.log(`Event ${event.title}: ${event.start_datetime} is upcoming: ${isUpcoming}`);
           return isUpcoming;
         });
 
-        const sortedPastEvents = pastEvents.sort((a, b) => new Date(b.start_date!).getTime() - new Date(a.start_date!).getTime());
-        const sortedUpcomingEvents = upcomingEvents.sort((a, b) => new Date(a.start_date!).getTime() - new Date(b.start_date!).getTime());
+        const sortedPastEvents = pastEvents.sort((a, b) => new Date(b.start_datetime!).getTime() - new Date(a.start_datetime!).getTime());
+        const sortedUpcomingEvents = upcomingEvents.sort((a, b) => new Date(a.start_datetime!).getTime() - new Date(b.start_datetime!).getTime());
 
         console.log('useUserEvents: Final result - Past:', sortedPastEvents.length, 'Upcoming:', sortedUpcomingEvents.length);
-        console.log('useUserEvents: Past events:', sortedPastEvents.map(e => ({ id: e.id, title: e.title, date: e.start_date, rsvp: e.rsvp_status })));
-        console.log('useUserEvents: Upcoming events:', sortedUpcomingEvents.map(e => ({ id: e.id, title: e.title, date: e.start_date, rsvp: e.rsvp_status })));
+        console.log('useUserEvents: Past events:', sortedPastEvents.map(e => ({ id: e.id, title: e.title, date: e.start_datetime, rsvp: e.rsvp_status })));
+        console.log('useUserEvents: Upcoming events:', sortedUpcomingEvents.map(e => ({ id: e.id, title: e.title, date: e.start_datetime, rsvp: e.rsvp_status })));
 
         return { pastEvents: sortedPastEvents, upcomingEvents: sortedUpcomingEvents };
       } catch (err) {

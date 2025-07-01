@@ -1,7 +1,7 @@
 
 import { useMemo } from 'react';
 import { Event } from '@/types';
-import { filterEventsByDate } from '@/utils/date-filtering';
+import { filterEventsByDateRange } from '@/utils/date-filtering';
 import { DateRange } from 'react-day-picker';
 
 interface UseFilteredEventsProps {
@@ -61,7 +61,7 @@ export const useFilteredEvents = ({
     // Filter by date
     if (dateRange || selectedDateFilter) {
       console.log('Applying date filter:', selectedDateFilter, dateRange);
-      filteredEvents = filterEventsByDate(filteredEvents, selectedDateFilter, dateRange);
+      filteredEvents = filteredEvents.filter(event => filterEventsByDateRange(event, selectedDateFilter, dateRange));
       console.log('Events after date filter:', filteredEvents.length);
     }
 

@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Event } from '@/types';
 import { supabase } from '@/lib/supabase';
 import { processEventsData } from '@/utils/eventProcessorUtils';
-import { filterEventsByDate } from '@/utils/date-filtering';
+import { filterEventsByDateRange } from '@/utils/date-filtering';
 
 interface UseSimilarEventsHandlerProps {
   mainEvents: Event[];
@@ -47,8 +47,8 @@ export const useSimilarEventsHandler = ({
             venues:venue_id(*),
             event_rsvps(id, user_id, status)
           `)
-          .gte('start_date', currentDate) // Only future events
-          .order('start_date', { ascending: true })
+          .gte('start_datetime', currentDate) // Only future events
+          .order('start_datetime', { ascending: true })
           .limit(6);
 
         // If we have event types selected, find other event types
@@ -78,7 +78,7 @@ export const useSimilarEventsHandler = ({
         let filteredEvents = processedEvents;
         if (dateRange || selectedDateFilter) {
           // Use approximately the same date range logic
-          filteredEvents = filterEventsByDate(processedEvents, selectedDateFilter, dateRange);
+          filteredEvents = processedEvents.filter(event => filterEventsByDateRange(event, selectedDateFilter, dateRange));
         }
 
         setSimilarEvents(filteredEvents.slice(0, 4)); // Limit to 4 similar events

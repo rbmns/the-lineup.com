@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Event } from '@/types';
 import { filterEventsByType, filterEventsByVenue } from '@/utils/eventUtils';
-import { filterEventsByDate } from '@/utils/date-filtering';
+import { filterEventsByDateRange } from '@/utils/date-filtering';
 import { useSearchParams } from 'react-router-dom';
 import { DateRange } from 'react-day-picker';
 
@@ -110,7 +110,7 @@ export const useEventsFiltering = (events: Event[] = [], userId: string | undefi
 
     // Apply date filter
     if (dateRange || selectedDateFilter) {
-      result = filterEventsByDate(result, selectedDateFilter, dateRange);
+      result = result.filter(event => filterEventsByDateRange(event, selectedDateFilter, dateRange));
     }
 
     setFilteredEvents(result);
