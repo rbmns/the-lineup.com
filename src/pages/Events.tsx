@@ -69,6 +69,32 @@ const Events = () => {
     });
   };
 
+  // Helper function to check if event belongs to selected area
+  const eventBelongsToArea = (event: Event, selectedAreaId: string): boolean => {
+    const selectedArea = venueAreas.find(area => area.id === selectedAreaId);
+    if (!selectedArea || !selectedArea.cities) {
+      return false;
+    }
+
+    // Check venue city
+    const venueCity = event.venues?.city;
+    if (venueCity) {
+      return selectedArea.cities.some(areaCity => 
+        areaCity.toLowerCase() === venueCity.toLowerCase()
+      );
+    }
+
+    // Check destination as fallback
+    const eventDestination = event.destination;
+    if (eventDestination) {
+      return selectedArea.cities.some(areaCity => 
+        areaCity.toLowerCase() === eventDestination.toLowerCase()
+      );
+    }
+
+    return false;
+  };
+
   // Enhanced search that respects all filters and excludes past events
   const handleSearch = useCallback(async (query: string) => {
     setSearchQuery(query);
@@ -162,24 +188,10 @@ const Events = () => {
             return false;
           }
 
-          // Location area filter - Fixed to work properly
+          // Location area filter - FIXED to use proper area-city mapping
           if (selectedLocation) {
-            const selectedArea = venueAreas.find(area => area.id === selectedLocation);
-            if (selectedArea) {
-              // Check if event's venue city matches any city in the selected area
-              const eventCity = event.venues?.city || event.destination;
-              if (eventCity) {
-                // Query venue_city_areas to see if this city belongs to the selected area
-                const cityBelongsToArea = selectedArea.cities?.some(city => 
-                  city.toLowerCase().includes(eventCity.toLowerCase()) ||
-                  eventCity.toLowerCase().includes(city.toLowerCase())
-                );
-                if (!cityBelongsToArea) {
-                  return false;
-                }
-              } else {
-                return false; // No city info, exclude from area filter
-              }
+            if (!eventBelongsToArea(event, selectedLocation)) {
+              return false;
             }
           }
 

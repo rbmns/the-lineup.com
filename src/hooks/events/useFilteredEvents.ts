@@ -12,6 +12,8 @@ interface UseFilteredEventsProps {
   selectedVibes: string[];
   dateRange: DateRange | undefined;
   selectedDateFilter: string;
+  selectedLocation?: string | null;
+  venueAreas?: Array<{ id: string; name: string; cities?: string[] }>;
 }
 
 export const useFilteredEvents = ({
@@ -21,7 +23,9 @@ export const useFilteredEvents = ({
   selectedVenues,
   selectedVibes,
   dateRange,
-  selectedDateFilter
+  selectedDateFilter,
+  selectedLocation,
+  venueAreas = []
 }: UseFilteredEventsProps) => {
   return useMemo(() => {
     if (!events || events.length === 0) {
@@ -58,6 +62,37 @@ export const useFilteredEvents = ({
       console.log('Events after vibe filter:', filteredEvents.length);
     }
 
+    // Filter by location area - FIXED to use proper area-city mapping
+    if (selectedLocation && venueAreas.length > 0) {
+      console.log('Applying location filter:', selectedLocation);
+      const selectedArea = venueAreas.find(area => area.id === selectedLocation);
+      
+      if (selectedArea && selectedArea.cities) {
+        filteredEvents = filteredEvents.filter(event => {
+          // Check venue city
+          const venueCity = event.venues?.city;
+          if (venueCity) {
+            const cityMatches = selectedArea.cities!.some(areaCity => 
+              areaCity.toLowerCase() === venueCity.toLowerCase()
+            );
+            if (cityMatches) return true;
+          }
+
+          // Check destination as fallback
+          const eventDestination = event.destination;
+          if (eventDestination) {
+            const destinationMatches = selectedArea.cities!.some(areaCity => 
+              areaCity.toLowerCase() === eventDestination.toLowerCase()
+            );
+            if (destinationMatches) return true;
+          }
+
+          return false;
+        });
+      }
+      console.log('Events after location filter:', filteredEvents.length);
+    }
+
     // Filter by date
     if (dateRange || selectedDateFilter) {
       console.log('Applying date filter:', selectedDateFilter, dateRange);
@@ -66,5 +101,5 @@ export const useFilteredEvents = ({
     }
 
     return filteredEvents;
-  }, [events, selectedCategories, allEventTypes, selectedVenues, selectedVibes, dateRange, selectedDateFilter]);
+  }, [events, selectedCategories, allEventTypes, selectedVenues, selectedVibes, dateRange, selectedDateFilter, selectedLocation, venueAreas]);
 };
