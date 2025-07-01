@@ -2,7 +2,7 @@
 import { useMemo } from 'react';
 import { Calendar } from 'lucide-react';
 import { formatDistanceToNow, parseISO } from 'date-fns';
-import { formatEventTimeRange, formatEventDate, createEventDateTime, getTimezoneLocationLabel } from '@/utils/timezone-utils';
+import { formatEventTimeRange, formatEventDate, createEventDateTime } from '@/utils/timezone-utils';
 
 interface EventDateTimeSectionProps {
   startTime?: string;
@@ -29,14 +29,14 @@ export const EventDateTimeSection = ({
     try {
       // Use timestampz fields first
       if (startDateTime) {
-        return formatEventTimeRange(startDateTime, endDateTime, timezone, city);
+        return formatEventTimeRange(startDateTime, endDateTime, timezone);
       }
       
       // Fallback to legacy fields
       if (startDate && startTime) {
         const startDateTimeString = `${startDate}T${startTime}`;
         const endDateTimeString = endTime ? `${startDate}T${endTime}` : null;
-        return formatEventTimeRange(startDateTimeString, endDateTimeString, timezone, city);
+        return formatEventTimeRange(startDateTimeString, endDateTimeString, timezone);
       }
       
       return '';
@@ -44,7 +44,7 @@ export const EventDateTimeSection = ({
       console.error('Error formatting time range:', error);
       return '';
     }
-  }, [startTime, endTime, startDate, startDateTime, endDateTime, timezone, city]);
+  }, [startTime, endTime, startDate, startDateTime, endDateTime, timezone]);
   
   // Format time until event
   const timeUntilEvent = useMemo(() => {
@@ -99,7 +99,7 @@ export const EventDateTimeSection = ({
     }
   }, [startTime, endTime, startDate, startDateTime, endDateTime, timezone]);
 
-  // For the display format "Sunday, 18 May 2025, 15:00 – 20:00 · Lisbon time"
+  // For the display format "Sunday, 18 May 2025, 15:00 – 20:00"
   const displayDateTime = useMemo(() => {
     try {
       let dateTimeToFormat: string;
@@ -117,6 +117,11 @@ export const EventDateTimeSection = ({
       
       if (formattedTimeRange) {
         formatted += `, ${formattedTimeRange}`;
+        
+        // Add city context if provided and timezone is not Amsterdam
+        if (city && timezone !== 'Europe/Amsterdam') {
+          formatted += ` (${city} local time)`;
+        }
       }
       
       return formatted;
@@ -124,7 +129,7 @@ export const EventDateTimeSection = ({
       console.error('Error formatting display date time:', error);
       return '';
     }
-  }, [startDate, startDateTime, formattedTimeRange, timezone]);
+  }, [startDate, startDateTime, formattedTimeRange, timezone, city]);
 
   return (
     <div className="flex items-start space-x-2">

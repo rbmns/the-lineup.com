@@ -21,9 +21,8 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
   showRecurring = false,
   recurringEvents = []
 }) => {
-  // Get event timezone and venue city for location labels
+  // Get event timezone
   const eventTimezone = event.timezone || 'Europe/Amsterdam';
-  const venueCity = event.venues?.city;
   
   // Check if we have valid date information - prioritize timestampz fields
   const hasValidDateTime = event.start_datetime || event.start_date;
@@ -50,8 +49,7 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
     timeRange = formatEventTimeRange(
       event.start_datetime, 
       event.end_datetime, 
-      eventTimezone, 
-      venueCity
+      eventTimezone
     );
   } else {
     // Fallback to old fields
@@ -59,8 +57,7 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
     timeRange = formatEventTimeRange(
       `${event.start_date}T${event.start_time || '00:00:00'}`,
       event.end_time ? `${event.start_date}T${event.end_time}` : null,
-      eventTimezone,
-      venueCity
+      eventTimezone
     );
   }
 
