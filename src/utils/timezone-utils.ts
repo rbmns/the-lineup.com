@@ -64,9 +64,9 @@ export const formatEventDateTime = (
       return { date: 'Date TBD', time: 'Time TBD', dateTime: 'Date and time TBD' };
     }
     
-    const date = formatInTimeZone(eventDateTime, targetTimezone, 'EEE, MMM d');
+    const date = formatInTimeZone(eventDateTime, targetTimezone, 'EEE, d MMM');
     const time = formatInTimeZone(eventDateTime, targetTimezone, 'HH:mm');
-    const dateTime = `${date} at ${time}`;
+    const dateTime = `${date}, ${time}`;
     
     return { date, time, dateTime };
   } catch (error) {
@@ -121,7 +121,7 @@ export const formatEventTime = (dateString: string, timeString: string, timezone
 export const formatEventDate = (dateString: string, timezone: string = AMSTERDAM_TIMEZONE): string => {
   try {
     const date = parseISO(dateString);
-    return formatInTimeZone(date, timezone, 'EEE, MMM d, yyyy');
+    return formatInTimeZone(date, timezone, 'EEE, d MMM, yyyy');
   } catch (error) {
     console.error('Error formatting date:', error);
     return dateString;
@@ -145,10 +145,10 @@ export const formatEventCardDateTime = (
     } else {
       // Single day event
       const date = parseISO(startDate);
-      const dateFormatted = formatInTimeZone(date, timezone, 'EEE, MMM d');
+      const dateFormatted = formatInTimeZone(date, timezone, 'EEE, d MMM');
       if (startTime) {
         const timeFormatted = formatEventTime(startDate, startTime, timezone);
-        return `${dateFormatted} at ${timeFormatted}`;
+        return `${dateFormatted}, ${timeFormatted}`;
       }
       return dateFormatted;
     }

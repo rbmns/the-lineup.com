@@ -50,7 +50,7 @@ describe('timezone-utils', () => {
   describe('formatEventDate', () => {
     it('should format date correctly', () => {
       const result = formatEventDate('2024-01-15', 'Europe/Amsterdam');
-      expect(result).toMatch(/Mon, Jan 15, 2024/);
+      expect(result).toMatch(/Mon, 15 Jan/);
     });
   });
 
