@@ -27,13 +27,15 @@ export const EventDateTimeSection = ({
   // Format time range for detail view in event's local timezone
   const formattedTimeRange = useMemo(() => {
     try {
-      // Use timestampz fields first
+      // ALWAYS use timestampz fields first if available
       if (startDateTime) {
+        console.log(`[EventDateTimeSection] Using timestampz fields: ${startDateTime} -> ${endDateTime}`);
         return formatEventTimeRange(startDateTime, endDateTime, timezone);
       }
       
-      // Fallback to legacy fields
+      // Only fallback to legacy fields if no timestampz data
       if (startDate && startTime) {
+        console.log(`[EventDateTimeSection] Using legacy fields: ${startDate}T${startTime}`);
         const startDateTimeString = `${startDate}T${startTime}`;
         const endDateTimeString = endTime ? `${startDate}T${endTime}` : null;
         return formatEventTimeRange(startDateTimeString, endDateTimeString, timezone);
@@ -44,17 +46,19 @@ export const EventDateTimeSection = ({
       console.error('Error formatting time range:', error);
       return '';
     }
-  }, [startTime, endTime, startDate, startDateTime, endDateTime, timezone]);
+  }, [startDateTime, endDateTime, timezone, startTime, endTime, startDate]);
   
   // Format time until event
   const timeUntilEvent = useMemo(() => {
     try {
       let eventDateTime: Date;
       
-      // Use timestampz field first
+      // ALWAYS use timestampz field first if available
       if (startDateTime) {
+        console.log(`[EventDateTimeSection] Calculating time until using timestampz: ${startDateTime}`);
         eventDateTime = createEventDateTime(startDateTime);
       } else if (startTime && startDate) {
+        console.log(`[EventDateTimeSection] Calculating time until using legacy: ${startDate}T${startTime}`);
         eventDateTime = createEventDateTime(`${startDate}T${startTime}`);
       } else {
         return '';
@@ -66,7 +70,7 @@ export const EventDateTimeSection = ({
       console.error('Error calculating time until event:', error);
       return '';
     }
-  }, [startTime, startDate, startDateTime, timezone]);
+  }, [startDateTime, startTime, startDate, timezone]);
   
   // Format event duration
   const eventDuration = useMemo(() => {
@@ -74,11 +78,13 @@ export const EventDateTimeSection = ({
       let startEventDateTime: Date;
       let endEventDateTime: Date;
       
-      // Use timestampz fields first
+      // ALWAYS use timestampz fields first if available
       if (startDateTime && endDateTime) {
+        console.log(`[EventDateTimeSection] Calculating duration using timestampz: ${startDateTime} -> ${endDateTime}`);
         startEventDateTime = createEventDateTime(startDateTime);
         endEventDateTime = createEventDateTime(endDateTime);
       } else if (startTime && endTime && startDate) {
+        console.log(`[EventDateTimeSection] Calculating duration using legacy: ${startDate}T${startTime} -> ${startDate}T${endTime}`);
         startEventDateTime = createEventDateTime(`${startDate}T${startTime}`);
         endEventDateTime = createEventDateTime(`${startDate}T${endTime}`);
       } else {
@@ -97,17 +103,19 @@ export const EventDateTimeSection = ({
       console.error('Error calculating event duration:', error);
       return '';
     }
-  }, [startTime, endTime, startDate, startDateTime, endDateTime, timezone]);
+  }, [startDateTime, endDateTime, timezone, startTime, endTime, startDate]);
 
   // For the display format "Sunday, 18 May 2025, 15:00 – 20:00"
   const displayDateTime = useMemo(() => {
     try {
       let dateTimeToFormat: string;
       
-      // Use timestampz field first
+      // ALWAYS use timestampz field first if available
       if (startDateTime) {
+        console.log(`[EventDateTimeSection] Formatting display using timestampz: ${startDateTime}`);
         dateTimeToFormat = startDateTime;
       } else if (startDate) {
+        console.log(`[EventDateTimeSection] Formatting display using legacy: ${startDate}`);
         dateTimeToFormat = startDate;
       } else {
         return '';
@@ -124,12 +132,13 @@ export const EventDateTimeSection = ({
         }
       }
       
+      console.log(`[EventDateTimeSection] Final formatted display: ${formatted}`);
       return formatted;
     } catch (error) {
       console.error('Error formatting display date time:', error);
       return '';
     }
-  }, [startDate, startDateTime, formattedTimeRange, timezone, city]);
+  }, [startDateTime, startDate, formattedTimeRange, timezone, city]);
 
   return (
     <div className="flex items-start space-x-2">
