@@ -26,8 +26,16 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   variant = 'default',
   className
 }) => {
+  const [optimisticStatus, setOptimisticStatus] = useState<RsvpStatus>(currentStatus);
   const [activeButton, setActiveButton] = useState<'Going' | 'Interested' | null>(null);
   const [internalLoading, setInternalLoading] = useState(false);
+
+  // Sync optimistic status with current status when it changes from server
+  useEffect(() => {
+    if (!internalLoading) {
+      setOptimisticStatus(currentStatus);
+    }
+  }, [currentStatus, internalLoading]);
 
   // Reset active button when loading completes
   useEffect(() => {
@@ -36,25 +44,10 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     }
   }, [isLoading, internalLoading]);
 
-  // Listen for cache updates to sync with server state
-  useEffect(() => {
-    const handleCacheUpdate = (event: CustomEvent) => {
-      // Reset any internal loading state when cache is updated
-      if (internalLoading) {
-        setInternalLoading(false);
-      }
-    };
+  const isGoing = optimisticStatus === 'Going';
+  const isInterested = optimisticStatus === 'Interested';
 
-    window.addEventListener('rsvpCacheUpdated', handleCacheUpdate as EventListener);
-    return () => {
-      window.removeEventListener('rsvpCacheUpdated', handleCacheUpdate as EventListener);
-    };
-  }, [internalLoading]);
-
-  const isGoing = currentStatus === 'Going';
-  const isInterested = currentStatus === 'Interested';
-
-  // Server-first RSVP handler - no optimistic updates
+  // Optimistic RSVP handler with immediate visual feedback
   const handleRsvp = async (status: 'Going' | 'Interested', e?: React.MouseEvent) => {
     // Comprehensive event isolation
     if (e) {
@@ -65,19 +58,37 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     
     if (isLoading || internalLoading) return false;
 
-    console.log(`EventRsvpButtons: Handling RSVP ${status}, current status: ${currentStatus}`);
+    console.log(`EventRsvpButtons: Handling RSVP ${status}, current status: ${optimisticStatus}`);
+
+    // Store the old status for potential rollback
+    const oldStatus = optimisticStatus;
+    
+    // Calculate new optimistic status (toggle off if same, otherwise set new)
+    const newOptimisticStatus = optimisticStatus === status ? null : status;
 
     try {
       setActiveButton(status);
       setInternalLoading(true);
       
-      // Call the provided onRsvp handler and wait for completion
+      // IMMEDIATE optimistic update - this provides instant visual feedback
+      setOptimisticStatus(newOptimisticStatus);
+      
+      // Call the server
       const result = await onRsvp(status);
       
       console.log(`EventRsvpButtons: RSVP ${status} completed with result: ${result}`);
+      
+      if (!result) {
+        // Rollback optimistic update on failure
+        console.log('RSVP failed, rolling back optimistic update');
+        setOptimisticStatus(oldStatus);
+      }
+      
       return result;
     } catch (error) {
       console.error('Error in RSVP handler:', error);
+      // Rollback optimistic update on error
+      setOptimisticStatus(oldStatus);
       return false;
     } finally {
       // Add slight delay for better UX
@@ -90,7 +101,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
 
   // If only showing status
   if (showStatusOnly) {
-    if (!currentStatus) return null;
+    if (!optimisticStatus) return null;
     return (
       <div className="text-sm font-medium">
         {isGoing && (
@@ -109,9 +120,8 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
     );
   }
 
-  console.log(`EventRsvpButtons: Rendering with currentStatus: ${currentStatus}, isGoing: ${isGoing}, isInterested: ${isInterested}`);
+  console.log(`EventRsvpButtons: Rendering with optimisticStatus: ${optimisticStatus}, isGoing: ${isGoing}, isInterested: ${isInterested}`);
 
-  // Use DefaultRsvpButtons for all cases
   return (
     <div 
       className={cn('', className)} 
@@ -124,7 +134,7 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
       }}
     >
       <DefaultRsvpButtons
-        currentStatus={currentStatus}
+        currentStatus={optimisticStatus}
         onRsvp={handleRsvp}
         isLoading={isLoading || internalLoading}
         className={className}
