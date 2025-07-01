@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { PlusCircle } from 'lucide-react';
 import { useFormContext } from 'react-hook-form';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
 interface VenueFieldProps {
   venues: Venue[];
@@ -19,6 +21,7 @@ export const VenueField: React.FC<VenueFieldProps> = ({
   onOpenCreateVenueModal 
 }) => {
   const form = useFormContext();
+  const isMobile = useIsMobile();
 
   return (
     <FormField
@@ -27,7 +30,10 @@ export const VenueField: React.FC<VenueFieldProps> = ({
       render={({ field }) => (
         <FormItem>
           <FormLabel htmlFor="venue_id">Venue</FormLabel>
-          <div className="flex items-center gap-2">
+          <div className={cn(
+            "flex gap-2",
+            isMobile ? "flex-col" : "flex-row items-center"
+          )}>
             <div className="flex-grow">
               <FormControl>
                 <VenueSelect
@@ -45,8 +51,12 @@ export const VenueField: React.FC<VenueFieldProps> = ({
               variant="outline"
               size="sm"
               onClick={onOpenCreateVenueModal}
+              className={cn(
+                "flex items-center gap-2",
+                isMobile ? "w-full justify-center" : "whitespace-nowrap"
+              )}
             >
-              <PlusCircle className="h-4 w-4 mr-2" />
+              <PlusCircle className="h-4 w-4" />
               New Venue
             </Button>
           </div>

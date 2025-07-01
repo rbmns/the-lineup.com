@@ -8,6 +8,8 @@ import { toast } from 'sonner';
 import { Venue } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 
 interface CreateVenueModalProps {
   open: boolean;
@@ -20,6 +22,7 @@ export const CreateVenueModal: React.FC<CreateVenueModalProps> = ({ open, onOpen
   const [isSubmitting, setIsSubmitting] = useState(false);
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
 
   const isEditMode = !!venueToEdit;
 
@@ -43,11 +46,13 @@ export const CreateVenueModal: React.FC<CreateVenueModalProps> = ({ open, onOpen
         
         if (error) {
           console.error("Error updating venue:", error);
-          throw error;
+          toast.error("Failed to update venue. Please try again.");
+          return;
         }
         
         if (!updatedVenue) {
-          throw new Error("No venue data returned from update");
+          toast.error("No venue data returned from update");
+          return;
         }
         
         savedVenue = updatedVenue;
@@ -88,11 +93,6 @@ export const CreateVenueModal: React.FC<CreateVenueModalProps> = ({ open, onOpen
         
         savedVenue = newVenue;
         toast.success(`Venue "${savedVenue.name}" created successfully!`);
-        
-        // Show additional message for non-authenticated users
-        if (!user) {
-          toast.info("Your venue has been added to the public list. Sign up to manage your venues later!");
-        }
       }
       
       // Invalidate and refetch venues
@@ -124,7 +124,10 @@ export const CreateVenueModal: React.FC<CreateVenueModalProps> = ({ open, onOpen
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-8">
+      <DialogContent className={cn(
+        "max-w-2xl max-h-[90vh] overflow-y-auto",
+        isMobile ? "p-4 mx-2 my-4 top-4 translate-y-0" : "p-8"
+      )}>
         <DialogHeader className="space-y-4 mb-6">
           <DialogTitle className="form-section-title">
             {isEditMode ? 'Edit Venue' : 'Create a New Venue'}
@@ -134,11 +137,6 @@ export const CreateVenueModal: React.FC<CreateVenueModalProps> = ({ open, onOpen
               ? 'Update the details for this venue.' 
               : 'Add a new venue to the list. This will be available for all event creators.'
             }
-            {!user && !isEditMode && (
-              <span className="block mt-3 text-sm text-graphite-grey/75">
-                No account needed - your venue will be added to the public list immediately.
-              </span>
-            )}
           </DialogDescription>
         </DialogHeader>
         <CreateVenueForm 

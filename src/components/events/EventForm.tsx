@@ -64,19 +64,25 @@ export const EventForm: React.FC<EventFormProps> = ({
   } = form;
 
   return (
-    <>
+    <div className={cn(
+      "w-full max-w-4xl mx-auto",
+      isMobile ? "px-4 py-6" : "px-6 py-8"
+    )}>
       <Form {...form}>
-        <form onSubmit={handleSubmit(handleFormSubmit, onInvalid)} className={cn(
-          "space-y-8",
-          isMobile ? "px-2" : ""
-        )}>
+        <form onSubmit={handleSubmit(handleFormSubmit, onInvalid)} className="space-y-6">
           {/* Basic Information Section */}
-          <div className="bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 p-6 rounded-lg border border-ocean-teal/20">
-            <div className="flex items-center gap-2 mb-6">
+          <div className={cn(
+            "bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 rounded-lg border border-ocean-teal/20",
+            isMobile ? "p-4" : "p-6"
+          )}>
+            <div className="flex items-center gap-2 mb-4">
               <div className="w-3 h-3 bg-ocean-teal rounded-full"></div>
-              <h2 className="text-xl font-semibold text-ocean-teal">Basic Information</h2>
+              <h2 className={cn(
+                "font-semibold text-ocean-teal",
+                isMobile ? "text-lg" : "text-xl"
+              )}>Basic Information</h2>
             </div>
-            <div className="space-y-6">
+            <div className="space-y-4">
               <TitleField />
               <DescriptionField />
             </div>
@@ -86,19 +92,30 @@ export const EventForm: React.FC<EventFormProps> = ({
           <DateTimeFields form={form} />
 
           {/* Location & Details Section */}
-          <div className="bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 p-6 rounded-lg border border-ocean-teal/20">
-            <div className="flex items-center gap-2 mb-6">
+          <div className={cn(
+            "bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 rounded-lg border border-ocean-teal/20",
+            isMobile ? "p-4" : "p-6"
+          )}>
+            <div className="flex items-center gap-2 mb-4">
               <div className="w-3 h-3 bg-ocean-teal rounded-full"></div>
-              <h2 className="text-xl font-semibold text-ocean-teal">Location & Details</h2>
+              <h2 className={cn(
+                "font-semibold text-ocean-teal",
+                isMobile ? "text-lg" : "text-xl"
+              )}>Location & Details</h2>
             </div>
-            <div className="space-y-6">
+            <div className="space-y-4">
               <VenueField 
                 venues={venues} 
                 isLoadingVenues={isLoadingVenues} 
                 onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)} 
               />
-              <CategoryToggleField />
-              <VibeToggleField />
+              <div className={cn(
+                "grid gap-4",
+                isMobile ? "grid-cols-1" : "grid-cols-2"
+              )}>
+                <CategoryToggleField />
+                <VibeToggleField />
+              </div>
             </div>
           </div>
 
@@ -108,10 +125,15 @@ export const EventForm: React.FC<EventFormProps> = ({
           />
 
           {/* Submit Button */}
-          <EventFormActions 
-            isSubmitting={isCreating} 
-            isEditMode={isEditMode} 
-          />
+          <div className={cn(
+            "sticky bottom-0 bg-white/95 backdrop-blur-sm border-t pt-4 -mx-4 px-4",
+            isMobile ? "pb-safe" : "pb-4"
+          )}>
+            <EventFormActions 
+              isSubmitting={isCreating} 
+              isEditMode={isEditMode} 
+            />
+          </div>
         </form>
       </Form>
 
@@ -127,7 +149,7 @@ export const EventForm: React.FC<EventFormProps> = ({
         createdEventId={createdEventId || undefined}
         createdEventTitle={createdEventTitle}
       />
-    </>
+    </div>
   );
 };
 

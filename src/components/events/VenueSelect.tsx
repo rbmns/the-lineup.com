@@ -1,23 +1,15 @@
 
-import React, { useState } from 'react';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import React, { useState, useMemo } from 'react';
 import { Venue } from '@/types';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
-import { filterVenues } from './venue-filter/VenueFilterUtils';
 
 interface VenueSelectProps {
-  id: string;
+  id?: string;
   venues: Venue[];
   isLoading: boolean;
-  value: string;
+  value?: string;
   onChange: (value: string) => void;
   placeholder?: string;
 }
@@ -31,50 +23,66 @@ export const VenueSelect: React.FC<VenueSelectProps> = ({
   placeholder = "Select a venue"
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
+
+  const filteredVenues = useMemo(() => {
+    if (!searchQuery.trim()) return venues;
+    
+    return venues.filter(venue =>
+      venue.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      venue.city?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [venues, searchQuery]);
+
+  const selectedVenue = venues.find(venue => venue.id === value);
 
   if (isLoading) {
-    return <Skeleton className="h-10 w-full" />;
+    return (
+      <Select disabled>
+        <SelectTrigger id={id}>
+          <SelectValue placeholder="Loading venues..." />
+        </SelectTrigger>
+      </Select>
+    );
   }
 
-  // Transform venues to format needed by filterVenues
-  const venueOptions = venues.map(venue => ({
-    value: venue.id,
-    label: venue.name
-  }));
-
-  // Filter venues based on search query
-  const filteredVenues = filterVenues(venueOptions, searchQuery);
-
-  // Map back to Venue format for rendering
-  const displayVenues = filteredVenues.map(option => {
-    return venues.find(venue => venue.id === option.value);
-  }).filter(Boolean) as Venue[];
-
   return (
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger id={id} className="w-full">
-        <SelectValue placeholder={placeholder} />
+    <Select 
+      value={value} 
+      onValueChange={onChange}
+      open={isOpen}
+      onOpenChange={setIsOpen}
+    >
+      <SelectTrigger id={id}>
+        <SelectValue placeholder={placeholder}>
+          {selectedVenue ? selectedVenue.name : placeholder}
+        </SelectValue>
       </SelectTrigger>
-      <SelectContent>
-        <div className="p-2">
-          <div className="flex items-center border rounded-md px-3 mb-2">
-            <Search className="h-4 w-4 text-gray-400 mr-2" />
-            <Input 
-              className="h-8 border-0 p-0 focus-visible:ring-0 placeholder:text-gray-400"
-              placeholder="Search venues..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+      <SelectContent className="max-h-[300px]">
+        <div className="flex items-center px-3 py-2 border-b">
+          <Search className="h-4 w-4 mr-2 text-gray-500" />
+          <Input
+            placeholder="Search venues..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 p-0 h-auto"
+          />
         </div>
-        {displayVenues.length > 0 ? (
-          displayVenues.map((venue) => (
+        {filteredVenues.length === 0 ? (
+          <div className="px-3 py-2 text-sm text-gray-500">
+            {searchQuery ? 'No venues found matching your search.' : 'No venues available.'}
+          </div>
+        ) : (
+          filteredVenues.map((venue) => (
             <SelectItem key={venue.id} value={venue.id}>
-              {venue.name}
+              <div className="flex flex-col">
+                <span className="font-medium">{venue.name}</span>
+                {venue.city && (
+                  <span className="text-sm text-gray-500">{venue.city}</span>
+                )}
+              </div>
             </SelectItem>
           ))
-        ) : (
-          <div className="text-center py-2 text-sm text-gray-500">No venues found</div>
         )}
       </SelectContent>
     </Select>
