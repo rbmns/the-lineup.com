@@ -50,7 +50,19 @@ export const useEventFormSubmission = () => {
       
       if (error) {
         console.error('Error creating event:', error);
-        toast.error('Failed to create event. Please try again.');
+        
+        // Provide more specific error messages
+        if (error.code === '23502') {
+          toast.error('Missing required fields. Please fill in all required information.');
+        } else if (error.code === '23505') {
+          toast.error('An event with this information already exists.');
+        } else if (error.code === '42501') {
+          toast.error('You don\'t have permission to create events. Please sign in or contact support.');
+        } else if (error.message?.includes('row-level security')) {
+          toast.error('Permission denied. Please sign in to create events.');
+        } else {
+          toast.error(`Failed to create event: ${error.message || 'Unknown error'}`);
+        }
         return;
       }
       
@@ -66,7 +78,7 @@ export const useEventFormSubmission = () => {
       
     } catch (error: any) {
       console.error('Failed to create event:', error);
-      toast.error('Failed to create event. Please try again.');
+      toast.error(`Failed to create event: ${error.message || 'Unknown error'}`);
     } finally {
       setIsCreating(false);
     }
@@ -90,7 +102,15 @@ export const useEventFormSubmission = () => {
         
         if (error) {
           console.error('Error creating event after auth:', error);
-          toast.error('Failed to create event. Please try again.');
+          
+          // Provide more specific error messages
+          if (error.code === '23502') {
+            toast.error('Missing required fields. Please check your event information.');
+          } else if (error.code === '42501') {
+            toast.error('Permission denied. Please try refreshing the page and signing in again.');
+          } else {
+            toast.error(`Failed to create event: ${error.message || 'Unknown error'}`);
+          }
           return;
         }
         
@@ -106,7 +126,7 @@ export const useEventFormSubmission = () => {
         
       } catch (error: any) {
         console.error('Failed to create event after auth:', error);
-        toast.error('Failed to create event. Please try again.');
+        toast.error(`Failed to create event: ${error.message || 'Unknown error'}`);
       } finally {
         setIsCreating(false);
         setPendingEventData(null);

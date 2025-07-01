@@ -122,14 +122,27 @@ export const createEvent = async (eventData: any) => {
   try {
     console.log('createEvent: Creating event with data:', eventData);
     
+    // Clean up the data by removing any undefined or null fields that shouldn't be there
+    const cleanedData = Object.fromEntries(
+      Object.entries(eventData).filter(([_, value]) => value !== undefined)
+    );
+    
+    console.log('createEvent: Cleaned event data:', cleanedData);
+    
     const { data, error } = await supabase
       .from('events')
-      .insert([eventData])
+      .insert([cleanedData])
       .select()
       .single();
 
     if (error) {
       console.error('createEvent: Error creating event:', error);
+      console.error('createEvent: Error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
       return { data: null, error };
     }
 

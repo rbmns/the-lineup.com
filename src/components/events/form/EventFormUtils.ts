@@ -3,6 +3,7 @@ import { EventFormData } from './EventFormSchema';
 
 export const processFormData = async (data: EventFormData, userId: string | null) => {
   console.log('Processing form data for user:', userId);
+  console.log('Raw form data:', data);
   
   // Convert date and time to datetime
   const startDateTime = data.startDate && data.startTime 
@@ -38,5 +39,15 @@ export const processFormData = async (data: EventFormData, userId: string | null
   };
 
   console.log('Processed event data:', processedData);
+  
+  // Validate required fields
+  if (!processedData.title) {
+    throw new Error('Event title is required');
+  }
+  
+  if (!processedData.start_datetime) {
+    throw new Error('Event start date and time are required');
+  }
+  
   return processedData;
 };
