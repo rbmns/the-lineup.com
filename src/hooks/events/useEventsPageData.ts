@@ -36,26 +36,56 @@ export const useEventsPageData = () => {
     isLoading: venuesLoading
   } = useVenueFilter();
 
-  // Fetch events with proper joins - fixed the relationship issue
+  // Fetch events with a simpler approach
   const { data: eventsData, isLoading: eventsLoading } = useQuery({
     queryKey: ['events-page-data'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First get events
+      const { data: events, error: eventsError } = await supabase
         .from('events')
-        .select(`
-          *,
-          creator:profiles!events_creator_fkey(*),
-          venues!events_venue_id_fkey(*)
-        `)
+        .select('*')
         .eq('status', 'published')
         .order('start_datetime', { ascending: true });
 
-      if (error) {
-        console.error('Error fetching events:', error);
-        throw error;
+      if (eventsError) {
+        console.error('Error fetching events:', eventsError);
+        throw eventsError;
       }
 
-      return data || [];
+      if (!events || events.length === 0) {
+        return [];
+      }
+
+      // Get all unique venue IDs and creator IDs
+      const venueIds = [...new Set(events.map(e => e.venue_id).filter(Boolean))];
+      const creatorIds = [...new Set(events.map(e => e.creator || e.created_by).filter(Boolean))];
+
+      // Fetch venues separately
+      let venues = [];
+      if (venueIds.length > 0) {
+        const { data: venuesData } = await supabase
+          .from('venues')
+          .select('*')
+          .in('id', venueIds);
+        venues = venuesData || [];
+      }
+
+      // Fetch creators separately
+      let creators = [];
+      if (creatorIds.length > 0) {
+        const { data: creatorsData } = await supabase
+          .from('profiles')
+          .select('*')
+          .in('id', creatorIds);
+        creators = creatorsData || [];
+      }
+
+      // Combine the data
+      return events.map(event => ({
+        ...event,
+        venues: venues.find(v => v.id === event.venue_id) || null,
+        creator: creators.find(c => c.id === (event.creator || event.created_by)) || null
+      }));
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
