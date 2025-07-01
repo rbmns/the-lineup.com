@@ -21,7 +21,6 @@ export function EventShareDialog({ event, isOpen, onOpenChange }: EventShareDial
   };
 
   const getShareTitle = () => {
-    // Use the event title as the main share title
     return event.title;
   };
 
@@ -39,22 +38,23 @@ export function EventShareDialog({ event, isOpen, onOpenChange }: EventShareDial
   };
 
   const handleCopyLink = async () => {
-    await copyToClipboard(getEventUrl());
-    onOpenChange(false);
+    try {
+      await copyToClipboard(getEventUrl());
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Failed to copy link:', error);
+    }
   };
-
-  // Adjust dialog size for mobile and ensure white background
-  const dialogContentClass = isMobile 
-    ? "px-3 py-4 bg-white border border-gray-200" 
-    : "sm:max-w-md bg-white border border-gray-200";
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className={dialogContentClass}>
+      <DialogContent className={`bg-white border border-gray-200 max-w-md mx-auto ${isMobile ? 'px-4 py-6 m-4' : ''}`}>
         <DialogHeader>
-          <DialogTitle className="text-gray-900">Share {event.title}</DialogTitle>
+          <DialogTitle className="text-gray-900 text-lg font-semibold">
+            Share {event.title}
+          </DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 pt-2">
           <ShareButtons 
             title={getShareTitle()}
             description={getShareDescription()}

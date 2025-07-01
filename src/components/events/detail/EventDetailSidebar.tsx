@@ -6,6 +6,8 @@ import { EventLocationSection } from '@/components/events/detail-sections/EventL
 import { EventAttendeesSummary } from '@/components/events/detail-sections/EventAttendeesSummary';
 import { EventExternalLink } from '@/components/events/detail-sections/EventExternalLink';
 import { EventTagsSection } from '@/components/events/detail-sections/EventTagsSection';
+import { EventOrganizerSection } from '@/components/events/detail-sections/EventOrganizerSection';
+import { EventBookingSection } from '@/components/events/detail-sections/EventBookingSection';
 
 interface EventDetailSidebarProps {
   event: Event;
@@ -43,6 +45,26 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
         />
       </div>
 
+      {/* Organizer Section */}
+      {event.organiser_name && (
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <EventOrganizerSection 
+            organizerName={event.organiser_name}
+            organizerLink={event.organizer_link}
+          />
+        </div>
+      )}
+
+      {/* Booking Information Section */}
+      {(event.fee || event.booking_link) && (
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <EventBookingSection 
+            fee={event.fee}
+            bookingLink={event.booking_link}
+          />
+        </div>
+      )}
+
       {/* Attendees Summary */}
       {isAuthenticated && attendees && (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -50,13 +72,6 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
             goingCount={attendees.going.length}
             interestedCount={attendees.interested.length}
           />
-        </div>
-      )}
-
-      {/* External Link */}
-      {event.organizer_link && (
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <EventExternalLink url={event.organizer_link} />
         </div>
       )}
 

@@ -1,6 +1,7 @@
 
 import { useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
+import { Tag } from 'lucide-react';
 
 interface EventTagsSectionProps {
   tags?: string[] | string | null;
@@ -18,10 +19,23 @@ export const EventTagsSection = ({ tags }: EventTagsSectionProps) => {
         return tags.filter(tag => !!tag);
       }
       
-      // If tags is a string, split by comma
+      // If tags is a string, try to parse it as JSON first (for cases like ["tag1", "tag2"])
       if (typeof tags === 'string') {
-        const tagsString: string = tags;
-        return tagsString.split(',').map(tag => tag.trim()).filter(Boolean);
+        // Check if it looks like a JSON array
+        if (tags.startsWith('[') && tags.endsWith(']')) {
+          try {
+            const parsed = JSON.parse(tags);
+            if (Array.isArray(parsed)) {
+              return parsed.filter(tag => !!tag);
+            }
+          } catch (e) {
+            // If JSON parsing fails, fall back to comma splitting
+            console.warn('Failed to parse tags as JSON, falling back to comma split:', e);
+          }
+        }
+        
+        // Split by comma as fallback
+        return tags.split(',').map(tag => tag.trim()).filter(Boolean);
       }
       
       // For any other types, log warning and return empty array
@@ -36,14 +50,17 @@ export const EventTagsSection = ({ tags }: EventTagsSectionProps) => {
   if (eventTags.length === 0) return null;
 
   return (
-    <div className="pt-2">
-      <h3 className="text-sm font-medium text-gray-500 mb-2">Tags</h3>
-      <div className="flex flex-wrap gap-2">
-        {eventTags.map((tag, index) => (
-          <Badge key={index} variant="secondary" className="text-xs">
-            {tag}
-          </Badge>
-        ))}
+    <div className="flex items-start space-x-2">
+      <Tag className="h-5 w-5 text-gray-500 mt-0.5" />
+      <div>
+        <p className="font-medium text-lg mb-2">Tags</p>
+        <div className="flex flex-wrap gap-2">
+          {eventTags.map((tag, index) => (
+            <Badge key={index} variant="secondary" className="text-sm">
+              {tag}
+            </Badge>
+          ))}
+        </div>
       </div>
     </div>
   );
