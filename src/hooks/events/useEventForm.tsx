@@ -31,11 +31,16 @@ export const useEventForm = (defaultValues?: Partial<EventFormData>) => {
   });
 
   const onSubmit = useCallback((data: EventFormData) => {
-    console.log('Form submitted:', data);
+    console.log('✅ useEventForm onSubmit called with data:', data);
   }, []);
 
   const onInvalid = useCallback((errors: any) => {
-    console.log('Form validation errors:', errors);
+    console.error('❌ Form validation errors in useEventForm:', errors);
+    console.error('❌ Detailed validation errors:', Object.entries(errors).map(([field, error]: [string, any]) => ({
+      field,
+      message: error?.message || 'Unknown error',
+      type: error?.type || 'unknown'
+    })));
   }, []);
 
   return {

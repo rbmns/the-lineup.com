@@ -19,23 +19,28 @@ export const useEventFormSubmission = () => {
   const navigate = useNavigate();
 
   const handleFormSubmit = async (data: EventFormData) => {
-    console.log('Event form submitted:', data);
+    console.log('🚀 Event form submitted in useEventFormSubmission:', data);
+    console.log('🔐 Current user state:', user ? `User ID: ${user.id}` : 'No user authenticated');
     
     if (!user) {
       // For unauthenticated users, process the form data and show auth modal
-      console.log('User not authenticated, processing form data and showing auth modal');
+      console.log('👤 User not authenticated, processing form data and showing auth modal');
       try {
+        console.log('📝 Processing form data for unauthenticated user...');
         const processedData = await processFormData(data, null); // Pass null for unauthenticated users
+        console.log('✅ Form data processed successfully:', processedData);
         setPendingEventData(processedData);
+        console.log('🔑 Showing auth modal...');
         setShowAuthModal(true);
       } catch (error) {
-        console.error('Error processing form data:', error);
+        console.error('❌ Error processing form data:', error);
         toast.error('Failed to process event data. Please try again.');
       }
       return;
     }
 
     // For authenticated users, create the event immediately
+    console.log('✅ User authenticated, creating event immediately...');
     await createEventWithAuth(data, user.id);
   };
 

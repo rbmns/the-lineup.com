@@ -2,8 +2,10 @@
 import { EventFormData } from './EventFormSchema';
 
 export const processFormData = async (data: EventFormData, userId: string | null) => {
-  console.log('Processing form data for user:', userId);
-  console.log('Raw form data:', data);
+  console.log('🔄 Processing form data for user:', userId);
+  console.log('📋 Raw form data:', data);
+  console.log('📅 Start date:', data.startDate, 'Start time:', data.startTime);
+  console.log('📍 Location data:', { venueName: data.venueName, address: data.address, city: data.city, postalCode: data.postalCode });
   
   // Convert date and time to datetime
   const startDateTime = data.startDate && data.startTime 

@@ -120,15 +120,25 @@ export const fetchEventAttendees = async (eventId: string) => {
 
 export const createEvent = async (eventData: any) => {
   try {
-    console.log('createEvent: Creating event with data:', eventData);
+    console.log('🏗️ createEvent: Creating event with data:', eventData);
+    console.log('🔍 createEvent: Data types check:', {
+      title: typeof eventData.title,
+      start_datetime: typeof eventData.start_datetime,
+      creator: typeof eventData.creator,
+      venue_name: typeof eventData.venue_name,
+      address: typeof eventData.address,
+      postal_code: typeof eventData.postal_code
+    });
     
     // Clean up the data by removing any undefined or null fields that shouldn't be there
     const cleanedData = Object.fromEntries(
       Object.entries(eventData).filter(([_, value]) => value !== undefined)
     );
     
-    console.log('createEvent: Cleaned event data:', cleanedData);
+    console.log('✨ createEvent: Cleaned event data:', cleanedData);
+    console.log('📊 createEvent: Cleaned data field count:', Object.keys(cleanedData).length);
     
+    console.log('🔄 createEvent: Attempting to insert into database...');
     const { data, error } = await supabase
       .from('events')
       .insert([cleanedData])
@@ -136,17 +146,19 @@ export const createEvent = async (eventData: any) => {
       .single();
 
     if (error) {
-      console.error('createEvent: Error creating event:', error);
-      console.error('createEvent: Error details:', {
+      console.error('❌ createEvent: Error creating event:', error);
+      console.error('❌ createEvent: Error details:', {
         message: error.message,
         details: error.details,
         hint: error.hint,
         code: error.code
       });
+      console.error('❌ createEvent: Data that failed to insert:', cleanedData);
       return { data: null, error };
     }
 
-    console.log('createEvent: Event created successfully:', data);
+    console.log('✅ createEvent: Event created successfully:', data);
+    console.log('🎉 createEvent: Created event ID:', data?.id);
     return { data, error: null };
   } catch (error) {
     console.error('createEvent: Unexpected error:', error);

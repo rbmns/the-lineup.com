@@ -12,12 +12,19 @@ export const EventFormActions: React.FC<EventFormActionsProps> = ({
   isSubmitting,
   isEditMode = false
 }) => {
+  const handleClick = () => {
+    console.log('🔥 Event form submit button clicked!');
+    console.log('🔄 isSubmitting state:', isSubmitting);
+    console.log('✏️ isEditMode:', isEditMode);
+  };
+
   return (
     <div className="flex justify-end pt-6">
       <Button 
         type="submit" 
         disabled={isSubmitting}
         className="min-w-[140px]"
+        onClick={handleClick}
       >
         {isSubmitting ? (
           <>

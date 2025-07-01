@@ -162,14 +162,14 @@ export const LocationFields: React.FC = () => {
         )}
       </div>
 
-      {/* Address - Now Required */}
+      {/* Address */}
       <FormField
         control={form.control}
         name="address"
         render={({ field }) => (
           <FormItem>
             <FormLabel className={isMobile ? "text-sm" : undefined}>
-              Address *
+              Address
             </FormLabel>
             <FormControl>
               <Input
@@ -222,7 +222,7 @@ export const LocationFields: React.FC = () => {
           render={({ field }) => (
             <FormItem>
               <FormLabel className={isMobile ? "text-sm" : undefined}>
-                Postal Code *
+                Postal Code
               </FormLabel>
               <FormControl>
                 <Input
