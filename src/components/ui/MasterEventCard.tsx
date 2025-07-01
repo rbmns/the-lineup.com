@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin } from 'lucide-react';
@@ -5,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { useEventImages } from '@/hooks/useEventImages';
 import { toast } from '@/hooks/use-toast';
-import { formatEventDateForCard, formatEventTime, formatEventTimeRange } from '@/utils/timezone-utils';
+import { formatEventDateForCard, formatEventTimeRange } from '@/utils/timezone-utils';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface MasterEventCardProps {
@@ -81,29 +82,32 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
     return 'Location TBD';
   };
 
-  // Format date and time for cards using timestampz fields
+  // Format date and time using the new datetime fields
   const getFormattedDateTime = (): { date: string; time: string } => {
     const eventTimezone = event.timezone || 'Europe/Amsterdam';
     
-    // Use start_datetime if available, fallback to old fields for backward compatibility
+    console.log('MasterEventCard formatting datetime:', {
+      eventId: event.id,
+      start_datetime: event.start_datetime,
+      end_datetime: event.end_datetime,
+      timezone: eventTimezone
+    });
+    
+    // Use start_datetime as primary source
     if (event.start_datetime) {
-      const date = formatEventDateForCard(event.start_datetime, eventTimezone);
-      const time = formatEventTimeRange(event.start_datetime, event.end_datetime, eventTimezone);
-      
-      return { date, time };
+      try {
+        const date = formatEventDateForCard(event.start_datetime, eventTimezone);
+        const time = formatEventTimeRange(event.start_datetime, event.end_datetime, eventTimezone);
+        
+        console.log('MasterEventCard formatted result:', { date, time });
+        return { date, time };
+      } catch (error) {
+        console.error('Error formatting datetime:', error);
+        return { date: 'Date TBD', time: 'Time TBD' };
+      }
     }
     
-    // Fallback to old fields if timestampz not available
-    if (event.start_date) {
-      const startDateTime = `${event.start_date}T${event.start_time || '00:00:00'}`;
-      const endDateTime = event.end_date ? `${event.end_date}T${event.end_time || '23:59:59'}` : null;
-      
-      const date = formatEventDateForCard(startDateTime, eventTimezone);
-      const time = formatEventTimeRange(startDateTime, endDateTime, eventTimezone);
-      
-      return { date, time };
-    }
-    
+    console.log('MasterEventCard: No start_datetime found');
     return { date: 'Date TBD', time: 'Time TBD' };
   };
 

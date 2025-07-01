@@ -107,24 +107,28 @@ const EventCardList: React.FC<EventCardListProps> = ({
   const getFormattedDateTime = (): { date: string; time: string } => {
     const eventTimezone = event.timezone || 'Europe/Amsterdam';
     
-    // Use start_datetime if available
+    console.log('EventCardList formatting datetime:', {
+      eventId: event.id,
+      start_datetime: event.start_datetime,
+      end_datetime: event.end_datetime,
+      timezone: eventTimezone
+    });
+    
+    // Use start_datetime as primary source
     if (event.start_datetime) {
-      const date = formatEventDateForCard(event.start_datetime, eventTimezone);
-      const time = formatEventTimeRange(event.start_datetime, event.end_datetime, eventTimezone);
-      return { date, time };
+      try {
+        const date = formatEventDateForCard(event.start_datetime, eventTimezone);
+        const time = formatEventTimeRange(event.start_datetime, event.end_datetime, eventTimezone);
+        
+        console.log('EventCardList formatted result:', { date, time });
+        return { date, time };
+      } catch (error) {
+        console.error('Error formatting datetime in EventCardList:', error);
+        return { date: 'Date TBD', time: 'Time TBD' };
+      }
     }
     
-    // Fallback to old fields if available
-    if (event.start_date) {
-      const startDateTime = `${event.start_date}T${event.start_time || '00:00:00'}`;
-      const endDateTime = event.end_date ? `${event.end_date}T${event.end_time || '23:59:59'}` : null;
-      
-      const date = formatEventDateForCard(startDateTime, eventTimezone);
-      const time = formatEventTimeRange(startDateTime, endDateTime, eventTimezone);
-      
-      return { date, time };
-    }
-    
+    console.log('EventCardList: No start_datetime found');
     return { date: 'Date TBD', time: 'Time TBD' };
   };
 
