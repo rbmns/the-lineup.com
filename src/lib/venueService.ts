@@ -13,14 +13,19 @@ export const createVenue = async (venueData: CreateVenueFormValues): Promise<{ d
     
     // Get current user (might be null for unauthenticated users)
     const { data: { user } } = await supabase.auth.getUser();
+    console.log('Current user:', user ? user.id : 'null (unauthenticated)');
     
     // Auto-detect country if city is provided
     let country = null;
     if (venueData.city) {
-      country = await TimezoneService.getCountryForCity(venueData.city);
+      try {
+        country = await TimezoneService.getCountryForCity(venueData.city);
+      } catch (error) {
+        console.warn('Could not detect country for city:', venueData.city, error);
+      }
     }
     
-    // Create venue data - use the current user's ID as creator_id if authenticated, null if not
+    // Create venue data - explicitly set creator_id to null for unauthenticated users
     const dataToInsert = {
       name: venueData.name,
       street: venueData.street || null,
@@ -29,12 +34,12 @@ export const createVenue = async (venueData: CreateVenueFormValues): Promise<{ d
       website: venueData.website || null,
       google_maps: venueData.google_maps || null,
       country: country,
-      creator_id: user?.id || null // This will be null for unauthenticated users
+      creator_id: user?.id || null // Explicitly null for unauthenticated users
     };
 
     console.log('Data to insert:', dataToInsert);
 
-    // First create the venue
+    // Create the venue
     const { data, error } = await supabase
       .from('venues')
       .insert(dataToInsert)
@@ -48,7 +53,7 @@ export const createVenue = async (venueData: CreateVenueFormValues): Promise<{ d
 
     console.log('Venue created successfully:', data);
 
-    // If venue was created successfully and has a city, categorize it
+    // If venue was created successfully and has a city, try to categorize it
     if (data && venueData.city) {
       try {
         const areaId = await LocationService.categorizeVenueToArea(venueData.city);

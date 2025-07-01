@@ -54,20 +54,36 @@ export const CreateVenueModal: React.FC<CreateVenueModalProps> = ({ open, onOpen
         toast.success(`Venue "${savedVenue.name}" updated successfully!`);
       } else {
         // Creating can be done without authentication
-        console.log("Creating new venue");
-        const venueData = { 
-          ...formData, 
-          creator_id: user?.id || null // Can be null for non-authenticated users
-        };
-        const { data: newVenue, error } = await createVenue(venueData);
+        console.log("Creating new venue", user ? "as authenticated user" : "as unauthenticated user");
+        const { data: newVenue, error } = await createVenue(formData);
         
         if (error) {
           console.error("Error creating venue:", error);
-          throw error;
+          
+          // More specific error handling
+          let errorMessage = "Failed to create venue. Please try again.";
+          
+          if (error?.code === '23505') {
+            if (error?.message?.includes('venues_name_key')) {
+              errorMessage = "A venue with this name already exists. Please use a different name.";
+            } else {
+              errorMessage = "This venue already exists. Please check if it's already in the list.";
+            }
+          } else if (error?.code === '42501') {
+            errorMessage = "Permission denied. Please try again or contact support.";
+          } else if (error?.message?.includes('violates row-level security')) {
+            errorMessage = "There was a security issue creating the venue. Please try again.";
+          } else if (error?.message) {
+            errorMessage = `Error: ${error.message}`;
+          }
+          
+          toast.error(errorMessage);
+          return;
         }
         
         if (!newVenue) {
-          throw new Error("No venue data returned from creation");
+          toast.error("No venue data returned. Please try again.");
+          return;
         }
         
         savedVenue = newVenue;
