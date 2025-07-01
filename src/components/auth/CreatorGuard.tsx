@@ -4,7 +4,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useCreatorStatus } from '@/hooks/useCreatorStatus';
 
 interface CreatorGuardProps {
   children: React.ReactNode;
@@ -13,13 +12,10 @@ interface CreatorGuardProps {
 export const CreatorGuard: React.FC<CreatorGuardProps> = ({ children }) => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const { canCreateEvents, creatorRequestStatus, isLoading: isCreatorStatusLoading } = useCreatorStatus();
-
-  const hasPermission = canCreateEvents || creatorRequestStatus === 'approved';
 
   useEffect(() => {
-    if (authLoading || isCreatorStatusLoading) {
-      return; // Wait until all loading is done
+    if (authLoading) {
+      return; // Wait until authentication loading is done
     }
 
     if (!user) {
@@ -28,17 +24,11 @@ export const CreatorGuard: React.FC<CreatorGuardProps> = ({ children }) => {
       return;
     }
 
-    if (!hasPermission) {
-      if (creatorRequestStatus === 'pending') {
-        toast.info("Your creator request is pending approval.");
-      } else {
-        toast.error("You don't have permission to create events.");
-      }
-      navigate('/profile', { replace: true });
-    }
-  }, [user, authLoading, navigate, hasPermission, isCreatorStatusLoading, creatorRequestStatus]);
+    // Allow any authenticated user to create events
+    // The database RLS policies will handle the security
+  }, [user, authLoading, navigate]);
 
-  if (authLoading || isCreatorStatusLoading) {
+  if (authLoading) {
     return (
         <div className="container mx-auto px-4 py-8 max-w-4xl">
             <div className="space-y-4">
@@ -55,7 +45,7 @@ export const CreatorGuard: React.FC<CreatorGuardProps> = ({ children }) => {
     );
   }
 
-  if (!hasPermission) {
+  if (!user) {
     return null; // Render nothing while redirecting
   }
 

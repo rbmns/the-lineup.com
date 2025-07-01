@@ -35,7 +35,9 @@ export const useCreatorStatus = () => {
   const isAdmin = roles?.includes('admin') || false;
   const isCreator = roles?.includes('event_creator') || false;
 
-  const canCreateEvents = isCreator || isAdmin;
+  // Allow any authenticated user to create events
+  // The database RLS policies handle the actual security
+  const canCreateEvents = !!user;
   const creatorRequestStatus = requestStatusData?.status || 'not_requested';
   
   return {
