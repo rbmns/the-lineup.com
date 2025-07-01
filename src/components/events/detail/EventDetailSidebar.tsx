@@ -36,23 +36,28 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
 
       {/* Location Section */}
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-        <EventLocationSection event={event} />
+        <EventLocationSection 
+          venue={event.venues}
+          location={event.location}
+          coordinates={event.coordinates ? { latitude: event.coordinates[0], longitude: event.coordinates[1] } : null}
+          title={event.title}
+        />
       </div>
 
       {/* Attendees Summary */}
       {isAuthenticated && attendees && (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <EventAttendeesSummary
-            attendees={attendees}
-            eventId={event.id}
+            goingCount={attendees.going.length}
+            interestedCount={attendees.interested.length}
           />
         </div>
       )}
 
       {/* External Link */}
-      {event.external_link && (
+      {event.organizer_link && (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <EventExternalLink url={event.external_link} />
+          <EventExternalLink url={event.organizer_link} />
         </div>
       )}
 
