@@ -8,7 +8,7 @@ import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { useEventImages } from '@/hooks/useEventImages';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { toast } from '@/hooks/use-toast';
-import { formatEventCardDateTime } from '@/utils/timezone-utils';
+import { formatEventDateForCard, formatEventTimeRange } from '@/utils/timezone-utils';
 import { LineupImage } from '@/components/ui/lineup-image';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';
@@ -103,6 +103,33 @@ const EventCardList: React.FC<EventCardListProps> = ({
     return 'Location TBD';
   };
 
+  // Format date and time using new datetime fields
+  const getFormattedDateTime = (): { date: string; time: string } => {
+    const eventTimezone = event.timezone || 'Europe/Amsterdam';
+    
+    // Use start_datetime if available
+    if (event.start_datetime) {
+      const date = formatEventDateForCard(event.start_datetime, eventTimezone);
+      const time = formatEventTimeRange(event.start_datetime, event.end_datetime, eventTimezone);
+      return { date, time };
+    }
+    
+    // Fallback to old fields if available
+    if (event.start_date) {
+      const startDateTime = `${event.start_date}T${event.start_time || '00:00:00'}`;
+      const endDateTime = event.end_date ? `${event.end_date}T${event.end_time || '23:59:59'}` : null;
+      
+      const date = formatEventDateForCard(startDateTime, eventTimezone);
+      const time = formatEventTimeRange(startDateTime, endDateTime, eventTimezone);
+      
+      return { date, time };
+    }
+    
+    return { date: 'Date TBD', time: 'Time TBD' };
+  };
+
+  const { date, time } = getFormattedDateTime();
+
   return (
     <div className={cn("w-full px-3 sm:px-4 lg:px-6", className)}>
       <Card 
@@ -160,13 +187,19 @@ const EventCardList: React.FC<EventCardListProps> = ({
             {event.title}
           </h3>
             
-          {/* Date and Time */}
+          {/* Date */}
           <div className="flex items-center gap-2 text-xs sm:text-sm text-[#005F73]/80">
             <Calendar className="h-4 w-4 text-[#2A9D8F] flex-shrink-0" />
-            <span className="font-medium">
-              {formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}
-            </span>
+            <span className="font-medium">{date}</span>
           </div>
+
+          {/* Time */}
+          {time && (
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-[#005F73]/80">
+              <Calendar className="h-4 w-4 text-[#2A9D8F] flex-shrink-0" />
+              <span className="font-medium">{time}</span>
+            </div>
+          )}
           
           {/* Bottom row with location and RSVP buttons */}
           <div className="flex items-center justify-between gap-3">

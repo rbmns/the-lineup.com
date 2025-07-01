@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { CalendarIcon, MapPin } from 'lucide-react';
-import { formatEventDateForCard, formatEventTime } from '@/utils/timezone-utils';
+import { formatEventDateForCard, formatEventTimeRange } from '@/utils/timezone-utils';
 import { cn } from '@/lib/utils';
 
 interface EventCardMetaProps {
@@ -35,39 +35,10 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
         return { date: 'Date TBD', time: 'Time TBD' };
       }
       
-      const startDate = new Date(event.start_datetime);
-      const endDate = event.end_datetime ? new Date(event.end_datetime) : null;
+      const date = formatEventDateForCard(event.start_datetime, eventTimezone);
+      const time = formatEventTimeRange(event.start_datetime, event.end_datetime, eventTimezone);
       
-      // Check if it's a multi-day event
-      const isMultiDay = endDate && 
-        startDate.toDateString() !== endDate.toDateString();
-      
-      let dateDisplay = '';
-      let timeDisplay = '';
-      
-      if (isMultiDay) {
-        // Multi-day event: show date range
-        const startFormatted = formatEventDateForCard(event.start_datetime, eventTimezone);
-        const endFormatted = formatEventDateForCard(event.end_datetime, eventTimezone);
-        dateDisplay = `${startFormatted} - ${endFormatted}`;
-        
-        // Show start time
-        timeDisplay = formatEventTime(event.start_datetime, eventTimezone);
-      } else {
-        // Single day event
-        dateDisplay = formatEventDateForCard(event.start_datetime, eventTimezone);
-        
-        // Show time range
-        const startTime = formatEventTime(event.start_datetime, eventTimezone);
-        if (endDate) {
-          const endTime = formatEventTime(event.end_datetime, eventTimezone);
-          timeDisplay = `${startTime} - ${endTime}`;
-        } else {
-          timeDisplay = startTime;
-        }
-      }
-      
-      return { date: dateDisplay, time: timeDisplay };
+      return { date, time };
     } catch (error) {
       console.error('Error formatting event display:', error);
       return { date: 'Date TBD', time: 'Time TBD' };

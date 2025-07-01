@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { useEventImages } from '@/hooks/useEventImages';
 import { toast } from '@/hooks/use-toast';
-import { formatEventCardDateTime } from '@/utils/timezone-utils';
+import { formatEventDateForCard, formatEventTime, formatEventTimeRange } from '@/utils/timezone-utils';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface MasterEventCardProps {
@@ -82,54 +82,32 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
   };
 
   // Format date and time for cards using timestampz fields
-  const getFormattedDateTime = (): string => {
-    // Debug logging for this specific event
-    if (event.id === '22600fd1-ff27-4653-a39a-4def487d4145') {
-      console.log(`[DEBUG EVENT ${event.id}] - Event data:`, {
-        start_datetime: event.start_datetime,
-        end_datetime: event.end_datetime,
-        start_date: event.start_date,
-        start_time: event.start_time,
-        end_date: event.end_date,
-        end_time: event.end_time,
-        timezone: event.timezone
-      });
-    }
+  const getFormattedDateTime = (): { date: string; time: string } => {
+    const eventTimezone = event.timezone || 'Europe/Amsterdam';
     
     // Use start_datetime if available, fallback to old fields for backward compatibility
     if (event.start_datetime) {
-      const eventTimezone = event.timezone || 'Europe/Amsterdam';
-      const result = formatEventCardDateTime(
-        event.start_datetime,
-        event.end_datetime,
-        eventTimezone
-      );
+      const date = formatEventDateForCard(event.start_datetime, eventTimezone);
+      const time = formatEventTimeRange(event.start_datetime, event.end_datetime, eventTimezone);
       
-      if (event.id === '22600fd1-ff27-4653-a39a-4def487d4145') {
-        console.log(`[DEBUG EVENT ${event.id}] - Using start_datetime: ${event.start_datetime}, timezone: ${eventTimezone}, result: ${result}`);
-      }
-      
-      return result;
+      return { date, time };
     }
     
     // Fallback to old fields if timestampz not available
     if (event.start_date) {
-      const eventTimezone = event.timezone || 'Europe/Amsterdam';
-      const result = formatEventCardDateTime(
-        `${event.start_date}T${event.start_time || '00:00:00'}`,
-        event.end_date ? `${event.end_date}T${event.end_time || '23:59:59'}` : null,
-        eventTimezone
-      );
+      const startDateTime = `${event.start_date}T${event.start_time || '00:00:00'}`;
+      const endDateTime = event.end_date ? `${event.end_date}T${event.end_time || '23:59:59'}` : null;
       
-      if (event.id === '22600fd1-ff27-4653-a39a-4def487d4145') {
-        console.log(`[DEBUG EVENT ${event.id}] - Using legacy fields: ${event.start_date}T${event.start_time}, timezone: ${eventTimezone}, result: ${result}`);
-      }
+      const date = formatEventDateForCard(startDateTime, eventTimezone);
+      const time = formatEventTimeRange(startDateTime, endDateTime, eventTimezone);
       
-      return result;
+      return { date, time };
     }
     
-    return '';
+    return { date: 'Date TBD', time: 'Time TBD' };
   };
+
+  const { date, time } = getFormattedDateTime();
 
   return (
     <div 
@@ -144,7 +122,7 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
       data-event-id={event.id}
     >
       {/* Image Container - Fixed height for uniformity */}
-      <div className="w-full overflow-hidden mb-4 rounded-t-md h-40 md:h-48">
+      <div className="relative w-full overflow-hidden mb-4 rounded-t-md h-40 md:h-48">
         <img
           src={imageUrl}
           alt={event.title}
@@ -181,13 +159,19 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
           </p>
         )}
         
-        {/* Date & Time - Use JetBrains Mono */}
-        <div className="text-sm text-graphite-grey opacity-75 font-mono mb-3 flex items-center gap-2">
+        {/* Date - Use JetBrains Mono */}
+        <div className="text-sm text-graphite-grey opacity-75 font-mono mb-2 flex items-center gap-2">
           <Calendar className="h-4 w-4 text-ocean-teal flex-shrink-0" />
-          <span>
-            {getFormattedDateTime()}
-          </span>
+          <span>{date}</span>
         </div>
+
+        {/* Time - Use JetBrains Mono */}
+        {time && (
+          <div className="text-sm text-graphite-grey opacity-75 font-mono mb-3 flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-ocean-teal flex-shrink-0" />
+            <span>{time}</span>
+          </div>
+        )}
         
         {/* Location - Use JetBrains Mono */}
         <div className="text-sm text-graphite-grey font-mono flex items-center mb-4 hover:underline hover:text-ocean-teal">
