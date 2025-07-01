@@ -15,10 +15,7 @@ export const useUserCreatedEvents = () => {
 
       const { data, error } = await supabase
         .from('events')
-        .select(`
-          *,
-          venues:venue_id(*)
-        `)
+        .select('*')
         .eq('creator', user.id)
         .order('start_datetime', { ascending: true });
 
