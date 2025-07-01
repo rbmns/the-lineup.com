@@ -26,13 +26,13 @@ export const EventFormModals: React.FC<EventFormModalsProps> = ({
     <>
       <PrePublishAuthModal
         open={showAuthModal}
-        onOpenChange={onAuthModalClose}
-        onAuthSuccess={onAuthSuccess}
+        onClose={onAuthModalClose}
+        onSuccess={onAuthSuccess}
       />
 
       <EventPublishedModal
         open={showSuccessModal}
-        onOpenChange={onSuccessModalClose}
+        onClose={onSuccessModalClose}
         eventId={createdEventId}
         eventTitle={createdEventTitle}
       />
