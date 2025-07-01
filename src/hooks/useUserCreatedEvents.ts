@@ -20,7 +20,7 @@ export const useUserCreatedEvents = () => {
           venues:venue_id(*)
         `)
         .eq('creator', user.id)
-        .order('start_date', { ascending: true });
+        .order('start_datetime', { ascending: true });
 
       if (error) {
         throw new Error(error.message);
@@ -34,13 +34,13 @@ export const useUserCreatedEvents = () => {
       const now = new Date();
       now.setHours(0, 0, 0, 0); // Compare with start of day
 
-      const upcomingEvents = events.filter(event => new Date(event.start_date) >= now);
-      const pastEvents = events.filter(event => new Date(event.start_date) < now);
+      const upcomingEvents = events.filter(event => new Date(event.start_datetime) >= now);
+      const pastEvents = events.filter(event => new Date(event.start_datetime) < now);
       
-      // Upcoming events are already sorted ascending by start_date from the query.
+      // Upcoming events are already sorted ascending by start_datetime from the query.
       
-      // Sort past events by start_date descending (most recent first)
-      pastEvents.sort((a, b) => new Date(b.start_date).getTime() - new Date(a.start_date).getTime());
+      // Sort past events by start_datetime descending (most recent first)
+      pastEvents.sort((a, b) => new Date(b.start_datetime).getTime() - new Date(a.start_datetime).getTime());
 
       return [...upcomingEvents, ...pastEvents];
     },

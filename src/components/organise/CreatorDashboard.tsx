@@ -21,13 +21,6 @@ export const CreatorDashboard: React.FC = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Event Dashboard</h1>
         <p className="text-gray-600">Create and manage your events</p>
-        {!isAuthenticated && (
-          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-blue-800 text-sm">
-              You can create events without signing up, but you'll need to sign in to publish them.
-            </p>
-          </div>
-        )}
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
@@ -89,14 +82,6 @@ export const CreatorDashboard: React.FC = () => {
                 Create New Event
               </Link>
             </Button>
-            {isAuthenticated && (
-              <Button asChild variant="outline" className="w-full justify-start">
-                <Link to="/profile?tab=created">
-                  <Calendar className="mr-2 h-4 w-4" />
-                  View My Events
-                </Link>
-              </Button>
-            )}
           </CardContent>
         </Card>
 
