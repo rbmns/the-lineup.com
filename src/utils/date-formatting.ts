@@ -1,4 +1,5 @@
 
+
 // Re-export the new timezone-aware functions
 export { 
   formatEventDate,
@@ -11,6 +12,9 @@ export {
 
 // Set timezone constant for Amsterdam/Netherlands (kept for backward compatibility)
 export const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
+
+// Import the functions we need to use internally
+import { formatEventDate, formatEventTime } from './timezone-utils';
 
 /**
  * Helper to format event date in a consistent way - now timezone-aware
@@ -99,3 +103,4 @@ export const formatMultiDayRange = (startDate: string, endDate: string, timezone
     return '';
   }
 };
+
