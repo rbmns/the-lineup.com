@@ -1,14 +1,9 @@
 
 import React from 'react';
-import { CreateVenueModal } from '@/components/venues/CreateVenueModal';
 import { PrePublishAuthModal } from './PrePublishAuthModal';
 import { EventPublishedModal } from './EventPublishedModal';
-import { Venue } from '@/types';
 
 interface EventFormModalsProps {
-  isCreateVenueModalOpen: boolean;
-  setCreateVenueModalOpen: (open: boolean) => void;
-  onVenueCreated: (venue: Venue) => void;
   showAuthModal: boolean;
   onAuthModalClose: () => void;
   onAuthSuccess: () => void;
@@ -19,36 +14,27 @@ interface EventFormModalsProps {
 }
 
 export const EventFormModals: React.FC<EventFormModalsProps> = ({
-  isCreateVenueModalOpen,
-  setCreateVenueModalOpen,
-  onVenueCreated,
   showAuthModal,
   onAuthModalClose,
   onAuthSuccess,
   showSuccessModal,
   onSuccessModalClose,
   createdEventId,
-  createdEventTitle
+  createdEventTitle,
 }) => {
   return (
     <>
-      <CreateVenueModal 
-        open={isCreateVenueModalOpen} 
-        onOpenChange={setCreateVenueModalOpen} 
-        onComplete={onVenueCreated} 
+      <PrePublishAuthModal
+        open={showAuthModal}
+        onOpenChange={onAuthModalClose}
+        onAuthSuccess={onAuthSuccess}
       />
 
-      <PrePublishAuthModal 
-        open={showAuthModal} 
-        onClose={onAuthModalClose} 
-        onSuccess={onAuthSuccess} 
-      />
-
-      <EventPublishedModal 
-        open={showSuccessModal} 
-        onClose={onSuccessModalClose} 
-        eventId={createdEventId} 
-        eventTitle={createdEventTitle} 
+      <EventPublishedModal
+        open={showSuccessModal}
+        onOpenChange={onSuccessModalClose}
+        eventId={createdEventId}
+        eventTitle={createdEventTitle}
       />
     </>
   );

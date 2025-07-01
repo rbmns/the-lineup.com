@@ -6,7 +6,7 @@ import { EventFormModals } from './EventFormModals';
 import { TitleField } from './form-sections/TitleField';
 import { DescriptionField } from './form-sections/DescriptionField';
 import { DateTimeFields } from './form-sections/DateTimeFields';
-import { VenueField } from './form-sections/VenueField';
+import { LocationFields } from './form-sections/LocationFields';
 import { CategoryToggleField } from './form-sections/CategoryToggleField';
 import { VibeToggleField } from './form-sections/VibeToggleField';
 import { OptionalFieldsSection } from './form-sections/OptionalFieldsSection';
@@ -31,13 +31,8 @@ export const EventForm: React.FC<EventFormProps> = ({
   
   const {
     form,
-    venues,
     vibes,
     isSubmitting,
-    isLoadingVenues,
-    isCreateVenueModalOpen,
-    setCreateVenueModalOpen,
-    handleVenueCreated,
     onSubmit,
     onInvalid
   } = useEventForm();
@@ -104,11 +99,7 @@ export const EventForm: React.FC<EventFormProps> = ({
               )}>Location & Details</h2>
             </div>
             <div className="space-y-4">
-              <VenueField 
-                venues={venues} 
-                isLoadingVenues={isLoadingVenues} 
-                onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)} 
-              />
+              <LocationFields />
               <div className={cn(
                 "grid gap-4",
                 isMobile ? "grid-cols-1" : "grid-cols-2"
@@ -138,9 +129,6 @@ export const EventForm: React.FC<EventFormProps> = ({
       </Form>
 
       <EventFormModals
-        isCreateVenueModalOpen={isCreateVenueModalOpen}
-        setCreateVenueModalOpen={setCreateVenueModalOpen}
-        onVenueCreated={handleVenueCreated}
         showAuthModal={showAuthModal}
         onAuthModalClose={handleAuthModalClose}
         onAuthSuccess={handleAuthSuccess}
