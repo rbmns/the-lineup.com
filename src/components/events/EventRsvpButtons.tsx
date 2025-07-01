@@ -82,6 +82,10 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         // Rollback optimistic update on failure
         console.log('RSVP failed, rolling back optimistic update');
         setOptimisticStatus(oldStatus);
+      } else {
+        // On success, keep the optimistic state in sync with the successful result
+        // The parent handler should have updated the global cache, so we keep our local state
+        console.log(`RSVP success: keeping optimistic state ${newOptimisticStatus}`);
       }
       
       return result;

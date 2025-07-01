@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchEventById } from '@/lib/eventService';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -27,6 +27,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
   const eventId = propEventId || paramId;
   const { user, isAuthenticated } = useAuth();
   const { handleRsvp, loadingEventId } = useUnifiedRsvp();
+  const queryClient = useQueryClient();
 
   console.log('EventDetail - eventId:', eventId, 'user:', user?.id);
 
@@ -80,6 +81,27 @@ const EventDetail: React.FC<EventDetailProps> = ({
     console.log(`RSVP button clicked: ${status} for event ${eventId}, current status: ${event?.rsvp_status}`);
     const result = await handleRsvp(eventId, status);
     console.log(`RSVP operation result: ${result}`);
+    
+    // If successful, invalidate relevant caches to ensure fresh data
+    if (result) {
+      console.log('RSVP success, invalidating caches');
+      
+      // Invalidate the specific event cache
+      queryClient.invalidateQueries({ 
+        queryKey: ['event', eventId] 
+      });
+      
+      // Also invalidate event attendees cache
+      queryClient.invalidateQueries({ 
+        queryKey: ['event-attendees', eventId] 
+      });
+      
+      // Invalidate events list caches to ensure consistency across pages
+      queryClient.invalidateQueries({ 
+        queryKey: ['events'] 
+      });
+    }
+    
     return result;
   };
 
