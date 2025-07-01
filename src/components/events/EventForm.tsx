@@ -61,23 +61,23 @@ export const EventForm: React.FC<EventFormProps> = ({
   return (
     <div className={cn(
       "w-full max-w-4xl mx-auto",
-      isMobile ? "px-4 py-6" : "px-6 py-8"
+      isMobile ? "px-2 py-4" : "px-6 py-8"
     )}>
       <Form {...form}>
-        <form onSubmit={handleSubmit(handleFormSubmit, onInvalid)} className="space-y-6">
+        <form onSubmit={handleSubmit(handleFormSubmit, onInvalid)} className="space-y-4">
           {/* Basic Information Section */}
           <div className={cn(
             "bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 rounded-lg border border-ocean-teal/20",
-            isMobile ? "p-4" : "p-6"
+            isMobile ? "p-3" : "p-6"
           )}>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-3 h-3 bg-ocean-teal rounded-full"></div>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-2 h-2 bg-ocean-teal rounded-full"></div>
               <h2 className={cn(
                 "font-semibold text-ocean-teal",
-                isMobile ? "text-lg" : "text-xl"
-              )}>Basic Information</h2>
+                isMobile ? "text-base" : "text-xl"
+              )}>Event Details</h2>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3">
               <TitleField />
               <DescriptionField />
             </div>
@@ -89,19 +89,19 @@ export const EventForm: React.FC<EventFormProps> = ({
           {/* Location & Details Section */}
           <div className={cn(
             "bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 rounded-lg border border-ocean-teal/20",
-            isMobile ? "p-4" : "p-6"
+            isMobile ? "p-3" : "p-6"
           )}>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-3 h-3 bg-ocean-teal rounded-full"></div>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-2 h-2 bg-ocean-teal rounded-full"></div>
               <h2 className={cn(
                 "font-semibold text-ocean-teal",
-                isMobile ? "text-lg" : "text-xl"
+                isMobile ? "text-base" : "text-xl"
               )}>Location & Details</h2>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3">
               <LocationFields />
               <div className={cn(
-                "grid gap-4",
+                "grid gap-3",
                 isMobile ? "grid-cols-1" : "grid-cols-2"
               )}>
                 <CategoryToggleField />
@@ -117,8 +117,8 @@ export const EventForm: React.FC<EventFormProps> = ({
 
           {/* Submit Button */}
           <div className={cn(
-            "sticky bottom-0 bg-white/95 backdrop-blur-sm border-t pt-4 -mx-4 px-4",
-            isMobile ? "pb-safe" : "pb-4"
+            "sticky bottom-0 bg-white/95 backdrop-blur-sm border-t pt-3 -mx-2 px-2",
+            isMobile ? "pb-4" : "pb-4"
           )}>
             <EventFormActions 
               isSubmitting={isCreating} 
