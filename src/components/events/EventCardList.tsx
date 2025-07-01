@@ -8,7 +8,7 @@ import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
 import { useEventImages } from '@/hooks/useEventImages';
 import { CategoryPill } from '@/components/ui/category-pill';
 import { toast } from '@/hooks/use-toast';
-import { formatEventCardDateTime } from '@/utils/date-formatting';
+import { formatEventCardDateTime } from '@/utils/timezone-utils';
 import { LineupImage } from '@/components/ui/lineup-image';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card } from '@/components/ui/card';

@@ -48,3 +48,6 @@ export function formatTime(timeString: string): string {
     return timeString;
   }
 }
+
+// Add missing constants
+export const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
