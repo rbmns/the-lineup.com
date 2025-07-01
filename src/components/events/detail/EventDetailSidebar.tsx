@@ -29,6 +29,8 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
           startTime={event.start_time}
           endTime={event.end_time}
           startDate={event.start_date}
+          startDateTime={event.start_datetime}
+          endDateTime={event.end_datetime}
           timezone={event.timezone}
           city={event.venues?.city}
         />
