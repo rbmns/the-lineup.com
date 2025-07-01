@@ -49,6 +49,22 @@ export const formatTime = (timeString: string, dateString?: string, timezone: st
 };
 
 /**
+ * Format date for featured/preview cards
+ */
+export const formatFeaturedDate = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', { 
+      day: 'numeric',
+      month: 'short'
+    });
+  } catch (error) {
+    console.error('Error formatting featured date:', error);
+    return dateString;
+  }
+};
+
+/**
  * Check if an event spans multiple days
  */
 export const isMultiDayEvent = (startDate: string, endDate?: string | null): boolean => {
