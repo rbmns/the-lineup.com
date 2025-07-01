@@ -58,15 +58,14 @@ const Events = () => {
 
   // Helper function to filter out past events
   const filterUpcomingEvents = (events: Event[]) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset to start of day for comparison
+    const now = new Date();
     
     return events.filter(event => {
       if (!event.start_datetime) {
         return true; // Include events without start_datetime
       }
       const eventDate = new Date(event.start_datetime);
-      return eventDate >= today;
+      return eventDate >= now;
     });
   };
 
@@ -163,54 +162,61 @@ const Events = () => {
             return false;
           }
 
-          // Location area filter - only apply if location is selected (not null)
+          // Location area filter - Fixed to work properly
           if (selectedLocation) {
-            // Get the selected area details
             const selectedArea = venueAreas.find(area => area.id === selectedLocation);
-            if (selectedArea && selectedArea.cities) {
-              const eventCity = event.venues?.city || event.location;
-              if (eventCity && !selectedArea.cities.some(city => 
-                city.toLowerCase() === eventCity.toLowerCase()
-              )) {
-                return false;
+            if (selectedArea) {
+              // Check if event's venue city matches any city in the selected area
+              const eventCity = event.venues?.city || event.destination;
+              if (eventCity) {
+                // Query venue_city_areas to see if this city belongs to the selected area
+                const cityBelongsToArea = selectedArea.cities?.some(city => 
+                  city.toLowerCase().includes(eventCity.toLowerCase()) ||
+                  eventCity.toLowerCase().includes(city.toLowerCase())
+                );
+                if (!cityBelongsToArea) {
+                  return false;
+                }
+              } else {
+                return false; // No city info, exclude from area filter
               }
             }
           }
 
           // Date filter
           if (selectedDateFilter && selectedDateFilter !== 'anytime') {
-            const today = new Date();
+            const now = new Date();
             const eventDate = new Date(event.start_datetime || '');
             
             switch (selectedDateFilter) {
               case 'today':
-                if (eventDate.toDateString() !== today.toDateString()) return false;
+                if (eventDate.toDateString() !== now.toDateString()) return false;
                 break;
               case 'tomorrow':
-                const tomorrow = new Date(today);
+                const tomorrow = new Date(now);
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 if (eventDate.toDateString() !== tomorrow.toDateString()) return false;
                 break;
               case 'this week':
-                const weekStart = new Date(today);
-                weekStart.setDate(today.getDate() - today.getDay());
+                const weekStart = new Date(now);
+                weekStart.setDate(now.getDate() - now.getDay());
                 const weekEnd = new Date(weekStart);
                 weekEnd.setDate(weekStart.getDate() + 6);
                 if (eventDate < weekStart || eventDate > weekEnd) return false;
                 break;
               case 'this weekend':
-                const dayOfWeek = today.getDay();
+                const dayOfWeek = now.getDay();
                 const daysUntilSaturday = (6 - dayOfWeek) % 7;
-                const saturday = new Date(today);
-                saturday.setDate(today.getDate() + daysUntilSaturday);
+                const saturday = new Date(now);
+                saturday.setDate(now.getDate() + daysUntilSaturday);
                 const sunday = new Date(saturday);
                 sunday.setDate(saturday.getDate() + 1);
                 if (eventDate.toDateString() !== saturday.toDateString() && 
                     eventDate.toDateString() !== sunday.toDateString()) return false;
                 break;
               case 'next week':
-                const nextWeekStart = new Date(today);
-                nextWeekStart.setDate(today.getDate() + (7 - today.getDay()));
+                const nextWeekStart = new Date(now);
+                nextWeekStart.setDate(now.getDate() + (7 - now.getDay()));
                 const nextWeekEnd = new Date(nextWeekStart);
                 nextWeekEnd.setDate(nextWeekStart.getDate() + 6);
                 if (eventDate < nextWeekStart || eventDate > nextWeekEnd) return false;
@@ -374,7 +380,7 @@ const Events = () => {
               {(hasActiveFilters || searchQuery.trim()) && (
                 <button
                   onClick={handleResetAllFilters}
-                  className="flex items-center gap-2 px-3 py-2 text-xs font-mono font-medium text-ocean-deep/70 hover:text-ocean-deep hover:bg-coral/10 border border-ocean-deep/20 rounded-md transition-all duration-200 hover:-translate-y-0.5 uppercase tracking-wide"
+                  className="flex items-center gap-2 px-3 py-2 text-xs font-mono font-medium text-ocean-deep/70 hover:text-ocean-deep hover:bg-coral/10 border border-ocean-deep/20 rounded-md transition-all duration-200 uppercase tracking-wide"
                 >
                   <X className="h-3.5 w-3.5" />
                   Clear

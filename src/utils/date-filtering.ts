@@ -36,6 +36,12 @@ export function filterEventsByDateRange(
 
   try {
     const eventDateTime = new Date(event.start_datetime);
+    const now = new Date();
+    
+    // First ensure event is not in the past
+    if (eventDateTime < now) {
+      return false;
+    }
     
     // If custom date range is provided, use it
     if (dateRange?.from) {

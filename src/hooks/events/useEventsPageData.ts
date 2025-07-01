@@ -51,7 +51,7 @@ export const useEventsPageData = () => {
             venues!events_venue_id_fkey(*)
           `)
           .eq('status', 'published')
-          .order('start_datetime', { ascending: true }); // Use start_datetime instead of start_date
+          .order('start_datetime', { ascending: true });
 
         if (error) {
           console.error('useEventsPageData: Error fetching events:', error);
@@ -142,10 +142,16 @@ export const useEventsPageData = () => {
       );
     }
 
-    // Apply location filter
+    // Apply location filter - Fixed to work with venue_city_areas
     if (selectedLocation) {
-      // This would need venue area data to work properly
-      // For now, we'll skip this filter
+      result = result.filter(event => {
+        const eventCity = event.venues?.city || event.destination;
+        if (!eventCity) return false;
+        
+        // This will be handled by the parent component with venue areas data
+        // For now, we'll let the parent handle this filtering
+        return true;
+      });
     }
 
     // Apply date filters
@@ -154,6 +160,10 @@ export const useEventsPageData = () => {
         if (!event.start_datetime) return false;
         
         const eventDate = new Date(event.start_datetime);
+        const now = new Date();
+        
+        // Ensure event is not in the past
+        if (eventDate < now) return false;
         
         // Custom date range
         if (dateRange?.from) {

@@ -6,9 +6,6 @@ import { cn } from '@/lib/utils';
 
 interface EventCardMetaProps {
   event: { 
-    start_date?: string | null;
-    start_time?: string | null;
-    end_time?: string | null;
     start_datetime?: string | null;
     end_datetime?: string | null;
     timezone?: string;
@@ -31,54 +28,49 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
 }) => {
   const eventTimezone = event.timezone || 'Europe/Amsterdam';
   
-  // Format date in event's local timezone (no year for cards)
-  const formatEventDateDisplay = (event: any): string => {
+  // Format date and time for display
+  const formatEventDisplay = (event: any): { date: string; time: string } => {
     try {
-      // Use timestampz field first, fallback to legacy fields
-      if (event.start_datetime) {
-        return formatEventDateForCard(event.start_datetime, eventTimezone);
+      if (!event.start_datetime) {
+        return { date: 'Date TBD', time: 'Time TBD' };
       }
       
-      if (event.start_date) {
-        return formatEventDateForCard(event.start_date, eventTimezone);
-      }
+      const startDate = new Date(event.start_datetime);
+      const endDate = event.end_datetime ? new Date(event.end_datetime) : null;
       
-      return 'Date not specified';
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return 'Date not specified';
-    }
-  };
-  
-  // Format time range in event's local timezone (no location label for cards)
-  const getEventTimeDisplay = (event: any): string => {
-    try {
-      // Use timestampz field first
-      if (event.start_datetime) {
+      // Check if it's a multi-day event
+      const isMultiDay = endDate && 
+        startDate.toDateString() !== endDate.toDateString();
+      
+      let dateDisplay = '';
+      let timeDisplay = '';
+      
+      if (isMultiDay) {
+        // Multi-day event: show date range
+        const startFormatted = formatEventDateForCard(event.start_datetime, eventTimezone);
+        const endFormatted = formatEventDateForCard(event.end_datetime, eventTimezone);
+        dateDisplay = `${startFormatted} - ${endFormatted}`;
+        
+        // Show start time
+        timeDisplay = formatEventTime(event.start_datetime, eventTimezone);
+      } else {
+        // Single day event
+        dateDisplay = formatEventDateForCard(event.start_datetime, eventTimezone);
+        
+        // Show time range
         const startTime = formatEventTime(event.start_datetime, eventTimezone);
-        
-        if (!event.end_datetime) {
-          return startTime;
+        if (endDate) {
+          const endTime = formatEventTime(event.end_datetime, eventTimezone);
+          timeDisplay = `${startTime} - ${endTime}`;
+        } else {
+          timeDisplay = startTime;
         }
-        
-        const endTime = formatEventTime(event.end_datetime, eventTimezone);
-        return `${startTime} – ${endTime}`;
       }
       
-      // Fallback to legacy fields
-      if (!event.start_date || !event.start_time) return 'Time not specified';
-      
-      const startTimeFormatted = formatEventTime(`${event.start_date}T${event.start_time}`, eventTimezone);
-      
-      if (!event.end_time) {
-        return startTimeFormatted;
-      }
-      
-      const endTimeFormatted = formatEventTime(`${event.start_date}T${event.end_time}`, eventTimezone);
-      return `${startTimeFormatted} – ${endTimeFormatted}`;
+      return { date: dateDisplay, time: timeDisplay };
     } catch (error) {
-      console.error('Error formatting time:', error);
-      return event.start_time ? event.start_time.substring(0, 5) : 'Time not specified';
+      console.error('Error formatting event display:', error);
+      return { date: 'Date TBD', time: 'Time TBD' };
     }
   };
 
@@ -105,6 +97,7 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
     return 'Location TBD';
   };
 
+  const { date, time } = formatEventDisplay(event);
   const textSize = compact ? 'text-xs' : 'text-sm';
 
   return (
@@ -112,14 +105,14 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
       <div className="flex items-center text-gray-600">
         <CalendarIcon className="h-4 w-4 mr-2" />
         <span className={cn("font-inter leading-7", textSize)}>
-          {formatEventDateDisplay(event)}
+          {date}
         </span>
       </div>
 
       <div className="flex items-center text-gray-600">
         <CalendarIcon className="h-4 w-4 mr-2" />
         <span className={cn("font-inter leading-7", textSize)}>
-          {getEventTimeDisplay(event)}
+          {time}
         </span>
       </div>
 
