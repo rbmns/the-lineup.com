@@ -5,15 +5,23 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import { EventFormData } from '@/components/events/form/EventFormSchema';
+import { useState, useCallback } from 'react';
 
 export const useEventFormSubmission = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [createdEventId, setCreatedEventId] = useState<string | null>(null);
+  const [createdEventTitle, setCreatedEventTitle] = useState('');
 
   const createEventMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
-      if (!user) throw new Error('User must be authenticated');
+      if (!user) {
+        setShowAuthModal(true);
+        throw new Error('User must be authenticated');
+      }
 
       // Convert form data to database format
       const eventData = {
@@ -48,24 +56,55 @@ export const useEventFormSubmission = () => {
     },
     onSuccess: (event) => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
+      setCreatedEventId(event.id);
+      setCreatedEventTitle(event.title);
+      setShowSuccessModal(true);
       toast({
         title: 'Event created successfully!',
         description: 'Your event has been published and is now visible to others.',
       });
-      navigate(`/events/${event.id}`);
     },
     onError: (error) => {
       console.error('Error creating event:', error);
-      toast({
-        title: 'Error creating event',
-        description: 'Please try again or contact support if the problem persists.',
-        variant: 'destructive',
-      });
+      if (!user) {
+        setShowAuthModal(true);
+      } else {
+        toast({
+          title: 'Error creating event',
+          description: 'Please try again or contact support if the problem persists.',
+          variant: 'destructive',
+        });
+      }
     },
   });
+
+  const handleFormSubmit = useCallback((data: EventFormData) => {
+    createEventMutation.mutate(data);
+  }, [createEventMutation]);
+
+  const handleAuthSuccess = useCallback(() => {
+    setShowAuthModal(false);
+  }, []);
+
+  const handleAuthModalClose = useCallback(() => {
+    setShowAuthModal(false);
+  }, []);
+
+  const handleEventCreated = useCallback((eventId: string, eventTitle: string) => {
+    navigate(`/events/${eventId}`);
+  }, [navigate]);
 
   return {
     createEvent: createEventMutation.mutate,
     isCreating: createEventMutation.isPending,
+    handleFormSubmit,
+    handleAuthSuccess,
+    handleAuthModalClose,
+    handleEventCreated,
+    showAuthModal,
+    showSuccessModal,
+    setShowSuccessModal,
+    createdEventId,
+    createdEventTitle,
   };
 };

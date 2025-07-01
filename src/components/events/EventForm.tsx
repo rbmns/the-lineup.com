@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useEventForm } from '@/hooks/events/useEventForm.tsx';
 import { useEventFormSubmission } from '@/hooks/events/useEventFormSubmission.tsx';
@@ -30,7 +31,6 @@ export const EventForm: React.FC<EventFormProps> = ({
   
   const {
     form,
-    isSubmitting,
     venues,
     isLoadingVenues,
     isCreateVenueModalOpen,
@@ -38,11 +38,7 @@ export const EventForm: React.FC<EventFormProps> = ({
     handleVenueCreated,
     onSubmit: originalOnSubmit,
     onInvalid
-  } = useEventForm({
-    eventId,
-    isEditMode,
-    initialData
-  });
+  } = useEventForm();
 
   // Define handleEventCreated first
   const handleEventCreated = (eventId: string, eventTitle: string) => {
@@ -58,15 +54,13 @@ export const EventForm: React.FC<EventFormProps> = ({
     showSuccessModal,
     setShowSuccessModal,
     createdEventId,
-    createdEventTitle
-  } = useEventFormSubmission({
-    isEditMode,
-    originalOnSubmit,
-    onEventCreated: handleEventCreated
-  });
+    createdEventTitle,
+    isCreating
+  } = useEventFormSubmission();
   
   const {
     handleSubmit,
+    control,
     setValue,
     watch,
     formState: { errors }
@@ -86,13 +80,13 @@ export const EventForm: React.FC<EventFormProps> = ({
               <h2 className="text-xl font-semibold text-ocean-teal">Basic Information</h2>
             </div>
             <div className="space-y-6">
-              <TitleField errors={errors} />
-              <DescriptionField errors={errors} />
+              <TitleField />
+              <DescriptionField />
             </div>
           </div>
 
           {/* Date & Time Section */}
-          <DateTimeFields watch={watch} setValue={setValue} errors={errors} />
+          <DateTimeFields form={form} />
 
           {/* Location & Details Section */}
           <div className="bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 p-6 rounded-lg border border-ocean-teal/20">
@@ -102,29 +96,23 @@ export const EventForm: React.FC<EventFormProps> = ({
             </div>
             <div className="space-y-6">
               <VenueField 
-                watch={watch} 
-                setValue={setValue} 
-                errors={errors} 
                 venues={venues} 
                 isLoadingVenues={isLoadingVenues} 
                 onOpenCreateVenueModal={() => setCreateVenueModalOpen(true)} 
               />
-              <CategoryToggleField watch={watch} setValue={setValue} errors={errors} />
-              <VibeToggleField watch={watch} setValue={setValue} errors={errors} />
+              <CategoryToggleField />
+              <VibeToggleField />
             </div>
           </div>
 
           {/* Optional Fields Section */}
           <OptionalFieldsSection 
-            errors={errors} 
-            control={form.control} 
-            watch={watch} 
-            setValue={setValue} 
+            control={control} 
           />
 
           {/* Submit Button */}
           <EventFormActions 
-            isSubmitting={isSubmitting} 
+            isSubmitting={isCreating} 
             isEditMode={isEditMode} 
           />
         </form>
