@@ -3,7 +3,6 @@ import React from 'react';
 import { Calendar, Clock, RepeatIcon, CalendarDays } from 'lucide-react';
 import { Event } from '@/types';
 import { formatEventDate, formatEventTimeRange, formatEventCardDateTime } from '@/utils/timezone-utils';
-import { isMultiDayEvent, getMultiDayDateRange } from '@/utils/event-date-utils';
 import { Badge } from '../ui/badge';
 
 interface EventDateTimeInfoProps {
@@ -12,6 +11,42 @@ interface EventDateTimeInfoProps {
   iconClassName?: string;
   showRecurring?: boolean;
   recurringEvents?: Event[];
+}
+
+// Check if event spans multiple days using timestampz fields
+function isMultiDayEvent(event: Event): boolean {
+  if (!event.start_datetime || !event.end_datetime) return false;
+  
+  try {
+    const eventTimezone = event.timezone || 'Europe/Amsterdam';
+    const startDate = new Date(event.start_datetime);
+    const endDate = new Date(event.end_datetime);
+    
+    // Format dates to compare date parts only
+    const startDateStr = startDate.toLocaleDateString('en-CA'); // YYYY-MM-DD format
+    const endDateStr = endDate.toLocaleDateString('en-CA');
+    
+    return startDateStr !== endDateStr;
+  } catch (error) {
+    console.error('Error checking multi-day event:', error);
+    return false;
+  }
+}
+
+// Get multi-day date range using timestampz fields
+function getMultiDayDateRange(event: Event): string {
+  if (!event.start_datetime || !event.end_datetime) return '';
+  
+  try {
+    const eventTimezone = event.timezone || 'Europe/Amsterdam';
+    const startFormatted = formatEventDate(event.start_datetime, eventTimezone);
+    const endFormatted = formatEventDate(event.end_datetime, eventTimezone);
+    
+    return `${startFormatted} - ${endFormatted}`;
+  } catch (error) {
+    console.error('Error formatting multi-day range:', error);
+    return '';
+  }
 }
 
 export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({ 
@@ -24,8 +59,8 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
   // Get event timezone
   const eventTimezone = event.timezone || 'Europe/Amsterdam';
   
-  // Check if we have valid date information - prioritize timestampz fields
-  const hasValidDateTime = event.start_datetime || event.start_date;
+  // Check if we have valid date information
+  const hasValidDateTime = event.start_datetime;
   
   if (!hasValidDateTime) {
     return (
@@ -39,27 +74,13 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
   const isMultiDay = isMultiDayEvent(event);
   const isRecurring = recurringEvents && recurringEvents.length > 0;
 
-  // Format date and times using timestampz fields when available
-  let startDate: string;
-  let timeRange: string;
-  
-  if (event.start_datetime) {
-    // Use timestampz fields
-    startDate = formatEventDate(event.start_datetime, eventTimezone);
-    timeRange = formatEventTimeRange(
-      event.start_datetime, 
-      event.end_datetime, 
-      eventTimezone
-    );
-  } else {
-    // Fallback to old fields
-    startDate = formatEventDate(event.start_date!, eventTimezone);
-    timeRange = formatEventTimeRange(
-      `${event.start_date}T${event.start_time || '00:00:00'}`,
-      event.end_time ? `${event.start_date}T${event.end_time}` : null,
-      eventTimezone
-    );
-  }
+  // Format date and times using timestampz fields
+  const startDate = formatEventDate(event.start_datetime, eventTimezone);
+  const timeRange = formatEventTimeRange(
+    event.start_datetime, 
+    event.end_datetime, 
+    eventTimezone
+  );
 
   return (
     <div className={`flex flex-col gap-2 text-gray-700 ${className}`}>
@@ -109,23 +130,13 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
             <div className="text-xs uppercase font-medium text-gray-500">Other dates:</div>
             <div className="space-y-1.5">
               {recurringEvents.map((recEvent) => {
-                let recEventDateTime: string;
-                
-                if (recEvent.start_datetime) {
-                  recEventDateTime = formatEventCardDateTime(
-                    recEvent.start_datetime,
-                    recEvent.end_datetime,
-                    recEvent.timezone || eventTimezone
-                  );
-                } else if (recEvent.start_date) {
-                  recEventDateTime = formatEventCardDateTime(
-                    `${recEvent.start_date}T${recEvent.start_time || '00:00:00'}`,
-                    recEvent.end_date ? `${recEvent.end_date}T${recEvent.end_time || '23:59:59'}` : null,
-                    recEvent.timezone || eventTimezone
-                  );
-                } else {
-                  recEventDateTime = 'Date not specified';
-                }
+                const recEventDateTime = recEvent.start_datetime 
+                  ? formatEventCardDateTime(
+                      recEvent.start_datetime,
+                      recEvent.end_datetime,
+                      recEvent.timezone || eventTimezone
+                    )
+                  : 'Date not specified';
                 
                 return (
                   <div key={recEvent.id} className="text-sm">

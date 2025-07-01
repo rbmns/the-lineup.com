@@ -22,63 +22,24 @@ interface MainEventContentProps {
   handleBackToEvents: () => void;
 }
 
-function formatDateTime(start_date?: string | null, start_time?: string | null, end_time?: string | null, start_datetime?: string | null, end_datetime?: string | null, timezone?: string) {
-  console.log(`[DEBUG] formatDateTime called with:`, {
-    start_date,
-    start_time,
-    end_time,
-    start_datetime,
-    end_datetime,
-    timezone
-  });
+function formatDateTime(start_datetime?: string | null, end_datetime?: string | null, timezone?: string) {
+  if (!start_datetime) return null;
   
-  // Use timestampz fields first if available
-  if (start_datetime) {
-    try {
-      const eventTimezone = timezone || 'Europe/Amsterdam';
-      const startDate = new Date(start_datetime);
-      
-      let startStr = formatInTimeZone(startDate, eventTimezone, "EEEE, d MMMM yyyy");
-      let timeStr = formatInTimeZone(startDate, eventTimezone, "HH:mm");
-
-      if (end_datetime) {
-        const endDate = new Date(end_datetime);
-        let endTimeStr = formatInTimeZone(endDate, eventTimezone, "HH:mm");
-        const result = `${startStr}, ${timeStr} - ${endTimeStr}`;
-        console.log(`[DEBUG] formatDateTime - Using timestampz result: ${result}`);
-        return result;
-      }
-      const result = `${startStr}, ${timeStr}`;
-      console.log(`[DEBUG] formatDateTime - Using timestampz result: ${result}`);
-      return result;
-    } catch (err) {
-      console.error('Error formatting with timestampz:', err);
-    }
-  }
-  
-  // Fallback to legacy fields
-  if (!start_date || !start_time) return null;
   try {
     const eventTimezone = timezone || 'Europe/Amsterdam';
-    const startIso = `${start_date}T${start_time}`;
-    const start = new Date(startIso);
+    const startDate = new Date(start_datetime);
+    
+    let startStr = formatInTimeZone(startDate, eventTimezone, "EEEE, d MMMM yyyy");
+    let timeStr = formatInTimeZone(startDate, eventTimezone, "HH:mm");
 
-    let startStr = formatInTimeZone(start, eventTimezone, "EEEE, d MMMM yyyy");
-    let timeStr = formatInTimeZone(start, eventTimezone, "HH:mm");
-
-    if (end_time) {
-      const endIso = `${start_date}T${end_time}`;
-      const end = new Date(endIso);
-      let endTimeStr = formatInTimeZone(end, eventTimezone, "HH:mm");
-      const result = `${startStr}, ${timeStr} - ${endTimeStr}`;
-      console.log(`[DEBUG] formatDateTime - Using legacy result: ${result}`);
-      return result;
+    if (end_datetime) {
+      const endDate = new Date(end_datetime);
+      let endTimeStr = formatInTimeZone(endDate, eventTimezone, "HH:mm");
+      return `${startStr}, ${timeStr} - ${endTimeStr}`;
     }
-    const result = `${startStr}, ${timeStr}`;
-    console.log(`[DEBUG] formatDateTime - Using legacy result: ${result}`);
-    return result;
+    return `${startStr}, ${timeStr}`;
   } catch (err) {
-    console.error('Error formatting with legacy fields:', err);
+    console.error('Error formatting with timestampz:', err);
     return null;
   }
 }
@@ -107,15 +68,10 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
   };
 
   const dateTimeInfo = formatDateTime(
-    event.start_date, 
-    event.start_time, 
-    event.end_time,
     event.start_datetime,
     event.end_datetime,
     event.timezone
   );
-
-  console.log(`[DEBUG] MainEventContent - Event ID: ${event.id}, dateTimeInfo: ${dateTimeInfo}`);
 
   return (
     <Card className="bg-pure-white border border-mist-grey shadow-md overflow-hidden">
@@ -128,7 +84,6 @@ export const MainEventContent: React.FC<MainEventContentProps> = ({
         shareUrl={shareUrl}
         title={event?.title || 'Event'}
         onEventTypeClick={handleEventTypeClick}
-        startTime={event?.start_time}
         showTitleOverlay={!isMobile}
         dateTimeInfo={!isMobile ? dateTimeInfo : undefined}
       />

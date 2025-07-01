@@ -47,18 +47,17 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
     navigate(`/events/${recurringEvent.id}`);
   };
 
-  // Filter out past events and sort by date
+  // Filter out past events and sort by date using new timestampz fields
   const upcomingRecurringEvents = recurringEvents
     .filter(recurringEvent => {
-      if (!recurringEvent.start_date) return false;
-      const eventDate = new Date(recurringEvent.start_date);
+      if (!recurringEvent.start_datetime) return false;
+      const eventDate = new Date(recurringEvent.start_datetime);
       const today = new Date();
-      today.setHours(0, 0, 0, 0);
       return eventDate >= today;
     })
     .sort((a, b) => {
-      if (!a.start_date || !b.start_date) return 0;
-      return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+      if (!a.start_datetime || !b.start_datetime) return 0;
+      return new Date(a.start_datetime).getTime() - new Date(b.start_datetime).getTime();
     });
 
   return (
@@ -112,17 +111,17 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2 text-sm font-medium">
                           <Calendar className="h-4 w-4 text-gray-500" />
-                          {recurringEvent.start_date && formatEventDate(
-                            recurringEvent.start_date, 
+                          {recurringEvent.start_datetime && formatEventDate(
+                            recurringEvent.start_datetime, 
                             recurringEvent.timezone || 'Europe/Amsterdam'
                           )}
                         </div>
                         
-                        {recurringEvent.start_time && (
+                        {recurringEvent.start_datetime && (
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Clock className="h-4 w-4 text-gray-500" />
                             {formatEventTime(
-                              recurringEvent.start_time,
+                              recurringEvent.start_datetime,
                               recurringEvent.timezone || 'Europe/Amsterdam'
                             )}
                           </div>

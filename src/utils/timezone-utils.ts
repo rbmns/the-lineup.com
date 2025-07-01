@@ -35,21 +35,8 @@ export function formatEventDateForCard(dateTimeString: string, timezone: string 
  */
 export function formatEventTime(dateTimeString: string, timezone: string = AMSTERDAM_TIMEZONE): string {
   try {
-    console.log(`[DEBUG] formatEventTime - Input: ${dateTimeString}, Timezone: ${timezone}`);
     const date = parseISO(dateTimeString);
-    console.log(`[DEBUG] formatEventTime - Parsed date object:`, date);
-    console.log(`[DEBUG] formatEventTime - Date in UTC: ${date.toISOString()}`);
-    
-    const result = formatInTimeZone(date, timezone, 'HH:mm');
-    console.log(`[DEBUG] formatEventTime - Output: ${result}`);
-    
-    // Additional debugging for Lisbon time specifically
-    if (timezone === 'Europe/Lisbon') {
-      const lisbonDate = formatInTimeZone(date, timezone, 'yyyy-MM-dd HH:mm:ss zzz');
-      console.log(`[DEBUG] formatEventTime - Full Lisbon format: ${lisbonDate}`);
-    }
-    
-    return result;
+    return formatInTimeZone(date, timezone, 'HH:mm');
   } catch (error) {
     console.error('Error formatting time:', error);
     return dateTimeString;
@@ -69,73 +56,6 @@ export function createEventDateTime(dateTimeString: string): Date {
 }
 
 /**
- * Convert local event time to proper UTC timestamp
- * This fixes the root cause of Portugal timezone issues
- */
-export function createEventTimestamp(dateString: string, timeString: string, timezone: string = AMSTERDAM_TIMEZONE): string {
-  try {
-    console.log(`[DEBUG] createEventTimestamp - Date: ${dateString}, Time: ${timeString}, Timezone: ${timezone}`);
-    
-    // Create a date in the event's local timezone
-    const localDateTimeString = `${dateString}T${timeString}`;
-    console.log(`[DEBUG] createEventTimestamp - Local datetime string: ${localDateTimeString}`);
-    
-    // Parse as local time first
-    const localDate = new Date(localDateTimeString);
-    console.log(`[DEBUG] createEventTimestamp - Local date parsed: ${localDate.toISOString()}`);
-    
-    // Now we need to adjust for the timezone offset
-    // Get the timezone offset for the specific date/time
-    const tempUtcDate = new Date(localDateTimeString + 'Z'); // Treat as UTC temporarily
-    const offsetInMs = getTimezoneOffset(tempUtcDate, timezone);
-    
-    // Apply the correct offset
-    const correctUtcDate = new Date(localDate.getTime() - offsetInMs);
-    
-    console.log(`[DEBUG] createEventTimestamp - Final UTC timestamp: ${correctUtcDate.toISOString()}`);
-    
-    // Verify the result by converting back to local time
-    const verification = formatInTimeZone(correctUtcDate, timezone, 'HH:mm');
-    console.log(`[DEBUG] createEventTimestamp - Verification (should match input time ${timeString}): ${verification}`);
-    
-    return correctUtcDate.toISOString();
-  } catch (error) {
-    console.error('Error creating event timestamp:', error);
-    // Fallback to simple concatenation
-    return `${dateString}T${timeString}:00.000Z`;
-  }
-}
-
-/**
- * Get timezone offset in milliseconds for a specific date and timezone
- */
-function getTimezoneOffset(date: Date, timezone: string): number {
-  try {
-    // Use Intl.DateTimeFormat to get the actual offset
-    const utcTime = date.getTime();
-    const localTime = new Date(date.toLocaleString('en-US', { timeZone: timezone })).getTime();
-    return localTime - utcTime;
-  } catch (error) {
-    console.error('Error getting timezone offset:', error);
-    // Fallback to standard offsets
-    switch (timezone) {
-      case 'Europe/Lisbon':
-        // Check if DST applies (rough approximation)
-        const month = date.getMonth() + 1;
-        const day = date.getDate();
-        const isDST = (month > 3 && month < 10) || 
-                     (month === 3 && day >= 25) || 
-                     (month === 10 && day < 25);
-        return isDST ? -1 * 60 * 60 * 1000 : 0; // WEST = UTC+1, WET = UTC+0
-      case 'Europe/Amsterdam':
-        return -1 * 60 * 60 * 1000; // Generally UTC+1/+2
-      default:
-        return 0;
-    }
-  }
-}
-
-/**
  * Format a complete event time range using start_datetime and end_datetime
  */
 export function formatEventTimeRange(
@@ -146,8 +66,6 @@ export function formatEventTimeRange(
   try {
     if (!startDateTime) return 'Time not specified';
     
-    console.log(`[DEBUG] formatEventTimeRange - Start: ${startDateTime}, End: ${endDateTime}, Timezone: ${timezone}`);
-    
     const startDate = parseISO(startDateTime);
     let timeRange = formatInTimeZone(startDate, timezone, 'HH:mm');
     
@@ -157,7 +75,6 @@ export function formatEventTimeRange(
       timeRange += ` - ${endTimeFormatted}`;
     }
     
-    console.log(`[DEBUG] formatEventTimeRange - Output: ${timeRange}`);
     return timeRange;
   } catch (error) {
     console.error('Error formatting time range:', error);
@@ -166,7 +83,7 @@ export function formatEventTimeRange(
 }
 
 /**
- * Format date and time for event cards using start_datetime (in event's local timezone, no location context)
+ * Format date and time for event cards using start_datetime (in event's local timezone)
  */
 export function formatEventCardDateTime(
   startDateTime: string,
@@ -176,8 +93,6 @@ export function formatEventCardDateTime(
   if (!startDateTime) return '';
 
   try {
-    console.log(`[DEBUG] formatEventCardDateTime - Start: ${startDateTime}, End: ${endDateTime}, Timezone: ${timezone}`);
-    
     // Check if it's a multi-day event by comparing dates
     if (endDateTime) {
       const startDate = parseISO(startDateTime);
@@ -185,8 +100,6 @@ export function formatEventCardDateTime(
       
       const startDateOnly = formatInTimeZone(startDate, timezone, 'yyyy-MM-dd');
       const endDateOnly = formatInTimeZone(endDate, timezone, 'yyyy-MM-dd');
-      
-      console.log(`[DEBUG] formatEventCardDateTime - Start date: ${startDateOnly}, End date: ${endDateOnly}`);
       
       if (startDateOnly !== endDateOnly) {
         // Multi-day event
@@ -199,9 +112,7 @@ export function formatEventCardDateTime(
     const datePart = formatEventDateForCard(startDateTime, timezone);
     const timePart = formatEventTime(startDateTime, timezone);
     
-    const result = `${datePart}, ${timePart}`;
-    console.log(`[DEBUG] formatEventCardDateTime - Final result: ${result}`);
-    return result;
+    return `${datePart}, ${timePart}`;
   } catch (error) {
     console.error('Error formatting event card date-time:', error);
     return startDateTime;

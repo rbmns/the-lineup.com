@@ -17,9 +17,8 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
   const isMobile = useIsMobile();
   const eventTimezone = event.timezone || 'Europe/Amsterdam';
 
-  // Get the formatted date and time
+  // Get the formatted date and time using new timestampz fields
   const getEventDateTimeDisplay = () => {
-    // Use timestampz fields first
     if (event.start_datetime) {
       const eventDate = formatEventDate(event.start_datetime, eventTimezone);
       const startTime = formatEventTime(event.start_datetime, eventTimezone);
@@ -28,25 +27,6 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
       return {
         date: eventDate,
         time: endTime ? `${startTime}-${endTime}` : startTime
-      };
-    }
-    
-    // Fallback to legacy fields
-    if (event.start_date) {
-      const eventDate = formatEventDate(event.start_date, eventTimezone);
-      let timeDisplay = '';
-      
-      if (event.start_time && event.end_time) {
-        const startTime = formatEventTime(`${event.start_date}T${event.start_time}`, eventTimezone);
-        const endTime = formatEventTime(`${event.start_date}T${event.end_time}`, eventTimezone);
-        timeDisplay = `${startTime}-${endTime}`;
-      } else if (event.start_time) {
-        timeDisplay = formatEventTime(`${event.start_date}T${event.start_time}`, eventTimezone);
-      }
-      
-      return {
-        date: eventDate,
-        time: timeDisplay
       };
     }
     
