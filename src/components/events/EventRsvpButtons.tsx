@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Check, Heart, Loader2 } from 'lucide-react';
 import { DefaultRsvpButtons } from './rsvp/DefaultRsvpButtons';
+import { useTracking } from '@/services/trackingService';
 
 export type RsvpStatus = 'Going' | 'Interested' | null;
 export type RsvpHandler = (status: 'Going' | 'Interested') => Promise<boolean>;
@@ -15,6 +16,8 @@ interface EventRsvpButtonsProps {
   size?: 'sm' | 'default' | 'lg';
   variant?: 'default' | 'subtle' | 'outline';
   className?: string;
+  eventId?: string;
+  eventTitle?: string;
 }
 
 export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
@@ -24,11 +27,14 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
   showStatusOnly = false,
   size = 'default',
   variant = 'default',
-  className
+  className,
+  eventId,
+  eventTitle
 }) => {
   const [optimisticStatus, setOptimisticStatus] = useState<RsvpStatus>(currentStatus);
   const [activeButton, setActiveButton] = useState<'Going' | 'Interested' | null>(null);
   const [internalLoading, setInternalLoading] = useState(false);
+  const { trackRSVP } = useTracking();
 
   // Sync optimistic status with current status when it changes from server
   useEffect(() => {
@@ -83,8 +89,17 @@ export const EventRsvpButtons: React.FC<EventRsvpButtonsProps> = ({
         console.log('RSVP failed, rolling back optimistic update');
         setOptimisticStatus(oldStatus);
       } else {
-        // On success, keep the optimistic state in sync with the successful result
-        // The parent handler should have updated the global cache, so we keep our local state
+        // On success, track the RSVP action
+        if (eventId && eventTitle) {
+          await trackRSVP({
+            event_id: eventId,
+            event_title: eventTitle,
+            rsvp_status: newOptimisticStatus,
+            previous_status: oldStatus,
+            user_id: '', // Will be filled by tracking service from auth context
+          });
+        }
+        
         console.log(`RSVP success: keeping optimistic state ${newOptimisticStatus}`);
       }
       

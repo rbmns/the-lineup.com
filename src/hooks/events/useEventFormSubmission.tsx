@@ -6,6 +6,7 @@ import { createEvent } from '@/lib/eventService';
 import { processFormData } from '@/components/events/form/EventFormUtils';
 import { toast } from 'sonner';
 import { EventFormData } from '@/components/events/form/EventFormSchema';
+import { useTracking } from '@/services/trackingService';
 
 export const useEventFormSubmission = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -17,6 +18,7 @@ export const useEventFormSubmission = () => {
   
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { trackEventCreation } = useTracking();
 
   const handleFormSubmit = async (data: EventFormData) => {
     console.log('🚀 Event form submitted in useEventFormSubmission:', data);
@@ -79,6 +81,17 @@ export const useEventFormSubmission = () => {
       console.log('Event created successfully:', createdEvent);
       setCreatedEventId(createdEvent.id);
       setCreatedEventTitle(createdEvent.title || 'Your Event');
+      
+      // Track the event creation
+      await trackEventCreation({
+        event_id: createdEvent.id,
+        event_title: createdEvent.title || 'Untitled Event',
+        event_category: createdEvent.event_category || 'Unknown',
+        event_vibe: createdEvent.vibe || 'Unknown',
+        destination: createdEvent.destination || 'Unknown',
+        creator_id: userId,
+      });
+      
       setShowSuccessModal(true);
       
     } catch (error: any) {
@@ -127,6 +140,17 @@ export const useEventFormSubmission = () => {
         console.log('Event created successfully after auth:', createdEvent);
         setCreatedEventId(createdEvent.id);
         setCreatedEventTitle(createdEvent.title || 'Your Event');
+        
+        // Track the event creation
+        await trackEventCreation({
+          event_id: createdEvent.id,
+          event_title: createdEvent.title || 'Untitled Event',
+          event_category: createdEvent.event_category || 'Unknown',
+          event_vibe: createdEvent.vibe || 'Unknown',
+          destination: createdEvent.destination || 'Unknown',
+          creator_id: user.id,
+        });
+        
         setShowSuccessModal(true);
         
       } catch (error: any) {

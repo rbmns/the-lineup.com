@@ -1,15 +1,21 @@
 
 import { CreditCard, ExternalLink } from 'lucide-react';
+import { useTracking } from '@/services/trackingService';
 
 interface EventBookingSectionProps {
   fee?: string | number | null;
   bookingLink?: string | null;
+  eventId?: string;
+  eventTitle?: string;
 }
 
 export const EventBookingSection = ({ 
   fee, 
-  bookingLink 
+  bookingLink,
+  eventId,
+  eventTitle
 }: EventBookingSectionProps) => {
+  const { trackBookingLinkClick } = useTracking();
   // Format fee display
   const formatFee = (feeValue: string | number | null | undefined) => {
     if (!feeValue) return 'Free';
@@ -25,6 +31,17 @@ export const EventBookingSection = ({
     }
     
     return 'Free';
+  };
+
+  const handleBookingLinkClick = async () => {
+    if (bookingLink && eventId && eventTitle) {
+      await trackBookingLinkClick({
+        event_id: eventId,
+        event_title: eventTitle,
+        booking_url: bookingLink,
+        source_page: window.location.pathname,
+      });
+    }
   };
 
   return (
@@ -44,6 +61,7 @@ export const EventBookingSection = ({
                 href={bookingLink}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={handleBookingLinkClick}
                 className="text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium"
               >
                 Booking Link

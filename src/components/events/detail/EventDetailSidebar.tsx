@@ -51,6 +51,8 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
           <EventOrganizerSection 
             organizerName={event.organiser_name}
             organizerLink={event.organizer_link}
+            eventId={event.id}
+            eventTitle={event.title}
           />
         </div>
       )}
@@ -61,6 +63,8 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
           <EventBookingSection 
             fee={event.fee}
             bookingLink={event.booking_link}
+            eventId={event.id}
+            eventTitle={event.title}
           />
         </div>
       )}
