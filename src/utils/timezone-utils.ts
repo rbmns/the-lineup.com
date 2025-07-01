@@ -20,15 +20,27 @@ export function formatEventDate(dateString: string, timezone: string = AMSTERDAM
 /**
  * Format a time string in a specific timezone
  */
-export function formatEventTime(timeString: string, timezone: string = AMSTERDAM_TIMEZONE): string {
+export function formatEventTime(dateString: string, timeString: string, timezone: string = AMSTERDAM_TIMEZONE): string {
   try {
-    // Create a date object with today's date and the provided time
-    const today = new Date().toISOString().split('T')[0];
-    const dateTime = parseISO(`${today}T${timeString}`);
+    // Create a date object with the provided date and time
+    const dateTime = parseISO(`${dateString}T${timeString}`);
     return formatInTimeZone(dateTime, timezone, 'HH:mm');
   } catch (error) {
     console.error('Error formatting time:', error);
     return timeString;
+  }
+}
+
+/**
+ * Create a Date object from date string, time string, and timezone
+ */
+export function createEventDateTime(dateString: string, timeString: string, timezone: string = AMSTERDAM_TIMEZONE): Date {
+  try {
+    const dateTime = parseISO(`${dateString}T${timeString}`);
+    return dateTime;
+  } catch (error) {
+    console.error('Error creating event datetime:', error);
+    return new Date();
   }
 }
 
@@ -45,7 +57,6 @@ export function formatEventTimeRange(
   try {
     if (!startTime) return 'Time not specified';
     
-    const today = new Date().toISOString().split('T')[0];
     const startDateTime = parseISO(`${startDate}T${startTime}`);
     
     let timeRange = formatInTimeZone(startDateTime, timezone, 'HH:mm');
@@ -87,4 +98,70 @@ export function formatEventCardDateTime(
     console.error('Error formatting card date time:', error);
     return startDate;
   }
+}
+
+/**
+ * Format event time with location context
+ */
+export function formatEventTimeWithLocation(
+  dateString: string,
+  timeString: string,
+  timezone: string = AMSTERDAM_TIMEZONE,
+  cityName?: string
+): string {
+  try {
+    const formattedTime = formatEventTime(dateString, timeString, timezone);
+    
+    if (cityName && timezone !== AMSTERDAM_TIMEZONE) {
+      return `${formattedTime} (${cityName} time)`;
+    }
+    
+    return formattedTime;
+  } catch (error) {
+    console.error('Error formatting time with location:', error);
+    return timeString;
+  }
+}
+
+/**
+ * Get timezone location label
+ */
+export function getTimezoneLocationLabel(timezone: string, cityName?: string): string {
+  if (cityName && timezone !== AMSTERDAM_TIMEZONE) {
+    return `${cityName} time`;
+  }
+  return '';
+}
+
+/**
+ * Get user's timezone
+ */
+export function getUserTimezone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch (error) {
+    console.error('Error getting user timezone:', error);
+    return AMSTERDAM_TIMEZONE;
+  }
+}
+
+/**
+ * Get common timezones for dropdown
+ */
+export function getCommonTimezones(): Array<{ value: string; label: string }> {
+  return [
+    { value: 'Europe/Amsterdam', label: 'Amsterdam (CET/CEST)' },
+    { value: 'Europe/London', label: 'London (GMT/BST)' },
+    { value: 'Europe/Berlin', label: 'Berlin (CET/CEST)' },
+    { value: 'Europe/Paris', label: 'Paris (CET/CEST)' },
+    { value: 'Europe/Rome', label: 'Rome (CET/CEST)' },
+    { value: 'Europe/Madrid', label: 'Madrid (CET/CEST)' },
+    { value: 'Europe/Lisbon', label: 'Lisbon (WET/WEST)' },
+    { value: 'America/New_York', label: 'New York (EST/EDT)' },
+    { value: 'America/Los_Angeles', label: 'Los Angeles (PST/PDT)' },
+    { value: 'America/Chicago', label: 'Chicago (CST/CDT)' },
+    { value: 'Asia/Tokyo', label: 'Tokyo (JST)' },
+    { value: 'Asia/Singapore', label: 'Singapore (SGT)' },
+    { value: 'Australia/Sydney', label: 'Sydney (AEST/AEDT)' },
+  ];
 }

@@ -1,5 +1,4 @@
 
-
 // Re-export the new timezone-aware functions
 export { 
   formatEventDate,
@@ -103,4 +102,3 @@ export const formatMultiDayRange = (startDate: string, endDate: string, timezone
     return '';
   }
 };
-
