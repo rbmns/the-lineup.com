@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
 import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayout';
@@ -16,6 +15,7 @@ import { MobileFriendlyDatePicker } from '@/components/events/filters/MobileFrie
 import { X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 
 const Events = () => {
   const isMobile = useIsMobile();
@@ -235,6 +235,13 @@ const Events = () => {
     setDateRange(undefined);
   };
 
+  // Format date range for display
+  const formatDateRangeDisplay = () => {
+    if (!dateRange?.from) return 'DATE';
+    if (!dateRange.to) return format(dateRange.from, 'MMM dd');
+    return `${format(dateRange.from, 'MMM dd')} - ${format(dateRange.to, 'MMM dd')}`;
+  };
+
   // Determine which events to display
   const displayEvents = searchQuery.trim() ? searchResults : events;
   const filteredEventsCount = displayEvents?.length || 0;
@@ -299,43 +306,31 @@ const Events = () => {
                   allEventTypes={allEventTypes}
                 />
                 
-                {/* Replace DateDropdownFilter with enhanced date picker */}
+                {/* Simplified Date Range Picker */}
                 <div className="relative">
                   <button
                     onClick={() => setShowDatePicker(!showDatePicker)}
                     className={cn(
-                      "inline-flex items-center gap-2 px-3 py-2 text-sm font-medium border rounded-md transition-colors",
-                      (selectedDateFilter && selectedDateFilter !== 'anytime') || dateRange?.from
+                      "inline-flex items-center gap-2 px-3 py-2 text-xs font-mono font-medium border rounded-md transition-colors uppercase tracking-wide",
+                      dateRange?.from
                         ? "bg-primary text-white border-primary"
                         : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
                     )}
                   >
-                    Date
-                    {((selectedDateFilter && selectedDateFilter !== 'anytime') || dateRange?.from) && (
-                      <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded text-xs">
-                        {dateRange?.from ? 'Custom' : selectedDateFilter}
-                      </span>
-                    )}
+                    {formatDateRangeDisplay()}
                   </button>
                   
                   {showDatePicker && (
-                    <div className="absolute top-full left-0 mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-4 min-w-[300px]">
+                    <div className="absolute top-full left-0 mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
                       <MobileFriendlyDatePicker
                         dateRange={dateRange}
                         onDateRangeChange={setDateRange}
                         selectedDateFilter={selectedDateFilter}
                         onDateFilterChange={setSelectedDateFilter}
                         onReset={handleClearDateFilter}
+                        onClose={() => setShowDatePicker(false)}
                         className="w-full"
                       />
-                      <div className="mt-3 pt-3 border-t flex justify-end">
-                        <button
-                          onClick={() => setShowDatePicker(false)}
-                          className="px-3 py-1.5 text-sm bg-primary text-white rounded-md hover:bg-primary/90"
-                        >
-                          Done
-                        </button>
-                      </div>
                     </div>
                   )}
                 </div>
@@ -394,25 +389,20 @@ const Events = () => {
                   <button
                     onClick={() => setShowDatePicker(!showDatePicker)}
                     className={cn(
-                      "inline-flex items-center gap-2 px-3 py-2 text-sm font-medium border rounded-md transition-colors",
-                      (selectedDateFilter && selectedDateFilter !== 'anytime') || dateRange?.from
+                      "inline-flex items-center gap-2 px-3 py-2 text-xs font-mono font-medium border rounded-md transition-colors uppercase tracking-wide",
+                      dateRange?.from
                         ? "bg-primary text-white border-primary"
                         : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
                     )}
                   >
-                    Date
-                    {((selectedDateFilter && selectedDateFilter !== 'anytime') || dateRange?.from) && (
-                      <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded text-xs">
-                        {dateRange?.from ? 'Custom' : selectedDateFilter}
-                      </span>
-                    )}
+                    {formatDateRangeDisplay()}
                   </button>
                   
                   {showDatePicker && (
                     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                       <div className="bg-white rounded-lg shadow-xl p-4 w-full max-w-sm">
                         <div className="flex justify-between items-center mb-4">
-                          <h3 className="font-medium">Select Date</h3>
+                          <h3 className="font-medium font-mono text-xs uppercase tracking-wide">Select Date</h3>
                           <button
                             onClick={() => setShowDatePicker(false)}
                             className="p-1 hover:bg-gray-100 rounded"
@@ -426,16 +416,9 @@ const Events = () => {
                           selectedDateFilter={selectedDateFilter}
                           onDateFilterChange={setSelectedDateFilter}
                           onReset={handleClearDateFilter}
+                          onClose={() => setShowDatePicker(false)}
                           className="w-full"
                         />
-                        <div className="mt-4 pt-3 border-t flex justify-end">
-                          <button
-                            onClick={() => setShowDatePicker(false)}
-                            className="px-4 py-2 text-sm bg-primary text-white rounded-md hover:bg-primary/90"
-                          >
-                            Done
-                          </button>
-                        </div>
                       </div>
                     </div>
                   )}
