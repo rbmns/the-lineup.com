@@ -26,9 +26,6 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
       {/* Date and Time Section with Local Time Display */}
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
         <EventDateTimeSection
-          startTime={event.start_time}
-          endTime={event.end_time}
-          startDate={event.start_date}
           startDateTime={event.start_datetime}
           endDateTime={event.end_datetime}
           timezone={event.timezone}
