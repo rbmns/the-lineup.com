@@ -91,8 +91,10 @@ export const EventDateTimeSection = ({
     <div className="flex items-start space-x-2">
       <Calendar className="h-5 w-5 text-gray-500 mt-0.5" />
       <div>
-        <p className="font-medium">{displayDateTime}</p>
-        <p className="text-sm text-gray-600">{timeUntilEvent}</p>
+        <p className="font-medium text-lg">{displayDateTime}</p>
+        {timeUntilEvent && (
+          <p className="text-sm text-gray-600 mt-1">{timeUntilEvent}</p>
+        )}
         {eventDuration && (
           <p className="text-sm text-gray-600">Duration: {eventDuration}</p>
         )}

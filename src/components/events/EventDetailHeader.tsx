@@ -82,11 +82,12 @@ export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({
         </div>
       )}
       
-      {/* Share button - Moved to bottom right of image */}
+      {/* Share button - Improved visibility with better styling */}
       <div className="absolute bottom-4 right-4 z-30">
         <EventShareButton 
           event={event} 
-          variant="outline" 
+          variant="secondary"
+          className="bg-white/90 hover:bg-white text-gray-900 shadow-lg border border-gray-200 backdrop-blur-sm"
         />
       </div>
     </div>

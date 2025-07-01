@@ -4,17 +4,20 @@ import { Button } from '@/components/ui/button';
 import { Share2 } from 'lucide-react';
 import { Event } from '@/types';
 import { EventShareDialog } from './share/EventShareDialog';
+import { cn } from '@/lib/utils';
 
 interface EventShareButtonProps {
   event: Event;
   variant?: 'default' | 'outline' | 'secondary' | 'destructive' | 'ghost' | 'link';
   label?: string;
+  className?: string;
 }
 
 const EventShareButton = ({
   event,
   variant = 'secondary',
-  label = 'Share'
+  label = 'Share',
+  className
 }: EventShareButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -55,7 +58,11 @@ const EventShareButton = ({
 
   return (
     <>
-      <Button variant={variant} onClick={handleShare}>
+      <Button 
+        variant={variant} 
+        onClick={handleShare}
+        className={cn(className)}
+      >
         <Share2 size={16} className="mr-2" />
         {label}
       </Button>
