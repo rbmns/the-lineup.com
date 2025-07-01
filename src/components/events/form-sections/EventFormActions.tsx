@@ -1,32 +1,32 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
 
 interface EventFormActionsProps {
   isSubmitting: boolean;
-  isEditMode: boolean;
+  isEditMode?: boolean;
 }
 
 export const EventFormActions: React.FC<EventFormActionsProps> = ({
   isSubmitting,
-  isEditMode
+  isEditMode = false
 }) => {
-  const isMobile = useIsMobile();
-
   return (
-    <div className={cn(
-      "pt-6 border-t border-mist-grey sticky bottom-0 bg-white",
-      isMobile ? "pb-6 -mx-2 px-4" : "pb-4"
-    )}>
+    <div className="flex justify-end pt-6">
       <Button 
         type="submit" 
-        variant="default"
-        disabled={isSubmitting} 
-        className="w-full h-12 text-base font-semibold bg-ocean-teal hover:bg-ocean-teal/90"
+        disabled={isSubmitting}
+        className="min-w-[140px]"
       >
-        {isSubmitting ? "Publishing..." : isEditMode ? "Update Event" : "Publish Event"}
+        {isSubmitting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            {isEditMode ? 'Updating...' : 'Publishing...'}
+          </>
+        ) : (
+          isEditMode ? 'Update Event' : 'Publish Event'
+        )}
       </Button>
     </div>
   );

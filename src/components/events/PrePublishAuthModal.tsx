@@ -33,11 +33,11 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
     
     setIsSubmitting(true);
     try {
-      console.log("Attempting Google authentication");
+      console.log("🔄 Attempting Google authentication");
       const { error } = await loginWithGoogle();
       
       if (error) {
-        console.error("Google login error:", error);
+        console.error("❌ Google login error:", error);
         toast({
           title: "Google sign in failed",
           description: error.message || "Please try again.",
@@ -46,19 +46,19 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
         return;
       }
 
-      console.log("Google authentication successful");
+      console.log("✅ Google authentication successful");
       toast({
         title: "Welcome! 🎉",
         description: "You're now signed in with Google.",
       });
 
-      // Wait for auth state to update, then call success
+      // Wait a bit for auth state to propagate, then call success
       setTimeout(() => {
         onSuccess();
       }, 1000);
 
     } catch (error: any) {
-      console.error("Google auth error:", error);
+      console.error("❌ Google auth error:", error);
       toast({
         title: "Something went wrong",
         description: error.message || "Please try again.",
@@ -85,10 +85,10 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
 
     try {
       if (isLogin) {
-        console.log("Attempting login with email:", email);
+        console.log("🔄 Attempting login with email:", email);
         const { error } = await signIn(email, password);
         if (error) {
-          console.error("Login error:", error);
+          console.error("❌ Login error:", error);
           toast({
             title: "Login failed",
             description: error.message,
@@ -96,7 +96,7 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
           });
           return;
         }
-        console.log("Login successful");
+        console.log("✅ Login successful");
         
         toast({
           title: "Welcome back! 🎉",
@@ -109,10 +109,10 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
         }, 1000);
 
       } else {
-        console.log("Attempting signup with email:", email);
+        console.log("🔄 Attempting signup with email:", email);
         const { error } = await signUp(email, password, name);
         if (error) {
-          console.error("Signup error:", error);
+          console.error("❌ Signup error:", error);
           toast({
             title: "Sign up failed",
             description: error.message,
@@ -120,23 +120,21 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
           });
           return;
         }
-        console.log("Signup successful");
+        console.log("✅ Signup successful");
 
-        // For new accounts, show success and proceed to publish immediately
-        // The event will be published since the email is stored with the account
         toast({
           title: "Account created! 🎉",
           description: "Your account has been created and your event will be published.",
         });
         
-        // Wait for auth state to update, then call success to publish the event
+        // Wait for auth state to update, then call success
         setTimeout(() => {
           onSuccess();
         }, 1500);
       }
 
     } catch (error: any) {
-      console.error("Auth error:", error);
+      console.error("❌ Auth error:", error);
       toast({
         title: "Something went wrong",
         description: error.message || "Please try again.",
