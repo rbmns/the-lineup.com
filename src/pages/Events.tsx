@@ -366,16 +366,18 @@ const Events = () => {
                   </button>
                   
                   {showDatePicker && (
-                    <div className="absolute top-full right-0 mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-xl p-4 min-w-max">
-                      <MobileFriendlyDatePicker
-                        dateRange={dateRange}
-                        onDateRangeChange={setDateRange}
-                        selectedDateFilter={selectedDateFilter}
-                        onDateFilterChange={setSelectedDateFilter}
-                        onReset={handleClearDateFilter}
-                        onClose={() => setShowDatePicker(false)}
-                        className="w-full"
-                      />
+                    <div className="absolute top-full right-0 mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden min-w-max">
+                      <div className="max-w-none overflow-x-auto">
+                        <MobileFriendlyDatePicker
+                          dateRange={dateRange}
+                          onDateRangeChange={setDateRange}
+                          selectedDateFilter={selectedDateFilter}
+                          onDateFilterChange={setSelectedDateFilter}
+                          onReset={handleClearDateFilter}
+                          onClose={() => setShowDatePicker(false)}
+                          className="w-full p-4"
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
@@ -445,8 +447,8 @@ const Events = () => {
                   
                   {showDatePicker && (
                     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                      <div className="bg-white rounded-lg shadow-xl p-4 w-full max-w-sm max-h-[90vh] overflow-y-auto">
-                        <div className="flex justify-between items-center mb-4">
+                      <div className="bg-white rounded-lg shadow-xl w-full max-w-sm max-h-[90vh] overflow-hidden">
+                        <div className="flex justify-between items-center p-4 border-b">
                           <h3 className="font-medium font-mono text-xs uppercase tracking-wide">Select Date</h3>
                           <button
                             onClick={() => setShowDatePicker(false)}
@@ -455,15 +457,17 @@ const Events = () => {
                             <X className="h-4 w-4" />
                           </button>
                         </div>
-                        <MobileFriendlyDatePicker
-                          dateRange={dateRange}
-                          onDateRangeChange={setDateRange}
-                          selectedDateFilter={selectedDateFilter}
-                          onDateFilterChange={setSelectedDateFilter}
-                          onReset={handleClearDateFilter}
-                          onClose={() => setShowDatePicker(false)}
-                          className="w-full"
-                        />
+                        <div className="overflow-y-auto max-h-[calc(90vh-80px)]">
+                          <MobileFriendlyDatePicker
+                            dateRange={dateRange}
+                            onDateRangeChange={setDateRange}
+                            selectedDateFilter={selectedDateFilter}
+                            onDateFilterChange={setSelectedDateFilter}
+                            onReset={handleClearDateFilter}
+                            onClose={() => setShowDatePicker(false)}
+                            className="w-full p-4"
+                          />
+                        </div>
                       </div>
                     </div>
                   )}

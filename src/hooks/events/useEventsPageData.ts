@@ -8,6 +8,7 @@ import { useVenueFilter } from './useVenueFilter';
 import { DateRange } from 'react-day-picker';
 import { processEventsData } from '@/utils/eventProcessorUtils';
 import { useVenueAreas } from '@/hooks/useVenueAreas';
+import { filterUpcomingEvents } from '@/utils/date-filtering';
 
 export const useEventsPageData = () => {
   // State for filters
@@ -81,11 +82,14 @@ export const useEventsPageData = () => {
       }
 
       // Combine the data
-      return events.map(event => ({
+      const eventsWithRelations = events.map(event => ({
         ...event,
         venues: venues.find(v => v.id === event.venue_id) || null,
         creator: creators.find(c => c.id === (event.creator || event.created_by)) || null
       }));
+
+      // Filter out past events before returning
+      return filterUpcomingEvents(eventsWithRelations);
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
   });

@@ -11,24 +11,35 @@ interface ProfileEventsProps {
 
 const ProfileEvents = ({ events, isLoading, onRsvp }: ProfileEventsProps) => {
   if (isLoading) {
-    return <div className="text-gray-500 font-inter leading-7">Loading events...</div>;
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="text-gray-500 font-inter leading-7">Loading events...</div>
+      </div>
+    );
   }
 
   if (!events || events.length === 0) {
-    return <div className="text-gray-500 font-inter leading-7">No events found.</div>;
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="text-gray-500 font-inter leading-7">No events found.</div>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-2">
-      {events.map((event) => (
-        <div key={event.id} className="block">
-          <EventCardList 
-            event={event} 
-            showRsvpStatus={true} 
-            onRsvp={onRsvp}
-          />
-        </div>
-      ))}
+    <div className="w-full max-w-none overflow-hidden">
+      <div className="space-y-3">
+        {events.map((event) => (
+          <div key={event.id} className="w-full">
+            <EventCardList 
+              event={event} 
+              showRsvpStatus={true} 
+              onRsvp={onRsvp}
+              className="mx-0 px-0"
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
