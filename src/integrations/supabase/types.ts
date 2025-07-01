@@ -369,6 +369,7 @@ export type Database = {
       }
       events: {
         Row: {
+          address: string | null
           area: string | null
           booking_link: string | null
           coordinates: unknown | null
@@ -388,6 +389,7 @@ export type Database = {
           organiser_name: string | null
           organizer_email_internal: string | null
           organizer_link: string | null
+          postal_code: string | null
           recurring_count: number | null
           slug: string | null
           start_datetime: string
@@ -397,9 +399,11 @@ export type Database = {
           title: string | null
           updated_at: string | null
           venue_id: string | null
+          venue_name: string | null
           vibe: string | null
         }
         Insert: {
+          address?: string | null
           area?: string | null
           booking_link?: string | null
           coordinates?: unknown | null
@@ -419,6 +423,7 @@ export type Database = {
           organiser_name?: string | null
           organizer_email_internal?: string | null
           organizer_link?: string | null
+          postal_code?: string | null
           recurring_count?: number | null
           slug?: string | null
           start_datetime: string
@@ -428,9 +433,11 @@ export type Database = {
           title?: string | null
           updated_at?: string | null
           venue_id?: string | null
+          venue_name?: string | null
           vibe?: string | null
         }
         Update: {
+          address?: string | null
           area?: string | null
           booking_link?: string | null
           coordinates?: unknown | null
@@ -450,6 +457,7 @@ export type Database = {
           organiser_name?: string | null
           organizer_email_internal?: string | null
           organizer_link?: string | null
+          postal_code?: string | null
           recurring_count?: number | null
           slug?: string | null
           start_datetime?: string
@@ -459,6 +467,7 @@ export type Database = {
           title?: string | null
           updated_at?: string | null
           venue_id?: string | null
+          venue_name?: string | null
           vibe?: string | null
         }
         Relationships: [
