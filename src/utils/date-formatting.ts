@@ -1,12 +1,9 @@
-
-
 // Re-export the new timezone-aware functions
 export { 
   formatEventDate,
   formatEventDateForCard,
   formatEventTime,
   formatEventTimeWithLocation,
-  formatEventCardDateTime,
   formatEventTimeRange,
   getTimezoneLocationLabel
 } from './timezone-utils';
@@ -15,7 +12,7 @@ export {
 export const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
 
 // Import the functions we need to use internally
-import { formatEventDate, formatEventTime, formatEventDateForCard } from './timezone-utils';
+import { formatEventDate, formatEventTime, formatEventDateForCard, formatEventCardDateTime as formatEventCardDateTimeFromUtils } from './timezone-utils';
 
 /**
  * Helper to format event date in a consistent way - now timezone-aware
@@ -70,7 +67,7 @@ export const formatFeaturedDate = (dateString: string): string => {
 };
 
 /**
- * Format date and time for event cards (using new card-specific formatting without year)
+ * Format date and time for event cards (using timezone-aware function from utils)
  */
 export const formatEventCardDateTime = (
   startDate?: string | null,
@@ -78,28 +75,7 @@ export const formatEventCardDateTime = (
   endDate?: string | null,
   timezone: string = AMSTERDAM_TIMEZONE
 ): string => {
-  if (!startDate) return '';
-
-  try {
-    // Check if it's a multi-day event
-    if (endDate && endDate !== startDate) {
-      const startFormatted = formatEventDateForCard(startDate, timezone);
-      const endFormatted = formatEventDateForCard(endDate, timezone);
-      return `${startFormatted} - ${endFormatted}`;
-    }
-
-    const datePart = formatEventDateForCard(startDate, timezone);
-    
-    if (!startTime) {
-      return datePart;
-    }
-    
-    const timePart = formatEventTime(startDate, startTime, timezone);
-    return `${datePart}, ${timePart}`;
-  } catch (error) {
-    console.error('Error formatting event card date-time:', error);
-    return startDate;
-  }
+  return formatEventCardDateTimeFromUtils(startDate || '', startTime, endDate, timezone);
 };
 
 /**

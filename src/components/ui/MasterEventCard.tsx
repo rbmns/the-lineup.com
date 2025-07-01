@@ -82,10 +82,11 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
     return 'Location TBD';
   };
 
-  // Format date and time for cards (without year and location label)
+  // Format date and time for cards (without year, using event's timezone)
   const formatEventCardDateTime = (): string => {
     if (!event.start_date) return '';
     
+    // Use the event's timezone, not Amsterdam default
     const eventTimezone = event.timezone || 'Europe/Amsterdam';
     
     // Check if it's a multi-day event
