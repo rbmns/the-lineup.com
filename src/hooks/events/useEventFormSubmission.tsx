@@ -1,139 +1,71 @@
 
-import { useState } from 'react';
-import { toast } from '@/hooks/use-toast';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
+import { EventFormData } from '@/components/events/form/EventFormSchema';
 
-interface UseEventFormSubmissionProps {
-  isEditMode?: boolean;
-  originalOnSubmit: (data: any) => Promise<void>;
-  onEventCreated?: (eventId: string, eventTitle: string) => void;
-}
+export const useEventFormSubmission = () => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-export const useEventFormSubmission = ({
-  isEditMode = false,
-  originalOnSubmit,
-  onEventCreated
-}: UseEventFormSubmissionProps) => {
-  const { isAuthenticated, user, session } = useAuth();
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [createdEventId, setCreatedEventId] = useState<string | null>(null);
-  const [createdEventTitle, setCreatedEventTitle] = useState<string>('');
-  const [pendingFormData, setPendingFormData] = useState<any>(null);
+  const createEventMutation = useMutation({
+    mutationFn: async (data: EventFormData) => {
+      if (!user) throw new Error('User must be authenticated');
 
-  const handleFormSubmit = async (data: any) => {
-    console.log("Form submit called with data:", data);
-    console.log("Is authenticated:", isAuthenticated);
-    console.log("User object:", user);
-    console.log("Session object:", session);
-    console.log("Is edit mode:", isEditMode);
+      // Convert form data to database format
+      const eventData = {
+        title: data.title,
+        description: data.description || null,
+        venue_id: data.venueId || null,
+        location: data.location || null,
+        start_date: data.startDate.toISOString().split('T')[0],
+        start_time: data.startTime,
+        end_date: data.endDate?.toISOString().split('T')[0] || null,
+        end_time: data.endTime || null,
+        fixed_start_time: !data.flexibleStartTime, // Invert the checkbox value
+        timezone: data.timezone,
+        event_category: data.eventCategory || null,
+        vibe: data.vibe || null,
+        fee: data.fee || null,
+        organizer_link: data.organizerLink || null,
+        tags: data.tags?.join(',') || null,
+        creator: user.id,
+        created_by: user.id,
+        status: 'published' as const,
+      };
 
-    // If editing an existing event, proceed normally
-    if (isEditMode) {
-      return originalOnSubmit(data);
-    }
+      const { data: event, error } = await supabase
+        .from('events')
+        .insert([eventData])
+        .select()
+        .single();
 
-    // Check authentication using multiple indicators for reliability
-    const isUserAuthenticated = isAuthenticated && user && session;
-
-    // If not authenticated, store form data and show auth modal
-    if (!isUserAuthenticated) {
-      console.log("User not authenticated, showing auth modal");
-      setPendingFormData(data);
-      setShowAuthModal(true);
-      return;
-    }
-
-    // If authenticated, proceed with submission
-    console.log("User authenticated, proceeding with submission");
-    return originalOnSubmit(data);
-  };
-
-  const handleAuthSuccess = async () => {
-    console.log("Auth success callback called");
-    setShowAuthModal(false);
-    
-    if (pendingFormData) {
-      console.log("Submitting pending form data after auth success");
-      
-      // Show a toast to let user know we're processing their event
+      if (error) throw error;
+      return event;
+    },
+    onSuccess: (event) => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
       toast({
-        title: "Publishing your event...",
-        description: "Please wait while we publish your event.",
+        title: 'Event created successfully!',
+        description: 'Your event has been published and is now visible to others.',
       });
-
-      // Add a delay to ensure auth state is fully propagated for new accounts
-      setTimeout(async () => {
-        // Check auth state before proceeding - for new accounts, they should be logged in now
-        if (isAuthenticated && user && session) {
-          try {
-            console.log("Auth confirmed, now submitting event");
-            await originalOnSubmit(pendingFormData);
-            setPendingFormData(null);
-          } catch (error) {
-            console.error("Error submitting form after auth:", error);
-            toast({
-              title: "Event publishing failed",
-              description: "Please try again or check your connection.",
-              variant: "destructive"
-            });
-          }
-        } else {
-          console.log("Auth state not yet confirmed, retrying in a moment");
-          // For new accounts, auth state might take longer to propagate
-          setTimeout(async () => {
-            if (isAuthenticated && user && session) {
-              try {
-                console.log("Auth confirmed on retry, now submitting event");
-                await originalOnSubmit(pendingFormData);
-                setPendingFormData(null);
-              } catch (error) {
-                console.error("Error submitting form after auth retry:", error);
-                toast({
-                  title: "Event publishing failed",
-                  description: "Please try refreshing the page and try again.",
-                  variant: "destructive"
-                });
-              }
-            } else {
-              console.log("Auth state still not confirmed, asking user to try again");
-              toast({
-                title: "Please try again",
-                description: "Your account was created but there was an issue publishing your event. Please try again.",
-                variant: "destructive"
-              });
-              setPendingFormData(null);
-            }
-          }, 2000);
-        }
-      }, 1000);
-    }
-  };
-
-  const handleAuthModalClose = () => {
-    console.log("Auth modal closed without success");
-    setShowAuthModal(false);
-    setPendingFormData(null);
-  };
-
-  const handleEventCreated = (eventId: string, eventTitle: string) => {
-    setCreatedEventId(eventId);
-    setCreatedEventTitle(eventTitle);
-    setShowSuccessModal(true);
-    if (onEventCreated) {
-      onEventCreated(eventId, eventTitle);
-    }
-  };
+      navigate(`/events/${event.id}`);
+    },
+    onError: (error) => {
+      console.error('Error creating event:', error);
+      toast({
+        title: 'Error creating event',
+        description: 'Please try again or contact support if the problem persists.',
+        variant: 'destructive',
+      });
+    },
+  });
 
   return {
-    handleFormSubmit,
-    handleAuthSuccess,
-    handleAuthModalClose,
-    handleEventCreated,
-    showAuthModal,
-    showSuccessModal,
-    setShowSuccessModal,
-    createdEventId,
-    createdEventTitle
+    createEvent: createEventMutation.mutate,
+    isCreating: createEventMutation.isPending,
   };
 };

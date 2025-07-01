@@ -1034,6 +1034,10 @@ export type Database = {
         Args: { city_name: string }
         Returns: string
       }
+      get_timezone_by_country: {
+        Args: { country_name: string }
+        Returns: string
+      }
       has_role: {
         Args: { user_id: string; role_name: string }
         Returns: boolean

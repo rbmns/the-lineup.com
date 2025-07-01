@@ -1,176 +1,149 @@
 
-import React, { useEffect } from 'react';
-import { FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form';
-import { FormValues } from '@/components/events/form/EventFormTypes';
+import React from 'react';
+import { UseFormReturn } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { DatePicker } from '@/components/ui/date-picker';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useFormContext } from 'react-hook-form';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { FlexibleStartTimeField } from './FlexibleStartTimeField';
 
 interface DateTimeFieldsProps {
-  watch: UseFormWatch<FormValues>;
-  setValue: UseFormSetValue<FormValues>;
-  errors: FieldErrors<FormValues>;
+  form: UseFormReturn<any>;
 }
 
-export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ watch, setValue, errors }) => {
-  const form = useFormContext<FormValues>();
-  const isMobile = useIsMobile();
-  const [showEndDate, setShowEndDate] = React.useState(false);
-  
-  const startDate = watch('start_date');
-  const startTime = watch('start_time');
-  
-  // Auto-set end date to match start date when start date changes
-  useEffect(() => {
-    if (startDate && !showEndDate) {
-      setValue('end_date', startDate);
-    }
-  }, [startDate, setValue, showEndDate]);
+export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ form }) => {
+  const startDate = form.watch('startDate');
 
-  // Auto-set end time to be 2 hours after start time when start time changes
-  useEffect(() => {
-    if (startTime) {
-      const [hours, minutes] = startTime.split(':').map(Number);
-      const endHours = (hours + 2) % 24;
-      const endTime = `${endHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-      setValue('end_time', endTime);
-    }
-  }, [startTime, setValue]);
-
-  const handleEndDateToggle = (checked: boolean | "indeterminate") => {
-    const isChecked = checked === true;
-    setShowEndDate(isChecked);
-  };
-  
   return (
-    <div className="bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 p-6 rounded-lg border border-ocean-teal/20">
-      <div className="flex items-center gap-2 mb-6">
-        <div className="w-3 h-3 bg-ocean-teal rounded-full"></div>
-        <h2 className="text-xl font-semibold text-ocean-teal">Date & Time</h2>
+    <div className="space-y-4">
+      {/* Start Date */}
+      <FormField
+        control={form.control}
+        name="startDate"
+        render={({ field }) => (
+          <FormItem className="flex flex-col">
+            <FormLabel>Start Date *</FormLabel>
+            <Popover>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full pl-3 text-left font-normal",
+                      !field.value && "text-muted-foreground"
+                    )}
+                  >
+                    {field.value ? (
+                      format(field.value, "PPP")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={field.value}
+                  onSelect={field.onChange}
+                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      {/* Start Time and Flexible Start Time */}
+      <div className="space-y-2">
+        <FormField
+          control={form.control}
+          name="startTime"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Start Time *</FormLabel>
+              <FormControl>
+                <Input
+                  type="time"
+                  {...field}
+                  className="w-full"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        {/* Flexible Start Time Checkbox */}
+        <FlexibleStartTimeField form={form} />
       </div>
-      
-      <div className="space-y-6">
-        {/* Start Date & Time */}
-        <div>
-          <h3 className="text-lg font-medium text-graphite-grey mb-4">Event Start</h3>
-          <div className={cn(
-            "grid gap-4",
-            isMobile ? "grid-cols-1" : "grid-cols-2"
-          )}>
-            <FormField
-              control={form.control}
-              name="start_date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-graphite-grey">
-                    Start Date *
-                  </FormLabel>
-                  <FormControl>
-                    <DatePicker
-                      selected={field.value}
-                      onSelect={(date) => date && field.onChange(date)}
-                      className="w-full h-11 border-2 border-mist-grey focus:border-ocean-teal"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
-            <FormField
-              control={form.control}
-              name="start_time"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-graphite-grey">
-                    Start Time *
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="time"
-                      className="h-11 border-2 border-mist-grey focus:border-ocean-teal"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
+      {/* End Date (optional) */}
+      <FormField
+        control={form.control}
+        name="endDate"
+        render={({ field }) => (
+          <FormItem className="flex flex-col">
+            <FormLabel>End Date (optional)</FormLabel>
+            <Popover>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full pl-3 text-left font-normal",
+                      !field.value && "text-muted-foreground"
+                    )}
+                  >
+                    {field.value ? (
+                      format(field.value, "PPP")
+                    ) : (
+                      <span>Pick an end date (if different)</span>
+                    )}
+                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={field.value}
+                  onSelect={field.onChange}
+                  disabled={(date) => startDate ? date < startDate : date < new Date(new Date().setHours(0, 0, 0, 0))}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
-        {/* End Date Toggle */}
-        <div className="flex items-center space-x-3 p-3 bg-white/50 rounded-md">
-          <Checkbox
-            id="show-end-date"
-            checked={showEndDate}
-            onCheckedChange={handleEndDateToggle}
-          />
-          <label
-            htmlFor="show-end-date"
-            className="text-sm font-medium text-graphite-grey cursor-pointer"
-          >
-            Event ends on a different date
-          </label>
-        </div>
-
-        {/* End Date & Time */}
-        <div>
-          <h3 className="text-lg font-medium text-graphite-grey mb-4">Event End</h3>
-          <div className={cn(
-            "grid gap-4",
-            isMobile ? "grid-cols-1" : showEndDate ? "grid-cols-2" : "grid-cols-1"
-          )}>
-            {/* End Date - Only show if checkbox is checked */}
-            {showEndDate && (
-              <FormField
-                control={form.control}
-                name="end_date"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium text-graphite-grey">
-                      End Date
-                    </FormLabel>
-                    <FormControl>
-                      <DatePicker
-                        selected={field.value}
-                        onSelect={(date) => date && field.onChange(date)}
-                        className="w-full h-11 border-2 border-mist-grey focus:border-ocean-teal"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+      {/* End Time */}
+      <FormField
+        control={form.control}
+        name="endTime"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>End Time (optional)</FormLabel>
+            <FormControl>
+              <Input
+                type="time"
+                {...field}
+                className="w-full"
               />
-            )}
-
-            {/* End Time - Always shown */}
-            <FormField
-              control={form.control}
-              name="end_time"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-graphite-grey">
-                    End Time *
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="time"
-                      className="h-11 border-2 border-mist-grey focus:border-ocean-teal"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
-      </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 };
