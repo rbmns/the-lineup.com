@@ -15,7 +15,7 @@ export const LocationFields: React.FC = () => {
   const venueNameValue = form.watch('venueName');
   const [showVenueSuggestions, setShowVenueSuggestions] = useState(false);
   
-  const { data: venues = [] } = useVenues();
+  const { venues = [] } = useVenues();
 
   // Filter venues based on venue name input
   const filteredVenues = venues.filter(venue => 
