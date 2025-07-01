@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
 import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayout';
@@ -11,6 +12,7 @@ import { VibesDropdownFilter } from '@/components/events/filters/VibesDropdownFi
 import { CategoriesDropdownFilter } from '@/components/events/filters/CategoriesDropdownFilter';
 import { DateDropdownFilter } from '@/components/events/filters/DateDropdownFilter';
 import { LocationDropdownFilter } from '@/components/events/filters/LocationDropdownFilter';
+import { MobileFriendlyDatePicker } from '@/components/events/filters/MobileFriendlyDatePicker';
 import { X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -49,6 +51,7 @@ const Events = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Event[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const dateFilters = ['today', 'tomorrow', 'this week', 'this weekend', 'next week', 'later'];
 
@@ -227,6 +230,11 @@ const Events = () => {
     setSelectedEventTypes([]);
   };
 
+  const handleClearDateFilter = () => {
+    setSelectedDateFilter('anytime');
+    setDateRange(undefined);
+  };
+
   // Determine which events to display
   const displayEvents = searchQuery.trim() ? searchResults : events;
   const filteredEventsCount = displayEvents?.length || 0;
@@ -291,11 +299,46 @@ const Events = () => {
                   allEventTypes={allEventTypes}
                 />
                 
-                <DateDropdownFilter
-                  selectedDateFilter={selectedDateFilter}
-                  onDateFilterChange={setSelectedDateFilter}
-                  dateFilters={dateFilters}
-                />
+                {/* Replace DateDropdownFilter with enhanced date picker */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowDatePicker(!showDatePicker)}
+                    className={cn(
+                      "inline-flex items-center gap-2 px-3 py-2 text-sm font-medium border rounded-md transition-colors",
+                      (selectedDateFilter && selectedDateFilter !== 'anytime') || dateRange?.from
+                        ? "bg-primary text-white border-primary"
+                        : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
+                    )}
+                  >
+                    Date
+                    {((selectedDateFilter && selectedDateFilter !== 'anytime') || dateRange?.from) && (
+                      <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded text-xs">
+                        {dateRange?.from ? 'Custom' : selectedDateFilter}
+                      </span>
+                    )}
+                  </button>
+                  
+                  {showDatePicker && (
+                    <div className="absolute top-full left-0 mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-4 min-w-[300px]">
+                      <MobileFriendlyDatePicker
+                        dateRange={dateRange}
+                        onDateRangeChange={setDateRange}
+                        selectedDateFilter={selectedDateFilter}
+                        onDateFilterChange={setSelectedDateFilter}
+                        onReset={handleClearDateFilter}
+                        className="w-full"
+                      />
+                      <div className="mt-3 pt-3 border-t flex justify-end">
+                        <button
+                          onClick={() => setShowDatePicker(false)}
+                          className="px-3 py-1.5 text-sm bg-primary text-white rounded-md hover:bg-primary/90"
+                        >
+                          Done
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 
                 <LocationDropdownFilter
                   venueAreas={venueAreas}
@@ -346,11 +389,57 @@ const Events = () => {
                   allEventTypes={allEventTypes}
                 />
                 
-                <DateDropdownFilter
-                  selectedDateFilter={selectedDateFilter}
-                  onDateFilterChange={setSelectedDateFilter}
-                  dateFilters={dateFilters}
-                />
+                {/* Mobile date picker */}
+                <div className="relative">
+                  <button
+                    onClick={() => setShowDatePicker(!showDatePicker)}
+                    className={cn(
+                      "inline-flex items-center gap-2 px-3 py-2 text-sm font-medium border rounded-md transition-colors",
+                      (selectedDateFilter && selectedDateFilter !== 'anytime') || dateRange?.from
+                        ? "bg-primary text-white border-primary"
+                        : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
+                    )}
+                  >
+                    Date
+                    {((selectedDateFilter && selectedDateFilter !== 'anytime') || dateRange?.from) && (
+                      <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded text-xs">
+                        {dateRange?.from ? 'Custom' : selectedDateFilter}
+                      </span>
+                    )}
+                  </button>
+                  
+                  {showDatePicker && (
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                      <div className="bg-white rounded-lg shadow-xl p-4 w-full max-w-sm">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="font-medium">Select Date</h3>
+                          <button
+                            onClick={() => setShowDatePicker(false)}
+                            className="p-1 hover:bg-gray-100 rounded"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                        <MobileFriendlyDatePicker
+                          dateRange={dateRange}
+                          onDateRangeChange={setDateRange}
+                          selectedDateFilter={selectedDateFilter}
+                          onDateFilterChange={setSelectedDateFilter}
+                          onReset={handleClearDateFilter}
+                          className="w-full"
+                        />
+                        <div className="mt-4 pt-3 border-t flex justify-end">
+                          <button
+                            onClick={() => setShowDatePicker(false)}
+                            className="px-4 py-2 text-sm bg-primary text-white rounded-md hover:bg-primary/90"
+                          >
+                            Done
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 
                 <LocationDropdownFilter
                   venueAreas={venueAreas}
