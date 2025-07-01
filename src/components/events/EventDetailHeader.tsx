@@ -41,6 +41,11 @@ export const EventDetailHeader: React.FC<EventDetailHeaderProps> = ({
   // Use provided coverImage or image prop or get from hook
   const imageUrl = providedCoverImage || image || getEventImageUrl(event);
   
+  // Debug the dateTimeInfo being passed
+  console.log(`[DEBUG] EventDetailHeader - Event ID: ${event.id}`);
+  console.log(`[DEBUG] EventDetailHeader - dateTimeInfo: ${dateTimeInfo}`);
+  console.log(`[DEBUG] EventDetailHeader - showTitleOverlay: ${showTitleOverlay}`);
+  
   return (
     <div className="relative w-full">
       <LineupImage

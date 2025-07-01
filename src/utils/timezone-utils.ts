@@ -37,8 +37,18 @@ export function formatEventTime(dateTimeString: string, timezone: string = AMSTE
   try {
     console.log(`[DEBUG] formatEventTime - Input: ${dateTimeString}, Timezone: ${timezone}`);
     const date = parseISO(dateTimeString);
+    console.log(`[DEBUG] formatEventTime - Parsed date object:`, date);
+    console.log(`[DEBUG] formatEventTime - Date in UTC: ${date.toISOString()}`);
+    
     const result = formatInTimeZone(date, timezone, 'HH:mm');
     console.log(`[DEBUG] formatEventTime - Output: ${result}`);
+    
+    // Additional debugging for Lisbon time specifically
+    if (timezone === 'Europe/Lisbon') {
+      const lisbonDate = formatInTimeZone(date, timezone, 'yyyy-MM-dd HH:mm:ss zzz');
+      console.log(`[DEBUG] formatEventTime - Full Lisbon format: ${lisbonDate}`);
+    }
+    
     return result;
   } catch (error) {
     console.error('Error formatting time:', error);
@@ -108,6 +118,8 @@ export function formatEventCardDateTime(
       
       const startDateOnly = formatInTimeZone(startDate, timezone, 'yyyy-MM-dd');
       const endDateOnly = formatInTimeZone(endDate, timezone, 'yyyy-MM-dd');
+      
+      console.log(`[DEBUG] formatEventCardDateTime - Start date: ${startDateOnly}, End date: ${endDateOnly}`);
       
       if (startDateOnly !== endDateOnly) {
         // Multi-day event
