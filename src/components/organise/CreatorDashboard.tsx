@@ -10,7 +10,15 @@ import { format } from 'date-fns';
 
 export const CreatorDashboard: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
-  const { data: userEvents, isLoading } = useUserCreatedEvents();
+  const { data: userEvents, isLoading, error } = useUserCreatedEvents();
+
+  console.log('🔍 Dashboard Debug:', {
+    isAuthenticated,
+    userId: user?.id,
+    userEvents,
+    isLoading,
+    error
+  });
 
   const events = userEvents || [];
   const activeEvents = events.filter(event => new Date(event.start_datetime) > new Date());
