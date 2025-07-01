@@ -16,6 +16,7 @@ import { X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { Event } from '@/types';
 
 const Events = () => {
   const isMobile = useIsMobile();
@@ -56,7 +57,7 @@ const Events = () => {
   const dateFilters = ['today', 'tomorrow', 'this week', 'this weekend', 'next week', 'later'];
 
   // Helper function to filter out past events
-  const filterUpcomingEvents = (events: any[]) => {
+  const filterUpcomingEvents = (events: Event[]) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Reset to start of day for comparison
     
@@ -101,8 +102,13 @@ const Events = () => {
       }
 
       if (data) {
-        let processedEvents = data.map(event => ({
-          ...event,
+        let processedEvents: Event[] = data.map(event => ({
+          id: event.id,
+          title: event.title,
+          description: event.description,
+          start_datetime: event.start_datetime,
+          end_datetime: event.end_datetime,
+          venue_id: event.venue_id,
           venues: event.venues ? {
             id: event.venues.id,
             name: event.venues.name,
@@ -110,10 +116,31 @@ const Events = () => {
             street: event.venues.street,
             postal_code: event.venues.postal_code
           } : undefined,
+          event_category: event.event_category,
+          vibe: event.vibe,
+          creator: null,
+          status: event.status,
           attendees: {
             going: 0,
             interested: 0
-          }
+          },
+          tags: event.tags ? (typeof event.tags === 'string' ? [event.tags] : event.tags) : [],
+          image_urls: event.image_urls || [],
+          booking_link: event.booking_link,
+          organizer_link: event.organizer_link,
+          fee: event.fee,
+          destination: event.destination,
+          organiser_name: event.organiser_name,
+          created_at: event.created_at,
+          updated_at: event.updated_at,
+          fixed_start_time: event.fixed_start_time,
+          area: event.area,
+          google_maps: event.google_maps,
+          extra_info: event.extra_info,
+          slug: event.slug,
+          coordinates: event.coordinates,
+          created_by: event.created_by,
+          timezone: event.timezone
         }));
 
         // Filter out past events from search results
@@ -242,9 +269,9 @@ const Events = () => {
     return `${format(dateRange.from, 'MMM dd')} - ${format(dateRange.to, 'MMM dd')}`;
   };
 
-  // Determine which events to display
-  const displayEvents = searchQuery.trim() ? searchResults : events;
-  const filteredEventsCount = displayEvents?.length || 0;
+  // Determine which events to display - ensure consistent Event type
+  const displayEvents: Event[] = searchQuery.trim() ? searchResults : (events || []);
+  const filteredEventsCount = displayEvents.length;
 
   // Enhanced reset that clears search too and properly resets location to null
   const handleResetAllFilters = () => {
