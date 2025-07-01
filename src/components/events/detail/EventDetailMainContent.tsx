@@ -5,7 +5,12 @@ import { Event } from '@/types';
 import { EventRsvpSection } from '@/components/events/detail-sections/EventRsvpSection';
 import { filterFriendsFromAttendees } from '@/services/friendsService';
 import { useAuth } from '@/contexts/AuthContext';
-import { User, MessageCircle } from 'lucide-react';
+import { useRecurringEvents } from '@/hooks/useRecurringEvents';
+import { User, MessageCircle, Calendar, Clock, MapPin } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { formatEventDate, formatEventTime } from '@/utils/timezone-utils';
 
 interface EventDetailMainContentProps {
   event: Event;
@@ -31,11 +36,30 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
 }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { recurringEvents, isLoading: recurringLoading } = useRecurringEvents(event);
 
   const handleUserClick = (userId: string) => {
     console.log('Navigating to user profile:', userId);
     navigate(`/user/${userId}`);
   };
+
+  const handleRecurringEventClick = (recurringEvent: Event) => {
+    navigate(`/events/${recurringEvent.id}`);
+  };
+
+  // Filter out past events and sort by date
+  const upcomingRecurringEvents = recurringEvents
+    .filter(recurringEvent => {
+      if (!recurringEvent.start_date) return false;
+      const eventDate = new Date(recurringEvent.start_date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return eventDate >= today;
+    })
+    .sort((a, b) => {
+      if (!a.start_date || !b.start_date) return 0;
+      return new Date(a.start_date).getTime() - new Date(b.start_date).getTime();
+    });
 
   return (
     <div className="lg:col-span-2 space-y-8">
@@ -62,6 +86,81 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
           </p>
         </div>
       </div>
+
+      {/* Recurring Events Section */}
+      {upcomingRecurringEvents.length > 0 && (
+        <div className="text-left">
+          <h2 className="text-h2 font-montserrat text-graphite-grey mb-6">
+            Upcoming {event.title} Events
+          </h2>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                Other dates for this recurring event
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {upcomingRecurringEvents.slice(0, 5).map((recurringEvent) => (
+                  <div
+                    key={recurringEvent.id}
+                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                    onClick={() => handleRecurringEventClick(recurringEvent)}
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 text-sm font-medium">
+                          <Calendar className="h-4 w-4 text-gray-500" />
+                          {recurringEvent.start_date && formatEventDate(
+                            recurringEvent.start_date, 
+                            recurringEvent.timezone || 'Europe/Amsterdam'
+                          )}
+                        </div>
+                        
+                        {recurringEvent.start_time && (
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <Clock className="h-4 w-4 text-gray-500" />
+                            {formatEventTime(
+                              recurringEvent.start_time,
+                              recurringEvent.timezone || 'Europe/Amsterdam'
+                            )}
+                          </div>
+                        )}
+                        
+                        {recurringEvent.venues?.city && (
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <MapPin className="h-4 w-4 text-gray-500" />
+                            {recurringEvent.venues.city}
+                          </div>
+                        )}
+                      </div>
+                      
+                      {recurringEvent.venues?.name && (
+                        <div className="text-sm text-gray-500 mt-1">
+                          at {recurringEvent.venues.name}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <Button variant="outline" size="sm">
+                      View Event
+                    </Button>
+                  </div>
+                ))}
+                
+                {upcomingRecurringEvents.length > 5 && (
+                  <div className="text-center pt-4">
+                    <Badge variant="secondary">
+                      +{upcomingRecurringEvents.length - 5} more upcoming events
+                    </Badge>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Additional Information Section */}
       {event.extra_info && (
