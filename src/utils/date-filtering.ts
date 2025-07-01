@@ -175,6 +175,10 @@ export const filterEventsByDate = (
 // Alias for filterEventsByDate for backwards compatibility
 export const filterEventsByDateFilter = filterEventsByDate;
 
+/**
+ * Check if a single event matches the date range filter criteria
+ * This is used for individual event filtering in components
+ */
 export const filterEventsByDateRange = (event: Event, dateFilter: string, dateRange?: DateRange): boolean => {
   if (!dateFilter && !dateRange) return true;
   
@@ -217,6 +221,10 @@ export const filterEventsByDateRange = (event: Event, dateFilter: string, dateRa
       const eventDate = new Date(event.start_date);
       const twoWeeksFromNow = addDays(now, 14);
       return eventDate > twoWeeksFromNow;
+      
+    case 'anytime':
+    case '':
+      return true;
       
     default:
       return true;

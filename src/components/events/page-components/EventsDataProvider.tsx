@@ -9,6 +9,7 @@ import { useFilterState } from '@/contexts/FilterStateContext';
 import { Event } from '@/types';
 import { LocationData } from '@/hooks/useLocation';
 import { isEventNearby } from '@/utils/geolocationUtils';
+import { filterEventsByDateRange } from '@/utils/date-filtering';
 
 interface EventsDataProviderProps {
   children: (data: {
@@ -146,13 +147,12 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     }
   };
 
-  // Filter events based on all selected filters including vibes
+  // Filter events based on all selected filters including vibes and dates
   const filteredEvents = useMemo(() => {
     if (!allEvents) return [];
     
     console.log('🔍 Starting filteredEvents calculation with', allEvents.length, 'events');
-    console.log('🔍 selectedCategories:', selectedCategories);
-    console.log('🔍 allEventTypes:', allEventTypes);
+    console.log('🔍 Date filters:', { selectedDateFilter, dateRange });
     
     let tempFilteredEvents = [...allEvents];
 
@@ -177,9 +177,7 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
     }
 
     const result = tempFilteredEvents.filter((event) => {
-      // Simplified category filter logic:
-      // If no categories are selected (empty array), show all events
-      // If specific categories are selected, filter by those categories only
+      // Category filter
       if (selectedCategories.length > 0) {
         if (!selectedCategories.includes(event.event_category || '')) {
           return false;
@@ -198,42 +196,16 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
         }
       }
       
-      // Date filter logic
-      if (dateRange?.from) {
-        const eventDate = new Date(event.start_date || '');
-        const fromDate = new Date(dateRange.from);
-        const toDate = dateRange.to ? new Date(dateRange.to) : fromDate;
-        
-        if (eventDate < fromDate || eventDate > toDate) {
+      // Date filter logic - use the utility function
+      if (selectedDateFilter && selectedDateFilter !== 'anytime') {
+        const matchesDateFilter = filterEventsByDateRange(event, selectedDateFilter, dateRange);
+        if (!matchesDateFilter) {
           return false;
         }
-      }
-      
-      // Quick date filters
-      if (selectedDateFilter) {
-        const today = new Date();
-        const eventDate = new Date(event.start_date || '');
-        
-        switch (selectedDateFilter) {
-          case 'today':
-            if (eventDate.toDateString() !== today.toDateString()) return false;
-            break;
-          case 'tomorrow':
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            if (eventDate.toDateString() !== tomorrow.toDateString()) return false;
-            break;
-          case 'this-weekend':
-            const dayOfWeek = today.getDay();
-            const daysUntilSaturday = (6 - dayOfWeek) % 7;
-            const saturday = new Date(today);
-            saturday.setDate(today.getDate() + daysUntilSaturday);
-            const sunday = new Date(saturday);
-            sunday.setDate(saturday.getDate() + 1);
-            
-            if (eventDate.toDateString() !== saturday.toDateString() && 
-                eventDate.toDateString() !== sunday.toDateString()) return false;
-            break;
+      } else if (dateRange?.from) {
+        const matchesDateRange = filterEventsByDateRange(event, '', dateRange);
+        if (!matchesDateRange) {
+          return false;
         }
       }
       
@@ -245,7 +217,8 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
       selectedCategories: selectedCategories.length,
       selectedVenues: selectedVenues.length,
       selectedVibes: selectedVibes?.length || 0,
-      hasDateFilter: !!dateRange || !!selectedDateFilter
+      selectedDateFilter,
+      hasDateRange: !!dateRange?.from
     });
     
     return result;

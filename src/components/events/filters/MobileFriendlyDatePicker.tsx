@@ -1,0 +1,200 @@
+
+import React, { useState } from 'react';
+import { DateRange } from 'react-day-picker';
+import { Calendar } from '@/components/ui/calendar';
+import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
+import { CalendarIcon, X } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+
+interface MobileFriendlyDatePickerProps {
+  dateRange: DateRange | undefined;
+  onDateRangeChange: (range: DateRange | undefined) => void;
+  selectedDateFilter: string;
+  onDateFilterChange: (filter: string) => void;
+  onReset: () => void;
+  className?: string;
+}
+
+export const MobileFriendlyDatePicker: React.FC<MobileFriendlyDatePickerProps> = ({
+  dateRange,
+  onDateRangeChange,
+  selectedDateFilter,
+  onDateFilterChange,
+  onReset,
+  className
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useIsMobile();
+
+  const quickDateOptions = [
+    { label: 'Today', value: 'today' },
+    { label: 'Tomorrow', value: 'tomorrow' },
+    { label: 'This Week', value: 'this week' },
+    { label: 'This Weekend', value: 'this weekend' },
+    { label: 'Next Week', value: 'next week' },
+    { label: 'Later', value: 'later' },
+  ];
+
+  const handleQuickDateSelect = (value: string) => {
+    onDateFilterChange(value);
+    onDateRangeChange(undefined); // Clear custom range when using quick filters
+  };
+
+  const formatDateRange = (range: DateRange | undefined) => {
+    if (!range?.from) return 'Select dates';
+    if (!range.to) return format(range.from, 'MMM dd');
+    return `${format(range.from, 'MMM dd')} - ${format(range.to, 'MMM dd')}`;
+  };
+
+  const handleDateRangeSelect = (range: DateRange | undefined) => {
+    onDateRangeChange(range);
+    if (range?.from) {
+      onDateFilterChange(''); // Clear quick filter when using custom range
+      if (range.to) {
+        setIsOpen(false); // Close when full range is selected
+      }
+    }
+  };
+
+  const hasActiveFilter = dateRange?.from || (selectedDateFilter && selectedDateFilter !== 'anytime');
+
+  return (
+    <div className={cn("space-y-3", className)}>
+      {/* Quick date filters */}
+      <div className="space-y-2">
+        <div className="flex flex-wrap gap-1.5">
+          {quickDateOptions.map((option) => (
+            <Button
+              key={option.value}
+              variant={selectedDateFilter === option.value ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleQuickDateSelect(option.value)}
+              className={cn(
+                "text-xs px-2 py-1 h-7 rounded-full transition-colors",
+                selectedDateFilter === option.value 
+                  ? "bg-primary text-white hover:bg-primary/90" 
+                  : "border-gray-200 text-neutral hover:bg-primary/5"
+              )}
+            >
+              {option.label}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Custom date range picker */}
+      <div className="space-y-2">
+        <p className="text-xs text-gray-600">Or select a custom date range:</p>
+        <div className="flex items-center gap-2">
+          <Popover open={isOpen} onOpenChange={setIsOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "flex-1 justify-start text-left font-normal h-9 text-sm",
+                  !dateRange?.from && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {formatDateRange(dateRange)}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent 
+              className={cn(
+                "w-auto p-0 bg-white border border-gray-200 shadow-lg z-50",
+                isMobile && "w-[calc(100vw-2rem)] max-w-sm"
+              )} 
+              align="start"
+              sideOffset={4}
+            >
+              <div className="p-3 space-y-3">
+                {/* Close button for mobile */}
+                {isMobile && (
+                  <div className="flex justify-between items-center pb-2 border-b">
+                    <h4 className="font-medium">Select Date Range</h4>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsOpen(false)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+                
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={dateRange?.from}
+                  selected={dateRange}
+                  onSelect={handleDateRangeSelect}
+                  numberOfMonths={isMobile ? 1 : 2}
+                  className={cn(
+                    "pointer-events-auto",
+                    isMobile && "w-full"
+                  )}
+                  classNames={{
+                    months: isMobile ? "flex flex-col" : "flex flex-row space-x-4",
+                    month: "space-y-4",
+                    caption: "flex justify-center pt-1 relative items-center",
+                    caption_label: "text-sm font-medium",
+                    nav: "space-x-1 flex items-center",
+                    nav_button: "h-7 w-7 bg-transparent p-0 hover:bg-accent hover:text-accent-foreground",
+                    nav_button_previous: "absolute left-1",
+                    nav_button_next: "absolute right-1",
+                    table: "w-full border-collapse space-y-1",
+                    head_row: "flex",
+                    head_cell: "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem]",
+                    row: "flex w-full mt-2",
+                    cell: cn(
+                      "relative p-0 text-center text-sm focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-accent [&:has([aria-selected].day-outside)]:bg-accent/50",
+                      "h-8 w-8"
+                    ),
+                    day: "h-8 w-8 p-0 font-normal aria-selected:opacity-100 hover:bg-accent hover:text-accent-foreground rounded-md",
+                    day_range_start: "day-range-start rounded-l-md",
+                    day_range_end: "day-range-end rounded-r-md",
+                    day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+                    day_today: "bg-accent text-accent-foreground",
+                    day_outside: "day-outside text-muted-foreground opacity-50",
+                    day_disabled: "text-muted-foreground opacity-50",
+                    day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+                    day_hidden: "invisible",
+                  }}
+                />
+                
+                {/* Apply button for mobile */}
+                {isMobile && (
+                  <div className="flex justify-end pt-2 border-t">
+                    <Button 
+                      size="sm" 
+                      onClick={() => setIsOpen(false)}
+                      className="bg-primary hover:bg-primary/90"
+                    >
+                      {dateRange?.to ? "Apply Range" : dateRange?.from ? "Select End Date" : "Close"}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
+          
+          {hasActiveFilter && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onReset}
+              className="h-9 w-9 p-0 hover:bg-gray-100"
+            >
+              <X className="h-4 w-4" />
+              <span className="sr-only">Clear date filter</span>
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
