@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin } from 'lucide-react';
@@ -6,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { useEventImages } from '@/hooks/useEventImages';
 import { toast } from '@/hooks/use-toast';
-import { formatEventDateForCard, formatEventTime } from '@/utils/timezone-utils';
+import { formatEventCardDateTime } from '@/utils/timezone-utils';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface MasterEventCardProps {
@@ -82,33 +81,19 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
     return 'Location TBD';
   };
 
-  // Format date and time for cards (without year, using event's timezone)
-  const formatEventCardDateTime = (): string => {
+  // Format date and time for cards (in event's local timezone, no location context)
+  const getFormattedDateTime = (): string => {
     if (!event.start_date) return '';
     
-    // Use the event's timezone, not Amsterdam default
+    // Always use the event's local timezone for cards
     const eventTimezone = event.timezone || 'Europe/Amsterdam';
     
-    // Check if it's a multi-day event
-    if (event.end_date && event.end_date !== event.start_date) {
-      const startFormatted = formatEventDateForCard(event.start_date, eventTimezone);
-      const endFormatted = formatEventDateForCard(event.end_date, eventTimezone);
-      return `${startFormatted} - ${endFormatted}`;
-    }
-    
-    try {
-      const datePart = formatEventDateForCard(event.start_date, eventTimezone);
-      
-      if (!event.start_time) {
-        return datePart;
-      }
-      
-      const timePart = formatEventTime(event.start_date, event.start_time, eventTimezone);
-      return `${datePart}, ${timePart}`;
-    } catch (error) {
-      console.error('Error formatting event card date-time:', error);
-      return event.start_date;
-    }
+    return formatEventCardDateTime(
+      event.start_date,
+      event.start_time,
+      event.end_date,
+      eventTimezone
+    );
   };
 
   return (
@@ -165,7 +150,7 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
         <div className="text-sm text-graphite-grey opacity-75 font-mono mb-3 flex items-center gap-2">
           <Calendar className="h-4 w-4 text-ocean-teal flex-shrink-0" />
           <span>
-            {formatEventCardDateTime()}
+            {getFormattedDateTime()}
           </span>
         </div>
         

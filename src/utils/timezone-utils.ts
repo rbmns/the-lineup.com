@@ -58,7 +58,7 @@ export function createEventDateTime(dateString: string, timeString: string, time
 }
 
 /**
- * Format a complete event date and time range
+ * Format a complete event date and time range (for detail pages with location context)
  */
 export function formatEventTimeRange(
   startDate: string, 
@@ -80,9 +80,9 @@ export function formatEventTimeRange(
       timeRange += ` - ${endTimeFormatted}`;
     }
     
-    // Add city context if provided and different from Amsterdam
+    // Add city context if provided and different from Amsterdam (for detail pages)
     if (cityName && timezone !== AMSTERDAM_TIMEZONE) {
-      timeRange += ` (${cityName} time)`;
+      timeRange += ` (${cityName} local time)`;
     }
     
     return timeRange;
@@ -93,14 +93,13 @@ export function formatEventTimeRange(
 }
 
 /**
- * Format date and time for event cards (no year, timezone-aware)
+ * Format date and time for event cards (no year, no location context, always in event's local timezone)
  */
 export function formatEventCardDateTime(
   startDate: string,
   startTime?: string | null,
   endDate?: string | null,
-  timezone: string = AMSTERDAM_TIMEZONE,
-  cityName?: string
+  timezone: string = AMSTERDAM_TIMEZONE
 ): string {
   if (!startDate) return '';
 
@@ -118,6 +117,7 @@ export function formatEventCardDateTime(
       return datePart;
     }
     
+    // Always show time in event's local timezone, no location context for cards
     const timePart = formatEventTime(startDate, startTime, timezone);
     return `${datePart}, ${timePart}`;
   } catch (error) {
@@ -127,7 +127,7 @@ export function formatEventCardDateTime(
 }
 
 /**
- * Format event time with location context
+ * Format event time with location context (for detail pages)
  */
 export function formatEventTimeWithLocation(
   dateString: string,
@@ -139,7 +139,7 @@ export function formatEventTimeWithLocation(
     const formattedTime = formatEventTime(dateString, timeString, timezone);
     
     if (cityName && timezone !== AMSTERDAM_TIMEZONE) {
-      return `${formattedTime} (${cityName} time)`;
+      return `${formattedTime} (${cityName} local time)`;
     }
     
     return formattedTime;
@@ -154,7 +154,7 @@ export function formatEventTimeWithLocation(
  */
 export function getTimezoneLocationLabel(timezone: string, cityName?: string): string {
   if (cityName && timezone !== AMSTERDAM_TIMEZONE) {
-    return `${cityName} time`;
+    return `${cityName} local time`;
   }
   return '';
 }
