@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { FieldErrors, Control, UseFormWatch, UseFormSetValue } from 'react-hook-form';
-import { FormValues } from '@/components/events/form/EventFormTypes';
+import { Control } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,19 +10,13 @@ import { useFormContext } from 'react-hook-form';
 import { cn } from '@/lib/utils';
 
 interface OptionalFieldsSectionProps {
-  errors: FieldErrors<FormValues>;
-  control: Control<FormValues>;
-  watch: UseFormWatch<FormValues>;
-  setValue: UseFormSetValue<FormValues>;
+  control: Control<any>;
 }
 
 export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({ 
-  errors, 
-  control, 
-  watch, 
-  setValue 
+  control
 }) => {
-  const form = useFormContext<FormValues>();
+  const form = useFormContext();
   const [isOpen, setIsOpen] = React.useState(false);
   
   return (
@@ -52,7 +45,7 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
             {/* Organizer Link */}
             <FormField
               control={form.control}
-              name="organizer_link"
+              name="organizerLink"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-graphite-grey">
@@ -92,33 +85,12 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
               )}
             />
 
-            {/* Booking Link */}
-            <FormField
-              control={form.control}
-              name="booking_link"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-graphite-grey">
-                    Booking Link
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="https://example.com/book"
-                      className="h-11 border-2 border-mist-grey focus:border-ocean-teal"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             {/* Tags */}
             <FormField
               control={form.control}
               name="tags"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="md:col-span-2">
                   <FormLabel className="text-sm font-medium text-graphite-grey">
                     Tags (comma separated)
                   </FormLabel>
@@ -126,7 +98,12 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
                     <Input
                       placeholder="outdoor, sports, fun"
                       className="h-11 border-2 border-mist-grey focus:border-ocean-teal"
-                      {...field}
+                      value={Array.isArray(field.value) ? field.value.join(', ') : field.value || ''}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const tags = value ? value.split(',').map(tag => tag.trim()).filter(Boolean) : [];
+                        field.onChange(tags);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -134,27 +111,6 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
               )}
             />
           </div>
-
-          {/* Extra Info - Full width */}
-          <FormField
-            control={form.control}
-            name="extra_info"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium text-graphite-grey">
-                  Additional Information
-                </FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Any additional details about your event..."
-                    className="min-h-[120px] border-2 border-mist-grey focus:border-ocean-teal"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </CollapsibleContent>
       </Collapsible>
     </div>

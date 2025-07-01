@@ -1,17 +1,11 @@
 
 import React from 'react';
-import { FieldErrors } from 'react-hook-form';
-import { FormValues } from '@/components/events/form/EventFormTypes';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { useFormContext } from 'react-hook-form';
 
-interface DescriptionFieldProps {
-  errors: FieldErrors<FormValues>;
-}
-
-export const DescriptionField: React.FC<DescriptionFieldProps> = ({ errors }) => {
-  const form = useFormContext<FormValues>();
+export const DescriptionField: React.FC = () => {
+  const form = useFormContext();
   
   return (
     <FormField

@@ -32,24 +32,21 @@ export const EventForm: React.FC<EventFormProps> = ({
   const {
     form,
     venues,
+    vibes,
+    isSubmitting,
     isLoadingVenues,
     isCreateVenueModalOpen,
     setCreateVenueModalOpen,
     handleVenueCreated,
-    onSubmit: originalOnSubmit,
+    onSubmit,
     onInvalid
   } = useEventForm();
-
-  // Define handleEventCreated first
-  const handleEventCreated = (eventId: string, eventTitle: string) => {
-    // This will be handled by useEventFormSubmission
-  };
 
   const {
     handleFormSubmit,
     handleAuthSuccess,
     handleAuthModalClose,
-    handleEventCreated: handleEventCreatedFromSubmission,
+    handleEventCreated,
     showAuthModal,
     showSuccessModal,
     setShowSuccessModal,

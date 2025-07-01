@@ -23,6 +23,18 @@ export const useEventFormSubmission = () => {
         throw new Error('User must be authenticated');
       }
 
+      // Create start_datetime from date and time
+      const startDatetime = new Date(`${data.startDate.toISOString().split('T')[0]}T${data.startTime}`);
+      
+      // Create end_datetime if end date and time are provided
+      let endDatetime = null;
+      if (data.endDate && data.endTime) {
+        endDatetime = new Date(`${data.endDate.toISOString().split('T')[0]}T${data.endTime}`);
+      } else if (data.endTime) {
+        // Use start date with end time
+        endDatetime = new Date(`${data.startDate.toISOString().split('T')[0]}T${data.endTime}`);
+      }
+
       // Convert form data to database format
       const eventData = {
         title: data.title,
@@ -33,6 +45,8 @@ export const useEventFormSubmission = () => {
         start_time: data.startTime,
         end_date: data.endDate?.toISOString().split('T')[0] || null,
         end_time: data.endTime || null,
+        start_datetime: startDatetime.toISOString(),
+        end_datetime: endDatetime?.toISOString() || null,
         fixed_start_time: !data.flexibleStartTime, // Invert the checkbox value
         timezone: data.timezone,
         event_category: data.eventCategory || null,

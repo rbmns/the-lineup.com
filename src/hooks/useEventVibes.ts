@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 
 export const useEventVibes = () => {
-  return useQuery({
+  const query = useQuery({
     queryKey: ['event-vibes'],
     queryFn: async () => {
       console.log('Fetching event vibes from event_vibe table...');
@@ -32,4 +32,9 @@ export const useEventVibes = () => {
     retry: 1,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  return {
+    ...query,
+    vibes: query.data || [],
+  };
 };

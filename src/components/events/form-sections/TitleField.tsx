@@ -1,17 +1,11 @@
 
 import React from 'react';
-import { FieldErrors } from 'react-hook-form';
-import { FormValues } from '@/components/events/form/EventFormTypes';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { useFormContext } from 'react-hook-form';
 
-interface TitleFieldProps {
-  errors: FieldErrors<FormValues>;
-}
-
-export const TitleField: React.FC<TitleFieldProps> = ({ errors }) => {
-  const form = useFormContext<FormValues>();
+export const TitleField: React.FC = () => {
+  const form = useFormContext();
   
   return (
     <FormField
