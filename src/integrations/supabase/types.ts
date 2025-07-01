@@ -377,9 +377,7 @@ export type Database = {
           creator: string | null
           description: string | null
           destination: string | null
-          end_date: string | null
           end_datetime: string | null
-          end_time: string | null
           event_category: string | null
           extra_info: string | null
           fee: string | null
@@ -392,9 +390,7 @@ export type Database = {
           organizer_link: string | null
           recurring_count: number | null
           slug: string | null
-          start_date: string | null
           start_datetime: string
-          start_time: string | null
           status: Database["public"]["Enums"]["event_status"]
           tags: string | null
           timezone: string
@@ -412,9 +408,7 @@ export type Database = {
           creator?: string | null
           description?: string | null
           destination?: string | null
-          end_date?: string | null
           end_datetime?: string | null
-          end_time?: string | null
           event_category?: string | null
           extra_info?: string | null
           fee?: string | null
@@ -427,9 +421,7 @@ export type Database = {
           organizer_link?: string | null
           recurring_count?: number | null
           slug?: string | null
-          start_date?: string | null
           start_datetime: string
-          start_time?: string | null
           status?: Database["public"]["Enums"]["event_status"]
           tags?: string | null
           timezone?: string
@@ -447,9 +439,7 @@ export type Database = {
           creator?: string | null
           description?: string | null
           destination?: string | null
-          end_date?: string | null
           end_datetime?: string | null
-          end_time?: string | null
           event_category?: string | null
           extra_info?: string | null
           fee?: string | null
@@ -462,9 +452,7 @@ export type Database = {
           organizer_link?: string | null
           recurring_count?: number | null
           slug?: string | null
-          start_date?: string | null
           start_datetime?: string
-          start_time?: string | null
           status?: Database["public"]["Enums"]["event_status"]
           tags?: string | null
           timezone?: string

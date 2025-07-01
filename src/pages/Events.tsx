@@ -61,10 +61,10 @@ const Events = () => {
     today.setHours(0, 0, 0, 0); // Reset to start of day for comparison
     
     return events.filter(event => {
-      if (!event.start_date) {
-        return true; // Include events without start_date
+      if (!event.start_datetime) {
+        return true; // Include events without start_datetime
       }
-      const eventDate = new Date(event.start_date);
+      const eventDate = new Date(event.start_datetime);
       return eventDate >= today;
     });
   };
@@ -91,7 +91,7 @@ const Events = () => {
         `)
         .eq('status', 'published')
         .or(`title.ilike.${searchPattern},description.ilike.${searchPattern},destination.ilike.${searchPattern},event_category.ilike.${searchPattern},tags.ilike.${searchPattern},vibe.ilike.${searchPattern}`)
-        .order('start_date', { ascending: true });
+        .order('start_datetime', { ascending: true });
 
       const { data, error } = await searchQuery;
 
@@ -153,7 +153,7 @@ const Events = () => {
           // Date filter
           if (selectedDateFilter && selectedDateFilter !== 'anytime') {
             const today = new Date();
-            const eventDate = new Date(event.start_date || '');
+            const eventDate = new Date(event.start_datetime || '');
             
             switch (selectedDateFilter) {
               case 'today':
@@ -192,8 +192,8 @@ const Events = () => {
           }
 
           // Date range filter
-          if (dateRange?.from && event.start_date) {
-            const eventDate = new Date(event.start_date);
+          if (dateRange?.from && event.start_datetime) {
+            const eventDate = new Date(event.start_datetime);
             if (eventDate < dateRange.from) return false;
             if (dateRange.to && eventDate > dateRange.to) return false;
           }

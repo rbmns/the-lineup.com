@@ -45,7 +45,7 @@ export const useEventFetcher = ({ onDataFetched, onError, onLoadingChange }: Pro
 
       // Apply event type filter
       if (selectedEventTypes.length > 0) {
-        query = query.in('event_type', selectedEventTypes);
+        query = query.in('event_category', selectedEventTypes);
       }
 
       // Apply venue filter
@@ -55,70 +55,79 @@ export const useEventFetcher = ({ onDataFetched, onError, onLoadingChange }: Pro
 
       // Apply date filter based on date range or predefined filters
       if (dateRange && dateRange.from) {
-        const fromDate = dateRange.from.toISOString().split('T')[0]; // Get YYYY-MM-DD
-        query = query.gte('start_date', fromDate);
+        const fromDate = dateRange.from.toISOString(); // Use full datetime
+        query = query.gte('start_datetime', fromDate);
 
         if (dateRange.to) {
-          const toDate = dateRange.to.toISOString().split('T')[0]; // Get YYYY-MM-DD
-          query = query.lte('start_date', toDate);
+          const toDate = dateRange.to.toISOString(); // Use full datetime
+          query = query.lte('start_datetime', toDate);
         }
       } else if (selectedDateFilter) {
         // Handle predefined filters
-        let filterDate;
-
+        const today = new Date();
+        
         switch (selectedDateFilter) {
           case 'today':
-            filterDate = new Date().toISOString().split('T')[0]; // Today in YYYY-MM-DD
-            query = query.eq('start_date', filterDate);
+            const todayStart = new Date(today);
+            todayStart.setHours(0, 0, 0, 0);
+            const todayEnd = new Date(today);
+            todayEnd.setHours(23, 59, 59, 999);
+            query = query.gte('start_datetime', todayStart.toISOString())
+                        .lte('start_datetime', todayEnd.toISOString());
             break;
 
           case 'tomorrow':
-            const tomorrow = new Date();
+            const tomorrow = new Date(today);
             tomorrow.setDate(tomorrow.getDate() + 1);
-            filterDate = tomorrow.toISOString().split('T')[0]; // Tomorrow in YYYY-MM-DD
-            query = query.eq('start_date', filterDate);
+            const tomorrowStart = new Date(tomorrow);
+            tomorrowStart.setHours(0, 0, 0, 0);
+            const tomorrowEnd = new Date(tomorrow);
+            tomorrowEnd.setHours(23, 59, 59, 999);
+            query = query.gte('start_datetime', tomorrowStart.toISOString())
+                        .lte('start_datetime', tomorrowEnd.toISOString());
             break;
 
           case 'this-weekend':
             // Calculate this weekend's dates
-            const today = new Date();
             const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ...
             const daysUntilFriday = dayOfWeek <= 5 ? 5 - dayOfWeek : 5 + (7 - dayOfWeek);
             const friday = new Date(today);
             friday.setDate(today.getDate() + daysUntilFriday);
+            friday.setHours(0, 0, 0, 0);
 
             const sunday = new Date(friday);
             sunday.setDate(friday.getDate() + 2);
+            sunday.setHours(23, 59, 59, 999);
 
-            query = query
-              .gte('start_date', friday.toISOString().split('T')[0])
-              .lte('start_date', sunday.toISOString().split('T')[0]);
+            query = query.gte('start_datetime', friday.toISOString())
+                        .lte('start_datetime', sunday.toISOString());
             break;
 
           case 'next-week':
             // Calculate next week's dates (Monday to Sunday)
-            const currentDate = new Date();
+            const currentDate = new Date(today);
             const nextMonday = new Date();
             const currentDay = currentDate.getDay() || 7; // Convert Sunday (0) to 7
             nextMonday.setDate(currentDate.getDate() + (8 - currentDay)); // Next Monday
+            nextMonday.setHours(0, 0, 0, 0);
 
             const nextSunday = new Date(nextMonday);
             nextSunday.setDate(nextMonday.getDate() + 6);
+            nextSunday.setHours(23, 59, 59, 999);
 
-            query = query
-              .gte('start_date', nextMonday.toISOString().split('T')[0])
-              .lte('start_date', nextSunday.toISOString().split('T')[0]);
+            query = query.gte('start_datetime', nextMonday.toISOString())
+                        .lte('start_datetime', nextSunday.toISOString());
             break;
 
           default:
             // If none of the above, just filter by today or later
-            filterDate = new Date().toISOString().split('T')[0]; // Today in YYYY-MM-DD
-            query = query.gte('start_date', filterDate);
+            const now = new Date();
+            query = query.gte('start_datetime', now.toISOString());
         }
       }
 
-      // Always sort by date and time
-      query = query.order('start_date', { ascending: true }).order('start_time', { ascending: true });
+      // Always sort by datetime
+      query = query.order('start_datetime', { ascending: true });
 
       // Execute query
       const { data, error } = await query;
@@ -172,9 +181,8 @@ export const useEventFetcher = ({ onDataFetched, onError, onLoadingChange }: Pro
             type: 'websearch',
             config: 'english'
           })
-          .not('event_type', 'in', selectedEventTypes) // Exclude selected event types
-          .order('start_date', { ascending: true })
-          .order('start_time', { ascending: true });
+          .not('event_category', 'in', selectedEventTypes) // Exclude selected event types
+          .order('start_datetime', { ascending: true });
 
         if (error) {
           console.error("Error fetching query-only events:", error);
