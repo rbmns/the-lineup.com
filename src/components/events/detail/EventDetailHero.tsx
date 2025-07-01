@@ -2,7 +2,7 @@
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar } from 'lucide-react';
-import { formatDate, formatTime } from '@/utils/date-formatting';
+import { formatEventDate, formatEventTime } from '@/utils/timezone-utils';
 import { getEventImage } from '@/utils/eventImages';
 import EventShareButton from '@/components/events/EventShareButton';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -15,6 +15,7 @@ interface EventDetailHeroProps {
 export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
   const eventImage = getEventImage(event);
   const isMobile = useIsMobile();
+  const eventTimezone = event.timezone || 'Europe/Amsterdam';
 
   return (
     <div className="relative w-full">
@@ -60,9 +61,9 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
               <div className="flex items-center text-large font-lato text-pure-white drop-shadow-md">
                 <Calendar className="h-5 w-5 mr-3 flex-shrink-0" />
                 <span>
-                  {event.start_date && formatDate(event.start_date, event.timezone)}
-                  {event.start_time && event.end_time && `, ${formatTime(event.start_time, event.start_date, event.timezone)}-${formatTime(event.end_time, event.start_date, event.timezone)}`}
-                  {event.start_time && !event.end_time && `, ${formatTime(event.start_time, event.start_date, event.timezone)}`}
+                  {event.start_date && formatEventDate(event.start_date, eventTimezone)}
+                  {event.start_time && event.end_time && `, ${formatEventTime(event.start_date!, event.start_time, eventTimezone)}-${formatEventTime(event.start_date!, event.end_time, eventTimezone)}`}
+                  {event.start_time && !event.end_time && `, ${formatEventTime(event.start_date!, event.start_time, eventTimezone)}`}
                 </span>
               </div>
               
@@ -89,9 +90,9 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
             <div className="flex items-center text-base text-graphite-grey">
               <Calendar className="h-4 w-4 mr-2 flex-shrink-0 text-ocean-teal" />
               <span>
-                {event.start_date && formatDate(event.start_date, event.timezone)}
-                {event.start_time && event.end_time && `, ${formatTime(event.start_time, event.start_date, event.timezone)}-${formatTime(event.end_time, event.start_date, event.timezone)}`}
-                {event.start_time && !event.end_time && `, ${formatTime(event.start_time, event.start_date, event.timezone)}`}
+                {event.start_date && formatEventDate(event.start_date, eventTimezone)}
+                {event.start_time && event.end_time && `, ${formatEventTime(event.start_date!, event.start_time, eventTimezone)}-${formatEventTime(event.start_date!, event.end_time, eventTimezone)}`}
+                {event.start_time && !event.end_time && `, ${formatEventTime(event.start_date!, event.start_time, eventTimezone)}`}
               </span>
             </div>
             
