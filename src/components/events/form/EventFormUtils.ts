@@ -1,66 +1,42 @@
 
 import { EventFormData } from './EventFormSchema';
-import TimezoneService from '@/services/timezoneService';
-import LocationService from '@/services/locationService';
 
-export const processFormData = async (data: EventFormData, userId: string) => {
-  // Process tags - convert string to array
-  const processedTags = data.tags 
-    ? data.tags.join(', ')
-    : '';
-
-  // Build location string from components
-  const locationParts = [
-    data.venueName,
-    data.address,
-    data.city,
-    data.postalCode
-  ].filter(Boolean);
+export const processFormData = async (data: EventFormData, userId: string | null) => {
+  console.log('Processing form data for user:', userId);
   
-  const location = locationParts.join(', ');
-
-  // Convert dates to ISO strings and combine with times
-  const startDate = data.startDate ? data.startDate.toISOString().split('T')[0] : null;
-  const endDate = data.endDate ? data.endDate.toISOString().split('T')[0] : null;
-
-  // Create datetime strings
-  const startDateTime = startDate && data.startTime 
-    ? `${startDate}T${data.startTime}:00` 
+  // Convert date and time to datetime
+  const startDateTime = data.startDate && data.startTime 
+    ? new Date(`${data.startDate.toISOString().split('T')[0]}T${data.startTime}:00`)
     : null;
-  const endDateTime = endDate && data.endTime 
-    ? `${endDate}T${data.endTime}:00` 
+    
+  const endDateTime = data.endDate && data.endTime 
+    ? new Date(`${data.endDate.toISOString().split('T')[0]}T${data.endTime}:00`)
     : null;
 
-  // Auto-detect timezone if city is provided
-  let timezone = data.timezone || 'Europe/Amsterdam';
-  if (data.city) {
-    try {
-      const detectedTimezone = await TimezoneService.getTimezoneForCity(data.city);
-      if (detectedTimezone) {
-        timezone = detectedTimezone;
-      }
-    } catch (error) {
-      console.warn('Could not detect timezone for city:', data.city);
-    }
-  }
+  // Process tags
+  const tagsArray = data.tags || [];
+  const tagsString = tagsArray.length > 0 ? tagsArray.join(', ') : null;
 
-  return {
+  const processedData = {
     title: data.title,
-    description: data.description || '',
+    description: data.description || null,
     event_category: data.eventCategory || null,
-    start_datetime: startDateTime,
-    end_datetime: endDateTime,
-    destination: data.city || null, // Store city in destination field for area filtering
+    start_datetime: startDateTime?.toISOString(),
+    end_datetime: endDateTime?.toISOString(),
+    destination: data.city || null,
     venue_name: data.venueName || null,
     address: data.address || null,
     postal_code: data.postalCode || null,
     organizer_link: data.organizerLink || null,
     fee: data.fee || null,
-    extra_info: '',
-    tags: processedTags,
+    extra_info: data.extraInfo || null,
+    tags: tagsString,
     vibe: data.vibe || null,
-    creator: userId,
-    timezone: timezone,
-    status: 'published'
+    creator: userId, // Will be null for unauthenticated users, filled in after auth
+    timezone: data.timezone || 'Europe/Amsterdam',
+    status: 'published' as const
   };
+
+  console.log('Processed event data:', processedData);
+  return processedData;
 };

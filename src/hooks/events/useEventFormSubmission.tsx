@@ -13,6 +13,7 @@ export const useEventFormSubmission = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [createdEventId, setCreatedEventId] = useState<string | null>(null);
   const [createdEventTitle, setCreatedEventTitle] = useState('');
+  const [pendingEventData, setPendingEventData] = useState<any>(null);
   
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -21,14 +22,28 @@ export const useEventFormSubmission = () => {
     console.log('Event form submitted:', data);
     
     if (!user) {
-      setShowAuthModal(true);
+      // For unauthenticated users, process the form data and show auth modal
+      console.log('User not authenticated, processing form data and showing auth modal');
+      try {
+        const processedData = await processFormData(data, null); // Pass null for unauthenticated users
+        setPendingEventData(processedData);
+        setShowAuthModal(true);
+      } catch (error) {
+        console.error('Error processing form data:', error);
+        toast.error('Failed to process event data. Please try again.');
+      }
       return;
     }
 
+    // For authenticated users, create the event immediately
+    await createEventWithAuth(data, user.id);
+  };
+
+  const createEventWithAuth = async (data: EventFormData, userId: string) => {
     setIsCreating(true);
     
     try {
-      const processedData = await processFormData(data, user.id);
+      const processedData = await processFormData(data, userId);
       console.log('Processed event data:', processedData);
       
       const { data: createdEvent, error } = await createEvent(processedData);
@@ -57,13 +72,51 @@ export const useEventFormSubmission = () => {
     }
   };
 
-  const handleAuthSuccess = () => {
+  const handleAuthSuccess = async () => {
+    console.log('Authentication successful, creating event with pending data');
     setShowAuthModal(false);
-    // The form will be automatically submitted after successful auth
+    
+    if (pendingEventData && user) {
+      // Update the pending data with the authenticated user's ID
+      const updatedEventData = {
+        ...pendingEventData,
+        creator: user.id
+      };
+      
+      setIsCreating(true);
+      
+      try {
+        const { data: createdEvent, error } = await createEvent(updatedEventData);
+        
+        if (error) {
+          console.error('Error creating event after auth:', error);
+          toast.error('Failed to create event. Please try again.');
+          return;
+        }
+        
+        if (!createdEvent) {
+          toast.error('No event data returned. Please try again.');
+          return;
+        }
+        
+        console.log('Event created successfully after auth:', createdEvent);
+        setCreatedEventId(createdEvent.id);
+        setCreatedEventTitle(createdEvent.title || 'Your Event');
+        setShowSuccessModal(true);
+        
+      } catch (error: any) {
+        console.error('Failed to create event after auth:', error);
+        toast.error('Failed to create event. Please try again.');
+      } finally {
+        setIsCreating(false);
+        setPendingEventData(null);
+      }
+    }
   };
 
   const handleAuthModalClose = () => {
     setShowAuthModal(false);
+    setPendingEventData(null);
   };
 
   const handleEventCreated = (eventId: string) => {

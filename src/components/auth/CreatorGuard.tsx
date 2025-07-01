@@ -7,9 +7,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 interface CreatorGuardProps {
   children: React.ReactNode;
+  requireAuth?: boolean; // New prop to control whether auth is required
 }
 
-export const CreatorGuard: React.FC<CreatorGuardProps> = ({ children }) => {
+export const CreatorGuard: React.FC<CreatorGuardProps> = ({ 
+  children, 
+  requireAuth = false // Default to false to allow unauthenticated access
+}) => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -18,15 +22,15 @@ export const CreatorGuard: React.FC<CreatorGuardProps> = ({ children }) => {
       return; // Wait until authentication loading is done
     }
 
-    if (!user) {
-      toast.error("You must be logged in to create an event.");
+    if (requireAuth && !user) {
+      toast.error("You must be logged in to access this page.");
       navigate('/login', { replace: true });
       return;
     }
 
-    // Allow any authenticated user to create events
-    // The database RLS policies will handle the security
-  }, [user, authLoading, navigate]);
+    // Allow both authenticated and unauthenticated users to access
+    // The form submission logic will handle authentication flow
+  }, [user, authLoading, navigate, requireAuth]);
 
   if (authLoading) {
     return (
@@ -45,9 +49,6 @@ export const CreatorGuard: React.FC<CreatorGuardProps> = ({ children }) => {
     );
   }
 
-  if (!user) {
-    return null; // Render nothing while redirecting
-  }
-
+  // Always render children - auth will be handled in the form submission
   return <>{children}</>;
 };

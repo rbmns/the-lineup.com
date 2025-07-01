@@ -25,7 +25,7 @@ const CreateEvent = () => {
           "text-graphite-grey mx-auto",
           isMobile ? "text-sm max-w-xs mb-3" : "text-body-base max-w-2xl mb-4"
         )}>
-          Share your event with the community
+          Share your event with the community - no account required to start!
         </p>
         
         {/* Compact Beta Message for Mobile */}
