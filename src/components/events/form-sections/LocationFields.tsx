@@ -7,13 +7,19 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import TimezoneService from '@/services/timezoneService';
 import { useVenues } from '@/hooks/useVenues';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertTriangle, Mail } from 'lucide-react';
 
 export const LocationFields: React.FC = () => {
   const form = useFormContext();
   const isMobile = useIsMobile();
   const cityValue = form.watch('city');
+  const addressValue = form.watch('address');
+  const postalCodeValue = form.watch('postalCode');
   const venueNameValue = form.watch('venueName');
   const [showVenueSuggestions, setShowVenueSuggestions] = useState(false);
+  const [locationValidationError, setLocationValidationError] = useState<string | null>(null);
+  const [isValidatingLocation, setIsValidatingLocation] = useState(false);
   
   const { venues = [] } = useVenues();
 
@@ -22,37 +28,93 @@ export const LocationFields: React.FC = () => {
     venueNameValue && 
     venue.name?.toLowerCase().includes(venueNameValue.toLowerCase()) &&
     venueNameValue.length > 2
-  ).slice(0, 5); // Limit to 5 suggestions
+  ).slice(0, 5);
 
-  // Auto-detect timezone when city changes
+  // Auto-detect timezone and validate location when city changes
   useEffect(() => {
-    const detectTimezone = async () => {
+    const validateAndDetectTimezone = async () => {
       if (cityValue && cityValue.length > 2) {
+        setIsValidatingLocation(true);
+        setLocationValidationError(null);
+        
         try {
           const timezone = await TimezoneService.getTimezoneForCity(cityValue);
           if (timezone) {
             form.setValue('timezone', timezone);
+            setLocationValidationError(null);
+          } else {
+            setLocationValidationError(`Could not find timezone for "${cityValue}". Please check the city name spelling.`);
           }
         } catch (error) {
           console.warn('Could not detect timezone for city:', cityValue);
+          setLocationValidationError(`Unable to validate location "${cityValue}". Please double-check the spelling or try a different format.`);
+        } finally {
+          setIsValidatingLocation(false);
         }
       }
     };
 
-    detectTimezone();
+    const debounce = setTimeout(validateAndDetectTimezone, 500);
+    return () => clearTimeout(debounce);
   }, [cityValue, form]);
+
+  // Validate address format
+  useEffect(() => {
+    if (addressValue && addressValue.length > 0) {
+      // Basic address validation - should contain at least a number or letter
+      const hasValidFormat = /^[a-zA-Z0-9\s,.-]+$/.test(addressValue);
+      if (!hasValidFormat) {
+        setLocationValidationError('Please enter a valid address format (e.g., "123 Main Street")');
+      } else if (locationValidationError?.includes('address')) {
+        setLocationValidationError(null);
+      }
+    }
+  }, [addressValue, locationValidationError]);
+
+  // Validate postal code format
+  useEffect(() => {
+    if (postalCodeValue && postalCodeValue.length > 0) {
+      // Basic postal code validation - should be alphanumeric
+      const hasValidFormat = /^[a-zA-Z0-9\s-]+$/.test(postalCodeValue);
+      if (!hasValidFormat) {
+        setLocationValidationError('Please enter a valid postal code format');
+      } else if (locationValidationError?.includes('postal')) {
+        setLocationValidationError(null);
+      }
+    }
+  }, [postalCodeValue, locationValidationError]);
 
   const handleVenueSelect = (venue: any) => {
     form.setValue('venueName', venue.name);
-    // Use street field from venue
     form.setValue('address', venue.street || '');
     form.setValue('city', venue.city || '');
     form.setValue('postalCode', venue.postal_code || '');
     setShowVenueSuggestions(false);
+    setLocationValidationError(null);
   };
 
   return (
     <div className="space-y-3">
+      {/* Location Validation Alert */}
+      {locationValidationError && (
+        <Alert variant="destructive" className="border-orange-200 bg-orange-50">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription className="text-sm">
+            <div className="mb-2">{locationValidationError}</div>
+            <div className="text-xs text-gray-600 flex items-center gap-1">
+              <Mail className="h-3 w-3" />
+              Having trouble? Contact us at{' '}
+              <a 
+                href="mailto:events@the-lineup.com" 
+                className="text-ocean-teal hover:underline font-medium"
+              >
+                events@the-lineup.com
+              </a>
+            </div>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Venue Name with Suggestions */}
       <div className="relative">
         <FormField
@@ -115,7 +177,8 @@ export const LocationFields: React.FC = () => {
                 {...field}
                 className={cn(
                   "bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal",
-                  isMobile ? "h-11 text-base" : "h-10"
+                  isMobile ? "h-11 text-base" : "h-10",
+                  locationValidationError?.includes('address') && "border-orange-300"
                 )}
               />
             </FormControl>
@@ -135,7 +198,7 @@ export const LocationFields: React.FC = () => {
           render={({ field }) => (
             <FormItem>
               <FormLabel className={isMobile ? "text-sm" : undefined}>
-                City *
+                City * {isValidatingLocation && <span className="text-xs text-gray-500">(validating...)</span>}
               </FormLabel>
               <FormControl>
                 <Input
@@ -143,7 +206,8 @@ export const LocationFields: React.FC = () => {
                   {...field}
                   className={cn(
                     "bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal",
-                    isMobile ? "h-11 text-base" : "h-10"
+                    isMobile ? "h-11 text-base" : "h-10",
+                    locationValidationError?.includes('timezone') && "border-orange-300"
                   )}
                 />
               </FormControl>
@@ -166,7 +230,8 @@ export const LocationFields: React.FC = () => {
                   {...field}
                   className={cn(
                     "bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal",
-                    isMobile ? "h-11 text-base" : "h-10"
+                    isMobile ? "h-11 text-base" : "h-10",
+                    locationValidationError?.includes('postal') && "border-orange-300"
                   )}
                 />
               </FormControl>

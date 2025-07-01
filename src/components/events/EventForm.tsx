@@ -15,6 +15,8 @@ import { Form } from '@/components/ui/form';
 import { Event } from '@/types';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertTriangle, Mail } from 'lucide-react';
 
 interface EventFormProps {
   eventId?: string;
@@ -58,6 +60,9 @@ export const EventForm: React.FC<EventFormProps> = ({
     formState: { errors }
   } = form;
 
+  // Check if there are any form errors
+  const hasFormErrors = Object.keys(errors).length > 0;
+
   return (
     <div className={cn(
       "w-full max-w-4xl mx-auto",
@@ -65,6 +70,34 @@ export const EventForm: React.FC<EventFormProps> = ({
     )}>
       <Form {...form}>
         <form onSubmit={handleSubmit(handleFormSubmit, onInvalid)} className="space-y-4">
+          {/* Form Validation Alert */}
+          {hasFormErrors && (
+            <Alert variant="destructive" className="border-red-200 bg-red-50">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                <div className="mb-2">Please fix the following errors before submitting:</div>
+                <ul className="list-disc list-inside text-sm space-y-1">
+                  {Object.entries(errors).map(([field, error]) => (
+                    <li key={field}>
+                      <span className="font-medium capitalize">{field.replace(/([A-Z])/g, ' $1').trim()}:</span>{' '}
+                      {error?.message}
+                    </li>
+                  ))}
+                </ul>
+                <div className="text-xs text-gray-600 flex items-center gap-1 mt-3">
+                  <Mail className="h-3 w-3" />
+                  Need help? Contact us at{' '}
+                  <a 
+                    href="mailto:events@the-lineup.com" 
+                    className="text-ocean-teal hover:underline font-medium"
+                  >
+                    events@the-lineup.com
+                  </a>
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
+
           {/* Basic Information Section */}
           <div className={cn(
             "bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 rounded-lg border border-ocean-teal/20",

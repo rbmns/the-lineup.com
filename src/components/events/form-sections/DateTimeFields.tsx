@@ -1,27 +1,21 @@
 
 import React from 'react';
-import { UseFormReturn } from 'react-hook-form';
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
-import { CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
-import { FlexibleStartTimeField } from './FlexibleStartTimeField';
-import { EventFormData } from '@/components/events/form/EventFormSchema';
+import { UseFormReturn } from 'react-hook-form';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
+import { EnhancedDatePicker } from '@/components/ui/enhanced-date-picker';
+import { EventFormData } from '@/components/events/form/EventFormSchema';
 
 interface DateTimeFieldsProps {
   form: UseFormReturn<EventFormData>;
 }
 
-export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({
-  form
-}) => {
-  const startDate = form.watch('startDate');
+export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ form }) => {
   const isMobile = useIsMobile();
+  const startDate = form.watch('startDate');
+  const endDate = form.watch('endDate');
 
   return (
     <div className={cn(
@@ -36,8 +30,8 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({
         )}>Date & Time</h2>
       </div>
       
-      <div className="space-y-3">
-        {/* Start Date and Time - Side by side on desktop, stacked on mobile */}
+      <div className="space-y-4">
+        {/* Start Date and Time */}
         <div className={cn(
           "grid gap-3",
           isMobile ? "grid-cols-1" : "grid-cols-2"
@@ -45,61 +39,23 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({
           <FormField
             control={form.control}
             name="startDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
+            render={({ field, fieldState }) => (
+              <FormItem>
                 <FormLabel className={isMobile ? "text-sm" : undefined}>
                   Start Date *
                 </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
-                          isMobile ? "h-11 text-base" : "h-10"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, isMobile ? "MMM d, yyyy" : "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent 
+                <FormControl>
+                  <EnhancedDatePicker
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    placeholder="Select start date"
+                    error={!!fieldState.error}
                     className={cn(
-                      "w-auto p-0", 
-                      isMobile && "w-screen max-w-sm"
-                    )} 
-                    align="start"
-                  >
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date < new Date(new Date().setHours(0, 0, 0, 0))
-                      }
-                      initialFocus
-                      className={cn(
-                        "pointer-events-auto",
-                        isMobile && "w-full"
-                      )}
-                      classNames={{
-                        months: isMobile ? "flex flex-col" : undefined,
-                        month: isMobile ? "w-full" : undefined,
-                        table: isMobile ? "w-full" : undefined,
-                        head_cell: isMobile ? "text-xs w-full" : undefined,
-                        cell: isMobile ? "w-full" : undefined,
-                        day: isMobile ? "w-8 h-8 text-sm" : undefined,
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
+                      "bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal",
+                      isMobile ? "h-11 text-base" : "h-10"
+                    )}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -118,7 +74,7 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({
                     type="time"
                     {...field}
                     className={cn(
-                      "w-full bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal",
+                      "bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal",
                       isMobile ? "h-11 text-base" : "h-10"
                     )}
                   />
@@ -129,10 +85,7 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({
           />
         </div>
 
-        {/* Flexible Start Time Checkbox */}
-        <FlexibleStartTimeField form={form} />
-
-        {/* End Date and Time - Optional */}
+        {/* End Date and Time */}
         <div className={cn(
           "grid gap-3",
           isMobile ? "grid-cols-1" : "grid-cols-2"
@@ -140,61 +93,23 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({
           <FormField
             control={form.control}
             name="endDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
+            render={({ field, fieldState }) => (
+              <FormItem>
                 <FormLabel className={isMobile ? "text-sm" : undefined}>
-                  End Date (optional)
+                  End Date (Optional)
                 </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
-                          isMobile ? "h-11 text-base" : "h-10"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, isMobile ? "MMM d, yyyy" : "PPP")
-                        ) : (
-                          <span>Pick end date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent 
+                <FormControl>
+                  <EnhancedDatePicker
+                    selected={field.value}
+                    onSelect={field.onChange}
+                    placeholder="Select end date"
+                    error={!!fieldState.error}
                     className={cn(
-                      "w-auto p-0", 
-                      isMobile && "w-screen max-w-sm"
-                    )} 
-                    align="start"
-                  >
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        startDate ? date < startDate : date < new Date(new Date().setHours(0, 0, 0, 0))
-                      }
-                      initialFocus
-                      className={cn(
-                        "pointer-events-auto",
-                        isMobile && "w-full"
-                      )}
-                      classNames={{
-                        months: isMobile ? "flex flex-col" : undefined,
-                        month: isMobile ? "w-full" : undefined,
-                        table: isMobile ? "w-full" : undefined,
-                        head_cell: isMobile ? "text-xs w-full" : undefined,
-                        cell: isMobile ? "w-full" : undefined,
-                        day: isMobile ? "w-8 h-8 text-sm" : undefined,
-                      }}
-                    />
-                  </PopoverContent>
-                </Popover>
+                      "bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal",
+                      isMobile ? "h-11 text-base" : "h-10"
+                    )}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -206,14 +121,14 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className={isMobile ? "text-sm" : undefined}>
-                  End Time
+                  End Time (Optional)
                 </FormLabel>
                 <FormControl>
                   <Input
                     type="time"
                     {...field}
                     className={cn(
-                      "w-full bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal",
+                      "bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal",
                       isMobile ? "h-11 text-base" : "h-10"
                     )}
                   />
@@ -223,6 +138,13 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({
             )}
           />
         </div>
+
+        {/* Date Validation Message */}
+        {startDate && endDate && endDate < startDate && (
+          <div className="text-sm text-red-600 bg-red-50 p-2 rounded border border-red-200">
+            End date cannot be before start date. Please adjust your dates.
+          </div>
+        )}
       </div>
     </div>
   );
