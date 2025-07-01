@@ -37,7 +37,24 @@ export const EventForm: React.FC<EventFormProps> = ({
     isSubmitting,
     onSubmit,
     onInvalid
-  } = useEventForm();
+  } = useEventForm(initialData ? {
+    title: initialData.title || '',
+    description: initialData.description || '',
+    venueName: (initialData as any).venue_name || '',
+    address: (initialData as any).address || '',
+    city: initialData.destination || '',
+    postalCode: (initialData as any).postal_code || '',
+    startDate: initialData.start_datetime ? new Date(initialData.start_datetime) : undefined,
+    startTime: initialData.start_datetime ? new Date(initialData.start_datetime).toTimeString().slice(0,5) : '',
+    endDate: initialData.end_datetime ? new Date(initialData.end_datetime) : undefined,
+    endTime: initialData.end_datetime ? new Date(initialData.end_datetime).toTimeString().slice(0,5) : '',
+    timezone: initialData.timezone || 'Europe/Amsterdam',
+    eventCategory: initialData.event_category || '',
+    vibe: initialData.vibe || '',
+    fee: String(initialData.fee || ''),
+    organizerLink: initialData.organizer_link || '',
+    tags: initialData.tags ? (typeof initialData.tags === 'string' ? initialData.tags.split(', ').filter(tag => tag.trim()) : initialData.tags) : [],
+  } : undefined);
 
   const {
     handleFormSubmit,
