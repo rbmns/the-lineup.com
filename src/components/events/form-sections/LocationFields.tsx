@@ -44,7 +44,8 @@ export const LocationFields: React.FC = () => {
 
   const handleVenueSelect = (venue: any) => {
     form.setValue('venueName', venue.name);
-    form.setValue('address', venue.address || '');
+    // Use street if available, otherwise use address field for compatibility
+    form.setValue('address', venue.street || venue.address || '');
     form.setValue('city', venue.city || '');
     form.setValue('postalCode', venue.postal_code || '');
     setShowVenueSuggestions(false);
@@ -91,7 +92,7 @@ export const LocationFields: React.FC = () => {
               >
                 <div className="font-medium text-sm">{venue.name}</div>
                 <div className="text-xs text-gray-500">
-                  {venue.address}, {venue.city}
+                  {venue.street || venue.address}, {venue.city}
                 </div>
               </button>
             ))}
