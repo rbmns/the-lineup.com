@@ -1,19 +1,40 @@
 
 import { EventFormData } from './EventFormSchema';
+import { toZonedTime } from 'date-fns-tz';
 
 export const processFormData = async (data: EventFormData, userId: string | null) => {
   console.log('🔄 Processing form data for user:', userId);
   console.log('📋 Raw form data:', data);
   console.log('📅 Start date:', data.startDate, 'Start time:', data.startTime);
   console.log('📍 Location data:', { venueName: data.venueName, address: data.address, city: data.city, postalCode: data.postalCode });
+  console.log('🌍 Event timezone:', data.timezone);
   
-  // Convert date and time to datetime
+  // Convert date and time to datetime in the event's timezone
   const startDateTime = data.startDate && data.startTime 
-    ? new Date(`${data.startDate.toISOString().split('T')[0]}T${data.startTime}:00`)
+    ? (() => {
+        // Create the datetime string in the event's timezone
+        const dateStr = `${data.startDate.toISOString().split('T')[0]}T${data.startTime}:00`;
+        const localDateTime = new Date(dateStr);
+        
+        // Convert to the event's timezone
+        const zonedDateTime = toZonedTime(localDateTime, data.timezone || 'Europe/Amsterdam');
+        console.log('⏰ Start time conversion:', {
+          input: `${data.startTime} (${data.timezone})`,
+          localDateTime: localDateTime.toISOString(),
+          zonedDateTime: zonedDateTime.toISOString()
+        });
+        
+        return zonedDateTime;
+      })()
     : null;
     
   const endDateTime = data.endDate && data.endTime 
-    ? new Date(`${data.endDate.toISOString().split('T')[0]}T${data.endTime}:00`)
+    ? (() => {
+        const dateStr = `${data.endDate.toISOString().split('T')[0]}T${data.endTime}:00`;
+        const localDateTime = new Date(dateStr);
+        const zonedDateTime = toZonedTime(localDateTime, data.timezone || 'Europe/Amsterdam');
+        return zonedDateTime;
+      })()
     : null;
 
   // Process tags
