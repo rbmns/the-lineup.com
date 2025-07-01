@@ -69,6 +69,73 @@ export function createEventDateTime(dateTimeString: string): Date {
 }
 
 /**
+ * Convert local event time to proper UTC timestamp
+ * This fixes the root cause of Portugal timezone issues
+ */
+export function createEventTimestamp(dateString: string, timeString: string, timezone: string = AMSTERDAM_TIMEZONE): string {
+  try {
+    console.log(`[DEBUG] createEventTimestamp - Date: ${dateString}, Time: ${timeString}, Timezone: ${timezone}`);
+    
+    // Create a date in the event's local timezone
+    const localDateTimeString = `${dateString}T${timeString}`;
+    console.log(`[DEBUG] createEventTimestamp - Local datetime string: ${localDateTimeString}`);
+    
+    // Parse as local time first
+    const localDate = new Date(localDateTimeString);
+    console.log(`[DEBUG] createEventTimestamp - Local date parsed: ${localDate.toISOString()}`);
+    
+    // Now we need to adjust for the timezone offset
+    // Get the timezone offset for the specific date/time
+    const tempUtcDate = new Date(localDateTimeString + 'Z'); // Treat as UTC temporarily
+    const offsetInMs = getTimezoneOffset(tempUtcDate, timezone);
+    
+    // Apply the correct offset
+    const correctUtcDate = new Date(localDate.getTime() - offsetInMs);
+    
+    console.log(`[DEBUG] createEventTimestamp - Final UTC timestamp: ${correctUtcDate.toISOString()}`);
+    
+    // Verify the result by converting back to local time
+    const verification = formatInTimeZone(correctUtcDate, timezone, 'HH:mm');
+    console.log(`[DEBUG] createEventTimestamp - Verification (should match input time ${timeString}): ${verification}`);
+    
+    return correctUtcDate.toISOString();
+  } catch (error) {
+    console.error('Error creating event timestamp:', error);
+    // Fallback to simple concatenation
+    return `${dateString}T${timeString}:00.000Z`;
+  }
+}
+
+/**
+ * Get timezone offset in milliseconds for a specific date and timezone
+ */
+function getTimezoneOffset(date: Date, timezone: string): number {
+  try {
+    // Use Intl.DateTimeFormat to get the actual offset
+    const utcTime = date.getTime();
+    const localTime = new Date(date.toLocaleString('en-US', { timeZone: timezone })).getTime();
+    return localTime - utcTime;
+  } catch (error) {
+    console.error('Error getting timezone offset:', error);
+    // Fallback to standard offsets
+    switch (timezone) {
+      case 'Europe/Lisbon':
+        // Check if DST applies (rough approximation)
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const isDST = (month > 3 && month < 10) || 
+                     (month === 3 && day >= 25) || 
+                     (month === 10 && day < 25);
+        return isDST ? -1 * 60 * 60 * 1000 : 0; // WEST = UTC+1, WET = UTC+0
+      case 'Europe/Amsterdam':
+        return -1 * 60 * 60 * 1000; // Generally UTC+1/+2
+      default:
+        return 0;
+    }
+  }
+}
+
+/**
  * Format a complete event time range using start_datetime and end_datetime
  */
 export function formatEventTimeRange(
