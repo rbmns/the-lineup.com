@@ -13,15 +13,17 @@ export const HomeHeroSection = () => {
 
   return (
     <div className="relative w-full min-h-screen flex items-center justify-center">
-      {/* Hero Background Image */}
+      {/* Hero Background Image with Cinematic Treatment */}
       <div className="absolute inset-0 z-0">
-        <img
-          src="/lovable-uploads/ac438e1f-f8a7-4208-aeed-6c95081daf90.png"
-          alt="Beach sunset background"
-          className="w-full h-full object-cover"
-        />
-        {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-ocean-deep/60 via-ocean-deep/30 to-transparent" />
+        <div className="lineup-image-style w-full h-full">
+          <img
+            src="/lovable-uploads/b423dbeb-77fa-4174-8464-b8558a423490.png"
+            alt="Ocean waves cinematic background"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        {/* Additional gradient overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-ocean-deep/70 via-ocean-deep/40 to-transparent" />
       </div>
 
       {/* Content */}
