@@ -126,7 +126,7 @@ export const CreatorDashboard: React.FC = () => {
                       <p className="text-xs text-gray-400">{event.destination}</p>
                     </div>
                     <Button asChild size="sm" variant="outline">
-                      <Link to={`/events/edit/${event.id}`}>
+                      <Link to={`/events/${event.id}/edit`}>
                         <Edit className="h-3 w-3" />
                       </Link>
                     </Button>
