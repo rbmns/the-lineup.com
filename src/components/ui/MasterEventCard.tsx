@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { useEventImages } from '@/hooks/useEventImages';
 import { toast } from '@/hooks/use-toast';
-import { formatEventDate, formatEventTime } from '@/utils/timezone-utils';
+import { formatEventDateForCard, formatEventTime } from '@/utils/timezone-utils';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface MasterEventCardProps {
@@ -82,7 +82,7 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
     return 'Location TBD';
   };
 
-  // Format date and time for cards (without location label)
+  // Format date and time for cards (without year and location label)
   const formatEventCardDateTime = (): string => {
     if (!event.start_date) return '';
     
@@ -90,13 +90,13 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
     
     // Check if it's a multi-day event
     if (event.end_date && event.end_date !== event.start_date) {
-      const startFormatted = formatEventDate(event.start_date, eventTimezone);
-      const endFormatted = formatEventDate(event.end_date, eventTimezone);
+      const startFormatted = formatEventDateForCard(event.start_date, eventTimezone);
+      const endFormatted = formatEventDateForCard(event.end_date, eventTimezone);
       return `${startFormatted} - ${endFormatted}`;
     }
     
     try {
-      const datePart = formatEventDate(event.start_date, eventTimezone);
+      const datePart = formatEventDateForCard(event.start_date, eventTimezone);
       
       if (!event.start_time) {
         return datePart;

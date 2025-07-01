@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { CalendarIcon, MapPin } from 'lucide-react';
-import { formatEventDate, formatEventTime } from '@/utils/timezone-utils';
+import { formatEventDateForCard, formatEventTime } from '@/utils/timezone-utils';
 import { cn } from '@/lib/utils';
 
 interface EventCardMetaProps {
@@ -29,12 +29,12 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
 }) => {
   const eventTimezone = event.timezone || 'Europe/Amsterdam';
   
-  // Format date in event's local timezone
+  // Format date in event's local timezone (no year for cards)
   const formatEventDateDisplay = (event: any): string => {
     try {
       if (!event.start_date) return 'Date not specified';
       
-      return formatEventDate(event.start_date, eventTimezone);
+      return formatEventDateForCard(event.start_date, eventTimezone);
     } catch (error) {
       console.error('Error formatting date:', error);
       return 'Date not specified';

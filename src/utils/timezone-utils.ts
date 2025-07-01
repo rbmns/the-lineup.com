@@ -18,6 +18,19 @@ export function formatEventDate(dateString: string, timezone: string = AMSTERDAM
 }
 
 /**
+ * Format a date string for cards (no year) in a specific timezone
+ */
+export function formatEventDateForCard(dateString: string, timezone: string = AMSTERDAM_TIMEZONE): string {
+  try {
+    const date = parseISO(dateString);
+    return formatInTimeZone(date, timezone, 'EEEE, MMMM d');
+  } catch (error) {
+    console.error('Error formatting date for card:', error);
+    return dateString;
+  }
+}
+
+/**
  * Format a time string in a specific timezone
  */
 export function formatEventTime(dateString: string, timeString: string, timezone: string = AMSTERDAM_TIMEZONE): string {
@@ -80,7 +93,7 @@ export function formatEventTimeRange(
 }
 
 /**
- * Format date and time for event cards
+ * Format date and time for event cards (no year)
  */
 export function formatEventCardDateTime(
   startDate: string,
@@ -90,7 +103,7 @@ export function formatEventCardDateTime(
   cityName?: string
 ): string {
   try {
-    const formattedDate = formatEventDate(startDate, timezone);
+    const formattedDate = formatEventDateForCard(startDate, timezone);
     const timeRange = formatEventTimeRange(startDate, startTime, null, timezone, cityName);
     
     return `${formattedDate}, ${timeRange}`;

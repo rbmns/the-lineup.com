@@ -1,7 +1,9 @@
 
+
 // Re-export the new timezone-aware functions
 export { 
   formatEventDate,
+  formatEventDateForCard,
   formatEventTime,
   formatEventTimeWithLocation,
   formatEventCardDateTime,
@@ -13,7 +15,7 @@ export {
 export const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
 
 // Import the functions we need to use internally
-import { formatEventDate, formatEventTime } from './timezone-utils';
+import { formatEventDate, formatEventTime, formatEventDateForCard } from './timezone-utils';
 
 /**
  * Helper to format event date in a consistent way - now timezone-aware
@@ -52,7 +54,7 @@ export const formatTime = (timeString: string, dateString?: string, timezone: st
 };
 
 /**
- * Format date for featured/preview cards
+ * Format date for featured/preview cards (no year)
  */
 export const formatFeaturedDate = (dateString: string): string => {
   try {
@@ -64,6 +66,39 @@ export const formatFeaturedDate = (dateString: string): string => {
   } catch (error) {
     console.error('Error formatting featured date:', error);
     return dateString;
+  }
+};
+
+/**
+ * Format date and time for event cards (using new card-specific formatting without year)
+ */
+export const formatEventCardDateTime = (
+  startDate?: string | null,
+  startTime?: string | null,
+  endDate?: string | null,
+  timezone: string = AMSTERDAM_TIMEZONE
+): string => {
+  if (!startDate) return '';
+
+  try {
+    // Check if it's a multi-day event
+    if (endDate && endDate !== startDate) {
+      const startFormatted = formatEventDateForCard(startDate, timezone);
+      const endFormatted = formatEventDateForCard(endDate, timezone);
+      return `${startFormatted} - ${endFormatted}`;
+    }
+
+    const datePart = formatEventDateForCard(startDate, timezone);
+    
+    if (!startTime) {
+      return datePart;
+    }
+    
+    const timePart = formatEventTime(startDate, startTime, timezone);
+    return `${datePart}, ${timePart}`;
+  } catch (error) {
+    console.error('Error formatting event card date-time:', error);
+    return startDate;
   }
 };
 
