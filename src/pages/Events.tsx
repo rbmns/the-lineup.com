@@ -306,7 +306,7 @@ const Events = () => {
                   allEventTypes={allEventTypes}
                 />
                 
-                {/* Simplified Date Range Picker */}
+                {/* Date Range Picker with improved positioning */}
                 <div className="relative">
                   <button
                     onClick={() => setShowDatePicker(!showDatePicker)}
@@ -321,7 +321,7 @@ const Events = () => {
                   </button>
                   
                   {showDatePicker && (
-                    <div className="absolute top-full left-0 mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+                    <div className="absolute top-full right-0 mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-xl p-4 min-w-max">
                       <MobileFriendlyDatePicker
                         dateRange={dateRange}
                         onDateRangeChange={setDateRange}
@@ -384,7 +384,7 @@ const Events = () => {
                   allEventTypes={allEventTypes}
                 />
                 
-                {/* Mobile date picker */}
+                {/* Mobile date picker - Full screen modal */}
                 <div className="relative">
                   <button
                     onClick={() => setShowDatePicker(!showDatePicker)}
@@ -400,7 +400,7 @@ const Events = () => {
                   
                   {showDatePicker && (
                     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                      <div className="bg-white rounded-lg shadow-xl p-4 w-full max-w-sm">
+                      <div className="bg-white rounded-lg shadow-xl p-4 w-full max-w-sm max-h-[90vh] overflow-y-auto">
                         <div className="flex justify-between items-center mb-4">
                           <h3 className="font-medium font-mono text-xs uppercase tracking-wide">Select Date</h3>
                           <button

@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import { EventFormData } from '@/components/events/form/EventFormSchema';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 export const useEventFormSubmission = () => {
   const { user } = useAuth();
@@ -15,20 +15,57 @@ export const useEventFormSubmission = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [createdEventId, setCreatedEventId] = useState<string | null>(null);
   const [createdEventTitle, setCreatedEventTitle] = useState('');
+  const [isAuthChecking, setIsAuthChecking] = useState(false);
+
+  // Enhanced authentication check
+  const checkAuthentication = useCallback(async () => {
+    setIsAuthChecking(true);
+    try {
+      // First check the context user
+      if (!user) {
+        console.log('No user in context, checking Supabase session...');
+        
+        // Then check Supabase session directly
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Session check error:', error);
+          return null;
+        }
+        
+        if (!session?.user) {
+          console.log('No active Supabase session');
+          return null;
+        }
+        
+        console.log('Found Supabase session user:', session.user.id);
+        return session.user;
+      }
+      
+      console.log('Using context user:', user.id);
+      return user;
+    } catch (error) {
+      console.error('Authentication check failed:', error);
+      return null;
+    } finally {
+      setIsAuthChecking(false);
+    }
+  }, [user]);
 
   const createEventMutation = useMutation({
     mutationFn: async (data: EventFormData) => {
-      // Check authentication first
-      const { data: { session } } = await supabase.auth.getSession();
-      const currentUser = session?.user;
+      console.log('🔄 Starting event creation process...');
       
-      if (!currentUser) {
-        console.error('No authenticated user found');
+      // Enhanced authentication check
+      const authenticatedUser = await checkAuthentication();
+      
+      if (!authenticatedUser) {
+        console.error('❌ Authentication failed - no user found');
         setShowAuthModal(true);
         throw new Error('User must be authenticated');
       }
 
-      console.log('Creating event with user:', currentUser.id);
+      console.log('✅ User authenticated:', authenticatedUser.id);
 
       // Create start_datetime from date and time
       const startDatetime = new Date(`${data.startDate.toISOString().split('T')[0]}T${data.startTime}`);
@@ -61,12 +98,12 @@ export const useEventFormSubmission = () => {
         fee: data.fee || null,
         organizer_link: data.organizerLink || null,
         tags: data.tags?.join(',') || null,
-        creator: currentUser.id,
-        created_by: currentUser.id,
+        creator: authenticatedUser.id,
+        created_by: authenticatedUser.id,
         status: 'published' as const,
       };
 
-      console.log('Event data being sent:', eventData);
+      console.log('📤 Sending event data:', eventData);
 
       const { data: event, error } = await supabase
         .from('events')
@@ -75,11 +112,11 @@ export const useEventFormSubmission = () => {
         .single();
 
       if (error) {
-        console.error('Database error:', error);
+        console.error('❌ Database error:', error);
         throw error;
       }
 
-      console.log('Event created successfully:', event);
+      console.log('✅ Event created successfully:', event);
       return event;
     },
     onSuccess: (event) => {
@@ -93,10 +130,12 @@ export const useEventFormSubmission = () => {
       });
     },
     onError: (error) => {
-      console.error('Error creating event:', error);
+      console.error('❌ Error creating event:', error);
       
       // Check if it's an auth error
-      if (error.message.includes('User must be authenticated') || error.message.includes('JWT')) {
+      if (error.message.includes('User must be authenticated') || 
+          error.message.includes('JWT') || 
+          error.message.includes('No user in context')) {
         setShowAuthModal(true);
         toast({
           title: 'Authentication required',
@@ -113,19 +152,21 @@ export const useEventFormSubmission = () => {
     },
   });
 
-  const handleFormSubmit = useCallback((data: EventFormData) => {
-    console.log('Form submitted with data:', data);
-    console.log('Current user:', user);
+  const handleFormSubmit = useCallback(async (data: EventFormData) => {
+    console.log('📝 Form submitted with data:', data);
+    console.log('👤 Current user in context:', user?.id || 'No user');
     
-    // Double-check authentication before submitting
-    if (!user) {
-      console.error('No user in context');
+    // Pre-check authentication before submitting
+    const authenticatedUser = await checkAuthentication();
+    if (!authenticatedUser) {
+      console.error('❌ Pre-submit auth check failed');
       setShowAuthModal(true);
       return;
     }
     
+    console.log('✅ Pre-submit auth check passed, proceeding with mutation');
     createEventMutation.mutate(data);
-  }, [createEventMutation, user]);
+  }, [createEventMutation, user, checkAuthentication]);
 
   const handleAuthSuccess = useCallback(() => {
     setShowAuthModal(false);
@@ -142,7 +183,7 @@ export const useEventFormSubmission = () => {
 
   return {
     createEvent: createEventMutation.mutate,
-    isCreating: createEventMutation.isPending,
+    isCreating: createEventMutation.isPending || isAuthChecking,
     handleFormSubmit,
     handleAuthSuccess,
     handleAuthModalClose,
@@ -152,5 +193,6 @@ export const useEventFormSubmission = () => {
     setShowSuccessModal,
     createdEventId,
     createdEventTitle,
+    isAuthChecking,
   };
 };
