@@ -36,7 +36,7 @@ export const useEventsPageData = () => {
     isLoading: venuesLoading
   } = useVenueFilter();
 
-  // Fetch events with proper joins
+  // Fetch events with proper joins - fixed the relationship issue
   const { data: eventsData, isLoading: eventsLoading } = useQuery({
     queryKey: ['events-page-data'],
     queryFn: async () => {
@@ -45,7 +45,7 @@ export const useEventsPageData = () => {
         .select(`
           *,
           creator:profiles!events_creator_fkey(*),
-          venues(*)
+          venues!events_venue_id_fkey(*)
         `)
         .eq('status', 'published')
         .order('start_datetime', { ascending: true });
