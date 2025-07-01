@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin } from 'lucide-react';
@@ -84,24 +83,49 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
 
   // Format date and time for cards using timestampz fields
   const getFormattedDateTime = (): string => {
+    // Debug logging for this specific event
+    if (event.id === '22600fd1-ff27-4653-a39a-4def487d4145') {
+      console.log(`[DEBUG EVENT ${event.id}] - Event data:`, {
+        start_datetime: event.start_datetime,
+        end_datetime: event.end_datetime,
+        start_date: event.start_date,
+        start_time: event.start_time,
+        end_date: event.end_date,
+        end_time: event.end_time,
+        timezone: event.timezone
+      });
+    }
+    
     // Use start_datetime if available, fallback to old fields for backward compatibility
     if (event.start_datetime) {
       const eventTimezone = event.timezone || 'Europe/Amsterdam';
-      return formatEventCardDateTime(
+      const result = formatEventCardDateTime(
         event.start_datetime,
         event.end_datetime,
         eventTimezone
       );
+      
+      if (event.id === '22600fd1-ff27-4653-a39a-4def487d4145') {
+        console.log(`[DEBUG EVENT ${event.id}] - Using start_datetime: ${event.start_datetime}, timezone: ${eventTimezone}, result: ${result}`);
+      }
+      
+      return result;
     }
     
     // Fallback to old fields if timestampz not available
     if (event.start_date) {
       const eventTimezone = event.timezone || 'Europe/Amsterdam';
-      return formatEventCardDateTime(
+      const result = formatEventCardDateTime(
         `${event.start_date}T${event.start_time || '00:00:00'}`,
         event.end_date ? `${event.end_date}T${event.end_time || '23:59:59'}` : null,
         eventTimezone
       );
+      
+      if (event.id === '22600fd1-ff27-4653-a39a-4def487d4145') {
+        console.log(`[DEBUG EVENT ${event.id}] - Using legacy fields: ${event.start_date}T${event.start_time}, timezone: ${eventTimezone}, result: ${result}`);
+      }
+      
+      return result;
     }
     
     return '';

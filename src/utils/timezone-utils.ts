@@ -35,8 +35,11 @@ export function formatEventDateForCard(dateTimeString: string, timezone: string 
  */
 export function formatEventTime(dateTimeString: string, timezone: string = AMSTERDAM_TIMEZONE): string {
   try {
+    console.log(`[DEBUG] formatEventTime - Input: ${dateTimeString}, Timezone: ${timezone}`);
     const date = parseISO(dateTimeString);
-    return formatInTimeZone(date, timezone, 'HH:mm');
+    const result = formatInTimeZone(date, timezone, 'HH:mm');
+    console.log(`[DEBUG] formatEventTime - Output: ${result}`);
+    return result;
   } catch (error) {
     console.error('Error formatting time:', error);
     return dateTimeString;
@@ -61,11 +64,12 @@ export function createEventDateTime(dateTimeString: string): Date {
 export function formatEventTimeRange(
   startDateTime: string, 
   endDateTime?: string | null, 
-  timezone: string = AMSTERDAM_TIMEZONE,
-  cityName?: string
+  timezone: string = AMSTERDAM_TIMEZONE
 ): string {
   try {
     if (!startDateTime) return 'Time not specified';
+    
+    console.log(`[DEBUG] formatEventTimeRange - Start: ${startDateTime}, End: ${endDateTime}, Timezone: ${timezone}`);
     
     const startDate = parseISO(startDateTime);
     let timeRange = formatInTimeZone(startDate, timezone, 'HH:mm');
@@ -76,11 +80,7 @@ export function formatEventTimeRange(
       timeRange += ` - ${endTimeFormatted}`;
     }
     
-    // Add city context if provided (for detail pages)
-    if (cityName && timezone !== AMSTERDAM_TIMEZONE) {
-      timeRange += ` (${cityName} local time)`;
-    }
-    
+    console.log(`[DEBUG] formatEventTimeRange - Output: ${timeRange}`);
     return timeRange;
   } catch (error) {
     console.error('Error formatting time range:', error);
@@ -99,6 +99,8 @@ export function formatEventCardDateTime(
   if (!startDateTime) return '';
 
   try {
+    console.log(`[DEBUG] formatEventCardDateTime - Start: ${startDateTime}, End: ${endDateTime}, Timezone: ${timezone}`);
+    
     // Check if it's a multi-day event by comparing dates
     if (endDateTime) {
       const startDate = parseISO(startDateTime);
@@ -118,7 +120,9 @@ export function formatEventCardDateTime(
     const datePart = formatEventDateForCard(startDateTime, timezone);
     const timePart = formatEventTime(startDateTime, timezone);
     
-    return `${datePart}, ${timePart}`;
+    const result = `${datePart}, ${timePart}`;
+    console.log(`[DEBUG] formatEventCardDateTime - Final result: ${result}`);
+    return result;
   } catch (error) {
     console.error('Error formatting event card date-time:', error);
     return startDateTime;
