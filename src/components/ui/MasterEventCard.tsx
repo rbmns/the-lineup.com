@@ -1,17 +1,19 @@
-
 import React from 'react';
 import { Event } from '@/types';
-import { Calendar, MapPin, Users } from 'lucide-react';
+import { Calendar, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
-import { CategoryPill } from '@/components/ui/category-pill';
-import { formatEventDateTime } from '@/utils/timezone-utils';
-import { Card } from '@/components/ui/card';
+import { useEventImages } from '@/hooks/useEventImages';
+import { toast } from '@/hooks/use-toast';
+import { formatEventCardDateTime } from '@/utils/date-formatting';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface MasterEventCardProps {
   event: Event;
   compact?: boolean;
   showRsvpButtons?: boolean;
+  showRsvpStatus?: boolean;
+  onRsvp?: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean | void>;
   className?: string;
   onClick?: (event: Event) => void;
   loadingEventId?: string | null;
@@ -21,19 +23,32 @@ interface MasterEventCardProps {
 export const MasterEventCard: React.FC<MasterEventCardProps> = ({
   event,
   compact = false,
-  showRsvpButtons = false,
+  showRsvpButtons = true,
+  showRsvpStatus = false,
+  onRsvp,
   className,
   onClick,
   loadingEventId,
   children,
 }) => {
+  const { isAuthenticated } = useAuth();
   const { navigateToEvent } = useEventNavigation();
+  const { getEventImageUrl } = useEventImages();
+  const imageUrl = getEventImageUrl(event);
+
+  const shouldShowRsvp = isAuthenticated && showRsvpButtons;
 
   const handleClick = (e: React.MouseEvent) => {
-    // Prevent navigation if clicking on RSVP buttons or other interactive elements
     const target = e.target as HTMLElement;
-    if (target.closest('[data-rsvp-container="true"]') || target.closest('button')) {
+    const isRsvpElement = 
+      target.closest('[data-rsvp-container="true"]') || 
+      target.closest('[data-rsvp-button="true"]') ||
+      target.hasAttribute('data-rsvp-button') ||
+      target.closest('button[data-status]');
+    
+    if (isRsvpElement) {
       e.stopPropagation();
+      e.preventDefault();
       return;
     }
     
@@ -46,6 +61,11 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
       navigateToEvent(event);
     } catch (error) {
       console.error("Error navigating to event:", error);
+      toast({
+        title: "Navigation Error",
+        description: "Could not navigate to event page",
+        variant: "destructive",
+      });
     }
   };
 
@@ -61,75 +81,89 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
     return 'Location TBD';
   };
 
-  // Use the unified datetime formatting function
-  const eventDateTime = formatEventDateTime({
-    start_datetime: event.start_datetime,
-    start_date: event.start_date || undefined,
-    start_time: event.start_time || undefined,
-    timezone: event.timezone
-  });
-
   return (
-    <Card 
+    <div 
       className={cn(
-        "cursor-pointer transition-all duration-200 hover:shadow-lg overflow-hidden",
-        compact ? "p-3" : "p-4",
+        // Container styling with uniform dimensions
+        "bg-pure-white rounded-lg shadow-md border border-mist-grey p-5",
+        "h-full flex flex-col cursor-pointer transition-all duration-200 ease-in-out",
+        "hover:shadow-lg hover:-translate-y-1",
         className
       )}
       onClick={handleClick}
       data-event-id={event.id}
     >
-      <div className="space-y-3">
-        {/* Header with title and category */}
-        <div className="flex items-start justify-between gap-2">
-          <h3 className={cn(
-            "font-semibold text-[#005F73] line-clamp-2 flex-1",
-            compact ? "text-sm" : "text-base"
-          )}>
-            {event.title}
-          </h3>
-          {event.event_category && (
-            <CategoryPill 
-              category={event.event_category} 
-              size={compact ? "xs" : "sm"}
-              showIcon={false}
-            />
-          )}
-        </div>
+      {/* Image Container - Fixed height for uniformity */}
+      <div className="w-full overflow-hidden mb-4 rounded-t-md h-40 md:h-48">
+        <img
+          src={imageUrl}
+          alt={event.title}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            if (!target.src.includes('/img/default.jpg')) {
+              target.src = "/img/default.jpg";
+            }
+          }}
+        />
         
-        {/* Date and Time */}
-        <div className="flex items-center gap-2 text-[#005F73]/80">
-          <Calendar className={cn("text-[#2A9D8F] flex-shrink-0", compact ? "h-3 w-3" : "h-4 w-4")} />
-          <span className={cn("font-medium", compact ? "text-xs" : "text-sm")}>
-            {eventDateTime.dateTime}
-          </span>
-        </div>
-        
-        {/* Location */}
-        <div className="flex items-center gap-2 text-[#005F73]/80">
-          <MapPin className={cn("text-[#2A9D8F] flex-shrink-0", compact ? "h-3 w-3" : "h-4 w-4")} />
-          <span className={cn("font-medium truncate", compact ? "text-xs" : "text-sm")}>
-            {getVenueDisplay()}
-          </span>
-        </div>
-
-        {/* Attendance info */}
-        {(event.going_count || event.interested_count) && (
-          <div className="flex items-center gap-2 text-[#005F73]/80">
-            <Users className={cn("text-[#2A9D8F] flex-shrink-0", compact ? "h-3 w-3" : "h-4 w-4")} />
-            <span className={cn("font-medium", compact ? "text-xs" : "text-sm")}>
-              {event.going_count || 0} going{event.interested_count ? `, ${event.interested_count} interested` : ''}
+        {/* Category badge overlay */}
+        {event.event_category && (
+          <div className="absolute top-3 left-3">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-mist-grey text-graphite-grey font-mono text-xs">
+              {event.event_category}
             </span>
           </div>
         )}
-
-        {/* Children (like RSVP buttons) */}
+      </div>
+      
+      {/* Content Section - Flexible grow area */}
+      <div className="flex flex-col flex-grow">
+        {/* Title - Keep original font (Montserrat) */}
+        <h4 className="text-h4 text-graphite-grey font-montserrat mb-2 line-clamp-2">
+          {event.title}
+        </h4>
+        
+        {/* Organizer info - Use JetBrains Mono */}
+        {event.organiser_name && (
+          <p className="text-sm text-graphite-grey opacity-75 font-mono mb-3">
+            By {event.organiser_name}
+          </p>
+        )}
+        
+        {/* Date & Time - Use JetBrains Mono */}
+        <div className="text-sm text-graphite-grey opacity-75 font-mono mb-3 flex items-center gap-2">
+          <Calendar className="h-4 w-4 text-ocean-teal flex-shrink-0" />
+          <span>{formatEventCardDateTime(event.start_date, event.start_time, event.end_date)}</span>
+        </div>
+        
+        {/* Location - Use JetBrains Mono */}
+        <div className="text-sm text-graphite-grey font-mono flex items-center mb-4 hover:underline hover:text-ocean-teal">
+          <MapPin className="h-4 w-4 text-graphite-grey mr-2 flex-shrink-0" />
+          <span className="truncate">{getVenueDisplay()}</span>
+        </div>
+        
+        {/* RSVP Status Display - Use JetBrains Mono */}
+        {showRsvpStatus && event.rsvp_status && (
+          <div className="flex items-center gap-2 mb-4">
+            <span className={cn(
+              "inline-flex items-center px-2 py-0.5 rounded-sm text-xs font-mono font-medium",
+              event.rsvp_status === 'Going' 
+                ? "bg-ocean-teal/20 text-ocean-teal" 
+                : "bg-sunrise-ochre/20 text-graphite-grey"
+            )}>
+              {event.rsvp_status}
+            </span>
+          </div>
+        )}
+        
+        {/* Children (typically RSVP buttons) - Always at bottom */}
         {children && (
-          <div data-rsvp-container="true">
+          <div className="mt-auto" data-rsvp-container="true">
             {children}
           </div>
         )}
       </div>
-    </Card>
+    </div>
   );
 };

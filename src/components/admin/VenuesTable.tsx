@@ -5,19 +5,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
-import { Venue } from '@/types';
-
-interface VenueCreator {
-  id: string;
-  username: string | null;
-}
+import { Profile, Venue } from '@/types';
 
 const useVenueCreators = (venues: Venue[]) => {
   const creatorIds = React.useMemo(() => 
     [...new Set(venues.map(v => v.creator_id).filter(Boolean))] as string[]
   , [venues]);
 
-  return useQuery<VenueCreator[], Error>({
+  return useQuery<Profile[], Error>({
     queryKey: ['profiles', 'creators', creatorIds],
     queryFn: async () => {
       if (creatorIds.length === 0) return [];
@@ -26,7 +21,7 @@ const useVenueCreators = (venues: Venue[]) => {
         .select('id, username')
         .in('id', creatorIds);
       if (error) throw error;
-      return data as VenueCreator[];
+      return data;
     },
     enabled: creatorIds.length > 0,
   });

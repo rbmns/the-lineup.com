@@ -170,7 +170,7 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
         
         return isEventNearby(
           { latitude, longitude },
-          { latitude: userLocation.latitude!, longitude: userLocation.longitude! },
+          { latitude: userLocation.latitude, longitude: userLocation.longitude },
           50 // 50km radius
         );
       });
@@ -254,7 +254,7 @@ export const EventsDataProvider: React.FC<EventsDataProviderProps> = ({ children
   // Format venues for the component
   const formattedVenues = venues.map(venue => ({
     value: venue.id,
-    label: venue.name || 'Unnamed Venue'
+    label: venue.name
   }));
 
   const isFilterLoading = vibesLoading;

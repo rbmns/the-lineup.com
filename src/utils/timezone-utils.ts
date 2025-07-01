@@ -1,159 +1,170 @@
+import { formatInTimeZone, toZonedTime, fromZonedTime } from 'date-fns-tz';
+import { parseISO, format } from 'date-fns';
 
-import { format, parseISO } from 'date-fns';
-import { formatInTimeZone } from 'date-fns-tz';
-
-export const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
-export const DEFAULT_TIMEZONE = AMSTERDAM_TIMEZONE;
-
-// Get user's timezone, defaulting to Amsterdam
+/**
+ * Get the user's browser timezone
+ */
 export const getUserTimezone = (): string => {
-  try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone || AMSTERDAM_TIMEZONE;
-  } catch {
-    return AMSTERDAM_TIMEZONE;
-  }
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
 };
 
-// Get common timezones for form selection
-export const getCommonTimezones = () => {
-  return [
-    { value: 'Europe/Amsterdam', label: 'Amsterdam (CET/CEST)' },
-    { value: 'Europe/London', label: 'London (GMT/BST)' },
-    { value: 'Europe/Paris', label: 'Paris (CET/CEST)' },
-    { value: 'Europe/Berlin', label: 'Berlin (CET/CEST)' },
-    { value: 'America/New_York', label: 'New York (EST/EDT)' },
-    { value: 'America/Los_Angeles', label: 'Los Angeles (PST/PDT)' },
-    { value: 'Asia/Tokyo', label: 'Tokyo (JST)' },
-    { value: 'Australia/Sydney', label: 'Sydney (AEST/AEDT)' },
-  ];
-};
-
-interface EventDateTimeParams {
-  start_datetime?: string;
-  start_date?: string;
-  start_time?: string;
-  end_date?: string;
-  end_datetime?: string;
-  timezone?: string;
-}
-
-// Unified function to format event date and time
-export const formatEventDateTime = (
-  event: EventDateTimeParams,
-  viewerTimezone?: string
-): { date: string; time: string; dateTime: string } => {
-  const targetTimezone = viewerTimezone || getUserTimezone();
-  
+/**
+ * Get timezone abbreviation for display
+ */
+export const getTimezoneAbbreviation = (timezone: string): string => {
   try {
-    let eventDateTime: Date;
-    
-    // Use new timestamptz field if available
-    if (event.start_datetime) {
-      eventDateTime = parseISO(event.start_datetime);
-    } 
-    // Fallback to legacy fields
-    else if (event.start_date && event.start_time) {
-      const eventTimezone = event.timezone || AMSTERDAM_TIMEZONE;
-      const dateTimeStr = `${event.start_date}T${event.start_time}`;
-      eventDateTime = new Date(dateTimeStr + (eventTimezone === AMSTERDAM_TIMEZONE ? '+01:00' : '+00:00'));
-    }
-    else if (event.start_date) {
-      eventDateTime = parseISO(`${event.start_date}T12:00:00`);
-    }
-    else {
-      return { date: 'Date TBD', time: 'Time TBD', dateTime: 'Date and time TBD' };
-    }
-    
-    const date = formatInTimeZone(eventDateTime, targetTimezone, 'EEE, d MMM');
-    const time = formatInTimeZone(eventDateTime, targetTimezone, 'HH:mm');
-    const dateTime = `${date}, ${time}`;
-    
-    return { date, time, dateTime };
+    const date = new Date();
+    const formatter = new Intl.DateTimeFormat('en', {
+      timeZone: timezone,
+      timeZoneName: 'short'
+    });
+    const parts = formatter.formatToParts(date);
+    const timeZonePart = parts.find(part => part.type === 'timeZoneName');
+    return timeZonePart?.value || timezone.split('/').pop() || timezone;
   } catch (error) {
-    console.error('Error formatting event date/time:', error);
-    return { date: 'Date error', time: 'Time error', dateTime: 'Date/time error' };
+    return timezone.split('/').pop() || timezone;
   }
 };
 
-// Format end time separately
-export const formatEventEndDateTime = (
-  event: EventDateTimeParams & { end_time?: string; end_datetime?: string },
-  viewerTimezone?: string
+/**
+ * Format event time in viewer's timezone
+ * Takes a date string, time string, and event timezone, converts to viewer's timezone
+ */
+export const formatEventTime = (
+  dateStr: string,
+  timeStr: string,
+  eventTimezone: string = 'Europe/Amsterdam',
+  displayTimezone?: string
 ): string => {
-  const targetTimezone = viewerTimezone || getUserTimezone();
+  try {
+    const viewerTimezone = displayTimezone || getUserTimezone();
+    
+    // If timezones are the same, no conversion needed
+    if (eventTimezone === viewerTimezone) {
+      return timeStr.substring(0, 5);
+    }
+    
+    // Create a date object representing the event time in the event's timezone
+    const eventDateTimeStr = `${dateStr}T${timeStr}:00`;
+    const eventDateTime = parseISO(eventDateTimeStr);
+    
+    // Treat this datetime as being in the event timezone
+    const eventInEventTz = toZonedTime(eventDateTime, eventTimezone);
+    
+    // Convert to UTC first, then to viewer timezone
+    const utcTime = fromZonedTime(eventInEventTz, eventTimezone);
+    
+    // Format in viewer's timezone
+    return formatInTimeZone(utcTime, viewerTimezone, 'HH:mm');
+  } catch (error) {
+    console.error('Error formatting event time:', error, { dateStr, timeStr, eventTimezone, displayTimezone });
+    return timeStr.substring(0, 5); // Fallback to original time
+  }
+};
+
+/**
+ * Format event time with timezone abbreviation
+ */
+export const formatEventTimeWithTimezone = (
+  dateStr: string,
+  timeStr: string,
+  eventTimezone: string = 'Europe/Amsterdam',
+  displayTimezone?: string
+): string => {
+  const viewerTimezone = displayTimezone || getUserTimezone();
+  const formattedTime = formatEventTime(dateStr, timeStr, eventTimezone, displayTimezone);
+  const tzAbbr = getTimezoneAbbreviation(viewerTimezone);
   
+  return `${formattedTime} ${tzAbbr}`;
+};
+
+/**
+ * Format event date consistently across the app in viewer's timezone
+ */
+export const formatEventDate = (
+  dateStr: string,
+  eventTimezone: string = 'Europe/Amsterdam',
+  displayTimezone?: string
+): string => {
   try {
-    let endDateTime: Date;
+    const viewerTimezone = displayTimezone || getUserTimezone();
+    const date = parseISO(dateStr);
     
-    // Use new timestamptz field if available
-    if (event.end_datetime) {
-      endDateTime = parseISO(event.end_datetime);
-    }
-    // Fallback to legacy fields
-    else if (event.start_date && event.end_time) {
-      const eventTimezone = event.timezone || AMSTERDAM_TIMEZONE;
-      const dateTimeStr = `${event.start_date}T${event.end_time}`;
-      endDateTime = new Date(dateTimeStr + (eventTimezone === AMSTERDAM_TIMEZONE ? '+01:00' : '+00:00'));
-    }
-    else {
-      return '';
-    }
-    
-    return formatInTimeZone(endDateTime, targetTimezone, 'HH:mm');
+    return formatInTimeZone(date, viewerTimezone, 'EEE, d MMM yyyy');
   } catch (error) {
-    console.error('Error formatting end time:', error);
-    return '';
+    console.error('Error formatting event date:', error);
+    return dateStr;
   }
 };
 
-// Legacy function exports for backward compatibility
-export const formatEventTime = (dateString: string, timeString: string, timezone: string = AMSTERDAM_TIMEZONE): string => {
-  try {
-    const dateTimeStr = `${dateString}T${timeString}`;
-    const eventDateTime = new Date(dateTimeStr + (timezone === AMSTERDAM_TIMEZONE ? '+01:00' : '+00:00'));
-    return formatInTimeZone(eventDateTime, timezone, 'HH:mm');
-  } catch (error) {
-    console.error('Error formatting time:', error);
-    return timeString.split(':').slice(0, 2).join(':'); // fallback to HH:MM
-  }
-};
-
-export const formatEventDate = (dateString: string, timezone: string = AMSTERDAM_TIMEZONE): string => {
-  try {
-    const date = parseISO(dateString);
-    return formatInTimeZone(date, timezone, 'EEE, d MMM, yyyy');
-  } catch (error) {
-    console.error('Error formatting date:', error);
-    return dateString;
-  }
-};
-
+/**
+ * Format event date and time for display in cards, showing in viewer's timezone
+ */
 export const formatEventCardDateTime = (
-  startDate: string, 
-  startTime?: string, 
-  endDate?: string, 
-  timezone: string = AMSTERDAM_TIMEZONE
+  startDate: string,
+  startTime?: string | null,
+  endDate?: string | null,
+  eventTimezone: string = 'Europe/Amsterdam',
+  displayTimezone?: string
 ): string => {
+  if (!startDate) return '';
+  
+  const viewerTimezone = displayTimezone || getUserTimezone();
+  
+  // Check if it's a multi-day event
+  if (endDate && endDate !== startDate) {
+    const startFormatted = formatEventDate(startDate, eventTimezone, viewerTimezone);
+    const endFormatted = formatEventDate(endDate, eventTimezone, viewerTimezone);
+    return `${startFormatted} - ${endFormatted}`;
+  }
+  
   try {
-    if (endDate && startDate !== endDate) {
-      // Multi-day event
-      const start = parseISO(startDate);
-      const end = parseISO(endDate);
-      const startFormatted = formatInTimeZone(start, timezone, 'MMM d');
-      const endFormatted = formatInTimeZone(end, timezone, 'MMM d');
-      return `${startFormatted} - ${endFormatted}`;
-    } else {
-      // Single day event
-      const date = parseISO(startDate);
-      const dateFormatted = formatInTimeZone(date, timezone, 'EEE, d MMM');
-      if (startTime) {
-        const timeFormatted = formatEventTime(startDate, startTime, timezone);
-        return `${dateFormatted}, ${timeFormatted}`;
-      }
-      return dateFormatted;
+    const datePart = formatEventDate(startDate, eventTimezone, viewerTimezone);
+    
+    if (!startTime) {
+      return datePart;
     }
+    
+    const timePart = formatEventTimeWithTimezone(startDate, startTime, eventTimezone, viewerTimezone);
+    return `${datePart}, ${timePart}`;
   } catch (error) {
-    console.error('Error formatting card date time:', error);
+    console.error('Error formatting event card date-time:', error);
     return startDate;
   }
+};
+
+/**
+ * Get available timezones for event creation
+ */
+export const getCommonTimezones = () => [
+  { value: 'Europe/Amsterdam', label: 'Amsterdam (Netherlands)' },
+  { value: 'Europe/Lisbon', label: 'Lisbon (Portugal)' },
+  { value: 'Europe/London', label: 'London (UK)' },
+  { value: 'Europe/Berlin', label: 'Berlin (Germany)' },
+  { value: 'Europe/Paris', label: 'Paris (France)' },
+  { value: 'Europe/Madrid', label: 'Madrid (Spain)' },
+  { value: 'Europe/Rome', label: 'Rome (Italy)' },
+  { value: 'America/New_York', label: 'New York (EST)' },
+  { value: 'America/Los_Angeles', label: 'Los Angeles (PST)' },
+  { value: 'Asia/Tokyo', label: 'Tokyo (Japan)' },
+  { value: 'Australia/Sydney', label: 'Sydney (Australia)' },
+];
+
+/**
+ * Create a proper Date object from date and time strings in a specific timezone
+ */
+export const createEventDateTime = (
+  dateStr: string, 
+  timeStr: string, 
+  eventTimezone: string = 'Europe/Amsterdam'
+): Date => {
+  if (!dateStr || !timeStr) {
+    throw new Error('Date and time are required');
+  }
+  
+  const eventDateTime = `${dateStr}T${timeStr}:00`;
+  const eventDate = parseISO(eventDateTime);
+  
+  // Convert to the event's timezone
+  return toZonedTime(eventDate, eventTimezone);
 };

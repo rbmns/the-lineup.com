@@ -19,13 +19,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
   selectedDate
 }) => {
   const [weekStart, setWeekStart] = useState<Date>(new Date());
-  const weekRange = getWeekRange(weekStart);
-  
-  // Create array of week days from start to end
-  const weekDays = [];
-  for (let i = 0; i < 7; i++) {
-    weekDays.push(addDays(weekRange.start, i));
-  }
+  const weekDays = getWeekRange(weekStart);
   
   const goToPreviousWeek = () => {
     setWeekStart(prevWeek => addDays(prevWeek, -7));
@@ -75,7 +69,7 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
             </Button>
             
             <span className="text-sm font-medium mx-2">
-              {format(weekRange.start, 'MMM d')} - {format(weekRange.end, 'MMM d')}
+              {format(weekDays[0], 'MMM d')} - {format(weekDays[6], 'MMM d')}
             </span>
             
             <Button

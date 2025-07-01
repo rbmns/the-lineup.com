@@ -36,7 +36,6 @@ export const UserService = {
         location_category: null, // We don't have this in the profiles table
         status: null, // We don't have this in the profiles table
         tagline: null, // We don't have this in the profiles table
-        status_details: null, // Set default value
         created_at: data.created_at,
         updated_at: data.updated_at,
         onboarded: data.onboarded,
@@ -84,7 +83,6 @@ export const UserService = {
         location_category: null,
         status: null,
         tagline: null,
-        status_details: null, // Set default value
         created_at: data.created_at,
         updated_at: data.updated_at,
         onboarded: data.onboarded,

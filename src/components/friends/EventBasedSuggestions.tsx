@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { UserPlus, X, Calendar, MapPin } from 'lucide-react';
-import useEventBasedSuggestions from '@/hooks/useEventBasedSuggestions';
+import { useEventBasedSuggestions } from '@/hooks/useEventBasedSuggestions';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
@@ -22,7 +22,7 @@ export const EventBasedSuggestions: React.FC<EventBasedSuggestionsProps> = ({
   onAddFriend,
   onDismiss
 }) => {
-  const { suggestions, isLoading } = useEventBasedSuggestions(currentUserId);
+  const { suggestions, isLoading } = useEventBasedSuggestions(currentUserId, friendIds);
   const { user } = useAuth();
   const [isRequestLoading, setIsRequestLoading] = React.useState(false);
 
@@ -113,12 +113,12 @@ export const EventBasedSuggestions: React.FC<EventBasedSuggestionsProps> = ({
         }
       }
       
-      const eventNames = suggestion.mutual_events?.slice(0, 2).map((e: any) => e.title).join(', ') || '';
-      const moreEvents = suggestion.mutual_events?.length > 2 ? ` and ${suggestion.mutual_events.length - 2} more event${suggestion.mutual_events.length - 2 !== 1 ? 's' : ''}` : '';
+      const eventNames = suggestion.mutual_events.slice(0, 2).map((e: any) => e.title).join(', ');
+      const moreEvents = suggestion.mutual_events.length > 2 ? ` and ${suggestion.mutual_events.length - 2} more event${suggestion.mutual_events.length - 2 !== 1 ? 's' : ''}` : '';
       
       toast({
         title: "Friend request sent!",
-        description: `You sent a friend request to ${suggestion.username}.${eventNames ? ` You both attended: ${eventNames}${moreEvents}.` : ''}`
+        description: `You sent a friend request to ${suggestion.username}. You both attended: ${eventNames}${moreEvents}.`
       });
       
       // Call the parent callback if provided  
@@ -189,7 +189,7 @@ export const EventBasedSuggestions: React.FC<EventBasedSuggestionsProps> = ({
                         {suggestion.username || 'Unknown User'}
                       </h3>
                       <Badge variant="secondary" className="text-xs">
-                        {suggestion.mutual_event_count || 0} mutual event{suggestion.mutual_event_count !== 1 ? 's' : ''}
+                        {suggestion.mutual_event_count} mutual event{suggestion.mutual_event_count !== 1 ? 's' : ''}
                       </Badge>
                     </div>
                     
@@ -206,7 +206,7 @@ export const EventBasedSuggestions: React.FC<EventBasedSuggestionsProps> = ({
                     
                     {/* Show recent mutual events */}
                     <div className="space-y-1">
-                      {suggestion.mutual_events?.slice(0, 2).map((event: any) => (
+                      {suggestion.mutual_events.slice(0, 2).map((event) => (
                         <div key={event.id} className="flex items-center gap-1 text-xs text-gray-500">
                           <Calendar className="h-3 w-3" />
                           <span className="truncate">
@@ -214,7 +214,7 @@ export const EventBasedSuggestions: React.FC<EventBasedSuggestionsProps> = ({
                           </span>
                         </div>
                       ))}
-                      {suggestion.mutual_events?.length > 2 && (
+                      {suggestion.mutual_events.length > 2 && (
                         <div className="text-xs text-gray-400">
                           +{suggestion.mutual_events.length - 2} more event{suggestion.mutual_events.length - 2 !== 1 ? 's' : ''}
                         </div>
