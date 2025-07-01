@@ -34,9 +34,8 @@ export const useFilteredEvents = ({
 
     let filteredEvents = [...events];
 
-    // Filter by event category - only apply if some categories are selected (not all or none)
-    const hasActiveCategories = selectedCategories.length > 0 && selectedCategories.length < allEventTypes.length;
-    if (hasActiveCategories) {
+    // Filter by event category - only apply if categories are specifically selected
+    if (selectedCategories.length > 0) {
       console.log('Applying category filter:', selectedCategories);
       filteredEvents = filteredEvents.filter(event => 
         event.event_category && selectedCategories.includes(event.event_category)
@@ -62,7 +61,7 @@ export const useFilteredEvents = ({
       console.log('Events after vibe filter:', filteredEvents.length);
     }
 
-    // Filter by location area - FIXED to use proper area-city mapping
+    // Filter by location area - use proper area-city mapping
     if (selectedLocation && venueAreas.length > 0) {
       console.log('Applying location filter:', selectedLocation);
       const selectedArea = venueAreas.find(area => area.id === selectedLocation);
