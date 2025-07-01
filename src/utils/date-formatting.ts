@@ -1,3 +1,4 @@
+
 // Re-export the new timezone-aware functions
 export { 
   formatEventDate,
@@ -24,17 +25,11 @@ export const formatDate = (dateString: string, timezone: string = AMSTERDAM_TIME
 /**
  * Helper to format event time in a consistent way - now timezone-aware
  */
-export const formatTime = (timeString: string, dateString?: string, timezone: string = AMSTERDAM_TIMEZONE): string => {
+export const formatTime = (timeString: string, timezone: string = AMSTERDAM_TIMEZONE): string => {
   try {
     // If it's a full ISO string
     if (timeString.includes('T')) {
-      const time = new Date(timeString);
-      return formatEventTime(dateString || timeString.split('T')[0], timeString.split('T')[1], timezone);
-    }
-    
-    // If it's just a time string (HH:MM:SS) and we have a date
-    if (timeString.includes(':') && dateString) {
-      return formatEventTime(dateString, timeString, timezone);
+      return formatEventTime(timeString, timezone);
     }
     
     // Fallback for just time string
@@ -75,7 +70,13 @@ export const formatEventCardDateTime = (
   endDate?: string | null,
   timezone: string = AMSTERDAM_TIMEZONE
 ): string => {
-  return formatEventCardDateTimeFromUtils(startDate || '', startTime, endDate, timezone);
+  if (!startDate) return '';
+  
+  // Create ISO datetime string from legacy fields
+  const startDateTime = startTime ? `${startDate}T${startTime}` : startDate;
+  const endDateTime = endDate && endDate !== startDate ? endDate : null;
+  
+  return formatEventCardDateTimeFromUtils(startDateTime, endDateTime, timezone);
 };
 
 /**

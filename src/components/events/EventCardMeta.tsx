@@ -9,6 +9,8 @@ interface EventCardMetaProps {
     start_date?: string | null;
     start_time?: string | null;
     end_time?: string | null;
+    start_datetime?: string | null;
+    end_datetime?: string | null;
     timezone?: string;
     venues?: { 
       name: string;
@@ -32,9 +34,16 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
   // Format date in event's local timezone (no year for cards)
   const formatEventDateDisplay = (event: any): string => {
     try {
-      if (!event.start_date) return 'Date not specified';
+      // Use timestampz field first, fallback to legacy fields
+      if (event.start_datetime) {
+        return formatEventDateForCard(event.start_datetime, eventTimezone);
+      }
       
-      return formatEventDateForCard(event.start_date, eventTimezone);
+      if (event.start_date) {
+        return formatEventDateForCard(event.start_date, eventTimezone);
+      }
+      
+      return 'Date not specified';
     } catch (error) {
       console.error('Error formatting date:', error);
       return 'Date not specified';
@@ -43,19 +52,30 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
   
   // Format time range in event's local timezone (no location label for cards)
   const getEventTimeDisplay = (event: any): string => {
-    if (!event.start_date) return 'Time not specified';
-    
     try {
-      if (!event.start_time) return 'Time not specified';
-      
-      const startTime = formatEventTime(event.start_date, event.start_time, eventTimezone);
-      
-      if (!event.end_time) {
-        return startTime;
+      // Use timestampz field first
+      if (event.start_datetime) {
+        const startTime = formatEventTime(event.start_datetime, eventTimezone);
+        
+        if (!event.end_datetime) {
+          return startTime;
+        }
+        
+        const endTime = formatEventTime(event.end_datetime, eventTimezone);
+        return `${startTime} – ${endTime}`;
       }
       
-      const endTime = formatEventTime(event.start_date, event.end_time, eventTimezone);
-      return `${startTime} – ${endTime}`;
+      // Fallback to legacy fields
+      if (!event.start_date || !event.start_time) return 'Time not specified';
+      
+      const startTimeFormatted = formatEventTime(`${event.start_date}T${event.start_time}`, eventTimezone);
+      
+      if (!event.end_time) {
+        return startTimeFormatted;
+      }
+      
+      const endTimeFormatted = formatEventTime(`${event.start_date}T${event.end_time}`, eventTimezone);
+      return `${startTimeFormatted} – ${endTimeFormatted}`;
     } catch (error) {
       console.error('Error formatting time:', error);
       return event.start_time ? event.start_time.substring(0, 5) : 'Time not specified';

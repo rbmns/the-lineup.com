@@ -1,3 +1,4 @@
+
 export interface Profile {
   id: string;
   username: string | null;
@@ -44,6 +45,8 @@ export interface Event {
   start_time?: string | null;
   end_date?: string | null;
   end_time?: string | null;
+  start_datetime?: string | null;
+  end_datetime?: string | null;
   location?: string;
   venue_id?: string;
   venues?: Venue | null;

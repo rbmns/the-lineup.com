@@ -17,15 +17,18 @@ export const getWeekRange = (date: Date): Date[] => {
 export const getEventDateTime = (event: Event): string => {
   if (!event) return '';
   
+  // Use timestampz field first
+  if (event.start_datetime) {
+    return event.start_datetime;
+  }
+  
   if (event.start_time && event.start_time.includes('T')) {
     return event.start_time;
   }
   
   if (event.start_date && event.start_time) {
     try {
-      const eventTimezone = event.timezone || 'Europe/Amsterdam';
-      const dateTime = createEventDateTime(event.start_date, event.start_time, eventTimezone);
-      return dateTime.toISOString();
+      return combineDateAndTime(event.start_date, event.start_time);
     } catch (error) {
       console.error('Error creating event datetime:', error);
       return combineDateAndTime(event.start_date, event.start_time);
@@ -41,15 +44,18 @@ export const getEventDateTime = (event: Event): string => {
 export const getEventEndDateTime = (event: Event): string => {
   if (!event) return '';
   
+  // Use timestampz field first
+  if (event.end_datetime) {
+    return event.end_datetime;
+  }
+  
   if (event.end_time && event.end_time.includes('T')) {
     return event.end_time;
   }
   
   if (event.start_date && event.end_time) {
     try {
-      const eventTimezone = event.timezone || 'Europe/Amsterdam';
-      const dateTime = createEventDateTime(event.start_date, event.end_time, eventTimezone);
-      return dateTime.toISOString();
+      return combineDateAndTime(event.start_date, event.end_time);
     } catch (error) {
       console.error('Error creating event end datetime:', error);
       return combineDateAndTime(event.start_date, event.end_time);
@@ -119,6 +125,19 @@ export const combineDateAndTime = (dateStr: string, timeStr: string): string => 
  * Checks if an event is a multi-day event
  */
 export const isMultiDayEvent = (event: Event): boolean => {
+  // Use timestampz fields first
+  if (event.start_datetime && event.end_datetime) {
+    const startDate = new Date(event.start_datetime);
+    const endDate = new Date(event.end_datetime);
+    
+    // Compare dates without time
+    const startDateOnly = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const endDateOnly = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+    
+    return endDateOnly > startDateOnly;
+  }
+  
+  // Fallback to legacy fields
   if (!event.start_date || !event.end_date) return false;
   
   const startDate = new Date(event.start_date);
@@ -137,6 +156,24 @@ export const isMultiDayEvent = (event: Event): boolean => {
 export const getMultiDayDateRange = (event: Event): string => {
   if (!isMultiDayEvent(event)) return '';
   
+  // Use timestampz fields first
+  if (event.start_datetime && event.end_datetime) {
+    const startDate = new Date(event.start_datetime);
+    const endDate = new Date(event.end_datetime);
+    
+    const options: Intl.DateTimeFormatOptions = { 
+      month: 'short', 
+      day: 'numeric',
+      year: startDate.getFullYear() !== endDate.getFullYear() ? 'numeric' : undefined
+    };
+    
+    const startFormatted = startDate.toLocaleDateString('en-US', options);
+    const endFormatted = endDate.toLocaleDateString('en-US', options);
+    
+    return `${startFormatted} - ${endFormatted}`;
+  }
+  
+  // Fallback to legacy fields
   const startDate = new Date(event.start_date!);
   const endDate = new Date(event.end_date!);
   
@@ -158,13 +195,30 @@ export const getMultiDayDateRange = (event: Event): string => {
 export const isDateInEventRange = (date: Date, event: Event): boolean => {
   if (!isMultiDayEvent(event)) {
     // For single-day events, check if it matches the start date
-    if (!event.start_date) return false;
-    const eventDate = new Date(event.start_date);
+    let eventDate: Date;
+    
+    if (event.start_datetime) {
+      eventDate = new Date(event.start_datetime);
+    } else if (event.start_date) {
+      eventDate = new Date(event.start_date);
+    } else {
+      return false;
+    }
+    
     return date.toDateString() === eventDate.toDateString();
   }
   
-  const startDate = new Date(event.start_date!);
-  const endDate = new Date(event.end_date!);
+  let startDate: Date;
+  let endDate: Date;
+  
+  // Use timestampz fields first
+  if (event.start_datetime && event.end_datetime) {
+    startDate = new Date(event.start_datetime);
+    endDate = new Date(event.end_datetime);
+  } else {
+    startDate = new Date(event.start_date!);
+    endDate = new Date(event.end_date!);
+  }
   
   // Remove time components for date comparison
   const checkDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());

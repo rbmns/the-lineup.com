@@ -17,6 +17,44 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
   const isMobile = useIsMobile();
   const eventTimezone = event.timezone || 'Europe/Amsterdam';
 
+  // Get the formatted date and time
+  const getEventDateTimeDisplay = () => {
+    // Use timestampz fields first
+    if (event.start_datetime) {
+      const eventDate = formatEventDate(event.start_datetime, eventTimezone);
+      const startTime = formatEventTime(event.start_datetime, eventTimezone);
+      const endTime = event.end_datetime ? formatEventTime(event.end_datetime, eventTimezone) : null;
+      
+      return {
+        date: eventDate,
+        time: endTime ? `${startTime}-${endTime}` : startTime
+      };
+    }
+    
+    // Fallback to legacy fields
+    if (event.start_date) {
+      const eventDate = formatEventDate(event.start_date, eventTimezone);
+      let timeDisplay = '';
+      
+      if (event.start_time && event.end_time) {
+        const startTime = formatEventTime(`${event.start_date}T${event.start_time}`, eventTimezone);
+        const endTime = formatEventTime(`${event.start_date}T${event.end_time}`, eventTimezone);
+        timeDisplay = `${startTime}-${endTime}`;
+      } else if (event.start_time) {
+        timeDisplay = formatEventTime(`${event.start_date}T${event.start_time}`, eventTimezone);
+      }
+      
+      return {
+        date: eventDate,
+        time: timeDisplay
+      };
+    }
+    
+    return { date: '', time: '' };
+  };
+
+  const { date, time } = getEventDateTimeDisplay();
+
   return (
     <div className="relative w-full">
       {/* Large Event Image */}
@@ -61,9 +99,9 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
               <div className="flex items-center text-large font-lato text-pure-white drop-shadow-md">
                 <Calendar className="h-5 w-5 mr-3 flex-shrink-0" />
                 <span>
-                  {event.start_date && formatEventDate(event.start_date, eventTimezone)}
-                  {event.start_time && event.end_time && `, ${formatEventTime(event.start_date!, event.start_time, eventTimezone)}-${formatEventTime(event.start_date!, event.end_time, eventTimezone)}`}
-                  {event.start_time && !event.end_time && `, ${formatEventTime(event.start_date!, event.start_time, eventTimezone)}`}
+                  {date && time && `${date}, ${time}`}
+                  {date && !time && date}
+                  {!date && 'Date and time TBD'}
                 </span>
               </div>
               
@@ -90,9 +128,9 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
             <div className="flex items-center text-base text-graphite-grey">
               <Calendar className="h-4 w-4 mr-2 flex-shrink-0 text-ocean-teal" />
               <span>
-                {event.start_date && formatEventDate(event.start_date, eventTimezone)}
-                {event.start_time && event.end_time && `, ${formatEventTime(event.start_date!, event.start_time, eventTimezone)}-${formatEventTime(event.start_date!, event.end_time, eventTimezone)}`}
-                {event.start_time && !event.end_time && `, ${formatEventTime(event.start_date!, event.start_time, eventTimezone)}`}
+                {date && time && `${date}, ${time}`}
+                {date && !time && date}
+                {!date && 'Date and time TBD'}
               </span>
             </div>
             
