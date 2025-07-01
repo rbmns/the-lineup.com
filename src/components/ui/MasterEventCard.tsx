@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { useEventNavigation } from '@/hooks/useEventNavigation';
 import { useEventImages } from '@/hooks/useEventImages';
 import { toast } from '@/hooks/use-toast';
-import { formatEventCardDateTime } from '@/utils/timezone-utils';
+import { formatEventDate, formatEventTime } from '@/utils/timezone-utils';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface MasterEventCardProps {
@@ -82,6 +82,34 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
     return 'Location TBD';
   };
 
+  // Format date and time for cards (without location label)
+  const formatEventCardDateTime = (): string => {
+    if (!event.start_date) return '';
+    
+    const eventTimezone = event.timezone || 'Europe/Amsterdam';
+    
+    // Check if it's a multi-day event
+    if (event.end_date && event.end_date !== event.start_date) {
+      const startFormatted = formatEventDate(event.start_date, eventTimezone);
+      const endFormatted = formatEventDate(event.end_date, eventTimezone);
+      return `${startFormatted} - ${endFormatted}`;
+    }
+    
+    try {
+      const datePart = formatEventDate(event.start_date, eventTimezone);
+      
+      if (!event.start_time) {
+        return datePart;
+      }
+      
+      const timePart = formatEventTime(event.start_date, event.start_time, eventTimezone);
+      return `${datePart}, ${timePart}`;
+    } catch (error) {
+      console.error('Error formatting event card date-time:', error);
+      return event.start_date;
+    }
+  };
+
   return (
     <div 
       className={cn(
@@ -132,17 +160,11 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
           </p>
         )}
         
-        {/* Date & Time with location label - Use JetBrains Mono */}
+        {/* Date & Time - Use JetBrains Mono */}
         <div className="text-sm text-graphite-grey opacity-75 font-mono mb-3 flex items-center gap-2">
           <Calendar className="h-4 w-4 text-ocean-teal flex-shrink-0" />
           <span>
-            {formatEventCardDateTime(
-              event.start_date, 
-              event.start_time, 
-              event.end_date, 
-              event.timezone,
-              event.venues?.city
-            )}
+            {formatEventCardDateTime()}
           </span>
         </div>
         

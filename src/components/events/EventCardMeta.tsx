@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { CalendarIcon, MapPin } from 'lucide-react';
-import { formatEventDate, formatEventTimeRange } from '@/utils/timezone-utils';
+import { formatEventDate, formatEventTime } from '@/utils/timezone-utils';
 import { cn } from '@/lib/utils';
 
 interface EventCardMetaProps {
@@ -41,19 +41,21 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
     }
   };
   
-  // Format time range in event's local timezone with location label
+  // Format time range in event's local timezone (no location label for cards)
   const getEventTimeDisplay = (event: any): string => {
     if (!event.start_date) return 'Time not specified';
     
     try {
-      const city = event.venues?.city;
-      return formatEventTimeRange(
-        event.start_date, 
-        event.start_time, 
-        event.end_time, 
-        eventTimezone, 
-        city
-      );
+      if (!event.start_time) return 'Time not specified';
+      
+      const startTime = formatEventTime(event.start_date, event.start_time, eventTimezone);
+      
+      if (!event.end_time) {
+        return startTime;
+      }
+      
+      const endTime = formatEventTime(event.start_date, event.end_time, eventTimezone);
+      return `${startTime} – ${endTime}`;
     } catch (error) {
       console.error('Error formatting time:', error);
       return event.start_time ? event.start_time.substring(0, 5) : 'Time not specified';
