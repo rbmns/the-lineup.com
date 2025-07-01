@@ -3,11 +3,18 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Plus, Calendar, Users, BarChart3 } from 'lucide-react';
+import { Plus, Calendar, Users, BarChart3, Edit } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserCreatedEvents } from '@/hooks/useUserCreatedEvents';
+import { format } from 'date-fns';
 
 export const CreatorDashboard: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const { data: userEvents, isLoading } = useUserCreatedEvents();
+
+  const events = userEvents || [];
+  const activeEvents = events.filter(event => new Date(event.start_datetime) > new Date());
+  const totalAttendees = 0; // We'll implement proper attendee counting later
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -31,7 +38,7 @@ export const CreatorDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {isAuthenticated ? '0' : '-'}
+              {isAuthenticated ? (isLoading ? '...' : activeEvents.length) : '-'}
             </div>
             <p className="text-xs text-muted-foreground">
               {isAuthenticated ? 'Currently active events' : 'Sign in to view your events'}
@@ -46,7 +53,7 @@ export const CreatorDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {isAuthenticated ? '0' : '-'}
+              {isAuthenticated ? (isLoading ? '...' : totalAttendees) : '-'}
             </div>
             <p className="text-xs text-muted-foreground">
               {isAuthenticated ? 'Across all your events' : 'Sign in to view stats'}
@@ -61,7 +68,7 @@ export const CreatorDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {isAuthenticated ? '0' : '-'}
+              {isAuthenticated ? (isLoading ? '...' : events.length) : '-'}
             </div>
             <p className="text-xs text-muted-foreground">
               {isAuthenticated ? 'Total events created' : 'Sign in to view history'}
@@ -95,19 +102,52 @@ export const CreatorDashboard: React.FC = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle>Your Events</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-center text-gray-500 py-8">
-              <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No recent activity</p>
-              <p className="text-sm">
-                {isAuthenticated 
-                  ? "Create your first event to get started!" 
-                  : "Sign in to view your activity"
-                }
-              </p>
-            </div>
+            {!isAuthenticated ? (
+              <div className="text-center text-gray-500 py-8">
+                <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Sign in to view your events</p>
+              </div>
+            ) : isLoading ? (
+              <div className="text-center text-gray-500 py-8">
+                <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Loading your events...</p>
+              </div>
+            ) : events.length === 0 ? (
+              <div className="text-center text-gray-500 py-8">
+                <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No events yet</p>
+                <p className="text-sm">Create your first event to get started!</p>
+              </div>
+            ) : (
+              <div className="space-y-3 max-h-64 overflow-y-auto">
+                {events.slice(0, 5).map((event) => (
+                  <div key={event.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-sm truncate">{event.title}</h4>
+                      <p className="text-xs text-gray-500">
+                        {format(new Date(event.start_datetime), 'MMM d, yyyy - HH:mm')}
+                      </p>
+                      <p className="text-xs text-gray-400">{event.destination}</p>
+                    </div>
+                    <Button asChild size="sm" variant="outline">
+                      <Link to={`/events/edit/${event.id}`}>
+                        <Edit className="h-3 w-3" />
+                      </Link>
+                    </Button>
+                  </div>
+                ))}
+                {events.length > 5 && (
+                  <Button asChild variant="outline" className="w-full" size="sm">
+                    <Link to="/profile?tab=created">
+                      View All Events ({events.length})
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
