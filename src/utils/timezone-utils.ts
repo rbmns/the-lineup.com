@@ -1,185 +1,84 @@
 
+import { format, parseISO } from 'date-fns';
 import { formatInTimeZone } from 'date-fns-tz';
-import { parseISO } from 'date-fns';
-
-export const AMSTERDAM_TIMEZONE = 'Europe/Amsterdam';
 
 /**
- * Format a datetime string in a specific timezone
+ * Format event date for card display (e.g., "Wed, 2 Jul")
  */
-export function formatEventDate(dateTimeString: string, timezone: string = AMSTERDAM_TIMEZONE): string {
+export function formatEventDateForCard(dateTimeString: string, timezone: string = 'Europe/Amsterdam'): string {
   try {
+    if (!dateTimeString) return 'Date TBD';
+    
     const date = parseISO(dateTimeString);
-    return formatInTimeZone(date, timezone, 'EEEE, MMMM d, yyyy');
+    return formatInTimeZone(date, timezone, 'EEE, d MMM');
   } catch (error) {
-    console.error('Error formatting date:', error);
-    return dateTimeString;
+    console.error('Error formatting event date for card:', error);
+    return 'Date TBD';
   }
 }
 
 /**
- * Format a datetime string for cards (no year) in a specific timezone
+ * Format event time (e.g., "19:00" or "09:00")
  */
-export function formatEventDateForCard(dateTimeString: string, timezone: string = AMSTERDAM_TIMEZONE): string {
+export function formatEventTime(dateTimeString: string, timezone: string = 'Europe/Amsterdam'): string {
   try {
-    const date = parseISO(dateTimeString);
-    return formatInTimeZone(date, timezone, 'EEEE, MMMM d');
-  } catch (error) {
-    console.error('Error formatting date for card:', error);
-    return dateTimeString;
-  }
-}
-
-/**
- * Format a datetime string to show only time in a specific timezone
- */
-export function formatEventTime(dateTimeString: string, timezone: string = AMSTERDAM_TIMEZONE): string {
-  try {
+    if (!dateTimeString) return 'Time TBD';
+    
     const date = parseISO(dateTimeString);
     return formatInTimeZone(date, timezone, 'HH:mm');
   } catch (error) {
-    console.error('Error formatting time:', error);
-    return dateTimeString;
+    console.error('Error formatting event time:', error);
+    return 'Time TBD';
   }
 }
 
 /**
- * Create a Date object from datetime string
+ * Format event datetime for display (e.g., "Wed, 2 Jul at 19:00")
  */
-export function createEventDateTime(dateTimeString: string): Date {
+export function formatEventDateTime(dateTimeString: string, timezone: string = 'Europe/Amsterdam'): string {
   try {
-    return parseISO(dateTimeString);
+    if (!dateTimeString) return 'Date & Time TBD';
+    
+    const date = parseISO(dateTimeString);
+    return formatInTimeZone(date, timezone, 'EEE, d MMM \'at\' HH:mm');
   } catch (error) {
-    console.error('Error creating event datetime:', error);
-    return new Date();
+    console.error('Error formatting event datetime:', error);
+    return 'Date & Time TBD';
   }
 }
 
 /**
- * Format a complete event time range using start_datetime and end_datetime
+ * Format full event date and time range
  */
-export function formatEventTimeRange(
+export function formatEventDateTimeRange(
   startDateTime: string, 
-  endDateTime?: string | null, 
-  timezone: string = AMSTERDAM_TIMEZONE
+  endDateTime?: string, 
+  timezone: string = 'Europe/Amsterdam'
 ): string {
   try {
-    if (!startDateTime) return 'Time not specified';
+    if (!startDateTime) return 'Date & Time TBD';
     
     const startDate = parseISO(startDateTime);
-    let timeRange = formatInTimeZone(startDate, timezone, 'HH:mm');
+    const startFormatted = formatInTimeZone(startDate, timezone, 'EEE, d MMM \'at\' HH:mm');
     
-    if (endDateTime) {
-      const endDate = parseISO(endDateTime);
-      const endTimeFormatted = formatInTimeZone(endDate, timezone, 'HH:mm');
-      timeRange += ` - ${endTimeFormatted}`;
+    if (!endDateTime) {
+      return startFormatted;
     }
     
-    return timeRange;
-  } catch (error) {
-    console.error('Error formatting time range:', error);
-    return 'Time not specified';
-  }
-}
-
-/**
- * Format date and time for event cards using start_datetime (in event's local timezone)
- */
-export function formatEventCardDateTime(
-  startDateTime: string,
-  endDateTime?: string | null,
-  timezone: string = AMSTERDAM_TIMEZONE
-): string {
-  if (!startDateTime) return '';
-
-  try {
-    // Check if it's a multi-day event by comparing dates
-    if (endDateTime) {
-      const startDate = parseISO(startDateTime);
-      const endDate = parseISO(endDateTime);
-      
-      const startDateOnly = formatInTimeZone(startDate, timezone, 'yyyy-MM-dd');
-      const endDateOnly = formatInTimeZone(endDate, timezone, 'yyyy-MM-dd');
-      
-      if (startDateOnly !== endDateOnly) {
-        // Multi-day event
-        const startFormatted = formatEventDateForCard(startDateTime, timezone);
-        const endFormatted = formatEventDateForCard(endDateTime, timezone);
-        return `${startFormatted} - ${endFormatted}`;
-      }
+    const endDate = parseISO(endDateTime);
+    const isSameDay = format(startDate, 'yyyy-MM-dd') === format(endDate, 'yyyy-MM-dd');
+    
+    if (isSameDay) {
+      // Same day: "Wed, 2 Jul at 19:00 - 21:00"
+      const endTime = formatInTimeZone(endDate, timezone, 'HH:mm');
+      return `${startFormatted} - ${endTime}`;
+    } else {
+      // Different days: "Wed, 2 Jul at 19:00 - Thu, 3 Jul at 21:00"
+      const endFormatted = formatInTimeZone(endDate, timezone, 'EEE, d MMM \'at\' HH:mm');
+      return `${startFormatted} - ${endFormatted}`;
     }
-
-    const datePart = formatEventDateForCard(startDateTime, timezone);
-    const timePart = formatEventTime(startDateTime, timezone);
-    
-    return `${datePart}, ${timePart}`;
   } catch (error) {
-    console.error('Error formatting event card date-time:', error);
-    return startDateTime;
+    console.error('Error formatting event datetime range:', error);
+    return 'Date & Time TBD';
   }
-}
-
-/**
- * Format event time with location context (for detail pages)
- */
-export function formatEventTimeWithLocation(
-  dateTimeString: string,
-  timezone: string = AMSTERDAM_TIMEZONE,
-  cityName?: string
-): string {
-  try {
-    const formattedTime = formatEventTime(dateTimeString, timezone);
-    
-    if (cityName && timezone !== AMSTERDAM_TIMEZONE) {
-      return `${formattedTime} (${cityName} local time)`;
-    }
-    
-    return formattedTime;
-  } catch (error) {
-    console.error('Error formatting time with location:', error);
-    return dateTimeString;
-  }
-}
-
-/**
- * Get timezone location label
- */
-export function getTimezoneLocationLabel(timezone: string, cityName?: string): string {
-  if (cityName && timezone !== AMSTERDAM_TIMEZONE) {
-    return `${cityName} local time`;
-  }
-  return '';
-}
-
-/**
- * Get user's timezone
- */
-export function getUserTimezone(): string {
-  try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone;
-  } catch (error) {
-    console.error('Error getting user timezone:', error);
-    return AMSTERDAM_TIMEZONE;
-  }
-}
-
-/**
- * Get common timezones for dropdown
- */
-export function getCommonTimezones(): Array<{ value: string; label: string }> {
-  return [
-    { value: 'Europe/Amsterdam', label: 'Amsterdam (CET/CEST)' },
-    { value: 'Europe/London', label: 'London (GMT/BST)' },
-    { value: 'Europe/Berlin', label: 'Berlin (CET/CEST)' },
-    { value: 'Europe/Paris', label: 'Paris (CET/CEST)' },
-    { value: 'Europe/Rome', label: 'Rome (CET/CEST)' },
-    { value: 'Europe/Madrid', label: 'Madrid (CET/CEST)' },
-    { value: 'Europe/Lisbon', label: 'Lisbon (WET/WEST)' },
-    { value: 'America/New_York', label: 'New York (EST/EDT)' },
-    { value: 'America/Los_Angeles', label: 'Los Angeles (PST/PDT)' },
-    { value: 'America/Chicago', label: 'Chicago (CST/CDT)' },
-    { value: 'Asia/Tokyo', label: 'Tokyo (JST)' },
-    { value: 'Asia/Singapore', label: 'Singapore (SGT)' },
-    { value: 'Australia/Sydney', label: 'Sydney (AEST/AEDT)' },
-  ];
 }

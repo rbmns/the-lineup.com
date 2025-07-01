@@ -101,24 +101,24 @@ export const EventCardMeta: React.FC<EventCardMetaProps> = ({
   const textSize = compact ? 'text-xs' : 'text-sm';
 
   return (
-    <div className={cn("space-y-1", className)}>
+    <div className={cn("space-y-2", className)}>
       <div className="flex items-center text-gray-600">
         <CalendarIcon className="h-4 w-4 mr-2" />
-        <span className={cn("font-inter leading-7", textSize)}>
+        <span className={cn("font-inter", textSize)}>
           {date}
         </span>
       </div>
 
       <div className="flex items-center text-gray-600">
         <CalendarIcon className="h-4 w-4 mr-2" />
-        <span className={cn("font-inter leading-7", textSize)}>
+        <span className={cn("font-inter", textSize)}>
           {time}
         </span>
       </div>
 
       <div className="flex items-center text-gray-600">
         <MapPin className="h-4 w-4 mr-2" />
-        <span className={cn("font-inter leading-7", textSize)}>
+        <span className={cn("font-inter", textSize)}>
           {getVenueDisplay()}
         </span>
       </div>
