@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Event } from '@/types';
 import { Calendar, MapPin } from 'lucide-react';
@@ -81,19 +82,29 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
     return 'Location TBD';
   };
 
-  // Format date and time for cards (in event's local timezone, no location context)
+  // Format date and time for cards using timestampz fields
   const getFormattedDateTime = (): string => {
-    if (!event.start_date) return '';
+    // Use start_datetime if available, fallback to old fields for backward compatibility
+    if (event.start_datetime) {
+      const eventTimezone = event.timezone || 'Europe/Amsterdam';
+      return formatEventCardDateTime(
+        event.start_datetime,
+        event.end_datetime,
+        eventTimezone
+      );
+    }
     
-    // Always use the event's local timezone for cards
-    const eventTimezone = event.timezone || 'Europe/Amsterdam';
+    // Fallback to old fields if timestampz not available
+    if (event.start_date) {
+      const eventTimezone = event.timezone || 'Europe/Amsterdam';
+      return formatEventCardDateTime(
+        `${event.start_date}T${event.start_time || '00:00:00'}`,
+        event.end_date ? `${event.end_date}T${event.end_time || '23:59:59'}` : null,
+        eventTimezone
+      );
+    }
     
-    return formatEventCardDateTime(
-      event.start_date,
-      event.start_time,
-      event.end_date,
-      eventTimezone
-    );
+    return '';
   };
 
   return (

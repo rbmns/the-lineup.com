@@ -25,8 +25,10 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
   const eventTimezone = event.timezone || 'Europe/Amsterdam';
   const venueCity = event.venues?.city;
   
-  // Check if we have valid date information
-  if (!event.start_date) {
+  // Check if we have valid date information - prioritize timestampz fields
+  const hasValidDateTime = event.start_datetime || event.start_date;
+  
+  if (!hasValidDateTime) {
     return (
       <div className={`flex items-center gap-2 text-gray-500 italic ${className}`}>
         <Calendar className={`h-4 w-4 flex-shrink-0 ${iconClassName}`} />
@@ -38,9 +40,29 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
   const isMultiDay = isMultiDayEvent(event);
   const isRecurring = recurringEvents && recurringEvents.length > 0;
 
-  // Format date and times in event's local timezone
-  const startDate = formatEventDate(event.start_date, eventTimezone);
-  const timeRange = formatEventTimeRange(event.start_date, event.start_time, event.end_time, eventTimezone, venueCity);
+  // Format date and times using timestampz fields when available
+  let startDate: string;
+  let timeRange: string;
+  
+  if (event.start_datetime) {
+    // Use timestampz fields
+    startDate = formatEventDate(event.start_datetime, eventTimezone);
+    timeRange = formatEventTimeRange(
+      event.start_datetime, 
+      event.end_datetime, 
+      eventTimezone, 
+      venueCity
+    );
+  } else {
+    // Fallback to old fields
+    startDate = formatEventDate(event.start_date!, eventTimezone);
+    timeRange = formatEventTimeRange(
+      `${event.start_date}T${event.start_time || '00:00:00'}`,
+      event.end_time ? `${event.start_date}T${event.end_time}` : null,
+      eventTimezone,
+      venueCity
+    );
+  }
 
   return (
     <div className={`flex flex-col gap-2 text-gray-700 ${className}`}>
@@ -90,12 +112,24 @@ export const EventDateTimeInfo: React.FC<EventDateTimeInfoProps> = ({
             <div className="text-xs uppercase font-medium text-gray-500">Other dates:</div>
             <div className="space-y-1.5">
               {recurringEvents.map((recEvent) => {
-                const recEventDateTime = formatEventCardDateTime(
-                  recEvent.start_date!, 
-                  recEvent.start_time, 
-                  recEvent.end_date,
-                  recEvent.timezone || eventTimezone
-                );
+                let recEventDateTime: string;
+                
+                if (recEvent.start_datetime) {
+                  recEventDateTime = formatEventCardDateTime(
+                    recEvent.start_datetime,
+                    recEvent.end_datetime,
+                    recEvent.timezone || eventTimezone
+                  );
+                } else if (recEvent.start_date) {
+                  recEventDateTime = formatEventCardDateTime(
+                    `${recEvent.start_date}T${recEvent.start_time || '00:00:00'}`,
+                    recEvent.end_date ? `${recEvent.end_date}T${recEvent.end_time || '23:59:59'}` : null,
+                    recEvent.timezone || eventTimezone
+                  );
+                } else {
+                  recEventDateTime = 'Date not specified';
+                }
+                
                 return (
                   <div key={recEvent.id} className="text-sm">
                     <Badge variant="outline" className="mr-2">
