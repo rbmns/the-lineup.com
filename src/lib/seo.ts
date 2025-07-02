@@ -18,7 +18,7 @@ export const getSeoMetadata = async (): Promise<SeoMetadata | null> => {
     // Return default metadata if nothing is stored
     const defaultMetadata: SeoMetadata = {
       id: 'default',
-      title: 'The Lineup - discover local events and casual plans that fit your vibe and connect with others',
+      title: 'The-Lineup.com - Discover local events and casual plans',
       description: 'Find local events and see who\'s joining',
       og_image_url: defaultSeoTags.ogImage,
       favicon_url: null,
@@ -45,7 +45,7 @@ export const updateSeoMetadata = async (
     // Get current metadata
     const current = await getSeoMetadata() || {
       id: 'default',
-      title: 'The Lineup - discover local events and casual plans that fit your vibe and connect with others',
+      title: 'The-Lineup.com - Discover local events and casual plans',
       description: 'Find local events and see who\'s joining',
       og_image_url: defaultSeoTags.ogImage,
       favicon_url: null,
@@ -122,7 +122,7 @@ export const uploadOgImage = async (
 export const initializeSeoMetadata = async (): Promise<void> => {
   try {
     await updateSeoMetadata({
-      title: 'The Lineup - discover local events and casual plans that fit your vibe and connect with others',
+      title: 'The-Lineup.com - Discover local events and casual plans',
       description: 'Find local events and see who\'s joining',
       og_image_url: defaultSeoTags.ogImage,
       favicon_url: 'https://res.cloudinary.com/dita7stkt/image/upload/v1746861996/icon_transp2_zsptuk.svg',
