@@ -1,4 +1,3 @@
-
 import { vi } from 'vitest';
 
 export const mockSupabase = {
@@ -7,6 +6,7 @@ export const mockSupabase = {
     signInWithPassword: vi.fn(),
     signOut: vi.fn(),
     getUser: vi.fn(),
+    getSession: vi.fn(),
     onAuthStateChange: vi.fn(() => ({
       data: { subscription: { unsubscribe: vi.fn() } },
     })),
@@ -19,7 +19,7 @@ export const mockSupabase = {
     eq: vi.fn().mockReturnThis(),
     order: vi.fn().mockReturnThis(),
     limit: vi.fn().mockReturnThis(),
-    single: vi.fn(),
+    single: vi.fn().mockReturnThis(),
   })),
 };
 
