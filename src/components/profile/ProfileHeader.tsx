@@ -37,61 +37,63 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   };
   
   return (
-    <div className="space-y-4 px-4 sm:px-6 lg:px-8">
+    <div className="space-y-4 px-3 sm:px-4">
       {showAvatar && (
         <div className="flex justify-center">
-          <ProfileAvatar profile={profile} size="xl" className="w-32 h-32 border-4 border-white/20" />
+          <ProfileAvatar profile={profile} size="xl" className="w-24 h-24 sm:w-32 sm:h-32 border-4 border-accent/30" />
         </div>
       )}
       
-      <div className="space-y-2 text-center">
-        <AppPageHeader className="text-white">
+      <div className="space-y-3 text-center">
+        <h1 className="text-h3 sm:text-h2 text-foreground font-bold break-words">
           {profile?.username || 'Anonymous User'}
-        </AppPageHeader>
+        </h1>
         
         {profile?.location && (
-          <p className="text-purple-100 flex items-center justify-center gap-1">
-            <MapPin className="h-4 w-4" />
-            {profile.location}
+          <p className="text-muted-foreground flex items-center justify-center gap-1 text-sm sm:text-base">
+            <MapPin className="h-4 w-4 text-accent flex-shrink-0" />
+            <span className="break-words">{profile.location}</span>
           </p>
         )}
 
         {profile?.status && (
-          <p className="text-sm text-white font-medium px-3 py-1 bg-white/20 rounded-full inline-block">
-            {profile.status}
+          <p className="text-xs sm:text-sm text-foreground font-medium px-3 py-1 bg-accent/20 border border-accent/30 rounded-full inline-block max-w-full">
+            <span className="break-words">{profile.status}</span>
           </p>
         )}
 
         {profile?.tagline && (
-          <p className="text-purple-100 italic">
+          <p className="text-muted-foreground italic text-sm sm:text-base break-words">
             "{profile.tagline}"
           </p>
         )}
         
-        {viewingOwnProfile ? (
-          <Button variant="secondary" size="sm" onClick={handleEditClick} className="bg-white text-purple-700 hover:bg-purple-50">
-            Edit Profile
-          </Button>
-        ) : (
-          friendStatus === 'accepted' ? (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={onRemoveFriend}
-              className="border-white/30 text-white hover:bg-white/10 bg-transparent"
-            >
-              Unfriend
-            </Button>
-          ) : friendStatus === 'pending' ? (
-            <Button variant="secondary" size="sm" disabled className="bg-white/20 text-white">
-              Pending...
+        <div className="pt-2">
+          {viewingOwnProfile ? (
+            <Button variant="secondary" size="sm" onClick={handleEditClick} className="w-full sm:w-auto">
+              Edit Profile
             </Button>
           ) : (
-            <Button size="sm" onClick={onAddFriend} className="bg-white text-purple-700 hover:bg-purple-50">
-              Add Friend
-            </Button>
-          )
-        )}
+            friendStatus === 'accepted' ? (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={onRemoveFriend}
+                className="w-full sm:w-auto"
+              >
+                Unfriend
+              </Button>
+            ) : friendStatus === 'pending' ? (
+              <Button variant="secondary" size="sm" disabled className="w-full sm:w-auto">
+                Pending...
+              </Button>
+            ) : (
+              <Button size="sm" onClick={onAddFriend} className="w-full sm:w-auto">
+                Add Friend
+              </Button>
+            )
+          )}
+        </div>
       </div>
     </div>
   );

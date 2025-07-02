@@ -68,7 +68,7 @@ const UserProfilePage: React.FC<UserProfilePageProps> = ({ hideTitle = false }) 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
             {/* Profile Header - Full width on mobile, sidebar on desktop */}
             <div className="lg:col-span-1">
-              <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg shadow-sm p-4 md:p-6 text-white sticky top-6">
+              <div className="bg-gradient-to-br from-accent/20 to-accent/40 border border-accent/30 rounded-lg shadow-sm p-4 md:p-6 sticky top-6 overflow-hidden">
                 <ProfileHeaderContainer
                   profile={profile}
                   isOwnProfile={isOwnProfile}
