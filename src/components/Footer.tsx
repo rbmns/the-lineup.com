@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Instagram } from 'lucide-react';
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -37,8 +38,9 @@ export const Footer = () => {
                 href="https://www.instagram.com/yourlocallineup" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-ocean-deep/70 hover:text-ocean-deep transition-colors duration-200"
+                className="text-ocean-deep/70 hover:text-ocean-deep transition-colors duration-200 flex items-center gap-2"
               >
+                <Instagram className="w-4 h-4" />
                 Follow for updates
               </a>
             </div>
