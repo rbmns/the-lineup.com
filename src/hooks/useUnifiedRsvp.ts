@@ -28,7 +28,7 @@ export const useUnifiedRsvp = () => {
       return updated;
     });
 
-    // Update events list cache immediately - handle multiple formats
+    // Update ALL events queries - this is key for the events page
     queryClient.setQueriesData({ queryKey: ['events'] }, (oldData: any) => {
       if (!oldData) return oldData;
       
@@ -51,6 +51,39 @@ export const useUnifiedRsvp = () => {
           data: oldData.data.map((event: any) => {
             if (event.id === eventId) {
               console.log(`Updated event in object.data cache: ${eventId} to ${newStatus}`);
+              return { ...event, rsvp_status: newStatus };
+            }
+            return event;
+          })
+        };
+      }
+      
+      return oldData;
+    });
+
+    // Update events-page-data cache specifically (this is what the events page uses)
+    queryClient.setQueryData(['events-page-data'], (oldData: any) => {
+      if (!oldData) return oldData;
+      
+      // Handle array format
+      if (Array.isArray(oldData)) {
+        const updated = oldData.map((event: any) => {
+          if (event.id === eventId) {
+            console.log(`Updated event in events-page-data cache: ${eventId} to ${newStatus}`);
+            return { ...event, rsvp_status: newStatus };
+          }
+          return event;
+        });
+        return updated;
+      }
+      
+      // Handle object format with events property
+      if (oldData.events && Array.isArray(oldData.events)) {
+        return {
+          ...oldData,
+          events: oldData.events.map((event: any) => {
+            if (event.id === eventId) {
+              console.log(`Updated event in events-page-data.events cache: ${eventId} to ${newStatus}`);
               return { ...event, rsvp_status: newStatus };
             }
             return event;
