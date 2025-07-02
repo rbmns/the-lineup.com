@@ -4,6 +4,8 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from '@/components/ui/toaster';
 import { QueryClient } from '@/components/query-client';
+import { usePendingEventPublisher } from '@/hooks/usePendingEventPublisher';
+import { PendingEventHandler } from '@/components/PendingEventHandler';
 import Layout from '@/components/Layout';
 import Home from '@/pages/Home';
 import Events from '@/pages/Events';
@@ -38,6 +40,7 @@ function App() {
     <HelmetProvider>
       <QueryClient>
         <AuthProvider>
+          <PendingEventHandler />
           <SearchProvider>
             <BrowserRouter>
               <Routes>

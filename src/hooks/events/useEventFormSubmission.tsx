@@ -163,6 +163,9 @@ export const useEventFormSubmission = (eventId?: string, isEditMode?: boolean) =
       setCreatedEventId(createdEvent.id);
       setCreatedEventTitle(createdEvent.title || 'Your Event');
       
+      // Store pending event ID for later publishing after email confirmation
+      localStorage.setItem('pendingEventId', createdEvent.id);
+      
       // Show signup modal instead of success modal
       setShowAuthModal(true);
       
@@ -212,6 +215,9 @@ export const useEventFormSubmission = (eventId?: string, isEditMode?: boolean) =
           creator_id: user.id,
         });
         
+        // Clear pending event from localStorage since it's now published
+        localStorage.removeItem('pendingEventId');
+        
         setShowSuccessModal(true);
         
       } catch (error: any) {
@@ -226,6 +232,7 @@ export const useEventFormSubmission = (eventId?: string, isEditMode?: boolean) =
   const handleAuthModalClose = () => {
     setShowAuthModal(false);
     setPendingEventData(null);
+    // Keep pendingEventId in localStorage - user might still want to confirm email later
   };
 
   const handleEventCreated = (eventId: string) => {
