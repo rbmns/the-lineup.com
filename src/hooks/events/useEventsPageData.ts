@@ -9,8 +9,11 @@ import { DateRange } from 'react-day-picker';
 import { processEventsData } from '@/utils/eventProcessorUtils';
 import { useVenueAreas } from '@/hooks/useVenueAreas';
 import { filterUpcomingEvents } from '@/utils/date-filtering';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const useEventsPageData = () => {
+  const { user } = useAuth();
+  
   // State for filters
   const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
@@ -37,9 +40,9 @@ export const useEventsPageData = () => {
     isLoading: venuesLoading
   } = useVenueFilter();
 
-  // Fetch events with a simpler approach
+  // Fetch events with RSVP status
   const { data: eventsData, isLoading: eventsLoading } = useQuery({
-    queryKey: ['events-page-data'],
+    queryKey: ['events-page-data', user?.id],
     queryFn: async () => {
       // First get events
       const { data: events, error: eventsError } = await supabase
@@ -60,6 +63,7 @@ export const useEventsPageData = () => {
       // Get all unique venue IDs and creator IDs
       const venueIds = [...new Set(events.map(e => e.venue_id).filter(Boolean))];
       const creatorIds = [...new Set(events.map(e => e.creator || e.created_by).filter(Boolean))];
+      const eventIds = events.map(e => e.id);
 
       // Fetch venues separately
       let venues = [];
@@ -81,11 +85,29 @@ export const useEventsPageData = () => {
         creators = creatorsData || [];
       }
 
+      // Fetch user's RSVP status if authenticated
+      let userRsvps = [];
+      if (user?.id && eventIds.length > 0) {
+        const { data: rsvpData } = await supabase
+          .from('event_rsvps')
+          .select('event_id, status')
+          .eq('user_id', user.id)
+          .in('event_id', eventIds);
+        userRsvps = rsvpData || [];
+      }
+
+      // Create RSVP status map
+      const rsvpMap: { [eventId: string]: 'Going' | 'Interested' } = {};
+      userRsvps.forEach(rsvp => {
+        rsvpMap[rsvp.event_id] = rsvp.status as 'Going' | 'Interested';
+      });
+
       // Combine the data
       const eventsWithRelations = events.map(event => ({
         ...event,
         venues: venues.find(v => v.id === event.venue_id) || null,
-        creator: creators.find(c => c.id === (event.creator || event.created_by)) || null
+        creator: creators.find(c => c.id === (event.creator || event.created_by)) || null,
+        rsvp_status: rsvpMap[event.id] || null
       }));
 
       // Filter out past events before returning

@@ -62,7 +62,7 @@ export const useUnifiedRsvp = () => {
     });
 
     // Update events-page-data cache specifically (this is what the events page uses)
-    queryClient.setQueryData(['events-page-data'], (oldData: any) => {
+    queryClient.setQueryData(['events-page-data', user?.id], (oldData: any) => {
       if (!oldData) return oldData;
       
       // Handle array format
