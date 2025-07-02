@@ -1,0 +1,26 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 70%
+        threshold: 2%
+    patch:
+      default:
+        target: 70%
+        threshold: 2%
+
+comment:
+  layout: "reach,diff,flags,tree"
+  behavior: default
+
+ignore:
+  - "src/test/**/*"
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/*.spec.ts"
+  - "**/*.spec.tsx"
+  - "e2e/**/*"
+  - "playwright.config.ts"
+  - "vite.config.ts"
+  - "tailwind.config.ts"
+  - "src/main.tsx"
