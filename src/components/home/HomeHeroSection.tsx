@@ -37,14 +37,14 @@ export const HomeHeroSection = () => {
             "font-display font-semibold text-pure-white leading-tight drop-shadow-lg",
             isMobile ? "text-3xl" : "text-5xl lg:text-6xl"
           )}>
-            discover local events and casual plans that fit your vibe
+            Find events and casual plans that fit your vibe
           </h1>
           
           <p className={cn(
             "text-pure-white/90 leading-relaxed max-w-2xl mx-auto drop-shadow-md",
             isMobile ? "text-lg px-2" : "text-xl"
           )}>
-            Discover unique experiences, connect with like-minded people, and make memories that last a lifetime.
+            Discover local plans in Ericeira & Zandvoort — yoga, workshops, beach hangouts & more.
           </p>
         </div>
 

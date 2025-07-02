@@ -33,6 +33,14 @@ export const Footer = () => {
               >
                 Cookie Policy
               </Link>
+              <a 
+                href="https://www.instagram.com/yourlocallineup" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-ocean-deep/70 hover:text-ocean-deep transition-colors duration-200"
+              >
+                Follow for updates
+              </a>
             </div>
           </div>
           
