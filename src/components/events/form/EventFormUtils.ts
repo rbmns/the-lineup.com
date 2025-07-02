@@ -68,7 +68,7 @@ export const processFormData = async (data: EventFormData, userId: string | null
     venue_name: data.venueName || null,
     address: data.address || null,
     postal_code: data.postalCode || null,
-    organizer_link: data.organizerLink || null,
+    booking_link: data.bookingLink || null,
     fee: data.fee || null,
     extra_info: null, // Remove the reference to data.extraInfo since it doesn't exist in the schema
     tags: tagsString,

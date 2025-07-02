@@ -17,7 +17,7 @@ export const eventFormSchema = z.object({
   eventCategory: z.string().optional(),
   vibe: z.string().optional(),
   fee: z.string().optional(),
-  organizerLink: z.string().url().optional().or(z.literal('')),
+  bookingLink: z.string().url().optional().or(z.literal('')),
   tags: z.array(z.string()).optional(),
   imageUrl: z.string().optional(),
 }).refine((data) => {

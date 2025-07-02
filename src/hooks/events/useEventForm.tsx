@@ -24,7 +24,7 @@ export const useEventForm = (defaultValues?: Partial<EventFormData>) => {
       eventCategory: '',
       vibe: '',
       fee: '',
-      organizerLink: '',
+      bookingLink: '',
       tags: [],
       ...defaultValues,
     },

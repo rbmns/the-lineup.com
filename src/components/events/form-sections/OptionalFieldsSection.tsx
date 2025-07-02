@@ -42,14 +42,14 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
         
         <CollapsibleContent className="space-y-6 mt-6">
           <div className="grid gap-6 md:grid-cols-2">
-            {/* Organizer Link */}
+            {/* Booking Link */}
             <FormField
               control={form.control}
-              name="organizerLink"
+              name="bookingLink"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-graphite-grey">
-                    Organizer Link
+                    Booking Link
                   </FormLabel>
                   <FormControl>
                     <Input
