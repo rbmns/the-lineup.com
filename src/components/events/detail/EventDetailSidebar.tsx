@@ -40,6 +40,7 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
         <EventLocationSection 
           venue={event.venues}
           location={event.location}
+          destination={event.destination}
           coordinates={event.coordinates ? { latitude: event.coordinates[0], longitude: event.coordinates[1] } : null}
           title={event.title}
         />

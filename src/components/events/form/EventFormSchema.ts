@@ -19,6 +19,7 @@ export const eventFormSchema = z.object({
   fee: z.string().optional(),
   organizerLink: z.string().url().optional().or(z.literal('')),
   tags: z.array(z.string()).optional(),
+  imageUrl: z.string().optional(),
 }).refine((data) => {
   // If end date is provided, it should be >= start date
   if (data.endDate && data.startDate) {

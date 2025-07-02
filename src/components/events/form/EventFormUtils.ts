@@ -1,6 +1,6 @@
 
 import { EventFormData } from './EventFormSchema';
-import { toZonedTime } from 'date-fns-tz';
+import { fromZonedTime } from 'date-fns-tz';
 
 export const processFormData = async (data: EventFormData, userId: string | null) => {
   console.log('🔄 Processing form data for user:', userId);
@@ -12,28 +12,45 @@ export const processFormData = async (data: EventFormData, userId: string | null
   // Convert date and time to datetime in the event's timezone
   const startDateTime = data.startDate && data.startTime 
     ? (() => {
-        // Create the datetime string in the event's timezone
-        const dateStr = `${data.startDate.toISOString().split('T')[0]}T${data.startTime}:00`;
-        const localDateTime = new Date(dateStr);
+        const eventTimezone = data.timezone || 'Europe/Amsterdam';
         
-        // Convert to the event's timezone
-        const zonedDateTime = toZonedTime(localDateTime, data.timezone || 'Europe/Amsterdam');
+        // Create a date string that represents the local time in the event's timezone
+        const year = data.startDate.getFullYear();
+        const month = String(data.startDate.getMonth() + 1).padStart(2, '0');
+        const day = String(data.startDate.getDate()).padStart(2, '0');
+        
+        // Combine date and time as if it's in the target timezone
+        const localDateTimeString = `${year}-${month}-${day}T${data.startTime}:00`;
+        
+        // Parse as a local date first
+        const localDate = new Date(localDateTimeString);
+        
+        // Convert from the event's timezone to UTC
+        const utcDateTime = fromZonedTime(localDate, eventTimezone);
+        
         console.log('⏰ Start time conversion:', {
-          input: `${data.startTime} (${data.timezone})`,
-          localDateTime: localDateTime.toISOString(),
-          zonedDateTime: zonedDateTime.toISOString()
+          input: `${data.startTime} local time in ${eventTimezone}`,
+          localDateTimeString,
+          utcResult: utcDateTime.toISOString()
         });
         
-        return zonedDateTime;
+        return utcDateTime;
       })()
     : null;
     
   const endDateTime = data.endDate && data.endTime 
     ? (() => {
-        const dateStr = `${data.endDate.toISOString().split('T')[0]}T${data.endTime}:00`;
-        const localDateTime = new Date(dateStr);
-        const zonedDateTime = toZonedTime(localDateTime, data.timezone || 'Europe/Amsterdam');
-        return zonedDateTime;
+        const eventTimezone = data.timezone || 'Europe/Amsterdam';
+        
+        const year = data.endDate.getFullYear();
+        const month = String(data.endDate.getMonth() + 1).padStart(2, '0');
+        const day = String(data.endDate.getDate()).padStart(2, '0');
+        
+        const localDateTimeString = `${year}-${month}-${day}T${data.endTime}:00`;
+        const localDate = new Date(localDateTimeString);
+        
+        // Convert from the event's timezone to UTC
+        return fromZonedTime(localDate, eventTimezone);
       })()
     : null;
 
@@ -58,6 +75,7 @@ export const processFormData = async (data: EventFormData, userId: string | null
     vibe: data.vibe || null,
     creator: userId, // Will be null for unauthenticated users, filled in after auth
     timezone: data.timezone || 'Europe/Amsterdam',
+    image_urls: data.imageUrl ? `["${data.imageUrl}"]` : null,
     status: 'published' as const
   };
 

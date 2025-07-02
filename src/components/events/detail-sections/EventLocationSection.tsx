@@ -18,6 +18,7 @@ interface Venue {
 interface EventLocationSectionProps {
   venue?: Venue | null;
   location?: string;
+  destination?: string;
   coordinates?: Coordinates | null;
   title?: string;
 }
@@ -25,24 +26,25 @@ interface EventLocationSectionProps {
 export const EventLocationSection = ({
   venue,
   location,
+  destination,
   coordinates,
   title
 }: EventLocationSectionProps) => {
-  if (!venue && !location && !coordinates) return null;
+  if (!venue && !location && !destination && !coordinates) return null;
+  
+  // Determine what to display - prioritize venue info if available, then fall back to event location
+  const displayName = venue?.name || 'Event Location';
+  const displayAddress = venue ? 
+    [venue.street, venue.city, venue.postal_code].filter(Boolean).join(', ') : 
+    location || destination || 'Location details not provided';
   
   return (
     <div>
       <div className="flex items-start space-x-2 mb-4">
         <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
         <div>
-          <p className="font-medium">{venue?.name || 'Event Location'}</p>
-          <p className="text-sm text-gray-600">
-            {[
-              venue?.street,
-              venue?.city,
-              venue?.postal_code
-            ].filter(Boolean).join(', ') || location || 'Location details not provided'}
-          </p>
+          <p className="font-medium">{displayName}</p>
+          <p className="text-sm text-gray-600">{displayAddress}</p>
         </div>
       </div>
       

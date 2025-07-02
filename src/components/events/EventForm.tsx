@@ -10,6 +10,7 @@ import { LocationFields } from './form-sections/LocationFields';
 import { CategoryToggleField } from './form-sections/CategoryToggleField';
 import { VibeToggleField } from './form-sections/VibeToggleField';
 import { OptionalFieldsSection } from './form-sections/OptionalFieldsSection';
+import { ImageUploadField } from './form-sections/ImageUploadField';
 import { EventFormActions } from './form-sections/EventFormActions';
 import { Form } from '@/components/ui/form';
 import { Event } from '@/types';
@@ -130,6 +131,7 @@ export const EventForm: React.FC<EventFormProps> = ({
             <div className="space-y-3">
               <TitleField />
               <DescriptionField />
+              <ImageUploadField />
             </div>
           </div>
 
