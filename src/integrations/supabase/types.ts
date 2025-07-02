@@ -1046,7 +1046,12 @@ export type Database = {
     }
     Enums: {
       event_source_type: "Submitted" | "Scraped"
-      event_status: "draft" | "pending_approval" | "published" | "rejected"
+      event_status:
+        | "draft"
+        | "pending_approval"
+        | "published"
+        | "rejected"
+        | "pending"
       request_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
@@ -1164,7 +1169,13 @@ export const Constants = {
   public: {
     Enums: {
       event_source_type: ["Submitted", "Scraped"],
-      event_status: ["draft", "pending_approval", "published", "rejected"],
+      event_status: [
+        "draft",
+        "pending_approval",
+        "published",
+        "rejected",
+        "pending",
+      ],
       request_status: ["pending", "approved", "rejected"],
     },
   },
