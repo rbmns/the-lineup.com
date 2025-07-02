@@ -11,7 +11,7 @@ export const eventFormSchema = z.object({
   startDate: z.date({ required_error: 'Start date is required' }),
   startTime: z.string().min(1, 'Start time is required'),
   endDate: z.date().optional(),
-  endTime: z.string().optional(),
+  endTime: z.string().min(1, 'End time is required'),
   flexibleStartTime: z.boolean().default(false),
   timezone: z.string().default('Europe/Amsterdam'),
   eventCategory: z.string().optional(),

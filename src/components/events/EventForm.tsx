@@ -68,7 +68,7 @@ export const EventForm: React.FC<EventFormProps> = ({
     createdEventId,
     createdEventTitle,
     isCreating
-  } = useEventFormSubmission();
+  } = useEventFormSubmission(eventId, isEditMode);
   
   const {
     handleSubmit,

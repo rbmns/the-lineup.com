@@ -2,13 +2,13 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { createEvent } from '@/lib/eventService';
+import { createEvent, updateEvent } from '@/lib/eventService';
 import { processFormData } from '@/components/events/form/EventFormUtils';
 import { toast } from 'sonner';
 import { EventFormData } from '@/components/events/form/EventFormSchema';
 import { useTracking } from '@/services/trackingService';
 
-export const useEventFormSubmission = () => {
+export const useEventFormSubmission = (eventId?: string, isEditMode?: boolean) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -41,9 +41,14 @@ export const useEventFormSubmission = () => {
       return;
     }
 
-    // For authenticated users, create the event immediately
-    console.log('✅ User authenticated, creating event immediately...');
-    await createEventWithAuth(data, user.id);
+    // For authenticated users, create or update the event immediately
+    if (isEditMode && eventId) {
+      console.log('✅ User authenticated, updating event...');
+      await updateEventWithAuth(data, user.id, eventId);
+    } else {
+      console.log('✅ User authenticated, creating event immediately...');
+      await createEventWithAuth(data, user.id);
+    }
   };
 
   const createEventWithAuth = async (data: EventFormData, userId: string) => {
@@ -97,6 +102,38 @@ export const useEventFormSubmission = () => {
     } catch (error: any) {
       console.error('Failed to create event:', error);
       toast.error(`Failed to create event: ${error.message || 'Unknown error'}`);
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const updateEventWithAuth = async (data: EventFormData, userId: string, eventId: string) => {
+    setIsCreating(true);
+    
+    try {
+      const processedData = await processFormData(data, userId);
+      console.log('Processed event update data:', processedData);
+      
+      const { data: updatedEvent, error } = await updateEvent(eventId, processedData);
+      
+      if (error) {
+        console.error('Error updating event:', error);
+        toast.error(`Failed to update event: ${error.message || 'Unknown error'}`);
+        return;
+      }
+      
+      if (!updatedEvent) {
+        toast.error('No event data returned. Please try again.');
+        return;
+      }
+      
+      console.log('Event updated successfully:', updatedEvent);
+      toast.success('Event updated successfully!');
+      navigate(`/events/${eventId}`);
+      
+    } catch (error: any) {
+      console.error('Failed to update event:', error);
+      toast.error(`Failed to update event: ${error.message || 'Unknown error'}`);
     } finally {
       setIsCreating(false);
     }

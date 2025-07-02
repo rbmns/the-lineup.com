@@ -21,6 +21,9 @@ interface EventLocationSectionProps {
   destination?: string;
   coordinates?: Coordinates | null;
   title?: string;
+  venueName?: string;
+  address?: string;
+  googleMaps?: string;
 }
 
 export const EventLocationSection = ({
@@ -28,15 +31,18 @@ export const EventLocationSection = ({
   location,
   destination,
   coordinates,
-  title
+  title,
+  venueName,
+  address,
+  googleMaps
 }: EventLocationSectionProps) => {
-  if (!venue && !location && !destination && !coordinates) return null;
+  if (!venue && !location && !destination && !coordinates && !venueName && !address) return null;
   
-  // Determine what to display - prioritize venue info if available, then fall back to event location
-  const displayName = venue?.name || 'Event Location';
+  // Determine what to display - prioritize venue info if available, then fall back to event location fields
+  const displayName = venue?.name || venueName || 'Event Location';
   const displayAddress = venue ? 
     [venue.street, venue.city, venue.postal_code].filter(Boolean).join(', ') : 
-    location || destination || 'Location details not provided';
+    address || location || destination || 'Location details not provided';
   
   return (
     <div>
@@ -45,6 +51,16 @@ export const EventLocationSection = ({
         <div>
           <p className="font-medium">{displayName}</p>
           <p className="text-sm text-gray-600">{displayAddress}</p>
+          {googleMaps && (
+            <a 
+              href={googleMaps} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-1 inline-block"
+            >
+              View on Google Maps
+            </a>
+          )}
         </div>
       </div>
       
