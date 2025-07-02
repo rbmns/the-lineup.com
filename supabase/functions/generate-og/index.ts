@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 // Updated default OG image URL to use the uploaded image
-const DEFAULT_OG_IMAGE = "/lovable-uploads/1dac6acf-bbe4-45ae-95a7-dae6832cdf73.png";
+const DEFAULT_OG_IMAGE = "/lovable-uploads/6ac187cb-1183-4980-bd9d-5590a3dc12df.png";
 
 // Handle CORS preflight requests
 const handleCors = (req: Request) => {

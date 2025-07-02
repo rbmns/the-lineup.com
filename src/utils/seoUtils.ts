@@ -55,11 +55,11 @@ export const getEventOgTags = async (event: { title: string; description?: strin
 };
 
 export const defaultSeoTags = {
-  title: "the lineup | Join the Flow",
+  title: "The Lineup - discover local events and casual plans that fit your vibe and connect with others",
   description: "Find events, connect with locals and friends, and join the flow of every place you land.",
-  ogTitle: "Join the Flow — Connect with Locals and Friends | the lineup",
+  ogTitle: "The Lineup - discover local events and casual plans that fit your vibe and connect with others",
   ogDescription: "Find events, connect with locals and friends, and join the flow of every place you land.",
-  ogImage: "/lovable-uploads/1dac6acf-bbe4-45ae-95a7-dae6832cdf73.png", // Updated to use the uploaded image
+  ogImage: "/lovable-uploads/6ac187cb-1183-4980-bd9d-5590a3dc12df.png",
   tagline: "Join the Flow."
 };
 
