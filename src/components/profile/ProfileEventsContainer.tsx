@@ -4,6 +4,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ProfileEventsSection } from './ProfileEventsSection';
 import { UserProfile } from '@/types';
 import { useUserEvents } from '@/hooks/useUserEvents';
+import { useFriendship } from '@/hooks/useFriendship';
+import { useMatchingRsvps } from '@/hooks/useMatchingRsvps';
 
 interface ProfileEventsContainerProps {
   profileId?: string | null;
@@ -25,7 +27,8 @@ export const ProfileEventsContainer: React.FC<ProfileEventsContainerProps> = ({
   // Use the profileId if provided, otherwise fall back to current user
   const userIdToFetch = profileId || user?.id;
   
-  console.log('ProfileEventsContainer: userIdToFetch:', userIdToFetch, 'isOwnProfile:', isOwnProfile);
+  // Get friendship status
+  const { status: friendshipStatus, sendFriendRequest } = useFriendship(user?.id, profileId);
   
   // Fetch user events using the hook
   const { 
@@ -35,25 +38,16 @@ export const ProfileEventsContainer: React.FC<ProfileEventsContainerProps> = ({
     error: eventsError
   } = useUserEvents(userIdToFetch);
 
-  console.log('ProfileEventsContainer: Events loaded:', {
-    pastEvents: pastEvents.length,
-    upcomingEvents: upcomingEvents.length,
-    isLoading: eventsLoading,
-    error: eventsError
-  });
+  // Get matching RSVPs between current user and profile user
+  const { matchingEvents } = useMatchingRsvps(user?.id, isOwnProfile ? undefined : profileId);
 
-  if (eventsError) {
-    console.error('ProfileEventsContainer: Error fetching events:', eventsError);
-  }
-
-  const handleAddFriend = () => {
-    // Friend request logic would go here
-    console.log('Add friend clicked');
+  const handleAddFriend = async () => {
+    if (!profileId) return;
+    const success = await sendFriendRequest();
+    if (success) {
+      console.log('Friend request sent successfully');
+    }
   };
-
-  // For now, we'll assume friendship status is 'accepted' for own profile
-  // and 'none' for others (you can enhance this with real friendship logic later)
-  const friendshipStatus = isOwnProfile ? 'accepted' : 'none';
   
   // Determine if user can view events based on friendship status and profile privacy
   const canViewEvents = isOwnProfile || friendshipStatus === 'accepted' || !isBlocked;
@@ -68,6 +62,8 @@ export const ProfileEventsContainer: React.FC<ProfileEventsContainerProps> = ({
       username={profile?.username}
       handleAddFriend={handleAddFriend}
       friendshipStatus={friendshipStatus}
+      matchingEvents={matchingEvents}
+      currentUserId={user?.id}
     />
   );
 };

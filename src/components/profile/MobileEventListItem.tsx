@@ -72,7 +72,7 @@ const MobileEventListItem: React.FC<MobileEventListItemProps> = ({
       <div className="space-y-2">
         {/* Title and Category */}
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-[#005F73] text-sm leading-tight line-clamp-2 flex-1">
+          <h3 className="font-semibold text-[#005F73] text-sm leading-tight line-clamp-2 flex-1 break-words">
             {event.title}
           </h3>
           {event.event_category && (

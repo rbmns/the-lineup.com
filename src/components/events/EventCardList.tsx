@@ -185,9 +185,9 @@ const EventCardList: React.FC<EventCardListProps> = ({
         </div>
         
         {/* Content */}
-        <div className="flex flex-col flex-1 p-3 sm:p-3 justify-center text-left gap-2">
+        <div className="flex flex-col flex-1 p-3 sm:p-4 justify-center text-left gap-1 sm:gap-2 min-w-0">
           {/* Title */}
-          <h3 className="font-semibold text-[#005F73] text-base sm:text-lg line-clamp-1 text-left leading-tight">
+          <h3 className="font-semibold text-[#005F73] text-sm sm:text-base leading-tight line-clamp-2 text-left break-words">
             {event.title}
           </h3>
             

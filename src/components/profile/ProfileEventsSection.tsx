@@ -14,6 +14,8 @@ interface ProfileEventsSectionProps {
   username?: string;
   handleAddFriend?: () => void;
   friendshipStatus?: string;
+  matchingEvents?: Event[];
+  currentUserId?: string;
 }
 
 export const ProfileEventsSection: React.FC<ProfileEventsSectionProps> = ({
@@ -24,7 +26,9 @@ export const ProfileEventsSection: React.FC<ProfileEventsSectionProps> = ({
   isCurrentUser = false,
   username = 'User',
   handleAddFriend,
-  friendshipStatus = 'none'
+  friendshipStatus = 'none',
+  matchingEvents = [],
+  currentUserId
 }) => {
   if (!canViewEvents) {
     return (
@@ -71,6 +75,30 @@ export const ProfileEventsSection: React.FC<ProfileEventsSectionProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Matching Events - only show for friends */}
+      {!isCurrentUser && matchingEvents.length > 0 && (
+        <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg shadow-sm border border-purple-200 p-6 md:p-8">
+          <h2 className="text-xl md:text-2xl font-semibold mb-6 flex items-center text-purple-700">
+            <Users className="h-5 w-5 md:h-6 md:w-6 mr-3" />
+            Events You're Both Attending
+          </h2>
+          
+          <div className="space-y-3">
+            {matchingEvents.map(event => (
+              <div key={event.id} className="relative">
+                <EventCardList
+                  event={event}
+                  showRsvpStatus={true}
+                />
+                <div className="mt-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-md text-xs mx-3">
+                  You and {username} are both attending this event
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      
       {/* Upcoming Events */}
       <div className="bg-white rounded-lg shadow-sm border border-secondary p-6 md:p-8">
         <h2 className="text-xl md:text-2xl font-semibold mb-6 flex items-center text-primary">
