@@ -70,14 +70,12 @@ const UserMenu = ({ user, profile, handleSignOut, canCreateEvents }: UserMenuPro
             <span>Dashboard</span>
           </Link>
         </DropdownMenuItem>
-        {canCreateEvents && (
-            <DropdownMenuItem asChild>
-              <Link to="/profile?tab=created" className="w-full cursor-pointer">
-                <Calendar className="mr-2 h-4 w-4" />
-                <span>My Events</span>
-              </Link>
-            </DropdownMenuItem>
-        )}
+        <DropdownMenuItem asChild>
+          <Link to="/my-events" className="w-full cursor-pointer">
+            <Calendar className="mr-2 h-4 w-4" />
+            <span>My Events</span>
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link to="/profile/edit" className="w-full cursor-pointer">
             <Settings className="mr-2 h-4 w-4" />

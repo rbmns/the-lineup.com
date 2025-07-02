@@ -15,6 +15,7 @@ import CreateCasualPlanPage from '@/components/casual-plans/CreateCasualPlanPage
 import Friends from '@/pages/Friends';
 import ProfilePage from '@/pages/ProfilePage';
 import ProfileEdit from '@/pages/ProfileEdit';
+import MyEvents from '@/pages/MyEvents';
 import Login from '@/pages/Login';
 import Signup from '@/pages/Signup';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -51,6 +52,7 @@ function App() {
                   <Route path="casual-plans" element={<CasualPlans />} />
                   <Route path="casual-plans/create" element={<CreateCasualPlanPage />} />
                   <Route path="friends" element={<Friends />} />
+                  <Route path="my-events" element={<MyEvents />} />
                   <Route path="profile" element={<ProfilePage />} />
                   <Route path="profile/edit" element={<ProfileEdit />} />
                   {/* Update organise route to redirect to dashboard */}

@@ -4,12 +4,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { ProfilePageLayout } from '@/components/profile/ProfilePageLayout';
 import { useProfileData } from '@/hooks/useProfileData';
-import { UserRsvpedEvents } from '@/components/profile/UserRsvpedEvents';
+import { SettingsPanel } from '@/components/profile/SettingsPanel';
 import { useAdminData } from '@/hooks/useAdminData';
 import { CreatorRequestsDashboard } from '@/components/admin/CreatorRequestsDashboard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useUserEvents } from '@/hooks/useUserEvents';
 
 const ProfilePage: React.FC = () => {
   const { user } = useAuth();
@@ -23,7 +22,6 @@ const ProfilePage: React.FC = () => {
   } = useProfileData(user?.id);
   
   const { isAdmin, requests, isLoading: isAdminLoading } = useAdminData();
-  const { upcomingEvents, pastEvents, isLoading: eventsLoading } = useUserEvents(user?.id);
 
   // Redirect to login if not authenticated
   React.useEffect(() => {
@@ -58,12 +56,12 @@ const ProfilePage: React.FC = () => {
     );
   }
   
-  // Show only RSVPs tab for regular users, add admin tab if user is admin
+  // Show settings for regular users, add admin tab if user is admin
   const showAdminTab = isAdmin;
   const numTabs = showAdminTab ? 2 : 1;
   const gridColsClass = `grid-cols-${numTabs}`;
 
-  const defaultTab = 'rsvps';
+  const defaultTab = 'settings';
 
   return (
     <>
@@ -76,8 +74,8 @@ const ProfilePage: React.FC = () => {
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 max-w-5xl">
         <Tabs defaultValue={defaultTab} className="w-full">
           <TabsList className={`grid w-full ${gridColsClass}`}>
-            <TabsTrigger value="rsvps" className="text-xs sm:text-sm">
-              My RSVPs
+            <TabsTrigger value="settings" className="text-xs sm:text-sm">
+              Settings
             </TabsTrigger>
             {showAdminTab && (
               <TabsTrigger value="admin" className="text-xs sm:text-sm">
@@ -86,37 +84,8 @@ const ProfilePage: React.FC = () => {
             )}
           </TabsList>
           
-          <TabsContent value="rsvps" className="mt-4 sm:mt-6">
-            <Tabs defaultValue="upcoming" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="upcoming" className="text-xs sm:text-sm px-2 sm:px-4">
-                  Upcoming ({upcomingEvents.length})
-                </TabsTrigger>
-                <TabsTrigger value="past" className="text-xs sm:text-sm px-2 sm:px-4">
-                  Past ({pastEvents.length})
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="upcoming" className="mt-3 sm:mt-4">
-                <UserRsvpedEvents 
-                  userId={user.id} 
-                  events={upcomingEvents}
-                  isLoading={eventsLoading}
-                  emptyMessage="No upcoming RSVPs"
-                  title="Your Upcoming RSVPs"
-                />
-              </TabsContent>
-              
-              <TabsContent value="past" className="mt-3 sm:mt-4">
-                <UserRsvpedEvents 
-                  userId={user.id} 
-                  events={pastEvents}
-                  isLoading={eventsLoading}
-                  emptyMessage="No past RSVPs"
-                  title="Your Past RSVPs"
-                />
-              </TabsContent>
-            </Tabs>
+          <TabsContent value="settings" className="mt-4 sm:mt-6">
+            <SettingsPanel userId={user.id} />
           </TabsContent>
           
           {showAdminTab && (

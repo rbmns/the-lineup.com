@@ -91,12 +91,12 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
               <SettingsPanel userId={user.id} />
             )}
 
-            {/* About Section - Mobile */}
-            {!showSettings && (
+                {/* About Section - Mobile */}
+            {!showSettings && profile?.tagline && (
               <div className="bg-white rounded-lg p-4 mb-6 shadow-sm text-left border border-secondary">
                 <h2 className="text-base md:text-lg font-semibold mb-2 text-primary">About</h2>
                 <p className="text-neutral text-xs md:text-sm">
-                  {profile?.tagline || "Explorer and local enthusiast. Love discovering new places and meeting new people."}
+                  {profile.tagline}
                 </p>
               </div>
             )}
@@ -158,11 +158,11 @@ export const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
                 )}
 
                 {/* About Section */}
-                {!showSettings && (
+                {!showSettings && profile?.tagline && (
                   <div className="bg-white rounded-lg p-6 shadow-sm border border-secondary">
                     <h2 className="text-lg md:text-xl font-semibold mb-4 text-primary">About</h2>
                     <p className="text-neutral text-sm md:text-base">
-                      {profile?.tagline || "Explorer and local enthusiast. Love discovering new places and meeting new people."}
+                      {profile.tagline}
                     </p>
                   </div>
                 )}
