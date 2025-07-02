@@ -29,11 +29,7 @@ describe('Authentication Flow Integration', () => {
         error: null,
       });
 
-      render(
-        <BrowserRouter>
-          <Login />
-        </BrowserRouter>
-      );
+      render(<Login />);
 
       // Fill in login form
       const emailInput = screen.getByLabelText(/email/i);
@@ -60,11 +56,7 @@ describe('Authentication Flow Integration', () => {
         error: { message: 'Invalid credentials' },
       });
 
-      render(
-        <BrowserRouter>
-          <Login />
-        </BrowserRouter>
-      );
+      render(<Login />);
 
       const emailInput = screen.getByLabelText(/email/i);
       const passwordInput = screen.getByLabelText(/password/i);
@@ -95,11 +87,7 @@ describe('Authentication Flow Integration', () => {
         error: null,
       });
 
-      render(
-        <BrowserRouter>
-          <Signup />
-        </BrowserRouter>
-      );
+      render(<Signup />);
 
       // Fill in signup form
       const emailInput = screen.getByLabelText(/email/i);
@@ -129,11 +117,7 @@ describe('Authentication Flow Integration', () => {
         error: { message: 'User already registered' },
       });
 
-      render(
-        <BrowserRouter>
-          <Signup />
-        </BrowserRouter>
-      );
+      render(<Signup />);
 
       const emailInput = screen.getByLabelText(/email/i);
       const passwordInput = screen.getByLabelText(/password/i);
@@ -167,11 +151,7 @@ describe('Authentication Flow Integration', () => {
         error: null,
       });
 
-      render(
-        <BrowserRouter>
-          <Login />
-        </BrowserRouter>
-      );
+      render(<Login />);
 
       // Should call getSession on mount
       await waitFor(() => {

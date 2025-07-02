@@ -22,7 +22,7 @@ describe('timezone-utils', () => {
 
     it('should fallback gracefully on error', () => {
       const result = formatEventTime('invalid-date', 'Europe/Amsterdam');
-      expect(result).toBe('invalid-date');
+      expect(result).toBe('Time TBD');
     });
   });
 
