@@ -123,14 +123,12 @@ export const PrePublishAuthModal: React.FC<PrePublishAuthModalProps> = ({
         console.log("✅ Signup successful");
 
         toast({
-          title: "Account created! 🎉",
-          description: "Your account has been created and your event will be published.",
+          title: "Check your email! 📧",
+          description: "We've sent you a confirmation link. Your event will be published once you confirm your account.",
         });
         
-        // Wait for auth state to update, then call success
-        setTimeout(() => {
-          onSuccess();
-        }, 1500);
+        // Close the modal since they need to check email first
+        onClose();
       }
 
     } catch (error: any) {

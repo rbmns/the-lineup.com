@@ -64,7 +64,9 @@ export const EventForm: React.FC<EventFormProps> = ({
     handleEventCreated,
     showAuthModal,
     showSuccessModal,
+    showPendingModal,
     setShowSuccessModal,
+    setShowPendingModal,
     createdEventId,
     createdEventTitle,
     isCreating

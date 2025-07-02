@@ -11,10 +11,12 @@ import { useTracking } from '@/services/trackingService';
 export const useEventFormSubmission = (eventId?: string, isEditMode?: boolean) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showPendingModal, setShowPendingModal] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [createdEventId, setCreatedEventId] = useState<string | null>(null);
   const [createdEventTitle, setCreatedEventTitle] = useState('');
   const [pendingEventData, setPendingEventData] = useState<any>(null);
+  const [pendingEventEmail, setPendingEventEmail] = useState('');
   
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -25,19 +27,9 @@ export const useEventFormSubmission = (eventId?: string, isEditMode?: boolean) =
     console.log('🔐 Current user state:', user ? `User ID: ${user.id}` : 'No user authenticated');
     
     if (!user) {
-      // For unauthenticated users, process the form data and show auth modal
-      console.log('👤 User not authenticated, processing form data and showing auth modal');
-      try {
-        console.log('📝 Processing form data for unauthenticated user...');
-        const processedData = await processFormData(data, null); // Pass null for unauthenticated users
-        console.log('✅ Form data processed successfully:', processedData);
-        setPendingEventData(processedData);
-        console.log('🔑 Showing auth modal...');
-        setShowAuthModal(true);
-      } catch (error) {
-        console.error('❌ Error processing form data:', error);
-        toast.error('Failed to process event data. Please try again.');
-      }
+      // For unauthenticated users, create pending event and show auth modal
+      console.log('👤 User not authenticated, creating pending event and showing auth modal');
+      await createPendingEvent(data);
       return;
     }
 
@@ -139,63 +131,94 @@ export const useEventFormSubmission = (eventId?: string, isEditMode?: boolean) =
     }
   };
 
-  const handleAuthSuccess = async () => {
-    console.log('Authentication successful, creating event with pending data');
-    setShowAuthModal(false);
+  const createPendingEvent = async (data: EventFormData) => {
+    setIsCreating(true);
     
-    if (pendingEventData && user) {
-      // Update the pending data with the authenticated user's ID
-      const updatedEventData = {
-        ...pendingEventData,
-        creator: user.id
+    try {
+      const processedData = await processFormData(data, null);
+      // Add pending status and temporary email from form data
+      const pendingEventData = {
+        ...processedData,
+        status: 'pending',
+        creator: null,
+        creator_email: null // Will be filled when user signs up
       };
       
+      console.log('Creating pending event:', pendingEventData);
+      
+      const { data: createdEvent, error } = await createEvent(pendingEventData);
+      
+      if (error) {
+        console.error('Error creating pending event:', error);
+        toast.error(`Failed to create event: ${error.message || 'Unknown error'}`);
+        return;
+      }
+      
+      if (!createdEvent) {
+        toast.error('No event data returned. Please try again.');
+        return;
+      }
+      
+      console.log('Pending event created successfully:', createdEvent);
+      setCreatedEventId(createdEvent.id);
+      setCreatedEventTitle(createdEvent.title || 'Your Event');
+      
+      // Show signup modal instead of success modal
+      setShowAuthModal(true);
+      
+    } catch (error: any) {
+      console.error('Failed to create pending event:', error);
+      toast.error(`Failed to create event: ${error.message || 'Unknown error'}`);
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleAuthSuccess = async () => {
+    console.log('Authentication successful, updating pending event');
+    setShowAuthModal(false);
+    
+    if (createdEventId && user) {
+      // Update the pending event with the authenticated user's ID and change status to published
       setIsCreating(true);
       
       try {
-        const { data: createdEvent, error } = await createEvent(updatedEventData);
+        const { data: updatedEvent, error } = await updateEvent(createdEventId, {
+          creator: user.id,
+          creator_email: user.email,
+          status: 'published'
+        });
         
         if (error) {
-          console.error('Error creating event after auth:', error);
-          
-          // Provide more specific error messages
-          if (error.code === '23502') {
-            toast.error('Missing required fields. Please check your event information.');
-          } else if (error.code === '42501') {
-            toast.error('Permission denied. Please try refreshing the page and signing in again.');
-          } else {
-            toast.error(`Failed to create event: ${error.message || 'Unknown error'}`);
-          }
+          console.error('Error updating pending event after auth:', error);
+          toast.error(`Failed to publish event: ${error.message || 'Unknown error'}`);
           return;
         }
         
-        if (!createdEvent) {
+        if (!updatedEvent) {
           toast.error('No event data returned. Please try again.');
           return;
         }
         
-        console.log('Event created successfully after auth:', createdEvent);
-        setCreatedEventId(createdEvent.id);
-        setCreatedEventTitle(createdEvent.title || 'Your Event');
+        console.log('Pending event updated successfully after auth:', updatedEvent);
         
         // Track the event creation
         await trackEventCreation({
-          event_id: createdEvent.id,
-          event_title: createdEvent.title || 'Untitled Event',
-          event_category: createdEvent.event_category || 'Unknown',
-          event_vibe: createdEvent.vibe || 'Unknown',
-          destination: createdEvent.destination || 'Unknown',
+          event_id: updatedEvent.id,
+          event_title: updatedEvent.title || 'Untitled Event',
+          event_category: updatedEvent.event_category || 'Unknown',
+          event_vibe: updatedEvent.vibe || 'Unknown',
+          destination: updatedEvent.destination || 'Unknown',
           creator_id: user.id,
         });
         
         setShowSuccessModal(true);
         
       } catch (error: any) {
-        console.error('Failed to create event after auth:', error);
-        toast.error(`Failed to create event: ${error.message || 'Unknown error'}`);
+        console.error('Failed to update pending event after auth:', error);
+        toast.error(`Failed to publish event: ${error.message || 'Unknown error'}`);
       } finally {
         setIsCreating(false);
-        setPendingEventData(null);
       }
     }
   };
@@ -216,7 +239,9 @@ export const useEventFormSubmission = (eventId?: string, isEditMode?: boolean) =
     handleEventCreated,
     showAuthModal,
     showSuccessModal,
+    showPendingModal,
     setShowSuccessModal,
+    setShowPendingModal,
     createdEventId,
     createdEventTitle,
     isCreating,
