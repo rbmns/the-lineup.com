@@ -58,6 +58,21 @@ export const processFormData = async (data: EventFormData, userId: string | null
   const tagsArray = data.tags || [];
   const tagsString = tagsArray.length > 0 ? tagsArray.join(', ') : null;
 
+  // Generate Google Maps link if not provided
+  const googleMapsLink = data.googleMaps || (() => {
+    if (data.address && data.city) {
+      const searchQuery = encodeURIComponent(`${data.address}, ${data.city}`);
+      return `https://www.google.com/maps/search/?api=1&query=${searchQuery}`;
+    } else if (data.venueName && data.city) {
+      const searchQuery = encodeURIComponent(`${data.venueName}, ${data.city}`);
+      return `https://www.google.com/maps/search/?api=1&query=${searchQuery}`;
+    } else if (data.city) {
+      const searchQuery = encodeURIComponent(data.city);
+      return `https://www.google.com/maps/search/?api=1&query=${searchQuery}`;
+    }
+    return null;
+  })();
+
   const processedData = {
     title: data.title,
     description: data.description || null,
@@ -69,6 +84,7 @@ export const processFormData = async (data: EventFormData, userId: string | null
     address: data.address || null,
     postal_code: data.postalCode || null,
     booking_link: data.bookingLink || null,
+    google_maps: googleMapsLink,
     fee: data.fee || null,
     extra_info: null, // Remove the reference to data.extraInfo since it doesn't exist in the schema
     tags: tagsString,

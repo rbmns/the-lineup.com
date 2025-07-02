@@ -18,6 +18,7 @@ export const eventFormSchema = z.object({
   vibe: z.string().optional(),
   fee: z.string().optional(),
   bookingLink: z.string().url().optional().or(z.literal('')),
+  googleMaps: z.string().url().optional().or(z.literal('')),
   tags: z.array(z.string()).optional(),
   imageUrl: z.string().optional(),
 }).refine((data) => {

@@ -85,6 +85,27 @@ export const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
               )}
             />
 
+            {/* Google Maps Link */}
+            <FormField
+              control={form.control}
+              name="googleMaps"
+              render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel className="text-sm font-medium text-graphite-grey">
+                    Google Maps Link (optional)
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="https://maps.google.com/..."
+                      className="h-11 border-2 border-mist-grey focus:border-ocean-teal"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             {/* Tags */}
             <FormField
               control={form.control}

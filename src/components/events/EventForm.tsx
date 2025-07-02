@@ -54,6 +54,7 @@ export const EventForm: React.FC<EventFormProps> = ({
     vibe: initialData.vibe || '',
     fee: String(initialData.fee || ''),
     bookingLink: initialData.booking_link || '',
+    googleMaps: initialData.google_maps || '',
     tags: initialData.tags ? (typeof initialData.tags === 'string' ? initialData.tags.split(', ').filter(tag => tag.trim()) : initialData.tags) : [],
   } : undefined);
 
