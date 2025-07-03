@@ -51,7 +51,7 @@ export const EventAttendeesSummary = ({
   }, [user?.id, attendees]);
   const hasFriendAttendees = friendAttendees.going.length > 0 || friendAttendees.interested.length > 0;
   return <div>
-      <h3 className="text-h3 font-montserrat text-graphite-grey mb-4">
+      <h3 className="text-h4 font-montserrat text-graphite-grey mb-3">
         Friends Attending
       </h3>
       
