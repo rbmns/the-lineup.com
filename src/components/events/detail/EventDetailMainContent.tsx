@@ -84,6 +84,24 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
             {event.description || 'No description provided.'}
           </p>
         </div>
+        
+        {/* Tags under description */}
+        {event.tags && event.tags.length > 0 && (
+          <div className="mt-6">
+            <h3 className="text-h4 font-montserrat text-graphite-grey mb-3">Tags</h3>
+            <div className="flex flex-wrap gap-2">
+              {(Array.isArray(event.tags) ? event.tags : 
+                typeof event.tags === 'string' ? 
+                  (event.tags.startsWith('[') ? JSON.parse(event.tags) : event.tags.split(',').map(t => t.trim())) : 
+                  []
+              ).filter(Boolean).map((tag, index) => (
+                <Badge key={index} variant="secondary" className="text-sm">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Recurring Events Section */}

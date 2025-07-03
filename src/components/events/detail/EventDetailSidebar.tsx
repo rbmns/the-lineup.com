@@ -80,26 +80,11 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
           <EventAttendeesSummary
             goingCount={attendees.going.length}
             interestedCount={attendees.interested.length}
+            attendees={attendees}
           />
         </div>
       )}
 
-      {/* Vibe and Category Section */}
-      {(event.vibe || event.event_category) && (
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <EventVibeAndCategorySection 
-            vibe={event.vibe} 
-            category={event.event_category} 
-          />
-        </div>
-      )}
-
-      {/* Tags Section */}
-      {event.tags && event.tags.length > 0 && (
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-          <EventTagsSection tags={event.tags} />
-        </div>
-      )}
     </div>
   );
 };

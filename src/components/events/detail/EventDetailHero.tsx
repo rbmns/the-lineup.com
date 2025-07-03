@@ -7,6 +7,7 @@ import { getEventImage } from '@/utils/eventImages';
 import EventShareButton from '@/components/events/EventShareButton';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 interface EventDetailHeroProps {
   event: Event;
@@ -56,6 +57,20 @@ export const EventDetailHero: React.FC<EventDetailHeroProps> = ({ event }) => {
         
         {/* Subtle graphite-grey overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-graphite-grey/60 via-graphite-grey/20 to-transparent" />
+        
+        {/* Category and Vibe badges - top left */}
+        <div className="absolute top-4 left-4 z-20 flex gap-2">
+          {event.event_category && (
+            <Badge variant="outline" className="bg-white/90 backdrop-blur-sm text-graphite-grey border-white/50">
+              {event.event_category}
+            </Badge>
+          )}
+          {event.vibe && (
+            <Badge variant="secondary" className="bg-white/20 backdrop-blur-sm text-white border-white/30">
+              {event.vibe}
+            </Badge>
+          )}
+        </div>
         
         {/* Share button - top right */}
         <div className="absolute top-4 right-4 z-20">
