@@ -42,10 +42,11 @@ export const DefaultRsvpButtons: React.FC<DefaultRsvpButtonsProps> = ({
       <Button
         variant={isGoing ? "default" : "outline"}
         className={cn(
-          'btn-primary flex-1 gap-2 transition-all duration-200',
+          'btn-primary flex-1 gap-2 transition-all duration-300 ease-in-out',
           sizeClass,
-          isGoing ? 'bg-ocean-teal hover:bg-ocean-teal/90 text-white' : 'border-ocean-teal text-ocean-teal hover:bg-ocean-teal hover:text-white',
-          activeButton === 'Going' && 'scale-95'
+          isGoing ? 'bg-ocean-teal hover:bg-ocean-teal/90 text-white transform' : 'border-ocean-teal text-ocean-teal hover:bg-ocean-teal hover:text-white',
+          activeButton === 'Going' && 'scale-95 bg-ocean-teal/80',
+          isLoading && activeButton === 'Going' && 'opacity-80 cursor-not-allowed'
         )}
         onClick={(e) => onRsvp('Going', e)}
         disabled={isLoading}
@@ -67,10 +68,11 @@ export const DefaultRsvpButtons: React.FC<DefaultRsvpButtonsProps> = ({
       <Button
         variant={isInterested ? "default" : "outline"}
         className={cn(
-          'btn-secondary flex-1 gap-2 transition-all duration-200',
+          'btn-secondary flex-1 gap-2 transition-all duration-300 ease-in-out',
           sizeClass,
-          isInterested ? 'bg-sunrise-ochre hover:bg-sunrise-ochre/90 text-graphite-grey' : 'border-sunrise-ochre text-sunrise-ochre hover:bg-sunrise-ochre hover:text-graphite-grey',
-          activeButton === 'Interested' && 'scale-95'
+          isInterested ? 'bg-sunrise-ochre hover:bg-sunrise-ochre/90 text-graphite-grey transform' : 'border-sunrise-ochre text-sunrise-ochre hover:bg-sunrise-ochre hover:text-graphite-grey',
+          activeButton === 'Interested' && 'scale-95 bg-sunrise-ochre/80',
+          isLoading && activeButton === 'Interested' && 'opacity-80 cursor-not-allowed'
         )}
         onClick={(e) => onRsvp('Interested', e)}
         disabled={isLoading}

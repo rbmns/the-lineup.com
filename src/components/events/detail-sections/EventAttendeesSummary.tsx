@@ -1,7 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { Users } from 'lucide-react';
-import { EventFriendRsvps } from '@/components/events/EventFriendRsvps';
 import { filterFriendsFromAttendees } from '@/services/friendsService';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -49,37 +47,105 @@ export const EventAttendeesSummary = ({
 
   return (
     <div>
-      <h3 className="font-medium flex items-center gap-2 mb-3">
-        <Users className="h-5 w-5" /> 
-        <span>Who's coming</span>
+      <h3 className="text-h3 font-montserrat text-graphite-grey mb-4">
+        Friends Attending
       </h3>
       
       {user && hasFriendAttendees ? (
-        <>
-          <EventFriendRsvps 
-            going={friendAttendees.going} 
-            interested={friendAttendees.interested} 
-          />
-          <div className="flex items-center space-x-4 mt-4 pt-4 border-t border-gray-200">
-            <div className="text-center">
-              <div className="text-xl font-bold">{goingCount}</div>
-              <div className="text-sm text-gray-600">Total Going</div>
+        <div className="space-y-6">
+          {/* Friends Going */}
+          {friendAttendees.going.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <h4 className="text-h4 font-montserrat text-graphite-grey">Going</h4>
+                <span className="text-h4 font-montserrat text-graphite-grey/70">{friendAttendees.going.length}</span>
+              </div>
+              
+              <div className="space-y-2">
+                {friendAttendees.going.map((friend) => (
+                  <div 
+                    key={friend.id}
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-coastal-haze/50 cursor-pointer transition-colors"
+                    onClick={() => window.location.href = `/user/${friend.id}`}
+                  >
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-mist-grey flex-shrink-0">
+                      <img 
+                        src={friend.avatar_url?.[0] || '/img/default-avatar.png'} 
+                        alt={friend.username || 'User'}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = '/img/default-avatar.png';
+                        }}
+                      />
+                    </div>
+                    <span className="text-body-base font-lato text-graphite-grey">
+                      {friend.username || 'Anonymous'}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-xl font-bold">{interestedCount}</div>
-              <div className="text-sm text-gray-600">Total Interested</div>
+          )}
+
+          {/* Friends Interested */}
+          {friendAttendees.interested.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <h4 className="text-h4 font-montserrat text-graphite-grey">Interested</h4>
+                <span className="text-h4 font-montserrat text-graphite-grey/70">{friendAttendees.interested.length}</span>
+              </div>
+              
+              <div className="space-y-2">
+                {friendAttendees.interested.map((friend) => (
+                  <div 
+                    key={friend.id}
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-coastal-haze/50 cursor-pointer transition-colors"
+                    onClick={() => window.location.href = `/user/${friend.id}`}
+                  >
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-mist-grey flex-shrink-0">
+                      <img 
+                        src={friend.avatar_url?.[0] || '/img/default-avatar.png'} 
+                        alt={friend.username || 'User'}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = '/img/default-avatar.png';
+                        }}
+                      />
+                    </div>
+                    <span className="text-body-base font-lato text-graphite-grey">
+                      {friend.username || 'Anonymous'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Total Counts */}
+          <div className="pt-4 border-t border-mist-grey/30">
+            <div className="flex items-center gap-6">
+              <div>
+                <span className="text-body-base font-lato text-graphite-grey">Going: </span>
+                <span className="text-body-base font-lato font-medium text-graphite-grey">{goingCount}</span>
+              </div>
+              <div>
+                <span className="text-body-base font-lato text-graphite-grey">Interested: </span>
+                <span className="text-body-base font-lato font-medium text-graphite-grey">{interestedCount}</span>
+              </div>
             </div>
           </div>
-        </>
+        </div>
       ) : (
-        <div className="flex items-center space-x-4">
-          <div className="text-center">
-            <div className="text-xl font-bold">{goingCount}</div>
-            <div className="text-sm text-gray-600">Going</div>
+        <div className="flex items-center gap-6">
+          <div>
+            <span className="text-body-base font-lato text-graphite-grey">Going: </span>
+            <span className="text-body-base font-lato font-medium text-graphite-grey">{goingCount}</span>
           </div>
-          <div className="text-center">
-            <div className="text-xl font-bold">{interestedCount}</div>
-            <div className="text-sm text-gray-600">Interested</div>
+          <div>
+            <span className="text-body-base font-lato text-graphite-grey">Interested: </span>
+            <span className="text-body-base font-lato font-medium text-graphite-grey">{interestedCount}</span>
           </div>
         </div>
       )}
