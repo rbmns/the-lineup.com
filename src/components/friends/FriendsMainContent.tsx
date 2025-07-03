@@ -10,7 +10,7 @@ import { DiscoverTabContent } from '@/components/friends/DiscoverTabContent';
 import { SuggestedFriendsTabContent } from '@/components/friends/SuggestedFriendsTabContent';
 import { FriendsHeader } from '@/components/friends/FriendsHeader';
 import { FriendsTabsNew } from '@/components/friends/FriendsTabsNew';
-import { FriendsSearchSection } from '@/components/friends/FriendsSearchSection';
+
 import { supabase } from '@/lib/supabase';
 
 export const FriendsMainContent: React.FC = () => {
@@ -171,12 +171,6 @@ export const FriendsMainContent: React.FC = () => {
     <div className="min-h-screen">
       <FriendsHeader />
       
-      <div className="max-w-screen-lg mx-auto px-6">
-        <FriendsSearchSection 
-          searchQuery={searchQuery}
-          onSearchChange={handleSearchChange}
-        />
-      </div>
 
       {/* Friends Content */}
       <div className="max-w-screen-lg mx-auto px-6 pb-6 md:pb-8">
@@ -193,8 +187,8 @@ export const FriendsMainContent: React.FC = () => {
               onAcceptRequest={onAcceptRequest}
               onDeclineRequest={onDeclineRequest}
               showFriendRequests={false}
-              searchQuery={undefined}
-              onSearchChange={undefined}
+              searchQuery={searchQuery}
+              onSearchChange={handleSearchChange}
             />
           }
           discoverContent={
