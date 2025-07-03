@@ -33,6 +33,17 @@ class TrackingService {
     this.anonymousId = this.getOrCreateAnonymousId();
   }
 
+  private isProductionEnvironment(): boolean {
+    // Check if we're in production
+    const hostname = window.location.hostname;
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.includes('127.0.0.1');
+    const isLovableStaging = hostname.includes('.lovable.app');
+    const isTestDomain = hostname.includes('test') || hostname.includes('staging') || hostname.includes('dev');
+    
+    // Only track in production (your actual domain)
+    return !isLocalhost && !isLovableStaging && !isTestDomain;
+  }
+
   private getOrCreateSessionId(): string {
     let sessionId = sessionStorage.getItem('tracking_session_id');
     if (!sessionId) {
@@ -90,10 +101,11 @@ class TrackingService {
 
   private sendToGTM(eventData: TrackingEvent): void {
     if (typeof window !== 'undefined' && window.dataLayer) {
-      // Check if user has consented to analytics
+      // Check if user has consented to analytics AND we're in production
       const hasConsented = localStorage.getItem('cookie-consent') === 'true';
+      const isProduction = this.isProductionEnvironment();
       
-      if (hasConsented) {
+      if (hasConsented && isProduction) {
         window.dataLayer.push({
           event: 'custom_tracking_event',
           event_name: eventData.event_name,
@@ -173,7 +185,8 @@ class TrackingService {
     // Also send to GTM with special handling for external link tracking
     if (typeof window !== 'undefined' && window.gtag) {
       const hasConsented = localStorage.getItem('cookie-consent') === 'true';
-      if (hasConsented) {
+      const isProduction = this.isProductionEnvironment();
+      if (hasConsented && isProduction) {
         window.gtag('event', 'click', {
           event_category: 'external_booking',
           event_label: linkData.booking_url,
