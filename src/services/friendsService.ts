@@ -57,14 +57,20 @@ export const filterFriendsFromAttendees = async (
   currentUserId: string | undefined
 ): Promise<any[]> => {
   if (!currentUserId || !attendees.length) {
+    console.log('filterFriendsFromAttendees: No current user or no attendees', { currentUserId, attendeesLength: attendees.length });
     return [];
   }
 
   try {
+    console.log('filterFriendsFromAttendees: Processing attendees:', attendees);
+    
     // Get all user IDs from attendees
     const userIds = attendees.map(attendee => attendee.id).filter(Boolean);
     
+    console.log('filterFriendsFromAttendees: Extracted user IDs:', userIds);
+    
     if (!userIds.length) {
+      console.log('filterFriendsFromAttendees: No valid user IDs found');
       return [];
     }
 
@@ -75,12 +81,15 @@ export const filterFriendsFromAttendees = async (
       .or(`user_id.eq.${currentUserId},friend_id.eq.${currentUserId}`)
       .eq('status', 'accepted');
 
+    console.log('filterFriendsFromAttendees: Friendships query result:', { friendships, error });
+
     if (error) {
       console.error('Error fetching friendships:', error);
       return [];
     }
 
     if (!friendships || friendships.length === 0) {
+      console.log('filterFriendsFromAttendees: No friendships found');
       return [];
     }
 
@@ -91,12 +100,14 @@ export const filterFriendsFromAttendees = async (
       )
     );
 
+    console.log('filterFriendsFromAttendees: Friend IDs:', Array.from(friendIds));
+
     // Filter attendees to only include friends
     const friendAttendees = attendees.filter(attendee => 
       attendee.id && friendIds.has(attendee.id)
     );
 
-    console.log(`Filtered ${attendees.length} attendees to ${friendAttendees.length} friends`);
+    console.log(`filterFriendsFromAttendees: Filtered ${attendees.length} attendees to ${friendAttendees.length} friends:`, friendAttendees);
     return friendAttendees;
   } catch (error) {
     console.error('Error filtering friend attendees:', error);

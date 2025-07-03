@@ -27,9 +27,20 @@ export const EventAttendeesSummary = ({
     const fetchFriendAttendees = async () => {
       if (!user?.id || !attendees) return;
 
+      console.log('EventAttendeesSummary - Starting to fetch friend attendees:', {
+        userId: user.id,
+        attendeesGoing: attendees.going,
+        attendeesInterested: attendees.interested
+      });
+
       try {
         const friendsGoing = await filterFriendsFromAttendees(attendees.going, user.id);
         const friendsInterested = await filterFriendsFromAttendees(attendees.interested, user.id);
+        
+        console.log('EventAttendeesSummary - Friend attendees found:', {
+          friendsGoing,
+          friendsInterested
+        });
         
         setFriendAttendees({
           going: friendsGoing,
