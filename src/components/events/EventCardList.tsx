@@ -228,8 +228,6 @@ const EventCardList: React.FC<EventCardListProps> = ({
                   size="sm"
                   showStatusOnly={!shouldShowRsvp && showRsvpStatus}
                 />
-                {/* Debug logging */}
-                {(() => {console.log(`EventCardList rendering - Event ${event.id} RSVP status:`, event.rsvp_status); return null;})()}
               </div>
             )}
           </div>

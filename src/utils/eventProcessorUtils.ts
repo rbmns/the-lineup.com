@@ -46,9 +46,11 @@ export const processEventsData = (eventsData: any[], userId?: string): Event[] =
       }
     }
 
-    // Determine user's RSVP status
-    let rsvpStatus: 'Going' | 'Interested' | undefined = undefined;
-    if (userId && eventData.event_rsvps && Array.isArray(eventData.event_rsvps)) {
+    // Use the RSVP status if already provided (from useEventsPageData), otherwise try to determine it
+    let rsvpStatus: 'Going' | 'Interested' | undefined = eventData.rsvp_status || undefined;
+    
+    // Fallback: Determine user's RSVP status from event_rsvps array if not already set
+    if (!rsvpStatus && userId && eventData.event_rsvps && Array.isArray(eventData.event_rsvps)) {
       const userRsvp = eventData.event_rsvps.find((rsvp: any) => rsvp.user_id === userId);
       if (userRsvp) {
         rsvpStatus = userRsvp.status as 'Going' | 'Interested';
