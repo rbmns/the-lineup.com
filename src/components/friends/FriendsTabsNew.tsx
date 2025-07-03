@@ -2,7 +2,7 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Users, UserPlus, Bell } from 'lucide-react';
+import { Users, UserPlus, Bell, Search } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface FriendsTabsNewProps {
@@ -13,6 +13,7 @@ interface FriendsTabsNewProps {
   allFriendsContent: React.ReactNode;
   suggestionsContent: React.ReactNode;
   requestsContent: React.ReactNode;
+  discoverContent?: React.ReactNode;
 }
 
 export const FriendsTabsNew = ({
@@ -22,7 +23,8 @@ export const FriendsTabsNew = ({
   suggestedFriendsCount,
   allFriendsContent,
   suggestionsContent,
-  requestsContent
+  requestsContent,
+  discoverContent
 }: FriendsTabsNewProps) => {
   const isMobile = useIsMobile();
 
@@ -31,8 +33,8 @@ export const FriendsTabsNew = ({
       <TabsList className={`
         w-full 
         ${isMobile 
-          ? 'grid grid-cols-3 h-12'
-          : 'grid grid-cols-3 h-12'
+          ? 'grid grid-cols-4 h-12'
+          : 'grid grid-cols-4 h-12'
         }
       `}>
         <TabsTrigger 
@@ -44,6 +46,17 @@ export const FriendsTabsNew = ({
         >
           <Users className={`${isMobile ? 'h-4 w-4' : 'h-4 w-4'}`} />
           <span>All Friends</span>
+        </TabsTrigger>
+        
+        <TabsTrigger 
+          value="discover" 
+          className={`
+            flex items-center gap-2 px-4 py-2 text-sm font-medium
+            ${isMobile ? 'flex-col gap-1 text-xs' : ''}
+          `}
+        >
+          <Search className={`${isMobile ? 'h-4 w-4' : 'h-4 w-4'}`} />
+          <span>Discover</span>
         </TabsTrigger>
         
         <TabsTrigger 
@@ -87,6 +100,10 @@ export const FriendsTabsNew = ({
 
       <TabsContent value="all-friends" className="space-y-4">
         {allFriendsContent}
+      </TabsContent>
+
+      <TabsContent value="discover" className="space-y-4">
+        {discoverContent}
       </TabsContent>
 
       <TabsContent value="suggestions" className="space-y-4">

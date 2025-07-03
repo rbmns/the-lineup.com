@@ -6,6 +6,7 @@ import { useFriendRequests } from '@/hooks/useFriendRequests';
 import { useSuggestedFriends } from '@/hooks/useSuggestedFriends';
 import { useFriendsSearch } from '@/hooks/useFriendsSearch';
 import { FriendsTabContent } from '@/components/friends/FriendsTabContent';
+import { DiscoverTabContent } from '@/components/friends/DiscoverTabContent';
 import { SuggestedFriendsTabContent } from '@/components/friends/SuggestedFriendsTabContent';
 import { FriendsHeader } from '@/components/friends/FriendsHeader';
 import { FriendsTabsNew } from '@/components/friends/FriendsTabsNew';
@@ -51,6 +52,31 @@ export const FriendsMainContent: React.FC = () => {
     setSearchQuery,
     setSearchResults
   } = useFriendsSearch(user, friends);
+
+  // Handle search manually
+  const handleSearch = async () => {
+    if (!searchQuery.trim() || !user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .or(`username.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%`)
+        .neq('id', user.id)
+        .limit(10);
+        
+      if (error) throw error;
+      
+      const friendIds = friends?.map(f => f.id) || [];
+      const filteredResults = (data || []).filter(profile => 
+        !friendIds.includes(profile.id) && profile.id !== user.id
+      );
+      
+      setSearchResults(filteredResults);
+    } catch (error) {
+      console.error('Error searching for users:', error);
+    }
+  };
 
   // Filter friends based on search query - EXCLUDE current user
   const filteredFriends = React.useMemo(() => {
@@ -169,6 +195,17 @@ export const FriendsMainContent: React.FC = () => {
               showFriendRequests={false}
               searchQuery={undefined}
               onSearchChange={undefined}
+            />
+          }
+          discoverContent={
+            <DiscoverTabContent
+              searchQuery={searchQuery}
+              onSearchChange={handleSearchChange}
+              searchResults={searchResults}
+              onAddFriend={handleAddFriend}
+              isSearching={isSearching}
+              pendingRequestIds={pendingRequestIds || []}
+              onSearch={handleSearch}
             />
           }
           suggestionsContent={
