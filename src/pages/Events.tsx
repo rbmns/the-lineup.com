@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useEventsPageData } from '@/hooks/events/useEventsPageData';
 import { EventsPageLayout } from '@/components/events/page-layout/EventsPageLayout';
 import { EventsResultsSection } from '@/components/events/page-sections/EventsResultsSection';
@@ -17,6 +17,7 @@ import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { Event } from '@/types';
+import { pageSeoTags } from '@/utils/seoUtils';
 
 const Events = () => {
   const isMobile = useIsMobile();
@@ -290,6 +291,20 @@ const Events = () => {
   // Determine which events to display - ensure consistent Event type
   const displayEvents: Event[] = searchQuery.trim() ? searchResults : (events || []);
   const filteredEventsCount = displayEvents.length;
+
+  // Set page title when component mounts
+  useEffect(() => {
+    document.title = pageSeoTags.events.title;
+    
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) metaDescription.setAttribute('content', pageSeoTags.events.description);
+    
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    
+    if (ogTitle) ogTitle.setAttribute('content', pageSeoTags.events.title);
+    if (ogDesc) ogDesc.setAttribute('content', pageSeoTags.events.description);
+  }, []);
 
   // Enhanced reset that clears search too and properly resets location to null
   const handleResetAllFilters = () => {
