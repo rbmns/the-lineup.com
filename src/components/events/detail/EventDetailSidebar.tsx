@@ -8,6 +8,7 @@ import { EventExternalLink } from '@/components/events/detail-sections/EventExte
 import { EventTagsSection } from '@/components/events/detail-sections/EventTagsSection';
 import { EventOrganizerSection } from '@/components/events/detail-sections/EventOrganizerSection';
 import { EventBookingSection } from '@/components/events/detail-sections/EventBookingSection';
+import { EventVibeAndCategorySection } from '@/components/events/detail-sections/EventVibeAndCategorySection';
 
 interface EventDetailSidebarProps {
   event: Event;
@@ -79,6 +80,16 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
           <EventAttendeesSummary
             goingCount={attendees.going.length}
             interestedCount={attendees.interested.length}
+          />
+        </div>
+      )}
+
+      {/* Vibe and Category Section */}
+      {(event.vibe || event.event_category) && (
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <EventVibeAndCategorySection 
+            vibe={event.vibe} 
+            category={event.event_category} 
           />
         </div>
       )}

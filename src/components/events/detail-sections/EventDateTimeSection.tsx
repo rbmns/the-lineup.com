@@ -101,9 +101,6 @@ export const EventDateTimeSection = ({
         {timeUntilEvent && (
           <p className="text-sm text-gray-600 mt-1">{timeUntilEvent}</p>
         )}
-        {eventDuration && (
-          <p className="text-sm text-gray-600">Duration: {eventDuration}</p>
-        )}
       </div>
     </div>
   );

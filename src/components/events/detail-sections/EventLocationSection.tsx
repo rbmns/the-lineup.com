@@ -51,16 +51,14 @@ export const EventLocationSection = ({
         <div>
           <p className="font-medium">{displayName}</p>
           <p className="text-sm text-gray-600">{displayAddress}</p>
-          {googleMaps && (
-            <a 
-              href={googleMaps} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-1 inline-block"
-            >
-              View on Google Maps
-            </a>
-          )}
+          <a 
+            href={googleMaps || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(displayAddress)}`} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-sm text-blue-600 hover:text-blue-800 hover:underline mt-1 inline-block"
+          >
+            View on Google Maps
+          </a>
         </div>
       </div>
       
