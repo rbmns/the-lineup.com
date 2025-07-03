@@ -71,12 +71,19 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
   };
 
   const getVenueDisplay = (): string => {
+    // Check for venue name first
     if (event.venues?.name) {
       return event.venues.name;
     }
     
+    // Check for location field
     if (event.location) {
       return event.location;
+    }
+    
+    // Check for destination (city/area)
+    if (event.destination) {
+      return event.destination;
     }
     
     return 'Location TBD';
