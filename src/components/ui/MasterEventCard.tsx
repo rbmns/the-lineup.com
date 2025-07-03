@@ -71,7 +71,7 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
   };
 
   const getVenueDisplay = (): string => {
-    // Check for venue name first
+    // Prioritize venue name first
     if (event.venues?.name) {
       return event.venues.name;
     }
