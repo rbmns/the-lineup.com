@@ -79,7 +79,7 @@ export const filterFriendsFromAttendees = async (
       .from('friendships')
       .select('user_id, friend_id')
       .or(`user_id.eq.${currentUserId},friend_id.eq.${currentUserId}`)
-      .eq('status', 'accepted');
+      .eq('status', 'Accepted');
 
     console.log('filterFriendsFromAttendees: Friendships query result:', { friendships, error });
 

@@ -1026,6 +1026,18 @@ export type Database = {
         }
         Returns: string
       }
+      duplicate_event: {
+        Args: {
+          event_id: string
+          new_start_datetime: string
+          new_end_datetime?: string
+        }
+        Returns: string
+      }
+      duplicate_recurring_event: {
+        Args: { event_id: string; occurrences?: number; interval_days?: number }
+        Returns: string[]
+      }
       get_city_country: {
         Args: { city_name: string }
         Returns: string
