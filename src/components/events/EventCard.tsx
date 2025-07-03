@@ -29,6 +29,8 @@ export const EventCard: React.FC<EventCardProps> = ({
   const { isAuthenticated } = useAuth();
   const shouldShowRsvp = isAuthenticated && showRsvpButtons;
 
+  console.log(`EventCard rendering - Event ${event.id} RSVP status:`, event.rsvp_status);
+
   const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
     if (!onRsvp || !shouldShowRsvp) return false;
     
