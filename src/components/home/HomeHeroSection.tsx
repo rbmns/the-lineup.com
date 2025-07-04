@@ -56,7 +56,7 @@ export const HomeHeroSection = () => {
           <Button 
             asChild 
             size={isMobile ? "default" : "default"}
-            className="bg-ocean-teal hover:bg-ocean-teal/90 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-3"
+            className="bg-sunset-orange hover:bg-dusk-coral text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-3"
           >
             <Link to="/events">
               <Search className="mr-2 h-5 w-5" />

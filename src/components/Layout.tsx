@@ -18,11 +18,11 @@ const Layout = () => {
   useScrollToTop();
 
   return (
-    <div className="min-h-screen w-full bg-pure-white overflow-x-hidden">
+    <div className="min-h-screen w-full bg-coconut overflow-x-hidden">
       <MainNav />
       <div className="flex w-full min-h-screen">
         {/* Main Content Area */}
-        <div className="flex-1 w-full min-h-screen bg-pure-white flex flex-col overflow-x-hidden">
+        <div className="flex-1 w-full min-h-screen bg-coconut flex flex-col overflow-x-hidden">
           {/* Main content with consistent padding system */}
           <main className={cn(
             "w-full flex-1 flex flex-col overflow-x-hidden",

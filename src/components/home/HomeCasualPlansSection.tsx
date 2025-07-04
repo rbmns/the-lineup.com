@@ -48,10 +48,10 @@ export const HomeCasualPlansSection: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {mockPlans.map(plan => {
           const IconComponent = plan.icon;
-          return <div key={plan.id} className="bg-pure-white rounded-lg p-6 border border-mist-grey hover:shadow-md transition-all duration-300 hover:scale-101">
+          return <div key={plan.id} className="bg-coconut rounded-lg p-6 border border-mist-grey hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
                 {/* Icon and Vibe */}
                 <div className="flex items-center justify-between mb-4">
-                  <IconComponent className="h-6 w-6 text-seafoam-drift" />
+                  <IconComponent className="h-6 w-6 text-dusk-coral" />
                   <span className="text-xl">{plan.vibe}</span>
                 </div>
 
@@ -78,7 +78,7 @@ export const HomeCasualPlansSection: React.FC = () => {
                       {plan.attendees} going
                     </span>
                   </div>
-                  <Button size="sm" variant="ghost" className="text-ocean-teal hover:bg-ocean-teal/5" onClick={() => navigate('/casual-plans')}>
+                  <Button size="sm" variant="ghost" className="text-sunset-orange hover:bg-sand-pink" onClick={() => navigate('/casual-plans')}>
                     Join
                   </Button>
                 </div>
@@ -88,7 +88,7 @@ export const HomeCasualPlansSection: React.FC = () => {
 
         {/* CTA Button */}
         <div className="text-center">
-          <Button onClick={() => navigate('/casual-plans')} size="lg" className="bg-seafoam-drift hover:bg-seafoam-drift/90 text-graphite-grey px-8 shadow-lg hover:shadow-xl transition-all duration-300">
+          <Button onClick={() => navigate('/casual-plans')} size="lg" className="bg-sunset-orange hover:bg-dusk-coral text-white px-8 shadow-lg hover:shadow-xl transition-all duration-300">
             Post a Casual Plan
           </Button>
         </div>
