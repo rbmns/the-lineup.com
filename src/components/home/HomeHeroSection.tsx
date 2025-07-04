@@ -13,17 +13,21 @@ export const HomeHeroSection = () => {
 
   return (
     <div className="relative w-full min-h-screen flex items-center justify-center">
-      {/* Hero Background Image with Cinematic Treatment */}
+      {/* Hero Background Image with Brand-Aligned Treatment */}
       <div className="absolute inset-0 z-0">
-        <div className="lineup-image-style w-full h-full">
+        <div className="w-full h-full">
           <img
-            src="/lovable-uploads/clark-gu-sbNlS7dWqKE-unsplash.jpg"
-            alt="Golden hour beach waves background"
-            className="w-full h-full object-cover"
+            src="/lovable-uploads/df996738-b355-4d60-acbf-d58c4b42daf0.png"
+            alt="Golden hour beach scene with warm coastal atmosphere"
+            className="w-full h-full object-cover object-center sm:object-center-bottom lg:object-center"
+            loading="eager"
+            decoding="async"
           />
         </div>
-        {/* Additional gradient overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-ocean-deep/70 via-ocean-deep/40 to-transparent" />
+        {/* Warm brand-aligned gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-sunset-orange/50 via-sunset-orange/20 to-transparent sm:bg-gradient-to-r sm:from-sunset-orange/40 sm:via-dusk-coral/10 sm:to-transparent" />
+        {/* Subtle overlay for optimal text readability */}
+        <div className="absolute inset-0 bg-ocean-deep/15" />
       </div>
 
       {/* Content */}
