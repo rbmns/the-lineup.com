@@ -29,44 +29,47 @@ const config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         
-        // The Lineup Coastal Minerals Palette - Complete with New Coastal Accents
+        // The Lineup Warm Coastal Palette - Human-centered with soft sunset tones
         'pure-white': '#FFFFFF',
-        'coastal-haze': '#F2F8F8', // Subtle light blue-grey for backgrounds, tags, muted elements
-        'graphite-grey': '#2C3E50', 
-        'ocean-deep': '#1a2332', // Almost black for main navigation and text
+        'coconut': '#FEFCFB', // Soft cream background instead of pure white
+        'sand-pink': '#FBE9E7', // Light background tint for section dividers
+        'coastal-haze': '#F2F8F8', // Subtle light blue-grey for backgrounds
+        'graphite-grey': '#333333', // Warmer, more readable dark grey
+        'ocean-deep': '#1a2332', // Almost black for main navigation
         'mist-grey': '#ECEFF1',
-        'ocean-teal': '#00A389',
+        'ocean-teal': '#00A389', // Keep as secondary
         'sunrise-ochre': '#E6AA68',
         'carbon-black': '#000000',
         
-        // New Coastal Accent Colors
-        'seafoam-drift': '#A9D1C1', // Muted green-blue for filter active states
-        'dusk-coral': '#C47D68', // Desaturated earthy coral for filter active states
-        'horizon-blue': '#6FA1B3', // Calm grey-blue for filter active states
+        // New Warm Coastal Accent Colors
+        'seafoam-drift': '#A9D1C1', // Soft green accent
+        'dusk-coral': '#C47D68', // Warm coral for hover states and metadata
+        'sunset-orange': '#EE6C4D', // Primary warm accent
+        'horizon-blue': '#6FA1B3', // Calm blue accent
         
         primary: {
-          DEFAULT: "#00A389", // ocean-teal
+          DEFAULT: "#EE6C4D", // sunset-orange as new primary
           foreground: "#FFFFFF", // pure-white
         },
         secondary: {
-          DEFAULT: "#2C3E50", // graphite-grey
+          DEFAULT: "#333333", // updated graphite-grey
           foreground: "#FFFFFF", // pure-white
         },
         muted: {
           DEFAULT: "#ECEFF1", // mist-grey
-          foreground: "#2C3E50", // graphite-grey
+          foreground: "#333333", // updated graphite-grey
         },
         accent: {
-          DEFAULT: "#E6AA68", // sunrise-ochre
-          foreground: "#2C3E50", // graphite-grey
+          DEFAULT: "#C47D68", // dusk-coral
+          foreground: "#FFFFFF", // pure-white
         },
         destructive: {
           DEFAULT: "#EF4444",
           foreground: "#FFFFFF",
         },
         card: {
-          DEFAULT: "#FFFFFF", // pure-white
-          foreground: "#2C3E50", // graphite-grey
+          DEFAULT: "#FEFCFB", // coconut instead of pure white
+          foreground: "#333333", // updated graphite-grey
         },
       },
       fontFamily: {
