@@ -2,7 +2,7 @@
 import React from 'react';
 import { useEvents } from '@/hooks/useEvents';
 import { HomeHeroSection } from '@/components/home/HomeHeroSection';
-import { HomeAudienceTiles } from '@/components/home/HomeAudienceTiles';
+import HomeHowItWorksSection from '@/components/home/HomeHowItWorksSection';
 import { HomeEventsPreview } from '@/components/home/HomeEventsPreview';
 import { HomeCasualPlansSection } from '@/components/home/HomeCasualPlansSection';
 
@@ -16,9 +16,9 @@ const Home = () => {
         <HomeHeroSection />
       </div>
 
-      {/* Audience Tiles - subtle mist grey background */}
-      <div className="bg-mist-grey/30 w-full spacing-section spacing-container">
-        <HomeAudienceTiles />
+      {/* How It Works Section */}
+      <div className="w-full">
+        <HomeHowItWorksSection />
       </div>
 
       {/* Events Preview - clean white background */}
