@@ -29,14 +29,17 @@ export const HomeCasualPlansSection: React.FC = () => {
     icon: Sun,
     vibe: '🧘'
   }];
-  return <section className="py-16 bg-white">
+  return <section className="py-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-primary mb-4">
-            Spontaneous plans? We've got those too.
-          </h2>
-          <p className="text-lg text-neutral max-w-2xl mx-auto">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <span className="text-2xl">🌊</span>
+            <h2 className="font-display text-3xl md:text-4xl font-semibold text-graphite-grey">
+              Spontaneous plans? We've got those too.
+            </h2>
+          </div>
+          <p className="font-body text-lg text-graphite-grey/80 max-w-2xl mx-auto">
             See or post casual meetups from others nearby.
           </p>
         </div>
@@ -45,37 +48,37 @@ export const HomeCasualPlansSection: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {mockPlans.map(plan => {
           const IconComponent = plan.icon;
-          return <div key={plan.id} className="bg-secondary-25 rounded-2xl p-6 border border-secondary-50 hover:shadow-lg transition-all duration-300 hover:scale-105">
+          return <div key={plan.id} className="bg-pure-white rounded-lg p-6 border border-mist-grey hover:shadow-md transition-all duration-300 hover:scale-101">
                 {/* Icon and Vibe */}
                 <div className="flex items-center justify-between mb-4">
-                  <IconComponent className="h-6 w-6 text-vibrant-seafoam" />
+                  <IconComponent className="h-6 w-6 text-seafoam-drift" />
                   <span className="text-xl">{plan.vibe}</span>
                 </div>
 
                 {/* Title */}
-                <h3 className="font-semibold text-primary text-lg mb-2">
+                <h3 className="font-semibold text-graphite-grey text-lg mb-2">
                   {plan.title}
                 </h3>
 
                 {/* Time */}
-                <p className="text-neutral text-sm mb-2">
+                <p className="text-graphite-grey/70 text-sm mb-2">
                   {plan.time}
                 </p>
 
                 {/* Location */}
-                <p className="text-neutral text-sm mb-4">
+                <p className="text-graphite-grey/70 text-sm mb-4">
                   📍 {plan.location}
                 </p>
 
                 {/* Attendees */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-neutral" />
-                    <span className="text-sm text-neutral">
+                    <Users className="h-4 w-4 text-graphite-grey/70" />
+                    <span className="text-sm text-graphite-grey/70">
                       {plan.attendees} going
                     </span>
                   </div>
-                  <Button size="sm" variant="ghost" className="text-primary hover:bg-primary/5" onClick={() => navigate('/casual-plans')}>
+                  <Button size="sm" variant="ghost" className="text-ocean-teal hover:bg-ocean-teal/5" onClick={() => navigate('/casual-plans')}>
                     Join
                   </Button>
                 </div>
@@ -85,7 +88,7 @@ export const HomeCasualPlansSection: React.FC = () => {
 
         {/* CTA Button */}
         <div className="text-center">
-          <Button onClick={() => navigate('/casual-plans')} size="lg" className="bg-vibrant-seafoam hover:bg-vibrant-seafoam/90 px-8 shadow-lg hover:shadow-xl transition-all duration-300 text-zinc-600">
+          <Button onClick={() => navigate('/casual-plans')} size="lg" className="bg-seafoam-drift hover:bg-seafoam-drift/90 text-graphite-grey px-8 shadow-lg hover:shadow-xl transition-all duration-300">
             Post a Casual Plan
           </Button>
         </div>
