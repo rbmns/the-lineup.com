@@ -17,7 +17,7 @@ export const HomeHeroSection = () => {
       <div className="absolute inset-0 z-0">
         <div className="lineup-image-style w-full h-full">
           <img
-            src="/lovable-uploads/ben-benjamin-A1-zZk7ixI4-unsplash.jpg"
+            src="/lovable-uploads/clark-gu-sbNlS7dWqKE-unsplash.jpg"
             alt="Golden hour beach waves background"
             className="w-full h-full object-cover"
           />
