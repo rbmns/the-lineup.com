@@ -120,7 +120,7 @@ export const EventForm: React.FC<EventFormProps> = ({
 
           {/* Basic Information Section */}
           <div className={cn(
-            "bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 rounded-lg border border-ocean-teal/20",
+            "bg-coastal-haze/30 rounded-lg border border-mist-grey shadow-sm",
             isMobile ? "p-3" : "p-6"
           )}>
             <div className="flex items-center gap-2 mb-3">
@@ -142,7 +142,7 @@ export const EventForm: React.FC<EventFormProps> = ({
 
           {/* Location Section */}
           <div className={cn(
-            "bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 rounded-lg border border-ocean-teal/20",
+            "bg-coastal-haze/30 rounded-lg border border-mist-grey shadow-sm",
             isMobile ? "p-3" : "p-6"
           )}>
             <div className="flex items-center gap-2 mb-3">
@@ -163,7 +163,7 @@ export const EventForm: React.FC<EventFormProps> = ({
 
           {/* Submit Button */}
           <div className={cn(
-            "sticky bottom-0 bg-white/95 backdrop-blur-sm border-t pt-3 -mx-2 px-2",
+            "sticky bottom-0 bg-pure-white/95 backdrop-blur-sm border-t border-mist-grey pt-3 -mx-2 px-2",
             isMobile ? "pb-4" : "pb-4"
           )}>
             <EventFormActions 

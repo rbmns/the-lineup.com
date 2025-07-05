@@ -12,7 +12,7 @@ export const BookingInfoSection: React.FC = () => {
 
   return (
     <div className={cn(
-      "bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 rounded-lg border border-ocean-teal/20",
+      "bg-coastal-haze/30 rounded-lg border border-mist-grey shadow-sm",
       isMobile ? "p-3" : "p-6"
     )}>
       <div className="flex items-center gap-2 mb-3">
@@ -36,7 +36,7 @@ export const BookingInfoSection: React.FC = () => {
               <FormControl>
                 <Input
                   placeholder="e.g. https://eventbrite.com/your-event"
-                  className="h-11 border-2 border-mist-grey focus:border-ocean-teal placeholder:text-muted-foreground/60"
+                  className={isMobile ? "h-11 text-base" : "h-10"}
                   {...field}
                 />
               </FormControl>
@@ -60,7 +60,7 @@ export const BookingInfoSection: React.FC = () => {
                   placeholder="0"
                   min="0"
                   step="0.01"
-                  className="h-11 border-2 border-mist-grey focus:border-ocean-teal"
+                  className={isMobile ? "h-11 text-base" : "h-10"}
                   {...field}
                 />
               </FormControl>
@@ -81,7 +81,7 @@ export const BookingInfoSection: React.FC = () => {
               <FormControl>
                 <Textarea
                   placeholder="Any extra details about booking, requirements, what to bring..."
-                  className="border-2 border-mist-grey focus:border-ocean-teal resize-none"
+                  className="resize-none"
                   rows={3}
                   {...field}
                 />

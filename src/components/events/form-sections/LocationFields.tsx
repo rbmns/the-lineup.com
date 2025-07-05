@@ -167,7 +167,6 @@ export const LocationFields: React.FC = () => {
                   placeholder="e.g., Beach Club Paradise, Town Hall..."
                   {...field}
                   className={cn(
-                    "bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal",
                     isMobile ? "h-11 text-base" : "h-10"
                   )}
                   onFocus={() => setShowVenueSuggestions(true)}
@@ -181,16 +180,16 @@ export const LocationFields: React.FC = () => {
         
         {/* Venue Suggestions */}
         {showVenueSuggestions && filteredVenues.length > 0 && (
-          <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+          <div className="absolute z-50 w-full mt-1 bg-pure-white border border-mist-grey rounded-md shadow-lg max-h-60 overflow-y-auto">
             {filteredVenues.map((venue) => (
               <button
                 key={venue.id}
                 type="button"
-                className="w-full px-3 py-2 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                className="w-full px-3 py-2 text-left hover:bg-coastal-haze border-b border-mist-grey last:border-b-0"
                 onClick={() => handleVenueSelect(venue)}
               >
-                <div className="font-medium text-sm">{venue.name}</div>
-                <div className="text-xs text-gray-500">
+                <div className="font-medium text-sm text-graphite-grey">{venue.name}</div>
+                <div className="text-xs text-graphite-grey/60">
                   {venue.street}, {venue.city}
                 </div>
               </button>
@@ -213,8 +212,7 @@ export const LocationFields: React.FC = () => {
                 placeholder="https://maps.google.com/..."
                 {...field}
                 className={cn(
-                  "bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal",
-                  isMobile ? "h-11 text-base" : "h-10"
+                    isMobile ? "h-11 text-base" : "h-10"
                 )}
               />
             </FormControl>
@@ -240,7 +238,6 @@ export const LocationFields: React.FC = () => {
                 placeholder="e.g., 123 Main Street"
                 {...field}
                 className={cn(
-                  "bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal",
                   isMobile ? "h-11 text-base" : "h-10",
                   locationValidationError?.includes('address') && "border-orange-300"
                 )}
@@ -269,7 +266,6 @@ export const LocationFields: React.FC = () => {
                   placeholder="e.g., Amsterdam, Lisbon"
                   {...field}
                   className={cn(
-                    "bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal",
                     isMobile ? "h-11 text-base" : "h-10",
                     locationValidationError?.includes('timezone') && "border-orange-300"
                   )}
@@ -293,7 +289,6 @@ export const LocationFields: React.FC = () => {
                   placeholder="e.g., 1012 AB"
                   {...field}
                   className={cn(
-                    "bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal",
                     isMobile ? "h-11 text-base" : "h-10",
                     locationValidationError?.includes('postal') && "border-orange-300"
                   )}

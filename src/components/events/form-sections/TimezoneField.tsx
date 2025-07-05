@@ -5,6 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useFormContext } from 'react-hook-form';
 import { FormValues } from '@/components/events/form/EventFormTypes';
 import { getCommonTimezones } from '@/utils/timezone-utils';
+import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface TimezoneFieldProps {
   autoDetectedTimezone?: string;
@@ -16,6 +18,7 @@ export const TimezoneField: React.FC<TimezoneFieldProps> = ({
   venueName 
 }) => {
   const form = useFormContext<FormValues>();
+  const isMobile = useIsMobile();
   const timezones = getCommonTimezones();
 
   // Set auto-detected timezone when available
@@ -46,16 +49,16 @@ export const TimezoneField: React.FC<TimezoneFieldProps> = ({
             </FormLabel>
             <Select onValueChange={field.onChange} value={field.value}>
               <FormControl>
-                <SelectTrigger className="h-10 bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal">
+                <SelectTrigger className={cn("h-10", isMobile ? "text-base" : "")}>
                   <SelectValue placeholder="Select event timezone" />
                 </SelectTrigger>
               </FormControl>
-              <SelectContent className="bg-white border-mist-grey shadow-lg max-h-60 overflow-y-auto">
+              <SelectContent className="bg-pure-white border-mist-grey shadow-lg max-h-60 overflow-y-auto">
                 {timezones.map((timezone) => (
                   <SelectItem 
                     key={timezone.value} 
                     value={timezone.value}
-                    className="hover:bg-mist-grey/50 focus:bg-mist-grey cursor-pointer"
+                    className="hover:bg-coastal-haze focus:bg-coastal-haze cursor-pointer"
                   >
                     {timezone.label}
                   </SelectItem>

@@ -154,7 +154,7 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ form }) => {
           control={form.control}
           name="isRecurring"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between p-4 bg-white/50 rounded-lg border border-ocean-teal/10">
+            <FormItem className="flex flex-row items-center justify-between p-4 bg-coastal-haze/20 rounded-lg border border-mist-grey">
               <div className="space-y-0.5">
                 <FormLabel className="text-sm font-medium text-graphite-grey">
                   This is a recurring event

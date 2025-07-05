@@ -13,7 +13,7 @@ export const DiscoverabilitySection: React.FC = () => {
 
   return (
     <div className={cn(
-      "bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 rounded-lg border border-ocean-teal/20",
+      "bg-coastal-haze/30 rounded-lg border border-mist-grey shadow-sm",
       isMobile ? "p-3" : "p-6"
     )}>
       <div className="flex items-center gap-2 mb-3">
@@ -49,7 +49,7 @@ export const DiscoverabilitySection: React.FC = () => {
               <FormControl>
                 <Input
                   placeholder="outdoor, sports, fun, beginner-friendly, family"
-                  className="h-11 border-2 border-mist-grey focus:border-ocean-teal"
+                  className={isMobile ? "h-11 text-base" : "h-10"}
                   value={Array.isArray(field.value) ? field.value.join(', ') : field.value || ''}
                   onChange={(e) => {
                     const value = e.target.value;

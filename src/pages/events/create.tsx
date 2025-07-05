@@ -57,12 +57,9 @@ const CreateEvent = () => {
         "mx-auto pb-8",
         isMobile ? "px-2 max-w-full" : "px-8 max-w-4xl"
       )}>
-        <div className={cn(
-          "bg-white rounded-lg border border-mist-grey",
-          isMobile ? "p-2" : "p-8"
-        )}>
-          <EventForm />
-        </div>
+          <div className="bg-pure-white rounded-lg border border-mist-grey shadow-sm p-6">
+            <EventForm />
+          </div>
       </div>
     </div>
   );
