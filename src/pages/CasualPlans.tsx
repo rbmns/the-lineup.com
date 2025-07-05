@@ -77,9 +77,7 @@ const CasualPlans = () => {
           <h1 className={`font-bold text-graphite-grey mb-4 leading-tight font-montserrat ${isMobile ? 'text-2xl' : 'text-3xl sm:text-4xl lg:text-5xl'}`}>
             Casual <span className="text-ocean-teal">Plans</span>
           </h1>
-          <p className={`text-graphite-grey/80 max-w-3xl mx-auto leading-relaxed font-lato ${isMobile ? 'text-base mb-6' : 'text-lg sm:text-xl mb-6'}`}>
-            Spontaneous meetups and activities with fellow travelers
-          </p>
+          <p className={`text-graphite-grey/80 max-w-3xl mx-auto leading-relaxed font-lato ${isMobile ? 'text-base mb-6' : 'text-lg sm:text-xl mb-6'}`}>Spontaneous meetups and activities. Invite people to join for sunset watching or a picknick.</p>
           
           <Button onClick={() => navigate('/casual-plans/create')} className="bg-ocean-teal hover:bg-ocean-teal/90 text-pure-white font-montserrat">
             <Plus className="h-4 w-4 mr-2" />
