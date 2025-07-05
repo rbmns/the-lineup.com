@@ -20,7 +20,7 @@ export const BookingInfoSection: React.FC = () => {
         <h2 className={cn(
           "font-semibold text-ocean-teal",
           isMobile ? "text-base" : "text-xl"
-        )}>Booking Info</h2>
+        )}>Booking Info (Optional)</h2>
       </div>
       
       <div className="space-y-3">
@@ -31,12 +31,12 @@ export const BookingInfoSection: React.FC = () => {
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-sm font-medium text-graphite-grey">
-                Booking Link
+                Booking Link (Optional)
               </FormLabel>
               <FormControl>
                 <Input
-                  placeholder="https://example.com/tickets"
-                  className="h-11 border-2 border-mist-grey focus:border-ocean-teal"
+                  placeholder="e.g. https://eventbrite.com/your-event"
+                  className="h-11 border-2 border-mist-grey focus:border-ocean-teal placeholder:text-muted-foreground/60"
                   {...field}
                 />
               </FormControl>
@@ -52,7 +52,7 @@ export const BookingInfoSection: React.FC = () => {
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-sm font-medium text-graphite-grey">
-                Fee (€)
+                Fee (€) (Optional)
               </FormLabel>
               <FormControl>
                 <Input
@@ -76,7 +76,7 @@ export const BookingInfoSection: React.FC = () => {
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-sm font-medium text-graphite-grey">
-                Additional Info
+                Additional Info (Optional)
               </FormLabel>
               <FormControl>
                 <Textarea
