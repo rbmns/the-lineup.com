@@ -11,51 +11,51 @@
   }
 
   :root {
-    /* THE LINEUP NEW COLOR PALETTE - Adult Minimalist + Coastal Energy (HSL Format) */
-    --background: 0 0% 100%; /* pure-white */
-    --foreground: 0 0% 20%; /* graphite-grey */
+    /* THE LINEUP NEW COLOR PALETTE - Adult Minimalist + Coastal Energy */
+    --background: 255 255 255; /* pure-white */
+    --foreground: 51 51 51; /* graphite-grey */
 
-    --card: 0 0% 100%; /* pure-white */
-    --card-foreground: 0 0% 20%; /* graphite-grey */
+    --card: 255 255 255; /* pure-white */
+    --card-foreground: 51 51 51; /* graphite-grey */
     
-    --primary: 0 0% 20%; /* graphite-grey - primary buttons */
-    --primary-foreground: 0 0% 100%; /* pure-white */
+    --primary: 51 51 51; /* graphite-grey - primary buttons */
+    --primary-foreground: 255 255 255; /* pure-white */
 
-    --secondary: 0 0% 94%; /* mist-grey - secondary buttons */
-    --secondary-foreground: 0 0% 20%; /* graphite-grey */
+    --secondary: 240 240 240; /* mist-grey - secondary buttons */
+    --secondary-foreground: 51 51 51; /* graphite-grey */
 
-    --muted: 180 33% 96%; /* coastal-haze - soft backgrounds */
-    --muted-foreground: 0 0% 20%; /* graphite-grey */
+    --muted: 242 248 248; /* coastal-haze - soft backgrounds */
+    --muted-foreground: 51 51 51; /* graphite-grey */
 
-    --accent: 18 37% 59%; /* dusk-coral - warm highlights */
-    --accent-foreground: 0 0% 100%; /* pure-white */
+    --accent: 196 125 104; /* dusk-coral - warm highlights */
+    --accent-foreground: 255 255 255; /* pure-white */
 
-    /* Brand Colors - HSL Format */
-    --pure-white: 0 0% 100%;
-    --mist-grey: 0 0% 94%;
-    --graphite-grey: 0 0% 20%;
-    --coastal-haze: 180 33% 96%;
-    --seafoam-drift: 153 27% 74%;
-    --dusk-coral: 18 37% 59%;
-    --horizon-blue: 197 29% 57%;
-    --sunset-orange: 37 100% 50%;
-    --vibrant-sky: 192 73% 85%;
+    /* Brand Colors */
+    --pure-white: 255 255 255;
+    --mist-grey: 240 240 240;
+    --graphite-grey: 51 51 51;
+    --coastal-haze: 242 248 248;
+    --seafoam-drift: 169 209 193;
+    --dusk-coral: 196 125 104;
+    --horizon-blue: 111 161 179;
+    --sunset-orange: 255 158 0;
+    --vibrant-sky: 144 224 239;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
 
-    --border: 0 0% 94%; /* mist-grey */
-    --input: 0 0% 94%; /* mist-grey */
-    --ring: 197 29% 57%; /* horizon-blue */
+    --border: 240 240 240; /* mist-grey */
+    --input: 240 240 240; /* mist-grey */
+    --ring: 111 161 179; /* horizon-blue */
 
     --radius: 0.375rem; /* md radius as default */
   }
 
   /* GLOBAL LAYOUT FOUNDATION */
   html, body {
-    background: hsl(var(--background));
-    color: hsl(var(--foreground));
-    font-family: 'Lato', sans-serif;
+    background: rgb(255 255 255) !important; /* pure-white */
+    color: rgb(51 51 51) !important; /* graphite-grey */
+    font-family: 'Lato', sans-serif !important; /* Body font default */
     min-height: 100vh;
     font-weight: 400;
     line-height: 1.6;
@@ -66,17 +66,17 @@
 
   /* ROOT LAYOUT - FULL HEIGHT STRUCTURE */
   body {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    min-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   /* GLOBAL TYPOGRAPHY SYSTEM - ADULT MINIMALIST */
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Montserrat', sans-serif;
-    color: hsl(var(--foreground));
-    line-height: 1.2;
-    font-weight: 600; /* Semi-bold for headlines */
+    font-family: 'Montserrat', sans-serif !important;
+    color: rgb(51 51 51) !important; /* graphite-grey */
+    line-height: 1.2 !important;
+    font-weight: 600 !important; /* Semi-bold for headlines */
   }
 
   /* Typography utility classes */
@@ -164,42 +164,42 @@
 /* THE LINEUP COMPONENT SYSTEM - ADULT MINIMALIST */
 @layer components {
   /* CORE COLOR UTILITIES */
-  .bg-brand-primary { background-color: hsl(var(--primary)); }
-  .bg-brand-secondary { background-color: hsl(var(--secondary)); }
-  .bg-brand-accent { background-color: hsl(var(--accent)); }
-  .bg-brand-muted { background-color: hsl(var(--muted)); }
-  .bg-brand-card { background-color: hsl(var(--card)); }
+  .bg-brand-primary { background-color: rgb(var(--primary)) !important; }
+  .bg-brand-secondary { background-color: rgb(var(--secondary)) !important; }
+  .bg-brand-accent { background-color: rgb(var(--accent)) !important; }
+  .bg-brand-muted { background-color: rgb(var(--muted)) !important; }
+  .bg-brand-card { background-color: rgb(var(--card)) !important; }
   
-  .text-brand-primary { color: hsl(var(--primary)); }
-  .text-brand-secondary { color: hsl(var(--secondary)); }
-  .text-brand-accent { color: hsl(var(--accent)); }
-  .text-brand-muted { color: hsl(var(--muted-foreground)); }
-  .text-brand-foreground { color: hsl(var(--foreground)); }
+  .text-brand-primary { color: rgb(var(--primary)) !important; }
+  .text-brand-secondary { color: rgb(var(--secondary)) !important; }
+  .text-brand-accent { color: rgb(var(--accent)) !important; }
+  .text-brand-muted { color: rgb(var(--muted-foreground)) !important; }
+  .text-brand-foreground { color: rgb(var(--foreground)) !important; }
 
-  .border-brand-primary { border-color: hsl(var(--primary)); }
-  .border-brand-muted { border-color: hsl(var(--border)); }
+  .border-brand-primary { border-color: rgb(var(--primary)) !important; }
+  .border-brand-muted { border-color: rgb(var(--border)) !important; }
 
   /* BUTTON SYSTEM - CLEAN & CALM */
   .btn-primary {
-    background-color: hsl(var(--graphite-grey));
-    color: hsl(var(--pure-white));
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.375rem;
-    transition: all 0.2s ease-in-out;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    border: none;
+    background-color: rgb(var(--graphite-grey)) !important;
+    color: rgb(var(--pure-white)) !important;
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 600 !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 0.375rem !important;
+    transition: all 0.2s ease-in-out !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    border: none !important;
   }
 
   .btn-primary:hover {
-    background-color: hsl(0 0% 12%); /* Slightly darker */
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    transform: translateY(-1px);
+    background-color: rgb(31 31 31) !important; /* Slightly darker */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    transform: translateY(-1px) !important;
   }
 
   .btn-secondary {

@@ -41,12 +41,14 @@ export const eventFormSchema = z.object({
   // If recurring is enabled, validate required fields
   if (data.isRecurring) {
     return data.recurringDays && data.recurringDays.length > 0 && 
+           data.recurringStartDate && 
            data.recurringEndDate && 
-           data.recurringEndDate >= data.startDate;
+           data.recurringTime &&
+           data.recurringEndDate >= data.recurringStartDate;
   }
   return true;
 }, {
-  message: "Please select recurring days and set an end date for the recurring events",
+  message: "All recurring event fields are required and end date must be after start date",
   path: ["isRecurring"],
 });
 
