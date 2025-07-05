@@ -105,8 +105,8 @@ export const getVibeColorClasses = (vibe: string, isActive: boolean = false, siz
   };
   
   if (isActive) {
-    return `${colors.bg} ${colors.text} ${colors.hover} ${sizeClasses[size]} rounded-full font-medium transition-colors`;
+    return `${colors.bg} text-white hover:opacity-90 ${sizeClasses[size]} rounded-full font-medium transition-all`;
   } else {
-    return `${colors.inactive} ${sizeClasses[size]} rounded-full font-medium transition-colors border`;
+    return `bg-mist-grey/20 text-graphite-grey hover:bg-ocean-teal hover:text-white border border-mist-grey/30 hover:border-ocean-teal ${sizeClasses[size]} rounded-full font-medium transition-all`;
   }
 };
