@@ -12,6 +12,8 @@ interface EventsResultsSectionProps {
   eventsLoading: boolean;
   isFilterLoading: boolean;
   user: any;
+  enhancedHandleRsvp: (eventId: string, status: 'Going' | 'Interested') => Promise<boolean>;
+  loadingEventId: string | null;
 }
 
 export const EventsResultsSection: React.FC<EventsResultsSectionProps> = ({
@@ -20,7 +22,9 @@ export const EventsResultsSection: React.FC<EventsResultsSectionProps> = ({
   resetFilters,
   eventsLoading,
   isFilterLoading,
-  user
+  user,
+  enhancedHandleRsvp,
+  loadingEventId
 }) => {
   const eventsCount = filteredEvents.length;
   const showNoResults = !eventsLoading && !isFilterLoading && filteredEvents.length === 0;
@@ -44,8 +48,10 @@ export const EventsResultsSection: React.FC<EventsResultsSectionProps> = ({
           mainEvents={filteredEvents}
           relatedEvents={[]} 
           isLoading={eventsLoading || isFilterLoading}
-          showRsvpButtons={false}
+          onRsvp={user ? enhancedHandleRsvp : undefined}
+          showRsvpButtons={!!user}
           hasActiveFilters={hasActiveFilters}
+          loadingEventId={loadingEventId}
           hideCount={true}
         />
       )}

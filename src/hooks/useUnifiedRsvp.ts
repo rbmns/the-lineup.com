@@ -10,24 +10,137 @@ export const useUnifiedRsvp = () => {
   const { user } = useAuth();
 
   const updateEventCaches = useCallback((eventId: string, newStatus: 'Going' | 'Interested' | null) => {
-    console.log(`Updating caches for event ${eventId} with status: ${newStatus}`);
+    console.log(`Updating all caches for event ${eventId} with status: ${newStatus}`);
     
-    // Update individual event cache
+    // Update individual event cache immediately with proper structure
     queryClient.setQueryData(['event', eventId, user?.id], (oldData: any) => {
       if (!oldData) return oldData;
-      return { ...oldData, rsvp_status: newStatus };
+      const updated = { ...oldData, rsvp_status: newStatus };
+      console.log(`Updated individual event cache for ${eventId}: ${newStatus}`);
+      return updated;
     });
 
-    // Update without user ID for compatibility
+    // Also update cache without user ID for backward compatibility
     queryClient.setQueryData(['event', eventId], (oldData: any) => {
       if (!oldData) return oldData;
-      return { ...oldData, rsvp_status: newStatus };
+      const updated = { ...oldData, rsvp_status: newStatus };
+      console.log(`Updated individual event cache (no user) for ${eventId}: ${newStatus}`);
+      return updated;
     });
 
-    // Invalidate event attendees to refresh
-    queryClient.invalidateQueries({ queryKey: ['event-attendees', eventId] });
+    // Update ALL events queries - this is key for the events page
+    queryClient.setQueriesData({ queryKey: ['events'] }, (oldData: any) => {
+      if (!oldData) return oldData;
+      
+      // Handle array format
+      if (Array.isArray(oldData)) {
+        const updated = oldData.map((event: any) => {
+          if (event.id === eventId) {
+            console.log(`Updated event in array cache: ${eventId} to ${newStatus}`);
+            return { ...event, rsvp_status: newStatus };
+          }
+          return event;
+        });
+        return updated;
+      }
+      
+      // Handle object format with data property
+      if (oldData.data && Array.isArray(oldData.data)) {
+        return {
+          ...oldData,
+          data: oldData.data.map((event: any) => {
+            if (event.id === eventId) {
+              console.log(`Updated event in object.data cache: ${eventId} to ${newStatus}`);
+              return { ...event, rsvp_status: newStatus };
+            }
+            return event;
+          })
+        };
+      }
+      
+      return oldData;
+    });
 
-    console.log(`Cache update complete for event ${eventId}`);
+    // Update events-page-data cache specifically (this is what the events page uses)
+    queryClient.setQueryData(['events-page-data', user?.id], (oldData: any) => {
+      if (!oldData) return oldData;
+      
+      // Handle array format
+      if (Array.isArray(oldData)) {
+        const updated = oldData.map((event: any) => {
+          if (event.id === eventId) {
+            console.log(`Updated event in events-page-data cache: ${eventId} to ${newStatus}`);
+            return { ...event, rsvp_status: newStatus };
+          }
+          return event;
+        });
+        return updated;
+      }
+      
+      // Handle object format with events property
+      if (oldData.events && Array.isArray(oldData.events)) {
+        return {
+          ...oldData,
+          events: oldData.events.map((event: any) => {
+            if (event.id === eventId) {
+              console.log(`Updated event in events-page-data.events cache: ${eventId} to ${newStatus}`);
+              return { ...event, rsvp_status: newStatus };
+            }
+            return event;
+          })
+        };
+      }
+      
+      return oldData;
+    });
+
+    // Update filtered events cache
+    queryClient.setQueriesData({ queryKey: ['filtered-events'] }, (oldData: any) => {
+      if (!oldData || !Array.isArray(oldData)) return oldData;
+      
+      const updated = oldData.map((event: any) => {
+        if (event.id === eventId) {
+          console.log(`Updated event in filtered cache: ${eventId} to ${newStatus}`);
+          return { ...event, rsvp_status: newStatus };
+        }
+        return event;
+      });
+      return updated;
+    });
+
+    // Update user events cache
+    if (user?.id) {
+      queryClient.setQueryData(['userEvents', user.id], (oldData: any) => {
+        if (!oldData) return oldData;
+        
+        const updateEventsList = (events: any[]) => {
+          if (!events || !Array.isArray(events)) return events;
+          return events.map((event: any) => {
+            if (event.id === eventId) {
+              console.log(`Updated event in user events cache: ${eventId} to ${newStatus}`);
+              return { ...event, rsvp_status: newStatus };
+            }
+            return event;
+          });
+        };
+
+        return {
+          ...oldData,
+          upcomingEvents: updateEventsList(oldData.upcomingEvents),
+          pastEvents: updateEventsList(oldData.pastEvents)
+        };
+      });
+    }
+
+    // Invalidate specific queries to ensure fresh data
+    queryClient.invalidateQueries({ queryKey: ['event-attendees', eventId] });
+    
+    // Broadcast cache update to other components
+    window.dispatchEvent(new CustomEvent('rsvpCacheUpdated', { 
+      detail: { eventId, newStatus } 
+    }));
+
+    console.log(`Cache update complete for event ${eventId} with status ${newStatus}`);
   }, [queryClient, user?.id]);
 
   const handleRsvp = useCallback(async (eventId: string, status: 'Going' | 'Interested'): Promise<boolean> => {

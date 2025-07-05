@@ -5,7 +5,6 @@ import { supabase } from '@/lib/supabase';
 import { Event } from '@/types';
 import { useFilteredEvents } from './useFilteredEvents';
 import { useVenueFilter } from './useVenueFilter';
-import { useUrlFilters } from './useUrlFilters';
 import { DateRange } from 'react-day-picker';
 import { processEventsData } from '@/utils/eventProcessorUtils';
 import { useVenueAreas } from '@/hooks/useVenueAreas';
@@ -15,7 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 export const useEventsPageData = () => {
   const { user } = useAuth();
   
-  // State for filters - these will be synced with URL
+  // State for filters
   const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
   const [selectedVibes, setSelectedVibes] = useState<string[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
@@ -40,22 +39,6 @@ export const useEventsPageData = () => {
     availableVenues,
     isLoading: venuesLoading
   } = useVenueFilter();
-
-  // Integrate URL filters for state persistence
-  useUrlFilters(
-    selectedEventTypes,
-    setSelectedEventTypes,
-    selectedVenues,
-    setSelectedVenues,
-    dateRange,
-    setDateRange,
-    selectedDateFilter,
-    setSelectedDateFilter,
-    selectedVibes,
-    setSelectedVibes,
-    selectedLocation,
-    setSelectedLocation
-  );
 
   // Fetch events with RSVP status
   const { data: eventsData, isLoading: eventsLoading } = useQuery({
