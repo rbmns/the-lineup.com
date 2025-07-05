@@ -26,8 +26,8 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
 }) => {
   return (
     <div className="space-y-6">
-      {/* Date and Time Section with Local Time Display */}
-      <div className="bg-gradient-to-r from-ocean-teal/5 to-coastal-haze/20 p-6 rounded-lg shadow-sm border border-ocean-teal/20">
+      {/* Date and Time Section */}
+      <div className="bg-gradient-to-r from-ocean-teal/5 to-coastal-haze/10 p-6 rounded-lg shadow-sm border border-ocean-teal/20">
         <EventDateTimeSection
           startDateTime={event.start_datetime}
           endDateTime={event.end_datetime}
@@ -37,7 +37,7 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
       </div>
 
       {/* Location Section */}
-      <div className="bg-gradient-to-r from-mist-grey/20 to-coastal-haze/30 p-6 rounded-lg shadow-sm border border-mist-grey/40">
+      <div className="bg-gradient-to-r from-ocean-teal/5 to-coastal-haze/10 p-6 rounded-lg shadow-sm border border-ocean-teal/20">
         <EventLocationSection 
           venue={event.venues}
           location={event.location}
@@ -52,7 +52,7 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
 
       {/* Organizer Section */}
       {event.organiser_name && (
-        <div className="bg-gradient-to-r from-horizon-blue/5 to-ocean-teal/10 p-6 rounded-lg shadow-sm border border-horizon-blue/20">
+        <div className="bg-gradient-to-r from-ocean-teal/5 to-coastal-haze/10 p-6 rounded-lg shadow-sm border border-ocean-teal/20">
           <EventOrganizerSection 
             organizerName={event.organiser_name}
             organizerLink={event.organizer_link}
@@ -63,8 +63,8 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
       )}
 
       {/* Booking Information Section */}
-      {(event.fee || event.booking_link) && (
-        <div className="bg-gradient-to-r from-coastal-haze/30 to-mist-grey/20 p-6 rounded-lg shadow-sm border border-ocean-teal/20">
+      {(event.fee || event.booking_link || (event as any).additional_info || (event as any).extra_info) && (
+        <div className="bg-gradient-to-r from-ocean-teal/5 to-coastal-haze/10 p-6 rounded-lg shadow-sm border border-ocean-teal/20">
           <EventBookingSection 
             fee={event.fee}
             bookingLink={event.booking_link}
@@ -77,7 +77,7 @@ export const EventDetailSidebar: React.FC<EventDetailSidebarProps> = ({
 
       {/* Attendees Summary */}
       {isAuthenticated && attendees && (
-        <div className="bg-gradient-to-r from-mist-grey/10 to-coastal-haze/20 p-6 rounded-lg shadow-sm border border-mist-grey/30">
+        <div className="bg-gradient-to-r from-ocean-teal/5 to-coastal-haze/10 p-6 rounded-lg shadow-sm border border-ocean-teal/20">
           <EventAttendeesSummary
             goingCount={attendees.going.length}
             interestedCount={attendees.interested.length}

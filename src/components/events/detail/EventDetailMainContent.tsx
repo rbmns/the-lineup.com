@@ -138,7 +138,5 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
           </Card>
         </div>}
 
-          {/* Additional Information Section */}
-          {event.extra_info}
     </div>;
 };

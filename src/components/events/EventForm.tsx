@@ -9,6 +9,7 @@ import { DateTimeFields } from './form-sections/DateTimeFields';
 import { LocationFields } from './form-sections/LocationFields';
 import { BookingInfoSection } from './form-sections/BookingInfoSection';
 import { DiscoverabilitySection } from './form-sections/DiscoverabilitySection';
+import { RecurringEventSection } from './form-sections/RecurringEventSection';
 import { ImageUploadField } from './form-sections/ImageUploadField';
 import { EventFormActions } from './form-sections/EventFormActions';
 import { Form } from '@/components/ui/form';
@@ -139,6 +140,9 @@ export const EventForm: React.FC<EventFormProps> = ({
 
           {/* Date & Time Section */}
           <DateTimeFields form={form} />
+
+          {/* Recurring Event Section */}
+          <RecurringEventSection />
 
           {/* Location Section */}
           <div className={cn(

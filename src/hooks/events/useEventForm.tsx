@@ -27,7 +27,11 @@ export const useEventForm = (defaultValues?: Partial<EventFormData>) => {
       bookingLink: '',
       googleMaps: '',
       additionalInfo: '',
-      tags: [],
+      isRecurring: false,
+      recurringDays: [],
+      recurringStartDate: undefined,
+      recurringEndDate: undefined,
+      recurringTime: '',
       ...defaultValues,
     },
   });
