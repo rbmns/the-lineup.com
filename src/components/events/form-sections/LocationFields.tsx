@@ -39,15 +39,29 @@ export const LocationFields: React.FC = () => {
         
         try {
           const timezone = await TimezoneService.getTimezoneForCity(cityValue);
-          if (timezone) {
+          if (timezone && timezone !== 'Europe/Amsterdam') {
+            // Found specific timezone for the city
             form.setValue('timezone', timezone);
             setLocationValidationError(null);
           } else {
-            setLocationValidationError(`Could not find timezone for "${cityValue}". Please check the city name spelling.`);
+            // No specific timezone found, show helpful message
+            setLocationValidationError(
+              `We couldn't automatically detect the timezone for "${cityValue}". Please select the correct timezone manually from the dropdown below.`
+            );
+            // Set default timezone but don't override if user has already selected one
+            if (!form.getValues('timezone') || form.getValues('timezone') === 'Europe/Amsterdam') {
+              form.setValue('timezone', 'Europe/Amsterdam');
+            }
           }
         } catch (error) {
           console.warn('Could not detect timezone for city:', cityValue);
-          setLocationValidationError(`Unable to validate location "${cityValue}". Please double-check the spelling or try a different format.`);
+          setLocationValidationError(
+            `Unable to automatically detect timezone for "${cityValue}". Please select the correct timezone manually from the dropdown below.`
+          );
+          // Set default timezone but don't override if user has already selected one
+          if (!form.getValues('timezone') || form.getValues('timezone') === 'Europe/Amsterdam') {
+            form.setValue('timezone', 'Europe/Amsterdam');
+          }
         } finally {
           setIsValidatingLocation(false);
         }

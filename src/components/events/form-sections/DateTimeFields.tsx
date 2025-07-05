@@ -10,6 +10,7 @@ import { EventFormData } from '@/components/events/form/EventFormSchema';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
+import { TimezoneField } from './TimezoneField';
 
 interface DateTimeFieldsProps {
   form: UseFormReturn<EventFormData>;
@@ -141,6 +142,12 @@ export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ form }) => {
             )}
           />
         </div>
+
+        {/* Timezone Field */}
+        <TimezoneField 
+          autoDetectedTimezone={form.watch('timezone')}
+          venueName={form.watch('city')}
+        />
 
         {/* Date Validation Message */}
         {startDate && endDate && endDate < startDate && (

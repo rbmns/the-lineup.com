@@ -181,9 +181,13 @@ export function getUserTimezone(): string {
 export function getCommonTimezones(): { value: string; label: string }[] {
   return [
     { value: 'Europe/Amsterdam', label: 'Amsterdam (CET/CEST)' },
+    { value: 'Europe/Lisbon', label: 'Lisbon (WET/WEST)' },
+    { value: 'Atlantic/Canary', label: 'Canary Islands (WET/WEST)' },
     { value: 'Europe/London', label: 'London (GMT/BST)' },
     { value: 'Europe/Paris', label: 'Paris (CET/CEST)' },
     { value: 'Europe/Berlin', label: 'Berlin (CET/CEST)' },
+    { value: 'Europe/Madrid', label: 'Madrid (CET/CEST)' },
+    { value: 'Europe/Rome', label: 'Rome (CET/CEST)' },
     { value: 'America/New_York', label: 'New York (EST/EDT)' },
     { value: 'America/Los_Angeles', label: 'Los Angeles (PST/PDT)' },
     { value: 'Asia/Tokyo', label: 'Tokyo (JST)' },
