@@ -5,6 +5,7 @@ import { useTracking } from '@/services/trackingService';
 interface EventBookingSectionProps {
   fee?: string | number | null;
   bookingLink?: string | null;
+  additionalInfo?: string | null;
   eventId?: string;
   eventTitle?: string;
 }
@@ -12,6 +13,7 @@ interface EventBookingSectionProps {
 export const EventBookingSection = ({ 
   fee, 
   bookingLink,
+  additionalInfo,
   eventId,
   eventTitle
 }: EventBookingSectionProps) => {
@@ -66,6 +68,13 @@ export const EventBookingSection = ({
               >
                 Booking Link
               </a>
+            </div>
+          )}
+          {additionalInfo && (
+            <div className="mt-3 pt-2 border-t border-gray-200">
+              <p className="text-sm text-gray-700 whitespace-pre-line">
+                {additionalInfo}
+              </p>
             </div>
           )}
         </div>
