@@ -26,6 +26,7 @@ export const useEventForm = (defaultValues?: Partial<EventFormData>) => {
       fee: '',
       bookingLink: '',
       googleMaps: '',
+      additionalInfo: '',
       tags: [],
       ...defaultValues,
     },

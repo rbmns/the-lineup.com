@@ -7,9 +7,8 @@ import { TitleField } from './form-sections/TitleField';
 import { DescriptionField } from './form-sections/DescriptionField';
 import { DateTimeFields } from './form-sections/DateTimeFields';
 import { LocationFields } from './form-sections/LocationFields';
-import { CategoryToggleField } from './form-sections/CategoryToggleField';
-import { VibeToggleField } from './form-sections/VibeToggleField';
-import { OptionalFieldsSection } from './form-sections/OptionalFieldsSection';
+import { BookingInfoSection } from './form-sections/BookingInfoSection';
+import { DiscoverabilitySection } from './form-sections/DiscoverabilitySection';
 import { ImageUploadField } from './form-sections/ImageUploadField';
 import { EventFormActions } from './form-sections/EventFormActions';
 import { Form } from '@/components/ui/form';
@@ -141,7 +140,7 @@ export const EventForm: React.FC<EventFormProps> = ({
           {/* Date & Time Section */}
           <DateTimeFields form={form} />
 
-          {/* Location & Details Section */}
+          {/* Location Section */}
           <div className={cn(
             "bg-gradient-to-r from-ocean-teal/5 to-ocean-teal/10 rounded-lg border border-ocean-teal/20",
             isMobile ? "p-3" : "p-6"
@@ -151,24 +150,16 @@ export const EventForm: React.FC<EventFormProps> = ({
               <h2 className={cn(
                 "font-semibold text-ocean-teal",
                 isMobile ? "text-base" : "text-xl"
-              )}>Location & Details</h2>
+              )}>Location</h2>
             </div>
-            <div className="space-y-3">
-              <LocationFields />
-              <div className={cn(
-                "grid gap-3",
-                isMobile ? "grid-cols-1" : "grid-cols-2"
-              )}>
-                <CategoryToggleField />
-                <VibeToggleField />
-              </div>
-            </div>
+            <LocationFields />
           </div>
 
-          {/* Optional Fields Section */}
-          <OptionalFieldsSection 
-            control={control} 
-          />
+          {/* Discoverability Section */}
+          <DiscoverabilitySection />
+
+          {/* Booking Info Section */}
+          <BookingInfoSection />
 
           {/* Submit Button */}
           <div className={cn(

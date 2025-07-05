@@ -93,6 +93,43 @@ export const LocationFields: React.FC = () => {
     setLocationValidationError(null);
   };
 
+  // Function to extract address from Google Maps URL
+  const extractAddressFromGoogleMaps = (url: string) => {
+    try {
+      // Extract address from various Google Maps URL formats
+      const patterns = [
+        /place\/([^\/]+)\//,  // place/address/
+        /query=([^&]+)/,      // query=address
+        /@([\d.-]+),([\d.-]+)/ // coordinates
+      ];
+      
+      for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match) {
+          let address = decodeURIComponent(match[1].replace(/\+/g, ' '));
+          // Clean up the address
+          address = address.replace(/,.*$/, ''); // Remove everything after first comma
+          return address;
+        }
+      }
+      return null;
+    } catch (error) {
+      console.warn('Could not extract address from Google Maps URL:', error);
+      return null;
+    }
+  };
+
+  // Watch Google Maps field and auto-fill address
+  const googleMapsValue = form.watch('googleMaps');
+  useEffect(() => {
+    if (googleMapsValue && googleMapsValue.includes('maps.google') && !addressValue) {
+      const extractedAddress = extractAddressFromGoogleMaps(googleMapsValue);
+      if (extractedAddress) {
+        form.setValue('address', extractedAddress);
+      }
+    }
+  }, [googleMapsValue, addressValue, form]);
+
   return (
     <div className="space-y-3">
       {/* Location Validation Alert */}
@@ -161,6 +198,33 @@ export const LocationFields: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Google Maps Link */}
+      <FormField
+        control={form.control}
+        name="googleMaps"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className={isMobile ? "text-sm" : undefined}>
+              Google Maps Link (Optional)
+            </FormLabel>
+            <FormControl>
+              <Input
+                placeholder="https://maps.google.com/..."
+                {...field}
+                className={cn(
+                  "bg-white border-mist-grey hover:border-ocean-teal focus:border-ocean-teal",
+                  isMobile ? "h-11 text-base" : "h-10"
+                )}
+              />
+            </FormControl>
+            <div className="text-xs text-graphite-grey/60 mt-1">
+              Paste a Google Maps link and we'll try to auto-fill the address
+            </div>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
       {/* Address */}
       <FormField
