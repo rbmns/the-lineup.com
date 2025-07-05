@@ -11,15 +11,51 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { TimezoneField } from './TimezoneField';
+import { toast } from 'sonner';
+import TimezoneService from '@/services/timezoneService';
 
 interface DateTimeFieldsProps {
   form: UseFormReturn<EventFormData>;
 }
 
-export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ form }) => {
+export const DateTimeFields: React.FC<DateTimeFieldsProps> = ({ form }) => {  
   const isMobile = useIsMobile();
   const startDate = form.watch('startDate');
   const endDate = form.watch('endDate');
+  const isRecurring = form.watch('isRecurring');
+  const recurringDays = form.watch('recurringDays');
+  
+  // Set default timezone to user's browser timezone
+  React.useEffect(() => {
+    const currentTimezone = form.getValues('timezone');
+    if (!currentTimezone || currentTimezone === 'Europe/Amsterdam') {
+      const userTimezone = TimezoneService.getUserTimezone();
+      form.setValue('timezone', userTimezone);
+    }
+  }, [form]);
+
+  // Validate recurring days match start date
+  React.useEffect(() => {
+    if (isRecurring && startDate && recurringDays && recurringDays.length > 0) {
+      const startDayOfWeek = startDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
+      const dayMapping: { [key: number]: string } = {
+        0: 'sun', 1: 'mon', 2: 'tue', 3: 'wed', 4: 'thu', 5: 'fri', 6: 'sat'
+      };
+      
+      const startDayKey = dayMapping[startDayOfWeek];
+      const dayNames: { [key: string]: string } = {
+        mon: 'Monday', tue: 'Tuesday', wed: 'Wednesday', thu: 'Thursday', 
+        fri: 'Friday', sat: 'Saturday', sun: 'Sunday'
+      };
+      
+      if (!recurringDays.includes(startDayKey)) {
+        toast.warning(
+          `Your event starts on ${dayNames[startDayKey]} but you haven't selected ${dayNames[startDayKey]} as a recurring day. This event won't repeat on its start date.`,
+          { duration: 6000 }
+        );
+      }
+    }
+  }, [isRecurring, startDate, recurringDays]);
 
   return (
     <div className={cn(

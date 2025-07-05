@@ -17,6 +17,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertTriangle, Mail } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 
 interface EventFormProps {
   eventId?: string;
@@ -30,6 +31,7 @@ export const EventForm: React.FC<EventFormProps> = ({
   initialData
 }) => {
   const isMobile = useIsMobile();
+  const errorAlertRef = useRef<HTMLDivElement>(null);
   
   const {
     form,
@@ -82,6 +84,16 @@ export const EventForm: React.FC<EventFormProps> = ({
 
   // Check if there are any form errors
   const hasFormErrors = Object.keys(errors).length > 0;
+  
+  // Scroll to error alert when errors appear
+  useEffect(() => {
+    if (hasFormErrors && errorAlertRef.current) {
+      errorAlertRef.current.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'center' 
+      });
+    }
+  }, [hasFormErrors]);
 
   return (
     <div className={cn(
@@ -92,7 +104,11 @@ export const EventForm: React.FC<EventFormProps> = ({
         <form onSubmit={handleSubmit(handleFormSubmit, onInvalid)} className="space-y-4">
           {/* Form Validation Alert */}
           {hasFormErrors && (
-            <Alert variant="destructive" className="border-red-200 bg-red-50">
+            <Alert 
+              ref={errorAlertRef}
+              variant="destructive" 
+              className="border-red-200 bg-red-50 sticky top-4 z-50 shadow-lg"
+            >
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
                 <div className="mb-2">Please fix the following errors before submitting:</div>
