@@ -27,7 +27,7 @@ jobs:
       run: npm ci
     
     - name: Type check
-      run: npm run type-check
+      run: npx tsc --noEmit
     
     - name: Lint
       run: npm run lint
@@ -50,10 +50,10 @@ jobs:
       run: npm ci
     
     - name: Run unit tests with coverage
-      run: npm run test:coverage
+      run: npx vitest --coverage
     
     - name: Run integration tests
-      run: npm run test:integration
+      run: npx vitest --run src/test/integration
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
@@ -82,7 +82,7 @@ jobs:
       run: npx playwright install --with-deps
     
     - name: Run E2E tests
-      run: npm run test:e2e
+      run: npx playwright test
     
     - name: Upload E2E test results
       uses: actions/upload-artifact@v3
@@ -114,4 +114,4 @@ jobs:
       run: npx playwright install --with-deps
     
     - name: Run cross-browser tests
-      run: npm run test:e2e:cross-browser
+      run: npx playwright test --project=chromium --project=firefox --project=webkit
