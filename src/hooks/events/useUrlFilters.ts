@@ -16,6 +16,10 @@ export const useUrlFilters = (
   setDateRange: (range: DateRange | undefined) => void,
   selectedDateFilter: string,
   setSelectedDateFilter: (filter: string) => void,
+  selectedVibes?: string[],
+  setSelectedVibes?: (vibes: string[]) => void,
+  selectedLocation?: string | null,
+  setSelectedLocation?: (location: string | null) => void,
 ) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -27,17 +31,19 @@ export const useUrlFilters = (
 
   // Serialize filter state to URL parameters using standardized naming
   const updateUrlParams = useCallback(() => {
-    // Standard filter state object with consistent naming
+    // Extended filter state object with vibes and location
     const filterState = {
       eventTypes: selectedEventTypes,
       venues: selectedVenues,
       dateRange,
-      dateFilter: selectedDateFilter
+      dateFilter: selectedDateFilter,
+      vibes: selectedVibes || [],
+      location: selectedLocation
     };
     
     // Update URL parameters without navigation
     updateUrlParameters(filterState, navigate, location.pathname);
-  }, [navigate, location.pathname, selectedEventTypes, selectedVenues, dateRange, selectedDateFilter]);
+  }, [navigate, location.pathname, selectedEventTypes, selectedVenues, dateRange, selectedDateFilter, selectedVibes, selectedLocation]);
 
   // Parse URL parameters and update filter state
   const parseUrlParams = useCallback(() => {
@@ -111,6 +117,34 @@ export const useUrlFilters = (
       filtersUpdated = true;
     }
     
+    // Get vibes with standardized name 'vibe'
+    if (selectedVibes && setSelectedVibes) {
+      const vibeParams = urlParams.getAll('vibe');
+      if (vibeParams.length > 0) {
+        if (JSON.stringify(vibeParams) !== JSON.stringify(selectedVibes)) {
+          setSelectedVibes(vibeParams);
+          filtersUpdated = true;
+          console.log(`Parsed vibes from URL: ${vibeParams.join(', ')}`);
+        }
+      } else if (selectedVibes.length > 0 && !location.state?.preserveFilters) {
+        setSelectedVibes([]);
+        filtersUpdated = true;
+      }
+    }
+    
+    // Get location with standardized name 'location'
+    if (setSelectedLocation) {
+      const locationParam = urlParams.get('location');
+      if (locationParam && locationParam !== selectedLocation) {
+        setSelectedLocation(locationParam);
+        filtersUpdated = true;
+        console.log(`Parsed location from URL: ${locationParam}`);
+      } else if (!locationParam && selectedLocation && !location.state?.preserveFilters) {
+        setSelectedLocation(null);
+        filtersUpdated = true;
+      }
+    }
+    
     return filtersUpdated;
   }, [
     location.search,
@@ -119,10 +153,14 @@ export const useUrlFilters = (
     selectedVenues,
     selectedDateFilter,
     dateRange,
+    selectedVibes,
+    selectedLocation,
     setSelectedEventTypes,
     setSelectedVenues,
     setSelectedDateFilter,
-    setDateRange
+    setDateRange,
+    setSelectedVibes,
+    setSelectedLocation
   ]);
 
   // Try to restore filters from URL on initial mount
@@ -137,7 +175,7 @@ export const useUrlFilters = (
     }, 50);
     
     return () => clearTimeout(timeoutId);
-  }, [selectedEventTypes, selectedVenues, dateRange, selectedDateFilter, updateUrlParams]);
+  }, [selectedEventTypes, selectedVenues, dateRange, selectedDateFilter, selectedVibes, selectedLocation, updateUrlParams]);
 
   return {
     updateUrlParams,

@@ -32,6 +32,8 @@ interface FilterState {
   venues: string[];
   dateRange?: DateRange;
   dateFilter: string;
+  vibes?: string[];
+  location?: string | null;
 }
 
 export const updateUrlParameters = (
@@ -62,6 +64,18 @@ export const updateUrlParameters = (
   }
   if (filterState.dateRange?.to) {
     searchParams.set('dateTo', filterState.dateRange.to.toISOString());
+  }
+  
+  // Add vibes
+  if (filterState.vibes && filterState.vibes.length > 0) {
+    filterState.vibes.forEach(vibe => {
+      searchParams.append('vibe', vibe);
+    });
+  }
+  
+  // Add location
+  if (filterState.location) {
+    searchParams.set('location', filterState.location);
   }
   
   const newUrl = searchParams.toString() ? `${pathname}?${searchParams.toString()}` : pathname;
