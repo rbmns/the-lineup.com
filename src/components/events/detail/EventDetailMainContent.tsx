@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Event } from '@/types';
@@ -11,7 +10,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatEventDate, formatEventTime } from '@/utils/timezone-utils';
-
 interface EventDetailMainContentProps {
   event: Event;
   attendees?: {
@@ -24,7 +22,6 @@ interface EventDetailMainContentProps {
   rsvpFeedback: 'going' | 'interested' | null;
   onRsvp: (status: 'Going' | 'Interested') => Promise<boolean>;
 }
-
 export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
   event,
   attendees,
@@ -35,44 +32,36 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
   onRsvp
 }) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { recurringEvents, isLoading: recurringLoading } = useRecurringEvents(event);
-
+  const {
+    user
+  } = useAuth();
+  const {
+    recurringEvents,
+    isLoading: recurringLoading
+  } = useRecurringEvents(event);
   const handleUserClick = (userId: string) => {
     console.log('Navigating to user profile:', userId);
     navigate(`/user/${userId}`);
   };
-
   const handleRecurringEventClick = (recurringEvent: Event) => {
     navigate(`/events/${recurringEvent.id}`);
   };
 
   // Filter out past events and sort by date using new timestampz fields
-  const upcomingRecurringEvents = recurringEvents
-    .filter(recurringEvent => {
-      if (!recurringEvent.start_datetime) return false;
-      const eventDate = new Date(recurringEvent.start_datetime);
-      const today = new Date();
-      return eventDate >= today;
-    })
-    .sort((a, b) => {
-      if (!a.start_datetime || !b.start_datetime) return 0;
-      return new Date(a.start_datetime).getTime() - new Date(b.start_datetime).getTime();
-    });
-
-  return (
-    <div className="lg:col-span-2 space-y-8">
+  const upcomingRecurringEvents = recurringEvents.filter(recurringEvent => {
+    if (!recurringEvent.start_datetime) return false;
+    const eventDate = new Date(recurringEvent.start_datetime);
+    const today = new Date();
+    return eventDate >= today;
+  }).sort((a, b) => {
+    if (!a.start_datetime || !b.start_datetime) return 0;
+    return new Date(a.start_datetime).getTime() - new Date(b.start_datetime).getTime();
+  });
+  return <div className="lg:col-span-2 space-y-8">
         {/* RSVP Section - only show if authenticated */}
-        {isAuthenticated && (
-          <div className={`transition-all duration-300 bg-gradient-to-r from-ocean-teal/5 to-coastal-haze/20 rounded-xl p-6 border border-ocean-teal/20 ${rsvpFeedback ? 'scale-105' : ''} ${rsvpFeedback === 'going' ? 'ring-2 ring-emerald-200 ring-opacity-50' : rsvpFeedback === 'interested' ? 'ring-2 ring-sky-200 ring-opacity-50' : ''}`}>
-          <EventRsvpSection 
-            isOwner={isOwner} 
-            onRsvp={onRsvp} 
-            isRsvpLoading={rsvpLoading} 
-            currentStatus={event.rsvp_status} 
-          />
-        </div>
-      )}
+        {isAuthenticated && <div className={`transition-all duration-300 bg-gradient-to-r from-ocean-teal/5 to-coastal-haze/20 rounded-xl p-6 border border-ocean-teal/20 ${rsvpFeedback ? 'scale-105' : ''} ${rsvpFeedback === 'going' ? 'ring-2 ring-emerald-200 ring-opacity-50' : rsvpFeedback === 'interested' ? 'ring-2 ring-sky-200 ring-opacity-50' : ''}`}>
+          <EventRsvpSection isOwner={isOwner} onRsvp={onRsvp} isRsvpLoading={rsvpLoading} currentStatus={event.rsvp_status} />
+        </div>}
 
       {/* About this event */}
       <div className="text-left">
@@ -86,27 +75,18 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
         </div>
         
         {/* Tags under description */}
-        {event.tags && event.tags.length > 0 && (
-          <div className="mt-6">
+        {event.tags && event.tags.length > 0 && <div className="mt-6">
             <h3 className="text-h4 font-montserrat text-graphite-grey mb-3">Tags</h3>
             <div className="flex flex-wrap gap-2">
-              {(Array.isArray(event.tags) ? event.tags : 
-                typeof event.tags === 'string' ? 
-                  (event.tags.startsWith('[') ? JSON.parse(event.tags) : event.tags.split(',').map(t => t.trim())) : 
-                  []
-              ).filter(Boolean).map((tag, index) => (
-                <Badge key={index} variant="secondary" className="text-sm">
+              {(Array.isArray(event.tags) ? event.tags : typeof event.tags === 'string' ? event.tags.startsWith('[') ? JSON.parse(event.tags) : event.tags.split(',').map(t => t.trim()) : []).filter(Boolean).map((tag, index) => <Badge key={index} variant="secondary" className="text-sm">
                   {tag}
-                </Badge>
-              ))}
+                </Badge>)}
             </div>
-          </div>
-        )}
+          </div>}
       </div>
 
       {/* Recurring Events Section */}
-      {upcomingRecurringEvents.length > 0 && (
-        <div className="text-left">
+      {upcomingRecurringEvents.length > 0 && <div className="text-left">
           <h2 className="text-h2 font-montserrat text-graphite-grey mb-6">
             Upcoming {event.title} Events
           </h2>
@@ -119,77 +99,46 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {upcomingRecurringEvents.slice(0, 5).map((recurringEvent) => (
-                  <div
-                    key={recurringEvent.id}
-                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => handleRecurringEventClick(recurringEvent)}
-                  >
+                {upcomingRecurringEvents.slice(0, 5).map(recurringEvent => <div key={recurringEvent.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handleRecurringEventClick(recurringEvent)}>
                     <div className="flex-1">
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2 text-sm font-medium">
                           <Calendar className="h-4 w-4 text-gray-500" />
-                          {recurringEvent.start_datetime && formatEventDate(
-                            recurringEvent.start_datetime, 
-                            recurringEvent.timezone || 'Europe/Amsterdam'
-                          )}
+                          {recurringEvent.start_datetime && formatEventDate(recurringEvent.start_datetime, recurringEvent.timezone || 'Europe/Amsterdam')}
                         </div>
                         
-                        {recurringEvent.start_datetime && (
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                        {recurringEvent.start_datetime && <div className="flex items-center gap-2 text-sm text-gray-600">
                             <Clock className="h-4 w-4 text-gray-500" />
-                            {formatEventTime(
-                              recurringEvent.start_datetime,
-                              recurringEvent.timezone || 'Europe/Amsterdam'
-                            )}
-                          </div>
-                        )}
+                            {formatEventTime(recurringEvent.start_datetime, recurringEvent.timezone || 'Europe/Amsterdam')}
+                          </div>}
                         
-                        {recurringEvent.venues?.city && (
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                        {recurringEvent.venues?.city && <div className="flex items-center gap-2 text-sm text-gray-600">
                             <MapPin className="h-4 w-4 text-gray-500" />
                             {recurringEvent.venues.city}
-                          </div>
-                        )}
+                          </div>}
                       </div>
                       
-                      {recurringEvent.venues?.name && (
-                        <div className="text-sm text-gray-500 mt-1">
+                      {recurringEvent.venues?.name && <div className="text-sm text-gray-500 mt-1">
                           at {recurringEvent.venues.name}
-                        </div>
-                      )}
+                        </div>}
                     </div>
                     
                     <Button variant="outline" size="sm">
                       View Event
                     </Button>
-                  </div>
-                ))}
+                  </div>)}
                 
-                {upcomingRecurringEvents.length > 5 && (
-                  <div className="text-center pt-4">
+                {upcomingRecurringEvents.length > 5 && <div className="text-center pt-4">
                     <Badge variant="secondary">
                       +{upcomingRecurringEvents.length - 5} more upcoming events
                     </Badge>
-                  </div>
-                )}
+                  </div>}
               </div>
             </CardContent>
           </Card>
-        </div>
-      )}
+        </div>}
 
           {/* Additional Information Section */}
-          {event.extra_info && (
-            <div className="text-left bg-gradient-to-r from-coastal-haze/30 to-mist-grey/20 rounded-xl p-6 border border-ocean-teal/20">
-              <h3 className="text-h4 font-montserrat text-ocean-teal mb-4">
-                Additional Information
-              </h3>
-              <p className="text-graphite-grey/80 leading-7 whitespace-pre-wrap text-left text-body-base font-lato">
-                {event.extra_info}
-              </p>
-            </div>
-          )}
-    </div>
-  );
+          {event.extra_info}
+    </div>;
 };
