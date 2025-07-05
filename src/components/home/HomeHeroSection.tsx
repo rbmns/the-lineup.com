@@ -9,8 +9,8 @@ import { cn } from '@/lib/utils';
 
 // Hero image configuration - easy to replace
 const HERO_IMAGE = {
-  src: "/lovable-uploads/df996738-b355-4d60-acbf-d58c4b42daf0.png",
-  alt: "Golden hour beach scene with warm coastal atmosphere",
+  src: "/lovable-uploads/f6ac5019-a951-408e-9fce-ed20a2d65048.png",
+  alt: "Dreamy sunset ocean view with soft pink and blue tones",
   // Add fallback image for better reliability
   fallback: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=1920&h=1080&fit=crop&auto=format"
 };
@@ -75,7 +75,7 @@ export const HomeHeroSection = () => {
           <Button 
             asChild 
             size={isMobile ? "default" : "default"}
-            className="bg-sunset-orange hover:bg-dusk-coral text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 px-6 py-3"
+            className="btn-primary"
           >
             <Link to="/events">
               <Search className="mr-2 h-5 w-5" />
@@ -88,7 +88,7 @@ export const HomeHeroSection = () => {
               asChild
               variant="outline"
               size={isMobile ? "default" : "default"}
-              className="border-2 border-pure-white text-pure-white hover:bg-pure-white hover:text-ocean-deep font-semibold transition-all duration-200 backdrop-blur-sm px-6 py-3"
+              className="btn-outline backdrop-blur-sm"
             >
               <Link to="/signup">
                 <UserPlus className="mr-2 h-5 w-5" />
