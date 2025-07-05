@@ -111,14 +111,14 @@ const EventDetail: React.FC<EventDetailProps> = ({
   if (isLoading) {
     console.log('EventDetail - Loading event data...');
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-pure-white">
         <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-            <div className="h-64 bg-gray-200 rounded mb-6"></div>
-            <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+            <div className="h-8 bg-mist-grey rounded w-1/4 mb-6"></div>
+            <div className="h-64 bg-mist-grey rounded mb-6"></div>
+            <div className="h-6 bg-mist-grey rounded w-3/4 mb-4"></div>
+            <div className="h-4 bg-mist-grey rounded w-1/2 mb-2"></div>
+            <div className="h-4 bg-mist-grey rounded w-1/3"></div>
           </div>
         </div>
       </div>
@@ -128,16 +128,17 @@ const EventDetail: React.FC<EventDetailProps> = ({
   if (error || !event) {
     console.error('EventDetail - Error or no event:', error, 'eventId:', eventId);
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-pure-white">
         <div className="max-w-4xl mx-auto px-4 md:px-6 py-8">
           <div className="text-center py-12">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
-            <p className="text-gray-600 mb-6">The event you're looking for doesn't exist or has been removed.</p>
+            <h1 className="text-2xl font-bold text-graphite-grey mb-4">Event Not Found</h1>
+            <p className="text-graphite-grey/70 mb-6">The event you're looking for doesn't exist or has been removed.</p>
             <Button 
               onClick={() => {
                 const filteredPath = hasFilteredEventsHistory() ? getFilteredEventsPath() : '/events';
                 navigate(filteredPath);
               }}
+              className="btn-primary"
             >
               Browse Events
             </Button>
@@ -152,7 +153,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
   console.log(`EventDetail rendering - Event RSVP status: ${event.rsvp_status}`);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-pure-white">
       <Helmet>
         <title>{event.title} | the lineup</title>
         <meta name="description" content={event.description || `Join us for ${event.title}`} />
@@ -170,7 +171,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
       <EventDetailHero event={event} />
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 bg-pure-white">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Main Content */}
           <EventDetailMainContent
@@ -195,13 +196,13 @@ const EventDetail: React.FC<EventDetailProps> = ({
 
         {/* Back to Events button at bottom */}
         {showBackButton && (
-          <div className="mt-12 pt-8 border-t border-gray-200">
+          <div className="mt-12 pt-8 border-t border-mist-grey">
             <button
               onClick={() => {
                 const filteredPath = hasFilteredEventsHistory() ? getFilteredEventsPath() : '/events';
                 navigate(filteredPath);
               }}
-              className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+              className="inline-flex items-center text-horizon-blue hover:text-graphite-grey transition-colors"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Events

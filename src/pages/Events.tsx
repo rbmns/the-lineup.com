@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useFilterState } from '@/contexts/FilterStateContext';
 import { useEvents } from '@/hooks/useEvents';
@@ -154,25 +155,25 @@ const Events = () => {
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-sand overflow-x-hidden">
+    <div className="min-h-screen w-full bg-pure-white overflow-x-hidden">
       {/* Header */}
       <div className={cn(
-        "w-full",
+        "w-full bg-pure-white",
         isMobile ? "px-4 py-6" : "px-6 py-8"
       )}>
         <div className="text-center space-y-3">
           <h1 className={cn(
-            "font-display font-semibold text-ocean-deep leading-tight",
+            "font-display font-semibold text-graphite-grey leading-tight",
             isMobile ? "text-2xl" : "text-3xl sm:text-4xl lg:text-5xl"
           )}>
-            Discover <span className="text-vibrant-aqua">Events</span>
+            Discover <span className="text-horizon-blue">Events</span>
           </h1>
         </div>
       </div>
 
       {/* Content */}
       <div className={cn(
-        "w-full max-w-6xl mx-auto overflow-x-hidden",
+        "w-full max-w-6xl mx-auto overflow-x-hidden bg-pure-white",
         isMobile ? "px-4" : "px-6"
       )}>
         <div className="space-y-6">
@@ -213,15 +214,15 @@ const Events = () => {
                     className={cn(
                       "inline-flex items-center gap-2 px-3 py-2 text-xs font-mono font-medium border rounded-md transition-colors uppercase tracking-wide",
                       dateRange?.from
-                        ? "bg-primary text-white border-primary"
-                        : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
+                        ? "bg-graphite-grey text-pure-white border-graphite-grey"
+                        : "bg-pure-white text-graphite-grey border-mist-grey hover:bg-coastal-haze"
                     )}
                   >
                     {formatDateRangeDisplay()}
                   </button>
                   
                   {showDatePicker && (
-                    <div className="absolute top-full right-0 mt-2 z-50 bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden min-w-max">
+                    <div className="absolute top-full right-0 mt-2 z-50 bg-pure-white border border-mist-grey rounded-lg shadow-xl overflow-hidden min-w-max">
                       <MobileFriendlyDatePicker
                         dateRange={dateRange}
                         onDateRangeChange={setDateRange}
@@ -249,7 +250,7 @@ const Events = () => {
               {(hasActiveFilters || searchQuery.trim()) && (
                 <button
                   onClick={handleResetAllFilters}
-                  className="flex items-center gap-2 px-3 py-2 text-xs font-mono font-medium text-ocean-deep/70 hover:text-ocean-deep hover:bg-coral/10 border border-ocean-deep/20 rounded-md transition-all duration-200 uppercase tracking-wide"
+                  className="flex items-center gap-2 px-3 py-2 text-xs font-mono font-medium text-graphite-grey/70 hover:text-graphite-grey hover:bg-dusk-coral/10 border border-mist-grey rounded-md transition-all duration-200 uppercase tracking-wide"
                 >
                   <X className="h-3.5 w-3.5" />
                   Clear
@@ -301,7 +302,7 @@ const Events = () => {
                 {(hasActiveFilters || searchQuery.trim()) && (
                   <button
                     onClick={handleResetAllFilters}
-                    className="flex items-center gap-1 px-2 py-1.5 text-xs font-mono font-medium text-ocean-deep/70 hover:text-ocean-deep hover:bg-coral/10 border border-ocean-deep/20 rounded-md transition-all duration-200"
+                    className="flex items-center gap-1 px-2 py-1.5 text-xs font-mono font-medium text-graphite-grey/70 hover:text-graphite-grey hover:bg-dusk-coral/10 border border-mist-grey rounded-md transition-all duration-200"
                   >
                     <X className="h-3 w-3" />
                     Clear
@@ -313,7 +314,7 @@ const Events = () => {
 
           {/* Results Count */}
           <div className="text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-graphite-grey/70">
               {eventsLoading ? 'Loading events...' : `${displayEvents.length} events found`}
             </p>
           </div>
@@ -328,7 +329,7 @@ const Events = () => {
               </div>
             ) : displayEvents.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-500 mb-4">
+                <p className="text-graphite-grey/70 mb-4">
                   {hasActiveFilters || searchQuery.trim() 
                     ? "No events found matching your filters." 
                     : "No events available."}
@@ -336,7 +337,7 @@ const Events = () => {
                 {(hasActiveFilters || searchQuery.trim()) && (
                   <button
                     onClick={handleResetAllFilters}
-                    className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+                    className="px-4 py-2 bg-graphite-grey text-pure-white rounded-md hover:bg-graphite-grey/90 transition-colors"
                   >
                     Clear Filters
                   </button>
