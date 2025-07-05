@@ -32,6 +32,7 @@ import DesignSystem from '@/pages/DesignSystem';
 import SearchPage from '@/pages/SearchPage';
 import OrganisePage from '@/pages/OrganisePage';
 import { SearchProvider } from '@/contexts/SearchContext';
+import { FilterStateProvider } from '@/contexts/FilterStateContext';
 import AdminPage from '@/pages/AdminPage';
 import Dashboard from '@/pages/Dashboard';
 
@@ -41,8 +42,9 @@ function App() {
       <QueryClient>
         <AuthProvider>
           <PendingEventHandler />
-          <SearchProvider>
-            <BrowserRouter>
+          <FilterStateProvider>
+            <SearchProvider>
+              <BrowserRouter>
               <Routes>
                 {/* All routes now use Layout with sticky navigation */}
                 <Route path="/" element={<Layout />}>
@@ -77,8 +79,9 @@ function App() {
                   <Route path="*" element={<NotFound />} />
                 </Route>
               </Routes>
-            </BrowserRouter>
-          </SearchProvider>
+              </BrowserRouter>
+            </SearchProvider>
+          </FilterStateProvider>
           <Toaster />
         </AuthProvider>
       </QueryClient>
