@@ -124,9 +124,10 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
     <div 
       className={cn(
         // Container styling with uniform dimensions - warm coconut background
-        "bg-coconut rounded-lg shadow-md border border-mist-grey p-5",
-        "h-full flex flex-col cursor-pointer transition-all duration-200 ease-in-out",
-        "hover:shadow-lg hover:-translate-y-0.5",
+        "bg-pure-white rounded-lg shadow-md border border-mist-grey p-5 group",
+        "h-full flex flex-col cursor-pointer transition-all duration-300 ease-in-out",
+        "hover:shadow-xl hover:-translate-y-1 hover:bg-gradient-to-br hover:from-coastal-haze hover:to-seafoam-drift/20",
+        "hover:border-seafoam-drift/40",
         className
       )}
       onClick={handleClick}
@@ -137,7 +138,7 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
         <img
           src={imageUrl}
           alt={event.title}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105 group-hover:brightness-110"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             if (!target.src.includes('/img/default.jpg')) {
@@ -149,7 +150,7 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
         {/* Category badge overlay */}
         {event.event_category && (
           <div className="absolute top-3 left-3">
-            <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-sand-pink text-dusk-coral font-mono text-xs">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-coastal-haze text-graphite-grey font-mono text-xs transition-all duration-300 group-hover:bg-seafoam-drift group-hover:text-pure-white">
               {event.event_category}
             </span>
           </div>
@@ -171,22 +172,22 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
         )}
         
         {/* Date - Use JetBrains Mono */}
-        <div className="text-sm text-graphite-grey opacity-75 font-mono mb-2 flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-ocean-teal flex-shrink-0" />
+        <div className="text-sm text-graphite-grey opacity-75 font-mono mb-2 flex items-center gap-2 transition-colors duration-300 group-hover:opacity-90">
+          <Calendar className="h-4 w-4 text-ocean-teal flex-shrink-0 transition-colors duration-300 group-hover:text-seafoam-drift" />
           <span>{date}</span>
         </div>
 
         {/* Time - Use JetBrains Mono */}
         {time && (
-          <div className="text-sm text-graphite-grey opacity-75 font-mono mb-3 flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-ocean-teal flex-shrink-0" />
+          <div className="text-sm text-graphite-grey opacity-75 font-mono mb-3 flex items-center gap-2 transition-colors duration-300 group-hover:opacity-90">
+            <Calendar className="h-4 w-4 text-ocean-teal flex-shrink-0 transition-colors duration-300 group-hover:text-seafoam-drift" />
             <span>{time}</span>
           </div>
         )}
         
         {/* Location - Use JetBrains Mono */}
-        <div className="text-sm text-graphite-grey font-mono flex items-center mb-4 hover:underline hover:text-ocean-teal">
-          <MapPin className="h-4 w-4 text-graphite-grey mr-2 flex-shrink-0" />
+        <div className="text-sm text-graphite-grey font-mono flex items-center mb-4 transition-colors duration-300 group-hover:text-ocean-teal">
+          <MapPin className="h-4 w-4 text-graphite-grey mr-2 flex-shrink-0 transition-colors duration-300 group-hover:text-seafoam-drift" />
           <span className="truncate">{getVenueDisplay()}</span>
         </div>
         
