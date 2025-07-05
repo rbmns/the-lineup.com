@@ -171,7 +171,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
       <EventDetailHero event={event} />
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 bg-pure-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 bg-gradient-to-br from-coastal-haze/30 via-pure-white to-mist-grey/20">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Main Content */}
           <EventDetailMainContent
@@ -196,7 +196,7 @@ const EventDetail: React.FC<EventDetailProps> = ({
 
         {/* Back to Events button at bottom */}
         {showBackButton && (
-          <div className="mt-12 pt-8 border-t border-mist-grey">
+          <div className="mt-12 pt-8 border-t border-ocean-teal/20 bg-gradient-to-r from-coastal-haze/20 to-mist-grey/30 rounded-lg p-6">
             <button
               onClick={() => {
                 const filteredPath = hasFilteredEventsHistory() ? getFilteredEventsPath() : '/events';

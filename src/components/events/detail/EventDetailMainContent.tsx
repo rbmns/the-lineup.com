@@ -62,9 +62,9 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
 
   return (
     <div className="lg:col-span-2 space-y-8">
-      {/* RSVP Section - only show if authenticated */}
-      {isAuthenticated && (
-        <div className={`transition-all duration-300 ${rsvpFeedback ? 'scale-105' : ''} ${rsvpFeedback === 'going' ? 'ring-2 ring-emerald-200 ring-opacity-50' : rsvpFeedback === 'interested' ? 'ring-2 ring-sky-200 ring-opacity-50' : ''}`}>
+        {/* RSVP Section - only show if authenticated */}
+        {isAuthenticated && (
+          <div className={`transition-all duration-300 bg-gradient-to-r from-ocean-teal/5 to-coastal-haze/20 rounded-xl p-6 border border-ocean-teal/20 ${rsvpFeedback ? 'scale-105' : ''} ${rsvpFeedback === 'going' ? 'ring-2 ring-emerald-200 ring-opacity-50' : rsvpFeedback === 'interested' ? 'ring-2 ring-sky-200 ring-opacity-50' : ''}`}>
           <EventRsvpSection 
             isOwner={isOwner} 
             onRsvp={onRsvp} 
@@ -179,17 +179,17 @@ export const EventDetailMainContent: React.FC<EventDetailMainContentProps> = ({
         </div>
       )}
 
-      {/* Additional Information Section */}
-      {event.extra_info && (
-        <div className="text-left bg-coastal-haze rounded-xl p-6 border border-mist-grey/30">
-          <h3 className="text-h4 font-montserrat text-graphite-grey mb-4">
-            Additional Information
-          </h3>
-          <p className="text-graphite-grey/80 leading-7 whitespace-pre-wrap text-left text-body-base font-lato">
-            {event.extra_info}
-          </p>
-        </div>
-      )}
+          {/* Additional Information Section */}
+          {event.extra_info && (
+            <div className="text-left bg-gradient-to-r from-coastal-haze/30 to-mist-grey/20 rounded-xl p-6 border border-ocean-teal/20">
+              <h3 className="text-h4 font-montserrat text-ocean-teal mb-4">
+                Additional Information
+              </h3>
+              <p className="text-graphite-grey/80 leading-7 whitespace-pre-wrap text-left text-body-base font-lato">
+                {event.extra_info}
+              </p>
+            </div>
+          )}
     </div>
   );
 };
