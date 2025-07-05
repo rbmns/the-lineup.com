@@ -7,6 +7,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
+// Hero image configuration - easy to replace
+const HERO_IMAGE = {
+  src: "/lovable-uploads/df996738-b355-4d60-acbf-d58c4b42daf0.png",
+  alt: "Golden hour beach scene with warm coastal atmosphere",
+  // Add fallback image for better reliability
+  fallback: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=1920&h=1080&fit=crop&auto=format"
+};
+
 export const HomeHeroSection = () => {
   const { isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
@@ -17,11 +25,18 @@ export const HomeHeroSection = () => {
       <div className="absolute inset-0 z-0">
         <div className="w-full h-full">
           <img
-            src="/lovable-uploads/df996738-b355-4d60-acbf-d58c4b42daf0.png"
-            alt="Golden hour beach scene with warm coastal atmosphere"
+            src={HERO_IMAGE.src}
+            alt={HERO_IMAGE.alt}
             className="w-full h-full object-cover object-center sm:object-center-bottom lg:object-center"
             loading="eager"
             decoding="async"
+            fetchPriority="high"
+            width="1920"
+            height="1080"
+            onError={(e) => {
+              // Fallback to placeholder if main image fails
+              e.currentTarget.src = HERO_IMAGE.fallback;
+            }}
           />
         </div>
         {/* Warm brand-aligned gradient overlay */}
