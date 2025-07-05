@@ -39,7 +39,7 @@ export const CategoryToggleField: React.FC = () => {
                       capitalize text-sm px-3 py-2 rounded-md border transition-all duration-200
                       ${isSelected 
                         ? 'bg-ocean-teal text-pure-white border-ocean-teal shadow-sm' 
-                        : 'bg-pure-white text-graphite-grey border-mist-grey hover:bg-coastal-haze hover:border-ocean-teal'
+                        : 'bg-pure-white text-graphite-grey border-mist-grey hover:bg-coastal-haze hover:border-ocean-teal hover:text-ocean-teal'
                       }
                     `}
                     data-state={isSelected ? 'on' : 'off'}

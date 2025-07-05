@@ -58,10 +58,10 @@ export const VibeToggleField: React.FC = () => {
                   key={vibe}
                   value={vibe}
                   variant="outline"
-                  className={`capitalize text-xs px-2 py-1.5 rounded-sm transition-colors font-mono ${
+                  className={`capitalize text-xs px-2 py-1.5 rounded-sm transition-colors ${
                     field.value === vibe 
-                      ? 'bg-seafoam text-midnight border-overcast'
-                      : 'border-sage bg-coconut text-midnight hover:bg-seafoam hover:border-overcast'
+                      ? 'bg-ocean-teal text-pure-white border-ocean-teal'
+                      : 'bg-pure-white text-graphite-grey border-mist-grey hover:bg-coastal-haze hover:border-ocean-teal hover:text-ocean-teal'
                   }`}
                 >
                   {vibe}
