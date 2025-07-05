@@ -6,7 +6,6 @@ import { useVenueAreas } from '@/hooks/useVenueAreas';
 import { EventSearch } from '@/components/events/search/EventSearch';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUnifiedRsvp } from '@/hooks/useUnifiedRsvp';
 import { VibesDropdownFilter } from '@/components/events/filters/VibesDropdownFilter';
 import { CategoriesDropdownFilter } from '@/components/events/filters/CategoriesDropdownFilter';
 import { DateDropdownFilter } from '@/components/events/filters/DateDropdownFilter';
@@ -22,7 +21,6 @@ import { pageSeoTags } from '@/utils/seoUtils';
 const Events = () => {
   const isMobile = useIsMobile();
   const { user } = useAuth();
-  const { handleRsvp, loadingEventId } = useUnifiedRsvp();
 
   const {
     events,
@@ -46,6 +44,17 @@ const Events = () => {
     resetAllFilters,
     isLocationLoaded
   } = useEventsPageData();
+
+  // Debug filter states
+  console.log('Events page filter states:', {
+    selectedVibes,
+    selectedEventTypes,
+    selectedVenues,
+    selectedLocation,
+    allEvents: allEvents?.length,
+    events: events?.length,
+    hasActiveFilters
+  });
 
   const { data: venueAreas = [], isLoading: areasLoading } = useVenueAreas();
 
@@ -353,14 +362,20 @@ const Events = () => {
               <div className="flex items-center gap-3">
                 <VibesDropdownFilter
                   selectedVibes={selectedVibes}
-                  onVibeChange={setSelectedVibes}
+                  onVibeChange={(vibes) => {
+                    console.log('Vibe change called:', vibes);
+                    setSelectedVibes(vibes);
+                  }}
                   events={allEvents || []}
                   vibesLoading={isLoading}
                 />
                 
                 <CategoriesDropdownFilter
                   selectedCategories={selectedEventTypes}
-                  onToggleCategory={handleCategoryToggle}
+                  onToggleCategory={(category) => {
+                    console.log('Category toggle called:', category);
+                    handleCategoryToggle(category);
+                  }}
                   onSelectAll={handleSelectAllCategories}
                   onDeselectAll={handleDeselectAllCategories}
                   allEventTypes={allEventTypes}
@@ -400,7 +415,10 @@ const Events = () => {
                 <LocationDropdownFilter
                   venueAreas={venueAreas}
                   selectedLocationId={selectedLocation}
-                  onLocationChange={setSelectedLocation}
+                  onLocationChange={(locationId) => {
+                    console.log('Location change called:', locationId);
+                    setSelectedLocation(locationId);
+                  }}
                   isLoading={areasLoading}
                   isLocationLoaded={isLocationLoaded}
                 />
@@ -433,14 +451,20 @@ const Events = () => {
               <div className="flex flex-wrap gap-2 justify-center items-center">
                 <VibesDropdownFilter
                   selectedVibes={selectedVibes}
-                  onVibeChange={setSelectedVibes}
+                  onVibeChange={(vibes) => {
+                    console.log('Mobile vibe change called:', vibes);
+                    setSelectedVibes(vibes);
+                  }}
                   events={allEvents || []}
                   vibesLoading={isLoading}
                 />
                 
                 <CategoriesDropdownFilter
                   selectedCategories={selectedEventTypes}
-                  onToggleCategory={handleCategoryToggle}
+                  onToggleCategory={(category) => {
+                    console.log('Mobile category toggle called:', category);
+                    handleCategoryToggle(category);
+                  }}
                   onSelectAll={handleSelectAllCategories}
                   onDeselectAll={handleDeselectAllCategories}
                   allEventTypes={allEventTypes}
@@ -491,7 +515,10 @@ const Events = () => {
                 <LocationDropdownFilter
                   venueAreas={venueAreas}
                   selectedLocationId={selectedLocation}
-                  onLocationChange={setSelectedLocation}
+                  onLocationChange={(locationId) => {
+                    console.log('Mobile location change called:', locationId);
+                    setSelectedLocation(locationId);
+                  }}
                   isLoading={areasLoading}
                   isLocationLoaded={isLocationLoaded}
                 />
@@ -520,8 +547,6 @@ const Events = () => {
               eventsLoading={isLoading || isSearching} 
               isFilterLoading={false} 
               user={user} 
-              enhancedHandleRsvp={handleRsvp} 
-              loadingEventId={loadingEventId}
             />
           </div>
         </div>

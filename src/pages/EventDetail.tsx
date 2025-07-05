@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchEventById } from '@/lib/eventService';
 import { ArrowLeft } from 'lucide-react';
@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useEventAttendees } from '@/hooks/useEventAttendees';
 import { useUnifiedRsvp } from '@/hooks/useUnifiedRsvp';
 import { useEventMetaTags } from '@/hooks/useEventMetaTags';
+import { useNavigationHistory } from '@/hooks/useNavigationHistory';
 import { EventDetailHero } from '@/components/events/detail/EventDetailHero';
 import { EventDetailMainContent } from '@/components/events/detail/EventDetailMainContent';
 import { EventDetailSidebar } from '@/components/events/detail/EventDetailSidebar';
@@ -28,6 +29,8 @@ const EventDetail: React.FC<EventDetailProps> = ({
   const { user, isAuthenticated } = useAuth();
   const { handleRsvp, loadingEventId } = useUnifiedRsvp();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const { getFilteredEventsPath, hasFilteredEventsHistory } = useNavigationHistory();
 
   console.log('EventDetail - eventId:', eventId, 'user:', user?.id);
 
@@ -130,8 +133,13 @@ const EventDetail: React.FC<EventDetailProps> = ({
           <div className="text-center py-12">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Event Not Found</h1>
             <p className="text-gray-600 mb-6">The event you're looking for doesn't exist or has been removed.</p>
-            <Button asChild>
-              <Link to="/events">Browse Events</Link>
+            <Button 
+              onClick={() => {
+                const filteredPath = hasFilteredEventsHistory() ? getFilteredEventsPath() : '/events';
+                navigate(filteredPath);
+              }}
+            >
+              Browse Events
             </Button>
           </div>
         </div>
@@ -188,10 +196,16 @@ const EventDetail: React.FC<EventDetailProps> = ({
         {/* Back to Events button at bottom */}
         {showBackButton && (
           <div className="mt-12 pt-8 border-t border-gray-200">
-            <Link to="/events" className="inline-flex items-center text-blue-600 hover:text-blue-800">
+            <button
+              onClick={() => {
+                const filteredPath = hasFilteredEventsHistory() ? getFilteredEventsPath() : '/events';
+                navigate(filteredPath);
+              }}
+              className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+            >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Events
-            </Link>
+            </button>
           </div>
         )}
       </div>

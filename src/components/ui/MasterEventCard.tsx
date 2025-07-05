@@ -123,10 +123,10 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
   return (
     <div 
       className={cn(
-        // Container styling with uniform dimensions
-        "bg-pure-white rounded-lg shadow-md border border-mist-grey p-5",
+        // Container styling with uniform dimensions - warm coconut background
+        "bg-coconut rounded-lg shadow-md border border-mist-grey p-5",
         "h-full flex flex-col cursor-pointer transition-all duration-200 ease-in-out",
-        "hover:shadow-lg hover:-translate-y-1",
+        "hover:shadow-lg hover:-translate-y-0.5",
         className
       )}
       onClick={handleClick}
@@ -149,7 +149,7 @@ export const MasterEventCard: React.FC<MasterEventCardProps> = ({
         {/* Category badge overlay */}
         {event.event_category && (
           <div className="absolute top-3 left-3">
-            <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-mist-grey text-graphite-grey font-mono text-xs">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-sm bg-sand-pink text-dusk-coral font-mono text-xs">
               {event.event_category}
             </span>
           </div>
