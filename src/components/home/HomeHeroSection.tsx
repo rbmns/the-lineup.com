@@ -9,8 +9,8 @@ import { cn } from '@/lib/utils';
 
 // Hero image configuration - easy to replace
 const HERO_IMAGE = {
-  src: "/lovable-uploads/2458b47a-99d2-4d1c-bcf7-8ff56089f194.png",
-  alt: "Serene beach sunset with soft pastel pink and blue sky tones",
+  src: "/lovable-uploads/f6ac5019-a951-408e-9fce-ed20a2d65048.png",
+  alt: "Dreamy sunset ocean view with soft pink and blue tones",
   // Add fallback image for better reliability
   fallback: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=1920&h=1080&fit=crop&auto=format"
 };
