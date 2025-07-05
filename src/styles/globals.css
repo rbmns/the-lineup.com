@@ -1,6 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Lato:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
-/* THE LINEUP COMPREHENSIVE UI DESIGN SYSTEM */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Lato:wght@400;500;600;700&display=swap');
+
+/* THE LINEUP ADULT MINIMALIST DESIGN SYSTEM */
 @layer base {
   /* CSS Reset and Base Styles */
   * {
@@ -10,42 +11,51 @@
   }
 
   :root {
-    --background: 254 252 251; /* coconut */
-    --foreground: 51 51 51; /* updated graphite-grey */
+    /* THE LINEUP NEW COLOR PALETTE - Adult Minimalist + Coastal Energy */
+    --background: 255 255 255; /* pure-white */
+    --foreground: 51 51 51; /* graphite-grey */
 
-    --card: 254 252 251; /* coconut */
-    --card-foreground: 51 51 51; /* updated graphite-grey */
+    --card: 255 255 255; /* pure-white */
+    --card-foreground: 51 51 51; /* graphite-grey */
     
-    --primary: 238 108 77; /* sunset-orange */
+    --primary: 51 51 51; /* graphite-grey - primary buttons */
     --primary-foreground: 255 255 255; /* pure-white */
 
-    --secondary: 51 51 51; /* updated graphite-grey */
-    --secondary-foreground: 255 255 255; /* pure-white */
+    --secondary: 240 240 240; /* mist-grey - secondary buttons */
+    --secondary-foreground: 51 51 51; /* graphite-grey */
 
-    --muted: 236 239 241; /* mist-grey */
-    --muted-foreground: 51 51 51; /* updated graphite-grey */
+    --muted: 242 248 248; /* coastal-haze - soft backgrounds */
+    --muted-foreground: 51 51 51; /* graphite-grey */
 
-    --accent: 196 125 104; /* dusk-coral */
+    --accent: 196 125 104; /* dusk-coral - warm highlights */
     --accent-foreground: 255 255 255; /* pure-white */
 
-    --coastal-haze: 242 248 248; /* coastal-haze color */
-    --sand-pink: 251 233 231; /* new sand-pink background */
+    /* Brand Colors */
+    --pure-white: 255 255 255;
+    --mist-grey: 240 240 240;
+    --graphite-grey: 51 51 51;
+    --coastal-haze: 242 248 248;
+    --seafoam-drift: 169 209 193;
+    --dusk-coral: 196 125 104;
+    --horizon-blue: 111 161 179;
+    --sunset-orange: 255 158 0;
+    --vibrant-sky: 144 224 239;
 
     --destructive: 239 68 68;
     --destructive-foreground: 255 255 255;
 
-    --border: 236 239 241; /* mist-grey */
-    --input: 236 239 241; /* mist-grey */
-    --ring: 238 108 77; /* sunset-orange */
+    --border: 240 240 240; /* mist-grey */
+    --input: 240 240 240; /* mist-grey */
+    --ring: 111 161 179; /* horizon-blue */
 
     --radius: 0.375rem; /* md radius as default */
   }
 
   /* GLOBAL LAYOUT FOUNDATION */
   html, body {
-    background: rgb(254 252 251) !important; /* coconut */
-    color: rgb(51 51 51) !important; /* updated graphite-grey */
-    font-family: 'Lato', sans-serif !important; /* Default to body font */
+    background: rgb(255 255 255) !important; /* pure-white */
+    color: rgb(51 51 51) !important; /* graphite-grey */
+    font-family: 'Lato', sans-serif !important; /* Body font default */
     min-height: 100vh;
     font-weight: 400;
     line-height: 1.6;
@@ -61,114 +71,118 @@
     flex-direction: column !important;
   }
 
-  /* GLOBAL TYPOGRAPHY SYSTEM - PAGE TITLES */
+  /* GLOBAL TYPOGRAPHY SYSTEM - ADULT MINIMALIST */
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Montserrat', sans-serif !important;
-    color: rgb(51 51 51) !important; /* updated graphite-grey */
-    line-height: 1.1 !important; /* tighter line spacing for titles */
-    font-weight: 600 !important; /* changed to semibold for warmth */
+    color: rgb(51 51 51) !important; /* graphite-grey */
+    line-height: 1.2 !important;
+    font-weight: 600 !important; /* Semi-bold for headlines */
   }
 
   /* Typography utility classes */
   .text-display {
     font-family: 'Montserrat', sans-serif !important;
-    font-size: 4rem !important; /* 64px */
-    font-weight: 800 !important;
-    line-height: 1 !important;
-    letter-spacing: -0.025em !important;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+    font-size: 3.5rem !important; /* 56px */
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+    letter-spacing: -0.02em !important;
   }
 
   @media (min-width: 768px) {
     .text-display {
-      font-size: 5rem !important; /* 80px on larger screens */
+      font-size: 4rem !important; /* 64px on larger screens */
     }
   }
 
   .text-h1 {
     font-family: 'Montserrat', sans-serif !important;
-    font-size: 3rem !important;
+    font-size: 2.5rem !important;
     font-weight: 700 !important;
-    line-height: 1.1 !important;
-    letter-spacing: -0.025em !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.02em !important;
   }
 
   .text-h2 {
     font-family: 'Montserrat', sans-serif !important;
-    font-size: 2.25rem !important;
-    font-weight: 700 !important;
-    line-height: 1.2 !important;
-    letter-spacing: -0.025em !important;
+    font-size: 2rem !important;
+    font-weight: 600 !important;
+    line-height: 1.3 !important;
+    letter-spacing: -0.01em !important;
   }
 
   .text-h3 {
-    font-family: 'Montserrat', sans-serif !important;
-    font-size: 1.875rem !important;
-    font-weight: 600 !important;
-    line-height: 1.3 !important;
-  }
-
-  .text-h4 {
     font-family: 'Montserrat', sans-serif !important;
     font-size: 1.5rem !important;
     font-weight: 600 !important;
     line-height: 1.4 !important;
   }
 
+  .text-h4 {
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+    line-height: 1.4 !important;
+  }
+
   .text-body-base {
     font-family: 'Lato', sans-serif !important;
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
+    font-weight: 400 !important;
+  }
+
+  .text-body-large {
+    font-family: 'Lato', sans-serif !important;
     font-size: 1.125rem !important;
-    line-height: 1.7 !important;
+    line-height: 1.6 !important;
+    font-weight: 400 !important;
   }
 
   .text-body-small {
     font-family: 'Lato', sans-serif !important;
     font-size: 0.875rem !important;
     line-height: 1.5 !important;
+    font-weight: 400 !important;
   }
 
-  /* JetBrains Mono utility classes */
-  .font-mono {
-    font-family: 'JetBrains Mono', monospace !important;
+  .text-label {
+    font-family: 'Lato', sans-serif !important;
+    font-size: 0.875rem !important;
+    line-height: 1.4 !important;
+    font-weight: 500 !important;
+  }
+
+  .text-metadata {
+    font-family: 'Lato', sans-serif !important;
+    font-size: 0.75rem !important;
+    line-height: 1.4 !important;
+    font-weight: 400 !important;
+    color: rgb(51 51 51 / 0.7) !important;
   }
 }
 
-/* THE LINEUP COMPREHENSIVE COMPONENT SYSTEM */
+/* THE LINEUP COMPONENT SYSTEM - ADULT MINIMALIST */
 @layer components {
-  /* CORE COLOR UTILITIES - Use these instead of individual colors */
-  .bg-brand-primary { background-color: hsl(var(--primary)) !important; }
-  .bg-brand-secondary { background-color: hsl(var(--secondary)) !important; }
-  .bg-brand-accent { background-color: hsl(var(--accent)) !important; }
-  .bg-brand-muted { background-color: hsl(var(--muted)) !important; }
-  .bg-brand-card { background-color: hsl(var(--card)) !important; }
+  /* CORE COLOR UTILITIES */
+  .bg-brand-primary { background-color: rgb(var(--primary)) !important; }
+  .bg-brand-secondary { background-color: rgb(var(--secondary)) !important; }
+  .bg-brand-accent { background-color: rgb(var(--accent)) !important; }
+  .bg-brand-muted { background-color: rgb(var(--muted)) !important; }
+  .bg-brand-card { background-color: rgb(var(--card)) !important; }
   
-  .text-brand-primary { color: hsl(var(--primary)) !important; }
-  .text-brand-secondary { color: hsl(var(--secondary)) !important; }
-  .text-brand-accent { color: hsl(var(--accent)) !important; }
-  .text-brand-muted { color: hsl(var(--muted-foreground)) !important; }
-  .text-brand-foreground { color: hsl(var(--foreground)) !important; }
+  .text-brand-primary { color: rgb(var(--primary)) !important; }
+  .text-brand-secondary { color: rgb(var(--secondary)) !important; }
+  .text-brand-accent { color: rgb(var(--accent)) !important; }
+  .text-brand-muted { color: rgb(var(--muted-foreground)) !important; }
+  .text-brand-foreground { color: rgb(var(--foreground)) !important; }
 
-  .border-brand-primary { border-color: hsl(var(--primary)) !important; }
-  .border-brand-muted { border-color: hsl(var(--border)) !important; }
+  .border-brand-primary { border-color: rgb(var(--primary)) !important; }
+  .border-brand-muted { border-color: rgb(var(--border)) !important; }
 
-  /* BUTTON SYSTEM - SEMANTIC STYLING */
-  .btn-base {
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 600 !important;
-    padding: 0.75rem 1.5rem !important;
-    border-radius: 0.375rem !important;
-    transition: all 0.2s ease-in-out !important;
-    cursor: pointer !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-decoration: none !important;
-    border: none !important;
-  }
-
+  /* BUTTON SYSTEM - CLEAN & CALM */
   .btn-primary {
-    background-color: hsl(var(--primary)) !important;
-    color: hsl(var(--primary-foreground)) !important;
+    background-color: rgb(var(--graphite-grey)) !important;
+    color: rgb(var(--pure-white)) !important;
     font-family: 'Montserrat', sans-serif !important;
     font-weight: 600 !important;
     padding: 0.75rem 1.5rem !important;
@@ -183,14 +197,14 @@
   }
 
   .btn-primary:hover {
-    background-color: hsl(var(--accent)) !important;
+    background-color: rgb(31 31 31) !important; /* Slightly darker */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px hsla(var(--primary), 0.25) !important;
   }
 
   .btn-secondary {
-    background-color: hsl(var(--secondary)) !important;
-    color: hsl(var(--secondary-foreground)) !important;
+    background-color: rgb(var(--mist-grey)) !important;
+    color: rgb(var(--graphite-grey)) !important;
     font-family: 'Montserrat', sans-serif !important;
     font-weight: 600 !important;
     padding: 0.75rem 1.5rem !important;
@@ -205,17 +219,39 @@
   }
 
   .btn-secondary:hover {
-    background-color: hsl(var(--accent)) !important;
+    background-color: rgb(var(--coastal-haze)) !important;
+    transform: translateY(-1px) !important;
+  }
+
+  .btn-accent {
+    background-color: rgb(var(--sunset-orange)) !important;
+    color: rgb(var(--pure-white)) !important;
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 600 !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 0.375rem !important;
+    transition: all 0.2s ease-in-out !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    border: none !important;
+  }
+
+  .btn-accent:hover {
+    background-color: rgb(230 140 0) !important; /* Slightly darker sunset-orange */
+    box-shadow: 0 4px 6px -1px rgba(255, 158, 0, 0.2) !important;
     transform: translateY(-1px) !important;
   }
 
   .btn-outline {
     background-color: transparent !important;
-    color: hsl(var(--foreground)) !important;
+    color: rgb(var(--graphite-grey)) !important;
     font-family: 'Montserrat', sans-serif !important;
     font-weight: 600 !important;
     padding: 0.75rem 1.5rem !important;
-    border: 1px solid hsl(var(--border)) !important;
+    border: 1px solid rgb(var(--mist-grey)) !important;
     border-radius: 0.375rem !important;
     transition: all 0.2s ease-in-out !important;
     cursor: pointer !important;
@@ -226,40 +262,118 @@
   }
 
   .btn-outline:hover {
-    background-color: hsl(var(--accent)) !important;
-    color: hsl(var(--accent-foreground)) !important;
+    background-color: rgb(var(--coastal-haze)) !important;
+    border-color: rgb(var(--seafoam-drift)) !important;
   }
 
-  /* CARD SYSTEM - SEMANTIC STYLING */
+  /* EVENT CARD SYSTEM - CLEAN & MINIMAL */
   .card-base {
-    background-color: hsl(var(--card)) !important;
-    border-color: hsl(var(--border)) !important;
+    background-color: rgb(var(--pure-white)) !important;
+    border: 1px solid rgb(var(--mist-grey)) !important;
     border-radius: 0.375rem !important;
-    box-shadow: 0 4px 6px -1px hsla(var(--foreground), 0.1), 0 2px 4px -1px hsla(var(--foreground), 0.06) !important;
-    border-width: 1px !important;
     padding: 1.5rem !important;
     transition: all 0.2s ease-in-out !important;
   }
 
   .card-base:hover {
-    box-shadow: 0 10px 15px -3px hsla(var(--foreground), 0.1), 0 4px 6px -2px hsla(var(--foreground), 0.05) !important;
-    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+    transform: translateY(-1px) !important;
   }
 
   .card-interactive {
-    background-color: hsl(var(--card)) !important;
-    border-color: hsl(var(--border)) !important;
+    background-color: rgb(var(--pure-white)) !important;
+    border: 1px solid rgb(var(--mist-grey)) !important;
     border-radius: 0.375rem !important;
-    box-shadow: 0 4px 6px -1px hsla(var(--foreground), 0.1), 0 2px 4px -1px hsla(var(--foreground), 0.06) !important;
-    border-width: 1px !important;
     padding: 1.5rem !important;
     transition: all 0.2s ease-in-out !important;
     cursor: pointer !important;
   }
 
   .card-interactive:hover {
-    box-shadow: 0 10px 15px -3px hsla(var(--foreground), 0.1), 0 4px 6px -2px hsla(var(--foreground), 0.05) !important;
-    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+    transform: translateY(-1px) !important;
+  }
+
+  /* NAVIGATION SYSTEM - STICKY & CLEAN */
+  .nav-base {
+    background-color: rgb(var(--pure-white)) !important;
+    border-bottom: 1px solid rgb(var(--mist-grey)) !important;
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 500 !important;
+  }
+
+  .nav-item {
+    color: rgb(var(--graphite-grey)) !important;
+    padding: 0.75rem 1rem !important;
+    transition: all 0.2s ease-in-out !important;
+    text-decoration: none !important;
+  }
+
+  .nav-item:hover {
+    color: rgb(var(--horizon-blue)) !important;
+  }
+
+  .nav-item.active {
+    color: rgb(var(--horizon-blue)) !important;
+    font-weight: 600 !important;
+  }
+
+  /* FILTER & TAG SYSTEM - COASTAL CALM */
+  .filter-pill {
+    background-color: rgb(var(--mist-grey)) !important;
+    color: rgb(var(--graphite-grey)) !important;
+    font-family: 'Lato', sans-serif !important;
+    font-weight: 500 !important;
+    padding: 0.5rem 0.875rem !important;
+    font-size: 0.875rem !important;
+    border-radius: 9999px !important;
+    transition: all 0.2s ease-in-out !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    border: none !important;
+  }
+
+  .filter-pill:hover {
+    background-color: rgb(var(--coastal-haze)) !important;
+  }
+
+  .filter-pill.active {
+    background-color: rgb(var(--seafoam-drift)) !important;
+    color: rgb(var(--graphite-grey)) !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  }
+
+  /* High-energy filter pills for music, party, etc */
+  .filter-pill.energetic {
+    background-color: rgb(var(--dusk-coral)) !important;
+    color: rgb(var(--pure-white)) !important;
+  }
+
+  .filter-pill.energetic:hover {
+    background-color: rgb(var(--sunset-orange)) !important;
+  }
+
+  /* TAG PILLS FOR EVENT CARDS - SUBTLE */
+  .tag-pill {
+    background-color: rgb(var(--coastal-haze)) !important;
+    color: rgb(var(--graphite-grey)) !important;
+    font-family: 'Lato', sans-serif !important;
+    font-weight: 500 !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 0.25rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.025em !important;
+  }
+
+  .tag-pill.energetic {
+    background-color: rgb(var(--dusk-coral)) !important;
+    color: rgb(var(--pure-white)) !important;
   }
 
   /* PAGE LAYOUT UTILITIES */
@@ -287,21 +401,21 @@
   }
 
   .section-spacing {
-    padding-top: 3rem !important;
-    padding-bottom: 3rem !important;
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
   }
 
   @media (min-width: 640px) {
     .section-spacing {
-      padding-top: 4rem !important;
-      padding-bottom: 4rem !important;
+      padding-top: 3rem !important;
+      padding-bottom: 3rem !important;
     }
   }
 
   @media (min-width: 1024px) {
     .section-spacing {
-      padding-top: 5rem !important;
-      padding-bottom: 5rem !important;
+      padding-top: 4rem !important;
+      padding-bottom: 4rem !important;
     }
   }
 
@@ -317,59 +431,31 @@
     }
   }
 
-  /* FORM ELEMENTS */
+  /* FORM ELEMENTS - CLEAN INPUT SYSTEM */
   .input-base {
-    background-color: hsl(var(--card)) !important;
-    border-color: hsl(var(--border)) !important;
-    color: hsl(var(--foreground)) !important;
+    background-color: rgb(var(--pure-white)) !important;
+    border: 1px solid rgb(var(--mist-grey)) !important;
+    color: rgb(var(--graphite-grey)) !important;
     font-family: 'Lato', sans-serif !important;
+    font-weight: 400 !important;
     padding: 0.75rem 1rem !important;
     border-radius: 0.375rem !important;
-    border-width: 1px !important;
     transition: all 0.2s ease-in-out !important;
   }
 
   .input-base:focus {
     outline: none !important;
-    border-color: hsl(var(--primary)) !important;
-    box-shadow: 0 0 0 3px hsla(var(--primary), 0.1) !important;
+    border-color: rgb(var(--horizon-blue)) !important;
+    box-shadow: 0 0 0 3px rgba(111, 161, 179, 0.1) !important;
   }
 
-  /* FILTER AND BADGE STYLES */
-  .filter-pill {
-    background-color: hsl(var(--muted)) !important;
-    color: hsl(var(--foreground)) !important;
-    font-family: 'Montserrat', sans-serif !important;
-    font-weight: 600 !important;
-    padding: 0.5rem 0.75rem !important;
-    font-size: 0.875rem !important;
-    border-radius: 9999px !important;
-    transition: all 0.2s ease-in-out !important;
-    cursor: pointer !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-decoration: none !important;
-    border: none !important;
-  }
-
-  .filter-pill:hover {
-    background-color: hsl(var(--accent)) !important;
-    color: hsl(var(--accent-foreground)) !important;
-  }
-
-  .filter-pill.active {
-    background-color: hsl(var(--primary)) !important;
-    color: hsl(var(--primary-foreground)) !important;
-  }
-
-  /* HOVER EFFECTS */
+  /* INTERACTIVE HOVER EFFECTS */
   .hover-lift {
     transition: transform 0.2s ease-in-out !important;
   }
 
   .hover-lift:hover {
-    transform: translateY(-2px) !important;
+    transform: translateY(-1px) !important;
   }
 
   .hover-scale {
@@ -383,7 +469,7 @@
   /* LOADING AND EMPTY STATES */
   .loading-skeleton {
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
-    background-color: hsla(var(--muted), 0.3) !important;
+    background-color: rgb(var(--mist-grey)) !important;
     border-radius: 0.375rem !important;
   }
 
@@ -392,29 +478,73 @@
     padding: 3rem 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 1.5rem !important;
+    gap: 1rem !important;
   }
 
   .empty-state-title {
     font-family: 'Montserrat', sans-serif !important;
-    font-size: 1.5rem !important;
+    font-size: 1.25rem !important;
     font-weight: 600 !important;
-    color: hsl(var(--foreground)) !important;
+    color: rgb(var(--graphite-grey)) !important;
     margin-bottom: 0.5rem !important;
   }
 
   .empty-state-description {
     font-family: 'Lato', sans-serif !important;
-    font-size: 1.125rem !important;
-    color: hsl(var(--muted-foreground)) !important;
+    font-size: 1rem !important;
+    color: rgb(var(--graphite-grey) / 0.7) !important;
   }
 
-  /* GRADIENT BACKGROUNDS */
-  .bg-gradient-primary {
-    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent))) !important;
+  /* SUBTLE BACKGROUND VARIATIONS */
+  .bg-soft {
+    background-color: rgb(var(--coastal-haze)) !important;
   }
 
-  .bg-gradient-muted {
-    background: linear-gradient(180deg, hsl(var(--card)), hsl(var(--muted))) !important;
+  .bg-minimal {
+    background-color: rgb(var(--mist-grey)) !important;
+  }
+
+  /* LINK STYLES - HORIZON BLUE ACCENTS */
+  .link-base {
+    color: rgb(var(--horizon-blue)) !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease-in-out !important;
+  }
+
+  .link-base:hover {
+    color: rgb(var(--graphite-grey)) !important;
+    text-decoration: underline !important;
+  }
+
+  /* RSVP BUTTON VARIANTS - ENERGETIC ACCENTS */
+  .btn-rsvp-going {
+    background-color: rgb(var(--horizon-blue)) !important;
+    color: rgb(var(--pure-white)) !important;
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.375rem !important;
+    transition: all 0.2s ease-in-out !important;
+    border: none !important;
+  }
+
+  .btn-rsvp-going:hover {
+    background-color: rgb(var(--vibrant-sky)) !important;
+  }
+
+  .btn-rsvp-interested {
+    background-color: rgb(var(--dusk-coral)) !important;
+    color: rgb(var(--pure-white)) !important;
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 0.375rem !important;
+    transition: all 0.2s ease-in-out !important;
+    border: none !important;
+  }
+
+  .btn-rsvp-interested:hover {
+    background-color: rgb(var(--sunset-orange)) !important;
   }
 }

@@ -29,35 +29,36 @@ const config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         
-        // The Lineup Warm Coastal Palette - Human-centered with soft sunset tones
+        // The Lineup Adult Minimalist + Coastal Energy Palette
         'pure-white': '#FFFFFF',
-        'coconut': '#FEFCFB', // Soft cream background instead of pure white
-        'sand-pink': '#FBE9E7', // Light background tint for section dividers
-        'coastal-haze': '#F2F8F8', // Subtle light blue-grey for backgrounds
-        'graphite-grey': '#333333', // Warmer, more readable dark grey
-        'ocean-deep': '#1a2332', // Almost black for main navigation
-        'mist-grey': '#ECEFF1',
-        'ocean-teal': '#00A389', // Keep as secondary
-        'sunrise-ochre': '#E6AA68',
+        'mist-grey': '#F0F0F0',
+        'graphite-grey': '#333333',
+        'coastal-haze': '#F2F8F8',
+        'seafoam-drift': '#A9D1C1',
+        'dusk-coral': '#C47D68',
+        'horizon-blue': '#6FA1B3',
+        'sunset-orange': '#FF9E00',
+        'vibrant-sky': '#90E0EF',
+        
+        // Legacy compatibility (mapped to new colors)
+        'coconut': '#FFFFFF', // Maps to pure-white
+        'sand-pink': '#F2F8F8', // Maps to coastal-haze
+        'ocean-deep': '#333333', // Maps to graphite-grey
+        'ocean-teal': '#6FA1B3', // Maps to horizon-blue
+        'sunrise-ochre': '#C47D68', // Maps to dusk-coral
         'carbon-black': '#000000',
         
-        // New Warm Coastal Accent Colors
-        'seafoam-drift': '#A9D1C1', // Soft green accent
-        'dusk-coral': '#C47D68', // Warm coral for hover states and metadata
-        'sunset-orange': '#EE6C4D', // Primary warm accent
-        'horizon-blue': '#6FA1B3', // Calm blue accent
-        
         primary: {
-          DEFAULT: "#EE6C4D", // sunset-orange as new primary
+          DEFAULT: "#333333", // graphite-grey as primary
           foreground: "#FFFFFF", // pure-white
         },
         secondary: {
-          DEFAULT: "#333333", // updated graphite-grey
-          foreground: "#FFFFFF", // pure-white
+          DEFAULT: "#F0F0F0", // mist-grey
+          foreground: "#333333", // graphite-grey
         },
         muted: {
-          DEFAULT: "#ECEFF1", // mist-grey
-          foreground: "#333333", // updated graphite-grey
+          DEFAULT: "#F2F8F8", // coastal-haze
+          foreground: "#333333", // graphite-grey
         },
         accent: {
           DEFAULT: "#C47D68", // dusk-coral
@@ -68,8 +69,8 @@ const config = {
           foreground: "#FFFFFF",
         },
         card: {
-          DEFAULT: "#FEFCFB", // coconut instead of pure white
-          foreground: "#333333", // updated graphite-grey
+          DEFAULT: "#FFFFFF", // pure-white
+          foreground: "#333333", // graphite-grey
         },
       },
       fontFamily: {
@@ -79,25 +80,28 @@ const config = {
         'body': ['Lato', 'sans-serif'], // alias for lato
       },
       fontSize: {
-        'display': ['4rem', { lineHeight: '1', letterSpacing: '-0.025em', fontWeight: '800' }], // 64px
-        'h1': ['3rem', { lineHeight: '1.1', letterSpacing: '-0.025em', fontWeight: '700' }], // 48px
-        'h2': ['2.25rem', { lineHeight: '1.2', letterSpacing: '-0.025em', fontWeight: '700' }], // 36px  
-        'h3': ['1.875rem', { lineHeight: '1.3', fontWeight: '600' }], // 30px
-        'h4': ['1.5rem', { lineHeight: '1.4', fontWeight: '600' }], // 24px
-        'body-base': ['1.125rem', { lineHeight: '1.7' }], // 18px with relaxed leading
-        'large': ['1.25rem', { lineHeight: '1.6' }], // 20px
-        'small': ['0.875rem', { lineHeight: '1.5' }], // 14px
+        'display': ['3.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }], // 56px
+        'h1': ['2.5rem', { lineHeight: '1.2', letterSpacing: '-0.02em', fontWeight: '700' }], // 40px
+        'h2': ['2rem', { lineHeight: '1.3', letterSpacing: '-0.01em', fontWeight: '600' }], // 32px  
+        'h3': ['1.5rem', { lineHeight: '1.4', fontWeight: '600' }], // 24px
+        'h4': ['1.25rem', { lineHeight: '1.4', fontWeight: '600' }], // 20px
+        'body-base': ['1rem', { lineHeight: '1.6', fontWeight: '400' }], // 16px
+        'body-large': ['1.125rem', { lineHeight: '1.6', fontWeight: '400' }], // 18px
+        'body-small': ['0.875rem', { lineHeight: '1.5', fontWeight: '400' }], // 14px
+        'label': ['0.875rem', { lineHeight: '1.4', fontWeight: '500' }], // 14px
+        'metadata': ['0.75rem', { lineHeight: '1.4', fontWeight: '400' }], // 12px
       },
       borderRadius: {
+        xl: "0.75rem", // 12px
         lg: "0.5rem", // 8px - for prominent cards, modals
         md: "0.375rem", // 6px - for most buttons, general cards, inputs
         sm: "0.25rem", // 4px - for very subtle rounding
       },
       boxShadow: {
-        'sm': '0 1px 2px 0 rgba(44, 62, 80, 0.05)',
-        'md': '0 4px 6px -1px rgba(44, 62, 80, 0.1), 0 2px 4px -1px rgba(44, 62, 80, 0.06)',
-        'lg': '0 10px 15px -3px rgba(44, 62, 80, 0.1), 0 4px 6px -2px rgba(44, 62, 80, 0.05)',
-        'xl': '0 20px 25px -5px rgba(44, 62, 80, 0.1), 0 10px 10px -5px rgba(44, 62, 80, 0.04)',
+        'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+        'md': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+        'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03)',
+        'xl': '0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02)',
       },
       keyframes: {
         "fade-in": {
@@ -112,7 +116,7 @@ const config = {
         },
         "scale-in": {
           "0%": {
-            transform: "scale(0.95)",
+            transform: "scale(0.98)",
             opacity: "0"
           },
           "100%": {
@@ -122,7 +126,7 @@ const config = {
         },
         "slide-up": {
           "0%": {
-            transform: "translateY(10px)",
+            transform: "translateY(8px)",
             opacity: "0"
           },
           "100%": {
@@ -142,7 +146,7 @@ const config = {
       animation: {
         "fade-in": "fade-in 0.2s ease-out",
         "scale-in": "scale-in 0.2s ease-out",
-        "slide-up": "slide-up 0.3s ease-out",
+        "slide-up": "slide-up 0.25s ease-out",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
