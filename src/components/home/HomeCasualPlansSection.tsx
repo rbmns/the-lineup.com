@@ -1,9 +1,12 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Coffee, Waves, Sun, Users } from 'lucide-react';
+
 export const HomeCasualPlansSection: React.FC = () => {
   const navigate = useNavigate();
+
   const mockPlans = [{
     id: '1',
     title: 'Beach Walk & Coffee',
@@ -29,7 +32,9 @@ export const HomeCasualPlansSection: React.FC = () => {
     icon: Sun,
     vibe: '🧘'
   }];
-  return <section className="py-16">
+
+  return (
+    <section className="py-16 bg-coastal-haze">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">
@@ -47,11 +52,15 @@ export const HomeCasualPlansSection: React.FC = () => {
         {/* Plans Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {mockPlans.map(plan => {
-          const IconComponent = plan.icon;
-          return <div key={plan.id} className="bg-coconut rounded-lg p-6 border border-mist-grey hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
+            const IconComponent = plan.icon;
+            return (
+              <div 
+                key={plan.id} 
+                className="bg-pure-white rounded-lg p-6 border border-mist-grey hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+              >
                 {/* Icon and Vibe */}
                 <div className="flex items-center justify-between mb-4">
-                  <IconComponent className="h-6 w-6 text-dusk-coral" />
+                  <IconComponent className="h-6 w-6 text-horizon-blue" />
                   <span className="text-xl">{plan.vibe}</span>
                 </div>
 
@@ -78,20 +87,31 @@ export const HomeCasualPlansSection: React.FC = () => {
                       {plan.attendees} going
                     </span>
                   </div>
-                  <Button size="sm" variant="ghost" className="text-sunset-orange hover:bg-sand-pink" onClick={() => navigate('/casual-plans')}>
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="text-ocean-teal hover:bg-coastal-haze" 
+                    onClick={() => navigate('/casual-plans')}
+                  >
                     Join
                   </Button>
                 </div>
-              </div>;
-        })}
+              </div>
+            );
+          })}
         </div>
 
         {/* CTA Button */}
         <div className="text-center">
-          <Button onClick={() => navigate('/casual-plans')} size="lg" className="bg-sunset-orange hover:bg-dusk-coral text-white px-8 shadow-lg hover:shadow-xl transition-all duration-300">
+          <Button 
+            onClick={() => navigate('/casual-plans')} 
+            size="lg" 
+            className="bg-ocean-teal hover:bg-horizon-blue text-white px-8 shadow-lg hover:shadow-xl transition-all duration-300"
+          >
             Post a Casual Plan
           </Button>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
