@@ -10,7 +10,7 @@ const Home = () => {
   const { data: events, isLoading } = useEvents(undefined, { includeAllStatuses: true });
 
   return (
-    <div className="w-full bg-coconut min-h-screen text-graphite-grey">
+    <div className="w-full bg-brand-card min-h-screen text-brand-foreground">
       {/* Hero Section - flows naturally */}
       <div className="w-full">
         <HomeHeroSection />
@@ -21,13 +21,13 @@ const Home = () => {
         <HomeHowItWorksSection />
       </div>
 
-      {/* Events Preview - clean coconut background */}
-      <div className="bg-coconut w-full spacing-section spacing-container">
+      {/* Events Preview - clean background */}
+      <div className="bg-brand-card w-full section-spacing page-container">
         <HomeEventsPreview events={events} isLoading={isLoading} />
       </div>
 
-      {/* Casual Plans Section - subtle sand pink background */}
-      <div className="bg-sand-pink w-full spacing-section spacing-container">
+      {/* Casual Plans Section - subtle muted background */}
+      <div className="bg-brand-muted w-full section-spacing page-container">
         <HomeCasualPlansSection />
       </div>
     </div>
