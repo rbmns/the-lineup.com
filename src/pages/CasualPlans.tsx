@@ -88,29 +88,7 @@ const CasualPlans = () => {
         </div>
       </div>
 
-      <div className={`max-w-screen-lg mx-auto px-6 ${isMobile ? 'py-4' : 'py-8'}`}>
-        {isLoading ? <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {[...Array(6)].map((_, i) => <div key={i} className="animate-pulse">
-                <div className="border border-gray-200 rounded-xl h-64"></div>
-              </div>)}
-          </div> : <>
-            {plans && plans.length > 0 ? <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {plans.map(plan => <CasualPlanCard key={plan.id} plan={plan} onRsvp={handleRsvp} showRsvpButtons={true} isLoading={loadingPlanId === plan.id} showBlurred={false} />)}
-              </div> : <div className="text-center py-12">
-                <div className="text-4xl sm:text-6xl mb-4">🏖️</div>
-                <h3 className="text-lg sm:text-xl font-medium text-graphite-grey mb-2 font-montserrat">
-                  No casual plans yet
-                </h3>
-                <p className="text-graphite-grey/80 mb-4 text-sm sm:text-base font-lato">
-                  Be the first to create a spontaneous meetup!
-                </p>
-                <Button onClick={() => navigate('/casual-plans/create')} className="bg-ocean-teal hover:bg-ocean-teal/90 text-pure-white font-montserrat">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Your First Plan
-                </Button>
-              </div>}
-          </>}
-      </div>
+      
     </div>;
 };
 export default CasualPlans;
