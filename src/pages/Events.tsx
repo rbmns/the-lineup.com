@@ -6,7 +6,6 @@ import { useVenueAreas } from '@/hooks/useVenueAreas';
 import { EventSearch } from '@/components/events/search/EventSearch';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUnifiedRsvp } from '@/hooks/useUnifiedRsvp';
 import { VibesDropdownFilter } from '@/components/events/filters/VibesDropdownFilter';
 import { CategoriesDropdownFilter } from '@/components/events/filters/CategoriesDropdownFilter';
 import { DateDropdownFilter } from '@/components/events/filters/DateDropdownFilter';
@@ -22,7 +21,6 @@ import { pageSeoTags } from '@/utils/seoUtils';
 const Events = () => {
   const isMobile = useIsMobile();
   const { user } = useAuth();
-  const { handleRsvp, loadingEventId } = useUnifiedRsvp();
 
   const {
     events,
@@ -520,8 +518,6 @@ const Events = () => {
               eventsLoading={isLoading || isSearching} 
               isFilterLoading={false} 
               user={user} 
-              enhancedHandleRsvp={handleRsvp} 
-              loadingEventId={loadingEventId}
             />
           </div>
         </div>

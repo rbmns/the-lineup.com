@@ -2,8 +2,9 @@
 import React from 'react';
 import { Event } from '@/types';
 import { MasterEventCard } from '@/components/ui/MasterEventCard';
-import { EventRsvpButtons } from '@/components/events/EventRsvpButtons';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useEventNavigation } from '@/hooks/useEventNavigation';
 
 interface EventCardProps {
   event: Event;
@@ -27,37 +28,33 @@ export const EventCard: React.FC<EventCardProps> = ({
   loadingEventId,
 }) => {
   const { isAuthenticated } = useAuth();
-  const shouldShowRsvp = isAuthenticated && showRsvpButtons;
+  const { navigateToEvent } = useEventNavigation();
 
-  const handleRsvp = async (status: 'Going' | 'Interested'): Promise<boolean> => {
-    if (!onRsvp || !shouldShowRsvp) return false;
-    
-    try {
-      const result = await onRsvp(event.id, status);
-      return result === undefined ? true : !!result;
-    } catch (error) {
-      console.error('Error in EventCard RSVP handler:', error);
-      return false;
-    }
+  const handleRsvpNavigate = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    navigateToEvent(event);
   };
 
   return (
     <MasterEventCard
       event={event}
       compact={compact}
-      showRsvpButtons={false} // We'll handle RSVP via children
+      showRsvpButtons={false}
+      showRsvpStatus={showRsvpStatus}
       className={className}
       onClick={onClick}
       loadingEventId={loadingEventId}
     >
-      {shouldShowRsvp && onRsvp && (
-        <EventRsvpButtons
-          currentStatus={event.rsvp_status}
-          onRsvp={handleRsvp}
-          isLoading={loadingEventId === event.id}
-          className="w-full"
+      {isAuthenticated && (
+        <Button
+          onClick={handleRsvpNavigate}
+          className="w-full bg-ocean-teal hover:bg-ocean-teal/90 text-white"
           size="default"
-        />
+          data-rsvp-button="true"
+        >
+          RSVP
+        </Button>
       )}
     </MasterEventCard>
   );
