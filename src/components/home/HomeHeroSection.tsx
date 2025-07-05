@@ -7,12 +7,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
-// Hero image configuration - easy to replace
+// Hero image configuration - calm beach aesthetic
 const HERO_IMAGE = {
-  src: "/lovable-uploads/f6ac5019-a951-408e-9fce-ed20a2d65048.png",
-  alt: "Dreamy sunset ocean view with soft pink and blue tones",
+  src: "/lovable-uploads/8dc38b0c-2d2f-42b6-b710-4b7fd099a09f.png",
+  alt: "Calm beach scene with soft morning light and gentle waves",
   // Add fallback image for better reliability
-  fallback: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=1920&h=1080&fit=crop&auto=format"
+  fallback: "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?w=1920&h=1080&fit=crop&auto=format"
 };
 
 export const HomeHeroSection = () => {
@@ -39,10 +39,10 @@ export const HomeHeroSection = () => {
             }}
           />
         </div>
-        {/* Warm brand-aligned gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-sunset-orange/50 via-sunset-orange/20 to-transparent sm:bg-gradient-to-r sm:from-sunset-orange/40 sm:via-dusk-coral/10 sm:to-transparent" />
-        {/* Subtle overlay for optimal text readability */}
-        <div className="absolute inset-0 bg-ocean-deep/15" />
+        {/* Subtle calm gradient overlay - much lighter than before */}
+        <div className="absolute inset-0 bg-gradient-to-t from-graphite-grey/20 via-transparent to-transparent sm:bg-gradient-to-r sm:from-graphite-grey/15 sm:via-transparent sm:to-transparent" />
+        {/* Very subtle overlay for optimal text readability */}
+        <div className="absolute inset-0 bg-graphite-grey/10" />
       </div>
 
       {/* Content */}

@@ -10,25 +10,31 @@ const Home = () => {
   const { data: events, isLoading } = useEvents(undefined, { includeAllStatuses: true });
 
   return (
-    <div className="w-full bg-brand-card min-h-screen text-brand-foreground">
+    <div className="w-full bg-pure-white min-h-screen text-graphite-grey">
       {/* Hero Section - flows naturally */}
       <div className="w-full">
         <HomeHeroSection />
       </div>
 
-      {/* How It Works Section */}
-      <div className="w-full">
-        <HomeHowItWorksSection />
+      {/* How It Works Section - no background, centered content */}
+      <div className="w-full py-12 md:py-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <HomeHowItWorksSection />
+        </div>
       </div>
 
-      {/* Events Preview - clean background */}
-      <div className="bg-brand-card w-full section-spacing page-container">
-        <HomeEventsPreview events={events} isLoading={isLoading} />
+      {/* Events Preview - no background, centered content */}
+      <div className="w-full py-12 md:py-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <HomeEventsPreview events={events} isLoading={isLoading} />
+        </div>
       </div>
 
-      {/* Casual Plans Section - subtle muted background */}
-      <div className="bg-brand-muted w-full section-spacing page-container">
-        <HomeCasualPlansSection />
+      {/* Casual Plans Section - no background, centered content */}
+      <div className="w-full py-12 md:py-16">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <HomeCasualPlansSection />
+        </div>
       </div>
     </div>
   );
