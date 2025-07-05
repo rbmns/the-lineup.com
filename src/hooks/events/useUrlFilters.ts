@@ -132,17 +132,16 @@ export const useUrlFilters = (
       }
     }
     
-    // Get location with standardized name 'location'
+    // Get location with standardized name 'location'  
     if (setSelectedLocation) {
       const locationParam = urlParams.get('location');
+      
       if (locationParam && locationParam !== selectedLocation) {
         setSelectedLocation(locationParam);
         filtersUpdated = true;
-        console.log(`Parsed location from URL: ${locationParam}`);
-      } else if (!locationParam && selectedLocation && !location.state?.preserveFilters) {
-        setSelectedLocation(null);
-        filtersUpdated = true;
-      }
+      } 
+      // FIXED: Only reset location if we're explicitly navigating without preserveFilters
+      // Don't reset just because URL doesn't have the param yet (race condition)
     }
     
     return filtersUpdated;
