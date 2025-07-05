@@ -45,6 +45,17 @@ const Events = () => {
     isLocationLoaded
   } = useEventsPageData();
 
+  // Debug filter states
+  console.log('Events page filter states:', {
+    selectedVibes,
+    selectedEventTypes,
+    selectedVenues,
+    selectedLocation,
+    allEvents: allEvents?.length,
+    events: events?.length,
+    hasActiveFilters
+  });
+
   const { data: venueAreas = [], isLoading: areasLoading } = useVenueAreas();
 
   // Add search state
@@ -351,14 +362,20 @@ const Events = () => {
               <div className="flex items-center gap-3">
                 <VibesDropdownFilter
                   selectedVibes={selectedVibes}
-                  onVibeChange={setSelectedVibes}
+                  onVibeChange={(vibes) => {
+                    console.log('Vibe change called:', vibes);
+                    setSelectedVibes(vibes);
+                  }}
                   events={allEvents || []}
                   vibesLoading={isLoading}
                 />
                 
                 <CategoriesDropdownFilter
                   selectedCategories={selectedEventTypes}
-                  onToggleCategory={handleCategoryToggle}
+                  onToggleCategory={(category) => {
+                    console.log('Category toggle called:', category);
+                    handleCategoryToggle(category);
+                  }}
                   onSelectAll={handleSelectAllCategories}
                   onDeselectAll={handleDeselectAllCategories}
                   allEventTypes={allEventTypes}
@@ -398,7 +415,10 @@ const Events = () => {
                 <LocationDropdownFilter
                   venueAreas={venueAreas}
                   selectedLocationId={selectedLocation}
-                  onLocationChange={setSelectedLocation}
+                  onLocationChange={(locationId) => {
+                    console.log('Location change called:', locationId);
+                    setSelectedLocation(locationId);
+                  }}
                   isLoading={areasLoading}
                   isLocationLoaded={isLocationLoaded}
                 />
@@ -431,14 +451,20 @@ const Events = () => {
               <div className="flex flex-wrap gap-2 justify-center items-center">
                 <VibesDropdownFilter
                   selectedVibes={selectedVibes}
-                  onVibeChange={setSelectedVibes}
+                  onVibeChange={(vibes) => {
+                    console.log('Mobile vibe change called:', vibes);
+                    setSelectedVibes(vibes);
+                  }}
                   events={allEvents || []}
                   vibesLoading={isLoading}
                 />
                 
                 <CategoriesDropdownFilter
                   selectedCategories={selectedEventTypes}
-                  onToggleCategory={handleCategoryToggle}
+                  onToggleCategory={(category) => {
+                    console.log('Mobile category toggle called:', category);
+                    handleCategoryToggle(category);
+                  }}
                   onSelectAll={handleSelectAllCategories}
                   onDeselectAll={handleDeselectAllCategories}
                   allEventTypes={allEventTypes}
@@ -489,7 +515,10 @@ const Events = () => {
                 <LocationDropdownFilter
                   venueAreas={venueAreas}
                   selectedLocationId={selectedLocation}
-                  onLocationChange={setSelectedLocation}
+                  onLocationChange={(locationId) => {
+                    console.log('Mobile location change called:', locationId);
+                    setSelectedLocation(locationId);
+                  }}
                   isLoading={areasLoading}
                   isLocationLoaded={isLocationLoaded}
                 />
